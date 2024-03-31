@@ -1,8 +1,12 @@
 package com.teamobi.mobiarmy2.network;
 
+import com.teamobi.mobiarmy2.network.Impl.Message;
+
 import java.io.IOException;
 
 public interface ISession {
+
+    void setHandler(IMessageHandler messageHandler);
 
     boolean isSendKeyComplete();
 

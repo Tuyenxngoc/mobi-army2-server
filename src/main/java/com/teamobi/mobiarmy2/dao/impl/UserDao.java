@@ -1,4 +1,4 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
-public class ClanDao {
+public class UserDao {
 }
