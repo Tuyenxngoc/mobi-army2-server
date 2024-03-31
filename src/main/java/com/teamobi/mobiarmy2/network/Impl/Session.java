@@ -90,6 +90,22 @@ public class Session implements ISession {
         return "Session id: " + id;
     }
 
+    public String getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(String platform) {
+        this.platform = platform;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
     protected synchronized void doSendMessage(Message m) {
         byte[] data = m.getData();
         try {

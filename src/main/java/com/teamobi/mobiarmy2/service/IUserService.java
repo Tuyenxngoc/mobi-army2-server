@@ -8,9 +8,15 @@ public interface IUserService {
 
     void sendKeys() throws IOException;
 
-    void SendServerMessage(String message);
+    void sendServerMessage(String message);
 
     void giaHanDo(Message ms);
 
     void nhiemVuView(Message ms);
+
+    void login(Message ms);
+
+    void gopClan(Message ms);
+
+    void getVersionCode(Message ms);
 }

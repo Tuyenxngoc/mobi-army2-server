@@ -49,4 +49,9 @@ public class HikariCPConfig implements IDatabaseConfig {
         return Integer.parseInt(properties.getProperty("jdbc.connectionTimeout"));
     }
 
+    @Override
+    public boolean isShowSql() {
+        return Boolean.parseBoolean(properties.getProperty("jdbc.showSql"));
+    }
+
 }

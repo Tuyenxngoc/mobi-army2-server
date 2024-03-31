@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.database;
 
 import com.teamobi.mobiarmy2.config.Impl.HikariCPConfig;
+import com.teamobi.mobiarmy2.server.ServerManager;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -12,6 +13,7 @@ public class HikariCPManager {
 
     private static HikariCPManager instance;
     private final HikariDataSource dataSource;
+    private final boolean isShowSql;
 
     private HikariCPManager() {
         HikariCPConfig config = new HikariCPConfig();
@@ -26,6 +28,7 @@ public class HikariCPManager {
         hikariConfig.setConnectionTimeout(config.getConnectionTimeout());
 
         dataSource = new HikariDataSource(hikariConfig);
+        this.isShowSql = config.isShowSql();
     }
 
     public static synchronized HikariCPManager getInstance() {
@@ -40,6 +43,17 @@ public class HikariCPManager {
     }
 
     public int update(String sql, Object... params) {
+        if (isShowSql) {
+            StringBuilder logMessage = new StringBuilder();
+            logMessage.append(sql).append(" [Parameters: ");
+            for (Object param : params) {
+                logMessage.append(param).append(", ");
+            }
+            logMessage.delete(logMessage.length() - 2, logMessage.length()); // Remove the trailing comma and space
+            logMessage.append("]");
+            ServerManager.getInstance().logger().logMessage(logMessage.toString());
+        }
+
         int rowsUpdated = 0;
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {

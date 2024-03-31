@@ -6,19 +6,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
-import java.util.Random;
-import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Random;
 
 public class Utils {
 
     private static final Random rand;
     private static final SimpleDateFormat dateFormat;
-    private static final short sinData[];
-    private static final short cosData[];
-    private static final int tanData[];
+    private static final short[] sinData;
+    private static final short[] cosData;
+    private static final int[] tanData;
 
     static {
         rand = new Random();
@@ -165,27 +165,27 @@ public class Utils {
     public static String arrayToString(byte[] bArr) {
         return Arrays.toString(bArr);
     }
-    
+
     public static String arrayToString(int[] iArr) {
         return Arrays.toString(iArr);
     }
-    
+
     public static String arrayToString(short[] sArr) {
         return Arrays.toString(sArr);
     }
-    
+
     public static String arrayToString(boolean[] zArr) {
         return Arrays.toString(zArr);
     }
-    
+
     public static String arrayToString(long[] lArr) {
         return Arrays.toString(lArr);
     }
-    
+
     public static String arrayToString(String[] Arr) {
         return Arrays.toString(Arr);
     }
-    
+
     public static String arrayToString(Object[] objArr) {
         return Arrays.toString(objArr);
     }
@@ -221,7 +221,7 @@ public class Utils {
         } else if (s >= 60) {
             return (s / 60) + " phút";
         } else {
-            return String.valueOf(s) + " giây";
+            return s + " giây";
         }
     }
 

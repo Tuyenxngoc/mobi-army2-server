@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.config.Impl.ServerConfig;
+import com.teamobi.mobiarmy2.dao.impl.UserDao;
 import com.teamobi.mobiarmy2.log.ILogManager;
 import com.teamobi.mobiarmy2.log.LoggerUtil;
 import com.teamobi.mobiarmy2.model.User;
@@ -59,7 +60,8 @@ public class ServerManager {
                     Socket socket = server.accept();
                     Session session = new Session(socket);
                     User user = new User(session);
-                    IUserService userService = new UserService(user);
+                    UserDao userDao = new UserDao();
+                    IUserService userService = new UserService(user, userDao);
                     IMessageHandler messageHandler = new MessageHandler(userService);
                     session.setHandler(messageHandler);
                     users.add(user);

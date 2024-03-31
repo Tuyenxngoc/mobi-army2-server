@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class LoggerUtil implements ILogManager {
+
     private static final String logFilePath = "logs/log.txt";
     private final Logger logger = LogManager.getLogger(LoggerUtil.class);
     private final boolean isDebugEnabled;
