@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 
-
 public class Until {
 
     private static final Random rand;

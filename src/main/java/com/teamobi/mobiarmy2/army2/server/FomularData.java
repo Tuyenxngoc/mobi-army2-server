@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import static com.teamobi.mobiarmy2.army2.server.NVData.EquipmentEntry;
 import static com.teamobi.mobiarmy2.army2.server.SpecialItemData.SpecialItemEntry;
 
-
 public class FomularData {
 
     public static class FomularDataEntry {

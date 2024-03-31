@@ -7,7 +7,6 @@ import com.teamobi.mobiarmy2.army2.server.Until;
 
 import java.io.IOException;
 
-
 public class SmallBoom extends Boss {
 
     public SmallBoom(FightManager fightMNG, byte idGun, String name, byte location, int HPMax, short X, short Y) throws IOException {

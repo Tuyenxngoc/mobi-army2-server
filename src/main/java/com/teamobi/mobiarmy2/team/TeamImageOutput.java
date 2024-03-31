@@ -1,16 +1,8 @@
-package com.teamobi.mobiarmy2.team;
-
-import com.teamobi.mobiarmy2.army2.server.Until;
-
-import java.io.ByteArrayOutputStream;
+package com.teamobi.mobiarmy2.team;import com.teamobi.mobiarmy2.army2.server.Until;import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-
-
-public class TeamImageOutput {
-
-    private final ArrayList<String> names;
+public class TeamImageOutput {    private final ArrayList<String> names;
     private final ArrayList<String> files;
 
     public TeamImageOutput() {

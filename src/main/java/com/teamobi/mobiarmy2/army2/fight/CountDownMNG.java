@@ -7,7 +7,6 @@ import java.io.IOException;
 import static com.teamobi.mobiarmy2.army2.server.BangXHManager.isComplete;
 import static com.teamobi.mobiarmy2.army2.server.BangXHManager.refreshTopTeam;
 
-
 public class CountDownMNG implements Runnable {
 
     private final FightManager fightMNG;

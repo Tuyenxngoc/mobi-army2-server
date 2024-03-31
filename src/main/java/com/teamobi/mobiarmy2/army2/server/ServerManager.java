@@ -33,7 +33,6 @@ import static com.teamobi.mobiarmy2.army2.server.NapTienData.NapTienEntry;
 import static com.teamobi.mobiarmy2.army2.server.SpecialItemData.SpecialItemEntry;
 import static com.teamobi.mobiarmy2.army2.server.User.nvEquipDefault;
 
-
 public class ServerManager {
 
     private static boolean debug;
@@ -791,7 +790,7 @@ public class ServerManager {
         }
     }
 
-    protected static void init() {
+    public static void init() {
         start = false;
         loadConfigFile();
         loadCauHinhFile();
@@ -1148,7 +1147,7 @@ public class ServerManager {
         FabricateItem.init();
     }
 
-    protected static void start() {
+    public static void start() {
         System.out.println("Start socket post=" + post);
         try {
             clients = new ArrayList<>();
@@ -1187,7 +1186,7 @@ public class ServerManager {
         }
     }
 
-    protected static void stop() {
+    public static void stop() {
         if (start) {
             close();
             start = false;

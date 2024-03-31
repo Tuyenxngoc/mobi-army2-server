@@ -7,7 +7,6 @@ import com.teamobi.mobiarmy2.army2.server.Until;
 
 import java.io.IOException;
 
-
 public class Balloon extends Boss {
 
     private final byte[] part;

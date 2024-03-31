@@ -5,7 +5,6 @@ import com.teamobi.mobiarmy2.army2.fight.BulletManager;
 import com.teamobi.mobiarmy2.army2.fight.Player;
 import com.teamobi.mobiarmy2.army2.fight.boss.SmallBoom;
 
-
 public class SmallBoomBum extends Bullet {
 
     public SmallBoomBum(BulletManager bullMNG, byte bullId, long satThuong, Player pl) {

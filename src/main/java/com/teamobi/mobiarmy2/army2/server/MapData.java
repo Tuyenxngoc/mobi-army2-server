@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 
-
 public class MapData {
 
     public static final class MapDataEntry {

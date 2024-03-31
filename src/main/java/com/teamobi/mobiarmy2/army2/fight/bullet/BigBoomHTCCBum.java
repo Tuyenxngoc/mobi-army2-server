@@ -5,7 +5,6 @@ import com.teamobi.mobiarmy2.army2.fight.BulletManager;
 import com.teamobi.mobiarmy2.army2.fight.Player;
 import com.teamobi.mobiarmy2.army2.fight.boss.BigBoomHTCC;
 
-
 public class BigBoomHTCCBum extends Bullet {
 
     public BigBoomHTCCBum(BulletManager bullMNG, byte bullId, long satThuong, Player pl) {

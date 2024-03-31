@@ -1,6 +1,5 @@
 package com.teamobi.mobiarmy2.army2.server;
 
-
 public class GameString {
 
     public static String notFinishedLoadingRanking() {

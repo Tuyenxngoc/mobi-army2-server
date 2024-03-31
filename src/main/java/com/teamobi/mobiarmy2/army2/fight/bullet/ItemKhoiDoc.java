@@ -7,7 +7,6 @@ import com.teamobi.mobiarmy2.army2.server.ServerManager;
 
 import java.io.IOException;
 
-
 public class ItemKhoiDoc extends Bullet {
 
     public ItemKhoiDoc(BulletManager bullMNG, byte bullId, long satThuong, Player pl, int X, int Y, int vx, int vy, int msg, int g100) {

@@ -4,7 +4,6 @@ import com.teamobi.mobiarmy2.army2.fight.Bullet;
 import com.teamobi.mobiarmy2.army2.fight.BulletManager;
 import com.teamobi.mobiarmy2.army2.fight.Player;
 
-
 public class BalloonLazer extends Bullet {
 
     public BalloonLazer(BulletManager bullMNG, byte bullId, long satThuong, Player pl, int x, int y) {

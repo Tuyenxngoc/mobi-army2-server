@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 public class SpiderDropSilk extends Bullet {
 
     public SpiderDropSilk(BulletManager bullMNG, byte bullId, long satThuong, Player pl) {

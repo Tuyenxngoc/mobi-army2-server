@@ -7,7 +7,6 @@ import java.util.ArrayList;
 
 import static com.teamobi.mobiarmy2.army2.server.MapData.MapDataEntry;
 
-
 public class MapManager {
 
     private final FightManager fm;

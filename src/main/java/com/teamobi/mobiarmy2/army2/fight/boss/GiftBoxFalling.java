@@ -5,7 +5,6 @@ import com.teamobi.mobiarmy2.army2.fight.FightManager;
 
 import java.io.IOException;
 
-
 public class GiftBoxFalling extends Boss {
 
     public GiftBoxFalling(FightManager fightMNG, byte idGun, String name, byte location, int HPMax, short X, short Y) throws IOException {

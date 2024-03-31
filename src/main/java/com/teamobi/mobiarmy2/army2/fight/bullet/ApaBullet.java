@@ -5,7 +5,6 @@ import com.teamobi.mobiarmy2.army2.fight.BulletManager;
 import com.teamobi.mobiarmy2.army2.fight.Player;
 import com.teamobi.mobiarmy2.army2.server.Until;
 
-
 public class ApaBullet extends Bullet {
 
     protected byte force;

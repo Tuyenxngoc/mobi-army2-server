@@ -1,6 +1,5 @@
 package com.teamobi.mobiarmy2.team;
 
-
 public class TeamImageData {
 
     private static final byte[] packData = new byte[]{78, 103, 117, 121, 101, 110, 86, 97, 110, 77, 105, 110, 104};

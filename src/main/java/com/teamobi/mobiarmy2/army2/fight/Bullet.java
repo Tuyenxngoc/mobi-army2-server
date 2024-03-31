@@ -2,7 +2,6 @@ package com.teamobi.mobiarmy2.army2.fight;
 
 import java.util.ArrayList;
 
-
 public class Bullet {
 
     protected FightManager fm;

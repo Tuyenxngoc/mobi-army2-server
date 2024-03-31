@@ -5,7 +5,6 @@ import com.teamobi.mobiarmy2.army2.fight.FightManager;
 
 import java.io.IOException;
 
-
 public class Balloon_FanBack extends Boss {
 
     public Balloon_FanBack(FightManager fightMNG, byte idGun, String name, byte location, int HPMax, short X, short Y) throws IOException {

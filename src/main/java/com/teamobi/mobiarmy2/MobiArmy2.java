@@ -1,6 +1,8 @@
-package com.teamobi.mobiarmy2.army2.server;
+package com.teamobi.mobiarmy2;
 
-public class SerArmy {
+import com.teamobi.mobiarmy2.army2.server.ServerManager;
+
+public class MobiArmy2 {
 
     public static void main(String[] args) {
         System.out.println("Start server!");
@@ -11,4 +13,5 @@ public class SerArmy {
         ServerManager.init();
         ServerManager.start();
     }
+
 }

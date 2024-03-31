@@ -9,7 +9,6 @@ import com.teamobi.mobiarmy2.army2.server.Until;
 import java.io.IOException;
 import java.util.ArrayList;
 
-
 public class SpiderMachine extends Boss {
 
     public SpiderMachine(FightManager fightMNG, byte idGun, String name, byte location, int HPMax, short X, short Y) throws IOException {

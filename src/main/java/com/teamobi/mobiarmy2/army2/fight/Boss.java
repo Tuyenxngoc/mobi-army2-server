@@ -4,7 +4,6 @@ import com.teamobi.mobiarmy2.army2.server.ServerManager;
 
 import java.util.ArrayList;
 
-
 public abstract class Boss extends Player {
 
     public String name;

@@ -8,7 +8,6 @@ import com.teamobi.mobiarmy2.army2.server.Until;
 
 import java.util.ArrayList;
 
-
 public class BigRocKet extends Bullet {
 
     private final short toX;

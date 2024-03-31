@@ -3,7 +3,6 @@ package com.teamobi.mobiarmy2.army2.server;
 import com.teamobi.mobiarmy2.network.IMessageHandler;
 import com.teamobi.mobiarmy2.network.Message;
 
-
 public class MessageHandler implements IMessageHandler {
 
     private final Session client;

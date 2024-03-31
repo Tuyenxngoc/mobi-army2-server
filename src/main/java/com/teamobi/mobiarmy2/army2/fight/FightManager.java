@@ -17,7 +17,6 @@ import java.util.Date;
 
 import static com.teamobi.mobiarmy2.army2.server.ServerManager.sendToServer;
 
-
 public class FightManager {
 
     final FightWait wait;

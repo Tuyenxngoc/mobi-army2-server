@@ -9,7 +9,6 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 
-
 public class FightWait {
 
     public final User[] players;

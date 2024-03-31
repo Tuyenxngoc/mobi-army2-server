@@ -7,7 +7,6 @@ import com.teamobi.mobiarmy2.army2.fight.boss.SmallBoom;
 
 import java.io.IOException;
 
-
 public class SmallBoomAdd extends Bullet {
 
     public SmallBoomAdd(BulletManager bullMNG, byte bullId, long satThuong, Player pl, int X, int Y, int vx, int vy, int msg, int g100) {

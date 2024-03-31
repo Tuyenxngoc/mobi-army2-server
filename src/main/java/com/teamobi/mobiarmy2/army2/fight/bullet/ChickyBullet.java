@@ -4,7 +4,6 @@ import com.teamobi.mobiarmy2.army2.fight.Bullet;
 import com.teamobi.mobiarmy2.army2.fight.BulletManager;
 import com.teamobi.mobiarmy2.army2.fight.Player;
 
-
 public class ChickyBullet extends Bullet {
 
     protected byte force2;

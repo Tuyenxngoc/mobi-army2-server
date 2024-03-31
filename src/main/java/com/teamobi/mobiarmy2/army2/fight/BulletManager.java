@@ -7,7 +7,6 @@ import com.teamobi.mobiarmy2.army2.server.Until;
 import java.io.IOException;
 import java.util.ArrayList;
 
-
 public class BulletManager {
 
     public static class VoiRong {

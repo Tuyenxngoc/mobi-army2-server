@@ -5,7 +5,6 @@ import com.teamobi.mobiarmy2.army2.fight.FightManager;
 import com.teamobi.mobiarmy2.army2.fight.Player;
 import com.teamobi.mobiarmy2.army2.server.Until;
 
-
 public class Trex extends Boss {
 
     public Trex(FightManager fightMNG, byte idGun, String name, byte location, int HPMax, short X, short Y) {

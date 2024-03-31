@@ -27,7 +27,6 @@ import static com.teamobi.mobiarmy2.army2.server.NVData.EquipmentEntry;
 import static com.teamobi.mobiarmy2.army2.server.NVData.NVEntry;
 import static com.teamobi.mobiarmy2.army2.server.SpecialItemData.SpecialItemEntry;
 
-
 public class User {
 
     public static class ruongDoItemEntry {
@@ -431,6 +430,7 @@ public class User {
         ability[4] = (envAdd[4] + this.pointAdd[nv][4]) * 10;
         ability[4] += ability[4] * percenAdd[4] / 100;
         return ability;
+
 ///////////////////////////////////////
 //        ability[0] = 1000 + this.pointAdd[nv][0] * 10 + envAdd[0] * 10;
 //        ability[0] += ((1000 + this.pointAdd[nv][0] * 10) * percenAdd[0]) / 100;
