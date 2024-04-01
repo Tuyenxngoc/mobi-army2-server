@@ -16,10 +16,6 @@ public class MessageHandler implements IMessageHandler {
         this.userService = userService;
     }
 
-    public MessageHandler(User user) {
-        this(new UserService(user));
-    }
-
     @Override
     public void onMessage(Message ms) {
         try {

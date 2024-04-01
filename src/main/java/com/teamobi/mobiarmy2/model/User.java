@@ -11,7 +11,7 @@ import lombok.Setter;
 public class User {
 
     private ISession session;
-    private UserState state;
+    private UserState state = UserState.WAITING;
     private int id;
     private byte nhanVat;
     private String username;

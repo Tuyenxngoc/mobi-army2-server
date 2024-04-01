@@ -4,6 +4,8 @@ import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessageHandler;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.server.ServerManager;
+import com.teamobi.mobiarmy2.service.IUserService;
+import com.teamobi.mobiarmy2.service.Impl.UserService;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -38,16 +40,16 @@ public class Session implements ISession {
     private String version;
     private byte provider;
 
-    public Session(Socket socket, int id) throws IOException {
+    public Session(int id, Socket socket) throws IOException {
+        this.id = id;
         this.socket = socket;
         this.dis = new DataInputStream(socket.getInputStream());
         this.dos = new DataOutputStream(socket.getOutputStream());
-
-        this.id = id;
         this.IPAddress = socket.getInetAddress().getHostName();
 
         this.user = new User(this);
-        this.messageHandler = new MessageHandler(user);
+        IUserService userService = new UserService(this.user);
+        this.messageHandler = new MessageHandler(userService);
 
         this.sendThread = new Thread(sender);
         this.collectorThread = new Thread(new MessageCollector());

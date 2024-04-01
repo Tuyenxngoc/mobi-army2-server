@@ -53,7 +53,7 @@ public class ServerManager {
             while (isStart) {
                 try {
                     Socket socket = server.accept();
-                    ISession session = new Session(socket, ++countClients);
+                    ISession session = new Session(++countClients, socket);
                     users.add(session);
                     log.logMessage("Accept socket client " + countClients + " done!");
                 } catch (Exception e) {
