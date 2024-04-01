@@ -2,15 +2,10 @@ package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.config.Impl.ServerConfig;
-import com.teamobi.mobiarmy2.dao.impl.UserDao;
 import com.teamobi.mobiarmy2.log.ILogManager;
 import com.teamobi.mobiarmy2.log.LoggerUtil;
-import com.teamobi.mobiarmy2.model.User;
-import com.teamobi.mobiarmy2.network.IMessageHandler;
-import com.teamobi.mobiarmy2.network.Impl.MessageHandler;
+import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.Impl.Session;
-import com.teamobi.mobiarmy2.service.IUserService;
-import com.teamobi.mobiarmy2.service.Impl.UserService;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -26,18 +21,14 @@ public class ServerManager {
 
     private ServerSocket server;
 
-    private long countClients;
+    private int countClients;
     private boolean isStart;
 
-    private final ArrayList<User> users = new ArrayList<>();
+    private final ArrayList<ISession> users = new ArrayList<>();
 
     public ServerManager() {
         this.config = new ServerConfig("army2.properties");
         this.log = new LoggerUtil(config.isDebug());
-    }
-
-    public ILogManager logger() {
-        return log;
     }
 
     public static synchronized ServerManager getInstance() {
@@ -45,6 +36,10 @@ public class ServerManager {
             instance = new ServerManager();
         }
         return instance;
+    }
+
+    public ILogManager logger() {
+        return log;
     }
 
     public void init() {
@@ -58,14 +53,8 @@ public class ServerManager {
             while (isStart) {
                 try {
                     Socket socket = server.accept();
-                    Session session = new Session(socket);
-                    User user = new User(session);
-                    UserDao userDao = new UserDao();
-                    IUserService userService = new UserService(user, userDao);
-                    IMessageHandler messageHandler = new MessageHandler(userService);
-                    session.setHandler(messageHandler);
-                    users.add(user);
-                    countClients++;
+                    ISession session = new Session(socket, ++countClients);
+                    users.add(session);
                     log.logMessage("Accept socket client " + countClients + " done!");
                 } catch (Exception e) {
                     //Empty catch block
@@ -79,6 +68,7 @@ public class ServerManager {
     public void stop() {
         log.logMessage("Stop server");
         isStart = false;
+        countClients = 0;
         try {
             users.clear();
             server.close();
@@ -87,4 +77,8 @@ public class ServerManager {
         }
     }
 
+    public void disconnect(Session session) {
+        users.remove(session);
+        countClients--;
+    }
 }

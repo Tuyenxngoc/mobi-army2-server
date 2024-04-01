@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.network.Impl;
 
+import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessageHandler;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.server.ServerManager;
@@ -15,7 +16,8 @@ public class Session implements ISession {
     private static final byte[] KEY = "bth.army2.ml".getBytes();
     private static final int TIMEOUT_DURATION = 180000;
 
-    private long id;
+    private int id;
+    private User user;
 
     private Socket socket;
     private DataInputStream dis;
@@ -31,27 +33,28 @@ public class Session implements ISession {
     private Thread collectorThread;
     private Thread sendThread;
 
+    private String IPAddress;
     private String platform;
     private String version;
-    private final String IPAddress;
+    private byte provider;
 
-    public Session(Socket socket) throws IOException {
+    public Session(Socket socket, int id) throws IOException {
         this.socket = socket;
         this.dis = new DataInputStream(socket.getInputStream());
         this.dos = new DataOutputStream(socket.getOutputStream());
+
+        this.id = id;
         this.IPAddress = socket.getInetAddress().getHostName();
+
+        this.user = new User(this);
+        this.messageHandler = new MessageHandler(user);
+
         this.sendThread = new Thread(sender);
         this.collectorThread = new Thread(new MessageCollector());
         this.collectorThread.start();
     }
 
-    @Override
-    public void setHandler(IMessageHandler messageHandler) {
-        this.messageHandler = messageHandler;
-    }
-
-    @Override
-    public boolean isSendKeyComplete() {
+    private boolean isSendKeyComplete() {
         return sendKeyComplete;
     }
 
@@ -63,7 +66,7 @@ public class Session implements ISession {
     @Override
     public void close() {
         try {
-//            ServerManager.getInstance().disconnect(this);
+            ServerManager.getInstance().disconnect(this);
             cleanNetwork();
         } catch (Exception e) {
             e.printStackTrace();
@@ -87,23 +90,25 @@ public class Session implements ISession {
 
     @Override
     public String toString() {
+        if (user.getUsername() != null && !user.getUsername().isEmpty()) {
+            return "User " + user.getUsername();
+        }
         return "Session id: " + id;
     }
 
-    public String getPlatform() {
-        return platform;
-    }
-
+    @Override
     public void setPlatform(String platform) {
         this.platform = platform;
     }
 
-    public String getVersion() {
-        return version;
-    }
-
+    @Override
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    @Override
+    public void setProvider(byte provider) {
+        this.provider = provider;
     }
 
     protected synchronized void doSendMessage(Message m) {

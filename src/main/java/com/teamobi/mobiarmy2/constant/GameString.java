@@ -364,4 +364,11 @@ public class GameString {
         return "Đập đồ thất bại!.";
     }
 
+    public static String loginLock() {
+        return "Tài khoản của bạn đang bị khóa.";
+    }
+
+    public static String loginActive() {
+        return "Tài khoản của bạn chưa được kích hoạt.";
+    }
 }

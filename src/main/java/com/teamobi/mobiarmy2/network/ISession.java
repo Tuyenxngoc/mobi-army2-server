@@ -6,14 +6,15 @@ import java.io.IOException;
 
 public interface ISession {
 
-    void setHandler(IMessageHandler messageHandler);
-
-    boolean isSendKeyComplete();
-
     void sendMessage(Message message);
 
     void close();
 
     void sendKeys() throws IOException;
 
+    void setPlatform(String platform);
+
+    void setProvider(byte provider);
+
+    void setVersion(String version);
 }

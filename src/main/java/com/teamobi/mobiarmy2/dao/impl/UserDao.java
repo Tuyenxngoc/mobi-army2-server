@@ -50,9 +50,11 @@ public class UserDao implements Dao<User>, IUserDao {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     user = new User();
-                    user.setId(resultSet.getInt("id"));
+                    user.setId(resultSet.getInt("user_id"));
                     user.setUsername(resultSet.getString("username"));
                     user.setPassword(resultSet.getString("password"));
+                    user.setLock(resultSet.getBoolean("lock"));
+                    user.setActive(resultSet.getBoolean("active"));
                 }
             }
         } catch (SQLException e) {

@@ -16,7 +16,13 @@ public interface IUserService {
 
     void login(Message ms);
 
+    void sendLoginSuccess();
+
     void gopClan(Message ms);
 
     void getVersionCode(Message ms);
+
+    void getProvider(Message ms);
+
+    void hopTrangBi(Message ms);
 }
