@@ -1,12 +1,14 @@
 package com.teamobi.mobiarmy2.service.Impl;
 
 import com.teamobi.mobiarmy2.constant.CmdClient;
+import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dao.impl.UserDao;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.Impl.Message;
-import com.teamobi.mobiarmy2.server.ClanManager;
+import com.teamobi.mobiarmy2.server.BangXHManager;
+import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IUserService;
 
 import java.io.DataInputStream;
@@ -20,6 +22,22 @@ public class UserService implements IUserService {
 
     public UserService(User user) {
         this.user = user;
+    }
+
+    private void handleUserNotLoggedIn() {
+        user.getSession().close();
+    }
+
+    private void sendMessageLoginFail(String message) {
+        try {
+            Message ms = new Message(4);
+            DataOutputStream ds = ms.writer();
+            ds.writeUTF(message);
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -42,28 +60,12 @@ public class UserService implements IUserService {
 
     @Override
     public void giaHanDo(Message ms) {
-        if (user.isNotWaiting()) {
-            return;
-        }
-        try {
-            DataInputStream dis = ms.reader();
-            byte action = dis.readByte();
-            int idKey = dis.readInt();
-            if (action == 0) {
 
-            } else if (action == 1) {
-
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
     public void nhiemVuView(Message ms) {
-        if (user.isNotWaiting()) {
-            return;
-        }
+
     }
 
     @Override
@@ -72,11 +74,23 @@ public class UserService implements IUserService {
             return;
         }
 
+        if (!BangXHManager.getInstance().isComplete) {
+            sendMessageLoginFail(GameString.getNotFinishedLoadingRanking());
+            return;
+        }
+
         try {
             DataInputStream dis = ms.reader();
-            String username = dis.readUTF();
-            String password = dis.readUTF();
+            String username = dis.readUTF().trim();
+            String password = dis.readUTF().trim();
             String version = dis.readUTF();
+
+            if (!username.matches(CommonConstant.ALPHANUMERIC_PATTERN) || !password.matches(CommonConstant.ALPHANUMERIC_PATTERN)) {
+                sendMessageLoginFail(GameString.reg_Error1());
+                return;
+            }
+
+            ServerManager.getInstance().logger().logMessage("Client: " + user.getSession().getSessionId() + " name: " + username + " pass: " + password + " version: " + version);
 
             User userFound = userDao.findByUsernameAndPassword(username, password);
             if (userFound == null) {
@@ -125,32 +139,7 @@ public class UserService implements IUserService {
 
     @Override
     public void gopClan(Message ms) {
-        if (user.getClanId() <= 0) {
-            return;
-        }
-        try {
-            DataInputStream dis = ms.reader();
-            byte type = dis.readByte();
-            int soluong = dis.readInt();
 
-            if (soluong <= 0) {
-                return;
-            }
-
-            if (type == 0) {
-                if (soluong > user.getXu()) {
-                    return;
-                }
-                ClanManager.getInstance().getClanDao().gopXu(user.getClanId(), soluong);
-            } else if (type == 1) {
-                if (soluong > user.getLuong()) {
-                    return;
-                }
-                ClanManager.getInstance().getClanDao().gopLuong(user.getClanId(), soluong);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -175,17 +164,11 @@ public class UserService implements IUserService {
 
     @Override
     public void hopTrangBi(Message ms) {
-        if (user.isNotWaiting()) {
-            return;
-        }
 
-        try {
-            DataInputStream dis = ms.reader();
-            dis.readByte();
-            dis.readByte();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
+    @Override
+    public void buyItem(Message ms) {
+
+    }
 }

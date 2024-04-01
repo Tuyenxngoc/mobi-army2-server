@@ -25,4 +25,6 @@ public interface IUserService {
     void getProvider(Message ms);
 
     void hopTrangBi(Message ms);
+
+    void buyItem(Message ms);
 }

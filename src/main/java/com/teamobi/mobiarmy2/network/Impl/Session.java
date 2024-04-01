@@ -18,8 +18,8 @@ public class Session implements ISession {
     private static final byte[] KEY = "bth.army2.ml".getBytes();
     private static final int TIMEOUT_DURATION = 180000;
 
-    private int id;
-    private User user;
+    private final long sessionId;
+    private final User user;
 
     private Socket socket;
     private DataInputStream dis;
@@ -30,18 +30,18 @@ public class Session implements ISession {
     private byte curW;
 
     private final Sender sender = new Sender();
-    private IMessageHandler messageHandler;
+    private final IMessageHandler messageHandler;
 
     private Thread collectorThread;
     private Thread sendThread;
 
-    private String IPAddress;
+    private final String IPAddress;
     private String platform;
     private String version;
     private byte provider;
 
-    public Session(int id, Socket socket) throws IOException {
-        this.id = id;
+    public Session(long sessionId, Socket socket) throws IOException {
+        this.sessionId = sessionId;
         this.socket = socket;
         this.dis = new DataInputStream(socket.getInputStream());
         this.dos = new DataOutputStream(socket.getOutputStream());
@@ -66,9 +66,16 @@ public class Session implements ISession {
     }
 
     @Override
+    public long getSessionId() {
+        return sessionId;
+    }
+
+    @Override
     public void close() {
         try {
-            ServerManager.getInstance().disconnect(this);
+            ServerManager serverManager = ServerManager.getInstance();
+            serverManager.logger().logMessage("Close " + this);
+            serverManager.disconnect(this);
             cleanNetwork();
         } catch (Exception e) {
             e.printStackTrace();
@@ -95,7 +102,7 @@ public class Session implements ISession {
         if (user.getUsername() != null && !user.getUsername().isEmpty()) {
             return "User " + user.getUsername();
         }
-        return "Session id: " + id;
+        return "Session id: " + sessionId;
     }
 
     @Override

@@ -8,6 +8,8 @@ public interface ISession {
 
     void sendMessage(Message message);
 
+    long getSessionId();
+
     void close();
 
     void sendKeys() throws IOException;

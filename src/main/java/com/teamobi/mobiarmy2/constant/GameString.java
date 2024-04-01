@@ -2,7 +2,9 @@ package com.teamobi.mobiarmy2.constant;
 
 public class GameString {
 
-    public static final String NOT_FINISHED_LOADING_RANKING = "Chưa tải xong bảng xếp hạng";
+    public static String getNotFinishedLoadingRanking() {
+        return "Chưa tải xong bảng xếp hạng";
+    }
 
     public static String leave1() {
         return "Đã bỏ chạy -%dxp.";
@@ -148,7 +150,7 @@ public class GameString {
         return "Giao dịch thành công. Xin cảm ơn!.";
     }
 
-    protected static String addFrienvError1() {
+    public static String addFrienvError1() {
         return "Tên bạn bè cần thêm có chứa kí tự đặc biệt!";
     }
 
@@ -268,23 +270,23 @@ public class GameString {
         return "Vui lòng chờ sau: %s.";
     }
 
-    protected static String reg_Error1() {
+    public static String reg_Error1() {
         return "Tài khoản hoặc mật khẩu không cho phép kí tự đặc biệt!.";
     }
 
-    protected static String reg_Error2() {
+    public static String reg_Error2() {
         return "Tài khoản phải có độ dài từ 5 - 16 kí tự!.";
     }
 
-    protected static String reg_Error3() {
+    public static String reg_Error3() {
         return "Mật khẩu phải có độ dài từ 1 - 40 kí tự!.";
     }
 
-    protected static String reg_Error4() {
+    public static String reg_Error4() {
         return "Tài khoản đã tồn tại. Vui lòng chọn một tài khoản khác!.";
     }
 
-    protected static String reg_Error5() {
+    public static String reg_Error5() {
         return "Đăng kí tài khoản thành công!.";
     }
 
@@ -300,23 +302,23 @@ public class GameString {
         return "Bạn không có biệt đội!.";
     }
 
-    protected static String clanNull() {
+    public static String clanNull() {
         return "Biệt đội không tồn tại!.";
     }
 
-    protected static String clanLevelNotEnought() {
+    public static String clanLevelNotEnought() {
         return "Biệt đội bạn chưa đủ cấp độ!.";
     }
 
-    protected static String clanrightNotEnought() {
+    public static String clanrightNotEnought() {
         return "Chỉ đội trưởng mới có thể mua!.";
     }
 
-    protected static String clanXuNotEnought() {
+    public static String clanXuNotEnought() {
         return "Biệt đội bạn không có đủ xu!.";
     }
 
-    protected static String clanLuongNotEnought() {
+    public static String clanLuongNotEnought() {
         return "Biệt đội bạn không có đủ lượng!.";
     }
 

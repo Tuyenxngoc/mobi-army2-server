@@ -21,7 +21,7 @@ public class ServerManager {
 
     private ServerSocket server;
 
-    private int countClients;
+    private long countClients;
     private boolean isStart;
 
     private final ArrayList<ISession> users = new ArrayList<>();

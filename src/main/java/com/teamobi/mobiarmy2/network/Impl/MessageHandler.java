@@ -2,11 +2,9 @@ package com.teamobi.mobiarmy2.network.Impl;
 
 import com.teamobi.mobiarmy2.constant.CmdClient;
 import com.teamobi.mobiarmy2.constant.CmdServer;
-import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessageHandler;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IUserService;
-import com.teamobi.mobiarmy2.service.Impl.UserService;
 
 public class MessageHandler implements IMessageHandler {
 
@@ -33,6 +31,8 @@ public class MessageHandler implements IMessageHandler {
                 case CmdServer.LOGIN -> userService.login(ms);
 
                 case CmdServer.SET_PROVIDER -> userService.getProvider(ms);
+
+                case CmdServer.BUY_ITEM -> userService.buyItem(ms);
 
                 case CmdClient.VERSION_CODE -> userService.getVersionCode(ms);
 
