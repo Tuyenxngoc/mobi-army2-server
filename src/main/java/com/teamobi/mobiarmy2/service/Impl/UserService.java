@@ -24,10 +24,6 @@ public class UserService implements IUserService {
         this.user = user;
     }
 
-    private void handleUserNotLoggedIn() {
-        user.getSession().close();
-    }
-
     private void sendMessageLoginFail(String message) {
         try {
             Message ms = new Message(4);

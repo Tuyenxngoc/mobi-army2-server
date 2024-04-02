@@ -12,11 +12,19 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Session implements ISession {
 
     private static final byte[] KEY = "bth.army2.ml".getBytes();
     private static final int TIMEOUT_DURATION = 180000;
+    private static final List<Byte> WHITE_LIST_CMD = List.of(
+            (byte) -27,
+            (byte) 1,
+            (byte) 58,
+            (byte) 114,
+            (byte) 127
+    );
 
     private final long sessionId;
     private final User user;
@@ -153,7 +161,6 @@ public class Session implements ISession {
             m.cleanup();
         } catch (Exception e) {
             closeMessage();
-            ServerManager.getInstance().logger().logError(e.getMessage());
         }
     }
 
@@ -245,12 +252,23 @@ public class Session implements ISession {
                         break;
                     }
                     ServerManager.getInstance().logger().logMessage(Session.this + " send mss " + message.getCommand());
+                    if (!Session.this.user.isLogged() && requiresAuthentication(message)) {
+                        ServerManager.getInstance().logger().logMessage("Unauthorized access attempted. Command requires authentication.");
+                        message.cleanup();
+                        break;
+                    }
                     Session.this.messageHandler.onMessage(message);
                     message.cleanup();
                 }
+                closeMessage();
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+
+        private boolean requiresAuthentication(Message message) {
+            Byte cmd = message.getCommand();
+            return !WHITE_LIST_CMD.contains(cmd);
         }
 
         private Message readMessage() {
@@ -284,7 +302,6 @@ public class Session implements ISession {
                 return new Message(cmd, data);
             } catch (Exception e) {
                 Session.this.closeMessage();
-                ServerManager.getInstance().logger().logError(e.getMessage());
                 return null;
             }
         }

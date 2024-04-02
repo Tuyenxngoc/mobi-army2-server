@@ -55,6 +55,15 @@ public class UserDao implements Dao<User>, IUserDao {
                     user.setPassword(resultSet.getString("password"));
                     user.setLock(resultSet.getBoolean("lock"));
                     user.setActive(resultSet.getBoolean("active"));
+
+                    //Get user details
+                    PreparedStatement detailStatement = connection.prepareStatement("SELECT * FROM armymem WHERE id = ?");
+                    detailStatement.setInt(1, user.getId());
+                    try (ResultSet detailResultSet = detailStatement.executeQuery()) {
+                        if (detailResultSet.next()) {
+
+                        }
+                    }
                 }
             }
         } catch (SQLException e) {
