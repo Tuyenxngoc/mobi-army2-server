@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.service.Impl;
 
+import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.model.MapData;
 import com.teamobi.mobiarmy2.service.IGameService;
@@ -23,11 +24,10 @@ public class GameService implements IGameService {
 
         try (ByteArrayOutputStream bas = new ByteArrayOutputStream();
              DataOutputStream ds = new DataOutputStream(bas)) {
-
-            int numMap = MapData.entries.size();
-            ds.writeByte(numMap);
-            System.out.println("Init map entry numMap=" + numMap);
-            for (int i = 0; i < numMap; i++) {
+            int size = MapData.entries.size();
+            ds.writeByte(size);
+            System.out.println("Init map numMap=" + size);
+            for (int i = 0; i < size; i++) {
                 MapData.MapDataEntry mapEntry = MapData.entries.get(i);
                 ds.writeByte(mapEntry.id);
                 ds.writeShort(mapEntry.data.length);
@@ -42,7 +42,7 @@ public class GameService implements IGameService {
                 System.out.println("   - id= " + mapEntry.id + " name= " + mapEntry.name + " file= " + mapEntry.file);
             }
             byte[] ab = bas.toByteArray();
-            Utils.saveFile("cache/valuesdata2", ab);
+            Utils.saveFile(CommonConstant.mapCacheName, ab);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -51,12 +51,13 @@ public class GameService implements IGameService {
     @Override
     public void setCacheCharacters() {
         gameDao.getAllCharacterData();
+        gameDao.getAllEquip();
 
     }
 
     @Override
     public void setCacheCaptionLevels() {
-
+        gameDao.getAllCaptionLevel();
     }
 
     @Override

@@ -51,28 +51,15 @@ public class ServerManager {
     }
 
     public void init() {
-        log.logMessage("Load map data");
-        setCache(0);
-
-        log.logMessage("Load NV data");
-        setCache(1);
-
-        log.logMessage("Load caption level");
-        setCache(2);
-
-        log.logMessage("Load player images");
-        setCache(3);
-        setCache(4);
+        setCache();
     }
 
-    private void setCache(int i) {
-        switch (i) {
-            case 0 -> gameService.setCacheMaps();
-            case 1 -> gameService.setCacheCharacters();
-            case 2 -> gameService.setCacheCaptionLevels();
-            case 3 -> gameService.setCachePlayerImages();
-            case 4 -> gameService.setCacheMapIcons();
-        }
+    private void setCache() {
+        gameService.setCacheMaps();
+        gameService.setCacheCharacters();
+        gameService.setCacheCaptionLevels();
+        gameService.setCachePlayerImages();
+        gameService.setCacheMapIcons();
     }
 
     public void start() {

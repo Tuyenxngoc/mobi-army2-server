@@ -53,7 +53,7 @@ public class NVData {
         public byte so_dan;
         public short sat_thuong;
         public byte sat_thuong_dan;
-        public ArrayList<EquipmentData> trangbis = new ArrayList<>();
+        public ArrayList<EquipmentData> listTrangBi = new ArrayList<>();
     }
 
     public static ArrayList<NVEntry> entrys = new ArrayList<>();
@@ -73,7 +73,7 @@ public class NVData {
             return;
         }
         EquipmentData equipDataEntry = null;
-        for (EquipmentData equipDataEntry2 : nvEntry.trangbis) {
+        for (EquipmentData equipDataEntry2 : nvEntry.listTrangBi) {
             if (equipDataEntry2.id == equipDatId) {
                 equipDataEntry = equipDataEntry2;
                 break;
@@ -84,7 +84,7 @@ public class NVData {
             equipDataEntry = new EquipmentData();
             equipDataEntry.id = (byte) equipDatId;
             equipDataEntry.entrys = new ArrayList<>();
-            nvEntry.trangbis.add(equipDataEntry);
+            nvEntry.listTrangBi.add(equipDataEntry);
         }
         for (EquipmentEntry equipEntry : equipDataEntry.entrys) {
             // Neu ton tai => thoat

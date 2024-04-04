@@ -5,4 +5,14 @@ public interface IGameDao {
     void getAllMapData();
 
     void getAllCharacterData();
+
+    void getAllEquip();
+
+    void getAllCaptionLevel();
+
+    void getAllItem();
+
+    void getAllItemClan();
+
+    void getAllSpecialItem();
 }
