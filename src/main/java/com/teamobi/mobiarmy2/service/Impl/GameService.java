@@ -193,11 +193,6 @@ public class GameService implements IGameService {
     }
 
     @Override
-    public void getItemData() {
-        gameDao.getAllItem();
-    }
-
-    @Override
     public void setDefaultNvData() {
         short[][] defaultNvData = new short[NVData.entrys.size()][5];
         User.nvEquipDefault = new NVData.EquipmentEntry[NVData.entrys.size()][5];
@@ -214,16 +209,6 @@ public class GameService implements IGameService {
                 User.nvEquipDefault[i][j] = NVData.getEquipEntryById(i, j, defaultNvData[i][j]);
             }
         }
-    }
-
-    @Override
-    public void getClanShopData() {
-        gameDao.getAllItemClan();
-    }
-
-    @Override
-    public void getSpecialItemData() {
-        gameDao.getAllSpecialItem();
     }
 
     @Override
@@ -365,4 +350,18 @@ public class GameService implements IGameService {
         gameDao.getAllMissions();
     }
 
+    @Override
+    public void getItemData() {
+        gameDao.getAllItem();
+    }
+
+    @Override
+    public void getClanShopData() {
+        gameDao.getAllItemClan();
+    }
+
+    @Override
+    public void getSpecialItemData() {
+        gameDao.getAllSpecialItem();
+    }
 }
