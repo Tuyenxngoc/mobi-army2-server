@@ -28,7 +28,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case CmdClient.FOMULA -> userService.hopTrangBi(ms);
 
-                case CmdServer.LOGIN -> userService.login(ms);
+                case CmdServer.LOGIN -> userService.handleLogin(ms);
 
                 case CmdServer.SET_PROVIDER -> userService.getProvider(ms);
 

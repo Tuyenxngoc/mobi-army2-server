@@ -6,6 +6,7 @@ import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.dao.impl.GameDao;
 import com.teamobi.mobiarmy2.log.ILogManager;
 import com.teamobi.mobiarmy2.log.LoggerUtil;
+import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.Impl.Session;
 import com.teamobi.mobiarmy2.service.IGameService;
@@ -50,8 +51,32 @@ public class ServerManager {
         return log;
     }
 
+    public void sendNVData(User user) {
+        gameService.sendNVData(user, config);
+    }
+
+    public void sendRoomInfo(User user) {
+        gameService.sendRoomInfo(user, config);
+    }
+
+    public void sendMapCollisionInfo(User user) {
+        gameService.sendMapCollisionInfo(user, config);
+    }
+
     public void init() {
+        initServerData();
         setCache();
+    }
+
+    private void initServerData() {
+        gameService.getItemData();
+        gameService.getClanShopData();
+        gameService.getSpecialItemData();
+        gameService.getFormulaData();
+        gameService.getPaymentData();
+        gameService.getMissionData();
+
+        gameService.setDefaultNvData();
     }
 
     private void setCache() {

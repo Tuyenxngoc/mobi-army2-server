@@ -301,7 +301,6 @@ public class Session implements ISession {
                 }
                 return new Message(cmd, data);
             } catch (Exception e) {
-                Session.this.closeMessage();
                 return null;
             }
         }

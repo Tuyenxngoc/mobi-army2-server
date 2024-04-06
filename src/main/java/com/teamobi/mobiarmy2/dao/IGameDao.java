@@ -15,4 +15,10 @@ public interface IGameDao {
     void getAllItemClan();
 
     void getAllSpecialItem();
+
+    void getAllFomular();
+
+    void getAllPayment();
+
+    void getAllMissions();
 }

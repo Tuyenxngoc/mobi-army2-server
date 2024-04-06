@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 
-public class Utils {
+public class Until {
 
     private static final Random rand;
     private static final SimpleDateFormat dateFormat;

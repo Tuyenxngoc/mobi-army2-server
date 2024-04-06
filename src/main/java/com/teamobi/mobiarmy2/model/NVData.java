@@ -3,9 +3,6 @@ package com.teamobi.mobiarmy2.model;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author ASD
- */
 public class NVData {
 
     public static class EquipmentData {
@@ -53,7 +50,7 @@ public class NVData {
         public byte so_dan;
         public short sat_thuong;
         public byte sat_thuong_dan;
-        public ArrayList<EquipmentData> listTrangBi = new ArrayList<>();
+        public ArrayList<EquipmentData> trangbis = new ArrayList<>();
     }
 
     public static ArrayList<NVEntry> entrys = new ArrayList<>();
@@ -73,7 +70,7 @@ public class NVData {
             return;
         }
         EquipmentData equipDataEntry = null;
-        for (EquipmentData equipDataEntry2 : nvEntry.listTrangBi) {
+        for (EquipmentData equipDataEntry2 : nvEntry.trangbis) {
             if (equipDataEntry2.id == equipDatId) {
                 equipDataEntry = equipDataEntry2;
                 break;
@@ -84,7 +81,7 @@ public class NVData {
             equipDataEntry = new EquipmentData();
             equipDataEntry.id = (byte) equipDatId;
             equipDataEntry.entrys = new ArrayList<>();
-            nvEntry.listTrangBi.add(equipDataEntry);
+            nvEntry.trangbis.add(equipDataEntry);
         }
         for (EquipmentEntry equipEntry : equipDataEntry.entrys) {
             // Neu ton tai => thoat

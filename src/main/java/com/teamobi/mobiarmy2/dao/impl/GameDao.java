@@ -3,8 +3,9 @@ package com.teamobi.mobiarmy2.dao.impl;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.*;
-import com.teamobi.mobiarmy2.util.Utils;
+import com.teamobi.mobiarmy2.util.Until;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import java.sql.Connection;
@@ -19,7 +20,7 @@ public class GameDao implements IGameDao {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
 
-            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM map")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `map`")) {
                 while (resultSet.next()) {
                     MapData.MapDataEntry mapDataEntry = new MapData.MapDataEntry();
                     mapDataEntry.id = (byte) (resultSet.getByte("id") - 1);
@@ -28,7 +29,7 @@ public class GameDao implements IGameDao {
                     if (mapDataEntry.id == 27) {
                         mapDataEntry.data = new byte[0];
                     } else {
-                        mapDataEntry.data = Utils.getFile("res/map/" + mapDataEntry.file);
+                        mapDataEntry.data = Until.getFile("res/map/" + mapDataEntry.file);
                     }
                     mapDataEntry.bg = resultSet.getShort("bg");
                     mapDataEntry.mapAddY = resultSet.getShort("mapAddY");
@@ -240,6 +241,124 @@ public class GameDao implements IGameDao {
                     }
                     SpecialItemData.entrys.add(iEntry);
                 }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    @Override
+    public void getAllFomular() {
+        try (Connection connection = HikariCPManager.getInstance().getConnection();
+             Statement statement = connection.createStatement()) {
+
+            try (ResultSet res = statement.executeQuery("SELECT * FROM `fomular`;")) {
+                while (res.next()) {
+                    int materialId = res.getInt("idMaterial");
+                    byte equipType = res.getByte("equipType");
+                    JSONArray jarr = (JSONArray) JSONValue.parse(res.getString("equipId"));
+                    short[] eqId = new short[jarr.size()];
+                    for (int i = 0; i < jarr.size(); i++) {
+                        eqId[i] = ((Long) jarr.get(i)).shortValue();
+                    }
+                    jarr = (JSONArray) JSONValue.parse(res.getString("equipNeed"));
+                    short[] eqNeedId = new short[jarr.size()];
+                    for (int i = 0; i < jarr.size(); i++) {
+                        eqNeedId[i] = ((Long) jarr.get(i)).shortValue();
+                    }
+                    FomularData.FomularEntry fE = new FomularData.FomularEntry();
+                    fE.level = res.getByte("lv");
+                    fE.levelRequire = res.getInt("lvRequire");
+                    jarr = (JSONArray) JSONValue.parse(res.getString("addPNMin"));
+                    fE.invAddMin = new short[jarr.size()];
+                    for (int i = 0; i < jarr.size(); i++) {
+                        fE.invAddMin[i] = ((Long) jarr.get(i)).shortValue();
+                    }
+                    jarr = (JSONArray) JSONValue.parse(res.getString("addPNMax"));
+                    fE.invAddMax = new short[jarr.size()];
+                    for (int i = 0; i < jarr.size(); i++) {
+                        fE.invAddMax[i] = ((Long) jarr.get(i)).shortValue();
+                    }
+                    jarr = (JSONArray) JSONValue.parse(res.getString("addPP100Min"));
+                    fE.percenAddMin = new short[jarr.size()];
+                    for (int i = 0; i < jarr.size(); i++) {
+                        fE.percenAddMin[i] = ((Long) jarr.get(i)).shortValue();
+                    }
+                    jarr = (JSONArray) JSONValue.parse(res.getString("addPP100Max"));
+                    fE.percenAddMax = new short[jarr.size()];
+                    for (int i = 0; i < jarr.size(); i++) {
+                        fE.percenAddMax[i] = ((Long) jarr.get(i)).shortValue();
+                    }
+                    jarr = (JSONArray) JSONValue.parse(res.getString("itemRequire"));
+                    fE.itemNeed = new SpecialItemData.SpecialItemEntry[jarr.size()];
+                    fE.itemNeedNum = new short[jarr.size()];
+                    for (int i = 0; i < jarr.size(); i++) {
+                        JSONObject jobj = (JSONObject) jarr.get(i);
+                        fE.itemNeed[i] = SpecialItemData.getSpecialItemById(((Long) jobj.get("id")).intValue());
+                        fE.itemNeedNum[i] = ((Long) jobj.get("num")).shortValue();
+                    }
+                    jarr = (JSONArray) JSONValue.parse(res.getString("detail"));
+                    fE.detail = new String[jarr.size()];
+                    for (int i = 0; i < jarr.size(); i++) {
+                        fE.detail[i] = (String) jarr.get(i);
+                    }
+                    FomularData.addFomularEntry(materialId, equipType, eqId, eqNeedId, fE);
+                }
+                System.out.println("Fomular readed size=" + FomularData.entrys.size());
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    @Override
+    public void getAllPayment() {
+        try (Connection connection = HikariCPManager.getInstance().getConnection();
+             Statement statement = connection.createStatement()) {
+            try (ResultSet res = statement.executeQuery("SELECT * FROM `napthe`")) {
+                while (res.next()) {
+                    NapTienData.NapTienEntry nE = new NapTienData.NapTienEntry();
+                    nE.id = res.getString("id");
+                    nE.info = res.getString("info");
+                    nE.url = res.getString("url");
+                    nE.mssTo = res.getString("mssTo");
+                    nE.mssContent = res.getString("mssContent");
+                    NapTienData.entrys.add(nE);
+                }
+                System.out.println("Nap the readed size=" + NapTienData.entrys.size());
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    @Override
+    public void getAllMissions() {
+        try (Connection connection = HikariCPManager.getInstance().getConnection();
+             Statement statement = connection.createStatement()) {
+            try (ResultSet res = statement.executeQuery("SELECT * FROM `mission`")) {
+                while (res.next()) {
+                    MissionData.MissionEntry mE = new MissionData.MissionEntry();
+                    int id = res.getInt("id");
+                    byte idNeed = res.getByte("idneed");
+                    mE.index = res.getInt("iddb");
+                    mE.level = res.getByte("level");
+                    mE.name = res.getString("name");
+                    mE.require = res.getInt("require");
+                    mE.reward = res.getString("reward");
+                    mE.rewardXu = res.getInt("rewardXu");
+                    mE.rewardLuong = res.getInt("rewardLuong");
+                    mE.rewardXP = res.getInt("rewardXP");
+                    mE.rewardCUP = res.getInt("rewardCUP");
+                    MissionData.addMissionEntry(id, idNeed, mE);
+                }
+                System.out.println("Mission readed size=" + MissionData.entrys.size());
+
             }
         } catch (SQLException e) {
             e.printStackTrace();

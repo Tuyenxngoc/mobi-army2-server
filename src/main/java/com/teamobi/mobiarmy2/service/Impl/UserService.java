@@ -65,7 +65,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void login(Message ms) {
+    public void handleLogin(Message ms) {
         if (user.isLogged()) {
             return;
         }
@@ -110,6 +110,10 @@ public class UserService implements IUserService {
             user.setLogged(true);
 
             sendLoginSuccess();
+            ServerManager serverManager = ServerManager.getInstance();
+            serverManager.sendNVData(user);
+            serverManager.sendRoomInfo(user);
+            serverManager.sendMapCollisionInfo(user);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -132,6 +136,7 @@ public class UserService implements IUserService {
             e.printStackTrace();
         }
     }
+
 
     @Override
     public void gopClan(Message ms) {

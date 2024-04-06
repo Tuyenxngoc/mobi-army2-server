@@ -18,7 +18,7 @@ public class SpecialItemData {
         public boolean onSale;
     }
 
-    public static ArrayList<SpecialItemEntry> entrys;
+    public static ArrayList<SpecialItemEntry> entrys = new ArrayList<>();
     public static int nSaleItem;
 
     public static final SpecialItemEntry getSpecialItemById(int id) {

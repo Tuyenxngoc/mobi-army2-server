@@ -10,6 +10,8 @@ import lombok.Setter;
 @Setter
 public class User {
 
+    public static NVData.EquipmentEntry[][] nvEquipDefault;
+
     private ISession session;
     private UserState state = UserState.WAITING;
     private int id;

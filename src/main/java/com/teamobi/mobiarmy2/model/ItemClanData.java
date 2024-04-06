@@ -15,7 +15,7 @@ public class ItemClanData {
         public int luong = 0;
     }
 
-    public static ArrayList<ItemClanEntry> entrys;
+    public static ArrayList<ItemClanEntry> entrys = new ArrayList<>();
 
     public static final ItemClanEntry getItemClanId(int id) {
         ItemClanEntry idEntry = null;

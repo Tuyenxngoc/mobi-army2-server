@@ -14,7 +14,7 @@ public interface IUserService {
 
     void nhiemVuView(Message ms);
 
-    void login(Message ms);
+    void handleLogin(Message ms);
 
     void sendLoginSuccess();
 
