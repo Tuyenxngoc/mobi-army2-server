@@ -30,6 +30,8 @@ public class ServerManager {
     private long countClients;
     private boolean isStart;
 
+    private Room[] rooms;
+
     private final ArrayList<ISession> users = new ArrayList<>();
 
     public ServerManager() {

@@ -265,7 +265,7 @@ public class UserService implements IUserService {
 
     @Override
     public void batDau(Message ms) {
-
+        user.getFightWait().startGame(user);
     }
 
     @Override
@@ -275,7 +275,6 @@ public class UserService implements IUserService {
 
     @Override
     public void Bann(Message ms) {
-
     }
 
     @Override

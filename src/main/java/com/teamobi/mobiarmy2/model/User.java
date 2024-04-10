@@ -1,6 +1,8 @@
 package com.teamobi.mobiarmy2.model;
 
 import com.teamobi.mobiarmy2.constant.UserState;
+import com.teamobi.mobiarmy2.fight.FightManager;
+import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import lombok.Getter;
@@ -25,6 +27,8 @@ public class User {
     private boolean isLogged;
     private boolean isLock;
     private boolean isActive;
+
+    private FightWait fightWait;
 
     public User() {
     }
