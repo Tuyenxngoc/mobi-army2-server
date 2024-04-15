@@ -4,8 +4,6 @@ import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessageHandler;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.server.ServerManager;
-import com.teamobi.mobiarmy2.service.IUserService;
-import com.teamobi.mobiarmy2.service.Impl.UserService;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -27,7 +25,7 @@ public class Session implements ISession {
     );
 
     private final long sessionId;
-    private final User user;
+    private final User user = null;
 
     private Socket socket;
     private DataInputStream dis;
@@ -43,10 +41,10 @@ public class Session implements ISession {
     private Thread collectorThread;
     private Thread sendThread;
 
-    private final String IPAddress;
-    private String platform;
-    private String version;
-    private byte provider;
+    public final String IPAddress;
+    public String platform;
+    public String version;
+    public byte provider;
 
     public Session(long sessionId, Socket socket) throws IOException {
         this.sessionId = sessionId;
@@ -54,11 +52,7 @@ public class Session implements ISession {
         this.dis = new DataInputStream(socket.getInputStream());
         this.dos = new DataOutputStream(socket.getOutputStream());
         this.IPAddress = socket.getInetAddress().getHostName();
-
-        this.user = new User(this);
-        IUserService userService = new UserService(this.user);
-        this.messageHandler = new MessageHandler(userService);
-
+        this.messageHandler = new MessageHandler(this);
         this.sendThread = new Thread(sender);
         this.collectorThread = new Thread(new MessageCollector());
         this.collectorThread.start();
@@ -90,26 +84,26 @@ public class Session implements ISession {
         }
     }
 
-    @Override
-    public void sendKeys() throws IOException {
-        Message ms = new Message(-27);
-        DataOutputStream ds = ms.writer();
-        ds.writeByte(KEY.length);
-        ds.writeByte(KEY[0]);
-        for (int i = 1; i < KEY.length; i++) {
-            ds.writeByte(KEY[i] ^ KEY[i - 1]);
+    public void sendKeys() {
+        try {
+            Message ms = new Message(-27);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(KEY.length);
+            ds.writeByte(KEY[0]);
+            for (int i = 1; i < KEY.length; i++) {
+                ds.writeByte(KEY[i] ^ KEY[i - 1]);
+            }
+            ds.flush();
+            doSendMessage(ms);
+            sendKeyComplete = true;
+            sendThread.start();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        ds.flush();
-        doSendMessage(ms);
-        sendKeyComplete = true;
-        sendThread.start();
     }
 
     @Override
     public String toString() {
-        if (user.getUsername() != null && !user.getUsername().isEmpty()) {
-            return "User " + user.getUsername();
-        }
         return "Session id: " + sessionId;
     }
 

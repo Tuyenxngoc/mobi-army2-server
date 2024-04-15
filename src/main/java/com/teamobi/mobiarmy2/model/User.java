@@ -1,7 +1,6 @@
 package com.teamobi.mobiarmy2.model;
 
 import com.teamobi.mobiarmy2.constant.UserState;
-import com.teamobi.mobiarmy2.fight.FightManager;
 import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.Impl.Message;
