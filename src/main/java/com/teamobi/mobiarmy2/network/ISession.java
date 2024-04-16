@@ -6,13 +6,7 @@ public interface ISession {
 
     void sendMessage(Message message);
 
-    long getSessionId();
+    void sendKeys();
 
     void close();
-
-    void setPlatform(String platform);
-
-    void setProvider(byte provider);
-
-    void setVersion(String version);
 }

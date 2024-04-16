@@ -26,12 +26,9 @@ public class ServerManager {
     private final ILogManager log;
 
     private ServerSocket server;
-
     private long countClients;
     private boolean isStart;
-
     private Room[] rooms;
-
     private final ArrayList<ISession> users = new ArrayList<>();
 
     public ServerManager() {

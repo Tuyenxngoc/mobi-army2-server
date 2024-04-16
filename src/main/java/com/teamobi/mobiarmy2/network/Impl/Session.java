@@ -15,7 +15,7 @@ import java.util.List;
 public class Session implements ISession {
 
     private static final byte[] KEY = "bth.army2.ml".getBytes();
-    private static final int TIMEOUT_DURATION = 180000;
+    private static final int TIMEOUT_DURATION = 180_000;
     private static final List<Byte> WHITE_LIST_CMD = List.of(
             (byte) -27,
             (byte) 1,
@@ -23,9 +23,6 @@ public class Session implements ISession {
             (byte) 114,
             (byte) 127
     );
-
-    private final long sessionId;
-    private final User user = null;
 
     private Socket socket;
     private DataInputStream dis;
@@ -41,10 +38,12 @@ public class Session implements ISession {
     private Thread collectorThread;
     private Thread sendThread;
 
-    public final String IPAddress;
-    public String platform;
-    public String version;
-    public byte provider;
+    private final long sessionId;
+    private final String IPAddress;
+    private String platform;
+    private String version;
+    private byte provider;
+    private final User user;
 
     public Session(long sessionId, Socket socket) throws IOException {
         this.sessionId = sessionId;
@@ -52,7 +51,10 @@ public class Session implements ISession {
         this.dis = new DataInputStream(socket.getInputStream());
         this.dos = new DataOutputStream(socket.getOutputStream());
         this.IPAddress = socket.getInetAddress().getHostName();
-        this.messageHandler = new MessageHandler(this);
+
+        this.user = new User(this);
+        this.messageHandler = new MessageHandler(user.getUserService());
+
         this.sendThread = new Thread(sender);
         this.collectorThread = new Thread(new MessageCollector());
         this.collectorThread.start();
@@ -68,11 +70,6 @@ public class Session implements ISession {
     }
 
     @Override
-    public long getSessionId() {
-        return sessionId;
-    }
-
-    @Override
     public void close() {
         try {
             ServerManager serverManager = ServerManager.getInstance();
@@ -84,6 +81,7 @@ public class Session implements ISession {
         }
     }
 
+    @Override
     public void sendKeys() {
         try {
             Message ms = new Message(-27);
@@ -100,26 +98,6 @@ public class Session implements ISession {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public String toString() {
-        return "Session id: " + sessionId;
-    }
-
-    @Override
-    public void setPlatform(String platform) {
-        this.platform = platform;
-    }
-
-    @Override
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    @Override
-    public void setProvider(byte provider) {
-        this.provider = provider;
     }
 
     protected synchronized void doSendMessage(Message m) {

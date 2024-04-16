@@ -4,6 +4,8 @@ import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.Impl.Message;
+import com.teamobi.mobiarmy2.service.IUserService;
+import com.teamobi.mobiarmy2.service.Impl.UserService;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,13 +28,16 @@ public class User {
     private boolean isLogged;
     private boolean isLock;
     private boolean isActive;
-
     private FightWait fightWait;
 
+    private final IUserService userService;
+
     public User() {
+        this.userService = new UserService(this);
     }
 
     public User(ISession session) {
+        this();
         this.session = session;
     }
 
@@ -42,5 +47,9 @@ public class User {
 
     public void sendMessage(Message ms) {
         session.sendMessage(ms);
+    }
+
+    public void sendServerMessage(String ss) {
+        this.userService.sendServerMessage(ss);
     }
 }

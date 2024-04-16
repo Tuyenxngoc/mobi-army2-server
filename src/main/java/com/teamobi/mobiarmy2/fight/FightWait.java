@@ -8,5 +8,4 @@ import lombok.Setter;
 public class FightWait {
 
     private FightManager fightManager;
-
 }
