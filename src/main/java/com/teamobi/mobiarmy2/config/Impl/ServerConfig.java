@@ -11,7 +11,7 @@ public class ServerConfig implements IServerConfig {
     private boolean debug;
     private byte n_area;
     private String host;
-    private short post;
+    private short port;
     private String mysql_host;
     private String mysql_user;
     private String mysql_pass;
@@ -105,7 +105,7 @@ public class ServerConfig implements IServerConfig {
         debug = Boolean.parseBoolean(properties.getProperty("debug"));
         n_area = Byte.parseByte(properties.getProperty("n_area"));
         host = properties.getProperty("host");
-        post = Short.parseShort(properties.getProperty("post"));
+        port = Short.parseShort(properties.getProperty("port"));
         mysql_host = properties.getProperty("mysql_host");
         mysql_user = properties.getProperty("mysql_user");
         mysql_pass = properties.getProperty("mysql_pass");
@@ -189,7 +189,7 @@ public class ServerConfig implements IServerConfig {
 
     @Override
     public int getPort() {
-        return post;
+        return port;
     }
 
 

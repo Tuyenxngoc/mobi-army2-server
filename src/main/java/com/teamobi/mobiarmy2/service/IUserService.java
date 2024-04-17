@@ -143,4 +143,6 @@ public interface IUserService {
     void getMaterialIconMessage(Message ms);
 
     void startLuyenTap(Message ms);
+
+    void sendMs10(String userLoginMany);
 }

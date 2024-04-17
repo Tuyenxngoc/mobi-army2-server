@@ -82,6 +82,26 @@ public class Session implements ISession {
     }
 
     @Override
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    @Override
+    public void setPlatform(String platform) {
+        this.platform = platform;
+    }
+
+    @Override
+    public void setProvider(byte provider) {
+        this.provider = provider;
+    }
+
+    @Override
+    public User getUser() {
+        return user;
+    }
+
+    @Override
     public void sendKeys() {
         try {
             Message ms = new Message(-27);

@@ -1,10 +1,19 @@
 package com.teamobi.mobiarmy2.service.Impl;
 
+import com.teamobi.mobiarmy2.constant.Cmd;
+import com.teamobi.mobiarmy2.constant.CommonConstant;
+import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.dao.impl.UserDao;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.Impl.Message;
+import com.teamobi.mobiarmy2.server.BangXHManager;
+import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IUserService;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class UserService implements IUserService {
 
@@ -15,10 +24,85 @@ public class UserService implements IUserService {
         this.user = user;
     }
 
+    private void sendMessageLoginFail(String message) {
+        try {
+            Message ms = new Message(4);
+            DataOutputStream ds = ms.writer();
+            ds.writeUTF(message);
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void handleLogin(Message ms) {
+        if (user.isLogged()) {
+            return;
+        }
 
+        if (!BangXHManager.getInstance().isComplete) {
+            sendMessageLoginFail(GameString.getNotFinishedLoadingRanking());
+            return;
+        }
+
+        try {
+            DataInputStream dis = ms.reader();
+            String username = dis.readUTF().trim();
+            String password = dis.readUTF().trim();
+            String version = dis.readUTF();
+
+            ServerManager serverManager = ServerManager.getInstance();
+
+            //Kiểm tra có đang đăng nhập hay không
+            User userLogin = serverManager.getUser(username);
+            if (userLogin != null) {
+                userLogin.getUserService().sendMs10(GameString.userLoginMany());
+                userLogin.getSession().close();
+
+                sendMessageLoginFail(GameString.loginErr1());
+                return;
+            }
+
+            if (!username.matches(CommonConstant.ALPHANUMERIC_PATTERN) || !password.matches(CommonConstant.ALPHANUMERIC_PATTERN)) {
+                sendMessageLoginFail(GameString.reg_Error1());
+                return;
+            }
+
+            User userFound = userDao.findByUsernameAndPassword(username, password);
+            if (userFound == null) {
+                sendServerMessage(GameString.loginPassFail());
+                return;
+            }
+            if (userFound.isLock()) {
+                sendServerMessage(GameString.loginLock());
+                return;
+            }
+            if (!userFound.isActive()) {
+                sendServerMessage(GameString.loginActive());
+                return;
+            }
+
+            user.setId(user.getId());
+            user.setUsername(user.getUsername());
+            user.setPassword(user.getPassword());
+            user.setXu(user.getXu());
+            user.setLuong(user.getLuong());
+            user.setDanhVong(user.getDanhVong());
+
+            user.getSession().setVersion(version);
+            user.setLogged(true);
+
+            userDao.updateOnline(true, user.getId());
+
+            sendLoginSuccess();
+            serverManager.sendNVData(user);
+            serverManager.sendRoomInfo(user);
+            serverManager.sendMapCollisionInfo(user);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -43,7 +127,20 @@ public class UserService implements IUserService {
 
     @Override
     public void sendLoginSuccess() {
-
+        try {
+            Message ms = new Message(Cmd.LOGIN_SUCESS);
+            DataOutputStream ds = ms.writer();
+            ds.writeInt(user.getId());
+            ds.writeInt(user.getXu());
+            ds.writeInt(user.getLuong());
+            ds.writeByte(user.getNhanVat());
+            ds.writeShort(user.getClanId());
+            ds.writeByte(0);
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -53,12 +150,22 @@ public class UserService implements IUserService {
 
     @Override
     public void getVersionCode(Message ms) {
-
+        try {
+            String platform = ms.reader().readUTF();
+            user.getSession().setPlatform(platform);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void getProvider(Message ms) {
-
+        try {
+            byte provider = ms.reader().readByte();
+            user.getSession().setProvider(provider);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -108,7 +215,66 @@ public class UserService implements IUserService {
 
     @Override
     public void guiTinNhan(Message ms) {
+        try {
+            DataInputStream dis = ms.reader();
+            int id = dis.readInt();
+            String content = dis.readUTF().trim();
+            if (content.isEmpty() || content.length() > 100) {
+                return;
+            }
+            // Neu la admin -> bo qua
+            if (id == 1) {
+                return;
+            }
+            // Neu la nguoi dua tin -> send Mss 46-> chat The gioi
+            if (id == 2) {
+                // 10000xu/lan
+                if (user.getXu() < CommonConstant.PRICE_CHAT) {
+                    return;
+                }
+                user.updateXu(-CommonConstant.PRICE_CHAT);
+                sendServerInfo(GameString.mssTGString(user.getUsername(), content));
+                return;
+            }
+            User receiver = ServerManager.getInstance().getUser(id);
+            if (receiver == null) {
+                return;
+            }
+            sendMSSToUser(receiver, content);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    private void sendServerInfo(String s) {
+        try {
+            Message ms = new Message(Cmd.SERVER_INFO);
+            DataOutputStream ds = ms.writer();
+            ds.writeUTF(s);
+            ds.flush();
+            ServerManager.getInstance().sendToServer(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendMSSToUser(User us, String s) {
+        try {
+            Message ms = new Message(5);
+            DataOutputStream ds = ms.writer();
+            if (us != null) {
+                ds.writeInt(us.getId());
+                ds.writeUTF(us.getUsername());
+            } else {
+                ds.writeInt(1);
+                ds.writeUTF("ADMIN");
+            }
+            ds.writeUTF(s);
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -364,5 +530,18 @@ public class UserService implements IUserService {
     @Override
     public void startLuyenTap(Message ms) {
 
+    }
+
+    @Override
+    public void sendMs10(String message) {
+        try {
+            Message ms = new Message(Cmd.SET_MONEY_ERROR);
+            DataOutputStream ds = ms.writer();
+            ds.writeUTF(message);
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

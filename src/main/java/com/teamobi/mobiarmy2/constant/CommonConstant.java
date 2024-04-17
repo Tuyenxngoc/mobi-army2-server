@@ -6,4 +6,6 @@ public class CommonConstant {
     public static final String cacheFolder = "cache";
 
     public static final String mapCacheName = cacheFolder + "/valuesdata2";
+
+    public static final int PRICE_CHAT = 10_000;
 }

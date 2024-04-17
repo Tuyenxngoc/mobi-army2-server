@@ -8,6 +8,7 @@ import com.teamobi.mobiarmy2.log.ILogManager;
 import com.teamobi.mobiarmy2.log.LoggerUtil;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.ISession;
+import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.network.Impl.Session;
 import com.teamobi.mobiarmy2.service.IGameService;
 import com.teamobi.mobiarmy2.service.Impl.GameService;
@@ -60,6 +61,14 @@ public class ServerManager {
 
     public void sendMapCollisionInfo(User user) {
         gameService.sendMapCollisionInfo(user, config);
+    }
+
+    public void sendToServer(Message ms) {
+        synchronized (users) {
+            for (ISession session : users) {
+                session.sendMessage(ms);
+            }
+        }
     }
 
     public void init() {
@@ -121,5 +130,39 @@ public class ServerManager {
     public void disconnect(Session session) {
         users.remove(session);
         countClients--;
+    }
+
+    public User getUser(int userId) {
+        synchronized (users) {
+            for (ISession session : users) {
+                if (checkUser(session)) {
+                    User user = session.getUser();
+                    if (user.getId() == userId) {
+                        return user;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public User getUser(String username) {
+        synchronized (users) {
+            for (ISession session : users) {
+                if (checkUser(session)) {
+                    User user = session.getUser();
+                    if (user.getUsername().equals(username)) {
+                        return user;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private boolean checkUser(ISession session) {
+        return session != null &&
+                session.getUser() != null &&
+                session.getUser().isLogged();
     }
 }

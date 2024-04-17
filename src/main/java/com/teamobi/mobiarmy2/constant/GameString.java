@@ -82,8 +82,8 @@ public class GameString {
         return "Bạn có muốn sử dụng item này không? Sẽ xóa hết điểm đã nâng!.";
     }
 
-    public static String mssTGString() {
-        return "Tin nhắn từ %s: %s.";
+    public static String mssTGString(String sender, String content) {
+        return String.format("Tin nhắn từ %s: %s.", sender, content);
     }
 
     public static String dailyReward() {
