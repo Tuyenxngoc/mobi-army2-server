@@ -112,11 +112,11 @@ public interface IUserService {
 
     void doiMatKhau(Message ms);
 
-    void layFilePack(Message ms);
+    void getFilePack(Message ms);
 
     void nangCap(Message ms);
 
-    void nangCap2(Message ms);
+    void nangCap2();
 
     void macTrangBi(Message ms);
 

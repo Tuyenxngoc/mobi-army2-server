@@ -119,11 +119,11 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.TRAINING -> userService.startLuyenTap(ms);
 
-                case Cmd.GET_FILEPACK -> userService.layFilePack(ms);
+                case Cmd.GET_FILEPACK -> userService.getFilePack(ms);
 
                 case Cmd.ADD_POINT -> userService.nangCap(ms);
 
-                case Cmd.CHARACTOR_INFO -> userService.nangCap2(ms);
+                case Cmd.CHARACTOR_INFO -> userService.nangCap2();
 
                 case Cmd.CHANGE_EQUIP -> userService.macTrangBi(ms);
 

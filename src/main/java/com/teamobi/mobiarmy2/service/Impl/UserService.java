@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.service.Impl;
 
+import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.constant.GameString;
@@ -10,6 +11,7 @@ import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.server.BangXHManager;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IUserService;
+import com.teamobi.mobiarmy2.util.Until;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -136,6 +138,38 @@ public class UserService implements IUserService {
             ds.writeByte(user.getNhanVat());
             ds.writeShort(user.getClanId());
             ds.writeByte(0);
+
+            // Trang bị
+            for (int i = 0; i < 10; i++) {
+                ds.writeBoolean(false);
+                for (int j = 0; j < 5; j++) {
+                    ds.writeShort(-1);
+                }
+            }
+
+            //Item
+            for (int i = 0; i < 36; i++) {
+                ds.writeByte(99);
+                ds.writeInt(1);
+                ds.writeInt(1);
+            }
+
+            //Nhan vat
+            for (int i = 0; i < 10; i++) {
+                if (i > 2) {
+                    ds.writeByte(0);
+                    ds.writeShort(1);
+                    ds.writeShort(1);
+                }
+            }
+
+            IServerConfig config = ServerManager.getInstance().config();
+            // Thong tin them
+            ds.writeUTF(config.getGameInfo());
+            // Dia chi cua About me
+            ds.writeUTF(config.getGameInfoUrl());
+            // Dia chi dang ki doi
+            ds.writeUTF(config.getRegTeamUrl());
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
@@ -453,8 +487,96 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void layFilePack(Message ms) {
+    public void getFilePack(Message ms) {
+        try {
+            DataInputStream dis = ms.reader();
+            byte type = dis.readByte();
+            byte version = dis.readByte();
 
+            switch (type) {
+                case 1 -> {
+                    IServerConfig config = ServerManager.getInstance().config();
+                    byte currentVersion = config.geticondata2();
+                    writeFilePack(CommonConstant.iconCacheName, type, version, currentVersion);
+                }
+
+                case 2 -> {
+                    IServerConfig config = ServerManager.getInstance().config();
+                    byte currentVersion = config.geticondata2();
+                    writeFilePack(CommonConstant.mapCacheName, type, version, currentVersion);
+                }
+
+                case 3 -> {
+                    IServerConfig config = ServerManager.getInstance().config();
+                    byte currentVersion = config.geticondata2();
+                    writeFilePack(CommonConstant.playerCacheName, type, version, currentVersion);
+                }
+
+                case 4 -> {
+                    IServerConfig config = ServerManager.getInstance().config();
+                    byte currentVersion = config.geticondata2();
+                    writeFilePack(CommonConstant.equipCacheName, type, version, currentVersion);
+                }
+
+                case 5 -> {
+                    IServerConfig config = ServerManager.getInstance().config();
+                    byte currentVersion = config.geticondata2();
+                    writeFilePack(CommonConstant.levelCacheName, type, version, currentVersion);
+                }
+
+                case 6 -> {
+                    nangCap2();
+                    sendRuongDoInfo();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void writeFilePack(String fileName, byte type, byte version, byte currentVersion) {
+        try {
+            Message ms = new Message(Cmd.GET_FILEPACK);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(type);
+            ds.writeByte(currentVersion);
+            if (version != currentVersion) {
+                byte[] ab = Until.getFile(fileName);
+                if(ab != null){
+                    ds.writeShort(ab.length);
+                    ds.write(ab);
+                }
+            }
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendRuongDoInfo() {
+        try {
+            // Ruong trang bi
+            Message ms = new Message(Cmd.INVENTORY);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(0);
+            // DB Key
+            for (int i = 0; i < 5; i++) {
+                ds.writeInt(65536);
+            }
+            ds.flush();
+            user.sendMessage(ms);
+
+            // Ruong do dac biet
+            ms = new Message(125);
+            ds = ms.writer();
+            ds.writeByte(0);
+            ds.writeByte(0);
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -463,8 +585,31 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void nangCap2(Message ms) {
-
+    public void nangCap2() {
+        try {
+            Message ms = new Message(Cmd.CHARACTOR_INFO);
+            DataOutputStream ds = ms.writer();
+            // lever
+            ds.writeByte(1);
+            // lever %
+            ds.writeByte(0);
+            // Diem con lai de nang cap
+            ds.writeShort(0);
+            // So diem da cong
+            for (int i = 0; i < 5; i++) {
+                ds.writeShort(10);
+            }
+            // XP Get
+            ds.writeInt(0);
+            // XP Max Lever
+            ds.writeInt(1000);
+            /* Danh vong */
+            ds.writeInt(0);
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -509,7 +654,23 @@ public class UserService implements IUserService {
 
     @Override
     public void getBigImage(Message ms) {
-
+        try {
+            int idS = ms.reader().readByte();
+            ms = new Message(120);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(idS);
+            byte[] ab1 = Until.getFile("res/bigImage/bigImage" + idS + ".png");
+            if (ab1 != null) {
+                ds.writeShort(ab1.length);
+                ds.write(ab1);
+            } else {
+                ds.writeShort(0);
+            }
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

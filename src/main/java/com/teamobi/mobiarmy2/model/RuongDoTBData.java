@@ -7,13 +7,12 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class ruongDoTBEntry {
+public class RuongDoTBData {
     int index;
     LocalDateTime dayBuy;
     byte slotNull;
-    byte vipLevel;
     short[] invAdd;
-    short[] percenAdd;
+    short[] percentAdd;
     short[] anAdd;
     int[] slot;
     boolean isUse;

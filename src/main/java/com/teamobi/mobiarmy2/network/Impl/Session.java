@@ -120,6 +120,14 @@ public class Session implements ISession {
         }
     }
 
+    @Override
+    public String toString() {
+        if (user.getUsername() != null) {
+            return user.getUsername();
+        }
+        return "Client " + sessionId;
+    }
+
     protected synchronized void doSendMessage(Message m) {
         byte[] data = m.getData();
         try {

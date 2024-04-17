@@ -29,4 +29,13 @@ public interface IServerConfig {
     int[] getRoomTypeStartNum();
 
     byte[] getMapIdBoss();
+
+    String getGameInfo();
+
+    String getGameInfoUrl();
+
+    String getRegTeamUrl();
+
+    byte geticondata2();
+
 }

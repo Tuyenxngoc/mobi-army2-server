@@ -1,6 +1,5 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
-import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.dao.Dao;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
@@ -45,7 +44,7 @@ public class UserDao implements Dao<User>, IUserDao {
         User user = null;
         try (Connection connection = HikariCPManager.getInstance().getConnection()) {
             // Truy vấn để lấy thông tin từ bảng user
-            String userQuery = "SELECT * FROM user WHERE username = ? AND password = ?";
+            String userQuery = "SELECT * FROM user WHERE user = ? AND password = ?";
             try (PreparedStatement userStatement = connection.prepareStatement(userQuery)) {
                 userStatement.setString(1, username);
                 userStatement.setString(2, password);
@@ -53,7 +52,7 @@ public class UserDao implements Dao<User>, IUserDao {
                     if (userResultSet.next()) {
                         user = new User();
                         user.setId(userResultSet.getInt("user_id"));
-                        user.setUsername(userResultSet.getString("username"));
+                        user.setUsername(userResultSet.getString("user"));
                         user.setPassword(userResultSet.getString("password"));
                         user.setLock(userResultSet.getBoolean("lock"));
                         user.setActive(userResultSet.getBoolean("active"));
@@ -63,27 +62,15 @@ public class UserDao implements Dao<User>, IUserDao {
 
             if (user != null) {
                 // Truy vấn để lấy thông tin từ bảng player
-                String playerQuery = "SELECT * FROM player WHERE user_id = ?";
+                String playerQuery = "SELECT * FROM armymem WHERE id = ?";
                 try (PreparedStatement playerStatement = connection.prepareStatement(playerQuery)) {
                     playerStatement.setInt(1, user.getId());
                     try (ResultSet playerResultSet = playerStatement.executeQuery()) {
                         if (playerResultSet.next()) {
+
                             user.setXu(playerResultSet.getInt("xu"));
                             user.setLuong(playerResultSet.getInt("luong"));
-                            user.setDanhVong(playerResultSet.getInt("danh_vong"));
-                            user.setClanId(playerResultSet.getShort("clan_id"));
-                            user.setPointEvent(playerResultSet.getInt("point_event"));
-
-                            Gson gson = new Gson();
-                            int[] friends = gson.fromJson(playerResultSet.getString("friends"), int[].class);
-                            if (friends != null && friends.length > 0) {
-                                user.setFriends(friends);
-                            } else {
-                                user.setFriends(new int[]{2});
-                            }
-
-                            String ruongTrangBi = playerResultSet.getString(("ruong_trang_bi"));
-                            String ruongItem = playerResultSet.getString(("ruong_item"));
+                            user.setDanhVong(playerResultSet.getInt("dvong"));
 
 
                         } else {//Tạo mới một bản ghi
@@ -100,7 +87,7 @@ public class UserDao implements Dao<User>, IUserDao {
 
     @Override
     public void updateOnline(boolean flag, int id) {
-        String sql = "UPDATE `armymem` SET `online` = ? WHERE user_id = ?";
+        String sql = "UPDATE `armymem` SET `online` = ? WHERE id = ?";
         HikariCPManager.getInstance().update(sql, flag, id);
     }
 

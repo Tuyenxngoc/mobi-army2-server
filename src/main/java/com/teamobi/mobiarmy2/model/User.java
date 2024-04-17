@@ -47,8 +47,8 @@ public class User {
     private int[] mission;
     private byte[] missionLevel;
 
-    private final List<ruongDoItemEntry> ruongDoItem = new ArrayList<>();
-    private final List<ruongDoTBEntry> ruongDoTB = new ArrayList<>();
+    private final List<RuongDoItemData> ruongDoItem = new ArrayList<>();
+    private final List<RuongDoTBData> ruongDoTB = new ArrayList<>();
     private FightWait fightWait;
 
     private final IUserService userService;

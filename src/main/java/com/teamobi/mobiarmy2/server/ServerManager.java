@@ -51,6 +51,10 @@ public class ServerManager {
         return log;
     }
 
+    public IServerConfig config() {
+        return config;
+    }
+
     public void sendNVData(User user) {
         gameService.sendNVData(user, config);
     }

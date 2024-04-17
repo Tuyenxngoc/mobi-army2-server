@@ -261,4 +261,24 @@ public class ServerConfig implements IServerConfig {
     public byte[] getMapIdBoss() {
         return mapIdBoss;
     }
+
+    @Override
+    public String getGameInfo() {
+        return addInfo;
+    }
+
+    @Override
+    public String getGameInfoUrl() {
+        return addInfoURL;
+    }
+
+    @Override
+    public String getRegTeamUrl() {
+        return regTeamURL;
+    }
+
+    @Override
+    public byte geticondata2() {
+        return 1;
+    }
 }
