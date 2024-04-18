@@ -3,12 +3,17 @@ package com.teamobi.mobiarmy2.dao.impl;
 import com.teamobi.mobiarmy2.dao.Dao;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
-import com.teamobi.mobiarmy2.model.User;
+import com.teamobi.mobiarmy2.model.*;
+import com.teamobi.mobiarmy2.util.Until;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,7 +76,10 @@ public class UserDao implements Dao<User>, IUserDao {
                             user.setXu(playerResultSet.getInt("xu"));
                             user.setLuong(playerResultSet.getInt("luong"));
                             user.setDanhVong(playerResultSet.getInt("dvong"));
-
+                            user.setNvUsed((byte) (playerResultSet.getByte("NVused") - 1));
+                            user.setClanId(playerResultSet.getShort("clan"));
+                            user.setXpX2Time(LocalDateTime.parse(playerResultSet.getString("x2XPTime")));
+                            user.setPointEvent(playerResultSet.getInt("point_event"));
 
                         } else {//Tạo mới một bản ghi
                             HikariCPManager.getInstance().update("INSERT INTO `armymem`(`user_id`) VALUES (?)", user.getId());

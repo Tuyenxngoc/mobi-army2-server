@@ -55,26 +55,6 @@ public class ServerManager {
         return config;
     }
 
-    public void sendNVData(User user) {
-        gameService.sendNVData(user, config);
-    }
-
-    public void sendRoomInfo(User user) {
-        gameService.sendRoomInfo(user, config);
-    }
-
-    public void sendMapCollisionInfo(User user) {
-        gameService.sendMapCollisionInfo(user, config);
-    }
-
-    public void sendToServer(Message ms) {
-        synchronized (users) {
-            for (ISession session : users) {
-                session.sendMessage(ms);
-            }
-        }
-    }
-
     public void init() {
         initServerData();
         setCache();
@@ -134,6 +114,14 @@ public class ServerManager {
     public void disconnect(Session session) {
         users.remove(session);
         countClients--;
+    }
+
+    public void sendToServer(Message ms) {
+        synchronized (users) {
+            for (ISession session : users) {
+                session.sendMessage(ms);
+            }
+        }
     }
 
     public User getUser(int userId) {

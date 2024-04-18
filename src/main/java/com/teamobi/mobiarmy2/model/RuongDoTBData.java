@@ -3,19 +3,20 @@ package com.teamobi.mobiarmy2.model;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Getter
 @Setter
 public class RuongDoTBData {
-    int index;
-    LocalDateTime dayBuy;
-    byte slotNull;
-    short[] invAdd;
-    short[] percentAdd;
-    short[] anAdd;
-    int[] slot;
-    boolean isUse;
-    NVData.EquipmentEntry entry;
-    byte cap;
+    public int index;
+    public Date dayBuy;
+    public byte vipLevel;
+    public byte slotNull;
+    public short[] invAdd;
+    public short[] percentAdd;
+    public short[] anAdd;
+    public int[] slot;
+    public boolean isUse;
+    public NVData.EquipmentEntry entry;
+    public byte cap;
 }

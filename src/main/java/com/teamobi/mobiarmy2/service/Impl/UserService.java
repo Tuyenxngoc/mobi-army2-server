@@ -6,6 +6,8 @@ import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.dao.impl.UserDao;
+import com.teamobi.mobiarmy2.model.MapData;
+import com.teamobi.mobiarmy2.model.NVData;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.server.BangXHManager;
@@ -16,6 +18,7 @@ import com.teamobi.mobiarmy2.util.Until;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class UserService implements IUserService {
 
@@ -55,18 +58,6 @@ public class UserService implements IUserService {
             String password = dis.readUTF().trim();
             String version = dis.readUTF();
 
-            ServerManager serverManager = ServerManager.getInstance();
-
-            //Kiểm tra có đang đăng nhập hay không
-            User userLogin = serverManager.getUser(username);
-            if (userLogin != null) {
-                userLogin.getUserService().sendMs10(GameString.userLoginMany());
-                userLogin.getSession().close();
-
-                sendMessageLoginFail(GameString.loginErr1());
-                return;
-            }
-
             if (!username.matches(CommonConstant.ALPHANUMERIC_PATTERN) || !password.matches(CommonConstant.ALPHANUMERIC_PATTERN)) {
                 sendMessageLoginFail(GameString.reg_Error1());
                 return;
@@ -86,30 +77,172 @@ public class UserService implements IUserService {
                 return;
             }
 
-            user.setId(user.getId());
-            user.setUsername(user.getUsername());
-            user.setPassword(user.getPassword());
-            user.setXu(user.getXu());
-            user.setLuong(user.getLuong());
-            user.setDanhVong(user.getDanhVong());
+            ServerManager serverManager = ServerManager.getInstance();
+
+            //Kiểm tra có đang đăng nhập hay không
+            User userLogin = serverManager.getUser(userFound.getId());
+            if (userLogin != null) {
+                userLogin.getUserService().sendMs10(GameString.userLoginMany());
+                userLogin.getSession().close();
+
+                sendMessageLoginFail(GameString.loginErr1());
+                return;
+            }
+
+            user.setId(userFound.getId());
+            user.setUsername(userFound.getUsername());
+            user.setPassword(userFound.getPassword());
+            user.setXu(userFound.getXu());
+            user.setLuong(userFound.getLuong());
+            user.setDanhVong(userFound.getDanhVong());
 
             user.getSession().setVersion(version);
             user.setLogged(true);
 
-            userDao.updateOnline(true, user.getId());
+            userDao.updateOnline(true, userFound.getId());
 
             sendLoginSuccess();
-            serverManager.sendNVData(user);
-            serverManager.sendRoomInfo(user);
-            serverManager.sendMapCollisionInfo(user);
+            IServerConfig config = serverManager.config();
+            sendNVData(config);
+            sendRoomInfo(config);
+            sendMapCollisionInfo(config);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendNVData(IServerConfig config) {
+        try {
+            // Send mss 64
+            Message ms = new Message(64);
+            DataOutputStream ds = ms.writer();
+            ArrayList<NVData.NVEntry> nvdatas = NVData.entrys;
+            int len = nvdatas.size();
+            ds.writeByte(len);
+            // Ma sat gio cac nv
+            for (NVData.NVEntry entry : nvdatas) {
+                ds.writeByte(entry.ma_sat_gio);
+            }
+            // Goc cuu tieu
+            ds.writeByte(len);
+            for (NVData.NVEntry entry : nvdatas) {
+                ds.writeShort(entry.goc_min);
+            }
+            // Sat thuong 1 vien dan
+            ds.writeByte(len);
+            for (NVData.NVEntry nvEntry : nvdatas) {
+                ds.writeByte(nvEntry.sat_thuong_dan);
+            }
+            // So dan
+            ds.writeByte(len);
+            for (NVData.NVEntry nvdata : nvdatas) {
+                ds.writeByte(nvdata.so_dan);
+            }
+            // Max player
+            ds.writeByte(config.getMaxElementFight());
+            // Map boss
+            ds.writeByte(config.getNumMapBoss());
+            for (int i = 0; i < config.getNumMapBoss(); i++) {
+                ds.writeByte(config.getStartMapBoss() + i);
+            }
+            // Type map boss
+            for (int i = 0; i < config.getNumMapBoss(); i++) {
+                ds.writeByte(config.getMapIdBoss()[i]);
+            }
+            // NUMB Player
+            ds.writeByte(config.getNumbPlayers());
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendRoomInfo(IServerConfig config) {
+        sendRoomCaption(user, config);
+        sendRoomName(user, config);
+    }
+
+    private void sendRoomName(User user, IServerConfig config) {
+        try {
+            // Cap nhat ten khu vuc
+            Message ms = new Message(-19);
+            DataOutputStream ds = ms.writer();
+            // Size
+            ds.writeByte(config.getNameRooms().length);
+            for (int i = 0; i < config.getNameRooms().length; i++) {
+                // He so cong
+                int namen = config.getNameRoomNumbers()[i];
+                int typen = config.getNameRoomTypes()[i];
+                if (namen > (config.getNRoom()[typen] + config.getRoomTypeStartNum()[typen])) {
+                    continue;
+                }
+                int notRoom = 0;
+                for (int j = 0; j < typen; j++) {
+                    if (config.getNRoom()[j] > 0) {
+                        notRoom++;
+                    }
+                }
+                ds.writeByte(config.getRoomTypeStartNum()[typen] + notRoom);
+                // Ten cho phong viet hoa
+                ds.writeUTF("Phòng " + (config.getRoomTypeStartNum()[typen] + namen) + ": " + config.getNameRooms()[i]);
+                // So
+                ds.writeByte(namen);
+            }
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendRoomCaption(User user, IServerConfig config) {
+        try {
+            // Send mss 88
+            Message ms = new Message(88);
+            DataOutputStream ds = ms.writer();
+            // Size
+            ds.writeByte(config.getRoomTypes().length);
+            for (int i = 0; i < config.getRoomTypes().length; i++) {
+                // Ten viet hoa
+                ds.writeUTF(config.getRoomTypes()[i]);
+                // Ten tieng anh
+                ds.writeUTF(config.getRoomTypesEng()[i]);
+            }
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendMapCollisionInfo(IServerConfig config) {
+        try {
+            // Send mss 92
+            Message ms = new Message(92);
+            DataOutputStream ds = ms.writer();
+            ds.writeShort(MapData.idNotCollisions.length);
+            for (int i = 0; i < MapData.idNotCollisions.length; i++) {
+                ds.writeShort(MapData.idNotCollisions[i]);
+            }
+            ds.flush();
+            user.sendMessage(ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void sendServerMessage(String ms) {
-
+    public void sendServerMessage(String message) {
+        try {
+            Message ms = new Message(Cmd.SERVER_MESSAGE);
+            DataOutputStream ds = ms.writer();
+            ds.writeUTF(message);
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -542,7 +675,7 @@ public class UserService implements IUserService {
             ds.writeByte(currentVersion);
             if (version != currentVersion) {
                 byte[] ab = Until.getFile(fileName);
-                if(ab != null){
+                if (ab != null) {
                     ds.writeShort(ab.length);
                     ds.write(ab);
                 }

@@ -1,13 +1,11 @@
 package com.teamobi.mobiarmy2.service.Impl;
 
-import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.model.CaptionData;
 import com.teamobi.mobiarmy2.model.MapData;
 import com.teamobi.mobiarmy2.model.NVData;
 import com.teamobi.mobiarmy2.model.User;
-import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.service.IGameService;
 import com.teamobi.mobiarmy2.team.TeamImageOutput;
 import com.teamobi.mobiarmy2.util.Until;
@@ -16,7 +14,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class GameService implements IGameService {
 
@@ -208,130 +205,6 @@ public class GameService implements IGameService {
             for (int j = 0; j < 3; j++) {
                 User.nvEquipDefault[i][j] = NVData.getEquipEntryById(i, j, defaultNvData[i][j]);
             }
-        }
-    }
-
-    @Override
-    public void sendNVData(User user, IServerConfig config) {
-        try {
-            // Send mss 64
-            Message ms = new Message(64);
-            DataOutputStream ds = ms.writer();
-            ArrayList<NVData.NVEntry> nvdatas = NVData.entrys;
-            int len = nvdatas.size();
-            ds.writeByte(len);
-            // Ma sat gio cac nv
-            for (NVData.NVEntry entry : nvdatas) {
-                ds.writeByte(entry.ma_sat_gio);
-            }
-            // Goc cuu tieu
-            ds.writeByte(len);
-            for (NVData.NVEntry entry : nvdatas) {
-                ds.writeShort(entry.goc_min);
-            }
-            // Sat thuong 1 vien dan
-            ds.writeByte(len);
-            for (NVData.NVEntry nvEntry : nvdatas) {
-                ds.writeByte(nvEntry.sat_thuong_dan);
-            }
-            // So dan
-            ds.writeByte(len);
-            for (NVData.NVEntry nvdata : nvdatas) {
-                ds.writeByte(nvdata.so_dan);
-            }
-            // Max player
-            ds.writeByte(config.getMaxElementFight());
-            // Map boss
-            ds.writeByte(config.getNumMapBoss());
-            for (int i = 0; i < config.getNumMapBoss(); i++) {
-                ds.writeByte(config.getStartMapBoss() + i);
-            }
-            // Type map boss
-            for (int i = 0; i < config.getNumMapBoss(); i++) {
-                ds.writeByte(config.getMapIdBoss()[i]);
-            }
-            // NUMB Player
-            ds.writeByte(config.getNumbPlayers());
-            ds.flush();
-            user.sendMessage(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void sendRoomInfo(User user, IServerConfig config) {
-        sendRoomCaption(user, config);
-        sendRoomName(user, config);
-    }
-
-    private void sendRoomName(User user, IServerConfig config) {
-        try {
-            // Cap nhat ten khu vuc
-            Message ms = new Message(-19);
-            DataOutputStream ds = ms.writer();
-            // Size
-            ds.writeByte(config.getNameRooms().length);
-            for (int i = 0; i < config.getNameRooms().length; i++) {
-                // He so cong
-                int namen = config.getNameRoomNumbers()[i];
-                int typen = config.getNameRoomTypes()[i];
-                if (namen > (config.getNRoom()[typen] + config.getRoomTypeStartNum()[typen])) {
-                    continue;
-                }
-                int notRoom = 0;
-                for (int j = 0; j < typen; j++) {
-                    if (config.getNRoom()[j] > 0) {
-                        notRoom++;
-                    }
-                }
-                ds.writeByte(config.getRoomTypeStartNum()[typen] + notRoom);
-                // Ten cho phong viet hoa
-                ds.writeUTF("Phòng " + (config.getRoomTypeStartNum()[typen] + namen) + ": " + config.getNameRooms()[i]);
-                // So
-                ds.writeByte(namen);
-            }
-            ds.flush();
-            user.sendMessage(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void sendRoomCaption(User user, IServerConfig config) {
-        try {
-            // Send mss 88
-            Message ms = new Message(88);
-            DataOutputStream ds = ms.writer();
-            // Size
-            ds.writeByte(config.getRoomTypes().length);
-            for (int i = 0; i < config.getRoomTypes().length; i++) {
-                // Ten viet hoa
-                ds.writeUTF(config.getRoomTypes()[i]);
-                // Ten tieng anh
-                ds.writeUTF(config.getRoomTypesEng()[i]);
-            }
-            ds.flush();
-            user.sendMessage(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void sendMapCollisionInfo(User user, IServerConfig config) {
-        try {
-            // Send mss 92
-            Message ms = new Message(92);
-            DataOutputStream ds = ms.writer();
-            ds.writeShort(MapData.idNotCollisions.length);
-            for (int i = 0; i < MapData.idNotCollisions.length; i++) {
-                ds.writeShort(MapData.idNotCollisions[i]);
-            }
-            ds.flush();
-            user.sendMessage(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 

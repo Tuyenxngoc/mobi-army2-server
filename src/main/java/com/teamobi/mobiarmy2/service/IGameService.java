@@ -1,8 +1,5 @@
 package com.teamobi.mobiarmy2.service;
 
-import com.teamobi.mobiarmy2.config.IServerConfig;
-import com.teamobi.mobiarmy2.model.User;
-
 public interface IGameService {
 
     void setCacheMaps();
@@ -22,12 +19,6 @@ public interface IGameService {
     void getClanShopData();
 
     void getSpecialItemData();
-
-    void sendNVData(User user, IServerConfig config);
-
-    void sendRoomInfo(User user, IServerConfig config);
-
-    void sendMapCollisionInfo(User user, IServerConfig config);
 
     void getFormulaData();
 

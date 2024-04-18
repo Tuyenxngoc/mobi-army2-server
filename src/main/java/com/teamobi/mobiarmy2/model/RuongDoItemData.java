@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RuongDoItemData {
-    int numb;
-    SpecialItemData.SpecialItemEntry entry;
+    public int numb;
+    public SpecialItemData.SpecialItemEntry entry;
 }

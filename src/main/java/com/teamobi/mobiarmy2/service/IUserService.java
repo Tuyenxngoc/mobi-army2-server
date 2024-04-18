@@ -6,7 +6,7 @@ public interface IUserService {
 
     void handleLogin(Message ms);
 
-    void sendServerMessage(String ms);
+    void sendServerMessage(String message);
 
     void handleHandshakeMessage();
 
