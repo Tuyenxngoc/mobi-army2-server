@@ -4,38 +4,37 @@ public interface IServerConfig {
 
     int getPort();
 
-    byte getMaxElementFight();
-
     boolean isDebug();
-
-    byte getNumMapBoss();
-
-    byte getStartMapBoss();
-
-    byte getNumbPlayers();
 
     String[] getRoomTypes();
 
     String[] getRoomTypesEng();
 
-    String[] getNameRooms();
+    byte getEquipVersion2();
 
-    int[] getNameRoomNumbers();
+    byte getIconversion2();
 
-    int[] getNameRoomTypes();
+    byte getLevelCVersion2();
 
-    byte[] getNRoom();
+    byte getValuesversion2();
 
-    int[] getRoomTypeStartNum();
-
-    byte[] getMapIdBoss();
+    byte getPlayerVersion2();
 
     String getGameInfo();
 
     String getGameInfoUrl();
 
-    String getRegTeamUrl();
+    String getGameClanUrl();
 
-    byte geticondata2();
+    int getMaxPlayerFight();
 
+    int getNumMapBoss();
+
+    int getStartMapBoss();
+
+    byte[] getMapIdBoss();
+
+    byte getNumbPlayers();
+
+    String[] getNameRooms();
 }

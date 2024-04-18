@@ -95,6 +95,8 @@ public class UserService implements IUserService {
             user.setXu(userFound.getXu());
             user.setLuong(userFound.getLuong());
             user.setDanhVong(userFound.getDanhVong());
+            user.setRuongDoItem(userFound.getRuongDoItem());
+            user.setRuongDoTB(userFound.getRuongDoTB());
 
             user.getSession().setVersion(version);
             user.setLogged(true);
@@ -113,33 +115,32 @@ public class UserService implements IUserService {
 
     public void sendNVData(IServerConfig config) {
         try {
-            // Send mss 64
-            Message ms = new Message(64);
+            Message ms = new Message(Cmd.ANTI_HACK_MESS);
             DataOutputStream ds = ms.writer();
-            ArrayList<NVData.NVEntry> nvdatas = NVData.entrys;
-            int len = nvdatas.size();
+            ArrayList<NVData.NVEntry> entries = NVData.entrys;
+            int len = entries.size();
             ds.writeByte(len);
             // Ma sat gio cac nv
-            for (NVData.NVEntry entry : nvdatas) {
+            for (NVData.NVEntry entry : entries) {
                 ds.writeByte(entry.ma_sat_gio);
             }
             // Goc cuu tieu
             ds.writeByte(len);
-            for (NVData.NVEntry entry : nvdatas) {
+            for (NVData.NVEntry entry : entries) {
                 ds.writeShort(entry.goc_min);
             }
             // Sat thuong 1 vien dan
             ds.writeByte(len);
-            for (NVData.NVEntry nvEntry : nvdatas) {
+            for (NVData.NVEntry nvEntry : entries) {
                 ds.writeByte(nvEntry.sat_thuong_dan);
             }
             // So dan
             ds.writeByte(len);
-            for (NVData.NVEntry nvdata : nvdatas) {
+            for (NVData.NVEntry nvdata : entries) {
                 ds.writeByte(nvdata.so_dan);
             }
             // Max player
-            ds.writeByte(config.getMaxElementFight());
+            ds.writeByte(config.getMaxPlayerFight());
             // Map boss
             ds.writeByte(config.getNumMapBoss());
             for (int i = 0; i < config.getNumMapBoss(); i++) {
@@ -159,54 +160,21 @@ public class UserService implements IUserService {
     }
 
     public void sendRoomInfo(IServerConfig config) {
-        sendRoomCaption(user, config);
-        sendRoomName(user, config);
+        sendRoomCaption(config);
+        sendRoomName(config);
     }
 
-    private void sendRoomName(User user, IServerConfig config) {
-        try {
-            // Cap nhat ten khu vuc
-            Message ms = new Message(-19);
-            DataOutputStream ds = ms.writer();
-            // Size
-            ds.writeByte(config.getNameRooms().length);
-            for (int i = 0; i < config.getNameRooms().length; i++) {
-                // He so cong
-                int namen = config.getNameRoomNumbers()[i];
-                int typen = config.getNameRoomTypes()[i];
-                if (namen > (config.getNRoom()[typen] + config.getRoomTypeStartNum()[typen])) {
-                    continue;
-                }
-                int notRoom = 0;
-                for (int j = 0; j < typen; j++) {
-                    if (config.getNRoom()[j] > 0) {
-                        notRoom++;
-                    }
-                }
-                ds.writeByte(config.getRoomTypeStartNum()[typen] + notRoom);
-                // Ten cho phong viet hoa
-                ds.writeUTF("Phòng " + (config.getRoomTypeStartNum()[typen] + namen) + ": " + config.getNameRooms()[i]);
-                // So
-                ds.writeByte(namen);
-            }
-            ds.flush();
-            user.sendMessage(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void sendRoomName(IServerConfig config) {
+
     }
 
-    private void sendRoomCaption(User user, IServerConfig config) {
+    private void sendRoomCaption(IServerConfig config) {
         try {
-            // Send mss 88
-            Message ms = new Message(88);
+            Message ms = new Message(Cmd.ROOM_CAPTION);
             DataOutputStream ds = ms.writer();
-            // Size
             ds.writeByte(config.getRoomTypes().length);
             for (int i = 0; i < config.getRoomTypes().length; i++) {
-                // Ten viet hoa
                 ds.writeUTF(config.getRoomTypes()[i]);
-                // Ten tieng anh
                 ds.writeUTF(config.getRoomTypesEng()[i]);
             }
             ds.flush();
@@ -302,7 +270,7 @@ public class UserService implements IUserService {
             // Dia chi cua About me
             ds.writeUTF(config.getGameInfoUrl());
             // Dia chi dang ki doi
-            ds.writeUTF(config.getRegTeamUrl());
+            ds.writeUTF(config.getGameClanUrl());
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
@@ -629,31 +597,31 @@ public class UserService implements IUserService {
             switch (type) {
                 case 1 -> {
                     IServerConfig config = ServerManager.getInstance().config();
-                    byte currentVersion = config.geticondata2();
+                    byte currentVersion = config.getIconversion2();
                     writeFilePack(CommonConstant.iconCacheName, type, version, currentVersion);
                 }
 
                 case 2 -> {
                     IServerConfig config = ServerManager.getInstance().config();
-                    byte currentVersion = config.geticondata2();
+                    byte currentVersion = config.getValuesversion2();
                     writeFilePack(CommonConstant.mapCacheName, type, version, currentVersion);
                 }
 
                 case 3 -> {
                     IServerConfig config = ServerManager.getInstance().config();
-                    byte currentVersion = config.geticondata2();
+                    byte currentVersion = config.getPlayerVersion2();
                     writeFilePack(CommonConstant.playerCacheName, type, version, currentVersion);
                 }
 
                 case 4 -> {
                     IServerConfig config = ServerManager.getInstance().config();
-                    byte currentVersion = config.geticondata2();
+                    byte currentVersion = config.getEquipVersion2();
                     writeFilePack(CommonConstant.equipCacheName, type, version, currentVersion);
                 }
 
                 case 5 -> {
                     IServerConfig config = ServerManager.getInstance().config();
-                    byte currentVersion = config.geticondata2();
+                    byte currentVersion = config.getLevelCVersion2();
                     writeFilePack(CommonConstant.levelCacheName, type, version, currentVersion);
                 }
 

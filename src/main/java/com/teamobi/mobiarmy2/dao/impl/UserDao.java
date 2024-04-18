@@ -1,19 +1,19 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
+import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.dao.Dao;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
+import com.teamobi.mobiarmy2.json.DataCharacter;
+import com.teamobi.mobiarmy2.json.DataItem;
+import com.teamobi.mobiarmy2.json.Equipment;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.util.Until;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,10 +76,73 @@ public class UserDao implements Dao<User>, IUserDao {
                             user.setXu(playerResultSet.getInt("xu"));
                             user.setLuong(playerResultSet.getInt("luong"));
                             user.setDanhVong(playerResultSet.getInt("dvong"));
-                            user.setNvUsed((byte) (playerResultSet.getByte("NVused") - 1));
+                            user.setNvUsed(playerResultSet.getByte("NVused"));
                             user.setClanId(playerResultSet.getShort("clan"));
-                            user.setXpX2Time(LocalDateTime.parse(playerResultSet.getString("x2XPTime")));
                             user.setPointEvent(playerResultSet.getInt("point_event"));
+
+                            int len = NVData.entrys.size();
+                            user.nvStt = new boolean[len];
+                            user.lever = new int[len];
+                            user.leverPercent = new byte[len];
+                            user.xp = new int[len];
+                            user.point = new int[len];
+                            user.pointAdd = new int[len][5];
+                            user.NvData = new int[len][6];
+                            user.nvEquip = new RuongDoTBData[len][6];
+                            Gson gson = new Gson();
+
+                            Equipment[] equipments = gson.fromJson(playerResultSet.getString("ruongTrangBi"), Equipment[].class);
+                            for (int i = 0; i < equipments.length; i++) {
+                                Equipment equipment = equipments[i];
+                                RuongDoTBData rdtbEntry = new RuongDoTBData();
+
+                                int nvId = equipment.getNvId();
+                                int equipType = equipment.getEquipType();
+                                int equipId = equipment.getId();
+
+                                rdtbEntry.index = i;
+                                rdtbEntry.entry = NVData.getEquipEntryById(nvId, equipType, equipId);
+                                rdtbEntry.dayBuy = Until.getDate(equipment.getDayBuy());
+                                rdtbEntry.vipLevel = equipment.getVipLevel();
+                                rdtbEntry.isUse = equipment.isUse();
+                                rdtbEntry.invAdd = new short[5];
+                                rdtbEntry.percentAdd = new short[5];
+                                rdtbEntry.slot = new int[3];
+                                rdtbEntry.anAdd = new short[5];
+                                rdtbEntry.slotNull = 0;
+                                rdtbEntry.cap = 0;
+                                for (int l = 0; l < 5; l++) {
+                                    rdtbEntry.invAdd[l] = equipment.getInvAdd().get(l);
+                                }
+                                for (int l = 0; l < 5; l++) {
+                                    rdtbEntry.percentAdd[l] = equipment.getPercenAdd().get(l);
+                                }
+                                for (int l = 0; l < 3; l++) {
+                                    rdtbEntry.slot[l] = equipment.getSlot().get(l);
+                                    if (rdtbEntry.slot[l] == -1) {
+                                        rdtbEntry.slotNull++;
+                                    }
+                                }
+                                user.ruongDoTB.add(rdtbEntry);
+                            }
+
+                            DataItem[] dataItems = gson.fromJson(playerResultSet.getString("ruongItem"), DataItem[].class);
+                            for (DataItem item : dataItems) {
+                                RuongDoItemData rdiEntry = new RuongDoItemData();
+                                rdiEntry.entry = SpecialItemData.getSpecialItemById(item.getId());
+                                rdiEntry.numb = item.getNumb();
+                                user.getRuongDoItem().add(rdiEntry);
+                            }
+
+                            for (int i = 0; i < 10; i++) {
+                                DataCharacter dataCharacter = gson.fromJson(playerResultSet.getString("NV" + (i + 1)), DataCharacter.class);
+                                user.lever[i] = dataCharacter.getLever();
+                                user.xp[i] = dataCharacter.getXp();
+                                user.point[i] = dataCharacter.getPoint();
+                                for (int j = 0; j < 5; j++) {
+                                    user.pointAdd[i][j] = dataCharacter.getPointAdd().get(j);
+                                }
+                            }
 
                         } else {//Tạo mới một bản ghi
                             HikariCPManager.getInstance().update("INSERT INTO `armymem`(`user_id`) VALUES (?)", user.getId());

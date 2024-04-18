@@ -21,10 +21,9 @@ public class SpecialItemData {
     public static ArrayList<SpecialItemEntry> entrys = new ArrayList<>();
     public static int nSaleItem;
 
-    public static final SpecialItemEntry getSpecialItemById(int id) {
+    public static SpecialItemEntry getSpecialItemById(int id) {
         SpecialItemEntry spiEntry = null;
-        for (int i = 0; i < entrys.size(); i++) {
-            SpecialItemEntry spiEntry2 = entrys.get(i);
+        for (SpecialItemEntry spiEntry2 : entrys) {
             if (spiEntry2.id == id) {
                 spiEntry = spiEntry2;
                 break;

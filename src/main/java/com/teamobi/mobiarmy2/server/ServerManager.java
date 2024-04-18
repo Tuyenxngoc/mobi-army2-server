@@ -57,7 +57,12 @@ public class ServerManager {
 
     public void init() {
         initServerData();
+        initRooms();
         setCache();
+    }
+
+    private void initRooms() {
+
     }
 
     private void initServerData() {
@@ -127,7 +132,7 @@ public class ServerManager {
     public User getUser(int userId) {
         synchronized (users) {
             for (ISession session : users) {
-                if (checkUser(session)) {
+                if (session != null && session.getUser() != null) {
                     User user = session.getUser();
                     if (user.getId() == userId) {
                         return user;
@@ -136,25 +141,5 @@ public class ServerManager {
             }
         }
         return null;
-    }
-
-    public User getUser(String username) {
-        synchronized (users) {
-            for (ISession session : users) {
-                if (checkUser(session)) {
-                    User user = session.getUser();
-                    if (user.getUsername().equals(username)) {
-                        return user;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    private boolean checkUser(ISession session) {
-        return session != null &&
-                session.getUser() != null &&
-                session.getUser().isLogged();
     }
 }
