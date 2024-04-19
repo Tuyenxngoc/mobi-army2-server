@@ -62,7 +62,7 @@ public class ServerManager {
     }
 
     private void initRooms() {
-
+        rooms = new Room[10];
     }
 
     private void initServerData() {

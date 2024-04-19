@@ -101,17 +101,17 @@ public class GameService implements IGameService {
 
             byte[] dat = Until.getFile("res/itemSpecial.png");
             if (dat == null) {
-                System.out.println("File item_special.png not found!");
-                System.exit(0);
+                System.out.println("File res/itemSpecial.png not found!");
+                System.exit(1);
             }
-            System.out.println("[coreLG/a] " + "Lent Icon= " + dat.length);
+            System.out.println("Lent Icon= " + dat.length);
             ds1.writeShort(dat.length);
             ds1.write(dat);
             for (int i = 0; i < numChamp; i++) {
                 dat = Until.getFile("res/bullet/bullet" + i + ".png");
                 if (dat == null) {
                     System.out.println("File bullet" + i + ".png not found!");
-                    System.exit(0);
+                    System.exit(1);
                 }
                 ds1.writeShort(dat.length);
                 ds1.write(dat);
@@ -160,6 +160,9 @@ public class GameService implements IGameService {
                 throw new IOException("Folder player not found!");
             }
             File[] playerFiles = playerDir.listFiles();
+            if (playerFiles == null) {
+                System.exit(1);
+            }
             for (File f : playerFiles) {
                 tos.addFile(f.getName(), f.getPath());
             }
@@ -179,6 +182,9 @@ public class GameService implements IGameService {
                 throw new IOException("Folder map icon not found!");
             }
             File[] mapFiles = mapDir.listFiles();
+            if (mapFiles == null) {
+                System.exit(1);
+            }
             for (File f : mapFiles) {
                 tos2.addFile(f.getName(), f.getPath());
             }

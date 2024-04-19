@@ -22,11 +22,29 @@ public class ServerConfig implements IServerConfig {
     private String gameInfoUrl;
     private String gameClanUrl;
     private byte maxPlayersFight;
+    public static byte maxPlayers;
     private byte numMapBoss;
     private byte startMapBoss;
     private byte[] mapIdBoss;
     private byte numbPlayers;
     private String[] nameRooms;
+    private byte nPlayersInitRoom;
+    private int min_xu_so_cap;
+    private int min_xu_trung_cap;
+    private int min_xu_cao_cap;
+    private int min_xu_dau_truong;
+    private int min_xu_tu_do;
+    private int min_xu_boss;
+    private int min_xu_clan;
+    private int max_xu_so_cap;
+    private int max_xu_trung_cap;
+    private int max_xu_cao_cap;
+    private int max_xu_dau_truong;
+    private int max_xu_tu_do;
+    private int max_xu_boss;
+    private int max_xu_clan;
+    private byte initMap;
+
 
     private final Properties properties;
 
@@ -70,6 +88,27 @@ public class ServerConfig implements IServerConfig {
         mapIdBoss = gson.fromJson(properties.getProperty("map_id_boss"), byte[].class);
         numbPlayers = Byte.parseByte(properties.getProperty("numb_player"));
         nameRooms = gson.fromJson(properties.getProperty("name_rooms"), String[].class);
+
+        nPlayersInitRoom = Byte.parseByte(properties.getProperty("n_players_init_room"));
+
+        min_xu_so_cap = Integer.parseInt(properties.getProperty("min_xu_so_cap"));
+        min_xu_trung_cap = Integer.parseInt(properties.getProperty("min_xu_trung_cap"));
+        min_xu_cao_cap = Integer.parseInt(properties.getProperty("min_xu_cao_cap"));
+        min_xu_dau_truong = Integer.parseInt(properties.getProperty("min_xu_dau_truong"));
+        min_xu_tu_do = Integer.parseInt(properties.getProperty("min_xu_tu_do"));
+        min_xu_boss = Integer.parseInt(properties.getProperty("min_xu_boss"));
+        min_xu_clan = Integer.parseInt(properties.getProperty("min_xu_clan"));
+
+        max_xu_so_cap = Integer.parseInt(properties.getProperty("max_xu_so_cap"));
+        max_xu_trung_cap = Integer.parseInt(properties.getProperty("max_xu_trung_cap"));
+        max_xu_cao_cap = Integer.parseInt(properties.getProperty("max_xu_cao_cap"));
+        max_xu_dau_truong = Integer.parseInt(properties.getProperty("max_xu_dau_truong"));
+        max_xu_tu_do = Integer.parseInt(properties.getProperty("max_xu_tu_do"));
+        max_xu_boss = Integer.parseInt(properties.getProperty("max_xu_boss"));
+        max_xu_clan = Integer.parseInt(properties.getProperty("max_xu_clan"));
+
+        initMap = Byte.parseByte(properties.getProperty("init_map"));
+        maxPlayers = Byte.parseByte(properties.getProperty("max_players"));
     }
 
     @Override
@@ -164,5 +203,90 @@ public class ServerConfig implements IServerConfig {
     @Override
     public String[] getNameRooms() {
         return nameRooms;
+    }
+
+    @Override
+    public byte getnPlayersInitRoom() {
+        return nPlayersInitRoom;
+    }
+
+    @Override
+    public int getMin_xu_so_cap() {
+        return min_xu_so_cap;
+    }
+
+    @Override
+    public int getMin_xu_trung_cap() {
+        return min_xu_trung_cap;
+    }
+
+    @Override
+    public int getMin_xu_cao_cap() {
+        return min_xu_cao_cap;
+    }
+
+    @Override
+    public int getMin_xu_dau_truong() {
+        return min_xu_dau_truong;
+    }
+
+    @Override
+    public int getMin_xu_tu_do() {
+        return min_xu_tu_do;
+    }
+
+    @Override
+    public int getMin_xu_boss() {
+        return min_xu_boss;
+    }
+
+    @Override
+    public int getMin_xu_clan() {
+        return min_xu_clan;
+    }
+
+    @Override
+    public int getMax_xu_so_cap() {
+        return max_xu_so_cap;
+    }
+
+    @Override
+    public int getMax_xu_trung_cap() {
+        return max_xu_trung_cap;
+    }
+
+    @Override
+    public int getMax_xu_cao_cap() {
+        return max_xu_cao_cap;
+    }
+
+    @Override
+    public int getMax_xu_dau_truong() {
+        return max_xu_dau_truong;
+    }
+
+    @Override
+    public int getMax_xu_tu_do() {
+        return max_xu_tu_do;
+    }
+
+    @Override
+    public int getMax_xu_boss() {
+        return max_xu_boss;
+    }
+
+    @Override
+    public int getMax_xu_clan() {
+        return max_xu_clan;
+    }
+
+    @Override
+    public byte getInitMap() {
+        return initMap;
+    }
+
+    @Override
+    public byte getMaxPlayers() {
+        return maxPlayers;
     }
 }
