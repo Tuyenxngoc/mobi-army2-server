@@ -2,6 +2,9 @@ package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.dao.impl.ClanDao;
 
+/**
+ * @author tuyen
+ */
 public class ClanManager {
 
     private static ClanManager instance;

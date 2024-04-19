@@ -6,6 +6,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
+/**
+ * @author tuyen
+ */
 public class FightWait {
 
     private FightManager fightManager;

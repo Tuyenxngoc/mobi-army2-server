@@ -15,6 +15,9 @@ import java.util.List;
 
 @Getter
 @Setter
+/**
+ * @author tuyen
+ */
 public class User {
 
     public static NVData.EquipmentEntry[][] nvEquipDefault;

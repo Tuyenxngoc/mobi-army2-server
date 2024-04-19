@@ -3,6 +3,9 @@ package com.teamobi.mobiarmy2.dao.impl;
 import com.teamobi.mobiarmy2.dao.IClanDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 
+/**
+ * @author tuyen
+ */
 public class ClanDao implements IClanDao {
 
     @Override

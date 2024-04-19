@@ -8,6 +8,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author tuyen
+ */
 public class MapData {
 
     public static final class MapDataEntry {

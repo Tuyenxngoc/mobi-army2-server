@@ -1,5 +1,8 @@
 package com.teamobi.mobiarmy2.constant;
 
+/**
+ * @author tuyen
+ */
 public class GameString {
 
     public static String getNotFinishedLoadingRanking() {

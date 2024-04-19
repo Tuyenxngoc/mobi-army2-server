@@ -6,7 +6,11 @@ import com.teamobi.mobiarmy2.util.Until;
 
 import java.util.ArrayList;
 
+/**
+ * @author tuyen
+ */
 public class Room {
+    
     public byte id;
     public byte type;
     public String name;
@@ -16,7 +20,6 @@ public class Room {
     public int maxMap;
     public final FightWait[] entrys;
     public int nType;
-
     public ArrayList<Byte> slMap;
 
     public Room(int id, int type, int maxEntrys, int ntype) {
@@ -27,30 +30,6 @@ public class Room {
         byte maxPlayerInit = 0;
         byte map = 0;
         boolean isLH = false;
-
-        if (type == 5 && ntype == 9) {
-            this.slMap.add((byte) 31);
-        } else {
-            byte[] continuityType = new byte[]{5};
-            byte[] continuityNumbers = new byte[]{8};
-            for (int i = 0; i < continuityNumbers.length; i++) {
-                if (type == continuityType[i] && ntype == continuityNumbers[i]) {
-                    isLH = true;
-                    break;
-                }
-            }
-            if (!isLH) {
-                byte[] slMapId = new byte[]{30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40};
-                byte[] slMapType = new byte[]{5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5};
-                byte[] slMapNumbers = new byte[]{0, 0, 1, 2, 3, 4, 5, 6, 7, 7, 10, 11, 12, 13, 14};
-                for (int i = 0; i < slMapId.length; i++) {
-                    if (type != slMapType[i] || slMapNumbers[i] != ntype) {
-                        continue;
-                    }
-                    this.slMap.add(slMapId[i]);
-                }
-            }
-        }
 
         IServerConfig config = ServerManager.getInstance().config();
         switch (type) {
@@ -119,10 +98,5 @@ public class Room {
             this.entrys[i] = new FightWait(this, this.type, (byte) i, config.getMaxPlayers(), maxPlayerInit, map, (byte) Until.nextInt(0, 2), isLH);
         }
     }
-
-    protected int getFully() {
-        return 0;
-    }
-
 
 }

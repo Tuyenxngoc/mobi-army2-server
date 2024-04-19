@@ -9,6 +9,9 @@ import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * @author tuyen
+ */
 public class LoggerUtil implements ILogManager {
 
     private static final String logFilePath = "logs/log.txt";

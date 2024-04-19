@@ -18,6 +18,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+/**
+ * @author tuyen
+ */
 public class ServerManager {
 
     private static ServerManager instance;

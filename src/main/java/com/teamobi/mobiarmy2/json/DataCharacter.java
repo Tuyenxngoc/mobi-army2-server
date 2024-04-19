@@ -8,6 +8,9 @@ import java.util.List;
 
 @Getter
 @Setter
+/**
+ * @author tuyen
+ */
 public class DataCharacter {
     @SerializedName("data")
     private List<Integer> data;

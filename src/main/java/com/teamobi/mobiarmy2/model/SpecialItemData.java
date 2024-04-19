@@ -2,6 +2,9 @@ package com.teamobi.mobiarmy2.model;
 
 import java.util.ArrayList;
 
+/**
+ * @author tuyen
+ */
 public class SpecialItemData {
 
     public static final class SpecialItemEntry {

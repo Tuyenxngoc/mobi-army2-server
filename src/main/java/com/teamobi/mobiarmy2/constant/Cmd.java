@@ -1,5 +1,8 @@
 package com.teamobi.mobiarmy2.constant;
 
+/**
+ * @author tuyen
+ */
 public class Cmd {
     public static final byte GET_BIG_EQUIP_HD = -120;
     public static final byte DELETE_ACC = -106;

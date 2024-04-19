@@ -3,6 +3,9 @@ package com.teamobi.mobiarmy2.model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author tuyen
+ */
 public class NVData {
 
     public static class EquipmentData {

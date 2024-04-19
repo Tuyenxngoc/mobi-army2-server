@@ -4,6 +4,9 @@ import com.teamobi.mobiarmy2.network.IMessage;
 
 import java.io.*;
 
+/**
+ * @author tuyen
+ */
 public class Message implements IMessage {
 
     private byte command;

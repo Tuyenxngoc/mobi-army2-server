@@ -15,6 +15,9 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * @author tuyen
+ */
 public class GameService implements IGameService {
 
     private final IGameDao gameDao;

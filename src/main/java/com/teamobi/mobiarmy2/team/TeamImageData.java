@@ -1,5 +1,8 @@
 package com.teamobi.mobiarmy2.team;
 
+/**
+ * @author tuyen
+ */
 public class TeamImageData {
 
     private static final byte[] packData;

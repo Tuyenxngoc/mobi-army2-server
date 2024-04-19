@@ -5,6 +5,9 @@ import com.teamobi.mobiarmy2.network.IMessageHandler;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IUserService;
 
+/**
+ * @author tuyen
+ */
 public class MessageHandler implements IMessageHandler {
 
     private final IUserService userService;

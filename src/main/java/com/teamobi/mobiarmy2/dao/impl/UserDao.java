@@ -17,6 +17,9 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @author tuyen
+ */
 public class UserDao implements Dao<User>, IUserDao {
 
     @Override

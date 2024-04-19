@@ -7,6 +7,9 @@ import com.teamobi.mobiarmy2.constant.CommonConstant;
 import java.io.FileInputStream;
 import java.util.Properties;
 
+/**
+ * @author tuyen
+ */
 public class ServerConfig implements IServerConfig {
 
     private boolean debug;

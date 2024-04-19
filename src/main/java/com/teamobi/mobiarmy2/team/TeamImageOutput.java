@@ -7,6 +7,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * @author tuyen
+ */
 public class TeamImageOutput {
 
     private final ArrayList<String> names;

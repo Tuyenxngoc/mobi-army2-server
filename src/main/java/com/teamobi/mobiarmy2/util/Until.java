@@ -12,6 +12,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 
+/**
+ * @author tuyen
+ */
 public class Until {
 
     private static final Random rand;

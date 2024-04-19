@@ -12,6 +12,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author tuyen
+ */
 public class Session implements ISession {
 
     private static final byte[] KEY = "bth.army2.ml".getBytes();

@@ -7,6 +7,9 @@ import java.util.Date;
 
 @Getter
 @Setter
+/**
+ * @author tuyen
+ */
 public class RuongDoTBData {
     public int index;
     public Date dayBuy;

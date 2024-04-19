@@ -1,5 +1,8 @@
 package com.teamobi.mobiarmy2.constant;
 
+/**
+ * @author tuyen
+ */
 public class CommonConstant {
     public static final String ALPHANUMERIC_PATTERN = "^[a-zA-Z0-9]+$";
     public static final String RESOURCES_PATH = "src/main/resources/";

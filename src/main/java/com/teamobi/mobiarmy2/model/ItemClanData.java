@@ -2,6 +2,9 @@ package com.teamobi.mobiarmy2.model;
 
 import java.util.ArrayList;
 
+/**
+ * @author tuyen
+ */
 public class ItemClanData {
 
     public static final class ItemClanEntry {

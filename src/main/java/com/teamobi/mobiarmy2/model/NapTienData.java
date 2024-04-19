@@ -2,6 +2,9 @@ package com.teamobi.mobiarmy2.model;
 
 import java.util.ArrayList;
 
+/**
+ * @author tuyen
+ */
 public class NapTienData {
 
     public static class NapTienEntry {

@@ -8,6 +8,9 @@ import java.util.List;
 
 @Getter
 @Setter
+/**
+ * @author tuyen
+ */
 public class Equipment {
     @SerializedName("nvId")
     private int nvId;
