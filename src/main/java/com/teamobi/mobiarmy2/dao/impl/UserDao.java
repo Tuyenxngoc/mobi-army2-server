@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -141,9 +142,23 @@ public class UserDao implements Dao<User>, IUserDao {
                                 DataCharacter dataCharacter = gson.fromJson(playerResultSet.getString("NV" + (i + 1)), DataCharacter.class);
                                 user.lever[i] = dataCharacter.getLever();
                                 user.xp[i] = dataCharacter.getXp();
+                                user.leverPercent[i] = 0;
                                 user.point[i] = dataCharacter.getPoint();
                                 for (int j = 0; j < 5; j++) {
                                     user.pointAdd[i][j] = dataCharacter.getPointAdd().get(j);
+                                }
+
+                                List<Integer> data = dataCharacter.getData();
+                                for (int j = 0; j < 5; j++) {
+                                    user.NvData[i][j] = data.get(j);
+                                    if (user.NvData[i][j] >= 0 && user.NvData[i][j] < user.ruongDoTB.size()) {
+                                        RuongDoTBData rdE = user.ruongDoTB.get(user.NvData[i][j]);
+                                        if (rdE.entry.hanSD - Until.getNumDay(rdE.dayBuy, new Date()) > 0) {
+                                            user.nvEquip[i][j] = rdE;
+                                        } else {
+                                            rdE.isUse = false;
+                                        }
+                                    }
                                 }
                             }
 

@@ -88,6 +88,7 @@ public class ServerManager {
     }
 
     public void start() {
+        log.logMessage("Start server!");
         try {
             isStart = true;
             server = new ServerSocket(config.getPort());

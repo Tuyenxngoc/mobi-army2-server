@@ -100,6 +100,7 @@ public class UserService implements IUserService {
             user.setDanhVong(userFound.getDanhVong());
             user.setRuongDoItem(userFound.getRuongDoItem());
             user.setRuongDoTB(userFound.getRuongDoTB());
+            user.setNvEquip(userFound.getNvEquip());
 
             user.getSession().setVersion(version);
             user.setLogged(true);
@@ -247,7 +248,13 @@ public class UserService implements IUserService {
             for (int i = 0; i < 10; i++) {
                 ds.writeBoolean(false);
                 for (int j = 0; j < 5; j++) {
-                    ds.writeShort(-1);
+                    if (user.nvEquip[i][j] != null) {
+                        ds.writeShort(user.nvEquip[i][j].entry.id);
+                    } else if (User.nvEquipDefault[i][j] != null) {
+                        ds.writeShort(User.nvEquipDefault[i][j].id);
+                    } else {
+                        ds.writeShort(-1);
+                    }
                 }
             }
 
