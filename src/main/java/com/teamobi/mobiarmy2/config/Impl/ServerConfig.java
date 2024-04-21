@@ -11,88 +11,95 @@ import java.util.Properties;
  * @author tuyen
  */
 public class ServerConfig implements IServerConfig {
+    private final Properties configMap;
 
-    private final Properties properties;
-
-    private int port;
-    private byte iconversion2;
-    private byte valuesversion2;
-    private byte equipVersion2;
-    private byte levelCVersion2;
-    private byte playerVersion2;
     private boolean debug;
-    private int nRoom0;
-    private int nRoom1;
-    private int nRoom2;
-    private int nRoom3;
-    private int nRoom4;
-    private int nRoom5;
-    private int nRoom6;
-    private int nArea;
-    private int maxPlayer;
-    private int maxFight;
-    private int numbPlayer;
-    private int nPlayersInitRoom;
-    private int luyenTapMap;
-    private int xLtap;
-    private int yLtap;
-    private int xLtap1;
-    private int yLtap1;
-    private int startMapBoss;
-    private int numMapBoss;
-    private int initMap;
-    private int initMapBoss;
+    private byte n_area;
+    private String host;
+    private short port;
+    private String mysql_host;
+    private String mysql_user;
+    private String mysql_pass;
+    private String mysql_database;
+    private byte equipVersion2;
+    private byte iconversion2;
+    private byte levelCVersion2;
+    private byte valuesversion2;
+    private byte playerVersion2;
+    private byte[] nRoom;
+    private byte nRoomAll;
+    private byte maxElementFight;
+    private byte maxPlayers;
+    private byte numbPlayers;
+    private boolean mgtBullNew;
+    private byte nPlayersInitRoom;
+    private byte ltapMap;
+    private short[] Xltap, Yltap;
+    private byte initMap;
+    private byte initMapBoss;
     private String addInfo;
-    private String addInfoUrl;
-    private String regTeamUrl;
+    private String addInfoURL;
+    private String regTeamURL;
     private String taiGameName;
     private String taiGameInfo;
-    private String taiGameUrl;
-    private int maxClients;
-    private int maxRuongTrangBi;
-    private int maxRuongItem;
-    private int maxItem;
-    private boolean mgtBullNew;
-    private int maxFriends;
-    private int kinhNghiemUp;
-    private String sendChatLogin;
-    private String sendThu1;
-    private String sendThu2;
-    private String sendThu3;
-    private String sendThu4;
-    private String sendThu5;
-    private int minXuSoCap;
-    private int minXuTrungCap;
-    private int minXuCaoCap;
-    private int minXuDauTruong;
-    private int minXuTuDo;
-    private int minXuBoss;
-    private int minXuClan;
-    private int maxXuSoCap;
-    private int maxXuTrungCap;
-    private int maxXuCaoCap;
-    private int maxXuDauTruong;
-    private int maxXuTuDo;
-    private int maxXuBoss;
-    private int maxXuClan;
-    private int minTimeX61;
-    private int minTimeX62;
-    private int minTimeX63;
-    private int maxTimeX61;
-    private int maxTimeX62;
-    private int maxTimeX63;
-    private int kinhNghiemUp2;
-    private int xuNhanDuoc;
-    private int xuBiTru;
-    private int luongNhanDuoc;
-    private int luongBiTru;
-    private String[] roomTypes;
-    private String[] roomTypesEng;
+    private String taiGameURL;
+    private int max_clients;
+    private int max_ruong_tb;
+    private int max_ruong_item;
+    private int max_ruong_itemslot;
+    private int max_item;
+    private int max_friends;
+    private int numClients;
+    private boolean start;
+    private int id;
+    private final String[] roomTypes
+            = {"PHÒNG SƠ CẤP", "PHÒNG TRUNG CẤP", "PHÒNG VIP", "PHÒNG ĐẤU TRƯỜNG", "PHÒNG TỰ DO", "PHÒNG ĐẤU TRÙM", "PHÒNG ĐẤU ĐỘI"};
+    private final String[] roomTypesEng
+            = {"NEWBIE ROOM", "INTERMEDIATE ROOM", "VIP ROOM", "ARENA", "FREEDOM ROOM", "BOSS BATTLE ROOM", "CLAN BATTLE ROOM"};
+    private int[] roomTypeStartNum;
+    private final String[] nameRooms = {"Bom", "Nhện máy", "Người máy", "T-rex máy", "UFO", "Khí cầu", "Nhện độc", "Ma", "Liên-Hoàn", "Vùng Cấm Địa", "Super Boss", "BOSS Thế Giới", "Hơi Thở Cuối Cùng", "Địa Sơn Vực", "Hoa Quả Sơn"};
+    private final int[] nameRoomNumbers = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+    private final int[] nameRoomTypes = {5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5};
+    private int startRoomBoss;
+    private int startMapBoss;
+    private int numMapBoss;
+    private final byte[] mapIdBoss = new byte[]{12, 12, 13, 14, 15, 16, 17, 18, 22, 25, 26, 17, 15, 15, 3, 3};
+    private int MIN_XU_BOSS;
+    private int MAX_XU_BOSS;
+    private int MIN_XU_SO_CAP;
+    private int MAX_XU_SO_CAP;
+    private int MIN_XU_TRUNG_CAP;
+    private int MAX_XU_TRUNG_CAP;
+    private int MIN_XU_CAO_CAP;
+    private int MAX_XU_CAO_CAP;
+    private int MIN_XU_DAU_TRUONG;
+    private int MAX_XU_DAU_TRUONG;
+    private int MIN_XU_TU_DO;
+    private int MAX_XU_TU_DO;
+    private int MIN_XU_CLAN;
+    private int MAX_XU_CLAN;
+    private int MIN_TIME_X6_1;
+    private int MAX_TIME_X6_1;
+    private int MIN_TIME_X6_2;
+    private int MAX_TIME_X6_2;
+    private int MIN_TIME_X6_3;
+    private int MAX_TIME_X6_3;
+    private int XU_NHAN_DUOC;
+    private int LUONG_NHAN_DUOC;
+    private int XU_BI_TRU;
+    private int LUONG_BI_TRU;
+    private String SEND_CHAT_LOGIN;
+    private String SEND_THU1;
+    private String SEND_THU2;
+    private String SEND_THU3;
+    private String SEND_THU4;
+    private String SEND_THU5;
+    private int KINH_NGHIEM_UP;
 
     public ServerConfig(String resourceName) {
-        properties = new Properties();
+        configMap = new Properties();
         try (FileInputStream fis = new FileInputStream(CommonConstant.RESOURCES_PATH + resourceName)) {
-            properties.load(fis);
+            configMap.load(fis);
             initializeConfigProperties();
         } catch (Exception e) {
             e.printStackTrace();
@@ -102,114 +109,361 @@ public class ServerConfig implements IServerConfig {
 
     private void initializeConfigProperties() {
         Gson gson = new Gson();
-        port = Integer.parseInt(properties.getProperty("port"));
-        iconversion2 = Byte.parseByte(properties.getProperty("iconversion2"));
-        valuesversion2 = Byte.parseByte(properties.getProperty("valuesversion2"));
-        equipVersion2 = Byte.parseByte(properties.getProperty("equipVersion2"));
-        levelCVersion2 = Byte.parseByte(properties.getProperty("levelCVersion2"));
-        playerVersion2 = Byte.parseByte(properties.getProperty("playerVersion2"));
-        debug = Boolean.parseBoolean(properties.getProperty("debug"));
-        nRoom0 = Integer.parseInt(properties.getProperty("n-room-0"));
-        nRoom1 = Integer.parseInt(properties.getProperty("n-room-1"));
-        nRoom2 = Integer.parseInt(properties.getProperty("n-room-2"));
-        nRoom3 = Integer.parseInt(properties.getProperty("n-room-3"));
-        nRoom4 = Integer.parseInt(properties.getProperty("n-room-4"));
-        nRoom5 = Integer.parseInt(properties.getProperty("n-room-5"));
-        nRoom6 = Integer.parseInt(properties.getProperty("n-room-6"));
-        nArea = Integer.parseInt(properties.getProperty("n-area"));
-        maxPlayer = Integer.parseInt(properties.getProperty("max-player"));
-        maxFight = Integer.parseInt(properties.getProperty("max-fight"));
-        numbPlayer = Integer.parseInt(properties.getProperty("numb-player"));
-        nPlayersInitRoom = Integer.parseInt(properties.getProperty("n-players-init-room"));
-        luyenTapMap = Integer.parseInt(properties.getProperty("luyen-tap-map"));
-        xLtap = Integer.parseInt(properties.getProperty("x-ltap"));
-        yLtap = Integer.parseInt(properties.getProperty("y-ltap"));
-        xLtap1 = Integer.parseInt(properties.getProperty("x-ltap1"));
-        yLtap1 = Integer.parseInt(properties.getProperty("y-ltap1"));
-        startMapBoss = Integer.parseInt(properties.getProperty("start-map-boss"));
-        numMapBoss = Integer.parseInt(properties.getProperty("num-map-boss"));
-        initMap = Integer.parseInt(properties.getProperty("init-map"));
-        initMapBoss = Integer.parseInt(properties.getProperty("init-map-boss"));
-        addInfo = properties.getProperty("add-info");
-        addInfoUrl = properties.getProperty("add-info-url");
-        regTeamUrl = properties.getProperty("reg-team-url");
-        taiGameName = properties.getProperty("tai-game-name");
-        taiGameInfo = properties.getProperty("tai-game-info");
-        taiGameUrl = properties.getProperty("tai-game-url");
-        maxClients = Integer.parseInt(properties.getProperty("max-clients"));
-        maxRuongTrangBi = Integer.parseInt(properties.getProperty("max-ruong-trang-bi"));
-        maxRuongItem = Integer.parseInt(properties.getProperty("max-ruong-item"));
-        maxItem = Integer.parseInt(properties.getProperty("max-item"));
-        mgtBullNew = Boolean.parseBoolean(properties.getProperty("mgt-bull-new"));
-        maxFriends = Integer.parseInt(properties.getProperty("max-friends"));
-        kinhNghiemUp = Integer.parseInt(properties.getProperty("kinh-nghiem-up"));
-        sendChatLogin = properties.getProperty("send-chat-login");
-        sendThu1 = properties.getProperty("send-thu1");
-        sendThu2 = properties.getProperty("send-thu2");
-        sendThu3 = properties.getProperty("send-thu3");
-        sendThu4 = properties.getProperty("send-thu4");
-        sendThu5 = properties.getProperty("send-thu5");
-        minXuSoCap = Integer.parseInt(properties.getProperty("MIN_XU_SO_CAP"));
-        minXuTrungCap = Integer.parseInt(properties.getProperty("MIN_XU_TRUNG_CAP"));
-        minXuCaoCap = Integer.parseInt(properties.getProperty("MIN_XU_CAO_CAP"));
-        minXuDauTruong = Integer.parseInt(properties.getProperty("MIN_XU_DAU_TRUONG"));
-        minXuTuDo = Integer.parseInt(properties.getProperty("MIN_XU_TU_DO"));
-        minXuBoss = Integer.parseInt(properties.getProperty("MIN_XU_BOSS"));
-        minXuClan = Integer.parseInt(properties.getProperty("MIN_XU_CLAN"));
-        maxXuSoCap = Integer.parseInt(properties.getProperty("MAX_XU_SO_CAP"));
-        maxXuTrungCap = Integer.parseInt(properties.getProperty("MAX_XU_TRUNG_CAP"));
-        maxXuCaoCap = Integer.parseInt(properties.getProperty("MAX_XU_CAO_CAP"));
-        maxXuDauTruong = Integer.parseInt(properties.getProperty("MAX_XU_DAU_TRUONG"));
-        maxXuTuDo = Integer.parseInt(properties.getProperty("MAX_XU_TU_DO"));
-        maxXuBoss = Integer.parseInt(properties.getProperty("MAX_XU_BOSS"));
-        maxXuClan = Integer.parseInt(properties.getProperty("MAX_XU_CLAN"));
-        minTimeX61 = Integer.parseInt(properties.getProperty("MIN_TIME_X6_1"));
-        minTimeX62 = Integer.parseInt(properties.getProperty("MIN_TIME_X6_2"));
-        minTimeX63 = Integer.parseInt(properties.getProperty("MIN_TIME_X6_3"));
-        maxTimeX61 = Integer.parseInt(properties.getProperty("MAX_TIME_X6_1"));
-        maxTimeX62 = Integer.parseInt(properties.getProperty("MAX_TIME_X6_2"));
-        maxTimeX63 = Integer.parseInt(properties.getProperty("MAX_TIME_X6_3"));
-        kinhNghiemUp2 = Integer.parseInt(properties.getProperty("KINH_NGHIEM_UP"));
-        xuNhanDuoc = Integer.parseInt(properties.getProperty("XU_NHAN_DUOC"));
-        xuBiTru = Integer.parseInt(properties.getProperty("XU_BI_TRU"));
-        luongNhanDuoc = Integer.parseInt(properties.getProperty("LUONG_NHAN_DUOC"));
-        luongBiTru = Integer.parseInt(properties.getProperty("LUONG_BI_TRU"));
-
-        roomTypes = gson.fromJson(properties.getProperty("room-names-vi"), String[].class);
-        roomTypesEng = gson.fromJson(properties.getProperty("room-names-en"), String[].class);
-        if (roomTypes.length != roomTypesEng.length) {
-            throw new IllegalStateException("Số lượng phòng trong Tiếng Việt và Tiếng Anh không khớp nhau.");
+        try {
+            if (configMap.containsKey("debug")) {
+                debug = Boolean.parseBoolean(configMap.getProperty("debug"));
+            } else {
+                debug = false;
+            }
+            if (configMap.containsKey("host")) {
+                host = configMap.getProperty("host");
+            } else {
+                host = "localhost";
+            }
+            if (configMap.containsKey("post")) {
+                port = Short.parseShort(configMap.getProperty("port"));
+            } else {
+                port = 8122;
+            }
+            if (configMap.containsKey("mysql-host")) {
+                mysql_host = configMap.getProperty("mysql-host");
+            } else {
+                mysql_host = "localhost";
+            }
+            if (configMap.containsKey("mysql-user")) {
+                mysql_user = configMap.getProperty("mysql-user");
+            } else {
+                mysql_user = "root";
+            }
+            if (configMap.containsKey("mysql-password")) {
+                mysql_pass = configMap.getProperty("mysql-password");
+            } else {
+                mysql_pass = "";
+            }
+            if (configMap.containsKey("mysql-database")) {
+                mysql_database = configMap.getProperty("mysql-database");
+            } else {
+                mysql_database = "dbarmy2";
+            }
+            if (configMap.containsKey("equipVersion2")) {
+                equipVersion2 = Byte.parseByte(configMap.getProperty("equipVersion2"));
+            } else {
+                equipVersion2 = 1;
+            }
+            if (configMap.containsKey("iconversion2")) {
+                iconversion2 = Byte.parseByte(configMap.getProperty("iconversion2"));
+            } else {
+                iconversion2 = 1;
+            }
+            if (configMap.containsKey("levelCVersion2")) {
+                levelCVersion2 = Byte.parseByte(configMap.getProperty("levelCVersion2"));
+            } else {
+                levelCVersion2 = 1;
+            }
+            if (configMap.containsKey("valuesversion2")) {
+                valuesversion2 = Byte.parseByte(configMap.getProperty("valuesversion2"));
+            } else {
+                valuesversion2 = 1;
+            }
+            if (configMap.containsKey("playerVersion2")) {
+                playerVersion2 = Byte.parseByte(configMap.getProperty("playerVersion2"));
+            } else {
+                playerVersion2 = 1;
+            }
+            nRoom = new byte[roomTypes.length];
+            nRoomAll = 0;
+            startRoomBoss = 0;
+            for (int i = 0; i < roomTypes.length; i++) {
+                if (configMap.containsKey("n-room-" + i)) {
+                    nRoom[i] = Byte.parseByte(configMap.getProperty("n-room-" + i));
+                    nRoomAll += nRoom[i];
+                    if (i < 5) {
+                        startMapBoss += nRoom[i];
+                    }
+                } else {
+                    nRoom[i] = 0;
+                }
+            }
+            if (configMap.containsKey("n-area")) {
+                n_area = Byte.parseByte(configMap.getProperty("n-area"));
+            } else {
+                n_area = 101;
+            }
+            if (configMap.containsKey("max-player")) {
+                maxPlayers = Byte.parseByte(configMap.getProperty("max-player"));
+            } else {
+                maxPlayers = 8;
+            }
+            if (configMap.containsKey("max-fight")) {
+                maxElementFight = Byte.parseByte(configMap.getProperty("max-fight"));
+            } else {
+                maxElementFight = 100;
+            }
+            if (configMap.containsKey("numb-player")) {
+                numbPlayers = Byte.parseByte(configMap.getProperty("numb-player"));
+            } else {
+                numbPlayers = 100;
+            }
+            if (configMap.containsKey("n-players-init-room")) {
+                nPlayersInitRoom = Byte.parseByte(configMap.getProperty("n-players-init-room"));
+            } else {
+                nPlayersInitRoom = 4;
+            }
+            Xltap = new short[2];
+            Yltap = new short[2];
+            if (configMap.containsKey("luyen-tap-map")) {
+                ltapMap = Byte.parseByte(configMap.getProperty("luyen-tap-map"));
+                Xltap[0] = Short.parseShort(configMap.getProperty("x-ltap"));
+                Xltap[1] = Short.parseShort(configMap.getProperty("x-ltap1"));
+                Yltap[0] = Short.parseShort(configMap.getProperty("y-ltap"));
+                Yltap[1] = Short.parseShort(configMap.getProperty("y-ltap1"));
+            } else {
+                ltapMap = 0;
+            }
+            if (configMap.containsKey("init-map")) {
+                initMap = Byte.parseByte(configMap.getProperty("init-map"));
+            } else {
+                initMap = 5;
+            }
+            if (configMap.containsKey("init-map-boss")) {
+                initMapBoss = Byte.parseByte(configMap.getProperty("init-map-boss"));
+            } else {
+                initMapBoss = (byte) startMapBoss;
+            }
+            if (configMap.containsKey("start-map-boss")) {
+                startMapBoss = Byte.parseByte(configMap.getProperty("start-map-boss"));
+            } else {
+                startMapBoss = 30;
+            }
+            if (configMap.containsKey("num-map-boss")) {
+                numMapBoss = Byte.parseByte(configMap.getProperty("num-map-boss"));
+            } else {
+                numMapBoss = 10;
+            }
+            if (configMap.containsKey("add-info")) {
+                addInfo = configMap.getProperty("add-info");
+            } else {
+                addInfo = "";
+            }
+            if (configMap.containsKey("add-info-url")) {
+                addInfoURL = configMap.getProperty("add-info-url");
+            } else {
+                addInfoURL = "";
+            }
+            if (configMap.containsKey("reg-team-url")) {
+                regTeamURL = configMap.getProperty("reg-team-url");
+            } else {
+                regTeamURL = "";
+            }
+            if (configMap.containsKey("tai-game-name")) {
+                taiGameName = configMap.getProperty("tai-game-name");
+            } else {
+                taiGameName = "";
+            }
+            if (configMap.containsKey("tai-game-info")) {
+                taiGameInfo = configMap.getProperty("tai-game-info");
+            } else {
+                taiGameInfo = "";
+            }
+            if (configMap.containsKey("tai-game-url")) {
+                taiGameURL = configMap.getProperty("tai-game-url");
+            } else {
+                taiGameURL = "";
+            }
+            if (configMap.containsKey("max-clients")) {
+                max_clients = Integer.parseInt(configMap.getProperty("max-clients"));
+            } else {
+                max_clients = 1000;
+            }
+            if (configMap.containsKey("max-ruong-trang-bi")) {
+                max_ruong_tb = Integer.parseInt(configMap.getProperty("max-ruong-trang-bi"));
+            } else {
+                max_ruong_tb = 100;
+            }
+            if (configMap.containsKey("max-ruong-item")) {
+                max_ruong_item = Integer.parseInt(configMap.getProperty("max-ruong-item"));
+            } else {
+                max_ruong_item = 100;
+            }
+            if (configMap.containsKey("max-ruong-itemslot")) {
+                max_ruong_itemslot = Integer.parseInt(configMap.getProperty("max-ruong-itemslot"));
+            } else {
+                max_ruong_itemslot = 30000;
+            }
+            if (configMap.containsKey("max-item")) {
+                max_item = Integer.parseInt(configMap.getProperty("max-item"));
+            } else {
+                max_item = 99;
+            }
+            if (configMap.containsKey("max-friends")) {
+                max_friends = Integer.parseInt(configMap.getProperty("max-friends"));
+            } else {
+                max_friends = 60;
+            }
+            if (configMap.containsKey("mgt-bull-new")) {
+                mgtBullNew = Boolean.parseBoolean(configMap.getProperty("mgt-bull-new"));
+            } else {
+                mgtBullNew = true;
+            }
+            if (configMap.containsKey("KINH_NGHIEM_UP")) {
+                KINH_NGHIEM_UP = Integer.parseInt(configMap.getProperty("KINH_NGHIEM_UP"));
+            } else {
+                KINH_NGHIEM_UP = 1;
+            }
+            if (configMap.containsKey("MIN_XU_SO_CAP")) {
+                MIN_XU_SO_CAP = Integer.parseInt(configMap.getProperty("MIN_XU_SO_CAP"));
+            } else {
+                MIN_XU_SO_CAP = 0;
+            }
+            if (configMap.containsKey("MIN_XU_TRUNG_CAP")) {
+                MIN_XU_TRUNG_CAP = Integer.parseInt(configMap.getProperty("MIN_XU_TRUNG_CAP"));
+            } else {
+                MIN_XU_TRUNG_CAP = 0;
+            }
+            if (configMap.containsKey("MIN_XU_CAO_CAP")) {
+                MIN_XU_CAO_CAP = Integer.parseInt(configMap.getProperty("MIN_XU_CAO_CAP"));
+            } else {
+                MIN_XU_CAO_CAP = 0;
+            }
+            if (configMap.containsKey("MIN_XU_DAU_TRUONG")) {
+                MIN_XU_DAU_TRUONG = Integer.parseInt(configMap.getProperty("MIN_XU_DAU_TRUONG"));
+            } else {
+                MIN_XU_DAU_TRUONG = 0;
+            }
+            if (configMap.containsKey("MIN_XU_TU_DO")) {
+                MIN_XU_TU_DO = Integer.parseInt(configMap.getProperty("MIN_XU_TU_DO"));
+            } else {
+                MIN_XU_TU_DO = 0;
+            }
+            if (configMap.containsKey("MIN_XU_CLAN")) {
+                MIN_XU_CLAN = Integer.parseInt(configMap.getProperty("MIN_XU_CLAN"));
+            } else {
+                MIN_XU_CLAN = 0;
+            }
+            if (configMap.containsKey("MIN_XU_BOSS")) {
+                MIN_XU_BOSS = Integer.parseInt(configMap.getProperty("MIN_XU_BOSS"));
+            } else {
+                MIN_XU_BOSS = 0;
+            }
+            if (configMap.containsKey("MAX_XU_SO_CAP")) {
+                MAX_XU_SO_CAP = Integer.parseInt(configMap.getProperty("MAX_XU_SO_CAP"));
+            } else {
+                MAX_XU_SO_CAP = 0;
+            }
+            if (configMap.containsKey("MAX_XU_TRUNG_CAP")) {
+                MAX_XU_TRUNG_CAP = Integer.parseInt(configMap.getProperty("MAX_XU_TRUNG_CAP"));
+            } else {
+                MAX_XU_TRUNG_CAP = 0;
+            }
+            if (configMap.containsKey("MAX_XU_CAO_CAP")) {
+                MAX_XU_CAO_CAP = Integer.parseInt(configMap.getProperty("MAX_XU_CAO_CAP"));
+            } else {
+                MAX_XU_CAO_CAP = 0;
+            }
+            if (configMap.containsKey("MAX_XU_DAU_TRUONG")) {
+                MAX_XU_DAU_TRUONG = Integer.parseInt(configMap.getProperty("MAX_XU_DAU_TRUONG"));
+            } else {
+                MAX_XU_DAU_TRUONG = 0;
+            }
+            if (configMap.containsKey("MAX_XU_TU_DO")) {
+                MAX_XU_TU_DO = Integer.parseInt(configMap.getProperty("MAX_XU_TU_DO"));
+            } else {
+                MAX_XU_TU_DO = 0;
+            }
+            if (configMap.containsKey("MAX_XU_CLAN")) {
+                MAX_XU_CLAN = Integer.parseInt(configMap.getProperty("MAX_XU_CLAN"));
+            } else {
+                MAX_XU_CLAN = 0;
+            }
+            if (configMap.containsKey("MAX_XU_BOSS")) {
+                MAX_XU_BOSS = Integer.parseInt(configMap.getProperty("MAX_XU_BOSS"));
+            } else {
+                MAX_XU_BOSS = 0;
+            }
+            if (configMap.containsKey("MIN_TIME_X6_1")) {
+                MIN_TIME_X6_1 = Integer.parseInt(configMap.getProperty("MIN_TIME_X6_1"));
+            } else {
+                MIN_TIME_X6_1 = 0;
+            }
+            if (configMap.containsKey("MIN_TIME_X6_2")) {
+                MIN_TIME_X6_2 = Integer.parseInt(configMap.getProperty("MIN_TIME_X6_2"));
+            } else {
+                MIN_TIME_X6_2 = 0;
+            }
+            if (configMap.containsKey("MIN_TIME_X6_3")) {
+                MIN_TIME_X6_3 = Integer.parseInt(configMap.getProperty("MIN_TIME_X6_3"));
+            } else {
+                MIN_TIME_X6_3 = 0;
+            }
+            if (configMap.containsKey("MAX_TIME_X6_1")) {
+                MAX_TIME_X6_1 = Integer.parseInt(configMap.getProperty("MAX_TIME_X6_1"));
+            } else {
+                MAX_TIME_X6_1 = 0;
+            }
+            if (configMap.containsKey("MAX_TIME_X6_2")) {
+                MAX_TIME_X6_2 = Integer.parseInt(configMap.getProperty("MAX_TIME_X6_2"));
+            } else {
+                MAX_TIME_X6_2 = 0;
+            }
+            if (configMap.containsKey("MAX_TIME_X6_3")) {
+                MAX_TIME_X6_3 = Integer.parseInt(configMap.getProperty("MAX_TIME_X6_3"));
+            } else {
+                MAX_TIME_X6_3 = 0;
+            }
+            if (configMap.containsKey("XU_NHAN_DUOC")) {
+                XU_NHAN_DUOC = Integer.parseInt(configMap.getProperty("XU_NHAN_DUOC"));
+            } else {
+                XU_NHAN_DUOC = 0;
+            }
+            if (configMap.containsKey("LUONG_NHAN_DUOC")) {
+                LUONG_NHAN_DUOC = Integer.parseInt(configMap.getProperty("LUONG_NHAN_DUOC"));
+            } else {
+                LUONG_NHAN_DUOC = 0;
+            }
+            if (configMap.containsKey("XU_BI_TRU")) {
+                XU_BI_TRU = Integer.parseInt(configMap.getProperty("XU_BI_TRU"));
+            } else {
+                XU_BI_TRU = 0;
+            }
+            if (configMap.containsKey("LUONG_BI_TRU")) {
+                LUONG_BI_TRU = Integer.parseInt(configMap.getProperty("LUONG_BI_TRU"));
+            } else {
+                LUONG_BI_TRU = 0;
+            }
+            if (configMap.containsKey("SEND_CHAT_LOGIN")) {
+                SEND_CHAT_LOGIN = configMap.getProperty("SEND_CHAT_LOGIN");
+            } else {
+                SEND_CHAT_LOGIN = "";
+            }
+            if (configMap.containsKey("SEND_THU1")) {
+                SEND_THU1 = configMap.getProperty("SEND_THU1");
+            } else {
+                SEND_THU1 = "";
+            }
+            if (configMap.containsKey("SEND_THU2")) {
+                SEND_THU2 = configMap.getProperty("SEND_THU2");
+            } else {
+                SEND_THU2 = "";
+            }
+            if (configMap.containsKey("SEND_THU3")) {
+                SEND_THU3 = configMap.getProperty("SEND_THU3");
+            } else {
+                SEND_THU3 = "";
+            }
+            if (configMap.containsKey("SEND_THU4")) {
+                SEND_THU4 = configMap.getProperty("SEND_THU4");
+            } else {
+                SEND_THU4 = "";
+            }
+            if (configMap.containsKey("SEND_THU5")) {
+                SEND_THU5 = configMap.getProperty("SEND_THU5");
+            } else {
+                SEND_THU5 = "";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
         }
-    }
-
-    @Override
-    public int getPort() {
-        return port;
-    }
-
-    @Override
-    public byte getIconversion2() {
-        return iconversion2;
-    }
-
-    @Override
-    public byte getValuesversion2() {
-        return valuesversion2;
-    }
-
-    @Override
-    public byte getEquipVersion2() {
-        return equipVersion2;
-    }
-
-    @Override
-    public byte getLevelCVersion2() {
-        return levelCVersion2;
-    }
-
-    @Override
-    public byte getPlayerVersion2() {
-        return playerVersion2;
     }
 
     @Override
@@ -218,107 +472,122 @@ public class ServerConfig implements IServerConfig {
     }
 
     @Override
-    public int getnRoom0() {
-        return nRoom0;
+    public byte getN_area() {
+        return n_area;
     }
 
     @Override
-    public int getnRoom1() {
-        return nRoom1;
+    public String getHost() {
+        return host;
     }
 
     @Override
-    public int getnRoom2() {
-        return nRoom2;
+    public short getPort() {
+        return port;
     }
 
     @Override
-    public int getnRoom3() {
-        return nRoom3;
+    public String getMysql_host() {
+        return mysql_host;
     }
 
     @Override
-    public int getnRoom4() {
-        return nRoom4;
+    public String getMysql_user() {
+        return mysql_user;
     }
 
     @Override
-    public int getnRoom5() {
-        return nRoom5;
+    public String getMysql_pass() {
+        return mysql_pass;
     }
 
     @Override
-    public int getnRoom6() {
-        return nRoom6;
+    public String getMysql_database() {
+        return mysql_database;
     }
 
     @Override
-    public int getnArea() {
-        return nArea;
+    public byte getEquipVersion2() {
+        return equipVersion2;
     }
 
     @Override
-    public int getMaxPlayer() {
-        return maxPlayer;
+    public byte getIconversion2() {
+        return iconversion2;
     }
 
     @Override
-    public int getMaxFight() {
-        return maxFight;
+    public byte getLevelCVersion2() {
+        return levelCVersion2;
     }
 
     @Override
-    public int getNumbPlayer() {
-        return numbPlayer;
+    public byte getValuesversion2() {
+        return valuesversion2;
     }
 
     @Override
-    public int getnPlayersInitRoom() {
+    public byte getPlayerVersion2() {
+        return playerVersion2;
+    }
+
+    @Override
+    public byte[] getnRoom() {
+        return nRoom;
+    }
+
+    @Override
+    public byte getnRoomAll() {
+        return nRoomAll;
+    }
+
+    @Override
+    public byte getMaxElementFight() {
+        return maxElementFight;
+    }
+
+    @Override
+    public byte getMaxPlayers() {
+        return maxPlayers;
+    }
+
+    @Override
+    public byte getNumbPlayers() {
+        return numbPlayers;
+    }
+
+    @Override
+    public boolean isMgtBullNew() {
+        return mgtBullNew;
+    }
+
+    @Override
+    public byte getnPlayersInitRoom() {
         return nPlayersInitRoom;
     }
 
     @Override
-    public int getLuyenTapMap() {
-        return luyenTapMap;
+    public byte getLtapMap() {
+        return ltapMap;
     }
 
     @Override
-    public int getxLtap() {
-        return xLtap;
+    public short[] getXltap() {
+        return Xltap;
     }
 
     @Override
-    public int getyLtap() {
-        return yLtap;
+    public short[] getYltap() {
+        return Yltap;
     }
 
     @Override
-    public int getxLtap1() {
-        return xLtap1;
-    }
-
-    @Override
-    public int getyLtap1() {
-        return yLtap1;
-    }
-
-    @Override
-    public int getStartMapBoss() {
-        return startMapBoss;
-    }
-
-    @Override
-    public int getNumMapBoss() {
-        return numMapBoss;
-    }
-
-    @Override
-    public int getInitMap() {
+    public byte getInitMap() {
         return initMap;
     }
 
     @Override
-    public int getInitMapBoss() {
+    public byte getInitMapBoss() {
         return initMapBoss;
     }
 
@@ -328,13 +597,13 @@ public class ServerConfig implements IServerConfig {
     }
 
     @Override
-    public String getAddInfoUrl() {
-        return addInfoUrl;
+    public String getAddInfoURL() {
+        return addInfoURL;
     }
 
     @Override
-    public String getRegTeamUrl() {
-        return regTeamUrl;
+    public String getRegTeamURL() {
+        return regTeamURL;
     }
 
     @Override
@@ -348,198 +617,53 @@ public class ServerConfig implements IServerConfig {
     }
 
     @Override
-    public String getTaiGameUrl() {
-        return taiGameUrl;
+    public String getTaiGameURL() {
+        return taiGameURL;
     }
 
     @Override
-    public int getMaxClients() {
-        return maxClients;
+    public int getMax_clients() {
+        return max_clients;
     }
 
     @Override
-    public int getMaxRuongTrangBi() {
-        return maxRuongTrangBi;
+    public int getMax_ruong_tb() {
+        return max_ruong_tb;
     }
 
     @Override
-    public int getMaxRuongItem() {
-        return maxRuongItem;
+    public int getMax_ruong_item() {
+        return max_ruong_item;
     }
 
     @Override
-    public int getMaxItem() {
-        return maxItem;
+    public int getMax_ruong_itemslot() {
+        return max_ruong_itemslot;
     }
 
     @Override
-    public boolean isMgtBullNew() {
-        return mgtBullNew;
+    public int getMax_item() {
+        return max_item;
     }
 
     @Override
-    public int getMaxFriends() {
-        return maxFriends;
+    public int getMax_friends() {
+        return max_friends;
     }
 
     @Override
-    public int getKinhNghiemUp() {
-        return kinhNghiemUp;
+    public int getNumClients() {
+        return numClients;
     }
 
     @Override
-    public String getSendChatLogin() {
-        return sendChatLogin;
+    public boolean isStart() {
+        return start;
     }
 
     @Override
-    public String getSendThu1() {
-        return sendThu1;
-    }
-
-    @Override
-    public String getSendThu2() {
-        return sendThu2;
-    }
-
-    @Override
-    public String getSendThu3() {
-        return sendThu3;
-    }
-
-    @Override
-    public String getSendThu4() {
-        return sendThu4;
-    }
-
-    @Override
-    public String getSendThu5() {
-        return sendThu5;
-    }
-
-    @Override
-    public int getMinXuSoCap() {
-        return minXuSoCap;
-    }
-
-    @Override
-    public int getMinXuTrungCap() {
-        return minXuTrungCap;
-    }
-
-    @Override
-    public int getMinXuCaoCap() {
-        return minXuCaoCap;
-    }
-
-    @Override
-    public int getMinXuDauTruong() {
-        return minXuDauTruong;
-    }
-
-    @Override
-    public int getMinXuTuDo() {
-        return minXuTuDo;
-    }
-
-    @Override
-    public int getMinXuBoss() {
-        return minXuBoss;
-    }
-
-    @Override
-    public int getMinXuClan() {
-        return minXuClan;
-    }
-
-    @Override
-    public int getMaxXuSoCap() {
-        return maxXuSoCap;
-    }
-
-    @Override
-    public int getMaxXuTrungCap() {
-        return maxXuTrungCap;
-    }
-
-    @Override
-    public int getMaxXuCaoCap() {
-        return maxXuCaoCap;
-    }
-
-    @Override
-    public int getMaxXuDauTruong() {
-        return maxXuDauTruong;
-    }
-
-    @Override
-    public int getMaxXuTuDo() {
-        return maxXuTuDo;
-    }
-
-    @Override
-    public int getMaxXuBoss() {
-        return maxXuBoss;
-    }
-
-    @Override
-    public int getMaxXuClan() {
-        return maxXuClan;
-    }
-
-    @Override
-    public int getMinTimeX61() {
-        return minTimeX61;
-    }
-
-    @Override
-    public int getMinTimeX62() {
-        return minTimeX62;
-    }
-
-    @Override
-    public int getMinTimeX63() {
-        return minTimeX63;
-    }
-
-    @Override
-    public int getMaxTimeX61() {
-        return maxTimeX61;
-    }
-
-    @Override
-    public int getMaxTimeX62() {
-        return maxTimeX62;
-    }
-
-    @Override
-    public int getMaxTimeX63() {
-        return maxTimeX63;
-    }
-
-    @Override
-    public int getKinhNghiemUp2() {
-        return kinhNghiemUp2;
-    }
-
-    @Override
-    public int getXuNhanDuoc() {
-        return xuNhanDuoc;
-    }
-
-    @Override
-    public int getXuBiTru() {
-        return xuBiTru;
-    }
-
-    @Override
-    public int getLuongNhanDuoc() {
-        return luongNhanDuoc;
-    }
-
-    @Override
-    public int getLuongBiTru() {
-        return luongBiTru;
+    public int getId() {
+        return id;
     }
 
     @Override
@@ -550,5 +674,200 @@ public class ServerConfig implements IServerConfig {
     @Override
     public String[] getRoomTypesEng() {
         return roomTypesEng;
+    }
+
+    @Override
+    public int[] getRoomTypeStartNum() {
+        return roomTypeStartNum;
+    }
+
+    @Override
+    public String[] getNameRooms() {
+        return nameRooms;
+    }
+
+    @Override
+    public int[] getNameRoomNumbers() {
+        return nameRoomNumbers;
+    }
+
+    @Override
+    public int[] getNameRoomTypes() {
+        return nameRoomTypes;
+    }
+
+    @Override
+    public int getStartRoomBoss() {
+        return startRoomBoss;
+    }
+
+    @Override
+    public int getStartMapBoss() {
+        return startMapBoss;
+    }
+
+    @Override
+    public int getNumMapBoss() {
+        return numMapBoss;
+    }
+
+    @Override
+    public byte[] getMapIdBoss() {
+        return mapIdBoss;
+    }
+
+    @Override
+    public int getMIN_XU_BOSS() {
+        return MIN_XU_BOSS;
+    }
+
+    @Override
+    public int getMAX_XU_BOSS() {
+        return MAX_XU_BOSS;
+    }
+
+    @Override
+    public int getMIN_XU_SO_CAP() {
+        return MIN_XU_SO_CAP;
+    }
+
+    @Override
+    public int getMAX_XU_SO_CAP() {
+        return MAX_XU_SO_CAP;
+    }
+
+    @Override
+    public int getMIN_XU_TRUNG_CAP() {
+        return MIN_XU_TRUNG_CAP;
+    }
+
+    @Override
+    public int getMAX_XU_TRUNG_CAP() {
+        return MAX_XU_TRUNG_CAP;
+    }
+
+    @Override
+    public int getMIN_XU_CAO_CAP() {
+        return MIN_XU_CAO_CAP;
+    }
+
+    @Override
+    public int getMAX_XU_CAO_CAP() {
+        return MAX_XU_CAO_CAP;
+    }
+
+    @Override
+    public int getMIN_XU_DAU_TRUONG() {
+        return MIN_XU_DAU_TRUONG;
+    }
+
+    @Override
+    public int getMAX_XU_DAU_TRUONG() {
+        return MAX_XU_DAU_TRUONG;
+    }
+
+    @Override
+    public int getMIN_XU_TU_DO() {
+        return MIN_XU_TU_DO;
+    }
+
+    @Override
+    public int getMAX_XU_TU_DO() {
+        return MAX_XU_TU_DO;
+    }
+
+    @Override
+    public int getMIN_XU_CLAN() {
+        return MIN_XU_CLAN;
+    }
+
+    @Override
+    public int getMAX_XU_CLAN() {
+        return MAX_XU_CLAN;
+    }
+
+    @Override
+    public int getMIN_TIME_X6_1() {
+        return MIN_TIME_X6_1;
+    }
+
+    @Override
+    public int getMAX_TIME_X6_1() {
+        return MAX_TIME_X6_1;
+    }
+
+    @Override
+    public int getMIN_TIME_X6_2() {
+        return MIN_TIME_X6_2;
+    }
+
+    @Override
+    public int getMAX_TIME_X6_2() {
+        return MAX_TIME_X6_2;
+    }
+
+    @Override
+    public int getMIN_TIME_X6_3() {
+        return MIN_TIME_X6_3;
+    }
+
+    @Override
+    public int getMAX_TIME_X6_3() {
+        return MAX_TIME_X6_3;
+    }
+
+    @Override
+    public int getXU_NHAN_DUOC() {
+        return XU_NHAN_DUOC;
+    }
+
+    @Override
+    public int getLUONG_NHAN_DUOC() {
+        return LUONG_NHAN_DUOC;
+    }
+
+    @Override
+    public int getXU_BI_TRU() {
+        return XU_BI_TRU;
+    }
+
+    @Override
+    public int getLUONG_BI_TRU() {
+        return LUONG_BI_TRU;
+    }
+
+    @Override
+    public String getSEND_CHAT_LOGIN() {
+        return SEND_CHAT_LOGIN;
+    }
+
+    @Override
+    public String getSEND_THU1() {
+        return SEND_THU1;
+    }
+
+    @Override
+    public String getSEND_THU2() {
+        return SEND_THU2;
+    }
+
+    @Override
+    public String getSEND_THU3() {
+        return SEND_THU3;
+    }
+
+    @Override
+    public String getSEND_THU4() {
+        return SEND_THU4;
+    }
+
+    @Override
+    public String getSEND_THU5() {
+        return SEND_THU5;
+    }
+
+    @Override
+    public int getKINH_NGHIEM_UP() {
+        return KINH_NGHIEM_UP;
     }
 }

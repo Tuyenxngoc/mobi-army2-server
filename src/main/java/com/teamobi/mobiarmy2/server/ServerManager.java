@@ -59,9 +59,10 @@ public class ServerManager {
     }
 
     public void init() {
+        isStart = false;
         initServerData();
-        initRooms();
         setCache();
+        initRooms();
     }
 
     private void initRooms() {

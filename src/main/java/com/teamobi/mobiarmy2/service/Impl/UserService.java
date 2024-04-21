@@ -119,32 +119,33 @@ public class UserService implements IUserService {
 
     public void sendNVData(IServerConfig config) {
         try {
-            Message ms = new Message(Cmd.ANTI_HACK_MESS);
+            // Send mss 64
+            Message ms = new Message(64);
             DataOutputStream ds = ms.writer();
-            ArrayList<NVData.NVEntry> entries = NVData.entrys;
-            int len = entries.size();
+            ArrayList<NVData.NVEntry> nvdatas = NVData.entrys;
+            int len = nvdatas.size();
             ds.writeByte(len);
             // Ma sat gio cac nv
-            for (NVData.NVEntry entry : entries) {
-                ds.writeByte(entry.ma_sat_gio);
+            for (int i = 0; i < len; i++) {
+                ds.writeByte(nvdatas.get(i).ma_sat_gio);
             }
             // Goc cuu tieu
             ds.writeByte(len);
-            for (NVData.NVEntry entry : entries) {
-                ds.writeShort(entry.goc_min);
+            for (int i = 0; i < len; i++) {
+                ds.writeShort(nvdatas.get(i).goc_min);
             }
             // Sat thuong 1 vien dan
             ds.writeByte(len);
-            for (NVData.NVEntry nvEntry : entries) {
-                ds.writeByte(nvEntry.sat_thuong_dan);
+            for (int i = 0; i < len; i++) {
+                ds.writeByte(nvdatas.get(i).sat_thuong_dan);
             }
             // So dan
             ds.writeByte(len);
-            for (NVData.NVEntry nvdata : entries) {
-                ds.writeByte(nvdata.so_dan);
+            for (int i = 0; i < len; i++) {
+                ds.writeByte(nvdatas.get(i).so_dan);
             }
             // Max player
-            ds.writeByte(config.getMaxPlayerFight());
+            ds.writeByte(config.getMaxElementFight());
             // Map boss
             ds.writeByte(config.getNumMapBoss());
             for (int i = 0; i < config.getNumMapBoss(); i++) {
@@ -276,11 +277,11 @@ public class UserService implements IUserService {
 
             IServerConfig config = ServerManager.getInstance().config();
             // Thong tin them
-            ds.writeUTF(config.getGameInfo());
+            ds.writeUTF(config.getAddInfo());
             // Dia chi cua About me
-            ds.writeUTF(config.getGameInfoUrl());
+            ds.writeUTF(config.getTaiGameInfo());
             // Dia chi dang ki doi
-            ds.writeUTF(config.getGameClanUrl());
+            ds.writeUTF(config.getRegTeamURL());
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {

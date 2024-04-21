@@ -1,151 +1,167 @@
 package com.teamobi.mobiarmy2.config;
 
 public interface IServerConfig {
-    int getPort();
-
-    byte getIconversion2();
-
-    byte getValuesversion2();
-
-    byte getEquipVersion2();
-
-    byte getLevelCVersion2();
-
-    byte getPlayerVersion2();
 
     boolean isDebug();
 
-    int getnRoom0();
+    byte getN_area();
 
-    int getnRoom1();
+    String getHost();
 
-    int getnRoom2();
+    short getPort();
 
-    int getnRoom3();
+    String getMysql_host();
 
-    int getnRoom4();
+    String getMysql_user();
 
-    int getnRoom5();
+    String getMysql_pass();
 
-    int getnRoom6();
+    String getMysql_database();
 
-    int getnArea();
+    byte getEquipVersion2();
 
-    int getMaxPlayer();
+    byte getIconversion2();
 
-    int getMaxFight();
+    byte getLevelCVersion2();
 
-    int getNumbPlayer();
+    byte getValuesversion2();
 
-    int getnPlayersInitRoom();
+    byte getPlayerVersion2();
 
-    int getLuyenTapMap();
+    byte[] getnRoom();
 
-    int getxLtap();
+    byte getnRoomAll();
 
-    int getyLtap();
+    byte getMaxElementFight();
 
-    int getxLtap1();
+    byte getMaxPlayers();
 
-    int getyLtap1();
+    byte getNumbPlayers();
 
-    int getStartMapBoss();
+    boolean isMgtBullNew();
 
-    int getNumMapBoss();
+    byte getnPlayersInitRoom();
 
-    int getInitMap();
+    byte getLtapMap();
 
-    int getInitMapBoss();
+    short[] getXltap();
+
+    short[] getYltap();
+
+    byte getInitMap();
+
+    byte getInitMapBoss();
 
     String getAddInfo();
 
-    String getAddInfoUrl();
+    String getAddInfoURL();
 
-    String getRegTeamUrl();
+    String getRegTeamURL();
 
     String getTaiGameName();
 
     String getTaiGameInfo();
 
-    String getTaiGameUrl();
+    String getTaiGameURL();
 
-    int getMaxClients();
+    int getMax_clients();
 
-    int getMaxRuongTrangBi();
+    int getMax_ruong_tb();
 
-    int getMaxRuongItem();
+    int getMax_ruong_item();
 
-    int getMaxItem();
+    int getMax_ruong_itemslot();
 
-    boolean isMgtBullNew();
+    int getMax_item();
 
-    int getMaxFriends();
+    int getMax_friends();
 
-    int getKinhNghiemUp();
+    int getNumClients();
 
-    String getSendChatLogin();
+    boolean isStart();
 
-    String getSendThu1();
-
-    String getSendThu2();
-
-    String getSendThu3();
-
-    String getSendThu4();
-
-    String getSendThu5();
-
-    int getMinXuSoCap();
-
-    int getMinXuTrungCap();
-
-    int getMinXuCaoCap();
-
-    int getMinXuDauTruong();
-
-    int getMinXuTuDo();
-
-    int getMinXuBoss();
-
-    int getMinXuClan();
-
-    int getMaxXuSoCap();
-
-    int getMaxXuTrungCap();
-
-    int getMaxXuCaoCap();
-
-    int getMaxXuDauTruong();
-
-    int getMaxXuTuDo();
-
-    int getMaxXuBoss();
-
-    int getMaxXuClan();
-
-    int getMinTimeX61();
-
-    int getMinTimeX62();
-
-    int getMinTimeX63();
-
-    int getMaxTimeX61();
-
-    int getMaxTimeX62();
-
-    int getMaxTimeX63();
-
-    int getKinhNghiemUp2();
-
-    int getXuNhanDuoc();
-
-    int getXuBiTru();
-
-    int getLuongNhanDuoc();
-
-    int getLuongBiTru();
+    int getId();
 
     String[] getRoomTypes();
 
     String[] getRoomTypesEng();
+
+    int[] getRoomTypeStartNum();
+
+    String[] getNameRooms();
+
+    int[] getNameRoomNumbers();
+
+    int[] getNameRoomTypes();
+
+    int getStartRoomBoss();
+
+    int getStartMapBoss();
+
+    int getNumMapBoss();
+
+    byte[] getMapIdBoss();
+
+    int getMIN_XU_BOSS();
+
+    int getMAX_XU_BOSS();
+
+    int getMIN_XU_SO_CAP();
+
+    int getMAX_XU_SO_CAP();
+
+    int getMIN_XU_TRUNG_CAP();
+
+    int getMAX_XU_TRUNG_CAP();
+
+    int getMIN_XU_CAO_CAP();
+
+    int getMAX_XU_CAO_CAP();
+
+    int getMIN_XU_DAU_TRUONG();
+
+    int getMAX_XU_DAU_TRUONG();
+
+    int getMIN_XU_TU_DO();
+
+    int getMAX_XU_TU_DO();
+
+    int getMIN_XU_CLAN();
+
+    int getMAX_XU_CLAN();
+
+    int getMIN_TIME_X6_1();
+
+    int getMAX_TIME_X6_1();
+
+    int getMIN_TIME_X6_2();
+
+    int getMAX_TIME_X6_2();
+
+    int getMIN_TIME_X6_3();
+
+    int getMAX_TIME_X6_3();
+
+    int getXU_NHAN_DUOC();
+
+    int getLUONG_NHAN_DUOC();
+
+    int getXU_BI_TRU();
+
+    int getLUONG_BI_TRU();
+
+    String getSEND_CHAT_LOGIN();
+
+    String getSEND_THU1();
+
+    String getSEND_THU2();
+
+    String getSEND_THU3();
+
+    String getSEND_THU4();
+
+    String getSEND_THU5();
+
+    int getKINH_NGHIEM_UP();
+
 }
