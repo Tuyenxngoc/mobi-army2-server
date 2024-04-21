@@ -80,4 +80,8 @@ public class User {
 
     public void updateXu(int xuUp) {
     }
+
+    public void logout() {
+        this.isLogged = false;
+    }
 }

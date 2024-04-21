@@ -111,7 +111,7 @@ public class UserService implements IUserService {
             IServerConfig config = serverManager.config();
             sendNVData(config);
             sendRoomInfo(config);
-            sendMapCollisionInfo(config);
+            sendMapCollisionInfo();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -170,7 +170,35 @@ public class UserService implements IUserService {
     }
 
     private void sendRoomName(IServerConfig config) {
-
+        try {
+            Message ms = new Message(-19);
+            DataOutputStream ds = ms.writer();
+            // Size
+            ds.writeByte(config.getNameRooms().length);
+            for (int i = 0; i < config.getNameRooms().length; i++) {
+                // He so cong
+                int namen = config.getNameRoomNumbers()[i];
+                int typen = config.getNameRoomTypes()[i];
+                if (namen > (config.getnRoom()[typen] + config.getRoomTypeStartNum()[typen])) {
+                    continue;
+                }
+                int notRoom = 0;
+                for (int j = 0; j < typen; j++) {
+                    if (config.getnRoom()[j] > 0) {
+                        notRoom++;
+                    }
+                }
+                ds.writeByte(config.getRoomTypeStartNum()[typen] + notRoom);
+                // Ten cho phong viet hoa
+                ds.writeUTF("Phòng " + (config.getRoomTypeStartNum()[typen] + namen) + ": " + config.getNameRooms()[i]);
+                // So
+                ds.writeByte(namen);
+            }
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void sendRoomCaption(IServerConfig config) {
@@ -189,7 +217,7 @@ public class UserService implements IUserService {
         }
     }
 
-    public void sendMapCollisionInfo(IServerConfig config) {
+    public void sendMapCollisionInfo() {
         try {
             // Send mss 92
             Message ms = new Message(92);
@@ -249,13 +277,7 @@ public class UserService implements IUserService {
             for (int i = 0; i < 10; i++) {
                 ds.writeBoolean(false);
                 for (int j = 0; j < 5; j++) {
-                    if (user.nvEquip[i][j] != null) {
-                        ds.writeShort(user.nvEquip[i][j].entry.id);
-                    } else if (User.nvEquipDefault[i][j] != null) {
-                        ds.writeShort(User.nvEquipDefault[i][j].id);
-                    } else {
-                        ds.writeShort(-1);
-                    }
+                    ds.writeShort(-1);
                 }
             }
 
@@ -346,7 +368,7 @@ public class UserService implements IUserService {
 
     @Override
     public void dangXuat(Message ms) {
-
+        user.getSession().close();
     }
 
     @Override
@@ -520,7 +542,32 @@ public class UserService implements IUserService {
 
     @Override
     public void xemThongTIn(Message ms) {
+        try {
+            int userId = ms.reader().readInt();
 
+            User userFound = userDao.getUserDetails(userId);
+
+            ms = new Message(34);
+            DataOutputStream ds = ms.writer();
+            if (userFound == null || userFound.isLogged() || !userFound.isActive()) {
+                ds.writeInt(-1);
+            } else {
+                ds.writeInt(userFound.getId());
+                ds.writeUTF(userFound.getUsername());
+                ds.writeInt(userFound.getXu());
+                ds.writeByte(1);/* lever */
+                ds.writeByte(0);/* %lever */
+                ds.writeInt(userFound.getLuong());
+                ds.writeInt(0);/* XP */
+                ds.writeInt(1000);/* XP Level */
+                ds.writeInt(userFound.getDanhVong());
+                ds.writeUTF("Chưa có hạng");
+            }
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -180,4 +180,46 @@ public class UserDao implements Dao<User>, IUserDao {
         HikariCPManager.getInstance().update(sql, flag, id);
     }
 
+    @Override
+    public User getUserDetails(int userId) {
+        User user = null;
+        try (Connection connection = HikariCPManager.getInstance().getConnection()) {
+            // Truy vấn để lấy thông tin từ bảng user
+            String userQuery = "SELECT `user`, `lock`, `active` FROM user WHERE user_id = ?";
+            try (PreparedStatement userStatement = connection.prepareStatement(userQuery)) {
+                userStatement.setInt(1, userId);
+                try (ResultSet userResultSet = userStatement.executeQuery()) {
+                    if (userResultSet.next()) {
+                        user = new User();
+                        user.setId(userId);
+                        user.setUsername(userResultSet.getString("user"));
+                        user.setLock(userResultSet.getBoolean("lock"));
+                        user.setActive(userResultSet.getBoolean("active"));
+                    }
+                }
+            }
+
+            if (user != null) {
+                // Truy vấn để lấy thông tin từ bảng player
+                String playerQuery = "SELECT * FROM armymem WHERE id = ?";
+                try (PreparedStatement playerStatement = connection.prepareStatement(playerQuery)) {
+                    playerStatement.setInt(1, user.getId());
+                    try (ResultSet playerResultSet = playerStatement.executeQuery()) {
+                        if (playerResultSet.next()) {
+                            user.setXu(playerResultSet.getInt("xu"));
+                            user.setLuong(playerResultSet.getInt("luong"));
+                            user.setDanhVong(playerResultSet.getInt("dvong"));
+                            user.setNvUsed(playerResultSet.getByte("NVused"));
+                        } else {
+                            user = null;
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return user;
+    }
+
 }

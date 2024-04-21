@@ -7,4 +7,7 @@ public interface IUserDao {
     User findByUsernameAndPassword(String username, String password);
 
     void updateOnline(boolean flag, int id);
+
+    User getUserDetails(int userId);
+
 }

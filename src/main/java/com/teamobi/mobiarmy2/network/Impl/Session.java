@@ -75,6 +75,9 @@ public class Session implements ISession {
     @Override
     public void close() {
         try {
+            if (user.isLogged()) {
+                user.logout();
+            }
             ServerManager serverManager = ServerManager.getInstance();
             serverManager.logger().logMessage("Close " + this);
             serverManager.disconnect(this);
