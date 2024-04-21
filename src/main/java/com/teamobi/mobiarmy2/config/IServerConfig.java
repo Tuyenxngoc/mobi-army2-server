@@ -88,6 +88,8 @@ public interface IServerConfig {
 
     int[] getRoomTypeStartNum();
 
+    void setRoomTypeStartNum(int[] roomTypeStartNum);
+
     String[] getNameRooms();
 
     int[] getNameRoomNumbers();

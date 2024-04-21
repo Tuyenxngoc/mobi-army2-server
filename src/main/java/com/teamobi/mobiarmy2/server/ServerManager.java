@@ -66,7 +66,18 @@ public class ServerManager {
     }
 
     private void initRooms() {
-        rooms = new Room[10];
+        rooms = new Room[config.getnRoomAll()];
+        config.setRoomTypeStartNum(new int[config.getRoomTypes().length]);
+        int k = 0;
+        for (int i = 0; i < config.getRoomTypes().length; i++) {
+            for (int j = 0; j < config.getnRoom()[i]; j++) {
+                if (j == 0) {
+                    config.getRoomTypeStartNum()[i] = k;
+                }
+                rooms[k] = new Room(k, i, config.getN_area(), j);
+                k++;
+            }
+        }
     }
 
     private void initServerData() {

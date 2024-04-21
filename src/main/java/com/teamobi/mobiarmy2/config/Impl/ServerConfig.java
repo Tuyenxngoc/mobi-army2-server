@@ -682,6 +682,11 @@ public class ServerConfig implements IServerConfig {
     }
 
     @Override
+    public void setRoomTypeStartNum(int[] roomTypeStartNum) {
+        this.roomTypeStartNum = roomTypeStartNum;
+    }
+
+    @Override
     public String[] getNameRooms() {
         return nameRooms;
     }
