@@ -47,7 +47,6 @@ public class SpecialItemData {
         return spiEntry;
     }
 
-
     public static String getItemName(byte id) {
         return getSpecialItemById(id).name;
     }

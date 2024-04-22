@@ -13,11 +13,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
-@Setter
 /**
  * @author tuyen
  */
+@Getter
+@Setter
 public class User {
 
     public static NVData.EquipmentEntry[][] nvEquipDefault;
@@ -83,5 +83,9 @@ public class User {
 
     public void logout() {
         this.isLogged = false;
+    }
+
+    public int getLever(byte nv) {
+        return lever[nv];
     }
 }

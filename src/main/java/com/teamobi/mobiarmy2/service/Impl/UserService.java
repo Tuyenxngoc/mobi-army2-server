@@ -126,23 +126,23 @@ public class UserService implements IUserService {
             int len = nvdatas.size();
             ds.writeByte(len);
             // Ma sat gio cac nv
-            for (int i = 0; i < len; i++) {
-                ds.writeByte(nvdatas.get(i).ma_sat_gio);
+            for (NVData.NVEntry nvdata : nvdatas) {
+                ds.writeByte(nvdata.ma_sat_gio);
             }
             // Goc cuu tieu
             ds.writeByte(len);
-            for (int i = 0; i < len; i++) {
-                ds.writeShort(nvdatas.get(i).goc_min);
+            for (NVData.NVEntry nvdata : nvdatas) {
+                ds.writeShort(nvdata.goc_min);
             }
             // Sat thuong 1 vien dan
             ds.writeByte(len);
-            for (int i = 0; i < len; i++) {
-                ds.writeByte(nvdatas.get(i).sat_thuong_dan);
+            for (NVData.NVEntry nvdata : nvdatas) {
+                ds.writeByte(nvdata.sat_thuong_dan);
             }
             // So dan
             ds.writeByte(len);
-            for (int i = 0; i < len; i++) {
-                ds.writeByte(nvdatas.get(i).so_dan);
+            for (NVData.NVEntry nvdata : nvdatas) {
+                ds.writeByte(nvdata.so_dan);
             }
             // Max player
             ds.writeByte(config.getMaxElementFight());
@@ -277,7 +277,13 @@ public class UserService implements IUserService {
             for (int i = 0; i < 10; i++) {
                 ds.writeBoolean(false);
                 for (int j = 0; j < 5; j++) {
-                    ds.writeShort(-1);
+                    if (user.nvEquip[i][j] != null) {
+                        ds.writeShort(user.nvEquip[i][j].entry.id);
+                    } else if (User.nvEquipDefault[i][j] != null) {
+                        ds.writeShort(User.nvEquipDefault[i][j].id);
+                    } else {
+                        ds.writeShort(-1);
+                    }
                 }
             }
 
@@ -544,18 +550,27 @@ public class UserService implements IUserService {
     public void xemThongTIn(Message ms) {
         try {
             int userId = ms.reader().readInt();
+            if (userId < 0) {
+                return;
+            }
 
             User userFound = userDao.getUserDetails(userId);
-
-            ms = new Message(34);
+            ms = new Message(Cmd.PLAYER_DETAIL);
             DataOutputStream ds = ms.writer();
-            if (userFound == null || userFound.isLogged() || !userFound.isActive()) {
+            if (userFound == null
+                    || userFound.isLogged()
+                    || !userFound.isActive()
+                    || userFound.getId() != userId
+            ) {
                 ds.writeInt(-1);
             } else {
                 ds.writeInt(userFound.getId());
                 ds.writeUTF(userFound.getUsername());
                 ds.writeInt(userFound.getXu());
-                ds.writeByte(1);/* lever */
+
+                byte nvUsed = userFound.getNvUsed();
+
+                ds.writeByte(userFound.getLever(nvUsed));
                 ds.writeByte(0);/* %lever */
                 ds.writeInt(userFound.getLuong());
                 ds.writeInt(0);/* XP */

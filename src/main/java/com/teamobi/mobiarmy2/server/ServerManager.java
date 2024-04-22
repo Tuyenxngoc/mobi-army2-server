@@ -65,6 +65,31 @@ public class ServerManager {
         initRooms();
     }
 
+    private void initServerData() {
+        gameService.getItemData();
+        gameService.getClanShopData();
+        gameService.getSpecialItemData();
+        gameService.getFormulaData();
+        gameService.getPaymentData();
+        gameService.getMissionData();
+
+        //Data to set up cache
+        gameService.getMapData();
+        gameService.getCharacterData();
+        gameService.getEquipData();
+        gameService.setCaptionLevelData();
+
+        gameService.setDefaultNvData();
+    }
+
+    private void setCache() {
+        gameService.setCacheMaps();
+        gameService.setCacheCharacters();
+        gameService.setCacheCaptionLevels();
+        gameService.setCachePlayerImages();
+        gameService.setCacheMapIcons();
+    }
+
     private void initRooms() {
         rooms = new Room[config.getnRoomAll()];
         config.setRoomTypeStartNum(new int[config.getRoomTypes().length]);
@@ -78,25 +103,6 @@ public class ServerManager {
                 k++;
             }
         }
-    }
-
-    private void initServerData() {
-        gameService.getItemData();
-        gameService.getClanShopData();
-        gameService.getSpecialItemData();
-        gameService.getFormulaData();
-        gameService.getPaymentData();
-        gameService.getMissionData();
-
-        gameService.setDefaultNvData();
-    }
-
-    private void setCache() {
-        gameService.setCacheMaps();
-        gameService.setCacheCharacters();
-        gameService.setCacheCaptionLevels();
-        gameService.setCachePlayerImages();
-        gameService.setCacheMapIcons();
     }
 
     public void start() {

@@ -5,7 +5,6 @@ import com.teamobi.mobiarmy2.server.Room;
 import lombok.Getter;
 import lombok.Setter;
 
-
 /**
  * @author tuyen
  */

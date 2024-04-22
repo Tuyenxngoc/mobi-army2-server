@@ -28,8 +28,6 @@ public class GameService implements IGameService {
 
     @Override
     public void setCacheMaps() {
-        gameDao.getAllMapData();
-
         try (ByteArrayOutputStream bas = new ByteArrayOutputStream();
              DataOutputStream ds = new DataOutputStream(bas)) {
             int size = MapData.entries.size();
@@ -58,9 +56,6 @@ public class GameService implements IGameService {
 
     @Override
     public void setCacheCharacters() {
-        gameDao.getAllCharacterData();
-        gameDao.getAllEquip();
-
         try {
             ByteArrayOutputStream bas1 = new ByteArrayOutputStream();
             DataOutputStream ds1 = new DataOutputStream(bas1);
@@ -131,8 +126,6 @@ public class GameService implements IGameService {
 
     @Override
     public void setCacheCaptionLevels() {
-        gameDao.getAllCaptionLevel();
-
         try {
             ByteArrayOutputStream bas2 = new ByteArrayOutputStream();
             DataOutputStream ds2 = new DataOutputStream(bas2);
@@ -230,6 +223,27 @@ public class GameService implements IGameService {
     @Override
     public void getMissionData() {
         gameDao.getAllMissions();
+    }
+
+    @Override
+    public void getMapData() {
+        gameDao.getAllMapData();
+    }
+
+    @Override
+    public void getCharacterData() {
+        gameDao.getAllCharacterData();
+
+    }
+
+    @Override
+    public void getEquipData() {
+        gameDao.getAllEquip();
+    }
+
+    @Override
+    public void setCaptionLevelData() {
+        gameDao.getAllCaptionLevel();
     }
 
     @Override

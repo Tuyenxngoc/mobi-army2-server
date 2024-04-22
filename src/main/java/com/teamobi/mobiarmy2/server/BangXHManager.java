@@ -15,5 +15,4 @@ public class BangXHManager {
         return instance;
     }
 
-
 }

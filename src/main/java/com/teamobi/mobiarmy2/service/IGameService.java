@@ -25,4 +25,13 @@ public interface IGameService {
     void getPaymentData();
 
     void getMissionData();
+
+    void getMapData();
+
+    void getCharacterData();
+
+    void getEquipData();
+
+    void setCaptionLevelData();
+
 }
