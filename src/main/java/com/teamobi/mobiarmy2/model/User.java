@@ -49,10 +49,10 @@ public class User {
     public int[] friends;
     public int[] mission;
     public byte[] missionLevel;
-    public RuongDoTBData[][] nvEquip;
+    public ruongDoTBEntry[][] nvEquip;
 
-    public List<RuongDoItemData> ruongDoItem = new ArrayList<>();
-    public List<RuongDoTBData> ruongDoTB = new ArrayList<>();
+    public List<ruongDoItemEntry> ruongDoItem = new ArrayList<>();
+    public List<ruongDoTBEntry> ruongDoTB = new ArrayList<>();
     private FightWait fightWait;
 
     private final IUserService userService;
@@ -75,17 +75,18 @@ public class User {
     }
 
     public void sendServerMessage(String ss) {
-        this.userService.sendServerMessage(ss);
+        userService.sendServerMessage(ss);
     }
 
     public void updateXu(int xuUp) {
     }
 
     public void logout() {
-        this.isLogged = false;
+        isLogged = false;
     }
 
     public int getLever(byte nv) {
         return lever[nv];
     }
+
 }

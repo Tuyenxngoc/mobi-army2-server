@@ -92,13 +92,13 @@ public class UserDao implements Dao<User>, IUserDao {
                             user.point = new int[len];
                             user.pointAdd = new int[len][5];
                             user.NvData = new int[len][6];
-                            user.nvEquip = new RuongDoTBData[len][6];
+                            user.nvEquip = new ruongDoTBEntry[len][6];
                             Gson gson = new Gson();
 
                             Equipment[] equipments = gson.fromJson(playerResultSet.getString("ruongTrangBi"), Equipment[].class);
                             for (int i = 0; i < equipments.length; i++) {
                                 Equipment equipment = equipments[i];
-                                RuongDoTBData rdtbEntry = new RuongDoTBData();
+                                ruongDoTBEntry rdtbEntry = new ruongDoTBEntry();
 
                                 int nvId = equipment.getNvId();
                                 int equipType = equipment.getEquipType();
@@ -132,7 +132,7 @@ public class UserDao implements Dao<User>, IUserDao {
 
                             DataItem[] dataItems = gson.fromJson(playerResultSet.getString("ruongItem"), DataItem[].class);
                             for (DataItem item : dataItems) {
-                                RuongDoItemData rdiEntry = new RuongDoItemData();
+                                ruongDoItemEntry rdiEntry = new ruongDoItemEntry();
                                 rdiEntry.entry = SpecialItemData.getSpecialItemById(item.getId());
                                 rdiEntry.numb = item.getNumb();
                                 user.getRuongDoItem().add(rdiEntry);
@@ -152,7 +152,7 @@ public class UserDao implements Dao<User>, IUserDao {
                                 for (int j = 0; j < 5; j++) {
                                     user.NvData[i][j] = data.get(j);
                                     if (user.NvData[i][j] >= 0 && user.NvData[i][j] < user.ruongDoTB.size()) {
-                                        RuongDoTBData rdE = user.ruongDoTB.get(user.NvData[i][j]);
+                                        ruongDoTBEntry rdE = user.ruongDoTB.get(user.NvData[i][j]);
                                         if (rdE.entry.hanSD - Until.getNumDay(rdE.dayBuy, new Date()) > 0) {
                                             user.nvEquip[i][j] = rdE;
                                         } else {

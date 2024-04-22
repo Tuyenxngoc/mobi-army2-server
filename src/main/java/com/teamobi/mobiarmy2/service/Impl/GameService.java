@@ -116,7 +116,7 @@ public class GameService implements IGameService {
             }
 
             byte[] ab1 = bas1.toByteArray();
-            Until.saveFile("cache/equipdata2", ab1);
+            Until.saveFile(CommonConstant.equipCacheName, ab1);
             bas1.close();
             ds1.close();
         } catch (IOException e) {
@@ -139,7 +139,7 @@ public class GameService implements IGameService {
                 System.out.println("  lvl= " + capEntry.level + " str= " + capEntry.caption);
             }
             byte[] ab2 = bas2.toByteArray();
-            Until.saveFile("cache/levelCData2", ab2);
+            Until.saveFile(CommonConstant.levelCacheName, ab2);
             bas2.close();
             ds2.close();
         } catch (IOException e) {
@@ -163,7 +163,7 @@ public class GameService implements IGameService {
                 tos.addFile(f.getName(), f.getPath());
             }
             byte[] ab3 = tos.output();
-            Until.saveFile("cache/playerdata2", ab3);
+            Until.saveFile(CommonConstant.playerCacheName, ab3);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -185,7 +185,7 @@ public class GameService implements IGameService {
                 tos2.addFile(f.getName(), f.getPath());
             }
             byte[] ab4 = tos2.output();
-            Until.saveFile("cache/icondata2", ab4);
+            Until.saveFile(CommonConstant.iconCacheName, ab4);
         } catch (IOException e) {
             e.printStackTrace();
         }

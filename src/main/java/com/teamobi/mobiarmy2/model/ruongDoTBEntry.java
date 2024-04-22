@@ -5,12 +5,12 @@ import lombok.Setter;
 
 import java.util.Date;
 
-@Getter
-@Setter
 /**
  * @author tuyen
  */
-public class RuongDoTBData {
+@Getter
+@Setter
+public class ruongDoTBEntry {
     public int index;
     public Date dayBuy;
     public byte vipLevel;

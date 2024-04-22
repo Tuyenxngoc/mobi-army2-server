@@ -126,7 +126,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.ADD_POINT -> userService.nangCap(ms);
 
-                case Cmd.CHARACTOR_INFO -> userService.nangCap2();
+                case Cmd.CHARACTOR_INFO -> userService.sendCharacterInfo();
 
                 case Cmd.CHANGE_EQUIP -> userService.macTrangBi(ms);
 

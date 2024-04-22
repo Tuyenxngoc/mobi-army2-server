@@ -4,11 +4,11 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
 /**
  * @author tuyen
  */
+@Getter
+@Setter
 public class DataItem {
 
     @SerializedName("id")

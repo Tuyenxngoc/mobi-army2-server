@@ -6,9 +6,7 @@ import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.dao.impl.UserDao;
-import com.teamobi.mobiarmy2.model.MapData;
-import com.teamobi.mobiarmy2.model.NVData;
-import com.teamobi.mobiarmy2.model.User;
+import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.server.BangXHManager;
 import com.teamobi.mobiarmy2.server.ServerManager;
@@ -19,6 +17,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * @author tuyen
@@ -670,59 +669,95 @@ public class UserService implements IUserService {
             switch (type) {
                 case 1 -> {
                     IServerConfig config = ServerManager.getInstance().config();
-                    byte currentVersion = config.getIconversion2();
-                    writeFilePack(CommonConstant.iconCacheName, type, version, currentVersion);
+                    ms = new Message(Cmd.GET_FILEPACK);
+                    DataOutputStream ds = ms.writer();
+                    ds.writeByte(type);
+                    ds.writeByte(config.getIconversion2());
+                    if (version != config.getIconversion2()) {
+                        byte[] ab = Until.getFile(CommonConstant.iconCacheName);
+                        if (ab == null) {
+                            return;
+                        }
+                        ds.writeShort(ab.length);
+                        ds.write(ab);
+                    }
+                    ds.flush();
+                    user.sendMessage(ms);
                 }
 
                 case 2 -> {
                     IServerConfig config = ServerManager.getInstance().config();
-                    byte currentVersion = config.getValuesversion2();
-                    writeFilePack(CommonConstant.mapCacheName, type, version, currentVersion);
+                    ms = new Message(Cmd.GET_FILEPACK);
+                    DataOutputStream ds = ms.writer();
+                    ds.writeByte(type);
+                    ds.writeByte(config.getValuesversion2());
+                    if (version != config.getValuesversion2()) {
+                        byte[] ab = Until.getFile(CommonConstant.mapCacheName);
+                        if (ab == null) {
+                            return;
+                        }
+                        ds.writeShort(ab.length);
+                        ds.write(ab);
+                    }
+                    ds.flush();
+                    user.sendMessage(ms);
                 }
-
                 case 3 -> {
                     IServerConfig config = ServerManager.getInstance().config();
-                    byte currentVersion = config.getPlayerVersion2();
-                    writeFilePack(CommonConstant.playerCacheName, type, version, currentVersion);
+                    ms = new Message(Cmd.GET_FILEPACK);
+                    DataOutputStream ds = ms.writer();
+                    ds.writeByte(type);
+                    ds.writeByte(config.getPlayerVersion2());
+                    if (version != config.getPlayerVersion2()) {
+                        byte[] ab = Until.getFile(CommonConstant.playerCacheName);
+                        if (ab == null) {
+                            return;
+                        }
+                        ds.writeShort(ab.length);
+                        ds.write(ab);
+                    }
+                    ds.flush();
+                    user.sendMessage(ms);
                 }
-
                 case 4 -> {
                     IServerConfig config = ServerManager.getInstance().config();
-                    byte currentVersion = config.getEquipVersion2();
-                    writeFilePack(CommonConstant.equipCacheName, type, version, currentVersion);
+                    ms = new Message(Cmd.GET_FILEPACK);
+                    DataOutputStream ds = ms.writer();
+                    ds.writeByte(type);
+                    ds.writeByte(config.getEquipVersion2());
+                    if (version != config.getEquipVersion2()) {
+                        byte[] ab = Until.getFile(CommonConstant.equipCacheName);
+                        if (ab == null) {
+                            return;
+                        }
+                        ds.writeInt(ab.length);
+                        ds.write(ab);
+                    }
+                    ds.flush();
+                    user.sendMessage(ms);
                 }
-
                 case 5 -> {
                     IServerConfig config = ServerManager.getInstance().config();
-                    byte currentVersion = config.getLevelCVersion2();
-                    writeFilePack(CommonConstant.levelCacheName, type, version, currentVersion);
+                    ms = new Message(Cmd.GET_FILEPACK);
+                    DataOutputStream ds = ms.writer();
+                    ds.writeByte(type);
+                    ds.writeByte(config.getLevelCVersion2());
+                    if (version != config.getLevelCVersion2()) {
+                        byte[] ab = Until.getFile(CommonConstant.levelCacheName);
+                        if (ab == null) {
+                            return;
+                        }
+                        ds.writeShort(ab.length);
+                        ds.write(ab);
+                    }
+                    ds.flush();
+                    user.sendMessage(ms);
                 }
-
                 case 6 -> {
-                    nangCap2();
+                    sendCharacterInfo();
                     sendRuongDoInfo();
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void writeFilePack(String fileName, byte type, byte version, byte currentVersion) {
-        try {
-            Message ms = new Message(Cmd.GET_FILEPACK);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(type);
-            ds.writeByte(currentVersion);
-            if (version != currentVersion) {
-                byte[] ab = Until.getFile(fileName);
-                if (ab != null) {
-                    ds.writeShort(ab.length);
-                    ds.write(ab);
-                }
-            }
-            ds.flush();
-            user.sendMessage(ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -733,10 +768,42 @@ public class UserService implements IUserService {
             // Ruong trang bi
             Message ms = new Message(Cmd.INVENTORY);
             DataOutputStream ds = ms.writer();
-            ds.writeByte(0);
+            int lent = user.ruongDoTB.size();
+            ds.writeByte(lent);
+            for (int i = 0; i < lent; i++) {
+                ruongDoTBEntry rdtbEntry = user.ruongDoTB.get(i);
+                // dbKey
+                ds.writeInt(i | 0x10000);
+                // idNV
+                ds.writeByte(rdtbEntry.entry.idNV);
+                // EquipType
+                ds.writeByte(rdtbEntry.entry.idEquipDat);
+                // idEquip
+                ds.writeShort(rdtbEntry.entry.id);
+                // Name
+                ds.writeUTF(rdtbEntry.entry.name + (rdtbEntry.cap > 0 ? String.format(" (+%d)", rdtbEntry.cap) : ""));
+                // pointNV
+                ds.writeByte(rdtbEntry.invAdd.length * 2);
+                for (int j = 0; j < rdtbEntry.invAdd.length; j++) {
+                    ds.writeByte(rdtbEntry.invAdd[j]);
+                    ds.writeByte(rdtbEntry.percentAdd[j]);
+                }
+                // Ngay het han
+                int hanSD = rdtbEntry.entry.hanSD - Until.getNumDay(rdtbEntry.dayBuy, new Date());
+                if (hanSD < 0) {
+                    hanSD = 0;
+                }
+                ds.writeByte(hanSD);
+                // Slot trong
+                ds.writeByte(rdtbEntry.slotNull);
+                // Vip I != 0 -> co tang % thoc tinh
+                ds.writeByte(rdtbEntry.entry.isSet ? 1 : 0);
+                // Vip Level
+                ds.writeByte(rdtbEntry.vipLevel);
+            }
             // DB Key
             for (int i = 0; i < 5; i++) {
-                ds.writeInt(65536);
+                ds.writeInt(user.NvData[user.nvUsed][i] | 0x10000);
             }
             ds.flush();
             user.sendMessage(ms);
@@ -744,8 +811,20 @@ public class UserService implements IUserService {
             // Ruong do dac biet
             ms = new Message(125);
             ds = ms.writer();
+            lent = user.ruongDoItem.size();
             ds.writeByte(0);
-            ds.writeByte(0);
+            ds.writeByte(lent);
+            for (int i = 0; i < lent; i++) {
+                ruongDoItemEntry rdiE = user.ruongDoItem.get(i);
+                // Id
+                ds.writeByte(rdiE.entry.id);
+                // Numb
+                ds.writeShort(rdiE.numb);
+                // Name
+                ds.writeUTF(rdiE.entry.name);
+                // Detail
+                ds.writeUTF(rdiE.entry.detail);
+            }
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
@@ -759,7 +838,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void nangCap2() {
+    public void sendCharacterInfo() {
         try {
             Message ms = new Message(Cmd.CHARACTOR_INFO);
             DataOutputStream ds = ms.writer();
@@ -778,7 +857,7 @@ public class UserService implements IUserService {
             // XP Max Lever
             ds.writeInt(1000);
             /* Danh vong */
-            ds.writeInt(0);
+            ds.writeInt(user.getDanhVong());
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {

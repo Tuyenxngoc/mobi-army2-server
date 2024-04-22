@@ -6,11 +6,11 @@ import lombok.Setter;
 
 import java.util.List;
 
-@Getter
-@Setter
 /**
  * @author tuyen
  */
+@Getter
+@Setter
 public class Equipment {
     @SerializedName("nvId")
     private int nvId;

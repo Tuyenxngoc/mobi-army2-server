@@ -116,7 +116,7 @@ public interface IUserService {
 
     void nangCap(Message ms);
 
-    void nangCap2();
+    void sendCharacterInfo();
 
     void macTrangBi(Message ms);
 
