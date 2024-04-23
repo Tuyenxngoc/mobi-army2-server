@@ -145,4 +145,8 @@ public interface IUserService {
     void startLuyenTap(Message ms);
 
     void sendMs10(String userLoginMany);
+
+    void sendUpdateMoney();
+
+    void sendUpdateDanhVong(int danhVongUp);
 }

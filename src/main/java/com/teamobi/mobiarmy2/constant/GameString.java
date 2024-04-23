@@ -376,4 +376,12 @@ public class GameString {
     public static String loginActive() {
         return "Tài khoản của bạn chưa được kích hoạt.";
     }
+
+    public static String gopClanMinXu(int xu) {
+        return String.format("Số xu góp tối thiểu là %d", xu);
+    }
+
+    public static String gopClanThanhCong() {
+        return "Góp thành công";
+    }
 }

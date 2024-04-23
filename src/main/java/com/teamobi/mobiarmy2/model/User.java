@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.model;
 
+import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.network.ISession;
@@ -10,7 +11,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,9 +21,8 @@ import java.util.List;
 public class User {
 
     public static NVData.EquipmentEntry[][] nvEquipDefault;
-
     public ISession session;
-    public UserState state = UserState.WAITING;
+    public UserState state;
     public int id;
     public byte nhanVat;
     public String username;
@@ -51,8 +50,8 @@ public class User {
     public byte[] missionLevel;
     public ruongDoTBEntry[][] nvEquip;
 
-    public List<ruongDoItemEntry> ruongDoItem = new ArrayList<>();
-    public List<ruongDoTBEntry> ruongDoTB = new ArrayList<>();
+    public List<ruongDoItemEntry> ruongDoItem;
+    public List<ruongDoTBEntry> ruongDoTB;
     private FightWait fightWait;
 
     private final IUserService userService;
@@ -78,8 +77,6 @@ public class User {
         userService.sendServerMessage(ss);
     }
 
-    public void updateXu(int xuUp) {
-    }
 
     public void logout() {
         isLogged = false;
@@ -89,4 +86,48 @@ public class User {
         return lever[nv];
     }
 
+    public void updateXu(int xuUp) {
+        if (xuUp == 0) {
+            return;
+        }
+        long sum = xuUp + xu;
+        if (sum > CommonConstant.MAX_XU) {
+            xu = CommonConstant.MAX_XU;
+        } else if (sum < CommonConstant.MIN_XU) {
+            xu = CommonConstant.MIN_XU;
+        } else {
+            xu += xuUp;
+        }
+        userService.sendUpdateMoney();
+    }
+
+    public void updateLuong(int luongUp) {
+        if (luongUp == 0) {
+            return;
+        }
+        long sum = luongUp + luong;
+        if (sum > CommonConstant.MAX_LUONG) {
+            luong = CommonConstant.MAX_LUONG;
+        } else if (sum < CommonConstant.MIN_LUONG) {
+            luong = CommonConstant.MIN_LUONG;
+        } else {
+            luong += luongUp;
+        }
+        userService.sendUpdateMoney();
+    }
+
+    public void updateDanhVong(int danhVongUp) {
+        if (danhVongUp == 0) {
+            return;
+        }
+        long sum = danhVongUp + danhVong;
+        if (sum > CommonConstant.MAX_DANH_VONG) {
+            danhVong = CommonConstant.MAX_DANH_VONG;
+        } else if (sum < CommonConstant.MIN_DANH_VONG) {
+            danhVong = CommonConstant.MIN_DANH_VONG;
+        } else {
+            danhVong += danhVongUp;
+        }
+        userService.sendUpdateDanhVong(danhVongUp);
+    }
 }

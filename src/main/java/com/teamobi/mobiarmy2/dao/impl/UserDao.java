@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -93,6 +94,8 @@ public class UserDao implements Dao<User>, IUserDao {
                             user.pointAdd = new int[len][5];
                             user.NvData = new int[len][6];
                             user.nvEquip = new ruongDoTBEntry[len][6];
+                            user.setRuongDoItem(new ArrayList<>());
+                            user.setRuongDoTB(new ArrayList<>());
                             Gson gson = new Gson();
 
                             Equipment[] equipments = gson.fromJson(playerResultSet.getString("ruongTrangBi"), Equipment[].class);

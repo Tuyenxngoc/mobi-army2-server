@@ -9,6 +9,7 @@ import com.teamobi.mobiarmy2.dao.impl.UserDao;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.server.BangXHManager;
+import com.teamobi.mobiarmy2.server.ClanManager;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.util.Until;
@@ -97,6 +98,16 @@ public class UserService implements IUserService {
             user.setXu(userFound.getXu());
             user.setLuong(userFound.getLuong());
             user.setDanhVong(userFound.getDanhVong());
+
+            user.setLever(userFound.getLever());
+            user.setLeverPercent(userFound.getLeverPercent());
+            user.setNvStt(userFound.getNvStt());
+            user.setXp(userFound.getXp());
+            user.setPoint(userFound.getPoint());
+            user.setPointAdd(userFound.getPointAdd());
+            user.setNvData(userFound.getNvData());
+            user.setNvEquip(userFound.getNvEquip());
+
             user.setRuongDoItem(userFound.getRuongDoItem());
             user.setRuongDoTB(userFound.getRuongDoTB());
             user.setNvEquip(userFound.getNvEquip());
@@ -318,7 +329,45 @@ public class UserService implements IUserService {
 
     @Override
     public void gopClan(Message ms) {
+        if (user.getClanId() <= 0) {
+            return;
+        }
 
+        try {
+            DataInputStream dis = ms.reader();
+            byte type = dis.readByte();
+            int quantity = dis.readInt();
+
+            if (quantity <= 0) {
+                return;
+            }
+
+            if (type == 0) {
+                if (quantity > user.getXu()) {
+                    return;
+                }
+                if (quantity < 1000) {
+                    sendServerMessage(GameString.gopClanMinXu(1000));
+                    return;
+                }
+                //Update xu user
+                user.updateXu(-quantity);
+                //Update xu clan
+                ClanManager.getInstance().contributeClan(user.getClanId(), user.getId(), quantity, Boolean.TRUE);
+                sendServerMessage(GameString.gopClanThanhCong());
+            } else if (type == 1) {
+                if (quantity > user.getLuong()) {
+                    return;
+                }
+                //Update lg user
+                user.updateLuong(-quantity);
+                //Update lg clan
+                ClanManager.getInstance().contributeClan(user.getClanId(), user.getId(), quantity, Boolean.FALSE);
+                sendServerMessage(GameString.gopClanThanhCong());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -952,6 +1001,34 @@ public class UserService implements IUserService {
             Message ms = new Message(Cmd.SET_MONEY_ERROR);
             DataOutputStream ds = ms.writer();
             ds.writeUTF(message);
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void sendUpdateMoney() {
+        try {
+            Message ms = new Message(Cmd.UPDATE_MONEY);
+            DataOutputStream ds = ms.writer();
+            ds.writeInt(user.getXu());
+            ds.writeInt(user.getLuong());
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void sendUpdateDanhVong(int danhVongUp) {
+        try {
+            Message ms = new Message(Cmd.CUP);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(danhVongUp);
+            ds.writeInt(user.getDanhVong());
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {

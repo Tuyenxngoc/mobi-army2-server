@@ -25,4 +25,12 @@ public class ClanManager {
     public ClanDao getClanDao() {
         return clanDao;
     }
+
+    public void contributeClan(short clanId, int userId, int quantity, boolean isXu) {
+        if (isXu) {
+            clanDao.gopXu(clanId, quantity);
+        } else {
+            clanDao.gopLuong(clanId, quantity);
+        }
+    }
 }

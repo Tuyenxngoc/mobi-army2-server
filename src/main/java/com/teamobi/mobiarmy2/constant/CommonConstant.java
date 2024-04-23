@@ -16,4 +16,11 @@ public class CommonConstant {
     public static final String iconCacheName = cacheFolder + "/icondata2";
 
     public static final int PRICE_CHAT = 10_000;
+
+    public static final int MAX_XU = 2_000_000_000;
+    public static final int MIN_XU = -2_000_000_000;
+    public static final int MAX_LUONG = MAX_XU;
+    public static final int MIN_LUONG = MIN_XU;
+    public static final int MAX_DANH_VONG = MAX_XU;
+    public static final int MIN_DANH_VONG = MIN_XU;
 }
