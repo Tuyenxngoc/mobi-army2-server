@@ -8,4 +8,5 @@ public interface IClanDao {
 
     void gopLuong(int clanId, int luong);
 
+    void gopClanContribute(String txtContribute, int userId);
 }

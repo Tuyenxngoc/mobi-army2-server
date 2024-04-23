@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.dao.impl.ClanDao;
+import com.teamobi.mobiarmy2.util.Until;
 
 /**
  * @author tuyen
@@ -27,10 +28,14 @@ public class ClanManager {
     }
 
     public void contributeClan(short clanId, int userId, int quantity, boolean isXu) {
+        String txtContribute;
         if (isXu) {
             clanDao.gopXu(clanId, quantity);
+            txtContribute = Until.getStringNumber(quantity) + " xu";
         } else {
             clanDao.gopLuong(clanId, quantity);
+            txtContribute = Until.getStringNumber(quantity) + " lượng";
         }
+        clanDao.gopClanContribute(txtContribute, userId);
     }
 }
