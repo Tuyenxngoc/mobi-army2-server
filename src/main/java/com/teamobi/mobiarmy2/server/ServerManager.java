@@ -43,7 +43,7 @@ public class ServerManager {
         this.log = new LoggerUtil(config.isDebug());
     }
 
-    public static synchronized ServerManager getInstance() {
+    public static ServerManager getInstance() {
         if (instance == null) {
             instance = new ServerManager();
         }

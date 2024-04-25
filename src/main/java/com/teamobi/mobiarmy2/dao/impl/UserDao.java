@@ -225,4 +225,42 @@ public class UserDao implements Dao<User>, IUserDao {
         return user;
     }
 
+    @Override
+    public List<User> getFriendsList(int userId, int[] friendIds) {
+        List<User> friendsList = new ArrayList<>();
+
+        StringBuilder queryBuilder = new StringBuilder("SELECT user.*, armymem.* FROM armymem INNER JOIN user ON user.user_id = armymem.id WHERE user.user_id IN (");
+        for (int i = 0; i < friendIds.length; i++) {
+            queryBuilder.append("?");
+            if (i < friendIds.length - 1) {
+                queryBuilder.append(",");
+            }
+        }
+        queryBuilder.append(")");
+
+        try (Connection connection = HikariCPManager.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(queryBuilder.toString())) {
+
+            for (int i = 0; i < friendIds.length; i++) {
+                statement.setInt(i + 1, friendIds[i]);
+            }
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    User friend = new User();
+                    friend.setId(resultSet.getInt("user_id"));
+                    friend.setUsername(resultSet.getString("user"));
+                    friend.setLock(resultSet.getBoolean("lock"));
+                    friend.setActive(resultSet.getBoolean("active"));
+
+                    friendsList.add(friend);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return friendsList;
+    }
+
 }

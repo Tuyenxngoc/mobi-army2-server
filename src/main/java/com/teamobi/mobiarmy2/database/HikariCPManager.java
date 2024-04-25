@@ -34,7 +34,7 @@ public class HikariCPManager {
         this.isShowSql = config.isShowSql();
     }
 
-    public static synchronized HikariCPManager getInstance() {
+    public static HikariCPManager getInstance() {
         if (instance == null) {
             instance = new HikariCPManager();
         }

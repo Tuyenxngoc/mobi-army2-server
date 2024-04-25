@@ -16,7 +16,7 @@ public class ClanManager {
         clanDao = new ClanDao();
     }
 
-    public static synchronized ClanManager getInstance() {
+    public static ClanManager getInstance() {
         if (instance == null) {
             instance = new ClanManager();
         }

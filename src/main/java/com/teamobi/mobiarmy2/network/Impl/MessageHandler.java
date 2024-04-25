@@ -102,7 +102,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.CHOOSE_ITEM -> userService.mangItem(ms);
 
-                case Cmd.CHOOSE_GUN -> userService.chonNhanVat(ms);
+                case Cmd.CHOOSE_GUN -> userService.handleChoseCharacter(ms);
 
                 case Cmd.CHANGE_TEAM -> userService.doiPhe(ms);
 

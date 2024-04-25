@@ -4,6 +4,7 @@ import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.constant.GameString;
+import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.dao.impl.UserDao;
 import com.teamobi.mobiarmy2.model.*;
@@ -19,6 +20,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author tuyen
@@ -427,7 +429,99 @@ public class UserService implements IUserService {
 
     @Override
     public void doDacBietShop(Message ms) {
+        try {
+            DataInputStream dis = ms.reader();
+            byte type = dis.readByte();
+            if (type == 0) {//send item
+                sendDoDacBietShop();
+            } else if (type == 1) {//buy item
+                byte buyLuong = ms.reader().readByte();
+                byte idS = ms.reader().readByte();
+                int numb = ms.reader().readUnsignedByte();
+                muaDoDacBietShop(buyLuong, idS, numb);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    private void muaDoDacBietShop(byte type, byte itemId, int quantity) {
+        //Todo check num ruong
+        if (quantity < 1) {
+            return;
+        }
+        SpecialItemData.SpecialItemEntry spE = SpecialItemData.getSpecialItemById(itemId);
+        if (!spE.onSale || (type == 0 ? spE.buyXu : spE.buyLuong) < 0) {
+            return;
+        }
+
+        if (type == 0) {// mua xu
+            int gia = quantity * spE.buyXu;
+            if (user.getXu() < gia) {
+                sendServerMessage(GameString.xuNotEnought());
+                return;
+            }
+            user.updateXu(-gia);
+        } else if (type == 1) {// mua luong
+            int gia = quantity * spE.buyLuong;
+            if (user.getLuong() < gia) {
+                sendServerMessage(GameString.xuNotEnought());
+                return;
+            }
+            user.updateLuong(-gia);
+        }
+
+        ArrayList<ruongDoItemEntry> arrayI = new ArrayList<>();
+        ruongDoItemEntry rdE = new ruongDoItemEntry();
+        rdE.entry = spE;
+        rdE.numb = quantity;
+        arrayI.add(rdE);
+        try {
+            user.updateRuong(null, null, -1, arrayI, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        sendServerMessage(GameString.buySuccess());
+    }
+
+    private void updateRuongItem(ArrayList<ruongDoItemEntry> arrayI) {
+        for (ruongDoItemEntry spE : arrayI) {
+            boolean isHave = false;
+            for (ruongDoItemEntry spE1 : user.getRuongDoItem()) {
+                if (spE1.entry.id == spE.entry.id) {
+                    isHave = true;
+                    spE1.numb += spE.numb;
+                    break;
+                }
+            }
+            // ko co=> Tao moi
+            if (!isHave) {
+                user.getRuongDoItem().add(spE);
+            }
+        }
+    }
+
+    private void sendDoDacBietShop() {
+        try {
+            Message ms = new Message(-3);
+            DataOutputStream ds = ms.writer();
+            for (SpecialItemData.SpecialItemEntry spEntry : SpecialItemData.entrys) {
+                if (!spEntry.onSale) {
+                    continue;
+                }
+                ds.writeByte(spEntry.id);
+                ds.writeUTF(spEntry.name);
+                ds.writeUTF(spEntry.detail);
+                ds.writeInt(spEntry.buyXu);
+                ds.writeInt(spEntry.buyLuong);
+                ds.writeByte(spEntry.hanSD);
+                ds.writeByte(spEntry.showChon ? 0 : 1);
+            }
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -516,7 +610,11 @@ public class UserService implements IUserService {
 
     @Override
     public void nhanTinn(Message ms) {
+        if (user.getState() == UserState.FIGHTING) {
 
+        } else if (user.getState() == UserState.WAIT_FIGHT) {
+
+        }
     }
 
     @Override
@@ -581,6 +679,34 @@ public class UserService implements IUserService {
 
     @Override
     public void xembanBe(Message ms) {
+        if (user.getFriends().length == 0) {
+            return;
+        }
+        try {
+            List<User> friends = userDao.getFriendsList(user.getId(), user.getFriends());
+
+            ms = new Message(Cmd.FRIENDLIST);
+            DataOutputStream ds = ms.writer();
+            for (User friend : friends) {
+                ds.writeInt(friend.getId());
+                ds.writeUTF(friend.getUsername());
+                ds.writeInt(friend.getXu());
+                ds.writeByte(friend.getNvUsed());
+                ds.writeShort(friend.getClanId());
+                ds.writeByte(1);//online
+                ds.writeByte(1);//lv
+                ds.writeByte(0);// lever %
+                /* data nhan vat */
+//                short[] data = ServerManager.data(iddbFR, (byte) nv);
+//                for (byte j = 0; j < 5; j++) {
+//                    ds.writeShort(data[j]);
+//                }
+                ds.flush();
+                user.sendMessage(ms);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -664,8 +790,38 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void chonNhanVat(Message ms) {
+    public void handleChoseCharacter(Message ms) {
+        try {
+            byte idNv = ms.reader().readByte();
+            if (idNv >= NVData.entrys.size() || idNv < 0 || !user.nvStt[idNv]) {
+                return;
+            }
+            user.nvUsed = idNv;
+            ms = new Message(Cmd.CHOOSE_GUN);
+            DataOutputStream ds = ms.writer();
+            ds.writeInt(user.getId());
+            ds.writeByte(idNv);
+            ds.flush();
+            user.sendMessage(ms);
+            sendCharacterInfo();
+            sendTBInfo();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    private void sendTBInfo() {
+        try {
+            Message ms = new Message(-7);
+            DataOutputStream ds = ms.writer();
+            for (int i = 0; i < 5; i++) {
+                ds.writeInt(user.NvData[user.nvUsed][i] | 0x10000);
+            }
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -987,7 +1143,38 @@ public class UserService implements IUserService {
 
     @Override
     public void getMaterialIconMessage(Message ms) {
+        try {
+            DataInputStream dis = ms.reader();
+            byte typeIcon = dis.readByte();
+            byte idIcon = dis.readByte();
 
+            byte indexIcon = 0;
+            byte[] ab0 = null;
+            switch (typeIcon) {
+                case 0, 1 -> ab0 = Until.getFile("res/icon/item/" + idIcon + ".png");
+                case 2 -> ab0 = Until.getFile("res/icon/map/" + idIcon + ".png");
+                case 3, 4 -> {
+                    indexIcon = ms.reader().readByte();
+                    ab0 = Until.getFile("res/icon/item/" + idIcon + ".png");
+                }
+            }
+            ms = new Message(126);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(typeIcon);
+            ds.writeByte(idIcon);
+            if (ab0 == null) {
+                ab0 = Until.getFile("/icon.png");
+            }
+            ds.writeShort(ab0.length);
+            ds.write(ab0);
+            if ((typeIcon == 3) || (typeIcon == 4)) {
+                ds.writeByte(indexIcon);
+            }
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

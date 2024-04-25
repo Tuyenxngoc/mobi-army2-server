@@ -8,7 +8,7 @@ public class BangXHManager {
     private static BangXHManager instance;
     public boolean isComplete = true;
 
-    public synchronized static BangXHManager getInstance() {
+    public static BangXHManager getInstance() {
         if (instance == null) {
             instance = new BangXHManager();
         }

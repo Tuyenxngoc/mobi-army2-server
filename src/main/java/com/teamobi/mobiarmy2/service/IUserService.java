@@ -94,7 +94,7 @@ public interface IUserService {
 
     void mangItem(Message ms);
 
-    void chonNhanVat(Message ms);
+    void handleChoseCharacter(Message ms);
 
     void doiPhe(Message ms);
 
