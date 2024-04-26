@@ -37,6 +37,7 @@ public class User {
     public int xu;
     public int luong;
     public int danhVong;
+    public boolean isOnline;
     public boolean isLogged;
     public boolean isLock;
     public boolean isActive;
@@ -89,8 +90,21 @@ public class User {
     }
 
     public int getLever(byte nv) {
+        if (nv < 0 || nv >= lever.length) {
+            return 1;
+        }
         return lever[nv];
     }
+
+    public int getCurrentLever() {
+        return lever[nvUsed];
+    }
+
+    //todo calculate the current level percent
+    public int getCurrentLeverPercent() {
+        return 0;
+    }
+
 
     public void updateXu(int xuUp) {
         if (xuUp == 0) {

@@ -693,9 +693,9 @@ public class UserService implements IUserService {
                 ds.writeInt(friend.getXu());
                 ds.writeByte(friend.getNvUsed());
                 ds.writeShort(friend.getClanId());
-                ds.writeByte(1);//online
-                ds.writeByte(1);//lv
-                ds.writeByte(0);// lever %
+                ds.writeByte(friend.isOnline() ? 1 : 0);
+                ds.writeByte(friend.getCurrentLever());
+                ds.writeByte(friend.getCurrentLeverPercent());
                 /* data nhan vat */
 //                short[] data = ServerManager.data(iddbFR, (byte) nv);
 //                for (byte j = 0; j < 5; j++) {
