@@ -14,4 +14,8 @@ public interface IUserDao {
 
     List<User> getFriendsList(int userId, int[] friends);
 
+    boolean existsByUserIdAndPassword(int id, String oldPass);
+
+    void changePassword(int id, String newPass);
+
 }

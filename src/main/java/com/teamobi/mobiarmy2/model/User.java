@@ -7,16 +7,10 @@ import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.service.Impl.UserService;
-import com.teamobi.mobiarmy2.util.Until;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -105,6 +99,14 @@ public class User {
         return 0;
     }
 
+    public int getCurrentXp() {
+        return 0;
+    }
+
+    public int getCurrentXpLevel() {
+        return 1000;
+    }
+
 
     public void updateXu(int xuUp) {
         if (xuUp == 0) {
@@ -150,5 +152,6 @@ public class User {
         }
         userService.sendUpdateDanhVong(danhVongUp);
     }
+
 
 }

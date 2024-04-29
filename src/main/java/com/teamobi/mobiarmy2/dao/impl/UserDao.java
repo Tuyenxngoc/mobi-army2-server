@@ -9,6 +9,7 @@ import com.teamobi.mobiarmy2.json.DataItem;
 import com.teamobi.mobiarmy2.json.Equipment;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.util.Until;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -54,15 +55,19 @@ public class UserDao implements Dao<User>, IUserDao {
         User user = null;
         try (Connection connection = HikariCPManager.getInstance().getConnection()) {
             // Truy vấn để lấy thông tin từ bảng user
-            String userQuery = "SELECT * FROM user WHERE user = ? AND password = ?";
+            String userQuery = "SELECT * FROM user WHERE username = ?";
             try (PreparedStatement userStatement = connection.prepareStatement(userQuery)) {
                 userStatement.setString(1, username);
-                userStatement.setString(2, password);
                 try (ResultSet userResultSet = userStatement.executeQuery()) {
                     if (userResultSet.next()) {
+                        // Kiểm tra mật khẩu đã được mã hóa bằng jBCrypt
+                        String hashedPassword = userResultSet.getString("password");
+                        if (!BCrypt.checkpw(password, hashedPassword)) {
+                            return null;
+                        }
                         user = new User();
                         user.setId(userResultSet.getInt("user_id"));
-                        user.setUsername(userResultSet.getString("user"));
+                        user.setUsername(userResultSet.getString("username"));
                         user.setPassword(userResultSet.getString("password"));
                         user.setLock(userResultSet.getBoolean("lock"));
                         user.setActive(userResultSet.getBoolean("active"));
@@ -188,7 +193,7 @@ public class UserDao implements Dao<User>, IUserDao {
         User user = null;
         try (Connection connection = HikariCPManager.getInstance().getConnection()) {
             // Truy vấn để lấy thông tin từ bảng user
-            String userQuery = "SELECT `user`, `lock`, `active` FROM user WHERE user_id = ?";
+            String userQuery = "SELECT username, `lock`, `active` FROM user WHERE user_id = ?";
             try (PreparedStatement userStatement = connection.prepareStatement(userQuery)) {
                 userStatement.setInt(1, userId);
                 try (ResultSet userResultSet = userStatement.executeQuery()) {
@@ -261,6 +266,31 @@ public class UserDao implements Dao<User>, IUserDao {
         }
 
         return friendsList;
+    }
+
+    @Override
+    public boolean existsByUserIdAndPassword(int id, String oldPass) {
+        try (Connection connection = HikariCPManager.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT password FROM user WHERE user_id = ?")) {
+            statement.setInt(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    String hashedPassword = resultSet.getString("password");
+                    // Check if the provided password matches the hashed password from the database
+                    return BCrypt.checkpw(oldPass, hashedPassword);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public void changePassword(int id, String newPass) {
+        String hashedPassword = BCrypt.hashpw(newPass, BCrypt.gensalt());
+        String sql = "UPDATE `user` SET `password` = ? WHERE user_id = ?";
+        HikariCPManager.getInstance().update(sql, hashedPassword, id);
     }
 
 }

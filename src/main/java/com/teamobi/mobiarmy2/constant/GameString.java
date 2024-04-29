@@ -384,4 +384,8 @@ public class GameString {
     public static String gopClanThanhCong() {
         return "Góp thành công";
     }
+
+    public static String notRanking() {
+        return "Chưa có hạng";
+    }
 }

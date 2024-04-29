@@ -110,7 +110,7 @@ public interface IUserService {
 
     void xoaDan(Message ms);
 
-    void doiMatKhau(Message ms);
+    void handleChangePassword(Message ms);
 
     void getFilePack(Message ms);
 
@@ -122,7 +122,7 @@ public interface IUserService {
 
     void shopTrangBi(Message ms);
 
-    void muaTrangBi(Message ms);
+    void handleEquipmentPurchases(Message ms);
 
     void quaySo(Message ms);
 

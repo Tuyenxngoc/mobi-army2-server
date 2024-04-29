@@ -23,6 +23,8 @@ import java.util.ArrayList;
  */
 public class ServerManager {
 
+    public static byte max_ruong_tb;
+
     private static ServerManager instance;
 
     private final IGameService gameService;

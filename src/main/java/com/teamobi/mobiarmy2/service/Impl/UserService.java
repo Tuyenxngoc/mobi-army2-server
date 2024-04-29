@@ -58,8 +58,8 @@ public class UserService implements IUserService {
 
         try {
             DataInputStream dis = ms.reader();
-            String username = dis.readUTF().trim();
-            String password = dis.readUTF().trim();
+            String username = dis.readUTF();
+            String password = dis.readUTF();
             String version = dis.readUTF();
 
             if (!username.matches(CommonConstant.ALPHANUMERIC_PATTERN) || !password.matches(CommonConstant.ALPHANUMERIC_PATTERN)) {
@@ -686,36 +686,25 @@ public class UserService implements IUserService {
     public void xemThongTIn(Message ms) {
         try {
             int userId = ms.reader().readInt();
-            if (userId < 0) {
-                return;
-            }
 
-            User userFound = userDao.getUserDetails(userId);
             ms = new Message(Cmd.PLAYER_DETAIL);
             DataOutputStream ds = ms.writer();
-            if (userFound == null
-                    || userFound.isLogged()
-                    || !userFound.isActive()
-                    || userFound.getId() != userId
-            ) {
+            if (user.getId() != userId) {
                 ds.writeInt(-1);
             } else {
-                ds.writeInt(userFound.getId());
-                ds.writeUTF(userFound.getUsername());
-                ds.writeInt(userFound.getXu());
-
-                byte nvUsed = userFound.getNvUsed();
-
-                ds.writeByte(userFound.getLever(nvUsed));
-                ds.writeByte(0);/* %lever */
-                ds.writeInt(userFound.getLuong());
-                ds.writeInt(0);/* XP */
-                ds.writeInt(1000);/* XP Level */
-                ds.writeInt(userFound.getDanhVong());
-                ds.writeUTF("Chưa có hạng");
+                ds.writeInt(user.getId());
+                ds.writeUTF(user.getUsername());
+                ds.writeInt(user.getXu());
+                ds.writeByte(user.getCurrentLever());
+                ds.writeByte(user.getCurrentLeverPercent());
+                ds.writeInt(user.getLuong());
+                ds.writeInt(user.getCurrentXp());
+                ds.writeInt(user.getCurrentXpLevel());
+                ds.writeInt(user.getDanhVong());
+                ds.writeUTF(GameString.notRanking());
             }
             ds.flush();
-            user.sendMessage(ms);
+            this.user.sendMessage(ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -822,8 +811,27 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void doiMatKhau(Message ms) {
+    public void handleChangePassword(Message ms) {
+        DataInputStream dis = ms.reader();
+        try {
+            String oldPass = dis.readUTF();
+            String newPass = dis.readUTF();
 
+            if (!oldPass.matches(CommonConstant.ALPHANUMERIC_PATTERN) || !newPass.matches(CommonConstant.ALPHANUMERIC_PATTERN)) {
+                sendServerMessage(GameString.changPassError1());
+                return;
+            }
+
+            if (!userDao.existsByUserIdAndPassword(user.getId(), oldPass)) {
+                sendServerMessage(GameString.changPassError2());
+                return;
+            }
+
+            userDao.changePassword(user.getId(), newPass);
+            sendServerMessage(GameString.changPassSuccess());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -1043,8 +1051,59 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void muaTrangBi(Message ms) {
+    public void handleEquipmentPurchases(Message ms) {
+        DataInputStream dis = ms.reader();
 
+        try {
+            byte type = dis.readByte();
+            if (type == 0) {//Mua trang bi
+                short indexSale = dis.readShort();
+                byte buyLuong = dis.readByte();
+                muaTrangBi(indexSale, buyLuong);
+
+            } else if (type == 1) {//Ban trang bi
+                byte size = dis.readByte();
+                for (int i = 0; i < size; i++) {
+                    int id = dis.readInt();
+                }
+
+            } else if (type == 2) {//Xac nhan ban trang bi
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void muaTrangBi(short indexSale, byte buyLuong) {
+        if (user.getRuongDoTB().size() == ServerManager.max_ruong_tb) {
+            sendServerMessage(GameString.ruongNoSlot());
+            return;
+        }
+        NVData.EquipmentEntry eqEntry = NVData.getEquipEntryByIndexSale(indexSale);
+        if (eqEntry == null || !eqEntry.onSale || (buyLuong == 0 ? eqEntry.giaXu : eqEntry.giaLuong) < 0) {
+            return;
+        }
+
+        if (buyLuong == 0) {
+            if (user.getXu() < eqEntry.giaXu) {
+                sendServerMessage(GameString.xuNotEnought());
+                return;
+            }
+            user.updateXu(-eqEntry.giaXu);
+        } else if (buyLuong == 1) {
+            if (user.getLuong() < eqEntry.giaLuong) {
+                sendServerMessage(GameString.xuNotEnought());
+                return;
+            }
+            user.updateLuong(-eqEntry.giaLuong);
+        } else {
+            return;
+        }
+        updateRuongItem(null, null);
+        sendServerMessage(GameString.buySuccess());
+    }
+
+    private void updateRuongItem(ArrayList<ruongDoItemEntry> addItem, ArrayList<ruongDoItemEntry> removeItem) {
     }
 
     @Override

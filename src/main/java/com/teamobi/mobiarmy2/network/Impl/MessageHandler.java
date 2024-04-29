@@ -118,7 +118,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.CHECK_CROSS -> userService.xoaDan(ms);
 
-                case Cmd.CHANGE_PASS -> userService.doiMatKhau(ms);
+                case Cmd.CHANGE_PASS -> userService.handleChangePassword(ms);
 
                 case Cmd.TRAINING -> userService.startLuyenTap(ms);
 
@@ -132,7 +132,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.SHOP_EQUIP -> userService.shopTrangBi(ms);
 
-                case Cmd.BUY_EQUIP -> userService.muaTrangBi(ms);
+                case Cmd.BUY_EQUIP -> userService.handleEquipmentPurchases(ms);
 
                 case Cmd.RULET -> userService.quaySo(ms);
 
