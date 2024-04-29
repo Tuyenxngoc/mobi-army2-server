@@ -4,7 +4,6 @@ import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.constant.GameString;
-import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.dao.impl.UserDao;
 import com.teamobi.mobiarmy2.model.*;
@@ -435,10 +434,10 @@ public class UserService implements IUserService {
             if (type == 0) {//send item
                 sendDoDacBietShop();
             } else if (type == 1) {//buy item
-                byte buyLuong = ms.reader().readByte();
-                byte idS = ms.reader().readByte();
-                int numb = ms.reader().readUnsignedByte();
-                muaDoDacBietShop(buyLuong, idS, numb);
+                byte isBuyXu = dis.readByte();
+                byte itemId = dis.readByte();
+                int quantity = dis.readUnsignedByte();
+                muaDoDacBietShop(isBuyXu, itemId, quantity);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -471,39 +470,12 @@ public class UserService implements IUserService {
             user.updateLuong(-gia);
         }
 
-        ArrayList<ruongDoItemEntry> arrayI = new ArrayList<>();
-        ruongDoItemEntry rdE = new ruongDoItemEntry();
-        rdE.entry = spE;
-        rdE.numb = quantity;
-        arrayI.add(rdE);
-        try {
-            user.updateRuong(null, null, -1, arrayI, null);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         sendServerMessage(GameString.buySuccess());
-    }
-
-    private void updateRuongItem(ArrayList<ruongDoItemEntry> arrayI) {
-        for (ruongDoItemEntry spE : arrayI) {
-            boolean isHave = false;
-            for (ruongDoItemEntry spE1 : user.getRuongDoItem()) {
-                if (spE1.entry.id == spE.entry.id) {
-                    isHave = true;
-                    spE1.numb += spE.numb;
-                    break;
-                }
-            }
-            // ko co=> Tao moi
-            if (!isHave) {
-                user.getRuongDoItem().add(spE);
-            }
-        }
     }
 
     private void sendDoDacBietShop() {
         try {
-            Message ms = new Message(-3);
+            Message ms = new Message(Cmd.SHOP_LINHTINH);
             DataOutputStream ds = ms.writer();
             for (SpecialItemData.SpecialItemEntry spEntry : SpecialItemData.entrys) {
                 if (!spEntry.onSale) {
@@ -610,11 +582,6 @@ public class UserService implements IUserService {
 
     @Override
     public void nhanTinn(Message ms) {
-        if (user.getState() == UserState.FIGHTING) {
-
-        } else if (user.getState() == UserState.WAIT_FIGHT) {
-
-        }
     }
 
     @Override
@@ -696,11 +663,6 @@ public class UserService implements IUserService {
                 ds.writeByte(friend.isOnline() ? 1 : 0);
                 ds.writeByte(friend.getCurrentLever());
                 ds.writeByte(friend.getCurrentLeverPercent());
-                /* data nhan vat */
-//                short[] data = ServerManager.data(iddbFR, (byte) nv);
-//                for (byte j = 0; j < 5; j++) {
-//                    ds.writeShort(data[j]);
-//                }
                 ds.flush();
                 user.sendMessage(ms);
             }
@@ -1146,28 +1108,29 @@ public class UserService implements IUserService {
         try {
             DataInputStream dis = ms.reader();
             byte typeIcon = dis.readByte();
-            byte idIcon = dis.readByte();
+            byte iconId = dis.readByte();
 
             byte indexIcon = 0;
-            byte[] ab0 = null;
+            byte[] data = null;
             switch (typeIcon) {
-                case 0, 1 -> ab0 = Until.getFile("res/icon/item/" + idIcon + ".png");
-                case 2 -> ab0 = Until.getFile("res/icon/map/" + idIcon + ".png");
+                case 0, 1 -> data = Until.getFile("res/icon/item/" + iconId + ".png");
+                case 2 -> data = Until.getFile("res/icon/map/" + iconId + ".png");
                 case 3, 4 -> {
-                    indexIcon = ms.reader().readByte();
-                    ab0 = Until.getFile("res/icon/item/" + idIcon + ".png");
+                    indexIcon = dis.readByte();
+                    data = Until.getFile("res/icon/item/" + iconId + ".png");
                 }
             }
-            ms = new Message(126);
+            if (data == null) {
+                data = new byte[0];
+            }
+
+            ms = new Message(Cmd.MATERIAL_ICON);
             DataOutputStream ds = ms.writer();
             ds.writeByte(typeIcon);
-            ds.writeByte(idIcon);
-            if (ab0 == null) {
-                ab0 = Until.getFile("/icon.png");
-            }
-            ds.writeShort(ab0.length);
-            ds.write(ab0);
-            if ((typeIcon == 3) || (typeIcon == 4)) {
+            ds.writeByte(iconId);
+            ds.writeShort(data.length);
+            ds.write(data);
+            if (typeIcon == 3 || typeIcon == 4) {
                 ds.writeByte(indexIcon);
             }
             ds.flush();

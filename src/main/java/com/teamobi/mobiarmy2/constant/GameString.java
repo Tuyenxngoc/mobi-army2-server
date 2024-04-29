@@ -10,19 +10,19 @@ public class GameString {
     }
 
     public static String leave1() {
-        return "Đã bỏ chạy -%dxp.";
+        return "Đã bỏ chạy -%dxp";
     }
 
     public static String leave2() {
-        return "Đã bỏ chạy.";
+        return "Đã bỏ chạy";
     }
 
     public static String inviteError1() {
-        return "Bạn đó đã offline rồi!.";
+        return "Bạn đó đã offline rồi!";
     }
 
     public static String inviteError2() {
-        return "Bạn đó đã vào bàn khác chơi rồi!.";
+        return "Bạn đó đã vào bàn khác chơi rồi!";
     }
 
     public static String inviteMessage() {
@@ -46,7 +46,7 @@ public class GameString {
     }
 
     public static String phucHoiSuccess() {
-        return "Phục hồi điểm nâng cấp thành công!.";
+        return "Phục hồi điểm nâng cấp thành công!";
     }
 
     public static String exchangeGift() {
@@ -54,35 +54,35 @@ public class GameString {
     }
 
     public static String x2XPSuccess() {
-        return "Sử dụng thành công. Bạn có 1 ngày x2 kinh nghiệm!.";
+        return "Sử dụng thành công. Bạn có 1 ngày x2 kinh nghiệm!";
     }
 
     public static String x6XPSuccess() {
-        return "Sử dụng thành công. Bạn có 1 ngày x6 kinh nghiệm!.";
+        return "Sử dụng thành công. Bạn có 1 ngày x6 kinh nghiệm!";
     }
 
     public static String x0XPSuccess() {
-        return "Sử dụng thành công. Bạn sẽ không nhận mọi kinh nghiệm trong 1 ngày!.";
+        return "Sử dụng thành công. Bạn sẽ không nhận mọi kinh nghiệm trong 1 ngày!";
     }
 
     public static String x0XPHuy() {
-        return "Sử dụng thành công. Bạn đã hủy không nhận kinh nghiệm!.";
+        return "Sử dụng thành công. Bạn đã hủy không nhận kinh nghiệm!";
     }
 
     public static String x2XPRequest() {
-        return "Bạn có muốn sử dụng item này không? Hiệu lực 1 ngày!.";
+        return "Bạn có muốn sử dụng item này không? Hiệu lực 1 ngày!";
     }
 
     public static String x6XPRequest() {
-        return "Bạn có muốn sử dụng item này không? Hiệu lực 1 ngày!.";
+        return "Bạn có muốn sử dụng item này không? Hiệu lực 1 ngày!";
     }
 
     public static String x0XPRequest() {
-        return "Bạn có muốn không nhận kinh nghiệm không? Hiệu lực 1 ngày!.";
+        return "Bạn có muốn không nhận kinh nghiệm không? Hiệu lực 1 ngày!";
     }
 
     public static String phucHoiDiemString() {
-        return "Bạn có muốn sử dụng item này không? Sẽ xóa hết điểm đã nâng!.";
+        return "Bạn có muốn sử dụng item này không? Sẽ xóa hết điểm đã nâng!";
     }
 
     public static String mssTGString(String sender, String content) {
@@ -90,7 +90,7 @@ public class GameString {
     }
 
     public static String dailyReward() {
-        return "Hôm nay bạn được tặng %dx item %s. Chúc chơi game vui vẻ.";
+        return "Hôm nay bạn được tặng %dx item %s. Chúc bạn chơi game vui vẻ";
     }
 
     public static String loginErr1() {
@@ -98,7 +98,7 @@ public class GameString {
     }
 
     public static String userLoginMany() {
-        return "Có người khác đăng nhập vào tài khoản của bạn!.";
+        return "Có người khác đăng nhập vào tài khoản của bạn!";
     }
 
     public static String loginPassFail() {
@@ -106,11 +106,11 @@ public class GameString {
     }
 
     public static String hopNgocFail() {
-        return "Chế ngọc thất bại, hao phí %d %s!.";
+        return "Chế ngọc thất bại, hao phí %d %s!";
     }
 
     public static String hopNgocSucess() {
-        return "Chế ngọc thành công hao phí %d %s thu được %d %s!.";
+        return "Chế ngọc thành công hao phí %d %s thu được %d %s!";
     }
 
     public static String cheDoSuccess() {
@@ -134,7 +134,7 @@ public class GameString {
     }
 
     public static String hopNgocNC() {
-        return "Bạn có muốn hợp thành ngọc cấp cao hơn? Tỉ lệ thành công là %s.";
+        return "Bạn có muốn hợp thành ngọc cấp cao hơn? Tỉ lệ thành công là %s";
     }
 
     public static String hopNgocSell() {
@@ -146,11 +146,11 @@ public class GameString {
     }
 
     public static String xuNotEnought() {
-        return "Bạn không có đủ tiền!.";
+        return "Bạn không có đủ tiền!";
     }
 
     public static String buySuccess() {
-        return "Giao dịch thành công. Xin cảm ơn!.";
+        return "Giao dịch thành công. Xin cảm ơn!";
     }
 
     public static String addFrienvError1() {
@@ -158,23 +158,23 @@ public class GameString {
     }
 
     public static String changPassError1() {
-        return "Mật khẩu không được chứa kí tự đặc biệt!.";
+        return "Mật khẩu không được chứa kí tự đặc biệt!";
     }
 
     public static String changPassError2() {
-        return "Mật khẩu cũ không chính xác!.";
+        return "Mật khẩu cũ không chính xác!";
     }
 
     public static String changPassSuccess() {
-        return "Đổi mật khẩu thành công!.";
+        return "Đổi mật khẩu thành công!";
     }
 
     public static String ruongNoSlot() {
-        return "Không đủ chỗ trong rương!.";
+        return "Không đủ chỗ trong rương!";
     }
 
     public static String ruongMaxSlot() {
-        return "Số lượng đã quá mức tối đa!.";
+        return "Số lượng đã quá mức tối đa!";
     }
 
     public static String thaoNgocRequest() {
@@ -186,19 +186,19 @@ public class GameString {
     }
 
     public static String sellTBError1() {
-        return "Không thể bán trang bị đang sử dụng!.";
+        return "Không thể bán trang bị đang sử dụng!";
     }
 
     public static String thaoNgocError1() {
-        return "Không thể tháo ngọc trang bị đang sử dụng!.";
+        return "Không thể tháo ngọc trang bị đang sử dụng!";
     }
 
     public static String thaoNgocError2() {
-        return "Bạn không có đủ tiền. Bạn cần %d xu để thực hiện thao tác này!.";
+        return "Bạn không có đủ tiền. Bạn cần %d xu để thực hiện thao tác này!";
     }
 
     public static String thaoNgocSuccess() {
-        return "Thao tác thành công!.";
+        return "Thao tác thành công!";
     }
 
     public static String giaHanRequest() {
@@ -206,51 +206,51 @@ public class GameString {
     }
 
     public static String giaHanSucess() {
-        return "Gia hạn thành công!.";
+        return "Gia hạn thành công!";
     }
 
     public static String findKVError1() {
-        return "Không tìm được khu vực!.";
+        return "Không tìm được khu vực!";
     }
 
     public static String joinKVError0() {
-        return "Khu vực đã bắt đầu!.";
+        return "Khu vực đã bắt đầu!";
     }
 
     public static String joinKVError1() {
-        return "Mật khẩu không chính xác!.";
+        return "Mật khẩu không chính xác!";
     }
 
     public static String joinKVError2() {
-        return "Không đủ tiền cược!.";
+        return "Không đủ tiền cược!";
     }
 
     public static String joinKVError3() {
-        return "Khu vực đã đầy!.";
+        return "Khu vực đã đầy!";
     }
 
     public static String kickString() {
-        return "Bạn bị đuổi bởi chủ phòng!.";
+        return "Bạn bị đuổi bởi chủ phòng!";
     }
 
     public static String datCuocError1() {
-        return "Chỉ có thể đặt cược từ %d xu đến %d xu!.";
+        return "Chỉ có thể đặt cược từ %d xu đến %d xu!";
     }
 
     public static String startGameError1() {
-        return "Mọi người chưa sẵn sàng!.";
+        return "Mọi người chưa sẵn sàng!";
     }
 
     public static String startGameError2() {
-        return "Còn %s chưa sẵn sàng!.";
+        return "Còn %s chưa sẵn sàng!";
     }
 
     public static String startGameError3() {
-        return "%s lỗi tiền đặt cược!.";
+        return "%s lỗi tiền đặt cược!";
     }
 
     public static String startGameError4() {
-        return "%s lỗi item slot %d xin chọn lại!.";
+        return "%s lỗi item slot %d xin chọn lại!";
     }
 
     public static String startGameError5() {
@@ -258,43 +258,43 @@ public class GameString {
     }
 
     public static String selectMapError1_1() {
-        return "Chỉ có thể chọn map %s!.";
+        return "Chỉ có thể chọn map %s!";
     }
 
     public static String selectMapError1_2() {
-        return "Chỉ có thể chọn map %s hoặc map %s!.";
+        return "Chỉ có thể chọn map %s hoặc map %s!";
     }
 
     public static String selectMapError1_3() {
-        return "Lỗi chọn map!.";
+        return "Lỗi chọn map!";
     }
 
     public static String Wait_click() {
-        return "Vui lòng chờ sau: %s.";
+        return "Vui lòng chờ sau: %s";
     }
 
     public static String reg_Error1() {
-        return "Tài khoản hoặc mật khẩu không cho phép kí tự đặc biệt!.";
+        return "Tài khoản hoặc mật khẩu không cho phép kí tự đặc biệt!";
     }
 
     public static String reg_Error2() {
-        return "Tài khoản phải có độ dài từ 5 - 16 kí tự!.";
+        return "Tài khoản phải có độ dài từ 5 - 16 kí tự!";
     }
 
     public static String reg_Error3() {
-        return "Mật khẩu phải có độ dài từ 1 - 40 kí tự!.";
+        return "Mật khẩu phải có độ dài từ 1 - 40 kí tự!";
     }
 
     public static String reg_Error4() {
-        return "Tài khoản đã tồn tại. Vui lòng chọn một tài khoản khác!.";
+        return "Tài khoản đã tồn tại. Vui lòng chọn một tài khoản khác!";
     }
 
     public static String reg_Error5() {
-        return "Đăng kí tài khoản thành công!.";
+        return "Đăng kí tài khoản thành công!";
     }
 
     public static String notCompletedMatch() {
-        return "Ván chơi không tính vì thời gian quá ngắn hoặc bạn có hành vi tiêu cực!.";
+        return "Ván chơi không tính vì thời gian quá ngắn hoặc bạn có hành vi tiêu cực!";
     }
 
     public static String openingGift() {
@@ -302,27 +302,27 @@ public class GameString {
     }
 
     public static String notClan() {
-        return "Bạn không có biệt đội!.";
+        return "Bạn không có biệt đội!";
     }
 
     public static String clanNull() {
-        return "Biệt đội không tồn tại!.";
+        return "Biệt đội không tồn tại!";
     }
 
     public static String clanLevelNotEnought() {
-        return "Biệt đội bạn chưa đủ cấp độ!.";
+        return "Biệt đội bạn chưa đủ cấp độ!";
     }
 
     public static String clanrightNotEnought() {
-        return "Chỉ đội trưởng mới có thể mua!.";
+        return "Chỉ đội trưởng mới có thể mua!";
     }
 
     public static String clanXuNotEnought() {
-        return "Biệt đội bạn không có đủ xu!.";
+        return "Biệt đội bạn không có đủ xu!";
     }
 
     public static String clanLuongNotEnought() {
-        return "Biệt đội bạn không có đủ lượng!.";
+        return "Biệt đội bạn không có đủ lượng!";
     }
 
     public static String unauthorized_Item() {
@@ -354,27 +354,27 @@ public class GameString {
     }
 
     public static String dapDoSuccess() {
-        return "Chúc mừng bạn đã đập đồ lên cấp %s (+ %s %s)!.";
+        return "Chúc mừng bạn đã đập đồ lên cấp %s (+ %s %s)!";
     }
 
     public static String dapDoMax() {
-        return "Chúc mừng bạn đã đập lên cấp tối đa %d, +%d%s và %d%s tất cả chỉ số!.";
+        return "Chúc mừng bạn đã đập lên cấp tối đa %d, +%d%s và %d%s tất cả chỉ số!";
     }
 
     public static String dapDoDatMuc() {
-        return "Chúc mừng bạn đã đập đồ lên cấp %d, %d%s và +%d tất cả chỉ số!.";
+        return "Chúc mừng bạn đã đập đồ lên cấp %d, %d%s và +%d tất cả chỉ số!";
     }
 
     public static String dapDoFail() {
-        return "Đập đồ thất bại!.";
+        return "Đập đồ thất bại!";
     }
 
     public static String loginLock() {
-        return "Tài khoản của bạn đang bị khóa.";
+        return "Tài khoản của bạn đang bị khóa";
     }
 
     public static String loginActive() {
-        return "Tài khoản của bạn chưa được kích hoạt.";
+        return "Tài khoản của bạn chưa được kích hoạt";
     }
 
     public static String gopClanMinXu(int xu) {
