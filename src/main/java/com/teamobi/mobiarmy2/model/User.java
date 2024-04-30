@@ -151,4 +151,6 @@ public class User {
         userService.sendUpdateDanhVong(danhVongUp);
     }
 
+    public void updateXp(int rewardXP, boolean b) {
+    }
 }

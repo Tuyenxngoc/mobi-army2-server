@@ -23,17 +23,17 @@ public class MissionData {
 
     public static class MissDataEntry {
 
-        int id;
-        byte idNeed;
-        ArrayList<MissionEntry> entrys = new ArrayList<>();
+        public int id;
+        public byte idNeed;
+        public ArrayList<MissionEntry> entrys = new ArrayList<>();
     }
 
-    public static ArrayList<MissDataEntry> entries = new ArrayList<>();
+    public static ArrayList<MissDataEntry> entrys = new ArrayList<>();
 
     public static void addMissionEntry(int id, byte idneed, MissionEntry mEntry) {
         System.out.println("Set mission id=" + id + " idneed=" + idneed);
         MissDataEntry mDatE = null;
-        for (MissDataEntry mDatE1 : entries) {
+        for (MissDataEntry mDatE1 : entrys) {
             if (mDatE1.id == id) {
                 mDatE = mDatE1;
                 break;
@@ -44,7 +44,7 @@ public class MissionData {
             mDatE.id = id;
             mDatE.idNeed = idneed;
             mDatE.entrys = new ArrayList<>();
-            entries.add(mDatE);
+            entrys.add(mDatE);
         }
         for (MissionEntry mE : mDatE.entrys) {
             if (mE.level == mEntry.level) {
@@ -56,7 +56,7 @@ public class MissionData {
     }
 
     public static MissionEntry getMissionData(int index) {
-        for (MissDataEntry mDatE1 : entries) {
+        for (MissDataEntry mDatE1 : entrys) {
             for (MissionEntry me : mDatE1.entrys) {
                 if (me.index == index) {
                     return me;

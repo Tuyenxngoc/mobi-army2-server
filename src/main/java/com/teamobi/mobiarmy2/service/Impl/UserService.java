@@ -432,12 +432,153 @@ public class UserService implements IUserService {
 
     @Override
     public void giaHanDo(Message ms) {
-
+        try {
+            byte action = ms.reader().readByte();
+            int idKey = ms.reader().readInt();
+            DataOutputStream ds;
+            if (action == 0) {
+                int gia = 0;
+                if ((idKey & 0x10000) > 0) {
+                    idKey &= 0xFFFF;
+                    if (idKey >= 0 && idKey < user.ruongDoTB.size()) {
+                        ruongDoTBEntry rdE = user.ruongDoTB.get(idKey);
+                        for (int i = 0; i < 3; i++) {
+                            if (rdE.slot[i] >= 0) {
+                                SpecialItemData.SpecialItemEntry spE = SpecialItemData.getSpecialItemById(rdE.slot[i]);
+                                gia += spE.buyXu;
+                            }
+                        }
+                        gia = gia / 20;
+                        if (rdE.entry.giaXu > 0) {
+                            gia += rdE.entry.giaXu;
+                        } else if (rdE.entry.giaLuong > 0) {
+                            gia += rdE.entry.giaLuong * 1000;
+                        }
+                        ms = new Message(-25);
+                        ds = ms.writer();
+                        ds.writeInt(rdE.index | 0x10000);
+                        ds.writeUTF(String.format(GameString.giaHanRequest(), gia));
+                        ds.flush();
+                        user.sendMessage(ms);
+                    }
+                }
+            }
+            if (action == 1) {
+                int gia = 0;
+                if ((idKey & 0x10000) > 0) {
+                    idKey &= 0xFFFF;
+                    if (idKey >= 0 && idKey < user.ruongDoTB.size()) {
+                        ruongDoTBEntry rdE = user.ruongDoTB.get(idKey);
+                        for (int i = 0; i < 3; i++) {
+                            if (rdE.slot[i] >= 0) {
+                                SpecialItemData.SpecialItemEntry spE = SpecialItemData.getSpecialItemById(rdE.slot[i]);
+                                gia += spE.buyXu;
+                            }
+                        }
+                        gia = gia / 20;
+                        if (rdE.entry.giaXu > 0) {
+                            gia += rdE.entry.giaXu;
+                        } else if (rdE.entry.giaLuong > 0) {
+                            gia += rdE.entry.giaLuong * 1000;
+                        }
+                        if (user.xu < gia) {
+                            ms = new Message(45);
+                            ds = ms.writer();
+                            ds.writeUTF(GameString.xuNotEnought());
+                            ds.flush();
+                            user.sendMessage(ms);
+                            return;
+                        }
+                        user.updateXu(-gia);
+                        rdE.dayBuy = new Date();
+                        this.updateRuong(rdE, null, -1, null, null);
+                        ms = new Message(45);
+                        ds = ms.writer();
+                        ds.writeUTF(GameString.giaHanSucess());
+                        ds.flush();
+                        user.sendMessage(ms);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void nhiemVuView(Message ms) {
+        try {
+            byte action = ms.reader().readByte();
+            byte indexNV = -1;
+            if (action == 1) {
+                indexNV = ms.reader().readByte();
+            }
+            DataOutputStream ds;
+            if (action == 0) {
+                sendMissionInfo();
+            }
+            if (action == 1) {
+                ms = new Message(10);
+                ds = ms.writer();
+                MissionData.MissionEntry me = MissionData.getMissionData(indexNV);
+                MissionData.MissDataEntry mDatE = me.mDatE;
+                byte id = (byte) (mDatE.id - 1);
+                if (id < 0 || id >= user.mission.length) {
+                    ds.writeUTF(GameString.missionError1());
+                } else {
+                    if (user.missionLevel[id] > me.level) {
+                        ds.writeUTF(GameString.missionError2());
+                    } else if (user.missionLevel[id] < me.level) {
+                        ds.writeUTF(GameString.missionError3());
+                    } else if (user.mission[mDatE.idNeed - 1] < me.require) {
+                        ds.writeUTF(GameString.missionError2());
+                    } else {
+                        user.missionLevel[id]++;
+                        if (me.rewardXu > 0) {
+                            user.updateXu(me.rewardXu);
+                        }
+                        if (me.rewardLuong > 0) {
+                            user.updateLuong(me.rewardLuong);
+                        }
+                        if (me.rewardXP > 0) {
+                            user.updateXp(me.rewardXP, false);
+                        }
+                        if (me.rewardCUP > 0) {
+                            user.updateDanhVong(me.rewardCUP);
+                        }
+                        sendMissionInfo();
+                        ds.writeUTF(String.format(GameString.missionComplete(), me.reward));
+                    }
+                }
+                ds.flush();
+                user.sendMessage(ms);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    private void sendMissionInfo() throws IOException {
+        Message ms;
+        DataOutputStream ds;
+        ms = new Message(-23);
+        ds = ms.writer();
+        for (int i = 0; i < MissionData.entrys.size(); i++) {
+            MissionData.MissDataEntry mDatE = MissionData.entrys.get(i);
+            if (user.missionLevel[i] >= mDatE.entrys.size()) {
+                continue;
+            }
+            MissionData.MissionEntry me = mDatE.entrys.get(user.missionLevel[i] - 1);
+            ds.writeByte(me.index);
+            ds.writeByte(me.level);
+            ds.writeUTF(me.name);
+            ds.writeUTF(me.reward);
+            ds.writeInt(me.require);
+            ds.writeInt(Math.min(user.mission[mDatE.idNeed - 1], me.require));
+            ds.writeBoolean(user.mission[mDatE.idNeed - 1] >= me.require);
+        }
+        ds.flush();
+        user.sendMessage(ms);
     }
 
     @Override

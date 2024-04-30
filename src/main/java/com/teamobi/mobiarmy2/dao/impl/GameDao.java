@@ -360,7 +360,7 @@ public class GameDao implements IGameDao {
                     mE.rewardCUP = res.getInt("rewardCUP");
                     MissionData.addMissionEntry(id, idNeed, mE);
                 }
-                System.out.println("Mission readed size=" + MissionData.entries.size());
+                System.out.println("Mission readed size=" + MissionData.entrys.size());
 
             }
         } catch (SQLException e) {
