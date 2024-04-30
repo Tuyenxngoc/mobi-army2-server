@@ -30,11 +30,11 @@ public class GameService implements IGameService {
     public void setCacheMaps() {
         try (ByteArrayOutputStream bas = new ByteArrayOutputStream();
              DataOutputStream ds = new DataOutputStream(bas)) {
-            int size = MapData.entries.size();
+            int size = MapData.MAPS.size();
             ds.writeByte(size);
             System.out.println("Init map numMap=" + size);
             for (int i = 0; i < size; i++) {
-                MapData.MapDataEntry mapEntry = MapData.entries.get(i);
+                MapData.Map mapEntry = MapData.MAPS.get(i);
                 ds.writeByte(mapEntry.id);
                 ds.writeShort(mapEntry.data.length);
                 ds.write(mapEntry.data);
@@ -44,8 +44,8 @@ public class GameService implements IGameService {
                 ds.writeShort(mapEntry.inWaterAddY);
                 ds.writeShort(mapEntry.cl2AddY);
                 ds.writeUTF(mapEntry.name);
-                ds.writeUTF(mapEntry.file);
-                System.out.println("   - id= " + mapEntry.id + " name= " + mapEntry.name + " file= " + mapEntry.file);
+                ds.writeUTF(mapEntry.fileName);
+                System.out.println("   - id= " + mapEntry.id + " name= " + mapEntry.name + " file= " + mapEntry.fileName);
             }
             byte[] ab = bas.toByteArray();
             Until.saveFile(CommonConstant.mapCacheName, ab);
@@ -129,11 +129,11 @@ public class GameService implements IGameService {
         try {
             ByteArrayOutputStream bas2 = new ByteArrayOutputStream();
             DataOutputStream ds2 = new DataOutputStream(bas2);
-            int numCaption = CaptionData.entrys.size();
+            int numCaption = CaptionData.captions.size();
             ds2.writeByte(numCaption);
             System.out.println("Init caption entry numCaption= " + numCaption);
             for (int i = numCaption - 1; i >= 0; i--) {
-                CaptionData.CaptionEntry capEntry = CaptionData.entrys.get(i);
+                CaptionData.Caption capEntry = CaptionData.captions.get(i);
                 ds2.writeUTF(capEntry.caption);
                 ds2.writeByte(capEntry.level);
                 System.out.println("  lvl= " + capEntry.level + " str= " + capEntry.caption);

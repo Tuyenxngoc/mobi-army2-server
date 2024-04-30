@@ -481,7 +481,7 @@ public class UserService implements IUserService {
                         } else if (rdE.entry.giaLuong > 0) {
                             gia += rdE.entry.giaLuong * 1000;
                         }
-                        if (user.xu < gia) {
+                        if (user.getXu() < gia) {
                             ms = new Message(45);
                             ds = ms.writer();
                             ds.writeUTF(GameString.xuNotEnought());
@@ -520,7 +520,7 @@ public class UserService implements IUserService {
             if (action == 1) {
                 ms = new Message(10);
                 ds = ms.writer();
-                MissionData.MissionEntry me = MissionData.getMissionData(indexNV);
+                MissionData.Mission me = MissionData.getMissionData(indexNV);
                 MissionData.MissDataEntry mDatE = me.mDatE;
                 byte id = (byte) (mDatE.id - 1);
                 if (id < 0 || id >= user.mission.length) {
@@ -565,10 +565,10 @@ public class UserService implements IUserService {
         ds = ms.writer();
         for (int i = 0; i < MissionData.entrys.size(); i++) {
             MissionData.MissDataEntry mDatE = MissionData.entrys.get(i);
-            if (user.missionLevel[i] >= mDatE.entrys.size()) {
+            if (user.missionLevel[i] >= mDatE.missions.size()) {
                 continue;
             }
-            MissionData.MissionEntry me = mDatE.entrys.get(user.missionLevel[i] - 1);
+            MissionData.Mission me = mDatE.missions.get(user.missionLevel[i] - 1);
             ds.writeByte(me.index);
             ds.writeByte(me.level);
             ds.writeUTF(me.name);
@@ -1056,7 +1056,7 @@ public class UserService implements IUserService {
             if (idNv >= NVData.entrys.size() || idNv < 0 || !user.nvStt[idNv]) {
                 return;
             }
-            user.nvUsed = idNv;
+            user.setNvUsed(idNv);
             ms = new Message(Cmd.CHOOSE_GUN);
             DataOutputStream ds = ms.writer();
             ds.writeInt(user.getId());

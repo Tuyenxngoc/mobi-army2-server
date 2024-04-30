@@ -8,13 +8,12 @@ import java.util.List;
  */
 public class ItemData {
 
-    public static final class ItemEntry {
-
+    public static final class Item {
         public String name;
         public int buyXu;
         public int buyLuong;
     }
 
-    public static List<ItemEntry> entrys = new ArrayList<>();
-    public static byte[] nItemDcMang = {2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    public static List<Item> items = new ArrayList<>();
+    public static byte[] carriedItemCount = {2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 }

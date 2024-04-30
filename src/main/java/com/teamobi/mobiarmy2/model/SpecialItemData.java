@@ -35,19 +35,17 @@ public class SpecialItemData {
         return spiEntry;
     }
 
-    public static final SpecialItemEntry getSpecialItemByIndexSale(int indexSale) {
-        SpecialItemEntry spiEntry = null;
-        for (int i = 0; i < entrys.size(); i++) {
-            SpecialItemEntry spiEntry2 = entrys.get(i);
-            if (spiEntry2.onSale && spiEntry2.indexSale == indexSale) {
-                spiEntry = spiEntry2;
-                break;
+    public static SpecialItemEntry getSpecialItemByIndexSale(int indexSale) {
+        for (SpecialItemEntry itemEntry : entrys) {
+            if (itemEntry.onSale && itemEntry.indexSale == indexSale) {
+                return itemEntry;
             }
         }
-        return spiEntry;
+        return null;
     }
 
     public static String getItemName(byte id) {
         return getSpecialItemById(id).name;
     }
+
 }

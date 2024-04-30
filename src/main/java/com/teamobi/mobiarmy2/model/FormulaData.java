@@ -5,9 +5,9 @@ import java.util.ArrayList;
 /**
  * @author tuyen
  */
-public class FomularData {
+public class FormulaData {
 
-    public static class FomularDataEntry {
+    public static final class FormulaDataEntry {
 
         SpecialItemData.SpecialItemEntry ins;
         byte equipType;
@@ -29,12 +29,12 @@ public class FomularData {
         public String[] detail;
     }
 
-    public static ArrayList<FomularDataEntry> entrys = new ArrayList<>();
+    public static ArrayList<FormulaDataEntry> entrys = new ArrayList<>();
 
     public static void addFomularEntry(int materialId, byte equipType, short[] eqId, short[] eqNeedId, FomularEntry fEntry) {
         System.out.println("Set fomular materialId=" + materialId + " equipType=" + equipType);
-        FomularDataEntry fDatEntry = null;
-        for (FomularDataEntry fDatEntry2 : entrys) {
+        FormulaDataEntry fDatEntry = null;
+        for (FormulaDataEntry fDatEntry2 : entrys) {
             if (fDatEntry2.ins.id == materialId) {
                 fDatEntry = fDatEntry2;
                 break;
@@ -42,7 +42,7 @@ public class FomularData {
         }
         // Neu ko ton tai -> tao moi
         if (fDatEntry == null) {
-            fDatEntry = new FomularDataEntry();
+            fDatEntry = new FormulaDataEntry();
             fDatEntry.ins = SpecialItemData.getSpecialItemById(materialId);
             fDatEntry.equipType = equipType;
             fDatEntry.equip = new NVData.EquipmentEntry[eqId.length];
@@ -65,8 +65,8 @@ public class FomularData {
         fDatEntry.entrys.add(fEntry);
     }
 
-    public static FomularDataEntry getFomularDataEntryById(int materialId) {
-        for (FomularDataEntry fDatEntry : entrys) {
+    public static FormulaDataEntry getFomularDataEntryById(int materialId) {
+        for (FormulaDataEntry fDatEntry : entrys) {
             if (fDatEntry.ins.id == materialId) {
                 return fDatEntry;
             }

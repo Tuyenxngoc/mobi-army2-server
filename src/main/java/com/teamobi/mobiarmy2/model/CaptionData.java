@@ -8,12 +8,11 @@ import java.util.List;
  */
 public class CaptionData {
 
-    public static final class CaptionEntry {
-
-        public int level;
+    public static final class Caption {
+        public byte level;
         public String caption;
     }
 
-    public static List<CaptionEntry> entrys = new ArrayList<>();
+    public static List<Caption> captions = new ArrayList<>();
 
 }

@@ -25,21 +25,21 @@ public class GameDao implements IGameDao {
 
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `map`")) {
                 while (resultSet.next()) {
-                    MapData.MapDataEntry mapDataEntry = new MapData.MapDataEntry();
-                    mapDataEntry.id = (byte) (resultSet.getByte("id") - 1);
-                    mapDataEntry.name = resultSet.getString("name");
-                    mapDataEntry.file = resultSet.getString("file");
-                    if (mapDataEntry.id == 27) {
-                        mapDataEntry.data = new byte[0];
+                    MapData.Map map = new MapData.Map();
+                    map.id = (byte) (resultSet.getByte("id") - 1);
+                    map.name = resultSet.getString("name");
+                    map.fileName = resultSet.getString("file");
+                    if (map.id == 27) {
+                        map.data = new byte[0];
                     } else {
-                        mapDataEntry.data = Until.getFile("res/map/" + mapDataEntry.file);
+                        map.data = Until.getFile("res/map/" + map.fileName);
                     }
-                    mapDataEntry.bg = resultSet.getShort("bg");
-                    mapDataEntry.mapAddY = resultSet.getShort("mapAddY");
-                    mapDataEntry.bullEffShower = resultSet.getShort("bullEffShower");
-                    mapDataEntry.inWaterAddY = resultSet.getShort("inWaterAddY");
-                    mapDataEntry.cl2AddY = resultSet.getShort("cl2AddY");
-                    MapData.entries.add(mapDataEntry);
+                    map.bg = resultSet.getShort("bg");
+                    map.mapAddY = resultSet.getShort("mapAddY");
+                    map.bullEffShower = resultSet.getShort("bullEffShower");
+                    map.inWaterAddY = resultSet.getShort("inWaterAddY");
+                    map.cl2AddY = resultSet.getShort("cl2AddY");
+                    MapData.MAPS.add(map);
                 }
             }
         } catch (SQLException e) {
@@ -154,10 +154,10 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `captionlv`")) {
                 while (resultSet.next()) {
-                    CaptionData.CaptionEntry capEntry = new CaptionData.CaptionEntry();
-                    capEntry.level = resultSet.getInt("lvl");
+                    CaptionData.Caption capEntry = new CaptionData.Caption();
+                    capEntry.level = resultSet.getByte("lvl");
                     capEntry.caption = resultSet.getString("caption");
-                    CaptionData.entrys.add(capEntry);
+                    CaptionData.captions.add(capEntry);
                 }
             }
         } catch (SQLException e) {
@@ -172,13 +172,13 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `item`")) {
                 while (resultSet.next()) {
-                    ItemData.ItemEntry iEntry = new ItemData.ItemEntry();
+                    ItemData.Item iEntry = new ItemData.Item();
                     iEntry.name = resultSet.getString("name");
                     iEntry.buyXu = resultSet.getInt("xu");
                     iEntry.buyLuong = resultSet.getInt("luong");
-                    ItemData.entrys.add(iEntry);
+                    ItemData.items.add(iEntry);
                 }
-                System.out.println("Item readed size=" + ItemData.entrys.size());
+                System.out.println("Item readed size=" + ItemData.items.size());
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -192,15 +192,15 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `clanshop`")) {
                 while (resultSet.next()) {
-                    ItemClanData.ItemClanEntry iEntry = new ItemClanData.ItemClanEntry();
+                    ItemClanData.ItemClan iEntry = new ItemClanData.ItemClan();
                     iEntry.id = resultSet.getInt("id");
                     iEntry.level = resultSet.getInt("level");
                     iEntry.name = resultSet.getString("name");
                     iEntry.time = resultSet.getShort("time");
-                    iEntry.onsole = resultSet.getByte("onsale");
+                    iEntry.onSale = resultSet.getByte("onsale");
                     iEntry.xu = resultSet.getInt("xu");
                     iEntry.luong = resultSet.getInt("luong");
-                    ItemClanData.entrys.add(iEntry);
+                    ItemClanData.itemClans.add(iEntry);
                     System.out.println("id " + iEntry.id + " level " + iEntry.level + " name " + iEntry.name);
                 }
             }
@@ -270,7 +270,7 @@ public class GameDao implements IGameDao {
                     for (int i = 0; i < jarr.size(); i++) {
                         eqNeedId[i] = ((Long) jarr.get(i)).shortValue();
                     }
-                    FomularData.FomularEntry fE = new FomularData.FomularEntry();
+                    FormulaData.FomularEntry fE = new FormulaData.FomularEntry();
                     fE.level = res.getByte("lv");
                     fE.levelRequire = res.getInt("lvRequire");
                     jarr = (JSONArray) JSONValue.parse(res.getString("addPNMin"));
@@ -306,9 +306,9 @@ public class GameDao implements IGameDao {
                     for (int i = 0; i < jarr.size(); i++) {
                         fE.detail[i] = (String) jarr.get(i);
                     }
-                    FomularData.addFomularEntry(materialId, equipType, eqId, eqNeedId, fE);
+                    FormulaData.addFomularEntry(materialId, equipType, eqId, eqNeedId, fE);
                 }
-                System.out.println("Fomular readed size=" + FomularData.entrys.size());
+                System.out.println("Fomular readed size=" + FormulaData.entrys.size());
 
             }
         } catch (SQLException e) {
@@ -323,15 +323,15 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet res = statement.executeQuery("SELECT * FROM `napthe`")) {
                 while (res.next()) {
-                    NapTienData.NapTienEntry nE = new NapTienData.NapTienEntry();
+                    PaymentData.Payment nE = new PaymentData.Payment();
                     nE.id = res.getString("id");
                     nE.info = res.getString("info");
                     nE.url = res.getString("url");
                     nE.mssTo = res.getString("mssTo");
                     nE.mssContent = res.getString("mssContent");
-                    NapTienData.entrys.add(nE);
+                    PaymentData.payments.add(nE);
                 }
-                System.out.println("Nap the readed size=" + NapTienData.entrys.size());
+                System.out.println("Nap the readed size=" + PaymentData.payments.size());
 
             }
         } catch (SQLException e) {
@@ -346,7 +346,7 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet res = statement.executeQuery("SELECT * FROM `mission`")) {
                 while (res.next()) {
-                    MissionData.MissionEntry mE = new MissionData.MissionEntry();
+                    MissionData.Mission mE = new MissionData.Mission();
                     int id = res.getInt("id");
                     byte idNeed = res.getByte("idneed");
                     mE.index = res.getInt("iddb");

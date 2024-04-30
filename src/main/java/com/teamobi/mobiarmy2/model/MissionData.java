@@ -7,8 +7,7 @@ import java.util.ArrayList;
  */
 public class MissionData {
 
-    public static class MissionEntry {
-
+    public static class Mission {
         public int index;
         public byte level;
         public String name;
@@ -22,15 +21,14 @@ public class MissionData {
     }
 
     public static class MissDataEntry {
-
         public int id;
         public byte idNeed;
-        public ArrayList<MissionEntry> entrys = new ArrayList<>();
+        public ArrayList<Mission> missions = new ArrayList<>();
     }
 
     public static ArrayList<MissDataEntry> entrys = new ArrayList<>();
 
-    public static void addMissionEntry(int id, byte idneed, MissionEntry mEntry) {
+    public static void addMissionEntry(int id, byte idneed, Mission mEntry) {
         System.out.println("Set mission id=" + id + " idneed=" + idneed);
         MissDataEntry mDatE = null;
         for (MissDataEntry mDatE1 : entrys) {
@@ -43,21 +41,21 @@ public class MissionData {
             mDatE = new MissDataEntry();
             mDatE.id = id;
             mDatE.idNeed = idneed;
-            mDatE.entrys = new ArrayList<>();
+            mDatE.missions = new ArrayList<>();
             entrys.add(mDatE);
         }
-        for (MissionEntry mE : mDatE.entrys) {
+        for (Mission mE : mDatE.missions) {
             if (mE.level == mEntry.level) {
                 return;
             }
         }
         mEntry.mDatE = mDatE;
-        mDatE.entrys.add(mEntry);
+        mDatE.missions.add(mEntry);
     }
 
-    public static MissionEntry getMissionData(int index) {
+    public static Mission getMissionData(int index) {
         for (MissDataEntry mDatE1 : entrys) {
-            for (MissionEntry me : mDatE1.entrys) {
+            for (Mission me : mDatE1.missions) {
                 if (me.index == index) {
                     return me;
                 }

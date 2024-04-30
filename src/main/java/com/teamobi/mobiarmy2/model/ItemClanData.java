@@ -7,29 +7,27 @@ import java.util.ArrayList;
  */
 public class ItemClanData {
 
-    public static final class ItemClanEntry {
-
+    public static final class ItemClan {
         public int id;
         public int level;
         public String name;
         public short time;
-        public byte onsole;
-        public int xu = 0;
-        public int luong = 0;
+        public byte onSale;
+        public int xu;
+        public int luong;
     }
 
-    public static ArrayList<ItemClanEntry> entrys = new ArrayList<>();
+    public static ArrayList<ItemClan> itemClans = new ArrayList<>();
 
-    public static final ItemClanEntry getItemClanId(int id) {
-        ItemClanEntry idEntry = null;
-        for (int i = 0; i < entrys.size(); i++) {
-            ItemClanEntry idEntry2 = entrys.get(i);
-            if (idEntry2.id == id) {
-                idEntry = idEntry2;
+    public static ItemClan getItemClanById(int id) {
+        ItemClan itemClan = null;
+        for (ItemClan tmp : itemClans) {
+            if (tmp.id == id) {
+                itemClan = tmp;
                 break;
             }
         }
-        return idEntry;
+        return itemClan;
     }
 
 }

@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.log;
 
+import com.teamobi.mobiarmy2.constant.CommonConstant;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,7 +15,6 @@ import java.time.format.DateTimeFormatter;
  */
 public class LoggerUtil implements ILogManager {
 
-    private static final String logFilePath = "logs/log.txt";
     private final Logger logger = LogManager.getLogger(LoggerUtil.class);
     private final boolean isDebugEnabled;
 
@@ -24,7 +24,7 @@ public class LoggerUtil implements ILogManager {
 
     @Override
     public void logToFile(String message) {
-        try (FileWriter fileWriter = new FileWriter(logFilePath, true);
+        try (FileWriter fileWriter = new FileWriter(CommonConstant.logFilePath, true);
              PrintWriter printWriter = new PrintWriter(fileWriter)) {
             LocalDateTime now = LocalDateTime.now();
             String formattedDateTime = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));

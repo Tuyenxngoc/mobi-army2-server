@@ -7,6 +7,7 @@ public class CommonConstant {
     public static final String ALPHANUMERIC_PATTERN = "^[a-zA-Z0-9]+$";
     public static final String RESOURCES_PATH = "src/main/resources/";
 
+    public static final String logFilePath = "logs/log.txt";
     public static final String cacheFolder = "cache";
     public static final String resFolder = "res";
     public static final String iconFolder = resFolder + "/icon";

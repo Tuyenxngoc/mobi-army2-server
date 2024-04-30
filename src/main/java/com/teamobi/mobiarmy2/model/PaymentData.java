@@ -5,10 +5,9 @@ import java.util.ArrayList;
 /**
  * @author tuyen
  */
-public class NapTienData {
+public class PaymentData {
 
-    public static class NapTienEntry {
-
+    public static class Payment {
         public String id;
         public String info;
         public String url;
@@ -16,6 +15,6 @@ public class NapTienData {
         public String mssTo;
     }
 
-    public static ArrayList<NapTienEntry> entrys = new ArrayList<>();
+    public static ArrayList<Payment> payments = new ArrayList<>();
 
 }
