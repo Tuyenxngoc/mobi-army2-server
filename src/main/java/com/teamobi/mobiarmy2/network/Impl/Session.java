@@ -24,6 +24,7 @@ public class Session implements ISession {
             (byte) 1,
             (byte) 58,
             (byte) 114,
+            (byte) 121,
             (byte) 127
     );
 
@@ -259,7 +260,6 @@ public class Session implements ISession {
                     }
                     ServerManager.getInstance().logger().logMessage(Session.this + " send mss " + message.getCommand());
                     if (!Session.this.user.isLogged() && requiresAuthentication(message)) {
-                        ServerManager.getInstance().logger().logMessage("Unauthorized access attempted. Command requires authentication.");
                         message.cleanup();
                         break;
                     }

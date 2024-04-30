@@ -120,7 +120,7 @@ public interface IUserService {
 
     void macTrangBi(Message ms);
 
-    void shopTrangBi(Message ms);
+    void shopTrangBi();
 
     void handleEquipmentPurchases(Message ms);
 
@@ -136,7 +136,7 @@ public interface IUserService {
 
     void getBigImage(Message ms);
 
-    void register(Message ms);
+    void handleRegister(Message ms);
 
     void napTien(Message ms);
 

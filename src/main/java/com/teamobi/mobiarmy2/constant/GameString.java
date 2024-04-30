@@ -293,6 +293,10 @@ public class GameString {
         return "Đăng kí tài khoản thành công!";
     }
 
+    public static String reg_Error6() {
+        return "Vui lòng truy cập trang chủ để đăng ký";
+    }
+
     public static String notCompletedMatch() {
         return "Ván chơi không tính vì thời gian quá ngắn hoặc bạn có hành vi tiêu cực!";
     }

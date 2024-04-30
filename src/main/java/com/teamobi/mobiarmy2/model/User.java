@@ -78,7 +78,6 @@ public class User {
         userService.sendServerMessage(ss);
     }
 
-
     public void logout() {
         isLogged = false;
     }
@@ -106,7 +105,6 @@ public class User {
     public int getCurrentXpLevel() {
         return 1000;
     }
-
 
     public void updateXu(int xuUp) {
         if (xuUp == 0) {
@@ -152,6 +150,5 @@ public class User {
         }
         userService.sendUpdateDanhVong(danhVongUp);
     }
-
 
 }

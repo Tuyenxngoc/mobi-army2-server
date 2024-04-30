@@ -130,7 +130,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.CHANGE_EQUIP -> userService.macTrangBi(ms);
 
-                case Cmd.SHOP_EQUIP -> userService.shopTrangBi(ms);
+                case Cmd.SHOP_EQUIP -> userService.shopTrangBi();
 
                 case Cmd.BUY_EQUIP -> userService.handleEquipmentPurchases(ms);
 
@@ -148,7 +148,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.GET_BIG_IMAGE -> userService.getBigImage(ms);
 
-                case Cmd.REGISTER_2 -> userService.register(ms);
+                case Cmd.REGISTER_2 -> userService.handleRegister(ms);
 
                 case Cmd.CHARGE_MONEY_2 -> userService.napTien(ms);
 
