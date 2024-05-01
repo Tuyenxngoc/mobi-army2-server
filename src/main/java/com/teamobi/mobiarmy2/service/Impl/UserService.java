@@ -1577,4 +1577,14 @@ public class UserService implements IUserService {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void ping(Message ms) {
+        try {
+            String s = ms.reader().readUTF();
+            System.out.println(s);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

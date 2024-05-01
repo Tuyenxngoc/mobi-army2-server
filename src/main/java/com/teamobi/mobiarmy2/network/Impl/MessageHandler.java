@@ -90,6 +90,8 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.SEARCH -> userService.timNguoiChoi(ms);
 
+                case Cmd.PING -> userService.ping(ms);
+
                 case Cmd.SKIP -> userService.boLuot(ms);
 
                 case Cmd.UPDATE_XY -> userService.capNhatXY(ms);

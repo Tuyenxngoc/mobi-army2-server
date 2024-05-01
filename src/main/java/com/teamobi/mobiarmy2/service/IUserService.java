@@ -149,4 +149,6 @@ public interface IUserService {
     void sendUpdateMoney();
 
     void sendUpdateDanhVong(int danhVongUp);
+
+    void ping(Message ms);
 }

@@ -77,12 +77,13 @@ public class User {
     }
 
     public int getCurrentLeverPercent() {
-        float xpRq = getCurrentXpLevel();
-        float xpNow = getCurrentXp();
-        if (xpRq == 0) {
+        float requiredXp = getCurrentXpLevel();
+        if (requiredXp == 0) {
             return 0;
         }
-        return Math.round((xpNow / xpRq) * 100);
+        float currentXp = getCurrentXp();
+        int percentage = Math.round((currentXp / requiredXp) * 100);
+        return Math.min(percentage, 100);
     }
 
     public int getCurrentXpLevel() {
