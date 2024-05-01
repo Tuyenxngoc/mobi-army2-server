@@ -50,11 +50,9 @@ public class User {
     public int[] mission;
     public byte[] missionLevel;
     public ruongDoTBEntry[][] nvEquip;
-
     public List<ruongDoItemEntry> ruongDoItem;
     public List<ruongDoTBEntry> ruongDoTB;
     private FightWait fightWait;
-
     private final IUserService userService;
 
     public User() {
@@ -74,36 +72,29 @@ public class User {
         session.sendMessage(ms);
     }
 
-    public void sendServerMessage(String ss) {
-        userService.sendServerMessage(ss);
-    }
-
     public void logout() {
         isLogged = false;
     }
 
-    public int getLever(byte nv) {
-        if (nv < 0 || nv >= lever.length) {
-            return 1;
+    public int getCurrentLeverPercent() {
+        float xpRq = getCurrentXpLevel();
+        float xpNow = getCurrentXp();
+        if (xpRq == 0) {
+            return 0;
         }
-        return lever[nv];
+        return Math.round((xpNow / xpRq) * 100);
+    }
+
+    public int getCurrentXpLevel() {
+        return XpData.getXpRequestLevel(getCurrentLever());
     }
 
     public int getCurrentLever() {
         return lever[nvUsed];
     }
 
-    //todo calculate the current level percent
-    public int getCurrentLeverPercent() {
-        return 0;
-    }
-
     public int getCurrentXp() {
-        return 0;
-    }
-
-    public int getCurrentXpLevel() {
-        return 1000;
+        return xp[nvUsed];
     }
 
     public void updateXu(int xuUp) {
@@ -151,6 +142,6 @@ public class User {
         userService.sendUpdateDanhVong(danhVongUp);
     }
 
-    public void updateXp(int rewardXP, boolean b) {
+    public void updateXp(int xpUp, boolean b) {
     }
 }

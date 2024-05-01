@@ -242,6 +242,11 @@ public class GameService implements IGameService {
     }
 
     @Override
+    public void getLvXpData() {
+        gameDao.getAllXpData();
+    }
+
+    @Override
     public void setCaptionLevelData() {
         gameDao.getAllCaptionLevel();
     }

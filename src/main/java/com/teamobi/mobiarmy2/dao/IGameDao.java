@@ -21,4 +21,6 @@ public interface IGameDao {
     void getAllPayment();
 
     void getAllMissions();
+
+    void getAllXpData();
 }

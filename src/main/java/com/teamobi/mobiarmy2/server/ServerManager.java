@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.config.Impl.ServerConfig;
+import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.dao.impl.GameDao;
 import com.teamobi.mobiarmy2.log.ILogManager;
@@ -23,8 +24,6 @@ import java.util.ArrayList;
  */
 public class ServerManager {
 
-    public static byte max_ruong_tb;
-
     private static ServerManager instance;
 
     private final IGameService gameService;
@@ -41,7 +40,7 @@ public class ServerManager {
         IGameDao gameDao = new GameDao();
         this.gameService = new GameService(gameDao);
 
-        this.config = new ServerConfig("army2.properties");
+        this.config = new ServerConfig(CommonConstant.ARMY_2_PROPERTIES);
         this.log = new LoggerUtil(config.isDebug());
     }
 
@@ -74,6 +73,7 @@ public class ServerManager {
         gameService.getFormulaData();
         gameService.getPaymentData();
         gameService.getMissionData();
+        gameService.getLvXpData();
 
         //Data to set up cache
         gameService.getMapData();

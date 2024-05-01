@@ -32,6 +32,8 @@ public interface IGameService {
 
     void getEquipData();
 
+    void getLvXpData();
+
     void setCaptionLevelData();
 
 }

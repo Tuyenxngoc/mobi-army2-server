@@ -52,8 +52,8 @@ public class UserService implements IUserService {
         if (addTB != null) {
             int bestLocation = -1;
             for (int i = 0; i < user.ruongDoTB.size(); i++) {
-                ruongDoTBEntry rdtbE = user.ruongDoTB.get(i);
-                if (rdtbE == null) {
+                ruongDoTBEntry ruongDoTBEntry = user.ruongDoTB.get(i);
+                if (ruongDoTBEntry == null) {
                     bestLocation = i;
                     break;
                 }
@@ -1408,7 +1408,7 @@ public class UserService implements IUserService {
     }
 
     private void muaTrangBi(short indexSale, byte buyLuong) {
-        if (user.getRuongDoTB().size() == ServerManager.max_ruong_tb) {
+        if (user.getRuongDoTB().size() == ServerManager.getInstance().config().getMax_ruong_tb()) {
             sendServerMessage(GameString.ruongNoSlot());
             return;
         }

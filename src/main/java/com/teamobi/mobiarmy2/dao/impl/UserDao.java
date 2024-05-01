@@ -171,13 +171,14 @@ public class UserDao implements Dao<User>, IUserDao {
                             }
 
                         } else {//Tạo mới một bản ghi
-                            HikariCPManager.getInstance().update("INSERT INTO `armymem`(`user_id`) VALUES (?)", user.getId());
+                            HikariCPManager.getInstance().update("INSERT INTO `armymem`(`id`, `ruongTrangBi`, `ruongItem`) VALUES (?, ?, ?)", user.getId(), "[]", "[]");
                         }
                     }
                 }
             }
-        } catch (SQLException e) {
+        } catch (SQLException | IllegalArgumentException e) {
             e.printStackTrace();
+            return null;
         }
         return user;
     }
@@ -226,6 +227,7 @@ public class UserDao implements Dao<User>, IUserDao {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            return null;
         }
         return user;
     }

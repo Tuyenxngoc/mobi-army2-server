@@ -361,6 +361,25 @@ public class GameDao implements IGameDao {
                     MissionData.addMissionEntry(id, idNeed, mE);
                 }
                 System.out.println("Mission readed size=" + MissionData.entrys.size());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    @Override
+    public void getAllXpData() {
+        try (Connection connection = HikariCPManager.getInstance().getConnection();
+             Statement statement = connection.createStatement()) {
+            try (ResultSet res = statement.executeQuery("SELECT * FROM `xp_lv`")) {
+                while (res.next()) {
+                    XpData.LevelXpRequired xpRequired = new XpData.LevelXpRequired();
+                    xpRequired.level = res.getInt("lvl");
+                    xpRequired.xp = res.getInt("exp");
+                    XpData.xpList.add(xpRequired);
+                }
+                System.out.println("Lv xp readed size=" + XpData.xpList.size());
 
             }
         } catch (SQLException e) {
