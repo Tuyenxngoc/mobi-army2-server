@@ -73,7 +73,7 @@ public class User {
     }
 
     public void logout() {
-        isLogged = false;
+        userService.handleLogout();
     }
 
     public int getCurrentLeverPercent() {

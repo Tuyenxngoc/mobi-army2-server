@@ -1,7 +1,6 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
-import com.teamobi.mobiarmy2.dao.Dao;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.DataCharacter;
@@ -23,7 +22,7 @@ import java.util.Optional;
 /**
  * @author tuyen
  */
-public class UserDao implements Dao<User>, IUserDao {
+public class UserDao implements IUserDao {
 
     @Override
     public List<User> getAll() {
@@ -37,7 +36,7 @@ public class UserDao implements Dao<User>, IUserDao {
 
     @Override
     public void save(User user) {
-
+        updateOnline(false, user.getId());
     }
 
     @Override

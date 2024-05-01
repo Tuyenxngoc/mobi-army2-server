@@ -296,6 +296,12 @@ public class UserService implements IUserService {
         }
     }
 
+    @Override
+    public void handleLogout() {
+        user.isLogged = false;
+        userDao.save(user);
+    }
+
     public void sendNVData(IServerConfig config) {
         try {
             // Send mss 64

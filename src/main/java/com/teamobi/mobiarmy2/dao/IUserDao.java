@@ -4,7 +4,7 @@ import com.teamobi.mobiarmy2.model.User;
 
 import java.util.List;
 
-public interface IUserDao {
+public interface IUserDao extends Dao<User> {
 
     User findByUsernameAndPassword(String username, String password);
 
