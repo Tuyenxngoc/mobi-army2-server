@@ -13,6 +13,7 @@ import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.network.Impl.Session;
 import com.teamobi.mobiarmy2.service.IGameService;
 import com.teamobi.mobiarmy2.service.Impl.GameService;
+import lombok.Getter;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -33,6 +34,7 @@ public class ServerManager {
     private ServerSocket server;
     private long countClients;
     private boolean isStart;
+    @Getter
     private Room[] rooms;
     private final ArrayList<ISession> users = new ArrayList<>();
 

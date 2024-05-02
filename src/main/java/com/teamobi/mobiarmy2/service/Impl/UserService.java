@@ -10,6 +10,7 @@ import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.server.BangXHManager;
 import com.teamobi.mobiarmy2.server.ClanManager;
+import com.teamobi.mobiarmy2.server.Room;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.util.Until;
@@ -276,6 +277,7 @@ public class UserService implements IUserService {
             user.setPointAdd(userFound.getPointAdd());
             user.setNvData(userFound.getNvData());
             user.setNvEquip(userFound.getNvEquip());
+            user.setFriends(userFound.getFriends());
 
             user.setRuongDoItem(userFound.getRuongDoItem());
             user.setRuongDoTB(userFound.getRuongDoTB());
@@ -881,8 +883,28 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void denKhuVuc(Message ms) {
-
+    public void denKhuVuc() {
+        try {
+            Message ms = new Message(Cmd.ROOM_LIST);
+            DataOutputStream ds = ms.writer();
+            ServerManager server = ServerManager.getInstance();
+            for (int i = 0; i < server.getRooms().length; i++) {
+                // So phong
+                ds.writeByte(i);
+                Room room = server.getRooms()[i];
+                // Tinh trang 0: do 1: vang 2: xanh
+                ds.writeByte(2);
+                // Null byte
+                ds.writeByte(0);
+                // Loai phong 0->6
+                ds.writeByte(room.type);
+            }
+            ds.flush();
+            user.sendMessage(ms);
+            sendRoomInfo(server.config());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -57,9 +57,9 @@ public class ServerConfig implements IServerConfig {
     private final String[] roomTypesEng
             = {"NEWBIE ROOM", "INTERMEDIATE ROOM", "VIP ROOM", "ARENA", "FREEDOM ROOM", "BOSS BATTLE ROOM", "CLAN BATTLE ROOM"};
     private int[] roomTypeStartNum;
-    private final String[] nameRooms = {"Bom", "Nhện máy", "Người máy", "T-rex máy", "UFO", "Khí cầu", "Nhện độc", "Ma", "Liên-Hoàn", "Vùng Cấm Địa", "Super Boss", "BOSS Thế Giới", "Hơi Thở Cuối Cùng", "Địa Sơn Vực", "Hoa Quả Sơn"};
-    private final int[] nameRoomNumbers = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-    private final int[] nameRoomTypes = {5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5};
+    private final String[] nameRooms = {"Bom", "Nhện máy", "Người máy", "T-rex máy", "UFO", "Khí cầu", "Nhện độc", "Ma", "Đấu trùm liên hoàn"};
+    private final int[] nameRoomNumbers = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    private final int[] nameRoomTypes = {5, 5, 5, 5, 5, 5, 5, 5, 5, 5};
     private int startRoomBoss;
     private int startMapBoss;
     private int numMapBoss;

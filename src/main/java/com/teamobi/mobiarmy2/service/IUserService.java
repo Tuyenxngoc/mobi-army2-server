@@ -44,7 +44,7 @@ public interface IUserService {
 
     void guiTinNhan(Message ms);
 
-    void denKhuVuc(Message ms);
+    void denKhuVuc();
 
     void vaoPhong(Message ms);
 

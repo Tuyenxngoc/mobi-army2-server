@@ -48,7 +48,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.CHAT_TO -> userService.guiTinNhan(ms);
 
-                case Cmd.ROOM_LIST -> userService.denKhuVuc(ms);
+                case Cmd.ROOM_LIST -> userService.denKhuVuc();
 
                 case Cmd.BOARD_LIST -> userService.vaoPhong(ms);
 

@@ -124,7 +124,7 @@ public class Room {
         }
     }
 
-    protected int getFully() {
+    public int getFully() {
         int maxPlayers = 0;
         int player = 0;
         synchronized (entrys) {
