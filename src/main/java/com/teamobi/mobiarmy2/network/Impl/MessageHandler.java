@@ -80,15 +80,15 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.JOIN_ANY_BOARD -> userService.choiNgay(ms);
 
-                case Cmd.FRIENDLIST -> userService.xembanBe();
+                case Cmd.REQUEST_FRIENDLIST -> userService.handleViewFriendList();
 
-                case Cmd.ADD_FRIEND_RESULT -> userService.ketBan(ms);
+                case Cmd.ADD_FRIEND -> userService.handleAddFriend(ms);
 
-                case Cmd.DELETE_FRIEND_RESULT -> userService.xoaBan(ms);
+                case Cmd.DELETE_FRIEND -> userService.handleRemoveFriend(ms);
 
-                case Cmd.PLAYER_DETAIL -> userService.xemThongTIn(ms);
+                case Cmd.PLAYER_DETAIL -> userService.handleGetFlayerDetail(ms);
 
-                case Cmd.SEARCH -> userService.timNguoiChoi(ms);
+                case Cmd.SEARCH -> userService.handleFindPlayer(ms);
 
                 case Cmd.PING -> userService.ping(ms);
 

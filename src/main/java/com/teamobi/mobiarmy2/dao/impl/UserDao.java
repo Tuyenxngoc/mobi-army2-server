@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.DataCharacter;
@@ -12,6 +13,7 @@ import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.util.Until;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -39,6 +41,7 @@ public class UserDao implements IUserDao {
     @Override
     public void save(User user) {
         updateOnline(false, user.getId());
+        HikariCPManager.getInstance().update("UPDATE `armymem` SET `friends` = ? WHERE id = ?", user.getFriends().toString(), user.getId());
     }
 
     @Override
@@ -171,7 +174,9 @@ public class UserDao implements IUserDao {
                                 }
                             }
 
-                            user.setFriends(gson.fromJson(playerResultSet.getString("friends"), int[].class));
+                            Type listType = new TypeToken<List<Integer>>() {
+                            }.getType();
+                            user.setFriends(gson.fromJson(playerResultSet.getString("friends"), listType));
 
                         } else {//Tạo mới một bản ghi
                             HikariCPManager.getInstance().update("INSERT INTO `armymem`(`id`, `ruongTrangBi`, `ruongItem`) VALUES (?, ?, ?)", user.getId(), "[]", "[]");
@@ -193,13 +198,13 @@ public class UserDao implements IUserDao {
     }
 
     @Override
-    public List<GetFriendResponse> getFriendsList(int userId, int[] friendIds) {
+    public List<GetFriendResponse> getFriendsList(int userId, List<Integer> friendIds) {
         List<GetFriendResponse> friendsList = new ArrayList<>();
 
         StringBuilder queryBuilder = new StringBuilder("SELECT user.*, armymem.* FROM armymem INNER JOIN user ON user.user_id = armymem.id WHERE user.user_id IN (");
-        for (int i = 0; i < friendIds.length; i++) {
+        for (int i = 0; i < friendIds.size(); i++) {
             queryBuilder.append("?");
-            if (i < friendIds.length - 1) {
+            if (i < friendIds.size() - 1) {
                 queryBuilder.append(",");
             }
         }
@@ -208,8 +213,8 @@ public class UserDao implements IUserDao {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(queryBuilder.toString())) {
 
-            for (int i = 0; i < friendIds.length; i++) {
-                statement.setInt(i + 1, friendIds[i]);
+            for (int i = 0; i < friendIds.size(); i++) {
+                statement.setInt(i + 1, friendIds.get(i));
             }
             Gson gson = new Gson();
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -267,6 +272,22 @@ public class UserDao implements IUserDao {
         String hashedPassword = BCrypt.hashpw(newPass, BCrypt.gensalt());
         String sql = "UPDATE `user` SET `password` = ? WHERE user_id = ?";
         HikariCPManager.getInstance().update(sql, hashedPassword, id);
+    }
+
+    @Override
+    public Integer findUserIdByUsername(String username) {
+        try (Connection connection = HikariCPManager.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT `user_id` FROM `user` WHERE username = ? LIMIT 1;")) {
+            statement.setString(1, username);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt("user_id");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

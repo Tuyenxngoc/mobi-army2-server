@@ -76,15 +76,15 @@ public interface IUserService {
 
     void choiNgay(Message ms);
 
-    void xembanBe();
+    void handleViewFriendList();
 
-    void ketBan(Message ms);
+    void handleAddFriend(Message ms);
 
-    void xoaBan(Message ms);
+    void handleRemoveFriend(Message ms);
 
-    void xemThongTIn(Message ms);
+    void handleGetFlayerDetail(Message ms);
 
-    void timNguoiChoi(Message ms);
+    void handleFindPlayer(Message ms);
 
     void boLuot(Message ms);
 

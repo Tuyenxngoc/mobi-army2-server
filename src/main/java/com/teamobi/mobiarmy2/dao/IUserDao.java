@@ -11,10 +11,11 @@ public interface IUserDao extends Dao<User> {
 
     void updateOnline(boolean flag, int id);
 
-    List<GetFriendResponse> getFriendsList(int userId, int[] friends);
+    List<GetFriendResponse> getFriendsList(int userId, List<Integer> friends);
 
     boolean existsByUserIdAndPassword(int id, String oldPass);
 
     void changePassword(int id, String newPass);
 
+    Integer findUserIdByUsername(String username);
 }

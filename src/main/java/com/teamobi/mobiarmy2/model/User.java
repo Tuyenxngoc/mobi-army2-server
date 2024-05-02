@@ -47,10 +47,10 @@ public class User {
     public int[][] pointAdd;
     public byte[] items;
     public int[][] NvData;
-    public int[] friends;
     public int[] mission;
     public byte[] missionLevel;
     public ruongDoTBEntry[][] nvEquip;
+    public List<Integer> friends;
     public List<ruongDoItemEntry> ruongDoItem;
     public List<ruongDoTBEntry> ruongDoTB;
     private FightWait fightWait;

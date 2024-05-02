@@ -983,26 +983,25 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void xembanBe() {
-        if (user.getFriends().length == 0) {
-            return;
-        }
+    public void handleViewFriendList() {
         try {
-            List<GetFriendResponse> friends = userDao.getFriendsList(user.getId(), user.getFriends());
-
             Message ms = new Message(Cmd.FRIENDLIST);
             DataOutputStream ds = ms.writer();
-            for (GetFriendResponse friend : friends) {
-                ds.writeInt(friend.getId());
-                ds.writeUTF(friend.getName());
-                ds.writeInt(friend.getXu());
-                ds.writeByte(friend.getNvUsed());
-                ds.writeShort(friend.getClanId());
-                ds.writeByte(friend.getOnline());
-                ds.writeByte(friend.getLevel());
-                ds.writeByte(friend.getLevelPt());
-                for (short i : friend.getData()) {
-                    ds.writeShort(i);
+
+            if (user.getFriends().size() > 0) {
+                List<GetFriendResponse> friends = userDao.getFriendsList(user.getId(), user.getFriends());
+                for (GetFriendResponse friend : friends) {
+                    ds.writeInt(friend.getId());
+                    ds.writeUTF(friend.getName());
+                    ds.writeInt(friend.getXu());
+                    ds.writeByte(friend.getNvUsed());
+                    ds.writeShort(friend.getClanId());
+                    ds.writeByte(friend.getOnline());
+                    ds.writeByte(friend.getLevel());
+                    ds.writeByte(friend.getLevelPt());
+                    for (short i : friend.getData()) {
+                        ds.writeShort(i);
+                    }
                 }
             }
             ds.flush();
@@ -1010,21 +1009,59 @@ public class UserService implements IUserService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
-    public void ketBan(Message ms) {
-
+    public void handleAddFriend(Message ms) {
+        try {
+            Integer id = ms.reader().readInt();
+            if (user.getFriends().size() > ServerManager.getInstance().config().getMax_friends()) {
+                sendMessageUpdateFriends(Boolean.FALSE, 2);
+                return;
+            }
+            if (user.getFriends().contains(id)) {
+                sendMessageUpdateFriends(Boolean.FALSE, 1);
+            } else {
+                user.getFriends().add(id);
+                sendMessageUpdateFriends(Boolean.FALSE, 0);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            sendMessageUpdateFriends(Boolean.FALSE, 1);
+        }
     }
 
     @Override
-    public void xoaBan(Message ms) {
+    public void handleRemoveFriend(Message ms) {
+        try {
+            Integer id = ms.reader().readInt();
+            user.getFriends().remove(id);
+            sendMessageUpdateFriends(Boolean.TRUE, 0);
+        } catch (IOException e) {
+            e.printStackTrace();
+            sendMessageUpdateFriends(Boolean.TRUE, 1);
+        }
+    }
 
+    private void sendMessageUpdateFriends(boolean isDelete, int status) {
+        try {
+            Message ms;
+            if (isDelete) {
+                ms = new Message(Cmd.DELETE_FRIEND_RESULT);
+            } else {
+                ms = new Message(Cmd.ADD_FRIEND_RESULT);
+            }
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(status);
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public void xemThongTIn(Message ms) {
+    public void handleGetFlayerDetail(Message ms) {
         try {
             int userId = ms.reader().readInt();
 
@@ -1052,8 +1089,29 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void timNguoiChoi(Message ms) {
-
+    public void handleFindPlayer(Message ms) {
+        try {
+            String username = ms.reader().readUTF().trim();
+            if (username.length() == 0) {
+                sendMessageLoginFail(GameString.addFrienvError2());
+                return;
+            }
+            if (!username.matches(CommonConstant.ALPHANUMERIC_PATTERN)) {
+                sendMessageLoginFail(GameString.addFrienvError1());
+                return;
+            }
+            Integer id = userDao.findUserIdByUsername(username);
+            ms = new Message(Cmd.SEARCH);
+            DataOutputStream ds = ms.writer();
+            if (id != null) {
+                ds.writeInt(id);
+                ds.writeUTF(username);
+            }
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

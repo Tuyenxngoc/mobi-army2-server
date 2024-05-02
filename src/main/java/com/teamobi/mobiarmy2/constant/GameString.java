@@ -157,6 +157,10 @@ public class GameString {
         return "Tên bạn bè cần thêm có chứa kí tự đặc biệt!";
     }
 
+    public static String addFrienvError2() {
+        return "Vui lòng nhập tên bạn bè cần thêm!";
+    }
+
     public static String changPassError1() {
         return "Mật khẩu không được chứa kí tự đặc biệt!";
     }
