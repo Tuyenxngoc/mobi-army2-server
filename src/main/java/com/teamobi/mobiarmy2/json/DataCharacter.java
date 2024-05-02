@@ -6,24 +6,26 @@ import lombok.Setter;
 
 import java.util.List;
 
-@Getter
-@Setter
 /**
  * @author tuyen
  */
+@Getter
+@Setter
 public class DataCharacter {
-    @SerializedName("data")
-    private List<Integer> data;
 
     @SerializedName("xp")
     private int xp;
-
-    @SerializedName("pointAdd")
-    private List<Integer> pointAdd;
 
     @SerializedName("lever")
     private int lever;
 
     @SerializedName("point")
     private int point;
+
+    @SerializedName("pointAdd")
+    private List<Integer> pointAdd;
+
+    @SerializedName("data")
+    private List<Integer> data;
+
 }

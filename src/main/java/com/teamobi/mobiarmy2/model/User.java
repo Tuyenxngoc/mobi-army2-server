@@ -7,6 +7,7 @@ import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.service.Impl.UserService;
+import com.teamobi.mobiarmy2.util.Until;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -78,12 +79,8 @@ public class User {
 
     public int getCurrentLeverPercent() {
         float requiredXp = getCurrentXpLevel();
-        if (requiredXp == 0) {
-            return 0;
-        }
         float currentXp = getCurrentXp();
-        int percentage = Math.round((currentXp / requiredXp) * 100);
-        return Math.min(percentage, 100);
+        return Until.calculateLevelPercent(currentXp, requiredXp);
     }
 
     public int getCurrentXpLevel() {

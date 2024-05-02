@@ -80,7 +80,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.JOIN_ANY_BOARD -> userService.choiNgay(ms);
 
-                case Cmd.FRIENDLIST -> userService.xembanBe(ms);
+                case Cmd.FRIENDLIST -> userService.xembanBe();
 
                 case Cmd.ADD_FRIEND_RESULT -> userService.ketBan(ms);
 

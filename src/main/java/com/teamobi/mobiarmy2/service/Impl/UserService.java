@@ -7,6 +7,7 @@ import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.dao.impl.UserDao;
 import com.teamobi.mobiarmy2.model.*;
+import com.teamobi.mobiarmy2.model.response.GetFriendResponse;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.server.BangXHManager;
 import com.teamobi.mobiarmy2.server.ClanManager;
@@ -982,27 +983,30 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void xembanBe(Message ms) {
+    public void xembanBe() {
         if (user.getFriends().length == 0) {
             return;
         }
         try {
-            List<User> friends = userDao.getFriendsList(user.getId(), user.getFriends());
+            List<GetFriendResponse> friends = userDao.getFriendsList(user.getId(), user.getFriends());
 
-            ms = new Message(Cmd.FRIENDLIST);
+            Message ms = new Message(Cmd.FRIENDLIST);
             DataOutputStream ds = ms.writer();
-            for (User friend : friends) {
+            for (GetFriendResponse friend : friends) {
                 ds.writeInt(friend.getId());
-                ds.writeUTF(friend.getUsername());
+                ds.writeUTF(friend.getName());
                 ds.writeInt(friend.getXu());
                 ds.writeByte(friend.getNvUsed());
                 ds.writeShort(friend.getClanId());
-                ds.writeByte(friend.isOnline() ? 1 : 0);
-                ds.writeByte(friend.getCurrentLever());
-                ds.writeByte(friend.getCurrentLeverPercent());
-                ds.flush();
-                user.sendMessage(ms);
+                ds.writeByte(friend.getOnline());
+                ds.writeByte(friend.getLevel());
+                ds.writeByte(friend.getLevelPt());
+                for (short i : friend.getData()) {
+                    ds.writeShort(i);
+                }
             }
+            ds.flush();
+            user.sendMessage(ms);
         } catch (IOException e) {
             e.printStackTrace();
         }

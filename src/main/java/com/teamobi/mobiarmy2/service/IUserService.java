@@ -76,7 +76,7 @@ public interface IUserService {
 
     void choiNgay(Message ms);
 
-    void xembanBe(Message ms);
+    void xembanBe();
 
     void ketBan(Message ms);
 

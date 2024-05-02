@@ -7,6 +7,8 @@ import com.teamobi.mobiarmy2.json.DataCharacter;
 import com.teamobi.mobiarmy2.json.DataItem;
 import com.teamobi.mobiarmy2.json.Equipment;
 import com.teamobi.mobiarmy2.model.*;
+import com.teamobi.mobiarmy2.model.response.GetFriendResponse;
+import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.util.Until;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -169,6 +171,8 @@ public class UserDao implements IUserDao {
                                 }
                             }
 
+                            user.setFriends(gson.fromJson(playerResultSet.getString("friends"), int[].class));
+
                         } else {//Tạo mới một bản ghi
                             HikariCPManager.getInstance().update("INSERT INTO `armymem`(`id`, `ruongTrangBi`, `ruongItem`) VALUES (?, ?, ?)", user.getId(), "[]", "[]");
                         }
@@ -189,51 +193,8 @@ public class UserDao implements IUserDao {
     }
 
     @Override
-    public User getUserDetails(int userId) {
-        User user = null;
-        try (Connection connection = HikariCPManager.getInstance().getConnection()) {
-            // Truy vấn để lấy thông tin từ bảng user
-            String userQuery = "SELECT username, `lock`, `active` FROM user WHERE user_id = ?";
-            try (PreparedStatement userStatement = connection.prepareStatement(userQuery)) {
-                userStatement.setInt(1, userId);
-                try (ResultSet userResultSet = userStatement.executeQuery()) {
-                    if (userResultSet.next()) {
-                        user = new User();
-                        user.setId(userId);
-                        user.setUsername(userResultSet.getString("user"));
-                        user.setLock(userResultSet.getBoolean("lock"));
-                        user.setActive(userResultSet.getBoolean("active"));
-                    }
-                }
-            }
-
-            if (user != null) {
-                // Truy vấn để lấy thông tin từ bảng player
-                String playerQuery = "SELECT * FROM armymem WHERE id = ?";
-                try (PreparedStatement playerStatement = connection.prepareStatement(playerQuery)) {
-                    playerStatement.setInt(1, user.getId());
-                    try (ResultSet playerResultSet = playerStatement.executeQuery()) {
-                        if (playerResultSet.next()) {
-                            user.setXu(playerResultSet.getInt("xu"));
-                            user.setLuong(playerResultSet.getInt("luong"));
-                            user.setDanhVong(playerResultSet.getInt("dvong"));
-                            user.setNvUsed(playerResultSet.getByte("NVused"));
-                        } else {
-                            user = null;
-                        }
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
-        return user;
-    }
-
-    @Override
-    public List<User> getFriendsList(int userId, int[] friendIds) {
-        List<User> friendsList = new ArrayList<>();
+    public List<GetFriendResponse> getFriendsList(int userId, int[] friendIds) {
+        List<GetFriendResponse> friendsList = new ArrayList<>();
 
         StringBuilder queryBuilder = new StringBuilder("SELECT user.*, armymem.* FROM armymem INNER JOIN user ON user.user_id = armymem.id WHERE user.user_id IN (");
         for (int i = 0; i < friendIds.length; i++) {
@@ -250,14 +211,28 @@ public class UserDao implements IUserDao {
             for (int i = 0; i < friendIds.length; i++) {
                 statement.setInt(i + 1, friendIds[i]);
             }
-
+            Gson gson = new Gson();
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    User friend = new User();
+                    if (resultSet.getBoolean("lock") || !resultSet.getBoolean("active")) {
+                        continue;
+                    }
+                    GetFriendResponse friend = new GetFriendResponse();
                     friend.setId(resultSet.getInt("user_id"));
-                    friend.setUsername(resultSet.getString("user"));
-                    friend.setLock(resultSet.getBoolean("lock"));
-                    friend.setActive(resultSet.getBoolean("active"));
+                    friend.setName(resultSet.getString("username"));
+                    friend.setXu(resultSet.getInt("xu"));
+                    friend.setNvUsed(resultSet.getByte("NVused"));
+                    friend.setClanId(resultSet.getShort("clan"));
+                    friend.setOnline(resultSet.getByte("online"));
+                    DataCharacter dataCharacter = gson.fromJson(resultSet.getString("NV" + friend.getNvUsed()), DataCharacter.class);
+
+                    int level = dataCharacter.getLever();
+                    int xp = dataCharacter.getXp();
+                    int xpRequired = XpData.getXpRequestLevel(level);
+
+                    friend.setLevel((byte) level);
+                    friend.setLevelPt((byte) Until.calculateLevelPercent(xp, xpRequired));
+                    friend.setData(ServerManager.data(friend.getId(), friend.getNvUsed()));
 
                     friendsList.add(friend);
                 }
