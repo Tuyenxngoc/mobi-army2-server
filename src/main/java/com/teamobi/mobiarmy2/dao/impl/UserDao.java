@@ -96,10 +96,10 @@ public class UserDao implements IUserDao {
 
                             int len = NVData.entrys.size();
                             user.nvStt = new boolean[len];
-                            user.lever = new int[len];
-                            user.leverPercent = new byte[len];
-                            user.xp = new int[len];
-                            user.point = new int[len];
+                            user.levels = new int[len];
+                            user.levelPercents = new byte[len];
+                            user.xps = new int[len];
+                            user.points = new int[len];
                             user.pointAdd = new int[len][5];
                             user.NvData = new int[len][6];
                             user.nvEquip = new ruongDoTBEntry[len][6];
@@ -152,10 +152,10 @@ public class UserDao implements IUserDao {
 
                             for (int i = 0; i < 10; i++) {
                                 DataCharacter dataCharacter = gson.fromJson(playerResultSet.getString("NV" + (i + 1)), DataCharacter.class);
-                                user.lever[i] = dataCharacter.getLever();
-                                user.xp[i] = dataCharacter.getXp();
-                                user.leverPercent[i] = 0;
-                                user.point[i] = dataCharacter.getPoint();
+                                user.levels[i] = dataCharacter.getLevel();
+                                user.xps[i] = dataCharacter.getXp();
+                                user.levelPercents[i] = 0;
+                                user.points[i] = dataCharacter.getPoint();
                                 for (int j = 0; j < 5; j++) {
                                     user.pointAdd[i][j] = dataCharacter.getPointAdd().get(j);
                                 }
@@ -235,7 +235,7 @@ public class UserDao implements IUserDao {
                     friend.setOnline(resultSet.getByte("online"));
                     DataCharacter dataCharacter = gson.fromJson(resultSet.getString("NV" + friend.getNvUsed()), DataCharacter.class);
 
-                    int level = dataCharacter.getLever();
+                    int level = dataCharacter.getLevel();
                     int xp = dataCharacter.getXp();
                     int xpRequired = XpData.getXpRequestLevel(level);
 

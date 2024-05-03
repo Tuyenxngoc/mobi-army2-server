@@ -16,8 +16,8 @@ public class DataCharacter {
     @SerializedName("xp")
     private int xp;
 
-    @SerializedName("lever")
-    private int lever;
+    @SerializedName("level")
+    private int level;
 
     @SerializedName("point")
     private int point;

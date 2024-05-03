@@ -270,11 +270,11 @@ public class UserService implements IUserService {
             user.setLuong(userFound.getLuong());
             user.setDanhVong(userFound.getDanhVong());
 
-            user.setLever(userFound.getLever());
-            user.setLeverPercent(userFound.getLeverPercent());
+            user.setLevels(userFound.getLevels());
+            user.setLevelPercents(userFound.getLevelPercents());
             user.setNvStt(userFound.getNvStt());
-            user.setXp(userFound.getXp());
-            user.setPoint(userFound.getPoint());
+            user.setXps(userFound.getXps());
+            user.setPoints(userFound.getPoints());
             user.setPointAdd(userFound.getPointAdd());
             user.setNvData(userFound.getNvData());
             user.setNvEquip(userFound.getNvEquip());
@@ -1078,8 +1078,8 @@ public class UserService implements IUserService {
                 ds.writeInt(user.getId());
                 ds.writeUTF(user.getUsername());
                 ds.writeInt(user.getXu());
-                ds.writeByte(user.getCurrentLever());
-                ds.writeByte(user.getCurrentLeverPercent());
+                ds.writeByte(user.getCurrentLevel());
+                ds.writeByte(user.getCurrentLevelPercent());
                 ds.writeInt(user.getLuong());
                 ds.writeInt(user.getCurrentXp());
                 ds.writeInt(user.getCurrentXpLevel());
@@ -1421,9 +1421,9 @@ public class UserService implements IUserService {
         try {
             Message ms = new Message(Cmd.CHARACTOR_INFO);
             DataOutputStream ds = ms.writer();
-            // lever
+            // level
             ds.writeByte(1);
-            // lever %
+            // level %
             ds.writeByte(0);
             // Diem con lai de nang cap
             ds.writeShort(0);
@@ -1433,7 +1433,7 @@ public class UserService implements IUserService {
             }
             // XP Get
             ds.writeInt(0);
-            // XP Max Lever
+            // XP Max Level
             ds.writeInt(1000);
             /* Danh vong */
             ds.writeInt(user.getDanhVong());
@@ -1679,16 +1679,16 @@ public class UserService implements IUserService {
             Message ms = new Message(Cmd.UPDATE_EXP);
             DataOutputStream ds = ms.writer();
             ds.writeInt(xpUp);
-            ds.writeInt(user.getCurrentLever());
-            ds.writeInt(XpData.getXpRequestLevel(user.getCurrentLever() + 1));
+            ds.writeInt(user.getCurrentLevel());
+            ds.writeInt(XpData.getXpRequestLevel(user.getCurrentLevel() + 1));
             if (updateLevel) {
                 ds.writeByte(1);
-                ds.writeByte(user.getCurrentLever());
-                ds.writeByte(user.getCurrentLeverPercent());
+                ds.writeByte(user.getCurrentLevel());
+                ds.writeByte(user.getCurrentLevelPercent());
                 ds.writeShort(user.getCurrentPoint());
             } else {
                 ds.writeByte(0);
-                ds.writeByte(user.getCurrentLeverPercent());
+                ds.writeByte(user.getCurrentLevelPercent());
             }
             ds.flush();
             user.sendMessage(ms);
@@ -1699,11 +1699,5 @@ public class UserService implements IUserService {
 
     @Override
     public void ping(Message ms) {
-        try {
-            String s = ms.reader().readUTF();
-            System.out.println(s);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

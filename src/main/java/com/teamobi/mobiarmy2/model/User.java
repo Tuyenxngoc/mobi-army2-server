@@ -40,10 +40,10 @@ public class User {
     public int pointEvent;
     public LocalDateTime xpX2Time;
     public boolean[] nvStt;
-    public int[] lever;
-    public byte[] leverPercent;
-    public int[] xp;
-    public int[] point;
+    public int[] levels;
+    public byte[] levelPercents;
+    public int[] xps;
+    public int[] points;
     public int[][] pointAdd;
     public byte[] items;
     public int[][] NvData;
@@ -77,26 +77,26 @@ public class User {
         userService.handleLogout();
     }
 
-    public int getCurrentLeverPercent() {
+    public int getCurrentLevelPercent() {
         float requiredXp = getCurrentXpLevel();
         float currentXp = getCurrentXp();
         return Until.calculateLevelPercent(currentXp, requiredXp);
     }
 
     public int getCurrentXpLevel() {
-        return XpData.getXpRequestLevel(getCurrentLever());
+        return XpData.getXpRequestLevel(getCurrentLevel());
     }
 
-    public int getCurrentLever() {
-        return lever[nvUsed];
+    public int getCurrentLevel() {
+        return levels[nvUsed];
     }
 
     public int getCurrentXp() {
-        return xp[nvUsed];
+        return xps[nvUsed];
     }
 
     public int getCurrentPoint() {
-        return point[nvUsed];
+        return points[nvUsed];
     }
 
     public void updateXu(int xuUp) {
@@ -144,26 +144,32 @@ public class User {
         userService.sendUpdateDanhVong(danhVongUp);
     }
 
-    public void updateXp(int xpUp, boolean canX2) {
-        if (xpUp == 0) {
+    public void updateXp(int xpUp, boolean isXpMultiplier) {
+        if (xpUp <= 0) {
             return;
         }
-        if (canX2 && xpUp > 0) {
+
+        if (isXpMultiplier) {
             if (xpX2Time.isAfter(LocalDateTime.now())) {
                 xpUp *= 2;
             }
         }
 
         int oldXp = getCurrentXp();
-        long sum = xpUp + oldXp;
-        if (sum > CommonConstant.MAX_XP) {
-            sum = CommonConstant.MAX_XP;
-        } else if (sum < CommonConstant.MIN_XP) {
-            sum = CommonConstant.MIN_XP;
+        long totalXp = xpUp + oldXp;
+        if (totalXp > CommonConstant.MAX_XP) {
+            totalXp = CommonConstant.MAX_XP;
         }
 
-        int lv = XpData.getLevelByEXP(sum);
-        lever[nvUsed] = lv;
-        userService.sendUpdateXp(xpUp, false);
+        int currentLevel = getCurrentLevel();
+        int newLevel = XpData.getLevelByEXP(totalXp);
+
+        int levelDiff = newLevel - currentLevel;
+        if (levelDiff > 0) {
+            levels[nvUsed] = newLevel;
+            points[nvUsed] += levelDiff * CommonConstant.POINT_ON_LEVEL;
+        }
+
+        userService.sendUpdateXp(xpUp, levelDiff > 0);
     }
 }

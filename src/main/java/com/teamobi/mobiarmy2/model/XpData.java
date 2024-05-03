@@ -12,8 +12,8 @@ public class XpData {
 
     public static final List<LevelXpRequired> xpList = new ArrayList<>();
 
-    public static int getXpRequestLevel(int currentLever) {
-        return xpList.get(currentLever).xp;
+    public static int getXpRequestLevel(int currentLevel) {
+        return xpList.get(currentLevel).xp;
     }
 
     public static int getLevelByEXP(long exp) {
