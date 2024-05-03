@@ -1674,6 +1674,30 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public void sendUpdateXp(int xpUp, boolean updateLevel) {
+        try {
+            Message ms = new Message(Cmd.UPDATE_EXP);
+            DataOutputStream ds = ms.writer();
+            ds.writeInt(xpUp);
+            ds.writeInt(user.getCurrentLever());
+            ds.writeInt(XpData.getXpRequestLevel(user.getCurrentLever() + 1));
+            if (updateLevel) {
+                ds.writeByte(1);
+                ds.writeByte(user.getCurrentLever());
+                ds.writeByte(user.getCurrentLeverPercent());
+                ds.writeShort(user.getCurrentPoint());
+            } else {
+                ds.writeByte(0);
+                ds.writeByte(user.getCurrentLeverPercent());
+            }
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void ping(Message ms) {
         try {
             String s = ms.reader().readUTF();

@@ -15,4 +15,13 @@ public class XpData {
     public static int getXpRequestLevel(int currentLever) {
         return xpList.get(currentLever).xp;
     }
+
+    public static int getLevelByEXP(long exp) {
+        for (LevelXpRequired levelXpRequired : xpList) {
+            if (exp < levelXpRequired.xp) {
+                return levelXpRequired.level - 1;
+            }
+        }
+        return -1;
+    }
 }

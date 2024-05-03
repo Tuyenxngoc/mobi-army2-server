@@ -152,5 +152,7 @@ public interface IUserService {
 
     void sendUpdateDanhVong(int danhVongUp);
 
+    void sendUpdateXp(int xpUp, boolean updateLevel);
+
     void ping(Message ms);
 }

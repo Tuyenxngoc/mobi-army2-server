@@ -27,4 +27,6 @@ public class CommonConstant {
     public static final int MIN_LUONG = -2_000_000_000;
     public static final int MAX_DANH_VONG = 2_000_000_000;
     public static final int MIN_DANH_VONG = -2_000_000_000;
+    public static final int MAX_XP = 2_000_000_000;
+    public static final int MIN_XP = -2_000_000_000;
 }

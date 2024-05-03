@@ -95,6 +95,10 @@ public class User {
         return xp[nvUsed];
     }
 
+    public int getCurrentPoint() {
+        return point[nvUsed];
+    }
+
     public void updateXu(int xuUp) {
         if (xuUp == 0) {
             return;
@@ -140,6 +144,26 @@ public class User {
         userService.sendUpdateDanhVong(danhVongUp);
     }
 
-    public void updateXp(int xpUp, boolean b) {
+    public void updateXp(int xpUp, boolean canX2) {
+        if (xpUp == 0) {
+            return;
+        }
+        if (canX2 && xpUp > 0) {
+            if (xpX2Time.isAfter(LocalDateTime.now())) {
+                xpUp *= 2;
+            }
+        }
+
+        int oldXp = getCurrentXp();
+        long sum = xpUp + oldXp;
+        if (sum > CommonConstant.MAX_XP) {
+            sum = CommonConstant.MAX_XP;
+        } else if (sum < CommonConstant.MIN_XP) {
+            sum = CommonConstant.MIN_XP;
+        }
+
+        int lv = XpData.getLevelByEXP(sum);
+        lever[nvUsed] = lv;
+        userService.sendUpdateXp(xpUp, false);
     }
 }

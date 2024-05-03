@@ -144,7 +144,9 @@ public class ServerManager {
         countClients = 0;
         try {
             users.clear();
-            server.close();
+            if (server != null) {
+                server.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
