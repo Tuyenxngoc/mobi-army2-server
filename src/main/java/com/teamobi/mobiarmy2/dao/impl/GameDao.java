@@ -372,16 +372,22 @@ public class GameDao implements IGameDao {
     public void getAllXpData() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet res = statement.executeQuery("SELECT * FROM `xp_lv`")) {
+            try (ResultSet res = statement.executeQuery("SELECT * FROM `xp_lv` ORDER BY lvl")) {
+                int previousXp = 0;
                 while (res.next()) {
+                    int currentXp = res.getInt("exp");
+                    if (currentXp < previousXp) {
+                        throw new SQLException(String.format("XP of the next level (%d) is lower than the XP of the previous level (%d)!", currentXp, previousXp));
+                    }
                     XpData.LevelXpRequired xpRequired = new XpData.LevelXpRequired();
                     xpRequired.level = res.getInt("lvl");
-                    xpRequired.xp = res.getInt("exp");
+                    xpRequired.xp = currentXp;
                     XpData.xpList.add(xpRequired);
+                    previousXp = currentXp;
                 }
                 System.out.println("Lv xp readed size=" + XpData.xpList.size());
-
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
             System.exit(1);
