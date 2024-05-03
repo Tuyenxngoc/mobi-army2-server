@@ -171,7 +171,4 @@ public class ServerManager {
         return null;
     }
 
-    public short[] data(int iddb, byte nv) {
-        return gameService.getEquipData(iddb, nv);
-    }
 }

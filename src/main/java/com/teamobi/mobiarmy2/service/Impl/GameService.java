@@ -252,11 +252,6 @@ public class GameService implements IGameService {
     }
 
     @Override
-    public short[] getEquipData(int iddb, byte nv) {
-        return gameDao.getEquipData(iddb, nv);
-    }
-
-    @Override
     public void getItemData() {
         gameDao.getAllItem();
     }

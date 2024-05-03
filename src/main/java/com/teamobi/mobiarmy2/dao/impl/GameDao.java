@@ -1,17 +1,17 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
-import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
-import com.teamobi.mobiarmy2.json.DataCharacter;
-import com.teamobi.mobiarmy2.json.Equipment;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.util.Until;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * @author tuyen
@@ -392,52 +392,6 @@ public class GameDao implements IGameDao {
             e.printStackTrace();
             System.exit(1);
         }
-    }
-
-    @Override
-    public short[] getEquipData(int playerId, byte idNv) {
-        short[] data = new short[5];
-        String sql = "SELECT ruongTrangBi, NV%s FROM armymem WHERE id = ? LIMIT 1".formatted(idNv);
-
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, playerId);
-
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    Gson gson = new Gson();
-                    DataCharacter dataCharacter = gson.fromJson(resultSet.getString("NV%s".formatted(idNv)), DataCharacter.class);
-                    Equipment[] trangBi = gson.fromJson(resultSet.getString("ruongTrangBi"), Equipment[].class);
-
-                    int indexS = dataCharacter.getData().get(5);
-                    if (indexS >= 0 && indexS < trangBi.length) {//Kiêm tra nếu có cải trang
-                        Equipment eqq = trangBi[indexS];
-                        NVData.EquipmentEntry entry = NVData.getEquipEntryById(eqq.getNvId(), eqq.getEquipType(), eqq.getId());
-                        if (entry != null && entry.arraySet != null) {
-                            data[0] = entry.arraySet[0];
-                            data[1] = entry.arraySet[1];
-                            data[2] = entry.arraySet[2];
-                            data[3] = entry.arraySet[3];
-                            data[4] = entry.arraySet[4];
-                        }
-                    } else {
-                        for (byte a = 0; a < 5; a++) {
-                            indexS = dataCharacter.getData().get(a);
-                            if (indexS >= 0 && indexS < trangBi.length) {
-                                data[a] = (short) trangBi[indexS].getId();
-                            } else if (User.nvEquipDefault[idNv - 1][a] != null) {
-                                data[a] = User.nvEquipDefault[idNv - 1][a].id;
-                            } else {
-                                data[a] = -1;
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return data;
     }
 
 }

@@ -36,5 +36,4 @@ public interface IGameService {
 
     void setCaptionLevelData();
 
-    short[] getEquipData(int id, byte nvId);
 }

@@ -321,4 +321,9 @@ public class Until {
         int percentage = Math.round((currentXp / requiredXp) * 100);
         return Math.min(percentage, 100);
     }
+
+    public static int calculateLevelClan(float xp) {
+        int level = ((int) Math.sqrt(1 + xp / 6250) + 1) >> 1;
+        return Math.min(level, 127);
+    }
 }

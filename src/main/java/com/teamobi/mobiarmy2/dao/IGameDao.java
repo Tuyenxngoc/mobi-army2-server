@@ -24,5 +24,4 @@ public interface IGameDao {
 
     void getAllXpData();
 
-    short[] getEquipData(int id, byte nvId);
 }
