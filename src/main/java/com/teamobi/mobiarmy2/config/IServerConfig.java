@@ -6,17 +6,7 @@ public interface IServerConfig {
 
     byte getN_area();
 
-    String getHost();
-
     short getPort();
-
-    String getMysql_host();
-
-    String getMysql_user();
-
-    String getMysql_pass();
-
-    String getMysql_database();
 
     byte getEquipVersion2();
 
@@ -75,12 +65,6 @@ public interface IServerConfig {
     int getMax_item();
 
     int getMax_friends();
-
-    int getNumClients();
-
-    boolean isStart();
-
-    int getId();
 
     String[] getRoomTypes();
 

@@ -14,7 +14,7 @@ public interface IUserService {
 
     void giaHanDo(Message ms);
 
-    void nhiemVuView(Message ms);
+    void handleGetMissions(Message ms);
 
     void sendLoginSuccess();
 
@@ -42,7 +42,7 @@ public interface IUserService {
 
     void macTrangBiVip(Message ms);
 
-    void guiTinNhan(Message ms);
+    void handleSendMessage(Message ms);
 
     void denKhuVuc();
 

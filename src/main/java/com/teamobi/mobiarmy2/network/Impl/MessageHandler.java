@@ -24,7 +24,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.GET_MORE_DAY -> userService.giaHanDo(ms);
 
-                case Cmd.MISSISON -> userService.nhiemVuView(ms);
+                case Cmd.MISSISON -> userService.handleGetMissions(ms);
 
                 case Cmd.CLAN_MONEY -> userService.gopClan(ms);
 
@@ -46,7 +46,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.LOGIN -> userService.handleLogin(ms);
 
-                case Cmd.CHAT_TO -> userService.guiTinNhan(ms);
+                case Cmd.CHAT_TO -> userService.handleSendMessage(ms);
 
                 case Cmd.ROOM_LIST -> userService.denKhuVuc();
 

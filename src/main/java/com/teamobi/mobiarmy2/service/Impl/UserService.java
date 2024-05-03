@@ -279,6 +279,8 @@ public class UserService implements IUserService {
             user.setNvData(userFound.getNvData());
             user.setNvEquip(userFound.getNvEquip());
             user.setFriends(userFound.getFriends());
+            user.setMission(userFound.getMission());
+            user.setMissionLevel(userFound.getMissionLevel());
 
             user.setRuongDoItem(userFound.getRuongDoItem());
             user.setRuongDoTB(userFound.getRuongDoTB());
@@ -294,6 +296,8 @@ public class UserService implements IUserService {
             sendNVData(config);
             sendRoomInfo(config);
             sendMapCollisionInfo();
+
+            sendServerInfo(config.getSEND_CHAT_LOGIN());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -515,63 +519,64 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void nhiemVuView(Message ms) {
+    public void handleGetMissions(Message ms) {
         try {
             byte action = ms.reader().readByte();
-            byte indexNV = -1;
+            byte indexNv = -1;
             if (action == 1) {
-                indexNV = ms.reader().readByte();
+                indexNv = ms.reader().readByte();
             }
-            DataOutputStream ds;
+
             if (action == 0) {
                 sendMissionInfo();
-            }
-            if (action == 1) {
-                ms = new Message(10);
-                ds = ms.writer();
-                MissionData.Mission me = MissionData.getMissionData(indexNV);
-                MissionData.MissDataEntry mDatE = me.mDatE;
-                byte id = (byte) (mDatE.id - 1);
-                if (id < 0 || id >= user.mission.length) {
-                    ds.writeUTF(GameString.missionError1());
-                } else {
-                    if (user.missionLevel[id] > me.level) {
-                        ds.writeUTF(GameString.missionError2());
-                    } else if (user.missionLevel[id] < me.level) {
-                        ds.writeUTF(GameString.missionError3());
-                    } else if (user.mission[mDatE.idNeed - 1] < me.require) {
-                        ds.writeUTF(GameString.missionError2());
-                    } else {
-                        user.missionLevel[id]++;
-                        if (me.rewardXu > 0) {
-                            user.updateXu(me.rewardXu);
-                        }
-                        if (me.rewardLuong > 0) {
-                            user.updateLuong(me.rewardLuong);
-                        }
-                        if (me.rewardXP > 0) {
-                            user.updateXp(me.rewardXP, false);
-                        }
-                        if (me.rewardCUP > 0) {
-                            user.updateDanhVong(me.rewardCUP);
-                        }
-                        sendMissionInfo();
-                        ds.writeUTF(String.format(GameString.missionComplete(), me.reward));
-                    }
-                }
-                ds.flush();
-                user.sendMessage(ms);
+            } else if (action == 1) {
+                missionComplete(indexNv);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    private void missionComplete(byte indexNv) throws IOException {
+        Message ms = new Message(10);
+        DataOutputStream ds = ms.writer();
+        MissionData.Mission me = MissionData.getMissionData(indexNv);
+        MissionData.MissDataEntry mDatE = me.mDatE;
+        byte id = (byte) (mDatE.id - 1);
+        if (id < 0 || id >= user.mission.length) {
+            ds.writeUTF(GameString.missionError1());
+        } else {
+            if (user.missionLevel[id] > me.level) {
+                ds.writeUTF(GameString.missionError2());
+            } else if (user.missionLevel[id] < me.level) {
+                ds.writeUTF(GameString.missionError3());
+            } else if (user.mission[mDatE.idNeed - 1] < me.require) {
+                ds.writeUTF(GameString.missionError2());
+            } else {
+                user.missionLevel[id]++;
+                if (me.rewardXu > 0) {
+                    user.updateXu(me.rewardXu);
+                }
+                if (me.rewardLuong > 0) {
+                    user.updateLuong(me.rewardLuong);
+                }
+                if (me.rewardXP > 0) {
+                    user.updateXp(me.rewardXP, false);
+                }
+                if (me.rewardCUP > 0) {
+                    user.updateDanhVong(me.rewardCUP);
+                }
+                sendMissionInfo();
+                ds.writeUTF(String.format(GameString.missionComplete(), me.reward));
+            }
+        }
+        ds.flush();
+        user.sendMessage(ms);
+    }
+
     private void sendMissionInfo() throws IOException {
-        Message ms;
-        DataOutputStream ds;
-        ms = new Message(-23);
-        ds = ms.writer();
+        Message ms = new Message(Cmd.MISSISON);
+        DataOutputStream ds = ms.writer();
         for (int i = 0; i < MissionData.entrys.size(); i++) {
             MissionData.MissDataEntry mDatE = MissionData.entrys.get(i);
             if (user.missionLevel[i] >= mDatE.missions.size()) {
@@ -820,7 +825,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void guiTinNhan(Message ms) {
+    public void handleSendMessage(Message ms) {
         try {
             DataInputStream dis = ms.reader();
             int id = dis.readInt();

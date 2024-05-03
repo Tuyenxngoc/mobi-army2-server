@@ -1,10 +1,11 @@
 package com.teamobi.mobiarmy2.config.Impl;
 
-import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.constant.CommonConstant;
 
 import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 /**
@@ -15,12 +16,8 @@ public class ServerConfig implements IServerConfig {
 
     private boolean debug;
     private byte n_area;
-    private String host;
     private short port;
-    private String mysql_host;
-    private String mysql_user;
-    private String mysql_pass;
-    private String mysql_database;
+
     private byte equipVersion2;
     private byte iconversion2;
     private byte levelCVersion2;
@@ -49,9 +46,6 @@ public class ServerConfig implements IServerConfig {
     private int max_ruong_itemslot;
     private int max_item;
     private int max_friends;
-    private int numClients;
-    private boolean start;
-    private int id;
     private final String[] roomTypes
             = {"PHÒNG SƠ CẤP", "PHÒNG TRUNG CẤP", "PHÒNG VIP", "PHÒNG ĐẤU TRƯỜNG", "PHÒNG TỰ DO", "PHÒNG ĐẤU TRÙM", "PHÒNG ĐẤU ĐỘI"};
     private final String[] roomTypesEng
@@ -98,8 +92,10 @@ public class ServerConfig implements IServerConfig {
 
     public ServerConfig(String resourceName) {
         configMap = new Properties();
-        try (FileInputStream fis = new FileInputStream(CommonConstant.RESOURCES_PATH + resourceName)) {
-            configMap.load(fis);
+        try (FileInputStream fis = new FileInputStream(CommonConstant.RESOURCES_PATH + resourceName);
+             InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8)
+        ) {
+            configMap.load(isr);
             initializeConfigProperties();
         } catch (Exception e) {
             e.printStackTrace();
@@ -108,68 +104,16 @@ public class ServerConfig implements IServerConfig {
     }
 
     private void initializeConfigProperties() {
-        Gson gson = new Gson();
         try {
-            if (configMap.containsKey("debug")) {
-                debug = Boolean.parseBoolean(configMap.getProperty("debug"));
-            } else {
-                debug = false;
-            }
-            if (configMap.containsKey("host")) {
-                host = configMap.getProperty("host");
-            } else {
-                host = "localhost";
-            }
-            if (configMap.containsKey("post")) {
-                port = Short.parseShort(configMap.getProperty("port"));
-            } else {
-                port = 8122;
-            }
-            if (configMap.containsKey("mysql-host")) {
-                mysql_host = configMap.getProperty("mysql-host");
-            } else {
-                mysql_host = "localhost";
-            }
-            if (configMap.containsKey("mysql-user")) {
-                mysql_user = configMap.getProperty("mysql-user");
-            } else {
-                mysql_user = "root";
-            }
-            if (configMap.containsKey("mysql-password")) {
-                mysql_pass = configMap.getProperty("mysql-password");
-            } else {
-                mysql_pass = "";
-            }
-            if (configMap.containsKey("mysql-database")) {
-                mysql_database = configMap.getProperty("mysql-database");
-            } else {
-                mysql_database = "dbarmy2";
-            }
-            if (configMap.containsKey("equipVersion2")) {
-                equipVersion2 = Byte.parseByte(configMap.getProperty("equipVersion2"));
-            } else {
-                equipVersion2 = 1;
-            }
-            if (configMap.containsKey("iconversion2")) {
-                iconversion2 = Byte.parseByte(configMap.getProperty("iconversion2"));
-            } else {
-                iconversion2 = 1;
-            }
-            if (configMap.containsKey("levelCVersion2")) {
-                levelCVersion2 = Byte.parseByte(configMap.getProperty("levelCVersion2"));
-            } else {
-                levelCVersion2 = 1;
-            }
-            if (configMap.containsKey("valuesversion2")) {
-                valuesversion2 = Byte.parseByte(configMap.getProperty("valuesversion2"));
-            } else {
-                valuesversion2 = 1;
-            }
-            if (configMap.containsKey("playerVersion2")) {
-                playerVersion2 = Byte.parseByte(configMap.getProperty("playerVersion2"));
-            } else {
-                playerVersion2 = 1;
-            }
+            debug = Boolean.parseBoolean(configMap.getProperty("debug", "false"));
+            port = Short.parseShort(configMap.getProperty("port", "8122"));
+
+            equipVersion2 = Byte.parseByte(configMap.getProperty("equipVersion2", "1"));
+            iconversion2 = Byte.parseByte(configMap.getProperty("iconversion2", "1"));
+            levelCVersion2 = Byte.parseByte(configMap.getProperty("levelCVersion2", "1"));
+            valuesversion2 = Byte.parseByte(configMap.getProperty("valuesversion2", "1"));
+            playerVersion2 = Byte.parseByte(configMap.getProperty("playerVersion2", "1"));
+
             nRoom = new byte[roomTypes.length];
             nRoomAll = 0;
             startRoomBoss = 0;
@@ -477,33 +421,8 @@ public class ServerConfig implements IServerConfig {
     }
 
     @Override
-    public String getHost() {
-        return host;
-    }
-
-    @Override
     public short getPort() {
         return port;
-    }
-
-    @Override
-    public String getMysql_host() {
-        return mysql_host;
-    }
-
-    @Override
-    public String getMysql_user() {
-        return mysql_user;
-    }
-
-    @Override
-    public String getMysql_pass() {
-        return mysql_pass;
-    }
-
-    @Override
-    public String getMysql_database() {
-        return mysql_database;
     }
 
     @Override
@@ -649,21 +568,6 @@ public class ServerConfig implements IServerConfig {
     @Override
     public int getMax_friends() {
         return max_friends;
-    }
-
-    @Override
-    public int getNumClients() {
-        return numClients;
-    }
-
-    @Override
-    public boolean isStart() {
-        return start;
-    }
-
-    @Override
-    public int getId() {
-        return id;
     }
 
     @Override

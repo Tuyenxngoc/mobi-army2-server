@@ -178,6 +178,10 @@ public class UserDao implements IUserDao {
                             }.getType();
                             user.setFriends(gson.fromJson(playerResultSet.getString("friends"), listType));
 
+                            //Mission
+                            user.setMission(gson.fromJson(playerResultSet.getString("mission"), int[].class));
+                            user.setMissionLevel(gson.fromJson(playerResultSet.getString("missionLevel"), byte[].class));
+
                         } else {//Tạo mới một bản ghi
                             HikariCPManager.getInstance().update("INSERT INTO `armymem`(`id`, `ruongTrangBi`, `ruongItem`) VALUES (?, ?, ?)", user.getId(), "[]", "[]");
                         }
