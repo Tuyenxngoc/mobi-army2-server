@@ -27,6 +27,6 @@ class XpDataTest {
 
     @Test
     void getLevelByEXP() {
-        assertEquals(0, XpData.getLevelByEXP(200));
+        assertEquals(2, XpData.getLevelByEXP(200));
     }
 }

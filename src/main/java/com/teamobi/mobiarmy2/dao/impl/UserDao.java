@@ -221,6 +221,7 @@ public class UserDao implements IUserDao {
                 statement.setInt(i + 1, friendIds.get(i));
             }
             Gson gson = new Gson();
+            ServerManager serverManager = ServerManager.getInstance();
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     if (resultSet.getBoolean("lock") || !resultSet.getBoolean("active")) {
@@ -241,7 +242,7 @@ public class UserDao implements IUserDao {
 
                     friend.setLevel((byte) level);
                     friend.setLevelPt((byte) Until.calculateLevelPercent(xp, xpRequired));
-                    friend.setData(ServerManager.data(friend.getId(), friend.getNvUsed()));
+                    friend.setData(serverManager.data(friend.getId(), friend.getNvUsed()));
 
                     friendsList.add(friend);
                 }
@@ -281,7 +282,7 @@ public class UserDao implements IUserDao {
     @Override
     public Integer findUserIdByUsername(String username) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT `user_id` FROM `user` WHERE username = ? LIMIT 1;")) {
+             PreparedStatement statement = connection.prepareStatement("SELECT u.`user_id` FROM user u INNER JOIN armymem a ON u.user_id = a.id WHERE username = ? LIMIT 1")) {
             statement.setString(1, username);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
