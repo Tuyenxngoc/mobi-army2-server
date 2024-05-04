@@ -48,171 +48,175 @@ public class UserService implements IUserService {
         }
     }
 
-    public synchronized void updateRuong(ruongDoTBEntry tbUpdate, ruongDoTBEntry addTB, int removeTB, ArrayList<ruongDoItemEntry> addItem, ArrayList<ruongDoItemEntry> removeItem) throws IOException {
-        Message ms;
-        DataOutputStream ds;
-        if (addTB != null) {
-            int bestLocation = -1;
-            for (int i = 0; i < user.ruongDoTB.size(); i++) {
-                ruongDoTBEntry ruongDoTBEntry = user.ruongDoTB.get(i);
-                if (ruongDoTBEntry == null) {
-                    bestLocation = i;
-                    break;
+    public synchronized void updateRuong(ruongDoTBEntry tbUpdate, ruongDoTBEntry addTB, int removeTB, ArrayList<ruongDoItemEntry> addItem, ArrayList<ruongDoItemEntry> removeItem) {
+        try {
+            Message ms;
+            DataOutputStream ds;
+            if (addTB != null) {
+                int bestLocation = -1;
+                for (int i = 0; i < user.ruongDoTB.size(); i++) {
+                    ruongDoTBEntry ruongDoTBEntry = user.ruongDoTB.get(i);
+                    if (ruongDoTBEntry == null) {
+                        bestLocation = i;
+                        break;
+                    }
+                }
+                addTB.dayBuy = new Date();
+                addTB.isUse = false;
+                if (addTB.invAdd == null) {
+                    addTB.invAdd = new short[addTB.entry.invAdd.length];
+                    for (int j = 0; j < addTB.entry.invAdd.length; j++) {
+                        addTB.invAdd[j] = addTB.entry.invAdd[j];
+                    }
+                }
+                if (addTB.percentAdd == null) {
+                    addTB.percentAdd = new short[addTB.entry.percenAdd.length];
+                    for (int j = 0; j < addTB.entry.percenAdd.length; j++) {
+                        addTB.percentAdd[j] = addTB.entry.percenAdd[j];
+                    }
+                }
+                addTB.slotNull = 3;
+                addTB.cap = addTB.entry.cap;
+                addTB.slot = new int[3];
+                for (int i = 0; i < 3; i++) {
+                    addTB.slot[i] = -1;
+                }
+                if (bestLocation == -1) {
+                    addTB.index = user.ruongDoTB.size();
+                    user.ruongDoTB.add(addTB);
+                } else {
+                    addTB.index = bestLocation;
+                    user.ruongDoTB.set(bestLocation, addTB);
+                }
+                ms = new Message(104);
+                ds = ms.writer();
+                ds.writeByte(0);
+                ds.writeInt(addTB.index | 0x10000);
+                ds.writeByte(addTB.entry.idNV);
+                ds.writeByte(addTB.entry.idEquipDat);
+                ds.writeShort(addTB.entry.id);
+                ds.writeUTF(addTB.entry.name);
+                ds.writeByte(addTB.invAdd.length * 2);
+                for (int i = 0; i < addTB.invAdd.length; i++) {
+                    ds.writeByte(addTB.invAdd[i]);
+                    ds.writeByte(addTB.percentAdd[i]);
+                }
+                ds.writeByte(addTB.entry.hanSD);
+                ds.writeByte(addTB.entry.isSet ? 1 : 0);
+                ds.writeByte(addTB.vipLevel);
+                ds.flush();
+                user.sendMessage(ms);
+            }
+            ByteArrayOutputStream bas = new ByteArrayOutputStream();
+            DataOutputStream ds1 = new DataOutputStream(bas);
+            int nUpdate = 0;
+            if (tbUpdate != null) {
+                nUpdate++;
+                ds1.writeByte(2);
+                ds1.writeInt(tbUpdate.index | 0x10000);
+                ds1.writeByte(tbUpdate.invAdd.length * 2);
+                for (int i = 0; i < tbUpdate.invAdd.length; i++) {
+                    ds1.writeByte(tbUpdate.invAdd[i]);
+                    ds1.writeByte(tbUpdate.percentAdd[i]);
+                }
+                ds1.writeByte(tbUpdate.slotNull);
+                // Ngay het han
+                int hanSD = tbUpdate.entry.hanSD - Until.getNumDay(tbUpdate.dayBuy, new Date());
+                if (hanSD < 0) {
+                    hanSD = 0;
+                }
+                ds1.writeByte(hanSD);
+            }
+            if (addItem != null && !addItem.isEmpty()) {
+                for (int i = 0; i < addItem.size(); i++) {
+                    ruongDoItemEntry spE = addItem.get(i);
+                    if (spE.numb > 100) {
+                        ruongDoItemEntry spE2 = new ruongDoItemEntry();
+                        spE2.entry = spE.entry;
+                        spE2.numb = spE.numb - 100;
+                        spE.numb = 100;
+                        addItem.add(spE2);
+                    }
+                    if (spE.numb <= 0) {
+                        continue;
+                    }
+                    nUpdate++;
+                    // Kiem tra trong ruong co=>tang so luong. ko co=> tao moi
+                    boolean isHave = false;
+                    for (ruongDoItemEntry spE1 : user.ruongDoItem) {
+                        if (spE1.entry.id == spE.entry.id) {
+                            isHave = true;
+                            spE1.numb += spE.numb;
+                            break;
+                        }
+                    }
+                    // ko co=> Tao moi
+                    if (!isHave) {
+                        user.ruongDoItem.add(spE);
+                    }
+                    ds1.writeByte(spE.numb > 1 ? 3 : 1);
+                    ds1.writeByte(spE.entry.id);
+                    if (spE.numb > 1) {
+                        ds1.writeByte(spE.numb);
+                    }
+                    ds1.writeUTF(spE.entry.name);
+                    ds1.writeUTF(spE.entry.detail);
                 }
             }
-            addTB.dayBuy = new Date();
-            addTB.isUse = false;
-            if (addTB.invAdd == null) {
-                addTB.invAdd = new short[addTB.entry.invAdd.length];
-                for (int j = 0; j < addTB.entry.invAdd.length; j++) {
-                    addTB.invAdd[j] = addTB.entry.invAdd[j];
+            if (removeItem != null && !removeItem.isEmpty()) {
+                for (int k = 0; k < removeItem.size(); k++) {
+                    ruongDoItemEntry spE = removeItem.get(k);
+                    if (spE.numb > 100) {
+                        ruongDoItemEntry spE2 = new ruongDoItemEntry();
+                        spE2.entry = spE.entry;
+                        spE2.numb = spE.numb - 100;
+                        spE.numb = 100;
+                        removeItem.add(spE2);
+                    }
+                    if (spE.numb <= 0) {
+                        continue;
+                    }
+                    // Kiem tra trong ruong co=>giam so luong
+                    for (int i = 0; i < user.ruongDoItem.size(); i++) {
+                        ruongDoItemEntry spE1 = user.ruongDoItem.get(i);
+                        if (spE1.entry.id == spE.entry.id) {
+                            if (spE1.numb < spE.numb) {
+                                spE.numb = spE1.numb;
+                            }
+                            spE1.numb -= spE.numb;
+                            if (spE1.numb == 0) {
+                                user.ruongDoItem.remove(i);
+                            }
+                            nUpdate++;
+                            ds1.writeByte(0);
+                            ds1.writeInt(spE.entry.id);
+                            ds1.writeByte(spE.numb);
+                            break;
+                        }
+                    }
                 }
             }
-            if (addTB.percentAdd == null) {
-                addTB.percentAdd = new short[addTB.entry.percenAdd.length];
-                for (int j = 0; j < addTB.entry.percenAdd.length; j++) {
-                    addTB.percentAdd[j] = addTB.entry.percenAdd[j];
-                }
+            if (removeTB >= 0 && removeTB < user.ruongDoTB.size() && user.ruongDoTB.get(removeTB) != null) {
+                nUpdate++;
+                user.ruongDoTB.set(removeTB, null);
+                ds1.writeByte(0);
+                ds1.writeInt(removeTB | 0x10000);
+                ds1.writeByte(1);
             }
-            addTB.slotNull = 3;
-            addTB.cap = addTB.entry.cap;
-            addTB.slot = new int[3];
-            for (int i = 0; i < 3; i++) {
-                addTB.slot[i] = -1;
+            ds1.flush();
+            bas.flush();
+            if (nUpdate == 0) {
+                return;
             }
-            if (bestLocation == -1) {
-                addTB.index = user.ruongDoTB.size();
-                user.ruongDoTB.add(addTB);
-            } else {
-                addTB.index = bestLocation;
-                user.ruongDoTB.set(bestLocation, addTB);
-            }
-            ms = new Message(104);
+            ms = new Message(27);
             ds = ms.writer();
-            ds.writeByte(0);
-            ds.writeInt(addTB.index | 0x10000);
-            ds.writeByte(addTB.entry.idNV);
-            ds.writeByte(addTB.entry.idEquipDat);
-            ds.writeShort(addTB.entry.id);
-            ds.writeUTF(addTB.entry.name);
-            ds.writeByte(addTB.invAdd.length * 2);
-            for (int i = 0; i < addTB.invAdd.length; i++) {
-                ds.writeByte(addTB.invAdd[i]);
-                ds.writeByte(addTB.percentAdd[i]);
-            }
-            ds.writeByte(addTB.entry.hanSD);
-            ds.writeByte(addTB.entry.isSet ? 1 : 0);
-            ds.writeByte(addTB.vipLevel);
+            ds.writeByte(nUpdate);
+            ds.write(bas.toByteArray());
             ds.flush();
             user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        ByteArrayOutputStream bas = new ByteArrayOutputStream();
-        DataOutputStream ds1 = new DataOutputStream(bas);
-        int nUpdate = 0;
-        if (tbUpdate != null) {
-            nUpdate++;
-            ds1.writeByte(2);
-            ds1.writeInt(tbUpdate.index | 0x10000);
-            ds1.writeByte(tbUpdate.invAdd.length * 2);
-            for (int i = 0; i < tbUpdate.invAdd.length; i++) {
-                ds1.writeByte(tbUpdate.invAdd[i]);
-                ds1.writeByte(tbUpdate.percentAdd[i]);
-            }
-            ds1.writeByte(tbUpdate.slotNull);
-            // Ngay het han
-            int hanSD = tbUpdate.entry.hanSD - Until.getNumDay(tbUpdate.dayBuy, new Date());
-            if (hanSD < 0) {
-                hanSD = 0;
-            }
-            ds1.writeByte(hanSD);
-        }
-        if (addItem != null && addItem.size() > 0) {
-            for (int i = 0; i < addItem.size(); i++) {
-                ruongDoItemEntry spE = addItem.get(i);
-                if (spE.numb > 100) {
-                    ruongDoItemEntry spE2 = new ruongDoItemEntry();
-                    spE2.entry = spE.entry;
-                    spE2.numb = spE.numb - 100;
-                    spE.numb = 100;
-                    addItem.add(spE2);
-                }
-                if (spE.numb <= 0) {
-                    continue;
-                }
-                nUpdate++;
-                // Kiem tra trong ruong co=>tang so luong. ko co=> tao moi
-                boolean isHave = false;
-                for (ruongDoItemEntry spE1 : user.ruongDoItem) {
-                    if (spE1.entry.id == spE.entry.id) {
-                        isHave = true;
-                        spE1.numb += spE.numb;
-                        break;
-                    }
-                }
-                // ko co=> Tao moi
-                if (!isHave) {
-                    user.ruongDoItem.add(spE);
-                }
-                ds1.writeByte(spE.numb > 1 ? 3 : 1);
-                ds1.writeByte(spE.entry.id);
-                if (spE.numb > 1) {
-                    ds1.writeByte(spE.numb);
-                }
-                ds1.writeUTF(spE.entry.name);
-                ds1.writeUTF(spE.entry.detail);
-            }
-        }
-        if (removeItem != null && removeItem.size() > 0) {
-            for (int k = 0; k < removeItem.size(); k++) {
-                ruongDoItemEntry spE = removeItem.get(k);
-                if (spE.numb > 100) {
-                    ruongDoItemEntry spE2 = new ruongDoItemEntry();
-                    spE2.entry = spE.entry;
-                    spE2.numb = spE.numb - 100;
-                    spE.numb = 100;
-                    removeItem.add(spE2);
-                }
-                if (spE.numb <= 0) {
-                    continue;
-                }
-                // Kiem tra trong ruong co=>giam so luong
-                for (int i = 0; i < user.ruongDoItem.size(); i++) {
-                    ruongDoItemEntry spE1 = user.ruongDoItem.get(i);
-                    if (spE1.entry.id == spE.entry.id) {
-                        if (spE1.numb < spE.numb) {
-                            spE.numb = spE1.numb;
-                        }
-                        spE1.numb -= spE.numb;
-                        if (spE1.numb == 0) {
-                            user.ruongDoItem.remove(i);
-                        }
-                        nUpdate++;
-                        ds1.writeByte(0);
-                        ds1.writeInt(spE.entry.id);
-                        ds1.writeByte(spE.numb);
-                        break;
-                    }
-                }
-            }
-        }
-        if (removeTB >= 0 && removeTB < user.ruongDoTB.size() && user.ruongDoTB.get(removeTB) != null) {
-            nUpdate++;
-            user.ruongDoTB.set(removeTB, null);
-            ds1.writeByte(0);
-            ds1.writeInt(removeTB | 0x10000);
-            ds1.writeByte(1);
-        }
-        ds1.flush();
-        bas.flush();
-        if (nUpdate == 0) {
-            return;
-        }
-        ms = new Message(27);
-        ds = ms.writer();
-        ds.writeByte(nUpdate);
-        ds.write(bas.toByteArray());
-        ds.flush();
-        user.sendMessage(ms);
     }
 
     @Override
@@ -511,7 +515,7 @@ public class UserService implements IUserService {
                         }
                         user.updateXu(-gia);
                         rdE.dayBuy = new Date();
-                        this.updateRuong(rdE, null, -1, null, null);
+                        updateRuong(rdE, null, -1, null, null);
                         ms = new Message(45);
                         ds = ms.writer();
                         ds.writeUTF(GameString.giaHanSucess());
@@ -1004,7 +1008,7 @@ public class UserService implements IUserService {
             Message ms = new Message(Cmd.FRIENDLIST);
             DataOutputStream ds = ms.writer();
 
-            if (user.getFriends().size() > 0) {
+            if (!user.getFriends().isEmpty()) {
                 List<GetFriendResponse> friends = userDao.getFriendsList(user.getId(), user.getFriends());
                 for (GetFriendResponse friend : friends) {
                     ds.writeInt(friend.getId());
@@ -1531,18 +1535,22 @@ public class UserService implements IUserService {
 
         try {
             byte type = dis.readByte();
-            if (type == 0) {//Mua trang bi
-                short indexSale = dis.readShort();
-                byte buyLuong = dis.readByte();
-                muaTrangBi(indexSale, buyLuong);
-
-            } else if (type == 1) {//Ban trang bi
-                byte size = dis.readByte();
-                for (int i = 0; i < size; i++) {
-                    int id = dis.readInt();
+            switch (type) {
+                case 0 -> {
+                    //Mua trang bi
+                    short indexSale = dis.readShort();
+                    byte buyLuong = dis.readByte();
+                    muaTrangBi(indexSale, buyLuong);
                 }
-
-            } else if (type == 2) {//Xac nhan ban trang bi
+                case 1 -> {
+                    //Ban trang bi
+                    byte size = dis.readByte();
+                    for (int i = 0; i < size; i++) {
+                        int id = dis.readInt();
+                    }
+                }
+                case 2 -> {//Xac nhan ban trang bi
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -1550,7 +1558,7 @@ public class UserService implements IUserService {
     }
 
     private void muaTrangBi(short indexSale, byte buyLuong) {
-        if (user.getRuongDoTB().size() == ServerManager.getInstance().config().getMax_ruong_tb()) {
+        if (user.getRuongDoTB().size() >= ServerManager.getInstance().config().getMax_ruong_tb()) {
             sendServerMessage(GameString.ruongNoSlot());
             return;
         }
@@ -1559,22 +1567,28 @@ public class UserService implements IUserService {
             return;
         }
 
-        if (buyLuong == 0) {
-            if (user.getXu() < eqEntry.giaXu) {
-                sendServerMessage(GameString.xuNotEnought());
+        switch (buyLuong) {
+            case 0 -> {
+                if (user.getXu() < eqEntry.giaXu) {
+                    sendServerMessage(GameString.xuNotEnought());
+                    return;
+                }
+                user.updateXu(-eqEntry.giaXu);
+            }
+            case 1 -> {
+                if (user.getLuong() < eqEntry.giaLuong) {
+                    sendServerMessage(GameString.xuNotEnought());
+                    return;
+                }
+                user.updateLuong(-eqEntry.giaLuong);
+            }
+            default -> {
                 return;
             }
-            user.updateXu(-eqEntry.giaXu);
-        } else if (buyLuong == 1) {
-            if (user.getLuong() < eqEntry.giaLuong) {
-                sendServerMessage(GameString.xuNotEnought());
-                return;
-            }
-            user.updateLuong(-eqEntry.giaLuong);
-        } else {
-            return;
         }
-        updateRuongItem(null, null);
+        ruongDoTBEntry rdE = new ruongDoTBEntry();
+        rdE.entry = eqEntry;
+        updateRuong(null, rdE, -1, null, null);
         sendServerMessage(GameString.buySuccess());
     }
 
