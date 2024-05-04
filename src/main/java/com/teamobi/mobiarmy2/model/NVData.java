@@ -9,13 +9,11 @@ import java.util.List;
 public class NVData {
 
     public static class EquipmentData {
-
         public byte id;
         public List<EquipmentEntry> entrys = new ArrayList<>();
     }
 
     public static class EquipmentEntry {
-
         public int indexEquip;
         public int indexSale;
         public byte idNV;
@@ -43,7 +41,6 @@ public class NVData {
     }
 
     public static final class NVEntry {
-
         public byte id;
         public String name;
         public int buyXu;

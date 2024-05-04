@@ -102,7 +102,7 @@ public interface IUserService {
 
     void muaItem(Message ms);
 
-    void muaNhanVat(Message ms);
+    void handleBuyCharacter(Message ms);
 
     void chonBanDo(Message ms);
 

@@ -9,7 +9,6 @@ import com.teamobi.mobiarmy2.json.DataItem;
 import com.teamobi.mobiarmy2.json.Equipment;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.response.GetFriendResponse;
-import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.util.Until;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -19,9 +18,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author tuyen
@@ -29,29 +28,44 @@ import java.util.Optional;
 public class UserDao implements IUserDao {
 
     @Override
-    public List<User> getAll() {
-        return null;
-    }
-
-    @Override
-    public Optional<User> get(int id) {
-        return Optional.empty();
-    }
-
-    @Override
     public void save(User user) {
-        updateOnline(false, user.getId());
-        HikariCPManager.getInstance().update("UPDATE `armymem` SET `friends` = ? WHERE id = ?", user.getFriends().toString(), user.getId());
+        HikariCPManager.getInstance().update("INSERT INTO `armymem`(`id`, `ruongTrangBi`, `ruongItem`) VALUES (?, ?, ?)", user.getId(), "[]", "[]");
     }
 
     @Override
     public void update(User user) {
+        int nvstt = 1, pow = 1;
+        for (int i = 0; i < user.nvStt.length; i++) {
+            nvstt |= user.nvStt[i] ? pow : 0;
+            pow <<= 1;
+        }
 
-    }
-
-    @Override
-    public void delete(User user) {
-
+        String sql = "UPDATE `armymem` SET " +
+                "`friends` = ?, " +
+                "`xu` = ?, " +
+                "`luong` = ?, " +
+                "`dvong` = ?, " +
+                "`clan` = ?, " +
+                "`item` = ?, " +
+                "`ruongTrangBi` = ?, " +
+                "`ruongItem` = ? ," +
+                "`sttnhanvat` = ?, " +
+                //...//
+                "`NVused` = ? " +
+                " WHERE id = ?";
+        HikariCPManager.getInstance().update(sql,
+                user.getFriends().toString(),
+                user.getXu(),
+                user.getLuong(),
+                user.getDanhVong(),
+                user.getClanId(),
+                Arrays.toString(user.getItems()),
+                user.getRuongDoTB().toString(),
+                user.getRuongDoItem().toString(),
+                nvstt,
+                //...//
+                user.getNvUsed(),
+                user.getId());
     }
 
     @Override
@@ -85,8 +99,21 @@ public class UserDao implements IUserDao {
                 try (PreparedStatement playerStatement = connection.prepareStatement(playerQuery)) {
                     playerStatement.setInt(1, user.getId());
                     try (ResultSet playerResultSet = playerStatement.executeQuery()) {
-                        if (playerResultSet.next()) {
+                        Gson gson = new Gson();
+                        //init
+                        int len = NVData.entrys.size();
+                        user.nvStt = new boolean[len];
+                        user.levels = new int[len];
+                        user.levelPercents = new byte[len];
+                        user.xps = new int[len];
+                        user.points = new int[len];
+                        user.pointAdd = new int[len][5];
+                        user.NvData = new int[len][6];
+                        user.nvEquip = new ruongDoTBEntry[len][6];
+                        user.setRuongDoItem(new ArrayList<>());
+                        user.setRuongDoTB(new ArrayList<>());
 
+                        if (playerResultSet.next()) {
                             user.setXu(playerResultSet.getInt("xu"));
                             user.setLuong(playerResultSet.getInt("luong"));
                             user.setDanhVong(playerResultSet.getInt("dvong"));
@@ -94,18 +121,13 @@ public class UserDao implements IUserDao {
                             user.setClanId(playerResultSet.getShort("clan"));
                             user.setPointEvent(playerResultSet.getInt("point_event"));
 
-                            int len = NVData.entrys.size();
-                            user.nvStt = new boolean[len];
-                            user.levels = new int[len];
-                            user.levelPercents = new byte[len];
-                            user.xps = new int[len];
-                            user.points = new int[len];
-                            user.pointAdd = new int[len][5];
-                            user.NvData = new int[len][6];
-                            user.nvEquip = new ruongDoTBEntry[len][6];
-                            user.setRuongDoItem(new ArrayList<>());
-                            user.setRuongDoTB(new ArrayList<>());
-                            Gson gson = new Gson();
+                            int nvstt = playerResultSet.getInt("sttnhanvat");
+                            for (byte i = 0; i < 10; i++) {
+                                user.nvStt[i] = (nvstt & 1) > 0;
+                                nvstt = nvstt / 2;
+                            }
+
+                            user.items = gson.fromJson(playerResultSet.getString("item"), byte[].class);
 
                             Equipment[] equipments = gson.fromJson(playerResultSet.getString("ruongTrangBi"), Equipment[].class);
                             for (int i = 0; i < equipments.length; i++) {
@@ -183,7 +205,8 @@ public class UserDao implements IUserDao {
                             user.setMissionLevel(gson.fromJson(playerResultSet.getString("missionLevel"), byte[].class));
 
                         } else {//Tạo mới một bản ghi
-                            HikariCPManager.getInstance().update("INSERT INTO `armymem`(`id`, `ruongTrangBi`, `ruongItem`) VALUES (?, ?, ?)", user.getId(), "[]", "[]");
+                            User.setDefaultValue(user);
+                            save(user);
                         }
                     }
                 }
@@ -221,7 +244,6 @@ public class UserDao implements IUserDao {
                 statement.setInt(i + 1, friendIds.get(i));
             }
             Gson gson = new Gson();
-            ServerManager serverManager = ServerManager.getInstance();
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     if (resultSet.getBoolean("lock") || !resultSet.getBoolean("active")) {
@@ -254,7 +276,7 @@ public class UserDao implements IUserDao {
         return friendsList;
     }
 
-    public short[] getEquipData(int playerId, byte idNv) {
+    private short[] getEquipData(int playerId, byte idNv) {
         short[] data = new short[5];
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT ruongTrangBi, NV%s FROM armymem WHERE id = ? LIMIT 1".formatted(idNv))) {
@@ -323,9 +345,9 @@ public class UserDao implements IUserDao {
     }
 
     @Override
-    public Integer findUserIdByUsername(String username) {
+    public Integer findPlayerIdByUsername(String username) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT u.`user_id` FROM user u INNER JOIN armymem a ON u.user_id = a.id WHERE username = ? LIMIT 1")) {
+             PreparedStatement statement = connection.prepareStatement("SELECT a.id FROM user u INNER JOIN armymem a ON u.user_id = a.id WHERE username = ? LIMIT 1")) {
             statement.setString(1, username);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {

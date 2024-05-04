@@ -25,7 +25,6 @@ public class User {
     public ISession session;
     public UserState state;
     public int id;
-    public byte nhanVat;
     public String username;
     public String password;
     public short clanId;
@@ -63,6 +62,11 @@ public class User {
     public User(ISession session) {
         this();
         this.session = session;
+    }
+
+    public static void setDefaultValue(User user) {
+        user.xu = 1000;
+        user.luong = 0;
     }
 
     public boolean isNotWaiting() {

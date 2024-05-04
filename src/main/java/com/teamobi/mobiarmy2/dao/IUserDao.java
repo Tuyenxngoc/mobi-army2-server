@@ -17,5 +17,5 @@ public interface IUserDao extends Dao<User> {
 
     void changePassword(int id, String newPass);
 
-    Integer findUserIdByUsername(String username);
+    Integer findPlayerIdByUsername(String username);
 }

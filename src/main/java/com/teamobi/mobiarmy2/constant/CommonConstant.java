@@ -4,7 +4,7 @@ package com.teamobi.mobiarmy2.constant;
  * @author tuyen
  */
 public class CommonConstant {
-    public static final String ALPHANUMERIC_PATTERN = "^[a-zA-Z0-9]+$";
+    public static final String ALPHANUMERIC_PATTERN = "^[a-z0-9]+$";
     public static final String RESOURCES_PATH = "src/main/resources/";
 
     public static final String ARMY_2_PROPERTIES = "army2.properties";

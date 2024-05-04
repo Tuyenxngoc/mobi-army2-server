@@ -110,7 +110,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.BUY_ITEM -> userService.muaItem(ms);
 
-                case Cmd.BUY_GUN -> userService.muaNhanVat(ms);
+                case Cmd.BUY_GUN -> userService.handleBuyCharacter(ms);
 
                 case Cmd.MAP_SELECT -> userService.chonBanDo(ms);
 

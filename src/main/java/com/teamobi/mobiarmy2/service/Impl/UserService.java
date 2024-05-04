@@ -232,7 +232,7 @@ public class UserService implements IUserService {
             String password = dis.readUTF();
             String version = dis.readUTF();
 
-            if (!username.matches(CommonConstant.ALPHANUMERIC_PATTERN) || !password.matches(CommonConstant.ALPHANUMERIC_PATTERN)) {
+            if (isInvalidInput(username) || isInvalidInput(password)) {
                 sendMessageLoginFail(GameString.reg_Error1());
                 return;
             }
@@ -263,29 +263,7 @@ public class UserService implements IUserService {
                 return;
             }
 
-            user.setId(userFound.getId());
-            user.setUsername(userFound.getUsername());
-            user.setPassword(userFound.getPassword());
-            user.setXu(userFound.getXu());
-            user.setLuong(userFound.getLuong());
-            user.setDanhVong(userFound.getDanhVong());
-
-            user.setLevels(userFound.getLevels());
-            user.setLevelPercents(userFound.getLevelPercents());
-            user.setNvStt(userFound.getNvStt());
-            user.setXps(userFound.getXps());
-            user.setPoints(userFound.getPoints());
-            user.setPointAdd(userFound.getPointAdd());
-            user.setNvData(userFound.getNvData());
-            user.setNvEquip(userFound.getNvEquip());
-            user.setFriends(userFound.getFriends());
-            user.setMission(userFound.getMission());
-            user.setMissionLevel(userFound.getMissionLevel());
-
-            user.setRuongDoItem(userFound.getRuongDoItem());
-            user.setRuongDoTB(userFound.getRuongDoTB());
-            user.setNvEquip(userFound.getNvEquip());
-
+            copyUserData(user, userFound);
             user.getSession().setVersion(version);
             user.setLogged(true);
 
@@ -303,10 +281,39 @@ public class UserService implements IUserService {
         }
     }
 
+    private boolean isInvalidInput(String input) {
+        return !input.matches(CommonConstant.ALPHANUMERIC_PATTERN);
+    }
+
+    private void copyUserData(User target, User source) {
+        target.setId(source.getId());
+        target.setUsername(source.getUsername());
+        target.setPassword(source.getPassword());
+        target.setXu(source.getXu());
+        target.setLuong(source.getLuong());
+        target.setDanhVong(source.getDanhVong());
+        target.setLevels(source.getLevels());
+        target.setLevelPercents(source.getLevelPercents());
+        target.setNvUsed(source.getNvUsed());
+        target.setNvStt(source.getNvStt());
+        target.setXps(source.getXps());
+        target.setPoints(source.getPoints());
+        target.setPointAdd(source.getPointAdd());
+        target.setNvData(source.getNvData());
+        target.setNvEquip(source.getNvEquip());
+        target.setFriends(source.getFriends());
+        target.setMission(source.getMission());
+        target.setMissionLevel(source.getMissionLevel());
+        target.setRuongDoItem(source.getRuongDoItem());
+        target.setRuongDoTB(source.getRuongDoTB());
+        target.setNvEquip(source.getNvEquip());
+        target.setItems(source.getItems());
+    }
+
     @Override
     public void handleLogout() {
         user.isLogged = false;
-        userDao.save(user);
+        userDao.update(user);
     }
 
     public void sendNVData(IServerConfig config) {
@@ -453,7 +460,7 @@ public class UserService implements IUserService {
                 int gia = 0;
                 if ((idKey & 0x10000) > 0) {
                     idKey &= 0xFFFF;
-                    if (idKey >= 0 && idKey < user.ruongDoTB.size()) {
+                    if (idKey < user.ruongDoTB.size()) {
                         ruongDoTBEntry rdE = user.ruongDoTB.get(idKey);
                         for (int i = 0; i < 3; i++) {
                             if (rdE.slot[i] >= 0) {
@@ -480,7 +487,7 @@ public class UserService implements IUserService {
                 int gia = 0;
                 if ((idKey & 0x10000) > 0) {
                     idKey &= 0xFFFF;
-                    if (idKey >= 0 && idKey < user.ruongDoTB.size()) {
+                    if (idKey < user.ruongDoTB.size()) {
                         ruongDoTBEntry rdE = user.ruongDoTB.get(idKey);
                         for (int i = 0; i < 3; i++) {
                             if (rdE.slot[i] >= 0) {
@@ -603,7 +610,7 @@ public class UserService implements IUserService {
             ds.writeInt(user.getId());
             ds.writeInt(user.getXu());
             ds.writeInt(user.getLuong());
-            ds.writeByte(user.getNhanVat());
+            ds.writeByte(user.getNvUsed());
             ds.writeShort(user.getClanId());
             ds.writeByte(0);
 
@@ -623,17 +630,21 @@ public class UserService implements IUserService {
 
             //Item
             for (int i = 0; i < 36; i++) {
-                ds.writeByte(99);
-                ds.writeInt(1);
-                ds.writeInt(1);
+                ds.writeByte(user.items[i]);
+                ItemData.Item item = ItemData.items.get(i);
+                // Gia xu
+                ds.writeInt(item.buyXu);
+                // Gia luong
+                ds.writeInt(item.buyLuong);
             }
 
             //Nhan vat
             for (int i = 0; i < 10; i++) {
                 if (i > 2) {
-                    ds.writeByte(0);
-                    ds.writeShort(1);
-                    ds.writeShort(1);
+                    ds.writeByte(user.nvStt[i] ? 1 : 0);
+                    NVData.NVEntry nvEntry = NVData.entrys.get(i);
+                    ds.writeShort(nvEntry.buyXu / 1000);
+                    ds.writeShort(nvEntry.buyLuong);
                 }
             }
 
@@ -1101,11 +1112,11 @@ public class UserService implements IUserService {
                 sendMessageLoginFail(GameString.addFrienvError2());
                 return;
             }
-            if (!username.matches(CommonConstant.ALPHANUMERIC_PATTERN)) {
+            if (isInvalidInput(username)) {
                 sendMessageLoginFail(GameString.addFrienvError1());
                 return;
             }
-            Integer id = userDao.findUserIdByUsername(username);
+            Integer id = userDao.findPlayerIdByUsername(username);
             ms = new Message(Cmd.SEARCH);
             DataOutputStream ds = ms.writer();
             if (id != null) {
@@ -1190,8 +1201,44 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void muaNhanVat(Message ms) {
-
+    public void handleBuyCharacter(Message ms) {
+        try {
+            byte idnv = ms.reader().readByte();
+            idnv += 3;
+            if (user.nvStt[idnv]) {
+                return;
+            }
+            NVData.NVEntry nventry = NVData.entrys.get(idnv);
+            byte buyLuong = ms.reader().readByte();
+            boolean buyOK = false;
+            if (buyLuong == 1) {
+                if (user.luong >= nventry.buyLuong && nventry.buyLuong >= 0) {
+                    user.updateLuong(-nventry.buyLuong);
+                    buyOK = true;
+                }
+            } else {
+                if (user.xu >= nventry.buyXu && nventry.buyXu >= 0) {
+                    user.updateXu(-nventry.buyXu);
+                    buyOK = true;
+                }
+            }
+            if (buyOK) {
+                user.nvStt[idnv] = true;
+                ms = new Message(74);
+                DataOutputStream ds = ms.writer();
+                ds.writeByte(idnv - 3);
+                ds.flush();
+                user.sendMessage(ms);
+            } else {
+                ms = new Message(45);
+                DataOutputStream ds = ms.writer();
+                ds.writeUTF(GameString.xuNotEnought());
+                ds.flush();
+                user.sendMessage(ms);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -1221,7 +1268,7 @@ public class UserService implements IUserService {
             String oldPass = dis.readUTF();
             String newPass = dis.readUTF();
 
-            if (!oldPass.matches(CommonConstant.ALPHANUMERIC_PATTERN) || !newPass.matches(CommonConstant.ALPHANUMERIC_PATTERN)) {
+            if (isInvalidInput(oldPass) || isInvalidInput(newPass)) {
                 sendServerMessage(GameString.changPassError1());
                 return;
             }
