@@ -62,7 +62,6 @@ public class ServerManager {
     }
 
     public void init() {
-        isStart = false;
         initServerData();
         setCache();
         initRooms();
@@ -159,16 +158,12 @@ public class ServerManager {
 
     public User getUser(int userId) {
         synchronized (users) {
-            for (ISession session : users) {
-                if (session != null && session.getUser() != null) {
-                    User user = session.getUser();
-                    if (user.getId() == userId) {
-                        return user;
-                    }
-                }
-            }
+            return users.stream()
+                    .filter(session -> session != null && session.getUser() != null && session.getUser().getId() == userId)
+                    .map(ISession::getUser)
+                    .findFirst()
+                    .orElse(null);
         }
-        return null;
     }
 
 }

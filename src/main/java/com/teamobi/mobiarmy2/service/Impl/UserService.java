@@ -48,6 +48,27 @@ public class UserService implements IUserService {
         }
     }
 
+    protected int getNumItemRuong(int id) {
+        // Kiem tra trong ruong co=>tang so luong. ko co=> tao moi
+        for (int i = 0; i < user.ruongDoItem.size(); i++) {
+            ruongDoItemEntry spE1 = user.ruongDoItem.get(i);
+            if (spE1.entry.id == id) {
+                return spE1.numb;
+            }
+        }
+        return 0;
+    }
+
+    protected ruongDoTBEntry getEquipNoNgoc(NVData.EquipmentEntry eqE, byte level) {
+        for (int i = 0; i < user.ruongDoTB.size(); i++) {
+            ruongDoTBEntry rdE = user.ruongDoTB.get(i);
+            if (rdE != null && rdE.entry == eqE && !rdE.isUse && rdE.vipLevel == level && rdE.slotNull == 3 && rdE.entry.hanSD - Until.getNumDay(rdE.dayBuy, new Date()) > 0) {
+                return rdE;
+            }
+        }
+        return null;
+    }
+
     public synchronized void updateRuong(ruongDoTBEntry tbUpdate, ruongDoTBEntry addTB, int removeTB, ArrayList<ruongDoItemEntry> addItem, ArrayList<ruongDoItemEntry> removeItem) {
         try {
             Message ms;
@@ -731,7 +752,125 @@ public class UserService implements IUserService {
 
     @Override
     public void hopTrangBi(Message ms) {
-
+        try {
+            byte materialId = ms.reader().readByte();
+            byte action = ms.reader().readByte();
+            byte index = -1;
+            if (action == 2) {
+                index = ms.reader().readByte();
+            }
+            DataOutputStream ds;
+            ms = new Message(-18);
+            ds = ms.writer();
+            if (action == 1) {
+                ds.writeByte(1);
+                FomularData.FomularDataEntry fDatE = FomularData.getFomularDataEntryById(materialId);
+                if (fDatE == null) {
+                    return;
+                }
+                NVData.NVEntry nvE = NVData.entrys.get(user.getNvUsed());
+                ds.writeByte(fDatE.ins.id);
+                ds.writeByte(fDatE.entrys.size());
+                for (int i = 0; i < fDatE.entrys.size(); i++) {
+                    FomularData.FomularEntry fE = fDatE.entrys.get(i);
+                    ds.writeByte(fDatE.equip[user.getNvUsed()].id);
+                    ds.writeUTF(fDatE.equip[user.getNvUsed()].name + " " + nvE.name + " cấp " + fE.level);
+                    ds.writeByte(fE.levelRequire);
+                    ds.writeByte(user.getNvUsed());
+                    ds.writeByte(fDatE.equipType);
+                    ds.writeByte(fE.itemNeed.length);
+                    boolean isFinish = true;
+                    for (int j = 0; j < fE.itemNeed.length; j++) {
+                        int itemNumHave = getNumItemRuong(fE.itemNeed[j].id);
+                        ds.writeByte(fE.itemNeed[j].id);
+                        ds.writeUTF(fE.itemNeed[j].name);
+                        ds.writeByte(fE.itemNeedNum[j]);
+                        ds.writeByte(itemNumHave > fE.itemNeedNum[j] ? fE.itemNeedNum[j] : itemNumHave);
+                        if (itemNumHave < fE.itemNeedNum[j]) {
+                            isFinish = false;
+                        }
+                    }
+                    boolean isHave;
+                    if (fE.level == 1) {
+                        ds.writeByte(fDatE.equipNeed[user.getNvUsed()].id);
+                        ds.writeUTF(fDatE.equipNeed[user.getNvUsed()].name);
+                        isHave = getEquipNoNgoc(fDatE.equipNeed[user.getNvUsed()], (byte) 0) != null;
+                    } else {
+                        ds.writeByte(fDatE.equip[user.getNvUsed()].id);
+                        ds.writeUTF(fDatE.equip[user.getNvUsed()].name);
+                        isHave = getEquipNoNgoc(fDatE.equip[user.getNvUsed()], (byte) (fE.level - 1)) != null;
+                    }
+                    if (!isHave) {
+                        isFinish = false;
+                    }
+                    ds.writeByte(fE.level - 1);
+                    ds.writeBoolean(isHave);
+                    ds.writeBoolean(isFinish);
+                    ds.writeByte(fE.detail.length);
+                    for (int j = 0; j < fE.detail.length; j++) {
+                        ds.writeUTF(fE.detail[j]);
+                    }
+                }
+            }
+            if (action == 2) {
+                FomularData.FomularDataEntry fDatE = FomularData.getFomularDataEntryById(materialId);
+                if (fDatE == null || index < 0 || index >= fDatE.entrys.size()) {
+                    return;
+                }
+                ArrayList<ruongDoItemEntry> arrayI = new ArrayList<>();
+                ruongDoTBEntry rdE = new ruongDoTBEntry(), rdE2;
+                rdE.entry = fDatE.equip[user.getNvUsed()];
+                FomularData.FomularEntry fE = fDatE.entrys.get(index);
+                boolean isFinish = true;
+                for (int j = 0; j < fE.itemNeed.length; j++) {
+                    int itemNumHave = getNumItemRuong(fE.itemNeed[j].id);
+                    if (itemNumHave < fE.itemNeedNum[j]) {
+                        isFinish = false;
+                        break;
+                    }
+                    ruongDoItemEntry rdE1 = new ruongDoItemEntry();
+                    rdE1.entry = fE.itemNeed[j];
+                    rdE1.numb = fE.itemNeedNum[j];
+                    arrayI.add(rdE1);
+                }
+                if (fE.level == 1) {
+                    rdE2 = getEquipNoNgoc(fDatE.equipNeed[user.getNvUsed()], (byte) 0);
+                } else {
+                    rdE2 = getEquipNoNgoc(fDatE.equip[user.getNvUsed()], (byte) (fE.level - 1));
+                }
+                if (rdE2 == null) {
+                    isFinish = false;
+                }
+                int numFomular = getNumItemRuong(materialId);
+                if (isFinish && (numFomular > 0 || user.xu >= fDatE.ins.buyXu)) {
+                    if (numFomular == 0) {
+                        user.updateXu(fDatE.ins.buyXu);
+                    } else {
+                        ruongDoItemEntry rdE1 = new ruongDoItemEntry();
+                        rdE1.entry = fDatE.ins;
+                        rdE1.numb = 1;
+                        arrayI.add(rdE1);
+                    }
+                    rdE.vipLevel = fE.level;
+                    rdE.invAdd = new short[5];
+                    rdE.percentAdd = new short[5];
+                    for (int i = 0; i < 5; i++) {
+                        rdE.invAdd[i] = (short) Until.nextInt(fE.invAddMin[i], fE.invAddMax[i]);
+                        rdE.percentAdd[i] = (short) Until.nextInt(fE.percenAddMin[i], fE.percenAddMax[i]);
+                    }
+                    updateRuong(null, rdE, rdE2.index, null, arrayI);
+                    ds.writeByte(0);
+                    ds.writeUTF(GameString.cheDoSuccess());
+                } else {
+                    ds.writeByte(0);
+                    ds.writeUTF(GameString.cheDoFail());
+                }
+            }
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
