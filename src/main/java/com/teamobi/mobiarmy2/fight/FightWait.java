@@ -2,23 +2,16 @@ package com.teamobi.mobiarmy2.fight;
 
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.server.Room;
-import lombok.Getter;
-import lombok.Setter;
 
-/**
- * @author tuyen
- */
-@Getter
-@Setter
+
 public class FightWait {
 
-    private FightManager fightManager;
-
-    public User[] players;
-    public Room parent;
-    public byte id;
-    public boolean[] readys;
-    public int[][] item;
+    public final User[] players;
+    public FightManager fight;
+    final Room parent;
+    public final byte id;
+    public final boolean[] readys;
+    public final int[][] item;
     public boolean started;
     public int numReady;
     public int maxSetPlayer;
@@ -33,14 +26,36 @@ public class FightWait {
     public byte teaFree;
     public byte map;
     public int boss;
-    public Thread kickBoss;
-    public long timeStart;
+    private Thread kickBoss;
+    protected long timeStart;
     public boolean isLH;
     public byte ntLH;
     public byte[] LHMap = new byte[]{30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
     public boolean isSieuBoss;
 
-    public FightWait(Room room, byte type, byte i, byte maxPlayers, byte maxPlayerInit, byte map, byte nextInt, boolean isLH, boolean isSieuBoss) {
-
+    public FightWait(Room parent, byte type, byte id, byte maxPlayers, byte maxPlayerInit, byte map, byte teaFree, boolean isLH, boolean isSieuBoss) {
+        this.parent = parent;
+        this.id = id;
+        this.maxPlayer = maxPlayers;
+        this.maxPlayerInit = maxPlayerInit;
+        this.maxSetPlayer = maxPlayerInit;
+        this.numPlayer = 0;
+        this.numReady = 0;
+        this.players = new User[maxPlayers];
+        this.readys = new boolean[maxPlayers];
+        this.item = new int[maxPlayers][8];
+        this.type = type;
+        this.teaFree = teaFree;
+        this.money = this.parent.minXu;
+        this.name = "";
+        this.pass = "";
+        this.isLH = isLH;
+        this.ntLH = (byte) (isLH ? 0 : -1);
+        this.isSieuBoss = isSieuBoss;
+        this.map = isLH ? LHMap[ntLH] : map;
+        this.fight = new FightManager();
+        this.started = false;
+        this.boss = -1;
+        this.timeStart = 0L;
     }
 }

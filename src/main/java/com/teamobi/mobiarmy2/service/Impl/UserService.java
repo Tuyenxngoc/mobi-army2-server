@@ -246,7 +246,7 @@ public class UserService implements IUserService {
             return;
         }
 
-        if (!BangXHManager.getInstance().isComplete) {
+        if (!BangXHManager.isComplete) {
             sendMessageLoginFail(GameString.getNotFinishedLoadingRanking());
             return;
         }
