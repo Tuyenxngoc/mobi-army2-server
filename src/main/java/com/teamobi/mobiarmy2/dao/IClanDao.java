@@ -2,6 +2,8 @@ package com.teamobi.mobiarmy2.dao;
 
 import com.teamobi.mobiarmy2.server.ClanManager;
 
+import java.util.List;
+
 public interface IClanDao {
 
     Short getClanIcon(int clanId);
@@ -13,4 +15,6 @@ public interface IClanDao {
     void gopClanContribute(String txtContribute, int userId);
 
     ClanManager.ClanInfo getClanInfo(short clanId);
+
+    List<ClanManager.ClanMemEntry> getClanMember(short clanId, byte page);
 }

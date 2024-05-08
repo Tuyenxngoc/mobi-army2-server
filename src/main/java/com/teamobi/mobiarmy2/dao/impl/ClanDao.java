@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author tuyen
@@ -81,6 +82,11 @@ public class ClanDao implements IClanDao {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return null;
+    }
+
+    @Override
+    public List<ClanManager.ClanMemEntry> getClanMember(short clanId, byte page) {
         return null;
     }
 

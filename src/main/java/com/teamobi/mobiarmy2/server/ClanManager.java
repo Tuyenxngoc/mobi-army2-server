@@ -4,7 +4,6 @@ import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dao.impl.ClanDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.ItemClanData;
-import com.teamobi.mobiarmy2.model.NVData;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.util.Until;
@@ -89,8 +88,9 @@ public class ClanManager {
         String contribute_text;
         byte right;
         byte nv;
-        boolean online;
+        byte online;
         int lever;
+        byte levelPt;
         int xp;
         short[] dataEquip;
         String name;
@@ -210,106 +210,8 @@ public class ClanManager {
         }
     }
 
-    public void getMemberClan(User us, Message ms) {
-        try {
-            byte page = ms.reader().readByte();
-            short Ids = ms.reader().readShort();
-            ResultSet res = HikariCPManager.getInstance().getConnection().createStatement().executeQuery(String.format("SELECT `Mem` FROM `clan` WHERE `id` = %d;", Ids));
-            res.first();
-            int mem = res.getInt("Mem");
-            int numPage = (mem % 10 == 0) ? mem / 10 : mem / 10 + 1;
-            res.close();
-            if (page >= numPage) {
-                page = 0;
-            }
-            DataOutputStream ds;
-            ms = new Message(118);
-            ds = ms.writer();
-            ds.writeByte(page);
-            ds.writeUTF("BIỆT ĐỘI");
-            ResultSet red = HikariCPManager.getInstance().getConnection().createStatement().executeQuery(String.format("SELECT `clanmem`.*, `armymem`.*, `user`.`user` FROM `clanmem` INNER JOIN `armymem` ON `clanmem`.`user` = `armymem`.`id` INNER JOIN `user` ON `clanmem`.`user` = `user`.`user_id` WHERE `clanmem`.`clan` = %d ORDER BY `clanmem`.`rights` DESC, `clanmem`.`xp` DESC LIMIT %d, 10;", Ids, (page * 10)));
-            member = new ArrayList<>();
-            int CupClan = 0;
-            while (red.next()) {
-                ClanMemEntry memberEntry = new ClanMemEntry();
-                memberEntry.setName(red.getString("user.user"));
-                memberEntry.setId(red.getInt("armymem.id"));
-                memberEntry.setClan(red.getInt("armymem.clan"));
-                memberEntry.setTimeJoin(red.getDate("clanmem.itemJoin"));
-                memberEntry.setXu(red.getInt("clanmem.xu"));
-                memberEntry.setLuong(red.getInt("clanmem.luong"));
-                memberEntry.setCup(red.getInt("armymem.dvong"));
-                memberEntry.setN_contribute(red.getInt("clanmem.n_contribute"));
-                memberEntry.setContribute_time(red.getString("clanmem.contribute_time"));
-                memberEntry.setContribute_text(red.getString("clanmem.contribute_text"));
-                memberEntry.setRight(red.getByte("clanmem.rights"));
-                memberEntry.setNv((byte) (red.getByte("armymem.NVused") - 1));
-                memberEntry.setOnline(red.getBoolean("armymem.online"));
-                JSONObject jobj = (JSONObject) JSONValue.parse(red.getString("armymem.NV" + (memberEntry.nv + 1)));
-                memberEntry.setLever(((Long) jobj.get("lever")).intValue());
-                memberEntry.setXp(((Long) jobj.get("xp")).intValue());
-                JSONArray trangBi = (JSONArray) JSONValue.parse(red.getString("armymem.ruongTrangBi"));
-                JSONArray Jarr = (JSONArray) jobj.get("data");
-                short indexS = ((Long) Jarr.get(5)).shortValue();
-                short[] dataEquip = new short[5];
-                if (indexS >= 0 && indexS < trangBi.size()) {
-                    JSONObject jobj1 = (JSONObject) trangBi.get(indexS);
-                    short nvId = Short.parseShort(jobj1.get("nvId").toString());
-                    short equipId = Short.parseShort(jobj1.get("id").toString());
-                    short equipType = Short.parseShort(jobj1.get("equipType").toString());
-                    NVData.EquipmentEntry eq = NVData.getEquipEntryById(nvId, equipType, equipId);
-                    dataEquip[0] = eq.arraySet[0];
-                    dataEquip[1] = eq.arraySet[1];
-                    dataEquip[2] = eq.arraySet[2];
-                    dataEquip[3] = eq.arraySet[3];
-                    dataEquip[4] = eq.arraySet[4];
-                } else {
-                    for (byte a = 0; a < 5; a++) {
-                        indexS = ((Long) Jarr.get(a)).shortValue();
-                        if (indexS >= 0 && indexS < trangBi.size()) {
-                            JSONObject jobj1 = (JSONObject) trangBi.get(indexS);
-                            dataEquip[a] = Short.parseShort(jobj1.get("id").toString());
-                        } else if (User.nvEquipDefault[memberEntry.getNv()][a] != null && a != 5) {
-                            dataEquip[a] = User.nvEquipDefault[memberEntry.getNv()][a].id;
-                        } else {
-                            dataEquip[a] = -1;
-                        }
-                    }
-                }
-                memberEntry.setDataEquip(dataEquip);
-                member.add(memberEntry);
-            }
-            red.close();
-            int length = member.size();
-            for (int i = 0; i < length; i++) {
-                ClanMemEntry memClan = member.get(i);
-                ds.writeInt(memClan.getId()); // iddb
-                ds.writeUTF(memClan.getName() + (memClan.getRight() == 2 ? " (Đội trưởng)" : (memClan.getRight() > 0 ? (" (Đội phó " + i + ")") : ""))); // tên nv
-                ds.writeInt(1);
-                ds.writeByte(memClan.getNv()); // stt nhân vật 0->9
-                ds.writeByte(memClan.isOnline() ? 1 : 0); // online: 1, offline: 0
-                ds.writeByte(memClan.getLever()); // lever
-                ds.writeByte((byte) (memClan.getXp() / memClan.getLever() / 10)); // % lever
-                ds.writeByte((page * 10) + i); // số thứ tự thành viên
-                CupClan += memClan.getCup();
-                ds.writeInt(memClan.getCup());
-                for (int j = 0; j < 5; j++) {
-                    ds.writeShort(memClan.getDataEquip()[j]);
-                }
-                if (memClan.getN_contribute() > 0) {
-                    ds.writeUTF("Góp " + memClan.getContribute_text() + " " + Until.getStrungTime((new Date().getTime() - Until.getDate(memClan.getContribute_time()).getTime())) + " trước");
-                } else {
-                    ds.writeUTF("Chưa đóng góp");
-                }
-                ds.writeUTF(memClan.getN_contribute() > 0 ? (memClan.getN_contribute() + " lần: " + Until.getStringNumber(memClan.getXu()) + " xu và " + Until.getStringNumber(memClan.getLuong()) + " lượng") : "");
-            }
-            member.clear();
-            HikariCPManager.getInstance().getConnection().createStatement().executeUpdate("UPDATE `clan` SET `cup` =  " + CupClan + "  WHERE `id` = " + Ids + ";");
-            ds.flush();
-            us.sendMessage(ms);
-        } catch (Exception e) {
-
-        }
+    public List<ClanMemEntry> getMemberClan(short clanId, byte page) {
+        return clanDao.getClanMember(clanId, page);
     }
 
     public void clanItemMessage(User us, Message ms) {
