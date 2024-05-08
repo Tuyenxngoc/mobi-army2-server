@@ -1,5 +1,7 @@
 package com.teamobi.mobiarmy2.dao;
 
+import com.teamobi.mobiarmy2.server.ClanManager;
+
 public interface IClanDao {
 
     Short getClanIcon(int clanId);
@@ -9,4 +11,6 @@ public interface IClanDao {
     void gopLuong(int clanId, int luong);
 
     void gopClanContribute(String txtContribute, int userId);
+
+    ClanManager.ClanInfo getClanInfo(short clanId);
 }

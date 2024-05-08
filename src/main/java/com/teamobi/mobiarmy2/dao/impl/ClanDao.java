@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.dao.impl;
 
 import com.teamobi.mobiarmy2.dao.IClanDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
+import com.teamobi.mobiarmy2.server.ClanManager;
 import com.teamobi.mobiarmy2.util.Until;
 
 import java.sql.Connection;
@@ -52,6 +53,35 @@ public class ClanDao implements IClanDao {
                 "`contribute_text` = ? " +
                 "WHERE `user` = ?";
         HikariCPManager.getInstance().update(sql, Until.toDateString(new Date()), txtContribute, userId);
+    }
+
+    @Override
+    public ClanManager.ClanInfo getClanInfo(short clanId) {
+        try (Connection connection = HikariCPManager.getInstance().getConnection();
+             Statement statement = connection.createStatement()) {
+
+            try (ResultSet red = statement.executeQuery("SELECT * FROM clan WHERE id = ?")) {
+                if (red.next()) {
+                    ClanManager.ClanInfo clanInfo = new ClanManager.ClanInfo();
+                    clanInfo.setId(red.getShort("id"));
+                    clanInfo.setName(red.getString("name"));
+                    clanInfo.setMemberCount((byte) red.getInt("mem"));
+                    clanInfo.setMaxMemberCount((byte) red.getInt("memmax"));
+                    clanInfo.setMasterName(red.getString("masterName"));
+                    clanInfo.setXu(red.getInt("xu"));
+                    clanInfo.setLuong(red.getInt("luong"));
+                    clanInfo.setCup(red.getInt("cup"));
+                    clanInfo.setXpUpLevel(red.getInt("xp"));
+                    clanInfo.setDescription(red.getString("desc"));
+                    clanInfo.setDateCreated(red.getString("dateCreat"));
+                    red.getString("Item");
+                    return clanInfo;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

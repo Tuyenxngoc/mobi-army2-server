@@ -20,11 +20,39 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author tuyen
  */
 public class ClanManager {
+
+    @Getter
+    @Setter
+    public static class ClanInfo {
+        private short id;
+        private String name;
+        private byte memberCount;
+        private byte maxMemberCount;
+        private String masterName;
+        private int xu;
+        private int luong;
+        private int cup;
+        private int exp;
+        private int xpUpLevel;
+        private byte level;
+        private byte levelPercentage;
+        private String description;
+        private String dateCreated;
+        private List<ClanItem> items;
+    }
+
+    @Getter
+    @Setter
+    public static class ClanItem {
+        private String name;
+        private int time;
+    }
 
     @Getter
     @Setter
@@ -607,4 +635,7 @@ public class ClanManager {
         }
     }
 
+    public ClanInfo getClanInfo(short clanId) {
+        return clanDao.getClanInfo(clanId);
+    }
 }

@@ -1763,7 +1763,39 @@ public class UserService implements IUserService {
 
     @Override
     public void getInfoClan(Message ms) {
-
+        try {
+            short clanId = ms.reader().readShort();
+            ClanManager.ClanInfo clanDetails = ClanManager.getInstance().getClanInfo(clanId);
+            if (clanDetails == null) {
+                sendMessageLoginFail(GameString.clanNull());
+                return;
+            }
+            ms = new Message(Cmd.CLAN_INFO);
+            DataOutputStream ds = ms.writer();
+            ds.writeShort(clanDetails.getId());
+            ds.writeUTF(clanDetails.getName());
+            ds.writeByte(clanDetails.getMemberCount());
+            ds.writeByte(clanDetails.getMaxMemberCount());
+            ds.writeUTF(clanDetails.getMasterName());
+            ds.writeInt(clanDetails.getXu());
+            ds.writeInt(clanDetails.getLuong());
+            ds.writeInt(clanDetails.getCup());
+            ds.writeInt(clanDetails.getExp());
+            ds.writeInt(clanDetails.getXpUpLevel());
+            ds.writeByte(clanDetails.getLevel());
+            ds.writeByte(clanDetails.getLevelPercentage());
+            ds.writeUTF(clanDetails.getDescription());
+            ds.writeUTF(clanDetails.getDateCreated());
+            ds.writeByte(clanDetails.getItems().size());
+            for (ClanManager.ClanItem item : clanDetails.getItems()) {
+                ds.writeUTF(item.getName());
+                ds.writeInt(item.getTime());
+            }
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
