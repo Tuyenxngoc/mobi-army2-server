@@ -83,6 +83,17 @@ public class ClanManager {
         return instance;
     }
 
+    public byte[] getClanIcon(short clanId) {
+        byte[] data;
+        Short index = clanDao.getClanIcon(clanId);
+        if (index == null) {
+            data = new byte[0];
+        } else {
+            data = Until.getFile("res/icon/clan/" + index + ".png");
+        }
+        return data;
+    }
+
     public void contributeClan(short clanId, int userId, int quantity, boolean isXu) {
         String txtContribute;
         if (isXu) {

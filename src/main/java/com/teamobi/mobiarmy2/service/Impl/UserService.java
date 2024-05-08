@@ -1741,7 +1741,19 @@ public class UserService implements IUserService {
 
     @Override
     public void clanIcon(Message ms) {
-
+        try {
+            short id = ms.reader().readShort();
+            byte[] data = ClanManager.getInstance().getClanIcon(id);
+            ms = new Message(Cmd.CLAN_ICON);
+            DataOutputStream ds = ms.writer();
+            ds.writeShort(id);
+            ds.writeShort(data.length);
+            ds.write(data);
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

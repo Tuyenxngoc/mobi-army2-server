@@ -4,6 +4,10 @@ import com.teamobi.mobiarmy2.dao.IClanDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.util.Until;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Date;
 
 /**
@@ -13,6 +17,18 @@ public class ClanDao implements IClanDao {
 
     @Override
     public Short getClanIcon(int clanId) {
+        try (Connection connection = HikariCPManager.getInstance().getConnection();
+             Statement statement = connection.createStatement()) {
+
+            try (ResultSet resultSet = statement.executeQuery("SELECT icon FROM clan WHERE id = ?")) {
+                if (resultSet.next()) {
+                    return resultSet.getShort("icon");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 
