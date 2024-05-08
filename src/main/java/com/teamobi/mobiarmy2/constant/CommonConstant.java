@@ -32,4 +32,5 @@ public class CommonConstant {
     public static final int MAX_XP_CLAN = 2_147_000_000;
 
     public static final byte POINT_ON_LEVEL = 3;
+    public static final int MIN_XU_CONTRIBUTE_CLAN = 1000;
 }

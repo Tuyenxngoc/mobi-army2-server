@@ -3,7 +3,6 @@ package com.teamobi.mobiarmy2.fight;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.server.Room;
 
-
 public class FightWait {
 
     public final User[] players;

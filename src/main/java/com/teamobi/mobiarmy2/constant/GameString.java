@@ -386,7 +386,7 @@ public class GameString {
     }
 
     public static String gopClanMinXu(int xu) {
-        return String.format("Số xu góp tối thiểu là %d", xu);
+        return String.format("Mức góp ít nhất là %d xu", xu);
     }
 
     public static String gopClanThanhCong() {

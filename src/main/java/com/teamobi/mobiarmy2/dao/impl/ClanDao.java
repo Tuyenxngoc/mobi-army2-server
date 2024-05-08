@@ -6,9 +6,10 @@ import com.teamobi.mobiarmy2.server.ClanManager;
 import com.teamobi.mobiarmy2.util.Until;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -20,9 +21,9 @@ public class ClanDao implements IClanDao {
     @Override
     public Short getClanIcon(int clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
-             Statement statement = connection.createStatement()) {
-
-            try (ResultSet resultSet = statement.executeQuery("SELECT icon FROM clan WHERE id = ?")) {
+             PreparedStatement statement = connection.prepareStatement("SELECT icon FROM clan WHERE id = ?")) {
+            statement.setInt(1, clanId);
+            try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     return resultSet.getShort("icon");
                 }
@@ -59,9 +60,11 @@ public class ClanDao implements IClanDao {
     @Override
     public ClanManager.ClanInfo getClanInfo(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
-             Statement statement = connection.createStatement()) {
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM clan WHERE id = ?")) {
 
-            try (ResultSet red = statement.executeQuery("SELECT * FROM clan WHERE id = ?")) {
+            statement.setShort(1, clanId);
+
+            try (ResultSet red = statement.executeQuery()) {
                 if (red.next()) {
                     ClanManager.ClanInfo clanInfo = new ClanManager.ClanInfo();
                     clanInfo.setId(red.getShort("id"));
@@ -72,10 +75,12 @@ public class ClanDao implements IClanDao {
                     clanInfo.setXu(red.getInt("xu"));
                     clanInfo.setLuong(red.getInt("luong"));
                     clanInfo.setCup(red.getInt("cup"));
-                    clanInfo.setXpUpLevel(red.getInt("xp"));
+                    clanInfo.setLevel((byte) 1);
+                    clanInfo.setXpUpLevel(1000);
                     clanInfo.setDescription(red.getString("desc"));
                     clanInfo.setDateCreated(red.getString("dateCreat"));
                     red.getString("Item");
+                    clanInfo.setItems(new ArrayList<>());
                     return clanInfo;
                 }
             }
@@ -87,13 +92,14 @@ public class ClanDao implements IClanDao {
 
     @Override
     public List<ClanManager.ClanMemEntry> getClanMember(short clanId, byte page) {
-        List<ClanManager.ClanMemEntry> entries = null;
+        List<ClanManager.ClanMemEntry> entries = new ArrayList<>();
         try (Connection connection = HikariCPManager.getInstance().getConnection();
-             Statement statement = connection.createStatement()) {
-
-            try (ResultSet red = statement.executeQuery("SELECT * FROM clanmem WHERE id = ?")) {
-                if (red.next()) {
-
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM clanmem WHERE id = ?")) {
+            statement.setShort(1, clanId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    ClanManager.ClanMemEntry entry = new ClanManager.ClanMemEntry();
+                    entries.add(entry);
                 }
             }
         } catch (SQLException e) {

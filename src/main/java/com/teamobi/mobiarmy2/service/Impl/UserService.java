@@ -317,6 +317,7 @@ public class UserService implements IUserService {
         target.setXu(source.getXu());
         target.setLuong(source.getLuong());
         target.setDanhVong(source.getDanhVong());
+        target.setClanId(source.getClanId());
         target.setLevels(source.getLevels());
         target.setLevelPercents(source.getLevelPercents());
         target.setNvUsed(source.getNvUsed());
@@ -706,8 +707,8 @@ public class UserService implements IUserService {
                 if (quantity > user.getXu()) {
                     return;
                 }
-                if (quantity < 1000) {
-                    sendServerMessage(GameString.gopClanMinXu(1000));
+                if (quantity < CommonConstant.MIN_XU_CONTRIBUTE_CLAN) {
+                    sendServerMessage(GameString.gopClanMinXu(CommonConstant.MIN_XU_CONTRIBUTE_CLAN));
                     return;
                 }
                 //Update xu user
