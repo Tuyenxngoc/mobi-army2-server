@@ -87,7 +87,19 @@ public class ClanDao implements IClanDao {
 
     @Override
     public List<ClanManager.ClanMemEntry> getClanMember(short clanId, byte page) {
-        return null;
+        List<ClanManager.ClanMemEntry> entries = null;
+        try (Connection connection = HikariCPManager.getInstance().getConnection();
+             Statement statement = connection.createStatement()) {
+
+            try (ResultSet red = statement.executeQuery("SELECT * FROM clanmem WHERE id = ?")) {
+                if (red.next()) {
+
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return entries;
     }
 
 }

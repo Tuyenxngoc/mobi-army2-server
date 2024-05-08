@@ -77,17 +77,18 @@ public class ClanManager {
     @Getter
     @Setter
     public static class ClanMemEntry {
+        byte index;
         int id;
         int clan;
         Date timeJoin;
         int xu;
         int luong;
         int cup;
-        int n_contribute;
+        String n_contribute;
         String contribute_time;
         String contribute_text;
         byte right;
-        byte nv;
+        byte nvUsed;
         byte online;
         int lever;
         byte levelPt;

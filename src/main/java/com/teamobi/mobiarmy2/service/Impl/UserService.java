@@ -1815,21 +1815,17 @@ public class UserService implements IUserService {
                 ds.writeInt(memClan.getId());
                 ds.writeUTF(memClan.getName());
                 ds.writeInt(1);
-                ds.writeByte(memClan.getNv()); // stt nhân vật 0->9
-                ds.writeByte(memClan.getOnline()); // online: 1, offline: 0
-                ds.writeByte(memClan.getLever()); // lever
-                ds.writeByte(memClan.getLevelPt()); // % lever
-                ds.writeByte((page * 10) + 1); // số thứ tự thành viên
+                ds.writeByte(memClan.getNvUsed());
+                ds.writeByte(memClan.getOnline());
+                ds.writeByte(memClan.getLever());
+                ds.writeByte(memClan.getLevelPt());
+                ds.writeByte(memClan.getIndex());
                 ds.writeInt(memClan.getCup());
                 for (int j = 0; j < 5; j++) {
                     ds.writeShort(memClan.getDataEquip()[j]);
                 }
-                if (memClan.getN_contribute() > 0) {
-                    ds.writeUTF("Góp " + memClan.getContribute_text() + " " + Until.getStrungTime((new Date().getTime() - Until.getDate(memClan.getContribute_time()).getTime())) + " trước");
-                } else {
-                    ds.writeUTF("Chưa đóng góp");
-                }
-                ds.writeUTF(memClan.getN_contribute() > 0 ? (memClan.getN_contribute() + " lần: " + Until.getStringNumber(memClan.getXu()) + " xu và " + Until.getStringNumber(memClan.getLuong()) + " lượng") : "");
+                ds.writeUTF(memClan.getContribute_text());
+                ds.writeUTF(memClan.getN_contribute());
             }
             ds.flush();
             user.sendMessage(ms);
