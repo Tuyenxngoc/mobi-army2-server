@@ -59,7 +59,7 @@ public class BangXHManager {
         switch (type) {
             case 0:
                 try {
-                    ResultSet res = HikariCPManager.getInstance().getConnection().createStatement().executeQuery("SELECT `id`,`dvong` FROM `armymem` ORDER BY `dvong` DESC LIMIT 0, 100;");
+                    ResultSet res = HikariCPManager.getInstance().getConnection().createStatement().executeQuery("SELECT `id`,`dvong` FROM `player` ORDER BY `dvong` DESC LIMIT 0, 100;");
                     int i = 1;
                     while (res.next()) {
                         int iddb = res.getInt("id");
@@ -79,13 +79,13 @@ public class BangXHManager {
                     res.close();
                     for (int j = 0; j < bxh.size(); j++) {
                         BangXHEntry bXHE = bxh.get(j);
-                        HikariCPManager.getInstance().getConnection().createStatement().executeUpdate("UPDATE `armymem` SET `top`='" + bXHE.index + "' WHERE `id`=" + bXHE.iddb + " LIMIT 1;");
+                        HikariCPManager.getInstance().getConnection().createStatement().executeUpdate("UPDATE `player` SET `top`='" + bXHE.index + "' WHERE `id`=" + bXHE.iddb + " LIMIT 1;");
                         int[] xuUp = new int[]{30000, 20000, 10000};
                         if (bXHE.index <= 3) {
                             if (ServerManager.getInstance().getUser(bXHE.iddb) != null) {
                                 ServerManager.getInstance().getUser(bXHE.iddb).updateXu(xuUp[bXHE.index - 1]);
                             } else {
-                                HikariCPManager.getInstance().getConnection().createStatement().executeUpdate("UPDATE `armymem` SET `xu`= `xu` + " + xuUp[bXHE.index - 1] + " WHERE (`id`=" + bXHE.iddb + " AND `xu` < 2000000000)LIMIT 1;");
+                                HikariCPManager.getInstance().getConnection().createStatement().executeUpdate("UPDATE `player` SET `xu`= `xu` + " + xuUp[bXHE.index - 1] + " WHERE (`id`=" + bXHE.iddb + " AND `xu` < 2000000000)LIMIT 1;");
                             }
                         }
                         if (j > 99) {
@@ -102,7 +102,7 @@ public class BangXHManager {
                 try {
                     int i = 1;
                     ResultSet red = HikariCPManager.getInstance().getConnection().createStatement()
-                            .executeQuery("SELECT `id`,`xpMax` FROM `armymem` ORDER BY `xpMax` DESC LIMIT 0, 100;");
+                            .executeQuery("SELECT `id`,`xpMax` FROM `player` ORDER BY `xpMax` DESC LIMIT 0, 100;");
                     while (red.next()) {
                         int iddb = red.getInt("id");
                         int xpMax = red.getInt("xpMax");
@@ -125,7 +125,7 @@ public class BangXHManager {
                 try {
                     int i = 1;
                     ResultSet red = HikariCPManager.getInstance().getConnection().createStatement()
-                            .executeQuery("SELECT `id`,`xu` FROM `armymem` ORDER BY `xu` DESC LIMIT 0, 100;");
+                            .executeQuery("SELECT `id`,`xu` FROM `player` ORDER BY `xu` DESC LIMIT 0, 100;");
                     while (red.next()) {
                         int iddb = red.getInt("id");
                         int xu = red.getInt("xu");
@@ -147,7 +147,7 @@ public class BangXHManager {
             case 3:
                 try {
                     int i = 1;
-                    ResultSet red = HikariCPManager.getInstance().getConnection().createStatement().executeQuery("SELECT `id`,`luong` FROM `armymem` ORDER BY `luong` DESC LIMIT 0, 100;");
+                    ResultSet red = HikariCPManager.getInstance().getConnection().createStatement().executeQuery("SELECT `id`,`luong` FROM `player` ORDER BY `luong` DESC LIMIT 0, 100;");
                     while (red.next()) {
                         int iddb = red.getInt("id");
                         int luong = red.getInt("luong");
@@ -170,7 +170,7 @@ public class BangXHManager {
                 try {
                     int i = 1;
                     ResultSet red = HikariCPManager.getInstance().getConnection().createStatement()
-                            .executeQuery("SELECT `id`,`CSinh` FROM `armymem` WHERE `CSinh` > 0 ORDER BY `CSinh` DESC LIMIT 0, 100;");
+                            .executeQuery("SELECT `id`,`CSinh` FROM `player` WHERE `CSinh` > 0 ORDER BY `CSinh` DESC LIMIT 0, 100;");
                     while (red.next()) {
                         int iddb = red.getInt("id");
                         int cs = red.getInt("CSinh");
@@ -193,7 +193,7 @@ public class BangXHManager {
                 try {
                     int i = 1;
                     ResultSet red = HikariCPManager.getInstance().getConnection().createStatement()
-                            .executeQuery("SELECT `id`,`point_event` FROM `armymem` ORDER BY `point_event` DESC LIMIT 0, 100;");
+                            .executeQuery("SELECT `id`,`point_event` FROM `player` ORDER BY `point_event` DESC LIMIT 0, 100;");
                     while (red.next()) {
                         int iddb = red.getInt("id");
                         int point = red.getInt("point_event");

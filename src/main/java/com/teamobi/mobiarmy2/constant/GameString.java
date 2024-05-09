@@ -1,5 +1,7 @@
 package com.teamobi.mobiarmy2.constant;
 
+import com.teamobi.mobiarmy2.util.Until;
+
 /**
  * @author tuyen
  */
@@ -386,7 +388,7 @@ public class GameString {
     }
 
     public static String gopClanMinXu(int xu) {
-        return String.format("Mức góp ít nhất là %d xu", xu);
+        return String.format("Mức góp ít nhất là %s xu", Until.getStringNumber(xu));
     }
 
     public static String gopClanThanhCong() {

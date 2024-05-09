@@ -16,7 +16,7 @@ public interface IGameDao {
 
     void getAllSpecialItem();
 
-    void getAllFomular();
+    void getAllFormula();
 
     void getAllPayment();
 

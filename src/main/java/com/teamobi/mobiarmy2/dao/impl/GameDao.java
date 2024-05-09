@@ -193,7 +193,7 @@ public class GameDao implements IGameDao {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `clanshop`")) {
                 while (resultSet.next()) {
                     ItemClanData.ItemClan iEntry = new ItemClanData.ItemClan();
-                    iEntry.id = resultSet.getInt("id");
+                    iEntry.id = resultSet.getInt("clanshop_id");
                     iEntry.level = resultSet.getInt("level");
                     iEntry.name = resultSet.getString("name");
                     iEntry.time = resultSet.getShort("time");
@@ -252,7 +252,7 @@ public class GameDao implements IGameDao {
     }
 
     @Override
-    public void getAllFomular() {
+    public void getAllFormula() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
 

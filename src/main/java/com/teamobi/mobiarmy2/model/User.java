@@ -24,9 +24,9 @@ public class User {
     public static NVData.EquipmentEntry[][] nvEquipDefault;
     public ISession session;
     public UserState state;
-    public int id;
+    public int userId;
+    public int playerId;
     public String username;
-    public String password;
     public short clanId;
     public int xu;
     public int luong;

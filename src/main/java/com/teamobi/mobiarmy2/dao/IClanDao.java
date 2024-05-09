@@ -8,11 +8,11 @@ public interface IClanDao {
 
     Short getClanIcon(int clanId);
 
-    void gopXu(int clanId, int xu);
+    void updateXu(int clanId, int xu);
 
-    void gopLuong(int clanId, int luong);
+    void updateLuong(int clanId, int luong);
 
-    void gopClanContribute(String txtContribute, int userId);
+    void gopClanContribute(String txtContribute, int playerId, int xu, int luong);
 
     ClanManager.ClanInfo getClanInfo(short clanId);
 

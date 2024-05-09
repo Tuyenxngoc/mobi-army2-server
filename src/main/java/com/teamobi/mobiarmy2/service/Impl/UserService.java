@@ -279,7 +279,7 @@ public class UserService implements IUserService {
             ServerManager serverManager = ServerManager.getInstance();
 
             //Kiểm tra có đang đăng nhập hay không
-            User userLogin = serverManager.getUser(userFound.getId());
+            User userLogin = serverManager.getUser(userFound.getUserId());
             if (userLogin != null) {
                 userLogin.getUserService().sendMs10(GameString.userLoginMany());
                 userLogin.getSession().close();
@@ -292,7 +292,7 @@ public class UserService implements IUserService {
             user.getSession().setVersion(version);
             user.setLogged(true);
 
-            userDao.updateOnline(true, userFound.getId());
+            userDao.updateOnline(true, userFound.getPlayerId());
 
             sendLoginSuccess();
             IServerConfig config = serverManager.config();
@@ -311,9 +311,9 @@ public class UserService implements IUserService {
     }
 
     private void copyUserData(User target, User source) {
-        target.setId(source.getId());
+        target.setUserId(source.getUserId());
+        target.setPlayerId(source.getPlayerId());
         target.setUsername(source.getUsername());
-        target.setPassword(source.getPassword());
         target.setXu(source.getXu());
         target.setLuong(source.getLuong());
         target.setDanhVong(source.getDanhVong());
@@ -633,7 +633,7 @@ public class UserService implements IUserService {
         try {
             Message ms = new Message(Cmd.LOGIN_SUCESS);
             DataOutputStream ds = ms.writer();
-            ds.writeInt(user.getId());
+            ds.writeInt(user.getUserId());
             ds.writeInt(user.getXu());
             ds.writeInt(user.getLuong());
             ds.writeByte(user.getNvUsed());
@@ -714,7 +714,7 @@ public class UserService implements IUserService {
                 //Update xu user
                 user.updateXu(-quantity);
                 //Update xu clan
-                ClanManager.getInstance().contributeClan(user.getClanId(), user.getId(), quantity, Boolean.TRUE);
+                ClanManager.getInstance().contributeClan(user.getClanId(), user.getUserId(), quantity, Boolean.TRUE);
                 sendServerMessage(GameString.gopClanThanhCong());
             } else if (type == 1) {
                 if (quantity > user.getLuong()) {
@@ -723,7 +723,7 @@ public class UserService implements IUserService {
                 //Update lg user
                 user.updateLuong(-quantity);
                 //Update lg clan
-                ClanManager.getInstance().contributeClan(user.getClanId(), user.getId(), quantity, Boolean.FALSE);
+                ClanManager.getInstance().contributeClan(user.getClanId(), user.getUserId(), quantity, Boolean.FALSE);
                 sendServerMessage(GameString.gopClanThanhCong());
             }
         } catch (IOException e) {
@@ -1029,7 +1029,7 @@ public class UserService implements IUserService {
             Message ms = new Message(5);
             DataOutputStream ds = ms.writer();
             if (us != null) {
-                ds.writeInt(us.getId());
+                ds.writeInt(us.getUserId());
                 ds.writeUTF(us.getUsername());
             } else {
                 ds.writeInt(1);
@@ -1149,7 +1149,7 @@ public class UserService implements IUserService {
             DataOutputStream ds = ms.writer();
 
             if (!user.getFriends().isEmpty()) {
-                List<GetFriendResponse> friends = userDao.getFriendsList(user.getId(), user.getFriends());
+                List<GetFriendResponse> friends = userDao.getFriendsList(user.getPlayerId(), user.getFriends());
                 for (GetFriendResponse friend : friends) {
                     ds.writeInt(friend.getId());
                     ds.writeUTF(friend.getName());
@@ -1227,10 +1227,10 @@ public class UserService implements IUserService {
 
             ms = new Message(Cmd.PLAYER_DETAIL);
             DataOutputStream ds = ms.writer();
-            if (user.getId() != userId) {
+            if (user.getUserId() != userId) {
                 ds.writeInt(-1);
             } else {
-                ds.writeInt(user.getId());
+                ds.writeInt(user.getUserId());
                 ds.writeUTF(user.getUsername());
                 ds.writeInt(user.getXu());
                 ds.writeByte(user.getCurrentLevel());
@@ -1309,7 +1309,7 @@ public class UserService implements IUserService {
             user.setNvUsed(idNv);
             ms = new Message(Cmd.CHOOSE_GUN);
             DataOutputStream ds = ms.writer();
-            ds.writeInt(user.getId());
+            ds.writeInt(user.getUserId());
             ds.writeByte(idNv);
             ds.flush();
             user.sendMessage(ms);
@@ -1417,12 +1417,12 @@ public class UserService implements IUserService {
                 return;
             }
 
-            if (!userDao.existsByUserIdAndPassword(user.getId(), oldPass)) {
+            if (!userDao.existsByUserIdAndPassword(user.getUserId(), oldPass)) {
                 sendServerMessage(GameString.changPassError2());
                 return;
             }
 
-            userDao.changePassword(user.getId(), newPass);
+            userDao.changePassword(user.getUserId(), newPass);
             sendServerMessage(GameString.changPassSuccess());
         } catch (IOException e) {
             e.printStackTrace();

@@ -212,7 +212,7 @@ public class GameService implements IGameService {
 
     @Override
     public void getFormulaData() {
-        gameDao.getAllFomular();
+        gameDao.getAllFormula();
     }
 
     @Override

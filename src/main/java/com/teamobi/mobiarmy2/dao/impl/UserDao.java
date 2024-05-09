@@ -29,7 +29,7 @@ public class UserDao implements IUserDao {
 
     @Override
     public void save(User user) {
-        HikariCPManager.getInstance().update("INSERT INTO `armymem`(`id`, `ruongTrangBi`, `ruongItem`) VALUES (?, ?, ?)", user.getId(), "[]", "[]");
+        HikariCPManager.getInstance().update("INSERT INTO `player`(`userId`) VALUES (?)", user.getUserId());
     }
 
     @Override
@@ -40,19 +40,19 @@ public class UserDao implements IUserDao {
             pow <<= 1;
         }
 
-        String sql = "UPDATE `armymem` SET " +
+        String sql = "UPDATE `player` SET " +
                 "`friends` = ?, " +
                 "`xu` = ?, " +
                 "`luong` = ?, " +
                 "`dvong` = ?, " +
-                "`clan` = ?, " +
+                "`clan_id` = ?, " +
                 "`item` = ?, " +
                 "`ruongTrangBi` = ?, " +
                 "`ruongItem` = ? ," +
                 "`sttnhanvat` = ?, " +
                 //...//
                 "`NVused` = ? " +
-                " WHERE id = ?";
+                " WHERE player_id = ?";
         HikariCPManager.getInstance().update(sql,
                 user.getFriends().toString(),
                 user.getXu(),
@@ -65,7 +65,7 @@ public class UserDao implements IUserDao {
                 nvstt,
                 //...//
                 user.getNvUsed(),
-                user.getId());
+                user.getPlayerId());
     }
 
     @Override
@@ -73,7 +73,7 @@ public class UserDao implements IUserDao {
         User user = null;
         try (Connection connection = HikariCPManager.getInstance().getConnection()) {
             // Truy vấn để lấy thông tin từ bảng user
-            String userQuery = "SELECT * FROM user WHERE username = ?";
+            String userQuery = "SELECT `user_id`, `password`, `lock`, `active` FROM user WHERE username = ?";
             try (PreparedStatement userStatement = connection.prepareStatement(userQuery)) {
                 userStatement.setString(1, username);
                 try (ResultSet userResultSet = userStatement.executeQuery()) {
@@ -84,9 +84,8 @@ public class UserDao implements IUserDao {
                             return null;
                         }
                         user = new User();
-                        user.setId(userResultSet.getInt("user_id"));
-                        user.setUsername(userResultSet.getString("username"));
-                        user.setPassword(userResultSet.getString("password"));
+                        user.setUsername(username);
+                        user.setUserId(userResultSet.getInt("user_id"));
                         user.setLock(userResultSet.getBoolean("lock"));
                         user.setActive(userResultSet.getBoolean("active"));
                     }
@@ -94,10 +93,14 @@ public class UserDao implements IUserDao {
             }
 
             if (user != null) {
+                //Nếu bị khóa hoặc chưa kích hoạt thì ngừng đọc thông tin
+                if (user.isLock() || !user.isActive()) {
+                    return user;
+                }
                 // Truy vấn để lấy thông tin từ bảng player
-                String playerQuery = "SELECT * FROM armymem WHERE id = ?";
+                String playerQuery = "SELECT * FROM player WHERE user_id = ?";
                 try (PreparedStatement playerStatement = connection.prepareStatement(playerQuery)) {
-                    playerStatement.setInt(1, user.getId());
+                    playerStatement.setInt(1, user.getUserId());
                     try (ResultSet playerResultSet = playerStatement.executeQuery()) {
                         Gson gson = new Gson();
                         //init
@@ -114,11 +117,12 @@ public class UserDao implements IUserDao {
                         user.setRuongDoTB(new ArrayList<>());
 
                         if (playerResultSet.next()) {
+                            user.setPlayerId(playerResultSet.getInt("player_id"));
                             user.setXu(playerResultSet.getInt("xu"));
                             user.setLuong(playerResultSet.getInt("luong"));
                             user.setDanhVong(playerResultSet.getInt("dvong"));
                             user.setNvUsed(playerResultSet.getByte("NVused"));
-                            user.setClanId(playerResultSet.getShort("clan"));
+                            user.setClanId(playerResultSet.getShort("clan_id"));
                             user.setPointEvent(playerResultSet.getInt("point_event"));
 
                             int nvstt = playerResultSet.getInt("sttnhanvat");
@@ -219,16 +223,16 @@ public class UserDao implements IUserDao {
     }
 
     @Override
-    public void updateOnline(boolean flag, int id) {
-        String sql = "UPDATE `armymem` SET `online` = ? WHERE id = ?";
-        HikariCPManager.getInstance().update(sql, flag, id);
+    public void updateOnline(boolean flag, int playerId) {
+        String sql = "UPDATE `player` SET `online` = ? WHERE player_id = ?";
+        HikariCPManager.getInstance().update(sql, flag, playerId);
     }
 
     @Override
-    public List<GetFriendResponse> getFriendsList(int userId, List<Integer> friendIds) {
+    public List<GetFriendResponse> getFriendsList(int playerId, List<Integer> friendIds) {
         List<GetFriendResponse> friendsList = new ArrayList<>();
 
-        StringBuilder queryBuilder = new StringBuilder("SELECT user.*, armymem.* FROM armymem INNER JOIN user ON user.user_id = armymem.id WHERE user.user_id IN (");
+        StringBuilder queryBuilder = new StringBuilder("SELECT user.*, player.* FROM player INNER JOIN user ON user.user_id = player.user_id WHERE player.player_id IN (");
         for (int i = 0; i < friendIds.size(); i++) {
             queryBuilder.append("?");
             if (i < friendIds.size() - 1) {
@@ -250,11 +254,11 @@ public class UserDao implements IUserDao {
                         continue;
                     }
                     GetFriendResponse friend = new GetFriendResponse();
-                    friend.setId(resultSet.getInt("user_id"));
+                    friend.setId(resultSet.getInt("player_id"));
                     friend.setName(resultSet.getString("username"));
                     friend.setXu(resultSet.getInt("xu"));
                     friend.setNvUsed(resultSet.getByte("NVused"));
-                    friend.setClanId(resultSet.getShort("clan"));
+                    friend.setClanId(resultSet.getShort("clan_id"));
                     friend.setOnline(resultSet.getByte("online"));
                     DataCharacter dataCharacter = gson.fromJson(resultSet.getString("NV" + friend.getNvUsed()), DataCharacter.class);
 
@@ -279,7 +283,7 @@ public class UserDao implements IUserDao {
     private short[] getEquipData(int playerId, byte idNv) {
         short[] data = new short[5];
         try (Connection connection = HikariCPManager.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT ruongTrangBi, NV%s FROM armymem WHERE id = ? LIMIT 1".formatted(idNv))) {
+             PreparedStatement statement = connection.prepareStatement("SELECT ruongTrangBi, NV%s FROM player WHERE player_id = ?".formatted(idNv))) {
             statement.setInt(1, playerId);
 
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -320,10 +324,10 @@ public class UserDao implements IUserDao {
     }
 
     @Override
-    public boolean existsByUserIdAndPassword(int id, String oldPass) {
+    public boolean existsByUserIdAndPassword(int userId, String oldPass) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT password FROM user WHERE user_id = ?")) {
-            statement.setInt(1, id);
+            statement.setInt(1, userId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     String hashedPassword = resultSet.getString("password");
@@ -338,16 +342,16 @@ public class UserDao implements IUserDao {
     }
 
     @Override
-    public void changePassword(int id, String newPass) {
+    public void changePassword(int userId, String newPass) {
         String hashedPassword = BCrypt.hashpw(newPass, BCrypt.gensalt());
         String sql = "UPDATE `user` SET `password` = ? WHERE user_id = ?";
-        HikariCPManager.getInstance().update(sql, hashedPassword, id);
+        HikariCPManager.getInstance().update(sql, hashedPassword, userId);
     }
 
     @Override
     public Integer findPlayerIdByUsername(String username) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT a.id FROM user u INNER JOIN armymem a ON u.user_id = a.id WHERE username = ? LIMIT 1")) {
+             PreparedStatement statement = connection.prepareStatement("SELECT p.user_id FROM user u INNER JOIN player p ON u.user_id = p.user_id WHERE username = ?")) {
             statement.setString(1, username);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
