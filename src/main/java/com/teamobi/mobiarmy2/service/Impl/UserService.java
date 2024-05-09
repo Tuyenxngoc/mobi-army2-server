@@ -246,7 +246,7 @@ public class UserService implements IUserService {
             return;
         }
 
-        if (!BangXHManager.isComplete) {
+        if (!BangXHManager.getInstance().isComplete()) {
             sendMessageLoginFail(GameString.getNotFinishedLoadingRanking());
             return;
         }
@@ -886,7 +886,44 @@ public class UserService implements IUserService {
 
     @Override
     public void bangXepHang(Message ms) {
+        try {
+            DataInputStream dis = ms.reader();
+            byte type = dis.readByte();
+            byte page = dis.readByte();
 
+            BangXHManager bangXHManager = BangXHManager.getInstance();
+            ms = new Message(Cmd.BANGTHANHTICH);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(type);
+            if (type == -1) {
+                ds.writeByte(bangXHManager.getBangXHString().length);
+                for (String name : bangXHManager.getBangXHString()) {
+                    ds.writeUTF(name);
+                }
+            } else {
+                ds.writeByte(page);
+                ds.writeUTF(bangXHManager.getBangXHString1()[type]);
+
+                BangXHManager.BangXHEntry[] bangXH = bangXHManager.getBangXH(type, page);
+                for (BangXHManager.BangXHEntry pl : bangXH) {
+                    ds.writeInt(pl.getPlayerId());
+                    ds.writeUTF(pl.getUsername());
+                    ds.writeByte(pl.getNvUsed());
+                    ds.writeShort(pl.getClanId());
+                    ds.writeByte(pl.getLevel());
+                    ds.writeByte(pl.getLevelPt());
+                    ds.writeByte(pl.getIndex());
+                    for (short i : pl.getData()) {
+                        ds.writeShort(i);
+                    }
+                    ds.writeUTF(pl.getDetail());
+                }
+            }
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
