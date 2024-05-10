@@ -161,10 +161,10 @@ public class ServerManager {
         }
     }
 
-    public User getUser(int userId) {
+    public User getUserByPlayerId(int playerId) {
         synchronized (users) {
             return users.stream()
-                    .filter(session -> session != null && session.getUser() != null && session.getUser().getUserId() == userId)
+                    .filter(session -> session != null && session.getUser() != null && session.getUser().getPlayerId() == playerId)
                     .map(ISession::getUser)
                     .findFirst()
                     .orElse(null);

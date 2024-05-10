@@ -279,7 +279,7 @@ public class UserService implements IUserService {
             ServerManager serverManager = ServerManager.getInstance();
 
             //Kiểm tra có đang đăng nhập hay không
-            User userLogin = serverManager.getUser(userFound.getUserId());
+            User userLogin = serverManager.getUserByPlayerId(userFound.getPlayerId());
             if (userLogin != null) {
                 userLogin.getUserService().sendMs10(GameString.userLoginMany());
                 userLogin.getSession().close();
@@ -633,7 +633,7 @@ public class UserService implements IUserService {
         try {
             Message ms = new Message(Cmd.LOGIN_SUCESS);
             DataOutputStream ds = ms.writer();
-            ds.writeInt(user.getUserId());
+            ds.writeInt(user.getPlayerId());
             ds.writeInt(user.getXu());
             ds.writeInt(user.getLuong());
             ds.writeByte(user.getNvUsed());
@@ -714,7 +714,7 @@ public class UserService implements IUserService {
                 //Update xu user
                 user.updateXu(-quantity);
                 //Update xu clan
-                ClanManager.getInstance().contributeClan(user.getClanId(), user.getUserId(), quantity, Boolean.TRUE);
+                ClanManager.getInstance().contributeClan(user.getClanId(), user.getPlayerId(), quantity, Boolean.TRUE);
                 sendServerMessage(GameString.gopClanThanhCong());
             } else if (type == 1) {
                 if (quantity > user.getLuong()) {
@@ -723,7 +723,7 @@ public class UserService implements IUserService {
                 //Update lg user
                 user.updateLuong(-quantity);
                 //Update lg clan
-                ClanManager.getInstance().contributeClan(user.getClanId(), user.getUserId(), quantity, Boolean.FALSE);
+                ClanManager.getInstance().contributeClan(user.getClanId(), user.getPlayerId(), quantity, Boolean.FALSE);
                 sendServerMessage(GameString.gopClanThanhCong());
             }
         } catch (IOException e) {
@@ -1033,17 +1033,17 @@ public class UserService implements IUserService {
     public void handleSendMessage(Message ms) {
         try {
             DataInputStream dis = ms.reader();
-            int id = dis.readInt();
+            int playerId = dis.readInt();
             String content = dis.readUTF().trim();
             if (content.isEmpty() || content.length() > 100) {
                 return;
             }
             // Neu la admin -> bo qua
-            if (id == 1) {
+            if (playerId == 1) {
                 return;
             }
             // Neu la nguoi dua tin -> send Mss 46-> chat The gioi
-            if (id == 2) {
+            if (playerId == 2) {
                 // 10000xu/lan
                 if (user.getXu() < CommonConstant.PRICE_CHAT) {
                     return;
@@ -1052,7 +1052,7 @@ public class UserService implements IUserService {
                 sendServerInfo(GameString.mssTGString(user.getUsername(), content));
                 return;
             }
-            User receiver = ServerManager.getInstance().getUser(id);
+            User receiver = ServerManager.getInstance().getUserByPlayerId(playerId);
             if (receiver == null) {
                 return;
             }
@@ -1079,7 +1079,7 @@ public class UserService implements IUserService {
             Message ms = new Message(5);
             DataOutputStream ds = ms.writer();
             if (us != null) {
-                ds.writeInt(us.getUserId());
+                ds.writeInt(us.getPlayerId());
                 ds.writeUTF(us.getUsername());
             } else {
                 ds.writeInt(1);
@@ -1273,14 +1273,14 @@ public class UserService implements IUserService {
     @Override
     public void handleGetFlayerDetail(Message ms) {
         try {
-            int userId = ms.reader().readInt();
+            int playerId = ms.reader().readInt();
 
             ms = new Message(Cmd.PLAYER_DETAIL);
             DataOutputStream ds = ms.writer();
-            if (user.getUserId() != userId) {
+            if (user.getPlayerId() != playerId) {
                 ds.writeInt(-1);
             } else {
-                ds.writeInt(user.getUserId());
+                ds.writeInt(user.getPlayerId());
                 ds.writeUTF(user.getUsername());
                 ds.writeInt(user.getXu());
                 ds.writeByte(user.getCurrentLevel());
@@ -1359,7 +1359,7 @@ public class UserService implements IUserService {
             user.setNvUsed(idNv);
             ms = new Message(Cmd.CHOOSE_GUN);
             DataOutputStream ds = ms.writer();
-            ds.writeInt(user.getUserId());
+            ds.writeInt(user.getPlayerId());
             ds.writeByte(idNv);
             ds.flush();
             user.sendMessage(ms);
