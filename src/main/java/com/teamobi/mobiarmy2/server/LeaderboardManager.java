@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.server;
 
+import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.dao.IRankingDao;
 import com.teamobi.mobiarmy2.dao.impl.RankingDao;
 import com.teamobi.mobiarmy2.model.PlayerLeaderboardEntry;
@@ -53,11 +54,23 @@ public class LeaderboardManager {
                 for (int i = 0; i < leaderboardCategories.length; i++) {
                     refreshXH(i);
                 }
+                addBonusGiftsForPlayers();
                 refreshTopTeams();
                 isComplete = true;
                 System.out.println("Refresh BXH + TopTeam");
             }
         }, calendar.getTime(), 86400000L);
+    }
+
+    private void addBonusGiftsForPlayers() {
+        int i = 0;
+        for (PlayerLeaderboardEntry entry : leaderboardEntries.get(0)) {
+            if (i >= 3) {
+                break;
+            }
+            rankingDao.addBonusGift(entry.getPlayerId(), CommonConstant.TOP_BONUS[i]);
+            i++;
+        }
     }
 
     public List<PlayerLeaderboardEntry> getLeaderboardEntries(int type, int page, int pageSize) {

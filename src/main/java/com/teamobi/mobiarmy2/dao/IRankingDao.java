@@ -17,4 +17,7 @@ public interface IRankingDao {
     List<PlayerLeaderboardEntry> getTopDanhDuTuan();
 
     List<PlayerLeaderboardEntry> getTopDaiGiaTuan();
+
+    void addBonusGift(int playerId, int quantity);
+
 }

@@ -194,4 +194,10 @@ public class RankingDao implements IRankingDao {
         return top;
     }
 
+    @Override
+    public void addBonusGift(int playerId, int quantity) {
+        String sql = "UPDATE player SET xu = xu + ? WHERE player_id = ?";
+        HikariCPManager.getInstance().update(sql, quantity, playerId);
+    }
+
 }
