@@ -65,6 +65,7 @@ public class ServerManager {
         initServerData();
         setCache();
         initRooms();
+        initRankings();
     }
 
     private void initServerData() {
@@ -106,6 +107,10 @@ public class ServerManager {
                 k++;
             }
         }
+    }
+
+    private void initRankings() {
+        BangXHManager.getInstance().init();
     }
 
     public void start() {

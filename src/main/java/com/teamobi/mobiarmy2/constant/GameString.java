@@ -398,4 +398,8 @@ public class GameString {
     public static String notRanking() {
         return "Chưa có hạng";
     }
+
+    public static String topBonus(String username, String bonus) {
+        return String.format("%s +%s xu mỗi ngày", username, bonus);
+    }
 }

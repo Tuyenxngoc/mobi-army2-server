@@ -1,7 +1,11 @@
 package com.teamobi.mobiarmy2.server;
 
+import com.teamobi.mobiarmy2.dao.IRankingDao;
+import com.teamobi.mobiarmy2.dao.impl.RankingDao;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 /**
  * @author tuyen
@@ -13,8 +17,8 @@ public class BangXHManager {
     public static class BangXHEntry {
         int playerId;
         String username;
-        byte nvUsed;
         short clanId;
+        byte nvUsed;
         byte level;
         byte levelPt;
         byte index;
@@ -23,6 +27,11 @@ public class BangXHManager {
     }
 
     private static BangXHManager instance;
+    private final IRankingDao rankingDao;
+
+    public BangXHManager() {
+        this.rankingDao = new RankingDao();
+    }
 
     public static BangXHManager getInstance() {
         if (instance == null) {
@@ -38,8 +47,52 @@ public class BangXHManager {
     @Getter
     private final String[] bangXHString1 = new String[]{"Danh dự", "XP", "Xu", "Lượng", "Danh dự", "Xu"};
 
+    private List<BangXHEntry> bangXHDanhDu;
+    private List<BangXHEntry> bangXHCaoThu;
+    private List<BangXHEntry> bangXHDaiGiaXu;
+    private List<BangXHEntry> bangXHDaiGiaLuong;
+    private List<BangXHEntry> bangXHDanhDuTuan;
+    private List<BangXHEntry> bangXHDaiGiaTuan;
+
+    public void init() {
+        getBangXhDanhDu();
+        getBangXhCaoThu();
+        getBangXhDaiGiaXu();
+        getBangXhDaiGiaLuong();
+        getBangXhDanhDuTuan();
+        getBangXhDaiGiaTuan();
+    }
+
+    private void getBangXhDanhDu() {
+        bangXHDanhDu = rankingDao.getTopDanhDu();
+    }
+
+    private void getBangXhCaoThu() {
+        bangXHCaoThu = rankingDao.getTopCaoThu();
+    }
+
+    private void getBangXhDaiGiaXu() {
+        bangXHDaiGiaXu = rankingDao.getTopDaiGiaXu();
+    }
+
+    private void getBangXhDaiGiaLuong() {
+        bangXHDaiGiaLuong = rankingDao.getTopDaiGiaLuong();
+    }
+
+    private void getBangXhDanhDuTuan() {
+        bangXHDanhDuTuan = rankingDao.getTopDanhDuTuan();
+    }
+
+    private void getBangXhDaiGiaTuan() {
+        bangXHDaiGiaTuan = rankingDao.getTopDaiGiaTuan();
+    }
+
     public BangXHEntry[] getBangXH(int type, int page) {
-        return new BangXHEntry[0];
+        BangXHEntry[] result = new BangXHEntry[2];
+        for (int i = 0; i < 2; i++) {
+            result[i] = bangXHCaoThu.get(i);
+        }
+        return result;
     }
 
 }
