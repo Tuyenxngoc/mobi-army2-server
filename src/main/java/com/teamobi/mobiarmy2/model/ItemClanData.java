@@ -1,5 +1,8 @@
 package com.teamobi.mobiarmy2.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 
 /**
@@ -7,6 +10,8 @@ import java.util.ArrayList;
  */
 public class ItemClanData {
 
+    @Getter
+    @Setter
     public static final class ItemClan {
         public int id;
         public int level;

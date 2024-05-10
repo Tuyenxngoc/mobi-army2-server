@@ -66,7 +66,9 @@ public class ClanManager {
     @Setter
     public static class ClanMemEntry {
         byte index;
-        int id;
+        int playerId;
+        String username;
+        byte nvUsed;
         int clan;
         Date timeJoin;
         int xu;
@@ -76,13 +78,11 @@ public class ClanManager {
         String contribute_time;
         String contribute_text;
         byte right;
-        byte nvUsed;
         byte online;
         int lever;
         byte levelPt;
         int xp;
         short[] dataEquip;
-        String name;
     }
 
     private static ClanManager instance;

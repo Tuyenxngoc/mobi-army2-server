@@ -1863,8 +1863,8 @@ public class UserService implements IUserService {
             ds.writeByte(page);
             ds.writeUTF("BIỆT ĐỘI");
             for (ClanManager.ClanMemEntry memClan : clanMemEntry) {
-                ds.writeInt(memClan.getId());
-                ds.writeUTF(memClan.getName());
+                ds.writeInt(memClan.getPlayerId());
+                ds.writeUTF(memClan.getUsername());
                 ds.writeInt(1);
                 ds.writeByte(memClan.getNvUsed());
                 ds.writeByte(memClan.getOnline());
