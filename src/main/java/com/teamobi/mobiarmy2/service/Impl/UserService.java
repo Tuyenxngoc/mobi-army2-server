@@ -9,8 +9,8 @@ import com.teamobi.mobiarmy2.dao.impl.UserDao;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.response.GetFriendResponse;
 import com.teamobi.mobiarmy2.network.Impl.Message;
-import com.teamobi.mobiarmy2.server.BangXHManager;
 import com.teamobi.mobiarmy2.server.ClanManager;
+import com.teamobi.mobiarmy2.server.LeaderboardManager;
 import com.teamobi.mobiarmy2.server.Room;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IUserService;
@@ -246,7 +246,7 @@ public class UserService implements IUserService {
             return;
         }
 
-        if (!BangXHManager.getInstance().isComplete()) {
+        if (!LeaderboardManager.getInstance().isComplete()) {
             sendMessageLoginFail(GameString.getNotFinishedLoadingRanking());
             return;
         }
@@ -690,7 +690,7 @@ public class UserService implements IUserService {
 
     @Override
     public void gopClan(Message ms) {
-        if (user.getClanId() <= 0) {
+        if (user.getClanId() == null) {
             return;
         }
 
@@ -891,32 +891,45 @@ public class UserService implements IUserService {
             byte type = dis.readByte();
             byte page = dis.readByte();
 
-            BangXHManager bangXHManager = BangXHManager.getInstance();
+            LeaderboardManager leaderboardManager = LeaderboardManager.getInstance();
+            if (type >= leaderboardManager.getLeaderboardCategories().length) {
+                return;
+            }
             ms = new Message(Cmd.BANGTHANHTICH);
             DataOutputStream ds = ms.writer();
             ds.writeByte(type);
-            if (type == -1) {
-                ds.writeByte(bangXHManager.getBangXHString().length);
-                for (String name : bangXHManager.getBangXHString()) {
+            if (type < 0) {
+                ds.writeByte(leaderboardManager.getLeaderboardCategories().length);
+                for (String name : leaderboardManager.getLeaderboardCategories()) {
                     ds.writeUTF(name);
                 }
             } else {
+                //Kiểm tra page num
+                byte maxPage = (byte) (leaderboardManager.getLeaderboardEntries().get(type).size() / 10);
+                if (page > maxPage || page >= 10) {
+                    page = 0;
+                }
+                if (page < 0) {
+                    page = maxPage;
+                }
+                //Gửi dữ liệu
                 ds.writeByte(page);
-                ds.writeUTF(bangXHManager.getBangXHString1()[type]);
-
-                BangXHManager.BangXHEntry[] bangXH = bangXHManager.getBangXH(type, page);
-                for (BangXHManager.BangXHEntry pl : bangXH) {
-                    ds.writeInt(pl.getPlayerId());
-                    ds.writeUTF(pl.getUsername());
-                    ds.writeByte(pl.getNvUsed());
-                    ds.writeShort(pl.getClanId());
-                    ds.writeByte(pl.getLevel());
-                    ds.writeByte(pl.getLevelPt());
-                    ds.writeByte(pl.getIndex());
-                    for (short i : pl.getData()) {
-                        ds.writeShort(i);
+                ds.writeUTF(leaderboardManager.getLeaderboardLabels()[type]);
+                List<PlayerLeaderboardEntry> bangXH = leaderboardManager.getLeaderboardEntries(type, page, 10);
+                if (bangXH != null) {
+                    for (PlayerLeaderboardEntry pl : bangXH) {
+                        ds.writeInt(pl.getPlayerId());
+                        ds.writeUTF(pl.getUsername());
+                        ds.writeByte(pl.getNvUsed());
+                        ds.writeShort(pl.getClanId());
+                        ds.writeByte(pl.getLevel());
+                        ds.writeByte(pl.getLevelPt());
+                        ds.writeByte(pl.getIndex());
+                        for (short i : pl.getData()) {
+                            ds.writeShort(i);
+                        }
+                        ds.writeUTF(pl.getDetail());
                     }
-                    ds.writeUTF(pl.getDetail());
                 }
             }
             ds.flush();

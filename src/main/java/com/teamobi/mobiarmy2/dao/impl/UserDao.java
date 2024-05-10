@@ -29,7 +29,7 @@ public class UserDao implements IUserDao {
 
     @Override
     public void save(User user) {
-        HikariCPManager.getInstance().update("INSERT INTO `player`(`userId`) VALUES (?)", user.getUserId());
+        HikariCPManager.getInstance().update("INSERT INTO `player`(`user_id`, `xu`, `luong`) VALUES (?,?,?)", user.getUserId(), user.getXu(), user.getLuong());
     }
 
     @Override

@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,7 +28,7 @@ public class User {
     public int userId;
     public int playerId;
     public String username;
-    public short clanId;
+    public Short clanId;
     public int xu;
     public int luong;
     public int danhVong;
@@ -67,6 +68,8 @@ public class User {
     public static void setDefaultValue(User user) {
         user.xu = 1000;
         user.luong = 0;
+        user.items = new byte[36];
+        user.friends = new ArrayList<>();
     }
 
     public boolean isNotWaiting() {

@@ -34,6 +34,6 @@ public class CommonConstant {
     public static final byte POINT_ON_LEVEL = 3;
     public static final int MIN_XU_CONTRIBUTE_CLAN = 1000;
 
-    public static final int[] TOP_BONUS_DD = {30_000, 20_000, 10_000};
+    public static final int[] TOP_BONUS = {30_000, 20_000, 10_000};
 
 }

@@ -110,7 +110,7 @@ public class ServerManager {
     }
 
     private void initRankings() {
-        BangXHManager.getInstance().init();
+        LeaderboardManager.getInstance().init();
     }
 
     public void start() {

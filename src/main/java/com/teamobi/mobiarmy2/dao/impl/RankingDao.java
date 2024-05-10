@@ -8,7 +8,7 @@ import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.DataCharacter;
 import com.teamobi.mobiarmy2.json.Equipment;
 import com.teamobi.mobiarmy2.model.NVData;
-import com.teamobi.mobiarmy2.server.BangXHManager;
+import com.teamobi.mobiarmy2.model.PlayerLeaderboardEntry;
 import com.teamobi.mobiarmy2.util.Until;
 
 import java.sql.Connection;
@@ -20,46 +20,53 @@ import java.util.List;
 
 public class RankingDao implements IRankingDao {
 
-    private void readInfo(List<BangXHManager.BangXHEntry> top, ResultSet resultSet, boolean isBonus) throws SQLException {
-        byte jjjjj = 1;
-        Gson gson = new Gson();
-        while (resultSet.next()) {
-            BangXHManager.BangXHEntry bangXHEntry = new BangXHManager.BangXHEntry();
-            bangXHEntry.setPlayerId(resultSet.getInt("player_id"));
-            if (jjjjj <= 3 && isBonus) {
-                bangXHEntry.setUsername(GameString.topBonus(resultSet.getString("username"), Until.getStringNumber(CommonConstant.TOP_BONUS_DD[jjjjj - 1])));
-            } else {
-                bangXHEntry.setUsername(resultSet.getString("username"));
-            }
-            bangXHEntry.setClanId(resultSet.getShort("clan_id"));
+    private final Gson gson;
 
-            byte nvUsed = resultSet.getByte("NVused");
-            DataCharacter character = gson.fromJson(resultSet.getString("NV%s".formatted(nvUsed)), DataCharacter.class);
-            Equipment[] trangBi = gson.fromJson(resultSet.getString("ruongTrangBi"), Equipment[].class);
+    public RankingDao() {
+        this.gson = new Gson();
+    }
 
-            bangXHEntry.setNvUsed(nvUsed);
-            bangXHEntry.setLevel((byte) character.getLevel());
-            bangXHEntry.setLevelPt((byte) 0);
-            bangXHEntry.setIndex(jjjjj);
-            bangXHEntry.setData(NVData.getEquipData(trangBi, character, nvUsed));
-            bangXHEntry.setDetail(Until.getStringNumber(resultSet.getInt("dvong")));
-
-            top.add(bangXHEntry);
-            jjjjj++;
+    private PlayerLeaderboardEntry createPlayerLeaderboardEntry(ResultSet resultSet, byte index, boolean isBonus) throws SQLException {
+        PlayerLeaderboardEntry entry = new PlayerLeaderboardEntry();
+        entry.setPlayerId(resultSet.getInt("player_id"));
+        if (index <= 3 && isBonus) {
+            entry.setUsername(GameString.topBonus(resultSet.getString("username"), Until.getStringNumber(CommonConstant.TOP_BONUS[index - 1])));
+        } else {
+            entry.setUsername(resultSet.getString("username"));
         }
+        entry.setClanId(resultSet.getShort("clan_id"));
+
+        byte nvUsed = resultSet.getByte("NVused");
+        DataCharacter character = gson.fromJson(resultSet.getString("NV%s".formatted(nvUsed)), DataCharacter.class);
+        Equipment[] equipment = gson.fromJson(resultSet.getString("ruongTrangBi"), Equipment[].class);
+
+        entry.setNvUsed(nvUsed);
+        entry.setLevel((byte) character.getLevel());
+        entry.setLevelPt((byte) 0);
+        entry.setIndex(index);
+        entry.setData(NVData.getEquipData(equipment, character, nvUsed));
+
+        return entry;
     }
 
     @Override
-    public List<BangXHManager.BangXHEntry> getTopDanhDu() {
-        List<BangXHManager.BangXHEntry> top = new ArrayList<>(100);
+    public List<PlayerLeaderboardEntry> getTopDanhDu() {
+        List<PlayerLeaderboardEntry> top = new ArrayList<>(100);
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery(
-                    "SELECT *, u.username " +
+                    "SELECT p.*, u.username " +
                             "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
+                            "WHERE p.dvong > 0 " +
                             "ORDER BY dvong LIMIT 100"
             )) {
-                readInfo(top, resultSet, true);
+                byte index = 1;
+                while (resultSet.next()) {
+                    PlayerLeaderboardEntry entry = createPlayerLeaderboardEntry(resultSet, index, true);
+                    entry.setDetail(Until.getStringNumber(resultSet.getInt("dvong")));
+                    top.add(entry);
+                    index++;
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -68,8 +75,8 @@ public class RankingDao implements IRankingDao {
     }
 
     @Override
-    public List<BangXHManager.BangXHEntry> getTopCaoThu() {
-        List<BangXHManager.BangXHEntry> top = new ArrayList<>(100);
+    public List<PlayerLeaderboardEntry> getTopCaoThu() {
+        List<PlayerLeaderboardEntry> top = new ArrayList<>(100);
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery(
@@ -77,7 +84,13 @@ public class RankingDao implements IRankingDao {
                             "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
                             "ORDER BY p.xpMax LIMIT 100"
             )) {
-                readInfo(top, resultSet, false);
+                byte index = 1;
+                while (resultSet.next()) {
+                    PlayerLeaderboardEntry entry = createPlayerLeaderboardEntry(resultSet, index, false);
+                    entry.setDetail(Until.getStringNumber(resultSet.getInt("dvong")));
+                    top.add(entry);
+                    index++;
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -85,10 +98,9 @@ public class RankingDao implements IRankingDao {
         return top;
     }
 
-
     @Override
-    public List<BangXHManager.BangXHEntry> getTopDaiGiaXu() {
-        List<BangXHManager.BangXHEntry> top = new ArrayList<>(100);
+    public List<PlayerLeaderboardEntry> getTopDaiGiaXu() {
+        List<PlayerLeaderboardEntry> top = new ArrayList<>(100);
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery(
@@ -96,7 +108,13 @@ public class RankingDao implements IRankingDao {
                             "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
                             "ORDER BY p.xu LIMIT 100"
             )) {
-                readInfo(top, resultSet, false);
+                byte index = 1;
+                while (resultSet.next()) {
+                    PlayerLeaderboardEntry entry = createPlayerLeaderboardEntry(resultSet, index, false);
+                    entry.setDetail(Until.getStringNumber(resultSet.getInt("xu")));
+                    top.add(entry);
+                    index++;
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -105,8 +123,8 @@ public class RankingDao implements IRankingDao {
     }
 
     @Override
-    public List<BangXHManager.BangXHEntry> getTopDaiGiaLuong() {
-        List<BangXHManager.BangXHEntry> top = new ArrayList<>(100);
+    public List<PlayerLeaderboardEntry> getTopDaiGiaLuong() {
+        List<PlayerLeaderboardEntry> top = new ArrayList<>(100);
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery(
@@ -114,7 +132,13 @@ public class RankingDao implements IRankingDao {
                             "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
                             "ORDER BY p.luong LIMIT 100"
             )) {
-                readInfo(top, resultSet, false);
+                byte index = 1;
+                while (resultSet.next()) {
+                    PlayerLeaderboardEntry entry = createPlayerLeaderboardEntry(resultSet, index, false);
+                    entry.setDetail(Until.getStringNumber(resultSet.getInt("luong")));
+                    top.add(entry);
+                    index++;
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -123,8 +147,8 @@ public class RankingDao implements IRankingDao {
     }
 
     @Override
-    public List<BangXHManager.BangXHEntry> getTopDanhDuTuan() {
-        List<BangXHManager.BangXHEntry> top = new ArrayList<>(100);
+    public List<PlayerLeaderboardEntry> getTopDanhDuTuan() {
+        List<PlayerLeaderboardEntry> top = new ArrayList<>(100);
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery(
@@ -132,7 +156,13 @@ public class RankingDao implements IRankingDao {
                             "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
                             "ORDER BY p.point_event LIMIT 100"
             )) {
-                readInfo(top, resultSet, false);
+                byte index = 1;
+                while (resultSet.next()) {
+                    PlayerLeaderboardEntry entry = createPlayerLeaderboardEntry(resultSet, index, false);
+                    entry.setDetail(Until.getStringNumber(resultSet.getInt("dvong")));
+                    top.add(entry);
+                    index++;
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -141,8 +171,8 @@ public class RankingDao implements IRankingDao {
     }
 
     @Override
-    public List<BangXHManager.BangXHEntry> getTopDaiGiaTuan() {
-        List<BangXHManager.BangXHEntry> top = new ArrayList<>(100);
+    public List<PlayerLeaderboardEntry> getTopDaiGiaTuan() {
+        List<PlayerLeaderboardEntry> top = new ArrayList<>(100);
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery(
@@ -150,7 +180,13 @@ public class RankingDao implements IRankingDao {
                             "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
                             "ORDER BY p.clanpoint LIMIT 100"
             )) {
-                readInfo(top, resultSet, false);
+                byte index = 1;
+                while (resultSet.next()) {
+                    PlayerLeaderboardEntry entry = createPlayerLeaderboardEntry(resultSet, index, false);
+                    entry.setDetail(Until.getStringNumber(resultSet.getInt("dvong")));
+                    top.add(entry);
+                    index++;
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();

@@ -1,20 +1,20 @@
 package com.teamobi.mobiarmy2.dao;
 
-import com.teamobi.mobiarmy2.server.BangXHManager;
+import com.teamobi.mobiarmy2.model.PlayerLeaderboardEntry;
 
 import java.util.List;
 
 public interface IRankingDao {
 
-    List<BangXHManager.BangXHEntry> getTopDanhDu();
+    List<PlayerLeaderboardEntry> getTopDanhDu();
 
-    List<BangXHManager.BangXHEntry> getTopCaoThu();
+    List<PlayerLeaderboardEntry> getTopCaoThu();
 
-    List<BangXHManager.BangXHEntry> getTopDaiGiaXu();
+    List<PlayerLeaderboardEntry> getTopDaiGiaXu();
 
-    List<BangXHManager.BangXHEntry> getTopDaiGiaLuong();
+    List<PlayerLeaderboardEntry> getTopDaiGiaLuong();
 
-    List<BangXHManager.BangXHEntry> getTopDanhDuTuan();
+    List<PlayerLeaderboardEntry> getTopDanhDuTuan();
 
-    List<BangXHManager.BangXHEntry> getTopDaiGiaTuan();
+    List<PlayerLeaderboardEntry> getTopDaiGiaTuan();
 }
