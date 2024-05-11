@@ -13,7 +13,7 @@ public class ItemClanData {
 
     @Getter
     @Setter
-    public static final class ClanItem {
+    public static final class ClanItemDetail {
         byte id;
         byte level;
         String name;
@@ -23,9 +23,9 @@ public class ItemClanData {
         int luong;
     }
 
-    public static final Map<Byte, ClanItem> clanItemsMap = new HashMap<>();
+    public static final Map<Byte, ClanItemDetail> clanItemsMap = new HashMap<>();
 
-    public static ClanItem getItemClanById(byte id) {
+    public static ClanItemDetail getItemClanById(byte id) {
         return clanItemsMap.get(id);
     }
 

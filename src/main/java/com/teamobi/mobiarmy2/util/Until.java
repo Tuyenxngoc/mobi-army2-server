@@ -209,8 +209,8 @@ public class Until {
         }
     }
 
-    public static String getStrungTime(long s) {
-        s = Math.abs(s) / 1000L;
+    public static String getStringTimeBySecond(long s) {
+        s = Math.abs(s);
         if (s >= 31104000) {
             return (s / 31104000) + " năm";
         } else if (s >= 2592000) {

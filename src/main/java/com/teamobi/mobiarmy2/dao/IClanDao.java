@@ -8,6 +8,8 @@ public interface IClanDao {
 
     Short getClanIcon(int clanId);
 
+    Byte getMembersOfClan(short clanId);
+
     void updateXu(int clanId, int xu);
 
     void updateLuong(int clanId, int luong);
@@ -17,4 +19,5 @@ public interface IClanDao {
     ClanManager.ClanInfo getClanInfo(short clanId);
 
     List<ClanManager.ClanMemEntry> getClanMember(short clanId, byte page);
+
 }

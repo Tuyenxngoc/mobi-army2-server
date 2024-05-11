@@ -1859,6 +1859,17 @@ public class UserService implements IUserService {
             byte page = dis.readByte();
             short clanId = dis.readShort();
 
+            byte totalPage = ClanManager.getInstance().getTotalPage(clanId);
+            if (totalPage == -1) {
+                return;
+            }
+            if (page >= totalPage) {
+                page = 0;
+            }
+            if (page < 0) {
+                page = (byte) (totalPage - 1);
+            }
+
             List<ClanManager.ClanMemEntry> clanMemEntry = ClanManager.getInstance().getMemberClan(clanId, page);
 
             ms = new Message(Cmd.CLAN_MEMBER);
@@ -1879,7 +1890,7 @@ public class UserService implements IUserService {
                     ds.writeShort(memClan.getDataEquip()[j]);
                 }
                 ds.writeUTF(memClan.getContribute_text());
-                ds.writeUTF(memClan.getN_contribute());
+                ds.writeUTF(memClan.getContribute_count());
             }
             ds.flush();
             user.sendMessage(ms);

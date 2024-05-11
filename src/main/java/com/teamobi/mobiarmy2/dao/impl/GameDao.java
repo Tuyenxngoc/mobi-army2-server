@@ -193,7 +193,7 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `clanshop`")) {
                 while (resultSet.next()) {
-                    ItemClanData.ClanItem item = new ItemClanData.ClanItem();
+                    ItemClanData.ClanItemDetail item = new ItemClanData.ClanItemDetail();
                     item.setId(resultSet.getByte("clanshop_id"));
                     item.setLevel(resultSet.getByte("level"));
                     item.setName(resultSet.getString("name"));

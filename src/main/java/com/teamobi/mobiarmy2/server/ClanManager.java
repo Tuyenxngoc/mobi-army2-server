@@ -6,7 +6,6 @@ import com.teamobi.mobiarmy2.util.Until;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -65,24 +64,17 @@ public class ClanManager {
     @Getter
     @Setter
     public static class ClanMemEntry {
-        byte index;
         int playerId;
         String username;
         byte nvUsed;
-        int clan;
-        Date timeJoin;
-        int xu;
-        int luong;
-        int cup;
-        String n_contribute;
-        String contribute_time;
-        String contribute_text;
-        byte right;
         byte online;
-        int lever;
+        byte lever;
         byte levelPt;
-        int xp;
+        byte index;
+        int cup;
         short[] dataEquip;
+        String contribute_text;
+        String contribute_count;
     }
 
     private static ClanManager instance;
@@ -103,13 +95,21 @@ public class ClanManager {
         return Until.getFile("res/icon/clan/" + clanDao.getClanIcon(clanId) + ".png");
     }
 
+    public byte getTotalPage(short clanId) {
+        Byte mem = clanDao.getMembersOfClan(clanId);
+        if (mem == null) {
+            return -1;
+        }
+        return (byte) Math.ceil((double) mem / 10);
+    }
+
     public void contributeClan(short clanId, int playerId, int quantity, boolean isXu) {
         if (isXu) {
             clanDao.updateXu(clanId, quantity);
-            clanDao.gopClanContribute(Until.getStringNumber(quantity) + " xu", playerId, quantity, 0);
+            clanDao.gopClanContribute("Góp " + Until.getStringNumber(quantity) + " xu", playerId, quantity, 0);
         } else {
             clanDao.updateLuong(clanId, quantity);
-            clanDao.gopClanContribute(Until.getStringNumber(quantity) + " lượng", playerId, 0, quantity);
+            clanDao.gopClanContribute("Góp " + Until.getStringNumber(quantity) + " lượng", playerId, 0, quantity);
         }
     }
 

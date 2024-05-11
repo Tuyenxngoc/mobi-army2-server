@@ -11,10 +11,9 @@ import com.teamobi.mobiarmy2.model.NVData;
 import com.teamobi.mobiarmy2.server.ClanManager;
 import com.teamobi.mobiarmy2.util.Until;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,6 +46,23 @@ public class ClanDao implements IClanDao {
     }
 
     @Override
+    public Byte getMembersOfClan(short clanId) {
+        try (Connection connection = HikariCPManager.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT mem FROM clan WHERE clan_id = ?")) {
+            statement.setInt(1, clanId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getByte("mem");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @Override
     public void updateXu(int clanId, int xu) {
         String sql = "UPDATE clan SET xu = xu + ? WHERE clan_id = ?";
         HikariCPManager.getInstance().update(sql, xu, clanId);
@@ -67,7 +83,7 @@ public class ClanDao implements IClanDao {
                 "`xu` = `xu` + ?, " +
                 "`luong` = `luong` + ? " +
                 "WHERE `player_id` = ?";
-        HikariCPManager.getInstance().update(sql, Until.toDateString(new Date()), txtContribute, xu, luong, playerId);
+        HikariCPManager.getInstance().update(sql, LocalDateTime.now(), txtContribute, xu, luong, playerId);
     }
 
     @Override
@@ -116,10 +132,10 @@ public class ClanDao implements IClanDao {
                     List<ClanManager.ClanItem> filteredItems = Arrays.stream(clanItemDataArray)
                             .filter(item -> !item.getTime().before(currentDate))
                             .map(item -> {
-                                ItemClanData.ClanItem clanItem = ItemClanData.getItemClanById(item.getId());
-                                if (clanItem != null) {
+                                ItemClanData.ClanItemDetail clanItemDetail = ItemClanData.getItemClanById(item.getId());
+                                if (clanItemDetail != null) {
                                     ClanManager.ClanItem newClanItem = new ClanManager.ClanItem();
-                                    newClanItem.setName(clanItem.getName());
+                                    newClanItem.setName(clanItemDetail.getName());
                                     newClanItem.setTime(Until.calculateTimeDifferenceInSeconds(item.getTime(), currentDate));
                                     return newClanItem;
                                 }
@@ -147,14 +163,16 @@ public class ClanDao implements IClanDao {
                      "INNER JOIN player p on c.player_id = p.player_id " +
                      "INNER JOIN user u on p.user_id = u.user_id " +
                      "WHERE p.clan_id = ? " +
-                     "ORDER BY c.rights DESC")) {
+                     "ORDER BY c.rights DESC " +
+                     "LIMIT 10 OFFSET ?")) {
             statement.setShort(1, clanId);
+            statement.setInt(2, page * 10);
+
             try (ResultSet resultSet = statement.executeQuery()) {
                 byte index = 0;
                 while (resultSet.next()) {
                     ClanManager.ClanMemEntry entry = new ClanManager.ClanMemEntry();
                     entry.setPlayerId(resultSet.getInt("p.player_id"));
-
                     byte rights = resultSet.getByte("c.rights");
                     if (rights == 2) {
                         entry.setUsername(resultSet.getString("username") + " (Đội trưởng)");
@@ -164,13 +182,34 @@ public class ClanDao implements IClanDao {
                         entry.setUsername(resultSet.getString("username"));
                     }
                     entry.setNvUsed(resultSet.getByte("NVused"));
+                    entry.setOnline(resultSet.getByte("p.online"));
 
                     DataCharacter dataCharacter = gson.fromJson(resultSet.getString("NV" + entry.getNvUsed()), DataCharacter.class);
                     Equipment[] trangBi = gson.fromJson(resultSet.getString("ruongTrangBi"), Equipment[].class);
+
+                    entry.setLever((byte) dataCharacter.getLevel());
+                    entry.setLevelPt((byte) 0);
+                    entry.setIndex((byte) ((page * 10) + index));
+                    entry.setCup(resultSet.getInt("p.dvong"));
                     entry.setDataEquip(NVData.getEquipData(trangBi, dataCharacter, entry.getNvUsed()));
 
-                    entry.setContribute_text(resultSet.getString("c.contribute_text"));
-                    entry.setN_contribute("Chưa đóng góp");
+                    short contributeCount = resultSet.getShort("c.contribute_count");
+                    if (contributeCount > 0) {
+                        Timestamp contributionTime = resultSet.getTimestamp("c.contribute_time");
+                        String contributionText = resultSet.getString("c.contribute_text");
+                        int xuContribution = resultSet.getInt("c.xu");
+                        int luongContribution = resultSet.getInt("c.luong");
+
+                        LocalDateTime now = LocalDateTime.now();
+                        LocalDateTime currentTime = contributionTime.toLocalDateTime();
+                        String formattedTime = Until.getStringTimeBySecond(now.getSecond() - currentTime.getSecond());
+
+                        entry.setContribute_text(String.format("%s %s trước", contributionText, formattedTime));
+                        entry.setContribute_count("%d lần: %s xu và %s lượng".formatted(contributeCount, Until.getStringNumber(xuContribution), Until.getStringNumber(luongContribution)));
+                    } else {
+                        entry.setContribute_text("Chưa đóng góp");
+                        entry.setContribute_count("");
+                    }
 
                     entries.add(entry);
                     index++;
