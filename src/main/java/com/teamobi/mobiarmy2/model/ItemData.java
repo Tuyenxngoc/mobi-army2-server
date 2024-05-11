@@ -1,5 +1,8 @@
 package com.teamobi.mobiarmy2.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,12 +11,14 @@ import java.util.List;
  */
 public class ItemData {
 
+    @Getter
+    @Setter
     public static final class Item {
-        public String name;
-        public int buyXu;
-        public int buyLuong;
+        String name;
+        int buyXu;
+        int buyLuong;
+        byte carriedItemCount;
     }
 
-    public static List<Item> items = new ArrayList<>();
-    public static byte[] carriedItemCount = {2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    public static final List<Item> items = new ArrayList<>();
 }

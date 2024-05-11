@@ -3,7 +3,8 @@ package com.teamobi.mobiarmy2.model;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author tuyen
@@ -12,27 +13,20 @@ public class ItemClanData {
 
     @Getter
     @Setter
-    public static final class ItemClan {
-        public int id;
-        public int level;
-        public String name;
-        public short time;
-        public byte onSale;
-        public int xu;
-        public int luong;
+    public static final class ClanItem {
+        byte id;
+        byte level;
+        String name;
+        byte time;
+        byte onSale;
+        int xu;
+        int luong;
     }
 
-    public static ArrayList<ItemClan> itemClans = new ArrayList<>();
+    public static final Map<Byte, ClanItem> clanItemsMap = new HashMap<>();
 
-    public static ItemClan getItemClanById(int id) {
-        ItemClan itemClan = null;
-        for (ItemClan tmp : itemClans) {
-            if (tmp.id == id) {
-                itemClan = tmp;
-                break;
-            }
-        }
-        return itemClan;
+    public static ClanItem getItemClanById(byte id) {
+        return clanItemsMap.get(id);
     }
 
 }

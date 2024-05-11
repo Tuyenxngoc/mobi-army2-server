@@ -15,9 +15,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author tuyen
@@ -89,35 +88,47 @@ public class ClanDao implements IClanDao {
                     ClanManager.ClanInfo clanInfo = new ClanManager.ClanInfo();
                     clanInfo.setId(red.getShort("clan_id"));
                     clanInfo.setName(red.getString("name"));
-                    clanInfo.setMemberCount((byte) red.getInt("mem"));
-                    clanInfo.setMaxMemberCount((byte) red.getInt("mem_max"));
+                    clanInfo.setMemberCount(red.getByte("mem"));
+                    clanInfo.setMaxMemberCount(red.getByte("mem_max"));
                     clanInfo.setMasterName(red.getString("username"));
                     clanInfo.setXu(red.getInt("xu"));
                     clanInfo.setLuong(red.getInt("luong"));
                     clanInfo.setCup(red.getInt("cup"));
-                    clanInfo.setLevel((byte) 1);
-                    clanInfo.setXpUpLevel(1000);
+
+                    int exp = red.getInt("xp");
+                    byte level = Until.calculateLevelClan(exp);
+                    int expUpLevel = Until.calculateXPRequired(level + 1);
+                    int expCurrentLevel = Until.calculateXPRequired(level);
+
+                    double expProgress = (exp - expCurrentLevel) * 100 / (double) expUpLevel;
+
+                    clanInfo.setExp(exp);
+                    clanInfo.setXpUpLevel(expUpLevel);
+                    clanInfo.setLevel(level);
+                    clanInfo.setLevelPercentage((byte) Math.min(100, expProgress));
+
                     clanInfo.setDescription(red.getString("description"));
                     clanInfo.setDateCreated(red.getString("date_created"));
 
-                    //Todo optimize this code
-                    ClanItemData[] items = gson.fromJson(red.getString("item"), ClanItemData[].class);
+                    ClanItemData[] clanItemDataArray = gson.fromJson(red.getString("item"), ClanItemData[].class);
                     Date currentDate = new Date();
-                    List<ClanManager.ClanItem> a = new ArrayList<>();
-                    for (ClanItemData item : items) {
-                        if (item.getTime().before(currentDate)) {
-                            continue;
-                        }
-                        ItemClanData.ItemClan itemClan = ItemClanData.getItemClanById(item.getId());
-                        if (itemClan != null) {
-                            ClanManager.ClanItem newItm = new ClanManager.ClanItem();
-                            newItm.setName(itemClan.getName());
-                            newItm.setTime((int) (item.getTime().getTime() / 1000) - (int) (currentDate.getTime() / 1000));
-                            a.add(newItm);
-                        }
 
-                    }
-                    clanInfo.setItems(a);
+                    List<ClanManager.ClanItem> filteredItems = Arrays.stream(clanItemDataArray)
+                            .filter(item -> !item.getTime().before(currentDate))
+                            .map(item -> {
+                                ItemClanData.ClanItem clanItem = ItemClanData.getItemClanById(item.getId());
+                                if (clanItem != null) {
+                                    ClanManager.ClanItem newClanItem = new ClanManager.ClanItem();
+                                    newClanItem.setName(clanItem.getName());
+                                    newClanItem.setTime(Until.calculateTimeDifferenceInSeconds(item.getTime(), currentDate));
+                                    return newClanItem;
+                                }
+                                return null;
+                            })
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toList());
+
+                    clanInfo.setItems(filteredItems);
 
                     return clanInfo;
                 }
@@ -135,7 +146,7 @@ public class ClanDao implements IClanDao {
              PreparedStatement statement = connection.prepareStatement("SELECT c.*, p.*, u.username FROM clanmem c " +
                      "INNER JOIN player p on c.player_id = p.player_id " +
                      "INNER JOIN user u on p.user_id = u.user_id " +
-                     "WHERE c.clan_id = ? " +
+                     "WHERE p.clan_id = ? " +
                      "ORDER BY c.rights DESC")) {
             statement.setShort(1, clanId);
             try (ResultSet resultSet = statement.executeQuery()) {

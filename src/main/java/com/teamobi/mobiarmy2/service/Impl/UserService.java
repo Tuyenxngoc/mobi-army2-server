@@ -655,13 +655,13 @@ public class UserService implements IUserService {
             }
 
             //Item
-            for (int i = 0; i < 36; i++) {
+            for (int i = 0; i < ItemData.items.size(); i++) {
                 ds.writeByte(user.items[i]);
                 ItemData.Item item = ItemData.items.get(i);
                 // Gia xu
-                ds.writeInt(item.buyXu);
+                ds.writeInt(item.getBuyXu());
                 // Gia luong
-                ds.writeInt(item.buyLuong);
+                ds.writeInt(item.getBuyLuong());
             }
 
             //Nhan vat
@@ -1793,11 +1793,14 @@ public class UserService implements IUserService {
     @Override
     public void clanIcon(Message ms) {
         try {
-            short id = ms.reader().readShort();
-            byte[] data = ClanManager.getInstance().getClanIcon(id);
+            short clanId = ms.reader().readShort();
+            byte[] data = ClanManager.getInstance().getClanIcon(clanId);
+            if (data == null) {
+                return;
+            }
             ms = new Message(Cmd.CLAN_ICON);
             DataOutputStream ds = ms.writer();
-            ds.writeShort(id);
+            ds.writeShort(clanId);
             ds.writeShort(data.length);
             ds.write(data);
             ds.flush();

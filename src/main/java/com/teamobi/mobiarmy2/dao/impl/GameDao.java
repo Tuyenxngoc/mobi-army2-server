@@ -173,12 +173,13 @@ public class GameDao implements IGameDao {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `item`")) {
                 while (resultSet.next()) {
                     ItemData.Item iEntry = new ItemData.Item();
-                    iEntry.name = resultSet.getString("name");
-                    iEntry.buyXu = resultSet.getInt("xu");
-                    iEntry.buyLuong = resultSet.getInt("luong");
+                    iEntry.setName(resultSet.getString("name"));
+                    iEntry.setBuyXu(resultSet.getInt("xu"));
+                    iEntry.setBuyLuong(resultSet.getInt("luong"));
+                    iEntry.setCarriedItemCount(resultSet.getByte("carried_item_count"));
+
                     ItemData.items.add(iEntry);
                 }
-                System.out.println("Item readed size=" + ItemData.items.size());
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -192,16 +193,16 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `clanshop`")) {
                 while (resultSet.next()) {
-                    ItemClanData.ItemClan iEntry = new ItemClanData.ItemClan();
-                    iEntry.id = resultSet.getInt("clanshop_id");
-                    iEntry.level = resultSet.getInt("level");
-                    iEntry.name = resultSet.getString("name");
-                    iEntry.time = resultSet.getShort("time");
-                    iEntry.onSale = resultSet.getByte("onsale");
-                    iEntry.xu = resultSet.getInt("xu");
-                    iEntry.luong = resultSet.getInt("luong");
-                    ItemClanData.itemClans.add(iEntry);
-                    System.out.println("id " + iEntry.id + " level " + iEntry.level + " name " + iEntry.name);
+                    ItemClanData.ClanItem item = new ItemClanData.ClanItem();
+                    item.setId(resultSet.getByte("clanshop_id"));
+                    item.setLevel(resultSet.getByte("level"));
+                    item.setName(resultSet.getString("name"));
+                    item.setTime(resultSet.getByte("time"));
+                    item.setOnSale(resultSet.getByte("on_sale"));
+                    item.setXu(resultSet.getInt("xu"));
+                    item.setLuong(resultSet.getInt("luong"));
+
+                    ItemClanData.clanItemsMap.put(item.getId(), item);
                 }
             }
         } catch (SQLException e) {
