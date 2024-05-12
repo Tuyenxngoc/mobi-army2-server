@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class Equipment {
+public class EquipmentData {
     @SerializedName("nvId")
     private int nvId;
 

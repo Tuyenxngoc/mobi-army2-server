@@ -9,7 +9,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class DataItem {
+public class ItemData {
 
     @SerializedName("id")
     private int id;

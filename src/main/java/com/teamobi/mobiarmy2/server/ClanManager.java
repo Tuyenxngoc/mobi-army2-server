@@ -2,10 +2,15 @@ package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.dao.IClanDao;
 import com.teamobi.mobiarmy2.dao.impl.ClanDao;
+import com.teamobi.mobiarmy2.json.ClanItemData;
+import com.teamobi.mobiarmy2.model.ItemClanData;
 import com.teamobi.mobiarmy2.util.Until;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -89,6 +94,47 @@ public class ClanManager {
             instance = new ClanManager();
         }
         return instance;
+    }
+
+    public byte getClanLevel(short clanId) {
+        int exp = clanDao.getExp(clanId);
+        return Until.calculateLevelClan(exp);
+    }
+
+    public int getClanXu(short clanId) {
+        return clanDao.getXu(clanId);
+    }
+
+    public int getClanLuong(short clanId) {
+        return clanDao.getLuong(clanId);
+    }
+
+    public void updateItemClan(short clanId, ItemClanData.ClanItemDetail clanItemDetail, boolean isBuyXu) {
+        if (isBuyXu) {
+            clanDao.updateXu(clanId, -clanItemDetail.getXu());
+        } else {
+            clanDao.updateLuong(clanId, -clanItemDetail.getLuong());
+        }
+
+        ClanItemData[] items = clanDao.getClanItems(clanId);
+        boolean found = false;
+        for (ClanItemData item : items) {
+            if (item.getId() == clanItemDetail.getId()) {
+                item.setTime(item.getTime().plusHours(clanItemDetail.getTime()));
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            List<ClanItemData> updatedItems = new ArrayList<>(Arrays.asList(items));
+            ClanItemData newItem = new ClanItemData();
+            newItem.setId(clanItemDetail.getId());
+            newItem.setTime(LocalDateTime.now().plusHours(clanItemDetail.getTime()));
+            updatedItems.add(newItem);
+            items = updatedItems.toArray(new ClanItemData[0]);
+        }
+        clanDao.updateClanItems(clanId, items);
     }
 
     public byte[] getClanIcon(short clanId) {

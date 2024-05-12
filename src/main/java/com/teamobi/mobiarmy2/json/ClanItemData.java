@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * @author tuyen
@@ -17,6 +17,6 @@ public class ClanItemData {
     private byte id;
 
     @SerializedName("time")
-    private Date time;
+    private LocalDateTime time;
 
 }

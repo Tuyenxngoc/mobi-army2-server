@@ -1,7 +1,6 @@
 package com.teamobi.mobiarmy2.model;
 
-import com.teamobi.mobiarmy2.json.DataCharacter;
-import com.teamobi.mobiarmy2.json.Equipment;
+import com.teamobi.mobiarmy2.json.CharacterData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,12 +119,12 @@ public class NVData {
         return null;
     }
 
-    public static short[] getEquipData(Equipment[] trangBi, DataCharacter character, byte nvUsed) {
+    public static short[] getEquipData(com.teamobi.mobiarmy2.json.EquipmentData[] trangBi, CharacterData character, byte nvUsed) {
         int index = character.getData().get(5);
         short[] data = new short[5];
         if (index >= 0 && index < trangBi.length) {
-            Equipment equipment = trangBi[index];
-            NVData.EquipmentEntry entry = NVData.getEquipEntryById(equipment.getNvId(), equipment.getEquipType(), equipment.getId());
+            com.teamobi.mobiarmy2.json.EquipmentData equipmentData = trangBi[index];
+            NVData.EquipmentEntry entry = NVData.getEquipEntryById(equipmentData.getNvId(), equipmentData.getEquipType(), equipmentData.getId());
             if (entry != null && entry.arraySet != null) {
                 data[0] = entry.arraySet[0];
                 data[1] = entry.arraySet[1];

@@ -941,7 +941,84 @@ public class UserService implements IUserService {
 
     @Override
     public void clanShop(Message ms) {
+        if (user.getClanId() == null) {
+            sendServerMessage(GameString.notClan());
+            return;
+        }
+        try {
+            DataInputStream dis = ms.reader();
+            byte type = dis.readByte();
+            if (type == 0) {
+                sendClanShop();
+            } else if (type == 1) {
+                byte buyType = dis.readByte();
+                byte itemId = dis.readByte();
+                buyClanShop(buyType, itemId);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    private void buyClanShop(byte buyType, byte itemId) {
+        ClanManager clanManager = ClanManager.getInstance();
+        ItemClanData.ClanItemDetail clanItemDetail = ItemClanData.getItemClanById(itemId);
+
+        if (clanItemDetail == null || clanItemDetail.getOnSale() != 1) {
+            return;
+        }
+
+        byte currentLevel = clanManager.getClanLevel(user.getClanId());
+        if (currentLevel < clanItemDetail.getLevel()) {
+            sendServerMessage(GameString.clanLevelNotEnought());
+            return;
+        }
+
+        if (buyType == 0) {//Xu
+            if (clanItemDetail.getXu() < 0) {
+                return;
+            }
+            int xuClan = clanManager.getClanXu(user.getClanId());
+            if (xuClan < clanItemDetail.getXu()) {
+                sendServerMessage(GameString.clanXuNotEnought());
+                return;
+            }
+
+            clanManager.updateItemClan(user.getClanId(), clanItemDetail, true);
+        } else if (buyType == 1) {//Luong
+            if (clanItemDetail.getLuong() < 0) {
+                return;
+            }
+            int luongClan = clanManager.getClanLuong(user.getClanId());
+            if (luongClan < clanItemDetail.getLuong()) {
+                sendServerMessage(GameString.clanLuongNotEnought());
+                return;
+            }
+
+            clanManager.updateItemClan(user.getClanId(), clanItemDetail, false);
+        }
+        sendServerMessage(GameString.buySuccess());
+    }
+
+    private void sendClanShop() {
+        try {
+            Message ms = new Message(Cmd.SHOP_BIETDOI);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(ItemClanData.clanItemsMap.size());
+            for (Byte key : ItemClanData.clanItemsMap.keySet()) {
+                ItemClanData.ClanItemDetail clanItemDetail = ItemClanData.clanItemsMap.get(key);
+                ds.writeByte(clanItemDetail.getId());
+                ds.writeUTF(clanItemDetail.getName());
+                ds.writeInt(clanItemDetail.getXu());
+                ds.writeInt(clanItemDetail.getLuong());
+                ds.writeByte(clanItemDetail.getTime());
+                ds.writeByte(clanItemDetail.getLevel());
+            }
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
