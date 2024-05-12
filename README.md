@@ -1,1 +1,1 @@
-Tuyenngoc
+<img src="res/icon.png" alt="icon"/>

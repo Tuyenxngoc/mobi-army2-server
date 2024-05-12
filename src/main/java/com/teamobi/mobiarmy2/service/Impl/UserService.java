@@ -6,6 +6,7 @@ import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.dao.impl.UserDao;
+import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.clan.ClanInfo;
@@ -1200,12 +1201,67 @@ public class UserService implements IUserService {
 
     @Override
     public void vaoPhong(Message ms) {
-
+        try {
+            byte roomNumber = ms.reader().readByte();
+            Room room = ServerManager.getInstance().getRooms()[roomNumber];
+            if (room.type == 6 && user.getClanId() == null) {
+                sendServerMessage(GameString.notClan());
+                return;
+            }
+            ms = new Message(7);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(roomNumber);
+            synchronized (ServerManager.getInstance().getRooms()) {
+                for (int i = 0; i < room.entrys.length; i++) {
+                    FightWait fightWait = room.entrys[i];
+                    synchronized (fightWait.users) {
+                        if (fightWait.numPlayer == fightWait.maxSetPlayer || fightWait.started || (fightWait.isLienHoan && fightWait.ntLH > 0)) {
+                            continue;
+                        }
+                        // So khu vuc
+                        ds.writeByte(i);
+                        // So nguoi trong khu vuc
+                        ds.writeByte(fightWait.numPlayer);
+                        // So nguoi toi da
+                        ds.writeByte(fightWait.maxSetPlayer);
+                        // Co mat khau or khong
+                        ds.writeBoolean(fightWait.passSet);
+                        // So tien
+                        ds.writeInt(fightWait.money);
+                        // Null boolean
+                        ds.writeBoolean(true);
+                        // Ten khu vuc
+                        ds.writeUTF(fightWait.name);
+                        // Kieu 0: Tea, 1: Free
+                        ds.writeByte(0);
+                    }
+                }
+            }
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void thamGiaKhuVuc(Message ms) {
+        try {
+            DataInputStream dis = ms.reader();
+            byte soPhong = dis.readByte();
+            byte soKhuVuc = dis.readByte();
+            String password = dis.readUTF();
+            FightWait fightWait = ServerManager.getInstance().getRooms()[soPhong].entrys[soKhuVuc];
 
+            if (fightWait.passSet && !fightWait.pass.equals(password)) {
+                sendServerMessage(GameString.joinKVError1());
+                return;
+            }
+
+            fightWait.enterFireOval(user);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

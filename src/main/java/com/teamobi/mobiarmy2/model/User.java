@@ -95,7 +95,7 @@ public class User {
     }
 
     public int getCurrentLevel() {
-        return levels[nvUsed];
+        return Math.min(levels[nvUsed], 127);
     }
 
     public int getCurrentXp() {
@@ -211,8 +211,26 @@ public class User {
     public void updateItem(byte b, int i) {
     }
 
-    public int[] getEquip() {
-        return new int[0];
+    public short[] getEquip() {
+        short[] equip = new short[5];
+        if (this.nvEquip[getNvUsed()][5] != null && this.nvEquip[getNvUsed()][5].entry.isSet) {
+            equip[0] = this.nvEquip[getNvUsed()][5].entry.arraySet[0];
+            equip[1] = this.nvEquip[getNvUsed()][5].entry.arraySet[1];
+            equip[2] = this.nvEquip[getNvUsed()][5].entry.arraySet[2];
+            equip[3] = this.nvEquip[getNvUsed()][5].entry.arraySet[3];
+            equip[4] = this.nvEquip[getNvUsed()][5].entry.arraySet[4];
+        } else {
+            for (int i = 0; i < 5; i++) {
+                if (this.nvEquip[getNvUsed()][i] != null && !this.nvEquip[getNvUsed()][i].entry.isSet) {
+                    equip[i] = this.nvEquip[getNvUsed()][i].entry.id;
+                } else if (nvEquipDefault[getNvUsed()][i] != null) {
+                    equip[i] = nvEquipDefault[getNvUsed()][i].id;
+                } else {
+                    equip[i] = -1;
+                }
+            }
+        }
+        return equip;
     }
 
     public void updateItems(byte itemIndex, byte quantity) {
