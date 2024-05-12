@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.model;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author tuyen
@@ -15,6 +16,6 @@ public class PaymentData {
         public String mssTo;
     }
 
-    public static ArrayList<Payment> payments = new ArrayList<>();
+    public static Map<String, Payment> payments = new HashMap<>();
 
 }

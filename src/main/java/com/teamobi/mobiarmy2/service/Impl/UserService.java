@@ -984,7 +984,7 @@ public class UserService implements IUserService {
                 return;
             }
 
-            clanManager.updateItemClan(user.getClanId(), clanItemDetail, true);
+            clanManager.updateItemClan(user.getClanId(), user.getPlayerId(), clanItemDetail, true);
         } else if (buyType == 1) {//Luong
             if (clanItemDetail.getLuong() < 0) {
                 return;
@@ -995,7 +995,7 @@ public class UserService implements IUserService {
                 return;
             }
 
-            clanManager.updateItemClan(user.getClanId(), clanItemDetail, false);
+            clanManager.updateItemClan(user.getClanId(), user.getPlayerId(), clanItemDetail, false);
         }
         sendServerMessage(GameString.buySuccess());
     }
@@ -1005,8 +1005,7 @@ public class UserService implements IUserService {
             Message ms = new Message(Cmd.SHOP_BIETDOI);
             DataOutputStream ds = ms.writer();
             ds.writeByte(ItemClanData.clanItemsMap.size());
-            for (Byte key : ItemClanData.clanItemsMap.keySet()) {
-                ItemClanData.ClanItemDetail clanItemDetail = ItemClanData.clanItemsMap.get(key);
+            for (ItemClanData.ClanItemDetail clanItemDetail : ItemClanData.clanItemsMap.values()) {
                 ds.writeByte(clanItemDetail.getId());
                 ds.writeUTF(clanItemDetail.getName());
                 ds.writeInt(clanItemDetail.getXu());
@@ -1467,8 +1466,52 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void muaItem(Message ms) {
+    public void handlePurchaseItem(Message ms) {
+        try {
+            DataInputStream dis = ms.reader();
+            byte unit = dis.readByte();
+            byte itemIndex = dis.readByte();
+            byte quantity = dis.readByte();
+            if (itemIndex < 0 || itemIndex >= ItemData.items.size()) {
+                return;
+            }
+            if (user.getItems()[itemIndex] + quantity > ServerManager.getInstance().config().getMax_item()) {
+                return;
+            }
 
+            switch (unit) {
+                case 0 -> {
+                    int total = ItemData.items.get(itemIndex).getBuyXu() * quantity;
+                    if (user.getXu() < total || total < 0) {
+                        return;
+                    }
+                    user.updateXu(-total);
+                    user.updateItems(itemIndex, quantity);
+                }
+                case 1 -> {
+                    int total = ItemData.items.get(itemIndex).getBuyLuong() * quantity;
+                    if (user.getLuong() < total || total < 0) {
+                        return;
+                    }
+                    user.updateLuong(-total);
+                    user.updateItems(itemIndex, quantity);
+                }
+                default -> {
+                    return;
+                }
+            }
+            ms = new Message(72);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(1);
+            ds.writeByte(itemIndex);
+            ds.writeByte(user.getItems()[itemIndex]);
+            ds.writeInt(user.getXu());
+            ds.writeInt(user.luong);
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -1519,7 +1562,23 @@ public class UserService implements IUserService {
 
     @Override
     public void napTheCao(Message ms) {
+        try {
+            DataInputStream dis = ms.reader();
+            String type = dis.readUTF().trim();
+            String serial = dis.readUTF().trim();
+            String pin = dis.readUTF().trim();
 
+            if (type.equals("giftcode") && !serial.isEmpty()) {
+                handleGiftCode(serial);
+                return;
+            }
+            sendServerMessage("..." + serial + " " + pin);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void handleGiftCode(String serial) {
     }
 
     @Override
@@ -2004,7 +2063,39 @@ public class UserService implements IUserService {
 
     @Override
     public void napTien(Message ms) {
-
+        try {
+            DataInputStream dis = ms.reader();
+            byte type = dis.readByte();
+            switch (type) {
+                case 0 -> {
+                    ms = new Message(Cmd.CHARGE_MONEY_2);
+                    DataOutputStream ds = ms.writer();
+                    ds.writeByte(0);
+                    for (PaymentData.Payment payment : PaymentData.payments.values()) {
+                        ds.writeUTF(payment.id);
+                        ds.writeUTF(payment.info);
+                        ds.writeUTF(payment.url);
+                    }
+                    ds.flush();
+                    user.sendMessage(ms);
+                }
+                case 1 -> {
+                    String id = dis.readUTF();
+                    PaymentData.Payment payment = PaymentData.payments.get(id);
+                    if (payment != null) {
+                        ms = new Message(Cmd.CHARGE_MONEY_2);
+                        DataOutputStream ds = ms.writer();
+                        ds.writeByte(2);
+                        ds.writeUTF(payment.mssTo);
+                        ds.writeUTF(payment.mssContent);
+                        ds.flush();
+                        user.sendMessage(ms);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

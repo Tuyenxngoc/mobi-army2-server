@@ -108,7 +108,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.CHANGE_TEAM -> userService.doiPhe(ms);
 
-                case Cmd.BUY_ITEM -> userService.muaItem(ms);
+                case Cmd.BUY_ITEM -> userService.handlePurchaseItem(ms);
 
                 case Cmd.BUY_GUN -> userService.handleBuyCharacter(ms);
 

@@ -109,11 +109,13 @@ public class ClanManager {
         return clanDao.getLuong(clanId);
     }
 
-    public void updateItemClan(short clanId, ItemClanData.ClanItemDetail clanItemDetail, boolean isBuyXu) {
+    public void updateItemClan(short clanId, int playerId, ItemClanData.ClanItemDetail clanItemDetail, boolean isBuyXu) {
         if (isBuyXu) {
             clanDao.updateXu(clanId, -clanItemDetail.getXu());
+            clanDao.gopClanContribute("Mua item đội -" + Until.getStringNumber(clanItemDetail.getXu()) + " xu", playerId, -clanItemDetail.getXu(), 0);
         } else {
             clanDao.updateLuong(clanId, -clanItemDetail.getLuong());
+            clanDao.gopClanContribute("Mua item đội -" + Until.getStringNumber(clanItemDetail.getLuong()) + " lượng", playerId, 0, -clanItemDetail.getLuong());
         }
 
         ClanItemData[] items = clanDao.getClanItems(clanId);

@@ -322,18 +322,17 @@ public class GameDao implements IGameDao {
     public void getAllPayment() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet res = statement.executeQuery("SELECT * FROM `napthe`")) {
+            try (ResultSet res = statement.executeQuery("SELECT * FROM `payment`")) {
                 while (res.next()) {
-                    PaymentData.Payment nE = new PaymentData.Payment();
-                    nE.id = res.getString("id");
-                    nE.info = res.getString("info");
-                    nE.url = res.getString("url");
-                    nE.mssTo = res.getString("mssTo");
-                    nE.mssContent = res.getString("mssContent");
-                    PaymentData.payments.add(nE);
-                }
-                System.out.println("Nap the readed size=" + PaymentData.payments.size());
+                    PaymentData.Payment payment = new PaymentData.Payment();
+                    payment.id = res.getString("payment_id");
+                    payment.info = res.getString("info");
+                    payment.url = res.getString("url");
+                    payment.mssTo = res.getString("mss_to");
+                    payment.mssContent = res.getString("mss_content");
 
+                    PaymentData.payments.put(payment.id, payment);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();

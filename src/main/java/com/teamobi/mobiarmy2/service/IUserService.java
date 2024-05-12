@@ -100,7 +100,7 @@ public interface IUserService {
 
     void doiPhe(Message ms);
 
-    void muaItem(Message ms);
+    void handlePurchaseItem(Message ms);
 
     void handleBuyCharacter(Message ms);
 

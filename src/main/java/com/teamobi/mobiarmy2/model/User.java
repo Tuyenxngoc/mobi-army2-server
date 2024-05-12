@@ -5,6 +5,7 @@ import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.Impl.Message;
+import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.service.Impl.UserService;
 import com.teamobi.mobiarmy2.util.Until;
@@ -213,5 +214,16 @@ public class User {
 
     public int[] getEquip() {
         return new int[0];
+    }
+
+    public void updateItems(byte itemIndex, byte quantity) {
+        this.items[itemIndex] += quantity;
+        if (this.items[itemIndex] < 0) {
+            this.items[itemIndex] = 0;
+        }
+        if (this.items[itemIndex] > ServerManager.getInstance().config().getMax_item()) {
+            this.items[itemIndex] = (byte) ServerManager.getInstance().config().getMax_item();
+        }
+        this.items[0] = this.items[1] = 99;
     }
 }
