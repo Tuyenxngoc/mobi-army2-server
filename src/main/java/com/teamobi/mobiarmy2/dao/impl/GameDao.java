@@ -52,10 +52,10 @@ public class GameDao implements IGameDao {
     public void getAllCharacterData() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `nhanvat`")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `character`")) {
                 while (resultSet.next()) {
                     NVData.NVEntry nvEntry = new NVData.NVEntry();
-                    nvEntry.id = (byte) (resultSet.getByte("nhanvat_id") - 1);
+                    nvEntry.id = (byte) (resultSet.getByte("character_id") - 1);
                     nvEntry.name = resultSet.getString("name");
                     nvEntry.buyXu = resultSet.getInt("xu");
                     nvEntry.buyLuong = resultSet.getInt("luong");

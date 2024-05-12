@@ -311,11 +311,11 @@ public class UserDao implements IUserDao {
     @Override
     public Integer findPlayerIdByUsername(String username) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT p.user_id FROM user u INNER JOIN player p ON u.user_id = p.user_id WHERE username = ?")) {
+             PreparedStatement statement = connection.prepareStatement("SELECT p.player_id FROM user u INNER JOIN player p ON u.user_id = p.user_id WHERE u.username = ?")) {
             statement.setString(1, username);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    return resultSet.getInt("user_id");
+                    return resultSet.getInt("player_id");
                 }
             }
         } catch (SQLException e) {
