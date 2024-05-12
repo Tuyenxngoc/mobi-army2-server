@@ -50,6 +50,7 @@ public class UserDao implements IUserDao {
                 "`ruongTrangBi` = ?, " +
                 "`ruongItem` = ? ," +
                 "`sttnhanvat` = ?, " +
+                "`online` = ?, " +
                 //...//
                 "`NVused` = ? " +
                 " WHERE player_id = ?";
@@ -63,6 +64,7 @@ public class UserDao implements IUserDao {
                 user.getRuongDoTB().toString(),
                 user.getRuongDoItem().toString(),
                 nvstt,
+                false,
                 //...//
                 user.getNvUsed(),
                 user.getPlayerId());

@@ -178,7 +178,7 @@ public class RankingDao implements IRankingDao {
             try (ResultSet resultSet = statement.executeQuery(
                     "SELECT *, u.username " +
                             "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
-                            "ORDER BY p.clanpoint LIMIT 100"
+                            "ORDER BY p.dvong LIMIT 100"
             )) {
                 byte index = 1;
                 while (resultSet.next()) {

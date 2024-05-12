@@ -4,9 +4,10 @@ import com.teamobi.mobiarmy2.dao.IClanDao;
 import com.teamobi.mobiarmy2.dao.impl.ClanDao;
 import com.teamobi.mobiarmy2.json.ClanItemData;
 import com.teamobi.mobiarmy2.model.ItemClanData;
+import com.teamobi.mobiarmy2.model.clan.ClanEntry;
+import com.teamobi.mobiarmy2.model.clan.ClanInfo;
+import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
 import com.teamobi.mobiarmy2.util.Until;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,70 +18,6 @@ import java.util.List;
  * @author tuyen
  */
 public class ClanManager {
-
-    @Getter
-    @Setter
-    public static class ClanInfo {
-        private short id;
-        private String name;
-        private byte memberCount;
-        private byte maxMemberCount;
-        private String masterName;
-        private int xu;
-        private int luong;
-        private int cup;
-        private int exp;
-        private int xpUpLevel;
-        private byte level;
-        private byte levelPercentage;
-        private String description;
-        private String dateCreated;
-        private List<ClanItem> items;
-    }
-
-    @Getter
-    @Setter
-    public static class ClanItem {
-        private String name;
-        private int time;
-    }
-
-    @Getter
-    @Setter
-    public static class ClanEntry {
-
-        int id;
-        int master;
-        String name;
-        int icon;
-        String thongBao;
-        String item;
-        int xu;
-        int luong;
-        int xp;
-        int cup;
-        int mem;
-        int memMax;
-        int level;
-        String dateCreat;
-        String masterName;
-    }
-
-    @Getter
-    @Setter
-    public static class ClanMemEntry {
-        int playerId;
-        String username;
-        byte nvUsed;
-        byte online;
-        byte lever;
-        byte levelPt;
-        byte index;
-        int cup;
-        short[] dataEquip;
-        String contribute_text;
-        String contribute_count;
-    }
 
     private static ClanManager instance;
     private final IClanDao clanDao;
@@ -167,5 +104,14 @@ public class ClanManager {
 
     public ClanInfo getClanInfo(short clanId) {
         return clanDao.getClanInfo(clanId);
+    }
+
+    public byte getTotalPagesClan() {
+        double count = clanDao.getCountClan();
+        return (byte) Math.ceil(count / 10);
+    }
+
+    public List<ClanEntry> getTopTeams(byte page) {
+        return clanDao.getTopTeams(page);
     }
 }

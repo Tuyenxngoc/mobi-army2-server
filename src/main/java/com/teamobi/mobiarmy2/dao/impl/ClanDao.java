@@ -10,13 +10,13 @@ import com.teamobi.mobiarmy2.json.EquipmentData;
 import com.teamobi.mobiarmy2.json.serialization.LocalDateTimeAdapter;
 import com.teamobi.mobiarmy2.model.ItemClanData;
 import com.teamobi.mobiarmy2.model.NVData;
-import com.teamobi.mobiarmy2.server.ClanManager;
+import com.teamobi.mobiarmy2.model.clan.ClanEntry;
+import com.teamobi.mobiarmy2.model.clan.ClanInfo;
+import com.teamobi.mobiarmy2.model.clan.ClanItem;
+import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
 import com.teamobi.mobiarmy2.util.Until;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -143,7 +143,7 @@ public class ClanDao implements IClanDao {
     }
 
     @Override
-    public ClanManager.ClanInfo getClanInfo(short clanId) {
+    public ClanInfo getClanInfo(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT c.*, u.username " +
@@ -157,7 +157,7 @@ public class ClanDao implements IClanDao {
 
             try (ResultSet red = statement.executeQuery()) {
                 if (red.next()) {
-                    ClanManager.ClanInfo clanInfo = new ClanManager.ClanInfo();
+                    ClanInfo clanInfo = new ClanInfo();
                     clanInfo.setId(red.getShort("clan_id"));
                     clanInfo.setName(red.getString("name"));
                     clanInfo.setMemberCount(red.getByte("mem"));
@@ -185,12 +185,12 @@ public class ClanDao implements IClanDao {
                     ClanItemData[] clanItemDataArray = gson.fromJson(red.getString("item"), ClanItemData[].class);
                     LocalDateTime currentDate = LocalDateTime.now();
 
-                    List<ClanManager.ClanItem> filteredItems = Arrays.stream(clanItemDataArray)
+                    List<ClanItem> filteredItems = Arrays.stream(clanItemDataArray)
                             .filter(item -> !item.getTime().isBefore(currentDate))
                             .map(item -> {
                                 ItemClanData.ClanItemDetail clanItemDetail = ItemClanData.getItemClanById(item.getId());
                                 if (clanItemDetail != null) {
-                                    ClanManager.ClanItem newClanItem = new ClanManager.ClanItem();
+                                    ClanItem newClanItem = new ClanItem();
                                     newClanItem.setName(clanItemDetail.getName());
                                     newClanItem.setTime((int) Duration.between(currentDate, item.getTime()).getSeconds());
                                     return newClanItem;
@@ -212,8 +212,8 @@ public class ClanDao implements IClanDao {
     }
 
     @Override
-    public List<ClanManager.ClanMemEntry> getClanMember(short clanId, byte page) {
-        List<ClanManager.ClanMemEntry> entries = new ArrayList<>();
+    public List<ClanMemEntry> getClanMember(short clanId, byte page) {
+        List<ClanMemEntry> entries = new ArrayList<>();
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT c.*, p.*, u.username FROM clanmem c " +
                      "INNER JOIN player p on c.player_id = p.player_id " +
@@ -227,7 +227,7 @@ public class ClanDao implements IClanDao {
             try (ResultSet resultSet = statement.executeQuery()) {
                 byte index = 0;
                 while (resultSet.next()) {
-                    ClanManager.ClanMemEntry entry = new ClanManager.ClanMemEntry();
+                    ClanMemEntry entry = new ClanMemEntry();
                     entry.setPlayerId(resultSet.getInt("p.player_id"));
                     byte rights = resultSet.getByte("c.rights");
                     if (rights == 2) {
@@ -237,6 +237,7 @@ public class ClanDao implements IClanDao {
                     } else {
                         entry.setUsername(resultSet.getString("username"));
                     }
+                    entry.setPoint(resultSet.getInt("c.clan_point"));
                     entry.setNvUsed(resultSet.getByte("NVused"));
                     entry.setOnline(resultSet.getByte("p.online"));
 
@@ -297,6 +298,66 @@ public class ClanDao implements IClanDao {
     public void updateClanItems(short clanId, ClanItemData[] items) {
         String sql = "UPDATE clan SET item = ? WHERE clan_id = ?";
         HikariCPManager.getInstance().update(sql, gson.toJson(items), clanId);
+    }
+
+    @Override
+    public short getCountClan() {
+        try (Connection connection = HikariCPManager.getInstance().getConnection();
+             Statement statement = connection.createStatement()) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT COUNT(clan_id) as `count` FROM clan")) {
+                if (resultSet.next()) {
+                    return resultSet.getShort("count");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public List<ClanEntry> getTopTeams(byte page) {
+        List<ClanEntry> top = new ArrayList<>(10);
+        try (Connection connection = HikariCPManager.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "SELECT c.*, u.username " +
+                             "FROM clan c " +
+                             "INNER JOIN player p ON c.master_id = p.player_id " +
+                             "INNER JOIN user u ON p.user_id = u.user_id " +
+                             "ORDER BY c.xp " +
+                             "LIMIT 10 OFFSET ?")
+        ) {
+            statement.setByte(1, page);
+
+            try (ResultSet red = statement.executeQuery()) {
+                while (red.next()) {
+                    ClanEntry clanInfo = new ClanEntry();
+                    clanInfo.setId(red.getShort("clan_id"));
+                    clanInfo.setName(red.getString("name"));
+                    clanInfo.setMemberCount(red.getByte("mem"));
+                    clanInfo.setMaxMemberCount(red.getByte("mem_max"));
+                    clanInfo.setMasterName(red.getString("username"));
+                    clanInfo.setXu(red.getInt("xu"));
+                    clanInfo.setLuong(red.getInt("luong"));
+                    clanInfo.setCup(red.getInt("cup"));
+
+                    int exp = red.getInt("xp");
+                    byte level = Until.calculateLevelClan(exp);
+                    int expUpLevel = Until.calculateXPRequired(level + 1);
+                    int expCurrentLevel = Until.calculateXPRequired(level);
+                    double expProgress = (exp - expCurrentLevel) * 100 / (double) expUpLevel;
+
+                    clanInfo.setLevel(level);
+                    clanInfo.setLevelPercentage((byte) Math.min(100, expProgress));
+                    clanInfo.setDescription(red.getString("description"));
+
+                    top.add(clanInfo);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return top;
     }
 
 }

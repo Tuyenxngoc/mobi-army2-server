@@ -33,7 +33,6 @@ public class User {
     public int xu;
     public int luong;
     public int danhVong;
-    public boolean isOnline;
     public boolean isLogged;
     public boolean isLock;
     public boolean isActive;

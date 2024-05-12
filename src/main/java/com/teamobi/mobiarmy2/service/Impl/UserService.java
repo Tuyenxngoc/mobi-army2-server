@@ -7,6 +7,10 @@ import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.dao.impl.UserDao;
 import com.teamobi.mobiarmy2.model.*;
+import com.teamobi.mobiarmy2.model.clan.ClanEntry;
+import com.teamobi.mobiarmy2.model.clan.ClanInfo;
+import com.teamobi.mobiarmy2.model.clan.ClanItem;
+import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
 import com.teamobi.mobiarmy2.model.response.GetFriendResponse;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.server.ClanManager;
@@ -1918,9 +1922,6 @@ public class UserService implements IUserService {
         sendServerMessage(GameString.buySuccess());
     }
 
-    private void updateRuongItem(ArrayList<ruongDoItemEntry> addItem, ArrayList<ruongDoItemEntry> removeItem) {
-    }
-
     @Override
     public void quaySo(Message ms) {
 
@@ -1948,14 +1949,44 @@ public class UserService implements IUserService {
 
     @Override
     public void getTopClan(Message ms) {
+        try {
+            byte page = ms.reader().readByte();
 
+            ClanManager clanManager = ClanManager.getInstance();
+            byte totalPages = clanManager.getTotalPagesClan();
+            if (page > totalPages) {
+                page = 0;
+            }
+
+            List<ClanEntry> topClan = clanManager.getTopTeams(page);
+            ms = new Message(Cmd.TOP_CLAN);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(page);
+            for (ClanEntry clan : topClan) {
+                ds.writeShort(clan.getId());
+                ds.writeUTF(clan.getName());
+                ds.writeByte(clan.getMemberCount());
+                ds.writeByte(clan.getMaxMemberCount());
+                ds.writeUTF(clan.getMasterName());
+                ds.writeInt(clan.getXu());
+                ds.writeInt(clan.getLuong());
+                ds.writeInt(clan.getCup());
+                ds.writeByte(clan.getLevel());
+                ds.writeByte(clan.getLevelPercentage());
+                ds.writeUTF(clan.getDescription());
+            }
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void getInfoClan(Message ms) {
         try {
             short clanId = ms.reader().readShort();
-            ClanManager.ClanInfo clanDetails = ClanManager.getInstance().getClanInfo(clanId);
+            ClanInfo clanDetails = ClanManager.getInstance().getClanInfo(clanId);
             if (clanDetails == null) {
                 sendMessageLoginFail(GameString.clanNull());
                 return;
@@ -1977,7 +2008,7 @@ public class UserService implements IUserService {
             ds.writeUTF(clanDetails.getDescription());
             ds.writeUTF(clanDetails.getDateCreated());
             ds.writeByte(clanDetails.getItems().size());
-            for (ClanManager.ClanItem item : clanDetails.getItems()) {
+            for (ClanItem item : clanDetails.getItems()) {
                 ds.writeUTF(item.getName());
                 ds.writeInt(item.getTime());
             }
@@ -2006,16 +2037,16 @@ public class UserService implements IUserService {
                 page = (byte) (totalPage - 1);
             }
 
-            List<ClanManager.ClanMemEntry> clanMemEntry = ClanManager.getInstance().getMemberClan(clanId, page);
+            List<ClanMemEntry> clanMemEntry = ClanManager.getInstance().getMemberClan(clanId, page);
 
             ms = new Message(Cmd.CLAN_MEMBER);
             DataOutputStream ds = ms.writer();
             ds.writeByte(page);
             ds.writeUTF("BIỆT ĐỘI");
-            for (ClanManager.ClanMemEntry memClan : clanMemEntry) {
+            for (ClanMemEntry memClan : clanMemEntry) {
                 ds.writeInt(memClan.getPlayerId());
                 ds.writeUTF(memClan.getUsername());
-                ds.writeInt(1);
+                ds.writeInt(memClan.getPoint());
                 ds.writeByte(memClan.getNvUsed());
                 ds.writeByte(memClan.getOnline());
                 ds.writeByte(memClan.getLever());
