@@ -9,6 +9,9 @@ import com.teamobi.mobiarmy2.server.Room;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+/**
+ * @author tuyen
+ */
 public class FightWait {
 
     public final User[] users;
@@ -102,7 +105,6 @@ public class FightWait {
             if (numPlayer == 0) {
                 changeBoss(bestLocation);
             }
-
             ms = new Message(Cmd.SOMEONE_JOINBOARD);
             ds = ms.writer();
             ds.writeByte(bestLocation);
@@ -121,13 +123,11 @@ public class FightWait {
             readies[bestLocation] = false;
             numPlayer++;
 
-            // Send mss 8
             ms = new Message(Cmd.JOIN_BOARD);
             ds = ms.writer();
             ds.writeInt(getRoomOwner().getPlayerId());
             ds.writeInt(money);
             ds.writeByte(mapId);
-            //null byte
             ds.writeByte(0);
             for (byte i = 0; i < users.length; i++) {
                 User user = users[i];
@@ -155,7 +155,6 @@ public class FightWait {
             ds.writeByte(parent.id);
             ds.writeByte(id);
             ds.writeUTF(name);
-            // Kieu ban do
             ds.writeByte(parent.type);
             ds.flush();
             us.sendMessage(ms);

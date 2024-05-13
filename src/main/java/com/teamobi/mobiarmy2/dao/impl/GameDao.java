@@ -271,7 +271,7 @@ public class GameDao implements IGameDao {
                     for (int i = 0; i < jarr.size(); i++) {
                         eqNeedId[i] = ((Long) jarr.get(i)).shortValue();
                     }
-                    FormulaData.FomularEntry fE = new FormulaData.FomularEntry();
+                    FormulaData.FormulaEntry fE = new FormulaData.FormulaEntry();
                     fE.level = res.getByte("lv");
                     fE.levelRequire = res.getInt("lvRequire");
                     jarr = (JSONArray) JSONValue.parse(res.getString("addPNMin"));

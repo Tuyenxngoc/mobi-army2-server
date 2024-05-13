@@ -18,6 +18,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author tuyen
+ */
 public class RankingDao implements IRankingDao {
 
     private final Gson gson;

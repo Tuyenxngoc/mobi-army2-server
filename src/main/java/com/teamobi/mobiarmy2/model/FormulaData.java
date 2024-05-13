@@ -8,16 +8,14 @@ import java.util.ArrayList;
 public class FormulaData {
 
     public static final class FormulaDataEntry {
-
-        SpecialItemData.SpecialItemEntry ins;
-        byte equipType;
-        NVData.EquipmentEntry[] equip;
-        NVData.EquipmentEntry[] equipNeed;
-        ArrayList<FomularEntry> entrys;
+        public SpecialItemData.SpecialItemEntry ins;
+        public byte equipType;
+        public NVData.EquipmentEntry[] equip;
+        public NVData.EquipmentEntry[] equipNeed;
+        public ArrayList<FormulaEntry> entrys;
     }
 
-    public static class FomularEntry {
-
+    public static class FormulaEntry {
         public byte level;
         public int levelRequire;
         public short[] invAddMin;
@@ -31,7 +29,7 @@ public class FormulaData {
 
     public static ArrayList<FormulaDataEntry> entrys = new ArrayList<>();
 
-    public static void addFomularEntry(int materialId, byte equipType, short[] eqId, short[] eqNeedId, FomularEntry fEntry) {
+    public static void addFomularEntry(int materialId, byte equipType, short[] eqId, short[] eqNeedId, FormulaEntry fEntry) {
         System.out.println("Set fomular materialId=" + materialId + " equipType=" + equipType);
         FormulaDataEntry fDatEntry = null;
         for (FormulaDataEntry fDatEntry2 : entrys) {
@@ -55,7 +53,7 @@ public class FormulaData {
             entrys.add(fDatEntry);
         }
         // Them fomular entry neu ko ton tai
-        for (FomularEntry fE1 : fDatEntry.entrys) {
+        for (FormulaEntry fE1 : fDatEntry.entrys) {
             // Neu ton tai -> thoat
             if (fE1.level == fEntry.level) {
                 return;

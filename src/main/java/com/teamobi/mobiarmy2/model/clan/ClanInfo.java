@@ -5,6 +5,9 @@ import lombok.Setter;
 
 import java.util.List;
 
+/**
+ * @author tuyen
+ */
 @Getter
 @Setter
 public class ClanInfo extends ClanEntry {

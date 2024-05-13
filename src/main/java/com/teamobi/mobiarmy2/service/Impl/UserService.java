@@ -483,6 +483,9 @@ public class UserService implements IUserService {
 
     @Override
     public void giaHanDo(Message ms) {
+        if (user.isNotWaiting()) {
+            return;
+        }
         try {
             byte action = ms.reader().readByte();
             int idKey = ms.reader().readInt();
@@ -558,6 +561,9 @@ public class UserService implements IUserService {
 
     @Override
     public void handleGetMissions(Message ms) {
+        if (user.isNotWaiting()) {
+            return;
+        }
         try {
             byte action = ms.reader().readByte();
             byte indexNv = -1;
@@ -695,6 +701,9 @@ public class UserService implements IUserService {
 
     @Override
     public void gopClan(Message ms) {
+        if (user.isNotWaiting()) {
+            return;
+        }
         if (user.getClanId() == null) {
             return;
         }
@@ -758,6 +767,9 @@ public class UserService implements IUserService {
 
     @Override
     public void hopTrangBi(Message ms) {
+        if (user.isNotWaiting()) {
+            return;
+        }
         try {
             byte materialId = ms.reader().readByte();
             byte action = ms.reader().readByte();
@@ -770,7 +782,7 @@ public class UserService implements IUserService {
             ds = ms.writer();
             if (action == 1) {
                 ds.writeByte(1);
-                FomularData.FomularDataEntry fDatE = FomularData.getFomularDataEntryById(materialId);
+                FormulaData.FormulaDataEntry fDatE = FormulaData.getFomularDataEntryById(materialId);
                 if (fDatE == null) {
                     return;
                 }
@@ -778,7 +790,7 @@ public class UserService implements IUserService {
                 ds.writeByte(fDatE.ins.id);
                 ds.writeByte(fDatE.entrys.size());
                 for (int i = 0; i < fDatE.entrys.size(); i++) {
-                    FomularData.FomularEntry fE = fDatE.entrys.get(i);
+                    FormulaData.FormulaEntry fE = fDatE.entrys.get(i);
                     ds.writeByte(fDatE.equip[user.getNvUsed()].id);
                     ds.writeUTF(fDatE.equip[user.getNvUsed()].name + " " + nvE.name + " cấp " + fE.level);
                     ds.writeByte(fE.levelRequire);
@@ -819,14 +831,14 @@ public class UserService implements IUserService {
                 }
             }
             if (action == 2) {
-                FomularData.FomularDataEntry fDatE = FomularData.getFomularDataEntryById(materialId);
+                FormulaData.FormulaDataEntry fDatE = FormulaData.getFomularDataEntryById(materialId);
                 if (fDatE == null || index < 0 || index >= fDatE.entrys.size()) {
                     return;
                 }
                 ArrayList<ruongDoItemEntry> arrayI = new ArrayList<>();
                 ruongDoTBEntry rdE = new ruongDoTBEntry(), rdE2;
                 rdE.entry = fDatE.equip[user.getNvUsed()];
-                FomularData.FomularEntry fE = fDatE.entrys.get(index);
+                FormulaData.FormulaEntry fE = fDatE.entrys.get(index);
                 boolean isFinish = true;
                 for (int j = 0; j < fE.itemNeed.length; j++) {
                     int itemNumHave = getNumItemRuong(fE.itemNeed[j].id);
@@ -886,7 +898,25 @@ public class UserService implements IUserService {
 
     @Override
     public void moHopQua(Message ms) {
+        try {
+            byte index = ms.reader().readByte();
 
+            byte type = 2;
+            byte itemId = 55;
+            String name = "Tuyenngoc";
+
+            ms = new Message(Cmd.GET_LUCKYGIFT);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(0);
+            ds.writeByte(index);
+            ds.writeByte(type);
+            ds.writeByte(itemId);
+            ds.writeUTF(name);
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -1027,7 +1057,9 @@ public class UserService implements IUserService {
 
     @Override
     public void luyenTap(Message ms) {
-
+        if (user.isNotWaiting()) {
+            return;
+        }
     }
 
     @Override
@@ -1037,6 +1069,9 @@ public class UserService implements IUserService {
 
     @Override
     public void doDacBietShop(Message ms) {
+        if (user.isNotWaiting()) {
+            return;
+        }
         try {
             DataInputStream dis = ms.reader();
             byte type = dis.readByte();
@@ -1107,7 +1142,9 @@ public class UserService implements IUserService {
 
     @Override
     public void macTrangBiVip(Message ms) {
-
+        if (user.isNotWaiting()) {
+            return;
+        }
     }
 
     @Override
@@ -1176,6 +1213,9 @@ public class UserService implements IUserService {
 
     @Override
     public void denKhuVuc() {
+        if (user.isNotWaiting()) {
+            return;
+        }
         try {
             Message ms = new Message(Cmd.ROOM_LIST);
             DataOutputStream ds = ms.writer();
@@ -1201,6 +1241,9 @@ public class UserService implements IUserService {
 
     @Override
     public void vaoPhong(Message ms) {
+        if (user.isNotWaiting()) {
+            return;
+        }
         try {
             byte roomNumber = ms.reader().readByte();
             Room room = ServerManager.getInstance().getRooms()[roomNumber];
@@ -1246,6 +1289,9 @@ public class UserService implements IUserService {
 
     @Override
     public void thamGiaKhuVuc(Message ms) {
+        if (user.isNotWaiting()) {
+            return;
+        }
         try {
             DataInputStream dis = ms.reader();
             byte soPhong = dis.readByte();
@@ -1266,6 +1312,7 @@ public class UserService implements IUserService {
 
     @Override
     public void nhanTinn(Message ms) {
+
     }
 
     @Override
