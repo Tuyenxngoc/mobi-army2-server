@@ -239,8 +239,8 @@ public class GameString {
         return "Bạn bị đuổi bởi chủ phòng!";
     }
 
-    public static String datCuocError1() {
-        return "Chỉ có thể đặt cược từ %d xu đến %d xu!";
+    public static String datCuocError1(int min, int max) {
+        return String.format("Chỉ có thể đặt cược từ %d xu đến %d xu!", min, max);
     }
 
     public static String startGameError1() {
@@ -307,8 +307,8 @@ public class GameString {
         return "Ván chơi không tính vì thời gian quá ngắn hoặc bạn có hành vi tiêu cực!";
     }
 
-    public static String openingGift() {
-        return "%s vẫn còn đang mở quà";
+    public static String openingGift(String name) {
+        return String.format("%s vẫn còn đang mở quà", name);
     }
 
     public static String notClan() {

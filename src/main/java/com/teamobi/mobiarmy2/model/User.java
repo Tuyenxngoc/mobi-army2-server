@@ -55,8 +55,10 @@ public class User {
     public List<ruongDoTBEntry> ruongDoTB;
     private FightWait fightWait;
     private final IUserService userService;
+    private boolean openingGift;
 
     public User() {
+        this.state = UserState.WAITING;
         this.userService = new UserService(this);
     }
 

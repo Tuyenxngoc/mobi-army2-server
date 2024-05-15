@@ -59,6 +59,10 @@ public class Session implements ISession {
         this.user = new User(this);
         this.messageHandler = new MessageHandler(user.getUserService());
 
+        initializeThreads();
+    }
+
+    private void initializeThreads() {
         this.sendThread = new Thread(sender);
         this.collectorThread = new Thread(new MessageCollector());
         this.collectorThread.start();
@@ -206,7 +210,6 @@ public class Session implements ISession {
             }
             sendThread = null;
             collectorThread = null;
-            System.gc();
         } catch (Exception e) {
             e.printStackTrace();
         }

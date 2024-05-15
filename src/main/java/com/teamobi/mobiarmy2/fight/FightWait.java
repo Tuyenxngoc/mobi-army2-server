@@ -8,6 +8,7 @@ import com.teamobi.mobiarmy2.server.Room;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * @author tuyen
@@ -197,4 +198,130 @@ public class FightWait {
             }
         }
     }
+
+    private int getUserIndexByPlayerId(int playerId) {
+        for (byte i = 0; i < users.length; i++) {
+            User user = this.users[i];
+            if (user == null) {
+                continue;
+            }
+            if (user.getPlayerId() == playerId) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public void setPassRoom(String password, int playerId) {
+        if (started) {
+            return;
+        }
+        if (getRoomOwner().getPlayerId() != playerId) {
+            return;
+        }
+        //Set new password
+        passSet = true;
+        pass = password;
+    }
+
+    public void setMoney(int xu, int playerId) {
+        if (started) {
+            return;
+        }
+        if (getRoomOwner().getPlayerId() != playerId) {
+            return;
+        }
+        if (xu < parent.minXu || xu > parent.maxXu) {
+            getRoomOwner().getUserService().sendServerMessage(GameString.datCuocError1(parent.minXu, parent.maxXu));
+            return;
+        }
+        if (getRoomOwner().getXu() < xu) {
+            getRoomOwner().getUserService().sendServerMessage(GameString.xuNotEnought());
+            return;
+        }
+
+        // Reset ready
+        Arrays.fill(readies, false);
+        readies[boss] = true;
+        numReady = 0;
+        // Set new money
+        money = xu;
+        try {
+            Message ms = new Message(19);
+            DataOutputStream ds = ms.writer();
+            ds.writeShort(0);
+            ds.writeInt(xu);
+            ds.flush();
+            sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setReady(boolean ready, int playerId) {
+        if (started) {
+            return;
+        }
+        if (getRoomOwner().getPlayerId() == playerId) {
+            return;
+        }
+
+        int index = getUserIndexByPlayerId(playerId);
+        if (index == -1) {
+            return;
+        }
+        // Set new player ready
+        if (readies[index] != ready) {
+            readies[index] = ready;
+            if (ready) {
+                numReady++;
+            } else {
+                numReady--;
+            }
+        }
+        try {
+            Message ms = new Message(16);
+            DataOutputStream ds = ms.writer();
+            ds.writeInt(playerId);
+            ds.writeBoolean(ready);
+            ds.flush();
+            this.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void kickPlayer(int playerId, int targetPlayerId) {
+        if (started) {
+            return;
+        }
+        if (getRoomOwner().getPlayerId() != playerId) {
+            return;
+        }
+        int index = getUserIndexByPlayerId(targetPlayerId);
+        if (index == -1) {
+            return;
+        }
+        if (readies[index]) {
+            return;
+        }
+        if (users[index].isOpeningGift()) {
+            getRoomOwner().getUserService().sendServerMessage(GameString.openingGift(users[index].getUsername()));
+        }
+
+        try {
+            Message ms = new Message(Cmd.KICK);
+            DataOutputStream ds = ms.writer();
+            ds.writeShort(index);
+            ds.writeInt(targetPlayerId);
+            ds.writeUTF(GameString.kickString());
+            ds.flush();
+            sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // todo leave
+    }
+
 }

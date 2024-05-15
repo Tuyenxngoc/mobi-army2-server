@@ -1317,7 +1317,12 @@ public class UserService implements IUserService {
 
     @Override
     public void duoiNguoiCHoi(Message ms) {
-
+        try {
+            int playerId = ms.reader().readInt();
+            user.getFightWait().kickPlayer(user.getPlayerId(), playerId);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -1327,7 +1332,12 @@ public class UserService implements IUserService {
 
     @Override
     public void SanSang(Message ms) {
-
+        try {
+            boolean ready = ms.reader().readBoolean();
+            user.getFightWait().setReady(ready, user.getPlayerId());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -1337,12 +1347,29 @@ public class UserService implements IUserService {
 
     @Override
     public void datMatKhau(Message ms) {
-
+        try {
+            String password = ms.reader().readUTF().trim();
+            if (password.isEmpty() || password.length() > 10) {
+                return;
+            }
+            user.getFightWait().setPassRoom(password, user.getPlayerId());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void datCuoc(Message ms) {
+        try {
+            int xu = ms.reader().readInt();
+            if (xu < 0) {
+                return;
+            }
+            user.getFightWait().setMoney(xu, user.getPlayerId());
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
