@@ -307,6 +307,7 @@ public class FightWait {
         }
         if (users[index].isOpeningGift()) {
             getRoomOwner().getUserService().sendServerMessage(GameString.openingGift(users[index].getUsername()));
+            return;
         }
 
         try {
@@ -322,6 +323,62 @@ public class FightWait {
         }
 
         // todo leave
+        leaveTeam(targetPlayerId);
+    }
+
+    private void leaveTeam(int targetPlayerId) {
+        if (numPlayer == 0) {
+            return;
+        }
+
+        removeUser(targetPlayerId);
+
+        try {
+            Message ms = new Message(Cmd.SOMEONE_LEAVEBOARD);
+            DataOutputStream ds = ms.writer();
+            ds.writeInt(targetPlayerId);
+            ds.writeInt(getRoomOwner().getPlayerId());
+            ds.flush();
+            sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void removeUser(int playerId) {
+        synchronized (users) {
+            for (int i = 0; i < users.length; i++) {
+                if (users[i] != null && users[i].getPlayerId() == playerId) {
+                    users[i] = null;
+                    numPlayer--;
+                    if (numPlayer == 0) {
+                        refreshFightWait();
+                    } else {
+                        if (boss == i) {
+                            findNewBoss();
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    private void findNewBoss() {
+        for (byte i = 0; i < users.length; i++) {
+            if (users[i] != null) {
+                changeBoss(i);
+                break;
+            }
+        }
+    }
+
+    private void refreshFightWait() {
+        money = parent.minXu;
+        name = "";
+        pass = "";
+        passSet = false;
+        boss = -1;
     }
 
 }
