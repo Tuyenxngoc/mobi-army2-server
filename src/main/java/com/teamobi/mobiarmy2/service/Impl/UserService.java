@@ -1312,7 +1312,15 @@ public class UserService implements IUserService {
 
     @Override
     public void nhanTinn(Message ms) {
-
+        try {
+            String message = ms.reader().readUTF().trim();
+            if (message.isEmpty() || message.length() > 100) {
+                return;
+            }
+            user.getFightWait().chatMessage(user.getPlayerId(), message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -18,7 +18,7 @@ public class FightWait {
     public final User[] users;
     public final boolean[] readies;
 
-    public FightManager fight;
+    public FightManager fightManager;
     public final Room parent;
     public final byte id;
     public final int[][] item;
@@ -61,7 +61,7 @@ public class FightWait {
         this.isLienHoan = isLienHoan;
         this.ntLH = (byte) (isLienHoan ? 0 : -1);
         this.mapId = isLienHoan ? LHMap[ntLH] : mapId;
-        this.fight = new FightManager();
+        this.fightManager = new FightManager();
         this.started = false;
         this.boss = -1;
         this.timeStart = 0L;
@@ -327,12 +327,13 @@ public class FightWait {
     }
 
     private void leaveTeam(int targetPlayerId) {
+        if (started) {
+            fightManager.leaveFight(targetPlayerId);
+        }
+        removeUser(targetPlayerId);
         if (numPlayer == 0) {
             return;
         }
-
-        removeUser(targetPlayerId);
-
         try {
             Message ms = new Message(Cmd.SOMEONE_LEAVEBOARD);
             DataOutputStream ds = ms.writer();
@@ -381,4 +382,24 @@ public class FightWait {
         boss = -1;
     }
 
+    public void chatMessage(int playerId, String message) {
+        int index = getUserIndexByPlayerId(playerId);
+        if (index == -1) {
+            return;
+        }
+        if(started){
+            fightManager.chatMessage(playerId, message);
+            return;
+        }
+        try {
+            Message ms = new Message(Cmd.CHAT_TO_BOARD);
+            DataOutputStream ds = ms.writer();
+            ds.writeInt(playerId);
+            ds.writeUTF(message);
+            ds.flush();
+            sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
