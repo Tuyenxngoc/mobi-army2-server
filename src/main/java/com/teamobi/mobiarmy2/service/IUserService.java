@@ -32,7 +32,7 @@ public interface IUserService {
 
     void bangXepHang(Message ms);
 
-    void clanShop(Message ms);
+    void handlePurchaseClanItem(Message ms);
 
     void luyenTap(Message ms);
 

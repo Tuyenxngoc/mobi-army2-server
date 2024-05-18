@@ -34,7 +34,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.BANGTHANHTICH -> userService.bangXepHang(ms);
 
-                case Cmd.SHOP_BIETDOI -> userService.clanShop(ms);
+                case Cmd.SHOP_BIETDOI -> userService.handlePurchaseClanItem(ms);
 
                 case Cmd.TRAINING_MAP -> userService.luyenTap(ms);
 

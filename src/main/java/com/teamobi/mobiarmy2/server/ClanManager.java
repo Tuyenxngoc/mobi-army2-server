@@ -57,8 +57,13 @@ public class ClanManager {
 
         ClanItemData[] items = clanDao.getClanItems(clanId);
         boolean found = false;
+        LocalDateTime now = LocalDateTime.now();
+
         for (ClanItemData item : items) {
             if (item.getId() == clanItemDetail.getId()) {
+                if (item.getTime().isBefore(now)) {
+                    item.setTime(now);
+                }
                 item.setTime(item.getTime().plusHours(clanItemDetail.getTime()));
                 found = true;
                 break;

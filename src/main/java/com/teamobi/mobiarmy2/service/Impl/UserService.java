@@ -976,7 +976,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void clanShop(Message ms) {
+    public void handlePurchaseClanItem(Message ms) {
         if (user.getClanId() == null) {
             sendServerMessage(GameString.notClan());
             return;
@@ -987,16 +987,16 @@ public class UserService implements IUserService {
             if (type == 0) {
                 sendClanShop();
             } else if (type == 1) {
-                byte buyType = dis.readByte();
+                byte unit = dis.readByte();
                 byte itemId = dis.readByte();
-                buyClanShop(buyType, itemId);
+                buyClanShop(unit, itemId);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void buyClanShop(byte buyType, byte itemId) {
+    private void buyClanShop(byte unit, byte itemId) {
         ClanManager clanManager = ClanManager.getInstance();
         ItemClanData.ClanItemDetail clanItemDetail = ItemClanData.getItemClanById(itemId);
 
@@ -1010,7 +1010,7 @@ public class UserService implements IUserService {
             return;
         }
 
-        if (buyType == 0) {//Xu
+        if (unit == 0) {//Xu
             if (clanItemDetail.getXu() < 0) {
                 return;
             }
@@ -1021,7 +1021,7 @@ public class UserService implements IUserService {
             }
 
             clanManager.updateItemClan(user.getClanId(), user.getPlayerId(), clanItemDetail, true);
-        } else if (buyType == 1) {//Luong
+        } else if (unit == 1) {//Luong
             if (clanItemDetail.getLuong() < 0) {
                 return;
             }
