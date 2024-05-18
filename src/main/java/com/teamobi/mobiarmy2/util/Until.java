@@ -1,10 +1,11 @@
 package com.teamobi.mobiarmy2.util;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.RoundingMode;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -286,29 +287,22 @@ public class Until {
     }
 
     public static byte[] getFile(String url) {
+        Path path = Paths.get(url);
         try {
-            FileInputStream fis = new FileInputStream(url);
-            byte[] ab = new byte[fis.available()];
-            fis.read(ab, 0, ab.length);
-            fis.close();
-            return ab;
+            return Files.readAllBytes(path);
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public static void saveFile(String url, byte[] ab) {
+    public static void saveFile(String url, byte[] data) {
+        Path path = Paths.get(url);
         try {
-            File f = new File(url);
-            if (f.exists()) {
-                f.delete();
+            Files.createDirectories(path.getParent());
+            try (FileOutputStream fos = new FileOutputStream(url)) {
+                fos.write(data);
             }
-            f.createNewFile();
-            FileOutputStream fos = new FileOutputStream(url);
-            fos.write(ab);
-            fos.flush();
-            fos.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

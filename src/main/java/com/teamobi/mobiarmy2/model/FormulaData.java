@@ -30,7 +30,6 @@ public class FormulaData {
     public static ArrayList<FormulaDataEntry> entrys = new ArrayList<>();
 
     public static void addFomularEntry(int materialId, byte equipType, short[] eqId, short[] eqNeedId, FormulaEntry fEntry) {
-        System.out.println("Set fomular materialId=" + materialId + " equipType=" + equipType);
         FormulaDataEntry fDatEntry = null;
         for (FormulaDataEntry fDatEntry2 : entrys) {
             if (fDatEntry2.ins.id == materialId) {

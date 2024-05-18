@@ -309,8 +309,6 @@ public class GameDao implements IGameDao {
                     }
                     FormulaData.addFomularEntry(materialId, equipType, eqId, eqNeedId, fE);
                 }
-                System.out.println("Fomular readed size=" + FormulaData.entrys.size());
-
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -360,7 +358,6 @@ public class GameDao implements IGameDao {
                     mE.rewardCUP = res.getInt("rewardCUP");
                     MissionData.addMissionEntry(id, idNeed, mE);
                 }
-                System.out.println("Mission readed size=" + MissionData.entrys.size());
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -385,9 +382,7 @@ public class GameDao implements IGameDao {
                     XpData.xpList.add(xpRequired);
                     previousXp = currentXp;
                 }
-                System.out.println("Lv xp readed size=" + XpData.xpList.size());
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
             System.exit(1);

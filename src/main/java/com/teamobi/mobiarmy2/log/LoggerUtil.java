@@ -1,8 +1,6 @@
 package com.teamobi.mobiarmy2.log;
 
 import com.teamobi.mobiarmy2.constant.CommonConstant;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,11 +13,19 @@ import java.time.format.DateTimeFormatter;
  */
 public class LoggerUtil implements ILogManager {
 
-    private final Logger logger = LogManager.getLogger(LoggerUtil.class);
     private final boolean isDebugEnabled;
 
     public LoggerUtil(boolean isDebugEnabled) {
         this.isDebugEnabled = isDebugEnabled;
+    }
+
+    private void log(String level, String message) {
+        String formattedDateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String logMessage = String.format("%s [%s] - %s", formattedDateTime, level, message);
+
+        if (isDebugEnabled) {
+            System.out.println(logMessage);
+        }
     }
 
     @Override
@@ -36,23 +42,17 @@ public class LoggerUtil implements ILogManager {
 
     @Override
     public void logMessage(String message) {
-        if (isDebugEnabled) {
-            logger.info(message);
-        }
+        log("MESSAGE", message);
     }
 
     @Override
     public void logWarning(String message) {
-        if (isDebugEnabled) {
-            logger.warn(message);
-        }
+        log("WARNING", message);
     }
 
     @Override
     public void logError(String message) {
-        if (isDebugEnabled) {
-            logger.error(message);
-        }
+        log("ERROR", message);
     }
 
 }

@@ -32,7 +32,6 @@ public class GameService implements IGameService {
              DataOutputStream ds = new DataOutputStream(bas)) {
             int size = MapData.MAPS.size();
             ds.writeByte(size);
-            System.out.println("Init map numMap=" + size);
             for (int i = 0; i < size; i++) {
                 MapData.Map mapEntry = MapData.MAPS.get(i);
                 ds.writeByte(mapEntry.id);
@@ -45,7 +44,6 @@ public class GameService implements IGameService {
                 ds.writeShort(mapEntry.cl2AddY);
                 ds.writeUTF(mapEntry.name);
                 ds.writeUTF(mapEntry.fileName);
-                System.out.println("   - id= " + mapEntry.id + " name= " + mapEntry.name + " file= " + mapEntry.fileName);
             }
             byte[] ab = bas.toByteArray();
             Until.saveFile(CommonConstant.mapCacheName, ab);
@@ -61,7 +59,6 @@ public class GameService implements IGameService {
             DataOutputStream ds1 = new DataOutputStream(bas1);
             int numChamp = NVData.entrys.size();
             ds1.writeByte(numChamp);
-            System.out.println("Init nhan vat numNV= " + numChamp);
             for (int i = 0; i < numChamp; i++) {
                 NVData.NVEntry nvEntry = NVData.entrys.get(i);
                 ds1.writeByte(nvEntry.id);
@@ -99,16 +96,13 @@ public class GameService implements IGameService {
 
             byte[] dat = Until.getFile("res/itemSpecial.png");
             if (dat == null) {
-                System.out.println("File res/itemSpecial.png not found!");
                 System.exit(1);
             }
-            System.out.println("Lent Icon= " + dat.length);
             ds1.writeShort(dat.length);
             ds1.write(dat);
             for (int i = 0; i < numChamp; i++) {
                 dat = Until.getFile("res/bullet/bullet" + i + ".png");
                 if (dat == null) {
-                    System.out.println("File bullet" + i + ".png not found!");
                     System.exit(1);
                 }
                 ds1.writeShort(dat.length);
@@ -131,12 +125,10 @@ public class GameService implements IGameService {
             DataOutputStream ds2 = new DataOutputStream(bas2);
             int numCaption = CaptionData.captions.size();
             ds2.writeByte(numCaption);
-            System.out.println("Init caption entry numCaption= " + numCaption);
             for (int i = numCaption - 1; i >= 0; i--) {
                 CaptionData.Caption capEntry = CaptionData.captions.get(i);
                 ds2.writeUTF(capEntry.caption);
                 ds2.writeByte(capEntry.level);
-                System.out.println("  lvl= " + capEntry.level + " str= " + capEntry.caption);
             }
             byte[] ab2 = bas2.toByteArray();
             Until.saveFile(CommonConstant.levelCacheName, ab2);

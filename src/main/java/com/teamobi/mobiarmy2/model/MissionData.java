@@ -29,7 +29,6 @@ public class MissionData {
     public static ArrayList<MissDataEntry> entrys = new ArrayList<>();
 
     public static void addMissionEntry(int id, byte idneed, Mission mEntry) {
-        System.out.println("Set mission id=" + id + " idneed=" + idneed);
         MissDataEntry mDatE = null;
         for (MissDataEntry mDatE1 : entrys) {
             if (mDatE1.id == id) {

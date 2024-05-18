@@ -60,7 +60,6 @@ public class NVData {
     public static int nSaleEquip = 0;
 
     public static void addEquipEntryById(int nvId, int equipDatId, int equipId, EquipmentEntry eqEntry) {
-        System.out.println("Set equip nv=" + nvId + " equipType=" + equipDatId + " id=" + equipId);
         NVEntry nvEntry = null;
         for (NVEntry nvEntry1 : entrys) {
             if (nvEntry1.id == nvId) {

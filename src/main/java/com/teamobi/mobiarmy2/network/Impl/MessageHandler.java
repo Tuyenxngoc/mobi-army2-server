@@ -68,7 +68,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.SET_MONEY -> userService.datCuoc(ms);
 
-                case Cmd.START_ARMY -> userService.batDau(ms);
+                case Cmd.START_ARMY -> userService.batDau();
 
                 case Cmd.MOVE_ARMY -> userService.diChuyen(ms);
 

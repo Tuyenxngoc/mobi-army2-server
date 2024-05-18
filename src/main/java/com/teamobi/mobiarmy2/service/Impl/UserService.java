@@ -4,6 +4,7 @@ import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.constant.GameString;
+import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.dao.impl.UserDao;
 import com.teamobi.mobiarmy2.fight.FightWait;
@@ -1381,8 +1382,11 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void batDau(Message ms) {
-
+    public void batDau() {
+        if (user.getState() != UserState.WAIT_FIGHT) {
+            return;
+        }
+        user.getFightWait().startGame(user.getPlayerId());
     }
 
     @Override

@@ -47,7 +47,6 @@ public final class TeamImageInput {
                 return ab;
             }
         }
-        System.out.println("File \"" + name + "\" not found!");
         return null;
     }
 

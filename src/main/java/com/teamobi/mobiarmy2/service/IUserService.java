@@ -64,7 +64,7 @@ public interface IUserService {
 
     void datCuoc(Message ms);
 
-    void batDau(Message ms);
+    void batDau();
 
     void diChuyen(Message ms);
 

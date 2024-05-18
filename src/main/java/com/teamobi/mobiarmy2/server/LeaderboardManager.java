@@ -52,15 +52,14 @@ public class LeaderboardManager {
             @Override
             public void run() {
                 isComplete = false;
-                for (int i = 0; i < leaderboardCategories.length; i++) {
+                for (byte i = 0; i < leaderboardCategories.length; i++) {
                     refreshXH(i);
                 }
                 addBonusGiftsForPlayers();
-                refreshTopTeams();
                 isComplete = true;
-                System.out.println("Refresh BXH + TopTeam");
+                ServerManager.getInstance().logger().logMessage("Refresh BXH");
             }
-        }, calendar.getTime(), 86400000L);
+        }, calendar.getTime(), 86_400_000L);
     }
 
     private void addBonusGiftsForPlayers() {
@@ -100,6 +99,4 @@ public class LeaderboardManager {
         }
     }
 
-    private void refreshTopTeams() {
-    }
 }

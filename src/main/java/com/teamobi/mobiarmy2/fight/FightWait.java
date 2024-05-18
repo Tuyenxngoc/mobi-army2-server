@@ -181,7 +181,6 @@ public class FightWait {
                     Thread.sleep(1000L);
                     second--;
                     if (second == 0) {
-                        System.out.println("kick " + boss);
                         break;
                     }
                 }
@@ -387,7 +386,7 @@ public class FightWait {
         if (index == -1) {
             return;
         }
-        if(started){
+        if (started) {
             fightManager.chatMessage(playerId, message);
             return;
         }
@@ -401,5 +400,14 @@ public class FightWait {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void startGame(int playerId) {
+
+        if (started || getRoomOwner().getPlayerId() != playerId) {
+            return;
+        }
+        started = true;
+        //fightManager.startGame();
     }
 }
