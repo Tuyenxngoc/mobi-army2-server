@@ -182,37 +182,6 @@ public class User {
         userService.sendUpdateXp(xpUp, levelDiff > 0);
     }
 
-    public short getIDBullet() {
-        return 0;
-    }
-
-    public short getGunId() {
-        return 0;
-    }
-
-    public int[] getAbility() {
-        return new int[0];
-    }
-
-    public void notifyNetWait() {
-
-    }
-
-    public void netWait() {
-
-    }
-
-    public void updateMission(int i, int i1) {
-
-    }
-
-    public void updateSpecialItem(int i, int soluong) {
-
-    }
-
-    public void updateItem(byte b, int i) {
-    }
-
     public short[] getEquip() {
         short[] equip = new short[5];
         if (this.nvEquip[getNvUsed()][5] != null && this.nvEquip[getNvUsed()][5].entry.isSet) {
