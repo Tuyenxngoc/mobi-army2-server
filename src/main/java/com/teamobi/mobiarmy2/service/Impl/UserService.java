@@ -5,10 +5,15 @@ import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.constant.UserState;
+import com.teamobi.mobiarmy2.dao.IGiftCodeDao;
 import com.teamobi.mobiarmy2.dao.IUserDao;
+import com.teamobi.mobiarmy2.dao.impl.GiftCodeDao;
 import com.teamobi.mobiarmy2.dao.impl.UserDao;
 import com.teamobi.mobiarmy2.fight.FightWait;
+import com.teamobi.mobiarmy2.json.GiftCodeRewardData;
+import com.teamobi.mobiarmy2.json.ItemData;
 import com.teamobi.mobiarmy2.model.*;
+import com.teamobi.mobiarmy2.model.GiftCode.GetGiftCode;
 import com.teamobi.mobiarmy2.model.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.clan.ClanItem;
@@ -20,12 +25,14 @@ import com.teamobi.mobiarmy2.server.LeaderboardManager;
 import com.teamobi.mobiarmy2.server.Room;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IUserService;
+import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Until;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,6 +44,7 @@ public class UserService implements IUserService {
 
     private final User user;
     private final IUserDao userDao = new UserDao();
+    private final IGiftCodeDao giftCodeDao = new GiftCodeDao();
 
     public UserService(User user) {
         this.user = user;
@@ -667,13 +675,13 @@ public class UserService implements IUserService {
             }
 
             //Item
-            for (int i = 0; i < ItemData.items.size(); i++) {
+            for (int i = 0; i < ItemFightData.ITEM_FIGHTS.size(); i++) {
                 ds.writeByte(user.items[i]);
-                ItemData.Item item = ItemData.items.get(i);
+                ItemFightData.ItemFight itemFight = ItemFightData.ITEM_FIGHTS.get(i);
                 // Gia xu
-                ds.writeInt(item.getBuyXu());
+                ds.writeInt(itemFight.getBuyXu());
                 // Gia luong
-                ds.writeInt(item.getBuyLuong());
+                ds.writeInt(itemFight.getBuyLuong());
             }
 
             //Nhan vat
@@ -1618,7 +1626,7 @@ public class UserService implements IUserService {
             byte unit = dis.readByte();
             byte itemIndex = dis.readByte();
             byte quantity = dis.readByte();
-            if (itemIndex < 0 || itemIndex >= ItemData.items.size()) {
+            if (itemIndex < 0 || itemIndex >= ItemFightData.ITEM_FIGHTS.size()) {
                 return;
             }
             if (user.getItems()[itemIndex] + quantity > ServerManager.getInstance().config().getMax_item()) {
@@ -1627,7 +1635,7 @@ public class UserService implements IUserService {
 
             switch (unit) {
                 case 0 -> {
-                    int total = ItemData.items.get(itemIndex).getBuyXu() * quantity;
+                    int total = ItemFightData.ITEM_FIGHTS.get(itemIndex).getBuyXu() * quantity;
                     if (user.getXu() < total || total < 0) {
                         return;
                     }
@@ -1635,7 +1643,7 @@ public class UserService implements IUserService {
                     user.updateItems(itemIndex, quantity);
                 }
                 case 1 -> {
-                    int total = ItemData.items.get(itemIndex).getBuyLuong() * quantity;
+                    int total = ItemFightData.ITEM_FIGHTS.get(itemIndex).getBuyLuong() * quantity;
                     if (user.getLuong() < total || total < 0) {
                         return;
                     }
@@ -1724,7 +1732,57 @@ public class UserService implements IUserService {
         }
     }
 
-    private void handleGiftCode(String serial) {
+    private void handleGiftCode(String code) {
+        GetGiftCode giftCode = giftCodeDao.getGiftCode(code);
+        if (giftCode == null) {
+            sendServerMessage(GameString.giftCodeError1());
+            return;
+        }
+        if (giftCode.getLimit() <= 0) {
+            sendServerMessage(GameString.giftCodeError2());
+            return;
+        }
+        if (LocalDateTime.now().isAfter(giftCode.getExpiryDate())) {
+            sendServerMessage(GameString.giftCodeError3(giftCode.getExpiryDate()));
+            return;
+        }
+        for (int i = 0; i < giftCode.getUsedPlayerIds().length; i++) {
+            if (giftCode.getUsedPlayerIds()[i] == user.getPlayerId()) {
+                sendServerMessage(GameString.giftCodeError4());
+                return;
+            }
+        }
+
+        GiftCodeRewardData rewardData = GsonUtil.GSON.fromJson(giftCode.getReward(), GiftCodeRewardData.class);
+
+        StringBuilder totalRewardBuilder = new StringBuilder();
+        if (rewardData.getXu() > 0) {
+            user.updateXu(rewardData.getXu());
+            totalRewardBuilder.append("+ ").append(rewardData.getXu()).append(" xu, ");
+        }
+        if (rewardData.getLuong() > 0) {
+            user.updateLuong(rewardData.getLuong());
+            totalRewardBuilder.append("+ ").append(rewardData.getLuong()).append(" lượng, ");
+        }
+        if (rewardData.getExp() > 0) {
+            user.updateXp(rewardData.getExp(), false);
+            totalRewardBuilder.append("+ ").append(rewardData.getExp()).append(" exp");
+        }
+        if (rewardData.getItems() != null) {
+            for (ItemData item : rewardData.getItems()) {
+                //todo update items
+            }
+        }
+
+        String totalReward = totalRewardBuilder.toString().trim();
+        if (!totalReward.isEmpty()) {
+            sendMSSToUser(null, String.format("CODE %s: %s", code, totalReward));
+        }
+
+        giftCode.addUsedPlayerId(user.getPlayerId());
+        giftCodeDao.updateGiftCode(giftCode);
+
+        sendServerMessage(GameString.giftCodeSuccess());
     }
 
     @Override

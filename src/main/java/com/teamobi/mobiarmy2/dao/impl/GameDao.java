@@ -172,13 +172,13 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `item`")) {
                 while (resultSet.next()) {
-                    ItemData.Item iEntry = new ItemData.Item();
+                    ItemFightData.ItemFight iEntry = new ItemFightData.ItemFight();
                     iEntry.setName(resultSet.getString("name"));
                     iEntry.setBuyXu(resultSet.getInt("xu"));
                     iEntry.setBuyLuong(resultSet.getInt("luong"));
                     iEntry.setCarriedItemCount(resultSet.getByte("carried_item_count"));
 
-                    ItemData.items.add(iEntry);
+                    ItemFightData.ITEM_FIGHTS.add(iEntry);
                 }
             }
         } catch (SQLException e) {

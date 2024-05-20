@@ -9,16 +9,16 @@ import java.util.List;
 /**
  * @author tuyen
  */
-public class ItemData {
+public class ItemFightData {
 
     @Getter
     @Setter
-    public static final class Item {
+    public static final class ItemFight {
         String name;
         int buyXu;
         int buyLuong;
         byte carriedItemCount;
     }
 
-    public static final List<Item> items = new ArrayList<>();
+    public static final List<ItemFight> ITEM_FIGHTS = new ArrayList<>();
 }

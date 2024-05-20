@@ -74,7 +74,7 @@ public class ClanManager {
             List<ClanItemData> updatedItems = new ArrayList<>(Arrays.asList(items));
             ClanItemData newItem = new ClanItemData();
             newItem.setId(clanItemDetail.getId());
-            newItem.setTime(LocalDateTime.now().plusHours(clanItemDetail.getTime()));
+            newItem.setTime(now.plusHours(clanItemDetail.getTime()));
             updatedItems.add(newItem);
             items = updatedItems.toArray(new ClanItemData[0]);
         }

@@ -2,6 +2,8 @@ package com.teamobi.mobiarmy2.constant;
 
 import com.teamobi.mobiarmy2.util.Until;
 
+import java.time.LocalDateTime;
+
 /**
  * @author tuyen
  */
@@ -401,5 +403,25 @@ public class GameString {
 
     public static String topBonus(String username, String bonus) {
         return String.format("%s +%s xu mỗi ngày", username, bonus);
+    }
+
+    public static String giftCodeError1() {
+        return "Mã quà tặng không tồn tại hoặc đã sử dụng!";
+    }
+
+    public static String giftCodeError2() {
+        return "Số lần sử dụng đã hết!";
+    }
+
+    public static String giftCodeError3(LocalDateTime expiryDate) {
+        return "Mã quà tặng đã hết hạn lúc " + expiryDate.toString();
+    }
+
+    public static String giftCodeError4() {
+        return "Tài khoản đã sử dụng mã quà tặng này";
+    }
+
+    public static String giftCodeSuccess() {
+        return "Sử dụng thành công Giftcode";
     }
 }
