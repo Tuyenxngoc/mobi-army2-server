@@ -137,9 +137,11 @@ public class ServerManager {
     public void stop() {
         log.logMessage("Stop server");
         isStart = false;
-        countClients = 0;
         try {
-            users.clear();
+            while (users.size() > 0) {
+                ISession session = users.get(0);
+                session.close();
+            }
             if (server != null) {
                 server.close();
             }
