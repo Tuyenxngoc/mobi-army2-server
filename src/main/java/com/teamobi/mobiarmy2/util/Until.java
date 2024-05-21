@@ -329,4 +329,21 @@ public class Until {
         return 25_000 * level * (level - 1);
     }
 
+    public static byte nextByte(int[] probabilities) {
+        int sum = 0;
+        for (int prob : probabilities) {
+            sum += prob;
+        }
+
+        int randomNumber = rand.nextInt(sum);
+
+        int cumulativeSum = 0;
+        for (byte i = 0; i < probabilities.length; i++) {
+            cumulativeSum += probabilities[i];
+            if (randomNumber < cumulativeSum) {
+                return i;
+            }
+        }
+        return -1;
+    }
 }

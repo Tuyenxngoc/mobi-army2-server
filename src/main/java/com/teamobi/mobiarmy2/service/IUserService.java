@@ -126,7 +126,7 @@ public interface IUserService {
 
     void handleEquipmentPurchases(Message ms);
 
-    void quaySo(Message ms);
+    void handleSpinWheel(Message ms);
 
     void clanIcon(Message ms);
 

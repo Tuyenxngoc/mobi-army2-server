@@ -1,10 +1,7 @@
 package com.teamobi.mobiarmy2.service.Impl;
 
 import com.teamobi.mobiarmy2.config.IServerConfig;
-import com.teamobi.mobiarmy2.constant.Cmd;
-import com.teamobi.mobiarmy2.constant.CommonConstant;
-import com.teamobi.mobiarmy2.constant.GameString;
-import com.teamobi.mobiarmy2.constant.UserState;
+import com.teamobi.mobiarmy2.constant.*;
 import com.teamobi.mobiarmy2.dao.IGiftCodeDao;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.dao.impl.GiftCodeDao;
@@ -1930,8 +1927,69 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void quaySo(Message ms) {
+    public void handleSpinWheel(Message ms) {
+        try {
+            byte unit = ms.reader().readByte();
+            switch (unit) {
+                case 0 -> {
+                    if (user.getXu() < SpinWheelConstants.XU_COST) {
+                        sendServerMessage(GameString.xuNotEnought());
+                        return;
+                    }
+                    user.updateXu(-SpinWheelConstants.XU_COST);
+                }
+                case 1 -> {
+                    if (user.getLuong() < SpinWheelConstants.LUONG_COST) {
+                        sendServerMessage(GameString.xuNotEnought());
+                        return;
+                    }
+                    user.updateLuong(-SpinWheelConstants.LUONG_COST);
+                }
+                default -> {
+                    return;
+                }
+            }
 
+            ms = new Message(Cmd.RULET);
+            DataOutputStream ds = ms.writer();
+
+            int luckyIndex = Until.nextInt(10);
+            for (byte i = 0; i < 10; i++) {
+                byte type = Until.nextByte(SpinWheelConstants.TYPE_PROBABILITIES);
+                byte itemId = 0;
+                int quantity = 0;
+
+                switch (type) {
+                    case 0 -> {
+                        itemId = ItemFightData.randomItem();
+                        quantity = SpinWheelConstants.ITEM_COUNTS[Until.nextInt(SpinWheelConstants.ITEM_PROBABILITIES)];
+                        if (i == luckyIndex) {
+                            user.updateItems(itemId, quantity);
+                        }
+                    }
+                    case 1 -> {
+                        quantity = SpinWheelConstants.XU_COUNTS[Until.nextInt(SpinWheelConstants.XU_PROBABILITIES)];
+                        if (i == luckyIndex) {
+                            user.updateXu(quantity);
+                        }
+                    }
+                    case 2 -> {
+                        quantity = SpinWheelConstants.XP_COUNTS[Until.nextInt(SpinWheelConstants.XP_PROBABILITIES)];
+                        if (i == luckyIndex) {
+                            user.updateXp(quantity, false);
+                        }
+                    }
+                }
+                ds.writeByte(type);
+                ds.writeByte(itemId);
+                ds.writeInt(quantity);
+            }
+            ds.writeByte(luckyIndex);
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

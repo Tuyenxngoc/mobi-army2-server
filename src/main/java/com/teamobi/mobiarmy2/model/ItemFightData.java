@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.model;
 
+import com.teamobi.mobiarmy2.util.Until;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,4 +22,8 @@ public class ItemFightData {
     }
 
     public static final List<ItemFight> ITEM_FIGHTS = new ArrayList<>();
+
+    public static byte randomItem() {
+        return (byte) (Until.nextInt(ITEM_FIGHTS.size() - 2) + 2);
+    }
 }

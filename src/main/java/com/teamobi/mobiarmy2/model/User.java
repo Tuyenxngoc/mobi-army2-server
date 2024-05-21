@@ -208,7 +208,7 @@ public class User {
         return equip;
     }
 
-    public void updateItems(byte itemIndex, byte quantity) {
+    public void updateItems(byte itemIndex, int quantity) {
         this.items[itemIndex] += quantity;
         if (this.items[itemIndex] < 0) {
             this.items[itemIndex] = 0;
