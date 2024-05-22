@@ -126,7 +126,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.GET_FILEPACK -> userService.getFilePack(ms);
 
-                case Cmd.ADD_POINT -> userService.nangCap(ms);
+                case Cmd.ADD_POINT -> userService.handleAddPoints(ms);
 
                 case Cmd.CHARACTOR_INFO -> userService.sendCharacterInfo();
 

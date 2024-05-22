@@ -112,7 +112,7 @@ public class UserDao implements IUserDao {
                         user.levelPercents = new byte[len];
                         user.xps = new int[len];
                         user.points = new int[len];
-                        user.pointAdd = new int[len][5];
+                        user.pointAdd = new short[len][5];
                         user.NvData = new int[len][6];
                         user.nvEquip = new ruongDoTBEntry[len][6];
                         user.setRuongDoItem(new ArrayList<>());

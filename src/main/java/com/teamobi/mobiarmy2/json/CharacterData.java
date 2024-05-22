@@ -23,7 +23,7 @@ public class CharacterData {
     private int point;
 
     @SerializedName("pointAdd")
-    private List<Integer> pointAdd;
+    private List<Short> pointAdd;
 
     @SerializedName("data")
     private List<Integer> data;

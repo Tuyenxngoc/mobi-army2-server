@@ -1812,8 +1812,24 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void nangCap(Message ms) {
-
+    public void handleAddPoints(Message ms) {
+        try {
+            short[] points = new short[5];
+            short totalPoints = 0;
+            for (int i = 0; i < points.length; i++) {
+                points[i] = ms.reader().readShort();
+                if (points[i] < 0) {
+                    return;
+                }
+                totalPoints += points[i];
+            }
+            if (totalPoints <= user.getCurrentPoint()) {
+                user.updatePoints(points, totalPoints);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        sendCharacterInfo();
     }
 
     @Override
@@ -1821,21 +1837,14 @@ public class UserService implements IUserService {
         try {
             Message ms = new Message(Cmd.CHARACTOR_INFO);
             DataOutputStream ds = ms.writer();
-            // level
-            ds.writeByte(1);
-            // level %
-            ds.writeByte(0);
-            // Diem con lai de nang cap
-            ds.writeShort(0);
-            // So diem da cong
-            for (int i = 0; i < 5; i++) {
-                ds.writeShort(10);
+            ds.writeByte(user.getCurrentLevel());
+            ds.writeByte(user.getCurrentLevelPercent());
+            ds.writeShort(user.getCurrentPoint());
+            for (short point : user.getCurrentPointAdd()) {
+                ds.writeShort(point);
             }
-            // XP Get
-            ds.writeInt(0);
-            // XP Max Level
-            ds.writeInt(1000);
-            /* Danh vong */
+            ds.writeInt(user.getCurrentXp());
+            ds.writeInt(user.getCurrentXpLevel());
             ds.writeInt(user.getDanhVong());
             ds.flush();
             user.sendMessage(ms);

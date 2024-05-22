@@ -48,7 +48,7 @@ public class User {
     public byte[] levelPercents;
     public int[] xps;
     public int[] points;
-    public int[][] pointAdd;
+    public short[][] pointAdd;
     public byte[] items;
     public int[][] NvData;
     public int[] mission;
@@ -110,6 +110,10 @@ public class User {
 
     public int getCurrentPoint() {
         return points[nvUsed];
+    }
+
+    public short[] getCurrentPointAdd() {
+        return pointAdd[nvUsed];
     }
 
     public void updateXu(int xuUp) {
@@ -409,5 +413,12 @@ public class User {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void updatePoints(short[] pointsToAdd, short totalPointsToSubtract) {
+        for (int i = 0; i < 5; i++) {
+            pointAdd[nvUsed][i] += pointsToAdd[i];
+        }
+        points[nvUsed] -= totalPointsToSubtract;
     }
 }

@@ -116,7 +116,7 @@ public interface IUserService {
 
     void getFilePack(Message ms);
 
-    void nangCap(Message ms);
+    void handleAddPoints(Message ms);
 
     void sendCharacterInfo();
 
