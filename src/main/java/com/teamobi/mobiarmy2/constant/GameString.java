@@ -29,8 +29,8 @@ public class GameString {
         return "Bạn đó đã vào bàn khác chơi rồi!";
     }
 
-    public static String inviteMessage() {
-        return "%s mời bạn chơi?";
+    public static String inviteMessage(String username) {
+        return String.format("%s mời bạn chơi?", username);
     }
 
     public static String missionError1() {

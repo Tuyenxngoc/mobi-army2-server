@@ -1605,8 +1605,19 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void timBanChoi(Message ms) {
-
+    public void handleFindPlayerWait(Message ms) {
+        try {
+            DataInputStream dis = ms.reader();
+            boolean find = dis.readBoolean();
+            if (find) {
+                user.getFightWait().findPlayer(user.getPlayerId());
+            } else {
+                int playerId = dis.readInt();
+                user.getFightWait().inviteToRoom(playerId);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

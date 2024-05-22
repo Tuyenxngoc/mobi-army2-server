@@ -3,6 +3,7 @@ package com.teamobi.mobiarmy2.server;
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.config.Impl.ServerConfig;
 import com.teamobi.mobiarmy2.constant.CommonConstant;
+import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.dao.impl.GameDao;
 import com.teamobi.mobiarmy2.log.ILogManager;
@@ -19,6 +20,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author tuyen
@@ -173,4 +176,13 @@ public class ServerManager {
         }
     }
 
+    public List<User> findWaitPlayers(int excludedPlayerId) {
+        synchronized (users) {
+            return users.stream()
+                    .filter(session -> session != null && session.getUser() != null)
+                    .map(ISession::getUser)
+                    .filter(user -> UserState.WAITING.equals(user.getState()) && user.getPlayerId() != excludedPlayerId)
+                    .collect(Collectors.toList());
+        }
+    }
 }

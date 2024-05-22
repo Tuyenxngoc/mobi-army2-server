@@ -108,7 +108,7 @@ public interface IUserService {
 
     void napTheCao(Message ms);
 
-    void timBanChoi(Message ms);
+    void handleFindPlayerWait(Message ms);
 
     void xoaDan(Message ms);
 

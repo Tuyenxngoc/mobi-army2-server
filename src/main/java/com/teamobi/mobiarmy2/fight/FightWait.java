@@ -6,10 +6,12 @@ import com.teamobi.mobiarmy2.model.MapData;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.server.Room;
+import com.teamobi.mobiarmy2.server.ServerManager;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author tuyen
@@ -471,6 +473,62 @@ public class FightWait {
             ds.writeByte(mapId);
             ds.flush();
             sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void findPlayer(int playerId) {
+        if (started) {
+            return;
+        }
+        if (getRoomOwner().getPlayerId() != playerId) {
+            return;
+        }
+        List<User> userList = ServerManager.getInstance().findWaitPlayers(playerId);
+        try {
+            Message ms = new Message(Cmd.FIND_PLAYER);
+            DataOutputStream ds = ms.writer();
+            ds.writeBoolean(true);
+            ds.writeByte(userList.size());
+            for (User u : userList) {
+                ds.writeUTF(u.getUsername());
+                ds.writeInt(u.getPlayerId());
+                ds.writeByte(u.getNvUsed());
+                ds.writeInt(u.getXu());
+                ds.writeByte(u.getCurrentLevel());
+                ds.writeByte(u.getCurrentLevelPercent());
+                for (short j : u.getEquip()) {
+                    ds.writeShort(j);
+                }
+            }
+            ds.flush();
+            getRoomOwner().sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void inviteToRoom(int playerId) {
+        User user = ServerManager.getInstance().getUserByPlayerId(playerId);
+        if (user == null) {
+            getRoomOwner().getUserService().sendServerMessage(GameString.inviteError1());
+            return;
+        }
+        if (user.isNotWaiting()) {
+            getRoomOwner().getUserService().sendServerMessage(GameString.inviteError2());
+            return;
+        }
+        try {
+            Message ms = new Message(Cmd.FIND_PLAYER);
+            DataOutputStream ds = ms.writer();
+            ds.writeBoolean(false);
+            ds.writeUTF(GameString.inviteMessage(user.getUsername()));
+            ds.writeByte(this.parent.id);
+            ds.writeByte(this.id);
+            ds.writeUTF(this.pass);
+            ds.flush();
+            user.sendMessage(ms);
         } catch (IOException e) {
             e.printStackTrace();
         }

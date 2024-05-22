@@ -116,7 +116,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.LOAD_CARD -> userService.napTheCao(ms);
 
-                case Cmd.FIND_PLAYER -> userService.timBanChoi(ms);
+                case Cmd.FIND_PLAYER -> userService.handleFindPlayerWait(ms);
 
                 case Cmd.CHECK_CROSS -> userService.xoaDan(ms);
 
