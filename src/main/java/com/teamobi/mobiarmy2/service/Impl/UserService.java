@@ -1370,12 +1370,22 @@ public class UserService implements IUserService {
 
     @Override
     public void datTenKhuVUc(Message ms) {
-
+        try {
+            String name = ms.reader().readUTF().trim();
+            user.getFightWait().setRoomName(user.getPlayerId(), name);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void datSoNguoi(Message ms) {
-
+        try {
+            byte maxPlayers = ms.reader().readByte();
+            user.getFightWait().setMaxPlayers(user.getPlayerId(), maxPlayers);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -1515,7 +1525,12 @@ public class UserService implements IUserService {
 
     @Override
     public void chonBanDo(Message ms) {
-
+        try {
+            byte mapId = ms.reader().readByte();
+            user.getFightWait().setMap(user.getPlayerId(), mapId);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

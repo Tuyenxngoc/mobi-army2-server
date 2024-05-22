@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.model;
 
 import com.teamobi.mobiarmy2.server.ServerManager;
+import com.teamobi.mobiarmy2.util.Until;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -87,4 +88,17 @@ public class MapData {
         return false;
     }
 
+    public static byte randomMap(int idNotSelect) {
+        if (MAPS.isEmpty()) {
+            return 0;
+        }
+        byte selectedMapId = -1;
+        while (selectedMapId == -1) {
+            Map map = MAPS.get(Until.nextInt(MAPS.size()));
+            if (map.id != idNotSelect) {
+                selectedMapId = map.id;
+            }
+        }
+        return selectedMapId;
+    }
 }

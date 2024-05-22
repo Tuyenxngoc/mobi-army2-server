@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.fight;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
+import com.teamobi.mobiarmy2.model.MapData;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.server.Room;
@@ -238,11 +239,8 @@ public class FightWait {
             getRoomOwner().getUserService().sendServerMessage(GameString.xuNotEnought());
             return;
         }
-
         // Reset ready
-        Arrays.fill(readies, false);
-        readies[boss] = true;
-        numReady = 0;
+        resetReadies();
         // Set new money
         money = xu;
         try {
@@ -255,6 +253,12 @@ public class FightWait {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void resetReadies() {
+        Arrays.fill(readies, false);
+        readies[boss] = true;
+        numReady = 0;
     }
 
     public void setReady(boolean ready, int playerId) {
@@ -409,5 +413,66 @@ public class FightWait {
         }
         started = true;
         //fightManager.startGame();
+    }
+
+    public void setRoomName(int playerId, String name) {
+        if (started) {
+            return;
+        }
+        if (getRoomOwner().getPlayerId() != playerId) {
+            return;
+        }
+        this.name = name;
+    }
+
+    public void setMaxPlayers(int playerId, byte maxPlayers) {
+        if (started) {
+            return;
+        }
+        if (getRoomOwner().getPlayerId() != playerId) {
+            return;
+        }
+        if (maxPlayers > 0 && maxPlayers < 9 && maxPlayers % 2 == 0 && numPlayer < maxPlayers) {
+            maxSetPlayer = maxPlayers;
+        }
+    }
+
+    public void setMap(int playerId, byte mapIdSet) {
+        if (started) {
+            return;
+        }
+        if (getRoomOwner().getPlayerId() != playerId) {
+            return;
+        }
+        if (isLienHoan) {
+            getRoomOwner().getUserService().sendServerMessage(GameString.selectMapError1_3());
+            return;
+        }
+        for (User user : users) {
+            if (user == null) {
+                continue;
+            }
+            if (user.isOpeningGift()) {
+                user.getUserService().sendServerMessage(GameString.openingGift(user.getUsername()));
+                return;
+            }
+        }
+
+        //todo check map can select
+
+        mapId = mapIdSet;
+        if (mapId == 27) {
+            mapId = MapData.randomMap(27);
+        }
+        resetReadies();
+        try {
+            Message ms = new Message(Cmd.MAP_SELECT);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(mapId);
+            ds.flush();
+            sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
