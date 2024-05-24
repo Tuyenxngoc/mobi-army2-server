@@ -379,54 +379,21 @@ public class UserService implements IUserService {
         }
         try {
             byte action = ms.reader().readByte();
-            byte indexNv = -1;
-            if (action == 1) {
-                indexNv = ms.reader().readByte();
-            }
 
             if (action == 0) {
                 sendMissionInfo();
             } else if (action == 1) {
-                missionComplete(indexNv);
+                byte missionId = ms.reader().readByte();
+                missionComplete(missionId);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void missionComplete(byte indexNv) throws IOException {
+    private void missionComplete(byte missionId) throws IOException {
         Message ms = new Message(10);
         DataOutputStream ds = ms.writer();
-        MissionData.Mission me = MissionData.getMissionData(indexNv);
-        MissionData.MissDataEntry mDatE = me.mDatE;
-        byte id = (byte) (mDatE.id - 1);
-        if (id < 0 || id >= user.mission.length) {
-            ds.writeUTF(GameString.missionError1());
-        } else {
-            if (user.missionLevel[id] > me.level) {
-                ds.writeUTF(GameString.missionError2());
-            } else if (user.missionLevel[id] < me.level) {
-                ds.writeUTF(GameString.missionError3());
-            } else if (user.mission[mDatE.idNeed - 1] < me.require) {
-                ds.writeUTF(GameString.missionError2());
-            } else {
-                user.missionLevel[id]++;
-                if (me.rewardXu > 0) {
-                    user.updateXu(me.rewardXu);
-                }
-                if (me.rewardLuong > 0) {
-                    user.updateLuong(me.rewardLuong);
-                }
-                if (me.rewardXP > 0) {
-                    user.updateXp(me.rewardXP, false);
-                }
-                if (me.rewardCUP > 0) {
-                    user.updateDanhVong(me.rewardCUP);
-                }
-                sendMissionInfo();
-                ds.writeUTF(String.format(GameString.missionComplete(), me.reward));
-            }
-        }
         ds.flush();
         user.sendMessage(ms);
     }
@@ -434,20 +401,6 @@ public class UserService implements IUserService {
     private void sendMissionInfo() throws IOException {
         Message ms = new Message(Cmd.MISSISON);
         DataOutputStream ds = ms.writer();
-        for (int i = 0; i < MissionData.entrys.size(); i++) {
-            MissionData.MissDataEntry mDatE = MissionData.entrys.get(i);
-            if (user.missionLevel[i] >= mDatE.missions.size()) {
-                continue;
-            }
-            MissionData.Mission me = mDatE.missions.get(user.missionLevel[i] - 1);
-            ds.writeByte(me.index);
-            ds.writeByte(me.level);
-            ds.writeUTF(me.name);
-            ds.writeUTF(me.reward);
-            ds.writeInt(me.require);
-            ds.writeInt(Math.min(user.mission[mDatE.idNeed - 1], me.require));
-            ds.writeBoolean(user.mission[mDatE.idNeed - 1] >= me.require);
-        }
         ds.flush();
         user.sendMessage(ms);
     }
@@ -1584,7 +1537,7 @@ public class UserService implements IUserService {
             totalRewardBuilder.append("+ ").append(rewardData.getLuong()).append(" lượng, ");
         }
         if (rewardData.getExp() > 0) {
-            user.updateXp(rewardData.getExp(), false);
+            user.updateXp(rewardData.getExp());
             totalRewardBuilder.append("+ ").append(rewardData.getExp()).append(" exp");
         }
         if (rewardData.getItems() != null) {
@@ -2011,7 +1964,7 @@ public class UserService implements IUserService {
                     case 2 -> {
                         quantity = SpinWheelConstants.XP_COUNTS[Until.nextInt(SpinWheelConstants.XP_PROBABILITIES)];
                         if (i == luckyIndex) {
-                            user.updateXp(quantity, false);
+                            user.updateXp(quantity);
                         }
                     }
                 }

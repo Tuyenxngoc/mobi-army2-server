@@ -161,6 +161,10 @@ public class User {
         userService.sendUpdateDanhVong(danhVongUp);
     }
 
+    public void updateXp(int xpUp) {
+        updateXp(xpUp, false);
+    }
+
     public void updateXp(int xpUp, boolean isXpMultiplier) {
         if (xpUp <= 0) {
             return;

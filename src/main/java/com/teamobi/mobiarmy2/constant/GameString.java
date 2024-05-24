@@ -45,8 +45,8 @@ public class GameString {
         return "Nhiệm vụ đã hoàn thành!";
     }
 
-    public static String missionComplete() {
-        return "Chúc mừng bạn nhận được phần thưởng %s!";
+    public static String missionComplete(String reward) {
+        return String.format("Chúc mừng bạn nhận được phần thưởng %s!", reward);
     }
 
     public static String phucHoiSuccess() {

@@ -3,6 +3,7 @@ package com.teamobi.mobiarmy2.dao.impl;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.*;
+import com.teamobi.mobiarmy2.model.mission.Mission;
 import com.teamobi.mobiarmy2.util.Until;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -344,19 +345,17 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet res = statement.executeQuery("SELECT * FROM `mission`")) {
                 while (res.next()) {
-                    MissionData.Mission mE = new MissionData.Mission();
-                    int id = res.getInt("id");
-                    byte idNeed = res.getByte("idneed");
-                    mE.index = res.getInt("iddb");
-                    mE.level = res.getByte("level");
-                    mE.name = res.getString("name");
-                    mE.require = res.getInt("require");
-                    mE.reward = res.getString("reward");
-                    mE.rewardXu = res.getInt("rewardXu");
-                    mE.rewardLuong = res.getInt("rewardLuong");
-                    mE.rewardXP = res.getInt("rewardXP");
-                    mE.rewardCUP = res.getInt("rewardCUP");
-                    MissionData.addMissionEntry(id, idNeed, mE);
+                    Mission mission = new Mission();
+                    mission.setId(res.getByte("mission_id"));
+                    mission.setType(res.getByte("mission_type"));
+                    mission.setLevel(res.getByte("level"));
+                    mission.setName(res.getString("mission_name"));
+                    mission.setRequirement(res.getInt("requirement"));
+                    mission.setReward(res.getString("reward_items"));
+                    mission.setRewardXu(res.getInt("reward_xu"));
+                    mission.setRewardLuong(res.getInt("reward_luong"));
+                    mission.setRewardXp(res.getInt("reward_xp"));
+                    mission.setRewardCup(res.getInt("reward_cup"));
                 }
             }
         } catch (SQLException e) {
