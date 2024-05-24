@@ -10,6 +10,8 @@ public interface IUserService {
 
     void sendServerMessage(String message);
 
+    void sendServerMessage2(String message);
+
     void handleHandshakeMessage();
 
     void giaHanDo(Message ms);
@@ -25,8 +27,6 @@ public interface IUserService {
     void getProvider(Message ms);
 
     void hopTrangBi(Message ms);
-
-    void buyItem(Message ms);
 
     void moHopQua(Message ms);
 
@@ -145,8 +145,6 @@ public interface IUserService {
     void getMaterialIconMessage(Message ms);
 
     void startLuyenTap(Message ms);
-
-    void sendMs10(String userLoginMany);
 
     void sendUpdateMoney();
 

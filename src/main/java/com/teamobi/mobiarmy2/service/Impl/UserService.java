@@ -100,7 +100,7 @@ public class UserService implements IUserService {
             //Kiểm tra có đang đăng nhập hay không
             User userLogin = serverManager.getUserByPlayerId(userFound.getPlayerId());
             if (userLogin != null) {
-                userLogin.getUserService().sendMs10(GameString.userLoginMany());
+                userLogin.getUserService().sendServerMessage2(GameString.userLoginMany());
                 userLogin.getSession().close();
 
                 sendMessageLoginFail(GameString.loginErr1());
@@ -291,6 +291,19 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public void sendServerMessage2(String message) {
+        try {
+            Message ms = new Message(Cmd.SET_MONEY_ERROR);
+            DataOutputStream ds = ms.writer();
+            ds.writeUTF(message);
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void handleHandshakeMessage() {
         user.getSession().sendKeys();
     }
@@ -393,20 +406,18 @@ public class UserService implements IUserService {
     }
 
     private void missionComplete(byte missionId) throws IOException {
-        Message ms = new Message(10);
-        DataOutputStream ds = ms.writer();
-
+        String message;
         Mission mission = MissionData.getMissionById(missionId);
         if (mission == null) {
-            ds.writeUTF(GameString.missionError1());
+            message = GameString.missionError1();
         } else {
             byte missionType = mission.getType();
             byte missionLevel = user.getMissionLevel()[missionType];
             byte requiredLevel = mission.getLevel();
 
-            if (user.getMission()[missionType] < mission.getRequirement()) {//Send error message if mission is not completed
-                ds.writeUTF(GameString.missionError2());
-            } else if (missionLevel == requiredLevel) {//Add reward if mission level == required level
+            if (user.getMission()[missionType] < mission.getRequirement()) {
+                message = GameString.missionError2();
+            } else if (missionLevel == requiredLevel) {
                 user.getMissionLevel()[mission.getType()]++;
                 if (mission.getRewardXu() > 0) {
                     user.updateXu(mission.getRewardXu());
@@ -421,16 +432,14 @@ public class UserService implements IUserService {
                     user.updateDanhVong(mission.getRewardCup());
                 }
                 sendMissionInfo();
-                ds.writeUTF(GameString.missionComplete(mission.getReward()));
+                message = GameString.missionComplete(mission.getReward());
             } else if (missionLevel < requiredLevel) {
-                ds.writeUTF(GameString.missionError2());
+                message = GameString.missionError2();
             } else {
-                ds.writeUTF(GameString.missionError3());
+                message = GameString.missionError3();
             }
         }
-
-        ds.flush();
-        user.sendMessage(ms);
+        sendServerMessage2(message);
     }
 
     private void sendMissionInfo() throws IOException {
@@ -706,11 +715,6 @@ public class UserService implements IUserService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void buyItem(Message ms) {
-
     }
 
     @Override
@@ -2273,19 +2277,6 @@ public class UserService implements IUserService {
     @Override
     public void startLuyenTap(Message ms) {
 
-    }
-
-    @Override
-    public void sendMs10(String message) {
-        try {
-            Message ms = new Message(Cmd.SET_MONEY_ERROR);
-            DataOutputStream ds = ms.writer();
-            ds.writeUTF(message);
-            ds.flush();
-            user.sendMessage(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
