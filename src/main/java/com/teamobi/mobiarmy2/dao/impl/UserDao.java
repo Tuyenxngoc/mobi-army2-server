@@ -210,9 +210,24 @@ public class UserDao implements IUserDao {
                             }.getType();
                             user.setFriends(gson.fromJson(playerResultSet.getString("friends"), listType));
 
-                            //Mission
-                            user.setMission(gson.fromJson(playerResultSet.getString("mission"), int[].class));
-                            user.setMissionLevel(gson.fromJson(playerResultSet.getString("missionLevel"), byte[].class));
+                            int[] missions = gson.fromJson(playerResultSet.getString("mission"), int[].class);
+                            byte[] missionLevels = gson.fromJson(playerResultSet.getString("missionLevel"), byte[].class);
+
+                            if (missions.length != MissionData.MISSION_LIST.size()) {
+                                int[] adjustedMissions = new int[MissionData.MISSION_LIST.size()];
+                                System.arraycopy(missions, 0, adjustedMissions, 0, Math.min(missions.length, adjustedMissions.length));
+                                user.setMission(adjustedMissions);
+                            } else {
+                                user.setMission(missions);
+                            }
+                            if (missionLevels.length != MissionData.MISSION_LIST.size()) {
+                                byte[] adjustedMissionLevels = new byte[MissionData.MISSION_LIST.size()];
+                                Arrays.fill(adjustedMissionLevels, (byte) 1);
+                                System.arraycopy(missionLevels, 0, adjustedMissionLevels, 0, Math.min(missionLevels.length, adjustedMissionLevels.length));
+                                user.setMissionLevel(adjustedMissionLevels);
+                            } else {
+                                user.setMissionLevel(missionLevels);
+                            }
 
                         } else {//Tạo mới một bản ghi
                             User.setDefaultValue(user);
