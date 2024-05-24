@@ -343,7 +343,7 @@ public class GameDao implements IGameDao {
     public void getAllMissions() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet res = statement.executeQuery("SELECT * FROM `mission`")) {
+            try (ResultSet res = statement.executeQuery("SELECT * FROM `mission` ORDER BY mission_type, level")) {
                 while (res.next()) {
                     Mission mission = new Mission();
                     mission.setId(res.getByte("mission_id"));
@@ -356,6 +356,7 @@ public class GameDao implements IGameDao {
                     mission.setRewardLuong(res.getInt("reward_luong"));
                     mission.setRewardXp(res.getInt("reward_xp"));
                     mission.setRewardCup(res.getInt("reward_cup"));
+                    MissionData.addMission(mission);
                 }
             }
         } catch (SQLException e) {

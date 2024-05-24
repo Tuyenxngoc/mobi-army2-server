@@ -51,6 +51,8 @@ public class UserDao implements IUserDao {
                 "`ruongItem` = ? ," +
                 "`sttnhanvat` = ?, " +
                 "`online` = ?, " +
+                "`mission` = ?, " +
+                "`missionLevel` = ?, " +
                 //...//
                 "`NVused` = ? " +
                 " WHERE player_id = ?";
@@ -65,6 +67,8 @@ public class UserDao implements IUserDao {
                 user.getRuongDoItem().toString(),
                 nvstt,
                 false,
+                Arrays.toString(user.getMission()),
+                Arrays.toString(user.getMissionLevel()),
                 //...//
                 user.getNvUsed(),
                 user.getPlayerId());

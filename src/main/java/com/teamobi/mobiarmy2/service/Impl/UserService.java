@@ -15,6 +15,7 @@ import com.teamobi.mobiarmy2.model.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.clan.ClanItem;
 import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
+import com.teamobi.mobiarmy2.model.mission.Mission;
 import com.teamobi.mobiarmy2.model.response.GetFriendResponse;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.server.ClanManager;
@@ -394,6 +395,40 @@ public class UserService implements IUserService {
     private void missionComplete(byte missionId) throws IOException {
         Message ms = new Message(10);
         DataOutputStream ds = ms.writer();
+
+        Mission mission = MissionData.getMissionById(missionId);
+        if (mission == null) {
+            ds.writeUTF(GameString.missionError1());
+        } else {
+            byte missionType = mission.getType();
+            byte missionLevel = user.getMissionLevel()[missionType];
+            byte requiredLevel = mission.getLevel();
+
+            if (user.getMission()[missionType] < mission.getRequirement()) {//Send error message if mission is not completed
+                ds.writeUTF(GameString.missionError2());
+            } else if (missionLevel == requiredLevel) {//Add reward if mission level == required level
+                user.getMissionLevel()[mission.getType()]++;
+                if (mission.getRewardXu() > 0) {
+                    user.updateXu(mission.getRewardXu());
+                }
+                if (mission.getRewardLuong() > 0) {
+                    user.updateLuong(mission.getRewardLuong());
+                }
+                if (mission.getRewardXp() > 0) {
+                    user.updateXp(mission.getRewardXp());
+                }
+                if (mission.getRewardCup() > 0) {
+                    user.updateDanhVong(mission.getRewardCup());
+                }
+                sendMissionInfo();
+                ds.writeUTF(GameString.missionComplete(mission.getReward()));
+            } else if (missionLevel < requiredLevel) {
+                ds.writeUTF(GameString.missionError2());
+            } else {
+                ds.writeUTF(GameString.missionError3());
+            }
+        }
+
         ds.flush();
         user.sendMessage(ms);
     }
@@ -401,6 +436,22 @@ public class UserService implements IUserService {
     private void sendMissionInfo() throws IOException {
         Message ms = new Message(Cmd.MISSISON);
         DataOutputStream ds = ms.writer();
+        int i = 0;
+        for (List<Mission> missionList : MissionData.MISSION_LIST.values()) {
+            int index = user.getMissionLevel()[i] - 1;// Subtracting 1 to access the correct index
+            if (index >= missionList.size()) {
+                index = missionList.size() - 1;
+            }
+            Mission mission = missionList.get(index);
+            ds.writeByte(mission.getId());
+            ds.writeByte(mission.getLevel());
+            ds.writeUTF(mission.getName());
+            ds.writeUTF(mission.getReward());
+            ds.writeInt(mission.getRequirement());
+            ds.writeInt(Math.min(user.getMission()[i], mission.getRequirement()));
+            ds.writeBoolean(user.getMission()[i] >= mission.getRequirement());
+            i++;
+        }
         ds.flush();
         user.sendMessage(ms);
     }
