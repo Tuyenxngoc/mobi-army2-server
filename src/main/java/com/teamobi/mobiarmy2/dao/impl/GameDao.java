@@ -4,10 +4,8 @@ import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.mission.Mission;
+import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Until;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -81,8 +79,8 @@ public class GameDao implements IGameDao {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `equip`")) {
                 while (resultSet.next()) {
                     NVData.EquipmentEntry equipEntry = new NVData.EquipmentEntry();
-                    equipEntry.idNV = resultSet.getByte("nv");
-                    equipEntry.idEquipDat = resultSet.getByte("equipType");
+                    equipEntry.idNV = resultSet.getByte("character_id");
+                    equipEntry.idEquipDat = resultSet.getByte("equip_type");
                     equipEntry.id = resultSet.getShort("equipId");
                     equipEntry.name = resultSet.getString("name");
                     equipEntry.giaXu = resultSet.getInt("giaXu");
@@ -94,52 +92,15 @@ public class GameDao implements IGameDao {
                     equipEntry.onSale = resultSet.getBoolean("onSale");
                     equipEntry.isSet = resultSet.getBoolean("isSet");
                     equipEntry.cap = resultSet.getByte("cap");
-                    equipEntry.bigImageCutX = new short[6];
-                    equipEntry.bigImageCutY = new short[6];
-                    equipEntry.bigImageSizeX = new byte[6];
-                    equipEntry.bigImageSizeY = new byte[6];
-                    equipEntry.bigImageAlignX = new byte[6];
-                    equipEntry.bigImageAlignY = new byte[6];
-                    equipEntry.arraySet = new short[5];
-                    int l;
-                    JSONArray jArray3 = (JSONArray) JSONValue.parse(resultSet.getString("bigCutX"));
-                    for (l = 0; l < 6; l++) {
-                        equipEntry.bigImageCutX[l] = ((Long) jArray3.get(l)).shortValue();
-                    }
-                    jArray3 = (JSONArray) JSONValue.parse(resultSet.getString("bigCutY"));
-                    for (l = 0; l < 6; l++) {
-                        equipEntry.bigImageCutY[l] = ((Long) jArray3.get(l)).shortValue();
-                    }
-                    jArray3 = (JSONArray) JSONValue.parse(resultSet.getString("bigSizeX"));
-                    for (l = 0; l < 6; l++) {
-                        equipEntry.bigImageSizeX[l] = ((Long) jArray3.get(l)).byteValue();
-                    }
-                    jArray3 = (JSONArray) JSONValue.parse(resultSet.getString("bigSizeY"));
-                    for (l = 0; l < 6; l++) {
-                        equipEntry.bigImageSizeY[l] = ((Long) jArray3.get(l)).byteValue();
-                    }
-                    jArray3 = (JSONArray) JSONValue.parse(resultSet.getString("bigAlignX"));
-                    for (l = 0; l < 6; l++) {
-                        equipEntry.bigImageAlignX[l] = ((Long) jArray3.get(l)).byteValue();
-                    }
-                    jArray3 = (JSONArray) JSONValue.parse(resultSet.getString("bigAlignY"));
-                    for (l = 0; l < 6; l++) {
-                        equipEntry.bigImageAlignY[l] = ((Long) jArray3.get(l)).byteValue();
-                    }
-                    jArray3 = (JSONArray) JSONValue.parse(resultSet.getString("arraySet"));
-                    for (l = 0; l < 5; l++) {
-                        equipEntry.arraySet[l] = ((Long) jArray3.get(l)).shortValue();
-                    }
-                    equipEntry.invAdd = new byte[5];
-                    equipEntry.percenAdd = new byte[5];
-                    jArray3 = (JSONArray) JSONValue.parse(resultSet.getString("addPN"));
-                    for (l = 0; l < 5; l++) {
-                        equipEntry.invAdd[l] = ((Long) jArray3.get(l)).byteValue();
-                    }
-                    jArray3 = (JSONArray) JSONValue.parse(resultSet.getString("addPN100"));
-                    for (l = 0; l < 5; l++) {
-                        equipEntry.percenAdd[l] = ((Long) jArray3.get(l)).byteValue();
-                    }
+                    equipEntry.bigImageCutX = GsonUtil.GSON.fromJson(resultSet.getString("bigCutX"), short[].class);
+                    equipEntry.bigImageCutY = GsonUtil.GSON.fromJson(resultSet.getString("bigCutY"), short[].class);
+                    equipEntry.bigImageSizeX = GsonUtil.GSON.fromJson(resultSet.getString("bigSizeX"), byte[].class);
+                    equipEntry.bigImageSizeY = GsonUtil.GSON.fromJson(resultSet.getString("bigSizeY"), byte[].class);
+                    equipEntry.bigImageAlignX = GsonUtil.GSON.fromJson(resultSet.getString("bigAlignX"), byte[].class);
+                    equipEntry.bigImageAlignY = GsonUtil.GSON.fromJson(resultSet.getString("bigAlignY"), byte[].class);
+                    equipEntry.arraySet = GsonUtil.GSON.fromJson(resultSet.getString("arraySet"), short[].class);
+                    equipEntry.invAdd = GsonUtil.GSON.fromJson(resultSet.getString("addPN"), byte[].class);
+                    equipEntry.percenAdd = GsonUtil.GSON.fromJson(resultSet.getString("addPN100"), byte[].class);
                     NVData.addEquipEntryById(equipEntry.idNV, equipEntry.idEquipDat, equipEntry.id, equipEntry);
                 }
             }
@@ -239,11 +200,7 @@ public class GameDao implements IGameDao {
                         iEntry.indexSale = SpecialItemData.nSaleItem;
                         SpecialItemData.nSaleItem++;
                     }
-                    JSONArray jarr = (JSONArray) JSONValue.parse(res.getString("ability"));
-                    iEntry.ability = new short[jarr.size()];
-                    for (int i = 0; i < jarr.size(); i++) {
-                        iEntry.ability[i] = ((Long) jarr.get(i)).shortValue();
-                    }
+                    iEntry.ability = GsonUtil.GSON.fromJson(res.getString("ability"), short[].class);
                     SpecialItemData.entrys.add(iEntry);
                 }
             }
@@ -258,57 +215,9 @@ public class GameDao implements IGameDao {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
 
-            try (ResultSet res = statement.executeQuery("SELECT * FROM `fomular`;")) {
-                while (res.next()) {
-                    int materialId = res.getInt("idMaterial");
-                    byte equipType = res.getByte("equipType");
-                    JSONArray jarr = (JSONArray) JSONValue.parse(res.getString("equipId"));
-                    short[] eqId = new short[jarr.size()];
-                    for (int i = 0; i < jarr.size(); i++) {
-                        eqId[i] = ((Long) jarr.get(i)).shortValue();
-                    }
-                    jarr = (JSONArray) JSONValue.parse(res.getString("equipNeed"));
-                    short[] eqNeedId = new short[jarr.size()];
-                    for (int i = 0; i < jarr.size(); i++) {
-                        eqNeedId[i] = ((Long) jarr.get(i)).shortValue();
-                    }
-                    FormulaData.FormulaEntry fE = new FormulaData.FormulaEntry();
-                    fE.level = res.getByte("lv");
-                    fE.levelRequire = res.getInt("lvRequire");
-                    jarr = (JSONArray) JSONValue.parse(res.getString("addPNMin"));
-                    fE.invAddMin = new short[jarr.size()];
-                    for (int i = 0; i < jarr.size(); i++) {
-                        fE.invAddMin[i] = ((Long) jarr.get(i)).shortValue();
-                    }
-                    jarr = (JSONArray) JSONValue.parse(res.getString("addPNMax"));
-                    fE.invAddMax = new short[jarr.size()];
-                    for (int i = 0; i < jarr.size(); i++) {
-                        fE.invAddMax[i] = ((Long) jarr.get(i)).shortValue();
-                    }
-                    jarr = (JSONArray) JSONValue.parse(res.getString("addPP100Min"));
-                    fE.percenAddMin = new short[jarr.size()];
-                    for (int i = 0; i < jarr.size(); i++) {
-                        fE.percenAddMin[i] = ((Long) jarr.get(i)).shortValue();
-                    }
-                    jarr = (JSONArray) JSONValue.parse(res.getString("addPP100Max"));
-                    fE.percenAddMax = new short[jarr.size()];
-                    for (int i = 0; i < jarr.size(); i++) {
-                        fE.percenAddMax[i] = ((Long) jarr.get(i)).shortValue();
-                    }
-                    jarr = (JSONArray) JSONValue.parse(res.getString("itemRequire"));
-                    fE.itemNeed = new SpecialItemData.SpecialItemEntry[jarr.size()];
-                    fE.itemNeedNum = new short[jarr.size()];
-                    for (int i = 0; i < jarr.size(); i++) {
-                        JSONObject jobj = (JSONObject) jarr.get(i);
-                        fE.itemNeed[i] = SpecialItemData.getSpecialItemById(((Long) jobj.get("id")).intValue());
-                        fE.itemNeedNum[i] = ((Long) jobj.get("num")).shortValue();
-                    }
-                    jarr = (JSONArray) JSONValue.parse(res.getString("detail"));
-                    fE.detail = new String[jarr.size()];
-                    for (int i = 0; i < jarr.size(); i++) {
-                        fE.detail[i] = (String) jarr.get(i);
-                    }
-                    FormulaData.addFomularEntry(materialId, equipType, eqId, eqNeedId, fE);
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `fomular`;")) {
+                while (resultSet.next()) {
+                   //Todo create fomular
                 }
             }
         } catch (SQLException e) {
@@ -321,14 +230,14 @@ public class GameDao implements IGameDao {
     public void getAllPayment() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet res = statement.executeQuery("SELECT * FROM `payment`")) {
-                while (res.next()) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `payment`")) {
+                while (resultSet.next()) {
                     PaymentData.Payment payment = new PaymentData.Payment();
-                    payment.id = res.getString("payment_id");
-                    payment.info = res.getString("info");
-                    payment.url = res.getString("url");
-                    payment.mssTo = res.getString("mss_to");
-                    payment.mssContent = res.getString("mss_content");
+                    payment.id = resultSet.getString("payment_id");
+                    payment.info = resultSet.getString("info");
+                    payment.url = resultSet.getString("url");
+                    payment.mssTo = resultSet.getString("mss_to");
+                    payment.mssContent = resultSet.getString("mss_content");
 
                     PaymentData.payments.put(payment.id, payment);
                 }
@@ -343,19 +252,20 @@ public class GameDao implements IGameDao {
     public void getAllMissions() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet res = statement.executeQuery("SELECT * FROM `mission` ORDER BY mission_type, level")) {
-                while (res.next()) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `mission` ORDER BY mission_type, level")) {
+                while (resultSet.next()) {
                     Mission mission = new Mission();
-                    mission.setId(res.getByte("mission_id"));
-                    mission.setType(res.getByte("mission_type"));
-                    mission.setLevel(res.getByte("level"));
-                    mission.setName(res.getString("mission_name"));
-                    mission.setRequirement(res.getInt("requirement"));
-                    mission.setReward(res.getString("reward_items"));
-                    mission.setRewardXu(res.getInt("reward_xu"));
-                    mission.setRewardLuong(res.getInt("reward_luong"));
-                    mission.setRewardXp(res.getInt("reward_xp"));
-                    mission.setRewardCup(res.getInt("reward_cup"));
+                    mission.setId(resultSet.getByte("mission_id"));
+                    mission.setType(resultSet.getByte("mission_type"));
+                    mission.setLevel(resultSet.getByte("level"));
+                    mission.setName(resultSet.getString("mission_name"));
+                    mission.setRequirement(resultSet.getInt("requirement"));
+                    mission.setReward(resultSet.getString("reward_items"));
+                    mission.setRewardXu(resultSet.getInt("reward_xu"));
+                    mission.setRewardLuong(resultSet.getInt("reward_luong"));
+                    mission.setRewardXp(resultSet.getInt("reward_xp"));
+                    mission.setRewardCup(resultSet.getInt("reward_cup"));
+
                     MissionData.addMission(mission);
                 }
             }
@@ -369,15 +279,15 @@ public class GameDao implements IGameDao {
     public void getAllXpData() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet res = statement.executeQuery("SELECT * FROM `xp_lv` ORDER BY lvl")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `xp_lv` ORDER BY lvl")) {
                 int previousXp = 0;
-                while (res.next()) {
-                    int currentXp = res.getInt("exp");
+                while (resultSet.next()) {
+                    int currentXp = resultSet.getInt("exp");
                     if (currentXp < previousXp) {
                         throw new SQLException(String.format("XP of the next level (%d) is lower than the XP of the previous level (%d)!", currentXp, previousXp));
                     }
                     XpData.LevelXpRequired xpRequired = new XpData.LevelXpRequired();
-                    xpRequired.level = res.getInt("lvl");
+                    xpRequired.level = resultSet.getInt("lvl");
                     xpRequired.xp = currentXp;
                     XpData.xpList.add(xpRequired);
                     previousXp = currentXp;

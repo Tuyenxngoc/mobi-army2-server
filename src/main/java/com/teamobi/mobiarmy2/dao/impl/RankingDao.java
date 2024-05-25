@@ -1,6 +1,5 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
-import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dao.IRankingDao;
@@ -9,6 +8,7 @@ import com.teamobi.mobiarmy2.json.CharacterData;
 import com.teamobi.mobiarmy2.json.EquipmentData;
 import com.teamobi.mobiarmy2.model.NVData;
 import com.teamobi.mobiarmy2.model.PlayerLeaderboardEntry;
+import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Until;
 
 import java.sql.Connection;
@@ -23,12 +23,6 @@ import java.util.List;
  */
 public class RankingDao implements IRankingDao {
 
-    private final Gson gson;
-
-    public RankingDao() {
-        this.gson = new Gson();
-    }
-
     private PlayerLeaderboardEntry createPlayerLeaderboardEntry(ResultSet resultSet, byte index, boolean isBonus) throws SQLException {
         PlayerLeaderboardEntry entry = new PlayerLeaderboardEntry();
         entry.setPlayerId(resultSet.getInt("player_id"));
@@ -40,8 +34,8 @@ public class RankingDao implements IRankingDao {
         entry.setClanId(resultSet.getShort("clan_id"));
 
         byte nvUsed = resultSet.getByte("NVused");
-        CharacterData character = gson.fromJson(resultSet.getString("NV%s".formatted(nvUsed)), CharacterData.class);
-        EquipmentData[] equipmentData = gson.fromJson(resultSet.getString("ruongTrangBi"), EquipmentData[].class);
+        CharacterData character = GsonUtil.GSON.fromJson(resultSet.getString("NV%s".formatted(nvUsed)), CharacterData.class);
+        EquipmentData[] equipmentData = GsonUtil.GSON.fromJson(resultSet.getString("ruongTrangBi"), EquipmentData[].class);
 
         entry.setNvUsed(nvUsed);
         entry.setLevel((byte) character.getLevel());
@@ -61,7 +55,7 @@ public class RankingDao implements IRankingDao {
                     "SELECT p.*, u.username " +
                             "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
                             "WHERE p.dvong > 0 " +
-                            "ORDER BY dvong LIMIT 100"
+                            "ORDER BY p.dvong LIMIT 100"
             )) {
                 byte index = 1;
                 while (resultSet.next()) {
@@ -85,6 +79,7 @@ public class RankingDao implements IRankingDao {
             try (ResultSet resultSet = statement.executeQuery(
                     "SELECT *, u.username " +
                             "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
+                            "WHERE p.xpMax > 0 " +
                             "ORDER BY p.xpMax LIMIT 100"
             )) {
                 byte index = 1;
@@ -109,6 +104,7 @@ public class RankingDao implements IRankingDao {
             try (ResultSet resultSet = statement.executeQuery(
                     "SELECT *, u.username " +
                             "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
+                            "WHERE p.xu > 0 " +
                             "ORDER BY p.xu LIMIT 100"
             )) {
                 byte index = 1;
@@ -133,6 +129,7 @@ public class RankingDao implements IRankingDao {
             try (ResultSet resultSet = statement.executeQuery(
                     "SELECT *, u.username " +
                             "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
+                            "WHERE p.luong > 0 " +
                             "ORDER BY p.luong LIMIT 100"
             )) {
                 byte index = 1;
@@ -157,12 +154,13 @@ public class RankingDao implements IRankingDao {
             try (ResultSet resultSet = statement.executeQuery(
                     "SELECT *, u.username " +
                             "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
-                            "ORDER BY p.point_event LIMIT 100"
+                            "WHERE p.weekly_earnings_cup IS NOT NULL AND p.weekly_earnings_cup > 0 " +
+                            "ORDER BY p.weekly_earnings_cup LIMIT 100"
             )) {
                 byte index = 1;
                 while (resultSet.next()) {
                     PlayerLeaderboardEntry entry = createPlayerLeaderboardEntry(resultSet, index, false);
-                    entry.setDetail(Until.getStringNumber(resultSet.getInt("dvong")));
+                    entry.setDetail(Until.getStringNumber(resultSet.getInt("weekly_earnings_cup")));
                     top.add(entry);
                     index++;
                 }
@@ -181,12 +179,13 @@ public class RankingDao implements IRankingDao {
             try (ResultSet resultSet = statement.executeQuery(
                     "SELECT *, u.username " +
                             "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
-                            "ORDER BY p.dvong LIMIT 100"
+                            "WHERE p.weekly_earnings_xu IS NOT NULL AND p.weekly_earnings_xu > 0 " +
+                            "ORDER BY p.weekly_earnings_xu LIMIT 100"
             )) {
                 byte index = 1;
                 while (resultSet.next()) {
                     PlayerLeaderboardEntry entry = createPlayerLeaderboardEntry(resultSet, index, false);
-                    entry.setDetail(Until.getStringNumber(resultSet.getInt("dvong")));
+                    entry.setDetail(Until.getStringNumber(resultSet.getInt("weekly_earnings_xu")));
                     top.add(entry);
                     index++;
                 }
