@@ -558,7 +558,7 @@ public class UserService implements IUserService {
         if (user.isNotWaiting()) {
             return;
         }
-        if (user.getClanId() == null) {
+        if (user.getClanId() == 0) {
             return;
         }
 
@@ -825,7 +825,7 @@ public class UserService implements IUserService {
 
     @Override
     public void handlePurchaseClanItem(Message ms) {
-        if (user.getClanId() == null) {
+        if (user.getClanId() == 0) {
             sendServerMessage(GameString.notClan());
             return;
         }
@@ -1100,7 +1100,7 @@ public class UserService implements IUserService {
         try {
             byte roomNumber = ms.reader().readByte();
             Room room = ServerManager.getInstance().getRooms()[roomNumber];
-            if (room.type == 6 && user.getClanId() == null) {
+            if (room.type == 6 && user.getClanId() == 0) {
                 sendServerMessage(GameString.notClan());
                 return;
             }

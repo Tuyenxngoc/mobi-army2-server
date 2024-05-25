@@ -62,7 +62,7 @@ public class UserDao implements IUserDao {
                 user.getXu(),
                 user.getLuong(),
                 user.getDanhVong(),
-                user.getClanId(),
+                user.getClanId() == 0 ? null : user.getClanId(),
                 Arrays.toString(user.getItems()),
                 user.getRuongDoTB().toString(),
                 user.getRuongDoItem().toString(),
