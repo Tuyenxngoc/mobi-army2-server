@@ -13,7 +13,7 @@ import java.util.*;
  */
 public class LeaderboardManager {
 
-    private static LeaderboardManager instance;
+    private static volatile LeaderboardManager instance;
     private final IRankingDao rankingDao;
 
     public LeaderboardManager() {
@@ -22,7 +22,11 @@ public class LeaderboardManager {
 
     public static LeaderboardManager getInstance() {
         if (instance == null) {
-            instance = new LeaderboardManager();
+            synchronized (LeaderboardManager.class) {
+                if (instance == null) {
+                    instance = new LeaderboardManager();
+                }
+            }
         }
         return instance;
     }

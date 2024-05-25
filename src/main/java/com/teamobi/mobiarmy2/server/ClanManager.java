@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class ClanManager {
 
-    private static ClanManager instance;
+    private static volatile ClanManager instance;
     private final IClanDao clanDao;
 
     public ClanManager() {
@@ -28,7 +28,11 @@ public class ClanManager {
 
     public static ClanManager getInstance() {
         if (instance == null) {
-            instance = new ClanManager();
+            synchronized (ClanManager.class) {
+                if (instance == null) {
+                    instance = new ClanManager();
+                }
+            }
         }
         return instance;
     }

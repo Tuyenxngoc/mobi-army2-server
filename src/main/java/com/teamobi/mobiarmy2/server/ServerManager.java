@@ -6,6 +6,7 @@ import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.dao.impl.GameDao;
+import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.log.ILogManager;
 import com.teamobi.mobiarmy2.log.LoggerUtil;
 import com.teamobi.mobiarmy2.model.User;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
  */
 public class ServerManager {
 
-    private static ServerManager instance;
+    private static volatile ServerManager instance;
 
     private final IGameService gameService;
     private final IServerConfig config;
@@ -51,7 +52,11 @@ public class ServerManager {
 
     public static ServerManager getInstance() {
         if (instance == null) {
-            instance = new ServerManager();
+            synchronized (ServerManager.class) {
+                if (instance == null) {
+                    instance = new ServerManager();
+                }
+            }
         }
         return instance;
     }
@@ -148,6 +153,7 @@ public class ServerManager {
             if (server != null) {
                 server.close();
             }
+            HikariCPManager.getInstance().closeDataSource();
         } catch (IOException e) {
             e.printStackTrace();
         }

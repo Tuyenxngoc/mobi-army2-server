@@ -14,7 +14,7 @@ import java.sql.SQLException;
  */
 public class HikariCPManager {
 
-    private static HikariCPManager instance;
+    private static volatile HikariCPManager instance;
     private final HikariDataSource dataSource;
     private final boolean isShowSql;
 
@@ -36,7 +36,11 @@ public class HikariCPManager {
 
     public static HikariCPManager getInstance() {
         if (instance == null) {
-            instance = new HikariCPManager();
+            synchronized (HikariCPManager.class) {
+                if (instance == null) {
+                    instance = new HikariCPManager();
+                }
+            }
         }
         return instance;
     }
