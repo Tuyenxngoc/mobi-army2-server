@@ -43,6 +43,7 @@ public class User {
     public byte nvUsed;
     public int pointEvent;
     public LocalDateTime xpX2Time;
+    private LocalDateTime lastOnline;
     public boolean[] nvStt;
     public int[] levels;
     public byte[] levelPercents;
@@ -60,6 +61,7 @@ public class User {
     private FightWait fightWait;
     private final IUserService userService;
     private boolean openingGift;
+    private int topEarningsXu;
 
     public User() {
         this.state = UserState.WAITING;
@@ -424,5 +426,12 @@ public class User {
             pointAdd[nvUsed][i] += pointsToAdd[i];
         }
         points[nvUsed] -= totalPointsToSubtract;
+    }
+
+    public void updateMission(int missionId, int quantity) {
+        if (missionId < 0 || missionId >= mission.length) {
+            return;
+        }
+        mission[missionId] += quantity;
     }
 }

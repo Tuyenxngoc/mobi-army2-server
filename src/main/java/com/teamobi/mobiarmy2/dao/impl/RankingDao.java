@@ -199,7 +199,7 @@ public class RankingDao implements IRankingDao {
 
     @Override
     public void addBonusGift(int playerId, int quantity) {
-        String sql = "UPDATE player SET xu = xu + ? WHERE player_id = ?";
+        String sql = "UPDATE player SET top_earnings_xu = ? WHERE player_id = ?";
         HikariCPManager.getInstance().update(sql, quantity, playerId);
     }
 

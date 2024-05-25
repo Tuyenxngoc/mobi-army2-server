@@ -93,8 +93,12 @@ public class GameString {
         return String.format("Tin nhắn từ %s: %s.", sender, content);
     }
 
-    public static String dailyReward() {
-        return "Hôm nay bạn được tặng %dx item %s. Chúc bạn chơi game vui vẻ";
+    public static String dailyReward(byte quantity, String name) {
+        return String.format("Hôm nay bạn được tặng %dx item %s. Chúc bạn chơi game vui vẻ", quantity, name);
+    }
+
+    public static String dailyTopReward(int quantity) {
+        return String.format("Chúc mừng bạn nhận được phần thưởng top là %s xu", Until.getStringNumber(quantity));
     }
 
     public static String loginErr1() {

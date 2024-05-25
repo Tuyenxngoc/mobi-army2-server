@@ -17,6 +17,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -229,6 +230,10 @@ public class UserDao implements IUserDao {
                                 user.setMissionLevel(missionLevels);
                             }
 
+                            user.setXpX2Time(playerResultSet.getTimestamp("x2_xp_time").toLocalDateTime());
+                            user.setLastOnline(playerResultSet.getTimestamp("last_online").toLocalDateTime());
+
+                            user.setTopEarningsXu(playerResultSet.getInt("top_earnings_xu"));
                         } else {//Tạo mới một bản ghi
                             User.setDefaultValue(user);
                             save(user);
@@ -341,6 +346,12 @@ public class UserDao implements IUserDao {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public void updateLastOnline(LocalDateTime now, int playerId) {
+        String sql = "UPDATE `player` SET `last_online` = ? WHERE user_id = ?";
+        HikariCPManager.getInstance().update(sql, now, playerId);
     }
 
 }

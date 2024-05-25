@@ -4,7 +4,6 @@ import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.dao.IRankingDao;
 import com.teamobi.mobiarmy2.dao.impl.RankingDao;
 import com.teamobi.mobiarmy2.model.PlayerLeaderboardEntry;
-import com.teamobi.mobiarmy2.model.User;
 import lombok.Getter;
 
 import java.util.*;
@@ -63,18 +62,12 @@ public class LeaderboardManager {
     }
 
     private void addBonusGiftsForPlayers() {
-        ServerManager server = ServerManager.getInstance();
         int i = 0;
         for (PlayerLeaderboardEntry entry : leaderboardEntries.get(0)) {
             if (i >= 3) {
                 break;
             }
-            User user = server.getUserByPlayerId(entry.getPlayerId());
-            if (user != null) {
-                user.updateXu(CommonConstant.TOP_BONUS[i]);
-            } else {
-                rankingDao.addBonusGift(entry.getPlayerId(), CommonConstant.TOP_BONUS[i]);
-            }
+            rankingDao.addBonusGift(entry.getPlayerId(), CommonConstant.TOP_BONUS[i]);
             i++;
         }
     }

@@ -83,15 +83,15 @@ public class UserService implements IUserService {
 
             User userFound = userDao.findByUsernameAndPassword(username, password);
             if (userFound == null) {
-                sendServerMessage(GameString.loginPassFail());
+                sendMessageLoginFail(GameString.loginPassFail());
                 return;
             }
             if (userFound.isLock()) {
-                sendServerMessage(GameString.loginLock());
+                sendMessageLoginFail(GameString.loginLock());
                 return;
             }
             if (!userFound.isActive()) {
-                sendServerMessage(GameString.loginActive());
+                sendMessageLoginFail(GameString.loginActive());
                 return;
             }
 
@@ -110,6 +110,31 @@ public class UserService implements IUserService {
             copyUserData(user, userFound);
             user.getSession().setVersion(version);
             user.setLogged(true);
+
+            //Kiểm tra chưa online hơn 1 ngày;
+            LocalDateTime now = LocalDateTime.now();
+            if (Until.hasLoggedInOnNewDay(user.getLastOnline(), now)) {
+                //Gửi item
+                byte indexItem = ItemFightData.randomItem();
+                byte quantity = 1;
+                user.updateItems(indexItem, quantity);
+                sendMSSToUser(GameString.dailyReward(quantity, ItemFightData.ITEM_FIGHTS.get(indexItem).getName()));
+                //Cập nhật quà top
+                if (user.getTopEarningsXu() > 0) {
+                    user.updateXu(user.getTopEarningsXu());
+                    sendMSSToUser(GameString.dailyTopReward(user.getTopEarningsXu()));
+                }
+                //Gửi messeage khi login
+                sendMSSToUser(serverManager.config().getSEND_THU1());
+                sendMSSToUser(serverManager.config().getSEND_THU2());
+                sendMSSToUser(serverManager.config().getSEND_THU3());
+                sendMSSToUser(serverManager.config().getSEND_THU4());
+                sendMSSToUser(serverManager.config().getSEND_THU5());
+                //Cập nhật nhiệm vụ
+                user.updateMission(16, 1);
+                //Lưu lại lần đăng nhập
+                userDao.updateLastOnline(now, user.getPlayerId());
+            }
 
             userDao.updateOnline(true, userFound.getPlayerId());
 
@@ -153,6 +178,9 @@ public class UserService implements IUserService {
         target.setRuongDoTB(source.getRuongDoTB());
         target.setNvEquip(source.getNvEquip());
         target.setItems(source.getItems());
+        target.setXpX2Time(source.getXpX2Time());
+        target.setLastOnline(source.getLastOnline());
+        target.setTopEarningsXu(source.getTopEarningsXu());
     }
 
     @Override
@@ -1013,18 +1041,22 @@ public class UserService implements IUserService {
         }
     }
 
-    private void sendMSSToUser(User us, String s) {
+    public void sendMSSToUser(String message) {
+        sendMSSToUser(null, message);
+    }
+
+    private void sendMSSToUser(User userSend, String message) {
         try {
             Message ms = new Message(5);
             DataOutputStream ds = ms.writer();
-            if (us != null) {
-                ds.writeInt(us.getPlayerId());
-                ds.writeUTF(us.getUsername());
+            if (userSend != null) {
+                ds.writeInt(userSend.getPlayerId());
+                ds.writeUTF(userSend.getUsername());
             } else {
                 ds.writeInt(1);
                 ds.writeUTF("ADMIN");
             }
-            ds.writeUTF(s);
+            ds.writeUTF(message);
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
@@ -1603,7 +1635,7 @@ public class UserService implements IUserService {
 
         String totalReward = totalRewardBuilder.toString().trim();
         if (!totalReward.isEmpty()) {
-            sendMSSToUser(null, String.format("CODE %s: %s", code, totalReward));
+            sendMSSToUser(String.format("CODE %s: %s", code, totalReward));
         }
 
         giftCode.addUsedPlayerId(user.getPlayerId());

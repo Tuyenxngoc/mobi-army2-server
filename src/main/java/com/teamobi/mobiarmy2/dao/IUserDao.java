@@ -3,6 +3,7 @@ package com.teamobi.mobiarmy2.dao;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.model.response.GetFriendResponse;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface IUserDao extends Dao<User> {
@@ -18,4 +19,6 @@ public interface IUserDao extends Dao<User> {
     void changePassword(int userId, String newPass);
 
     Integer findPlayerIdByUsername(String username);
+
+    void updateLastOnline(LocalDateTime now, int playerId);
 }

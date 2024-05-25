@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
@@ -345,5 +346,12 @@ public class Until {
             }
         }
         return -1;
+    }
+
+    public static boolean hasLoggedInOnNewDay(LocalDateTime lastOnline, LocalDateTime now) {
+        if (lastOnline.isAfter(now)) {
+            return false;
+        }
+        return !lastOnline.toLocalDate().isEqual(now.toLocalDate());
     }
 }
