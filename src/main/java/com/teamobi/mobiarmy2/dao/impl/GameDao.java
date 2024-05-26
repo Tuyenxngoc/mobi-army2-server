@@ -79,7 +79,7 @@ public class GameDao implements IGameDao {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `equip`")) {
                 while (resultSet.next()) {
                     NVData.EquipmentEntry equipEntry = new NVData.EquipmentEntry();
-                    equipEntry.idNV = resultSet.getByte("character_id");
+                    equipEntry.characterId = resultSet.getByte("character_id");
                     equipEntry.idEquipDat = resultSet.getByte("equip_type");
                     equipEntry.id = resultSet.getShort("equipId");
                     equipEntry.name = resultSet.getString("name");
@@ -100,8 +100,8 @@ public class GameDao implements IGameDao {
                     equipEntry.bigImageAlignY = GsonUtil.GSON.fromJson(resultSet.getString("bigAlignY"), byte[].class);
                     equipEntry.arraySet = GsonUtil.GSON.fromJson(resultSet.getString("arraySet"), short[].class);
                     equipEntry.invAdd = GsonUtil.GSON.fromJson(resultSet.getString("addPN"), byte[].class);
-                    equipEntry.percenAdd = GsonUtil.GSON.fromJson(resultSet.getString("addPN100"), byte[].class);
-                    NVData.addEquipEntryById(equipEntry.idNV, equipEntry.idEquipDat, equipEntry.id, equipEntry);
+                    equipEntry.percentAdd = GsonUtil.GSON.fromJson(resultSet.getString("addPN100"), byte[].class);
+                    NVData.addEquipEntryById(equipEntry.characterId, equipEntry.idEquipDat, equipEntry.id, equipEntry);
                 }
             }
         } catch (SQLException e) {

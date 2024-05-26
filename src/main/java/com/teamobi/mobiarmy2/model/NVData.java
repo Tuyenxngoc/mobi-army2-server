@@ -18,7 +18,7 @@ public class NVData {
     public static class EquipmentEntry {
         public int indexEquip;
         public int indexSale;
-        public byte idNV;
+        public byte characterId;
         public byte idEquipDat;
         public short id;
         public String name;
@@ -35,7 +35,7 @@ public class NVData {
         public byte[] bigImageAlignX;
         public byte[] bigImageAlignY;
         public byte[] invAdd;
-        public byte[] percenAdd;
+        public byte[] percentAdd;
         public boolean onSale;
         public boolean isSet;
         public short[] arraySet;
@@ -102,7 +102,7 @@ public class NVData {
 
     public static EquipmentEntry getEquipEntryById(int nvId, int equipDatId, int equipId) {
         for (EquipmentEntry equipEntry : equips) {
-            if (equipEntry.idNV == nvId && equipEntry.idEquipDat == equipDatId && equipEntry.id == equipId) {
+            if (equipEntry.characterId == nvId && equipEntry.idEquipDat == equipDatId && equipEntry.id == equipId) {
                 return equipEntry;
             }
         }

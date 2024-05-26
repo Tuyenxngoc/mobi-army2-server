@@ -272,9 +272,9 @@ public class User {
                     }
                 }
                 if (addTB.percentAdd == null) {
-                    addTB.percentAdd = new short[addTB.entry.percenAdd.length];
-                    for (int j = 0; j < addTB.entry.percenAdd.length; j++) {
-                        addTB.percentAdd[j] = addTB.entry.percenAdd[j];
+                    addTB.percentAdd = new short[addTB.entry.percentAdd.length];
+                    for (int j = 0; j < addTB.entry.percentAdd.length; j++) {
+                        addTB.percentAdd[j] = addTB.entry.percentAdd[j];
                     }
                 }
                 addTB.slotNull = 3;
@@ -294,7 +294,7 @@ public class User {
                 ds = ms.writer();
                 ds.writeByte(0);
                 ds.writeInt(addTB.index | 0x10000);
-                ds.writeByte(addTB.entry.idNV);
+                ds.writeByte(addTB.entry.characterId);
                 ds.writeByte(addTB.entry.idEquipDat);
                 ds.writeShort(addTB.entry.id);
                 ds.writeUTF(addTB.entry.name);

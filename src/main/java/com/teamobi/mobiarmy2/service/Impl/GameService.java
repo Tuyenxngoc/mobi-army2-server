@@ -88,7 +88,7 @@ public class GameService implements IGameService {
                         }
                         for (int l = 0; l < 5; l++) {
                             ds1.writeByte(equipEntry.invAdd[l]);
-                            ds1.writeByte(equipEntry.percenAdd[l]);
+                            ds1.writeByte(equipEntry.percentAdd[l]);
                         }
                     }
                 }

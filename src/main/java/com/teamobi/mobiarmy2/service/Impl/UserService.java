@@ -1805,7 +1805,7 @@ public class UserService implements IUserService {
                 // dbKey
                 ds.writeInt(i | 0x10000);
                 // idNV
-                ds.writeByte(rdtbEntry.entry.idNV);
+                ds.writeByte(rdtbEntry.entry.characterId);
                 // EquipType
                 ds.writeByte(rdtbEntry.entry.idEquipDat);
                 // idEquip
@@ -1922,7 +1922,7 @@ public class UserService implements IUserService {
                     continue;
                 }
                 // idNV
-                ds.writeByte(eqEntry.idNV);
+                ds.writeByte(eqEntry.characterId);
                 ds.writeByte(eqEntry.idEquipDat);
                 ds.writeShort(eqEntry.id);
                 ds.writeUTF(eqEntry.name);
