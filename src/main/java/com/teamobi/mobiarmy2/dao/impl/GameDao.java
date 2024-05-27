@@ -3,8 +3,8 @@ package com.teamobi.mobiarmy2.dao.impl;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.*;
+import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
 import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
-import com.teamobi.mobiarmy2.model.equip.NVEntry;
 import com.teamobi.mobiarmy2.model.mission.Mission;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Until;
@@ -55,17 +55,17 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `character`")) {
                 while (resultSet.next()) {
-                    NVEntry nvEntry = new NVEntry();
-                    nvEntry.id = (byte) (resultSet.getByte("character_id") - 1);
-                    nvEntry.name = resultSet.getString("name");
-                    nvEntry.buyXu = resultSet.getInt("xu");
-                    nvEntry.buyLuong = resultSet.getInt("luong");
-                    nvEntry.ma_sat_gio = resultSet.getByte("ma_sat_gio");
-                    nvEntry.goc_min = resultSet.getByte("goc_min");
-                    nvEntry.so_dan = resultSet.getByte("so_dan");
-                    nvEntry.sat_thuong = resultSet.getShort("sat_thuong");
-                    nvEntry.sat_thuong_dan = resultSet.getByte("sat_thuong_dan");
-                    NVData.entrys.add(nvEntry);
+                    CharacterEntry characterEntry = new CharacterEntry();
+                    characterEntry.id = resultSet.getByte("character_id");
+                    characterEntry.name = resultSet.getString("name");
+                    characterEntry.buyXu = resultSet.getInt("xu");
+                    characterEntry.buyLuong = resultSet.getInt("luong");
+                    characterEntry.windResistance = resultSet.getByte("ma_sat_gio");
+                    characterEntry.minAngle = resultSet.getByte("goc_min");
+                    characterEntry.bulletCount = resultSet.getByte("so_dan");
+                    characterEntry.damage = resultSet.getShort("sat_thuong");
+                    characterEntry.bulletDamage = resultSet.getByte("sat_thuong_dan");
+                    NVData.characterEntries.add(characterEntry);
                 }
             }
         } catch (SQLException e) {
@@ -92,8 +92,8 @@ public class GameDao implements IGameDao {
                     equipEntry.setFrameCount(resultSet.getShort("frame_count"));
                     equipEntry.setBulletId(resultSet.getByte("bullet_id"));
                     equipEntry.setOnSale(resultSet.getBoolean("on_sale"));
-                    equipEntry.isSet = (resultSet.getBoolean("is_set"));
-                    equipEntry.setArraySet(GsonUtil.GSON.fromJson(resultSet.getString("array_set"), short[].class));
+                    equipEntry.setDisguise(resultSet.getBoolean("is_disguise"));
+                    equipEntry.setArraySet(GsonUtil.GSON.fromJson(resultSet.getString("disguise_equipped_indexes"), short[].class));
                     equipEntry.setBigImageCutX(GsonUtil.GSON.fromJson(resultSet.getString("big_image_cut_x"), short[].class));
                     equipEntry.setBigImageCutY(GsonUtil.GSON.fromJson(resultSet.getString("big_image_cut_y"), short[].class));
                     equipEntry.setBigImageSizeX(GsonUtil.GSON.fromJson(resultSet.getString("big_image_size_x"), byte[].class));

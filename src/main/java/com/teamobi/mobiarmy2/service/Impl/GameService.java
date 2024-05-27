@@ -6,9 +6,8 @@ import com.teamobi.mobiarmy2.model.CaptionData;
 import com.teamobi.mobiarmy2.model.MapData;
 import com.teamobi.mobiarmy2.model.NVData;
 import com.teamobi.mobiarmy2.model.User;
-import com.teamobi.mobiarmy2.model.equip.EquipmentData;
+import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
 import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
-import com.teamobi.mobiarmy2.model.equip.NVEntry;
 import com.teamobi.mobiarmy2.service.IGameService;
 import com.teamobi.mobiarmy2.team.TeamImageOutput;
 import com.teamobi.mobiarmy2.util.Until;
@@ -17,6 +16,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author tuyen
@@ -58,64 +58,64 @@ public class GameService implements IGameService {
     @Override
     public void setCacheCharacters() {
         try {
-            ByteArrayOutputStream bas1 = new ByteArrayOutputStream();
-            DataOutputStream ds1 = new DataOutputStream(bas1);
-            int numChamp = NVData.entrys.size();
-            ds1.writeByte(numChamp);
-            for (int i = 0; i < numChamp; i++) {
-                NVEntry nvEntry = NVData.entrys.get(i);
-                ds1.writeByte(nvEntry.id);
-                ds1.writeShort(nvEntry.sat_thuong);
-                int numEquipData = nvEntry.trangbis.size();
-                ds1.writeByte(numEquipData);
-                for (int j = 0; j < numEquipData; j++) {
-                    EquipmentData equipDataEntry = nvEntry.trangbis.get(j);
-                    ds1.writeByte(equipDataEntry.id);
-                    int numEquip = equipDataEntry.entrys.size();
-                    ds1.writeByte(numEquip);
-                    for (int k = 0; k < numEquip; k++) {
-                        EquipmentEntry equipEntry = equipDataEntry.entrys.get(k);
-                        ds1.writeShort(equipEntry.index);
-                        if (equipDataEntry.id == 0) {
-                            ds1.writeByte(equipEntry.bulletId);
+            ByteArrayOutputStream bas = new ByteArrayOutputStream();
+            DataOutputStream ds = new DataOutputStream(bas);
+            ds.writeByte(NVData.characterEntries.size());
+
+            for (CharacterEntry characterEntry : NVData.characterEntries) {
+                ds.writeByte(characterEntry.getId());
+                ds.writeShort(characterEntry.getDamage());
+                ds.writeByte(characterEntry.equips.size());
+
+                for (byte i = 0; i < characterEntry.equips.size(); i++) {
+                    List<EquipmentEntry> equipmentEntries = characterEntry.equips.get(i);
+                    ds.writeByte(i);
+                    ds.writeByte(equipmentEntries.size());
+
+                    for (EquipmentEntry equipEntry : equipmentEntries) {
+                        ds.writeShort(equipEntry.getIndex());
+                        if (i == 0) {
+                            ds.writeByte(equipEntry.getBulletId());
                         }
-                        ds1.writeShort(equipEntry.frameCount);
-                        ds1.writeByte(equipEntry.levelRequirement);
-                        for (int l = 0; l < 6; l++) {
-                            ds1.writeShort(equipEntry.bigImageCutX[l]);
-                            ds1.writeShort(equipEntry.bigImageCutY[l]);
-                            ds1.writeByte(equipEntry.bigImageSizeX[l]);
-                            ds1.writeByte(equipEntry.bigImageSizeY[l]);
-                            ds1.writeByte(equipEntry.bigImageAlignX[l]);
-                            ds1.writeByte(equipEntry.bigImageAlignY[l]);
+                        ds.writeShort(equipEntry.getFrameCount());
+                        ds.writeByte(equipEntry.getLevelRequirement());
+
+                        for (int j = 0; j < 6; j++) {
+                            ds.writeShort(equipEntry.getBigImageCutX()[j]);
+                            ds.writeShort(equipEntry.getBigImageCutY()[j]);
+                            ds.writeByte(equipEntry.getBigImageSizeX()[j]);
+                            ds.writeByte(equipEntry.getBigImageSizeY()[j]);
+                            ds.writeByte(equipEntry.getBigImageAlignX()[j]);
+                            ds.writeByte(equipEntry.getBigImageAlignY()[j]);
                         }
-                        for (int l = 0; l < 5; l++) {
-                            ds1.writeByte(equipEntry.additionalPoints[l]);
-                            ds1.writeByte(equipEntry.additionalPercent[l]);
+
+                        for (int j = 0; j < 5; j++) {
+                            ds.writeByte(equipEntry.getAdditionalPoints()[j]);
+                            ds.writeByte(equipEntry.getAdditionalPercent()[j]);
                         }
                     }
                 }
             }
 
-            byte[] dat = Until.getFile("res/itemSpecial.png");
-            if (dat == null) {
+            byte[] bytes = Until.getFile("res/itemSpecial.png");
+            if (bytes == null) {
                 System.exit(1);
             }
-            ds1.writeShort(dat.length);
-            ds1.write(dat);
-            for (int i = 0; i < numChamp; i++) {
-                dat = Until.getFile("res/bullet/bullet" + i + ".png");
-                if (dat == null) {
+            ds.writeShort(bytes.length);
+            ds.write(bytes);
+            for (int i = 0; i < NVData.characterEntries.size(); i++) {
+                bytes = Until.getFile("res/bullet/bullet" + i + ".png");
+                if (bytes == null) {
                     System.exit(1);
                 }
-                ds1.writeShort(dat.length);
-                ds1.write(dat);
+                ds.writeShort(bytes.length);
+                ds.write(bytes);
             }
 
-            byte[] ab1 = bas1.toByteArray();
-            Until.saveFile(CommonConstant.equipCacheName, ab1);
-            bas1.close();
-            ds1.close();
+            byte[] data = bas.toByteArray();
+            Until.saveFile(CommonConstant.equipCacheName, data);
+            bas.close();
+            ds.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -188,17 +188,17 @@ public class GameService implements IGameService {
 
     @Override
     public void setDefaultNvData() {
-        short[][] defaultNvData = new short[NVData.entrys.size()][5];
-        User.nvEquipDefault = new EquipmentEntry[NVData.entrys.size()][5];
-        for (int i = 0; i < NVData.entrys.size(); i++) {
-            NVEntry nvdat = NVData.entrys.get(i);
-            for (int j = 0; j < 3; j++) {
-                defaultNvData[i][j] = nvdat.trangbis.get(j).entrys.get(0).index;
+        short[][] defaultNvData = new short[NVData.characterEntries.size()][5];
+        User.nvEquipDefault = new EquipmentEntry[NVData.characterEntries.size()][5];
+        for (byte i = 0; i < NVData.characterEntries.size(); i++) {
+            CharacterEntry characterEntry = NVData.characterEntries.get(i);
+            for (byte j = 0; j < 3; j++) {
+                defaultNvData[i][j] = characterEntry.equips.get(j).get(0).getIndex();
             }
             defaultNvData[i][3] = 0;
             defaultNvData[i][4] = 0;
         }
-        for (int i = 0; i < NVData.entrys.size(); i++) {
+        for (int i = 0; i < NVData.characterEntries.size(); i++) {
             for (int j = 0; j < 3; j++) {
                 User.nvEquipDefault[i][j] = NVData.getEquipEntryById(i, j, defaultNvData[i][j]);
             }

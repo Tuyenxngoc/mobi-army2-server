@@ -14,8 +14,8 @@ import com.teamobi.mobiarmy2.model.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.clan.ClanItem;
 import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
+import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
 import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
-import com.teamobi.mobiarmy2.model.equip.NVEntry;
 import com.teamobi.mobiarmy2.model.giftcode.GetGiftCode;
 import com.teamobi.mobiarmy2.model.mission.Mission;
 import com.teamobi.mobiarmy2.model.response.GetFriendResponse;
@@ -196,27 +196,27 @@ public class UserService implements IUserService {
             // Send mss 64
             Message ms = new Message(64);
             DataOutputStream ds = ms.writer();
-            ArrayList<NVEntry> nvdatas = NVData.entrys;
+            List<CharacterEntry> nvdatas = NVData.characterEntries;
             int len = nvdatas.size();
             ds.writeByte(len);
             // Ma sat gio cac nv
-            for (NVEntry nvdata : nvdatas) {
-                ds.writeByte(nvdata.ma_sat_gio);
+            for (CharacterEntry nvdata : nvdatas) {
+                ds.writeByte(nvdata.windResistance);
             }
             // Goc cuu tieu
             ds.writeByte(len);
-            for (NVEntry nvdata : nvdatas) {
-                ds.writeShort(nvdata.goc_min);
+            for (CharacterEntry nvdata : nvdatas) {
+                ds.writeShort(nvdata.minAngle);
             }
             // Sat thuong 1 vien dan
             ds.writeByte(len);
-            for (NVEntry nvdata : nvdatas) {
-                ds.writeByte(nvdata.sat_thuong_dan);
+            for (CharacterEntry nvdata : nvdatas) {
+                ds.writeByte(nvdata.bulletDamage);
             }
             // So dan
             ds.writeByte(len);
-            for (NVEntry nvdata : nvdatas) {
-                ds.writeByte(nvdata.so_dan);
+            for (CharacterEntry nvdata : nvdatas) {
+                ds.writeByte(nvdata.bulletCount);
             }
             // Max player
             ds.writeByte(config.getMaxElementFight());
@@ -535,9 +535,9 @@ public class UserService implements IUserService {
             for (int i = 0; i < 10; i++) {
                 if (i > 2) {
                     ds.writeByte(user.nvStt[i] ? 1 : 0);
-                    NVEntry nvEntry = NVData.entrys.get(i);
-                    ds.writeShort(nvEntry.buyXu / 1000);
-                    ds.writeShort(nvEntry.buyLuong);
+                    CharacterEntry characterEntry = NVData.characterEntries.get(i);
+                    ds.writeShort(characterEntry.buyXu / 1000);
+                    ds.writeShort(characterEntry.buyLuong);
                 }
             }
 
@@ -642,7 +642,7 @@ public class UserService implements IUserService {
                 if (fDatE == null) {
                     return;
                 }
-                NVEntry nvE = NVData.entrys.get(user.getNvUsed());
+                CharacterEntry nvE = NVData.characterEntries.get(user.getNvUsed());
                 ds.writeByte(fDatE.ins.id);
                 ds.writeByte(fDatE.entrys.size());
                 for (int i = 0; i < fDatE.entrys.size(); i++) {
@@ -1048,6 +1048,9 @@ public class UserService implements IUserService {
     }
 
     private void sendMSSToUser(User userSend, String message) {
+        if (message.isEmpty()) {
+            return;
+        }
         try {
             Message ms = new Message(5);
             DataOutputStream ds = ms.writer();
@@ -1439,7 +1442,7 @@ public class UserService implements IUserService {
     public void handleChoseCharacter(Message ms) {
         try {
             byte idNv = ms.reader().readByte();
-            if (idNv >= NVData.entrys.size() || idNv < 0 || !user.nvStt[idNv]) {
+            if (idNv >= NVData.characterEntries.size() || idNv < 0 || !user.nvStt[idNv]) {
                 return;
             }
             user.setNvUsed(idNv);
@@ -1532,7 +1535,7 @@ public class UserService implements IUserService {
             if (user.nvStt[idnv]) {
                 return;
             }
-            NVEntry nventry = NVData.entrys.get(idnv);
+            CharacterEntry nventry = NVData.characterEntries.get(idnv);
             byte buyLuong = ms.reader().readByte();
             boolean buyOK = false;
             if (buyLuong == 1) {
@@ -1829,7 +1832,7 @@ public class UserService implements IUserService {
                 // Slot trong
                 ds.writeByte(rdtbEntry.slotNull);
                 // Vip I != 0 -> co tang % thoc tinh
-                ds.writeByte(rdtbEntry.entry.isSet ? 1 : 0);
+                ds.writeByte(rdtbEntry.entry.isDisguise ? 1 : 0);
                 // Vip Level
                 ds.writeByte(rdtbEntry.vipLevel);
             }
@@ -1916,8 +1919,8 @@ public class UserService implements IUserService {
         try {
             Message ms = new Message(Cmd.SHOP_EQUIP);
             DataOutputStream ds = ms.writer();
-            ds.writeShort(NVData.nSaleEquip);
-            for (EquipmentEntry equip : NVData.equips) {
+            ds.writeShort(NVData.totalSaleEquipments);
+            for (EquipmentEntry equip : NVData.equipmentEntries) {
                 if (!equip.isOnSale()) {
                     continue;
                 }

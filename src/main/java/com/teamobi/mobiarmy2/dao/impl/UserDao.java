@@ -55,7 +55,7 @@ public class UserDao implements IUserDao {
                 "`mission` = ?, " +
                 "`missionLevel` = ?, " +
                 //...//
-                "`NVused` = ? " +
+                "`nv_used` = ? " +
                 " WHERE player_id = ?";
         HikariCPManager.getInstance().update(sql,
                 user.getFriends().toString(),
@@ -111,7 +111,7 @@ public class UserDao implements IUserDao {
                     try (ResultSet playerResultSet = playerStatement.executeQuery()) {
                         Gson gson = new Gson();
                         //init
-                        int len = NVData.entrys.size();
+                        int len = NVData.characterEntries.size();
                         user.nvStt = new boolean[len];
                         user.levels = new int[len];
                         user.levelPercents = new byte[len];
@@ -128,7 +128,7 @@ public class UserDao implements IUserDao {
                             user.setXu(playerResultSet.getInt("xu"));
                             user.setLuong(playerResultSet.getInt("luong"));
                             user.setDanhVong(playerResultSet.getInt("dvong"));
-                            user.setNvUsed(playerResultSet.getByte("NVused"));
+                            user.setNvUsed(playerResultSet.getByte("nv_used"));
                             user.setClanId(playerResultSet.getShort("clan_id"));
                             user.setPointEvent(playerResultSet.getInt("point_event"));
 
@@ -283,7 +283,7 @@ public class UserDao implements IUserDao {
                     friend.setId(resultSet.getInt("player_id"));
                     friend.setName(resultSet.getString("username"));
                     friend.setXu(resultSet.getInt("xu"));
-                    friend.setNvUsed(resultSet.getByte("NVused"));
+                    friend.setNvUsed(resultSet.getByte("nv_used"));
                     friend.setClanId(resultSet.getShort("clan_id"));
                     friend.setOnline(resultSet.getByte("online"));
                     CharacterData characterData = gson.fromJson(resultSet.getString("NV" + friend.getNvUsed()), CharacterData.class);

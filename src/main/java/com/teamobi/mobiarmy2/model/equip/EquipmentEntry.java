@@ -6,9 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class EquipmentEntry {
-    public int indexEquip;
     public int indexSale;
-    public byte characterId;
+
+    public Byte characterId;
     public byte equipType;
     public short index;
     public String name;
@@ -27,6 +27,6 @@ public class EquipmentEntry {
     public byte[] additionalPoints;
     public byte[] additionalPercent;
     public boolean onSale;
-    public boolean isSet;
+    public boolean isDisguise;
     public short[] arraySet;
 }

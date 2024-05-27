@@ -199,7 +199,7 @@ public class User {
 
     public short[] getEquip() {
         short[] equip = new short[5];
-        if (this.nvEquip[getNvUsed()][5] != null && this.nvEquip[getNvUsed()][5].entry.isSet) {
+        if (this.nvEquip[getNvUsed()][5] != null && this.nvEquip[getNvUsed()][5].entry.isDisguise) {
             equip[0] = this.nvEquip[getNvUsed()][5].entry.arraySet[0];
             equip[1] = this.nvEquip[getNvUsed()][5].entry.arraySet[1];
             equip[2] = this.nvEquip[getNvUsed()][5].entry.arraySet[2];
@@ -207,7 +207,7 @@ public class User {
             equip[4] = this.nvEquip[getNvUsed()][5].entry.arraySet[4];
         } else {
             for (int i = 0; i < 5; i++) {
-                if (this.nvEquip[getNvUsed()][i] != null && !this.nvEquip[getNvUsed()][i].entry.isSet) {
+                if (this.nvEquip[getNvUsed()][i] != null && !this.nvEquip[getNvUsed()][i].entry.isDisguise) {
                     equip[i] = this.nvEquip[getNvUsed()][i].entry.index;
                 } else if (nvEquipDefault[getNvUsed()][i] != null) {
                     equip[i] = nvEquipDefault[getNvUsed()][i].index;
@@ -305,7 +305,7 @@ public class User {
                     ds.writeByte(addTB.percentAdd[i]);
                 }
                 ds.writeByte(addTB.entry.expirationDays);
-                ds.writeByte(addTB.entry.isSet ? 1 : 0);
+                ds.writeByte(addTB.entry.isDisguise ? 1 : 0);
                 ds.writeByte(addTB.vipLevel);
                 ds.flush();
                 sendMessage(ms);

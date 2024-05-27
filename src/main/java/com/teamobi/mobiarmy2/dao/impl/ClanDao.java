@@ -238,7 +238,7 @@ public class ClanDao implements IClanDao {
                         entry.setUsername(resultSet.getString("username"));
                     }
                     entry.setPoint(resultSet.getInt("c.clan_point"));
-                    entry.setNvUsed(resultSet.getByte("NVused"));
+                    entry.setNvUsed(resultSet.getByte("nv_used"));
                     entry.setOnline(resultSet.getByte("p.online"));
 
                     CharacterData characterData = gson.fromJson(resultSet.getString("NV" + entry.getNvUsed()), CharacterData.class);

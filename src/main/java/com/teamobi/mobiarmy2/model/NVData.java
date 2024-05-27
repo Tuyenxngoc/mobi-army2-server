@@ -1,68 +1,50 @@
 package com.teamobi.mobiarmy2.model;
 
 import com.teamobi.mobiarmy2.json.CharacterData;
-import com.teamobi.mobiarmy2.model.equip.EquipmentData;
+import com.teamobi.mobiarmy2.json.EquipmentData;
+import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
 import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
-import com.teamobi.mobiarmy2.model.equip.NVEntry;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author tuyen
  */
 public class NVData {
 
-    public static ArrayList<NVEntry> entrys = new ArrayList<>();
-    public static ArrayList<EquipmentEntry> equips = new ArrayList<>();
-    public static int nSaleEquip = 0;
+    public static List<CharacterEntry> characterEntries = new ArrayList<>();
+    public static List<EquipmentEntry> equipmentEntries = new ArrayList<>();
+    public static short totalSaleEquipments = 0;
 
-    public static void addEquip(EquipmentEntry equip) {
-
-    }
-
-    public static void addEquipEntryById(int nvId, int equipDatId, int equipId, EquipmentEntry eqEntry) {
-        NVEntry nvEntry = null;
-        for (NVEntry nvEntry1 : entrys) {
-            if (nvEntry1.id == nvId) {
-                nvEntry = nvEntry1;
-                break;
-            }
-        }
-        if (nvEntry == null) {
+    public static void addEquip(EquipmentEntry newEquip) {
+        //Tìm nhân vật theo id
+        CharacterEntry characterEntry = characterEntries.stream()
+                .filter(entry -> entry.id == newEquip.characterId)
+                .findFirst()
+                .orElse(null);
+        if (characterEntry == null) {
             return;
         }
-        EquipmentData equipDataEntry = null;
-        for (EquipmentData equipDataEntry2 : nvEntry.trangbis) {
-            if (equipDataEntry2.id == equipDatId) {
-                equipDataEntry = equipDataEntry2;
-                break;
-            }
+        //Lấy danh sách theo loại trang bị, chưa có thì tạo mới
+        List<EquipmentEntry> entryList = characterEntry.equips.computeIfAbsent(newEquip.getEquipType(), k -> new ArrayList<>());
+        if (entryList.stream().anyMatch(entry -> entry.getIndex() == newEquip.getIndex())) {//Nếu tồn tại trong danh sách rồi thì bỏ qua
+            return;
         }
-        // Create equipData if not exists
-        if (equipDataEntry == null) {
-            equipDataEntry = new EquipmentData();
-            equipDataEntry.id = (byte) equipDatId;
-            equipDataEntry.entrys = new ArrayList<>();
-            nvEntry.trangbis.add(equipDataEntry);
+
+        if (newEquip.isOnSale()) {
+            newEquip.setIndexSale(totalSaleEquipments);
+            totalSaleEquipments++;
+        } else {
+            newEquip.setIndexSale(-1);
         }
-        for (EquipmentEntry equipEntry : equipDataEntry.entrys) {
-            // Neu ton tai => thoat
-            if (equipEntry.index == equipId) {
-                return;
-            }
-        }
-        // Neu ko ton tai => Tao moi        
-        if (eqEntry.onSale) {
-            eqEntry.indexSale = nSaleEquip;
-            nSaleEquip++;
-        }
-        eqEntry.indexEquip = equips.size();
-        equipDataEntry.entrys.add(eqEntry);
-        equips.add(eqEntry);
+
+        entryList.add(newEquip);
+        equipmentEntries.add(newEquip);
     }
 
     public static EquipmentEntry getEquipEntryById(int nvId, int equipDatId, int equipId) {
-        for (EquipmentEntry equipEntry : equips) {
+        for (EquipmentEntry equipEntry : equipmentEntries) {
             if (equipEntry.characterId == nvId && equipEntry.equipType == equipDatId && equipEntry.index == equipId) {
                 return equipEntry;
             }
@@ -71,7 +53,7 @@ public class NVData {
     }
 
     public static EquipmentEntry getEquipEntryByIndexSale(int indexSale) {
-        for (EquipmentEntry equipEntry : equips) {
+        for (EquipmentEntry equipEntry : equipmentEntries) {
             if (equipEntry.onSale && equipEntry.indexSale == indexSale) {
                 return equipEntry;
             }
@@ -79,11 +61,11 @@ public class NVData {
         return null;
     }
 
-    public static short[] getEquipData(com.teamobi.mobiarmy2.json.EquipmentData[] trangBi, CharacterData character, byte nvUsed) {
+    public static short[] getEquipData(EquipmentData[] trangBi, CharacterData character, byte nvUsed) {
         int index = character.getData().get(5);
         short[] data = new short[5];
         if (index >= 0 && index < trangBi.length) {
-            com.teamobi.mobiarmy2.json.EquipmentData equipmentData = trangBi[index];
+            EquipmentData equipmentData = trangBi[index];
             EquipmentEntry entry = NVData.getEquipEntryById(equipmentData.getNvId(), equipmentData.getEquipType(), equipmentData.getId());
             if (entry != null && entry.arraySet != null) {
                 data[0] = entry.arraySet[0];
@@ -97,8 +79,8 @@ public class NVData {
                 index = character.getData().get(i);
                 if (index >= 0 && index < trangBi.length) {
                     data[i] = (short) trangBi[index].getId();
-                } else if (User.nvEquipDefault[nvUsed - 1][i] != null) {
-                    data[i] = User.nvEquipDefault[nvUsed - 1][i].index;
+                } else if (User.nvEquipDefault[nvUsed][i] != null) {
+                    data[i] = User.nvEquipDefault[nvUsed][i].index;
                 } else {
                     data[i] = -1;
                 }

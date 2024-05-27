@@ -33,8 +33,8 @@ public class RankingDao implements IRankingDao {
         }
         entry.setClanId(resultSet.getShort("clan_id"));
 
-        byte nvUsed = resultSet.getByte("NVused");
-        CharacterData character = GsonUtil.GSON.fromJson(resultSet.getString("NV%s".formatted(nvUsed)), CharacterData.class);
+        byte nvUsed = resultSet.getByte("nv_used");
+        CharacterData character = GsonUtil.GSON.fromJson(resultSet.getString("NV%s".formatted(nvUsed + 1)), CharacterData.class);
         EquipmentData[] equipmentData = GsonUtil.GSON.fromJson(resultSet.getString("ruongTrangBi"), EquipmentData[].class);
 
         entry.setNvUsed(nvUsed);
