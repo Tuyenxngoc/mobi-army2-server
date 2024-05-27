@@ -6,6 +6,9 @@ import com.teamobi.mobiarmy2.model.CaptionData;
 import com.teamobi.mobiarmy2.model.MapData;
 import com.teamobi.mobiarmy2.model.NVData;
 import com.teamobi.mobiarmy2.model.User;
+import com.teamobi.mobiarmy2.model.equip.EquipmentData;
+import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
+import com.teamobi.mobiarmy2.model.equip.NVEntry;
 import com.teamobi.mobiarmy2.service.IGameService;
 import com.teamobi.mobiarmy2.team.TeamImageOutput;
 import com.teamobi.mobiarmy2.util.Until;
@@ -60,18 +63,18 @@ public class GameService implements IGameService {
             int numChamp = NVData.entrys.size();
             ds1.writeByte(numChamp);
             for (int i = 0; i < numChamp; i++) {
-                NVData.NVEntry nvEntry = NVData.entrys.get(i);
+                NVEntry nvEntry = NVData.entrys.get(i);
                 ds1.writeByte(nvEntry.id);
                 ds1.writeShort(nvEntry.sat_thuong);
                 int numEquipData = nvEntry.trangbis.size();
                 ds1.writeByte(numEquipData);
                 for (int j = 0; j < numEquipData; j++) {
-                    NVData.EquipmentData equipDataEntry = nvEntry.trangbis.get(j);
+                    EquipmentData equipDataEntry = nvEntry.trangbis.get(j);
                     ds1.writeByte(equipDataEntry.id);
                     int numEquip = equipDataEntry.entrys.size();
                     ds1.writeByte(numEquip);
                     for (int k = 0; k < numEquip; k++) {
-                        NVData.EquipmentEntry equipEntry = equipDataEntry.entrys.get(k);
+                        EquipmentEntry equipEntry = equipDataEntry.entrys.get(k);
                         ds1.writeShort(equipEntry.id);
                         if (equipDataEntry.id == 0) {
                             ds1.writeByte(equipEntry.bullId);
@@ -186,9 +189,9 @@ public class GameService implements IGameService {
     @Override
     public void setDefaultNvData() {
         short[][] defaultNvData = new short[NVData.entrys.size()][5];
-        User.nvEquipDefault = new NVData.EquipmentEntry[NVData.entrys.size()][5];
+        User.nvEquipDefault = new EquipmentEntry[NVData.entrys.size()][5];
         for (int i = 0; i < NVData.entrys.size(); i++) {
-            NVData.NVEntry nvdat = NVData.entrys.get(i);
+            NVEntry nvdat = NVData.entrys.get(i);
             for (int j = 0; j < 3; j++) {
                 defaultNvData[i][j] = nvdat.trangbis.get(j).entrys.get(0).id;
             }

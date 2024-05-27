@@ -2,7 +2,7 @@ package com.teamobi.mobiarmy2.dao.impl;
 
 import com.teamobi.mobiarmy2.dao.IGiftCodeDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
-import com.teamobi.mobiarmy2.model.GiftCode.GetGiftCode;
+import com.teamobi.mobiarmy2.model.giftcode.GetGiftCode;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 
 import java.sql.Connection;

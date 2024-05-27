@@ -3,6 +3,8 @@ package com.teamobi.mobiarmy2.dao.impl;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.*;
+import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
+import com.teamobi.mobiarmy2.model.equip.NVEntry;
 import com.teamobi.mobiarmy2.model.mission.Mission;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Until;
@@ -53,7 +55,7 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `character`")) {
                 while (resultSet.next()) {
-                    NVData.NVEntry nvEntry = new NVData.NVEntry();
+                    NVEntry nvEntry = new NVEntry();
                     nvEntry.id = (byte) (resultSet.getByte("character_id") - 1);
                     nvEntry.name = resultSet.getString("name");
                     nvEntry.buyXu = resultSet.getInt("xu");
@@ -78,7 +80,7 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `equip`")) {
                 while (resultSet.next()) {
-                    NVData.EquipmentEntry equipEntry = new NVData.EquipmentEntry();
+                    EquipmentEntry equipEntry = new EquipmentEntry();
                     equipEntry.characterId = resultSet.getByte("character_id");
                     equipEntry.idEquipDat = resultSet.getByte("equip_type");
                     equipEntry.id = resultSet.getShort("equipId");
@@ -217,7 +219,7 @@ public class GameDao implements IGameDao {
 
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `fomular`;")) {
                 while (resultSet.next()) {
-                   //Todo create fomular
+                    //Todo create fomular
                 }
             }
         } catch (SQLException e) {

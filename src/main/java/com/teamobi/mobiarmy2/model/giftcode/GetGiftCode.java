@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.model.GiftCode;
+package com.teamobi.mobiarmy2.model.giftcode;
 
 import lombok.Getter;
 import lombok.Setter;

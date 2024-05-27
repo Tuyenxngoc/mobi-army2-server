@@ -10,11 +10,13 @@ import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.json.GiftCodeRewardData;
 import com.teamobi.mobiarmy2.json.ItemData;
 import com.teamobi.mobiarmy2.model.*;
-import com.teamobi.mobiarmy2.model.GiftCode.GetGiftCode;
+import com.teamobi.mobiarmy2.model.giftcode.GetGiftCode;
 import com.teamobi.mobiarmy2.model.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.clan.ClanItem;
 import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
+import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
+import com.teamobi.mobiarmy2.model.equip.NVEntry;
 import com.teamobi.mobiarmy2.model.mission.Mission;
 import com.teamobi.mobiarmy2.model.response.GetFriendResponse;
 import com.teamobi.mobiarmy2.network.Impl.Message;
@@ -194,26 +196,26 @@ public class UserService implements IUserService {
             // Send mss 64
             Message ms = new Message(64);
             DataOutputStream ds = ms.writer();
-            ArrayList<NVData.NVEntry> nvdatas = NVData.entrys;
+            ArrayList<NVEntry> nvdatas = NVData.entrys;
             int len = nvdatas.size();
             ds.writeByte(len);
             // Ma sat gio cac nv
-            for (NVData.NVEntry nvdata : nvdatas) {
+            for (NVEntry nvdata : nvdatas) {
                 ds.writeByte(nvdata.ma_sat_gio);
             }
             // Goc cuu tieu
             ds.writeByte(len);
-            for (NVData.NVEntry nvdata : nvdatas) {
+            for (NVEntry nvdata : nvdatas) {
                 ds.writeShort(nvdata.goc_min);
             }
             // Sat thuong 1 vien dan
             ds.writeByte(len);
-            for (NVData.NVEntry nvdata : nvdatas) {
+            for (NVEntry nvdata : nvdatas) {
                 ds.writeByte(nvdata.sat_thuong_dan);
             }
             // So dan
             ds.writeByte(len);
-            for (NVData.NVEntry nvdata : nvdatas) {
+            for (NVEntry nvdata : nvdatas) {
                 ds.writeByte(nvdata.so_dan);
             }
             // Max player
@@ -533,7 +535,7 @@ public class UserService implements IUserService {
             for (int i = 0; i < 10; i++) {
                 if (i > 2) {
                     ds.writeByte(user.nvStt[i] ? 1 : 0);
-                    NVData.NVEntry nvEntry = NVData.entrys.get(i);
+                    NVEntry nvEntry = NVData.entrys.get(i);
                     ds.writeShort(nvEntry.buyXu / 1000);
                     ds.writeShort(nvEntry.buyLuong);
                 }
@@ -640,7 +642,7 @@ public class UserService implements IUserService {
                 if (fDatE == null) {
                     return;
                 }
-                NVData.NVEntry nvE = NVData.entrys.get(user.getNvUsed());
+                NVEntry nvE = NVData.entrys.get(user.getNvUsed());
                 ds.writeByte(fDatE.ins.id);
                 ds.writeByte(fDatE.entrys.size());
                 for (int i = 0; i < fDatE.entrys.size(); i++) {
@@ -1530,7 +1532,7 @@ public class UserService implements IUserService {
             if (user.nvStt[idnv]) {
                 return;
             }
-            NVData.NVEntry nventry = NVData.entrys.get(idnv);
+            NVEntry nventry = NVData.entrys.get(idnv);
             byte buyLuong = ms.reader().readByte();
             boolean buyOK = false;
             if (buyLuong == 1) {
@@ -1917,7 +1919,7 @@ public class UserService implements IUserService {
             // Size
             ds.writeShort(NVData.nSaleEquip);
             // Cac trang bi
-            for (NVData.EquipmentEntry eqEntry : NVData.equips) {
+            for (EquipmentEntry eqEntry : NVData.equips) {
                 if (!eqEntry.onSale) {
                     continue;
                 }
@@ -1971,7 +1973,7 @@ public class UserService implements IUserService {
             sendServerMessage(GameString.ruongNoSlot());
             return;
         }
-        NVData.EquipmentEntry eqEntry = NVData.getEquipEntryByIndexSale(indexSale);
+        EquipmentEntry eqEntry = NVData.getEquipEntryByIndexSale(indexSale);
         if (eqEntry == null || !eqEntry.onSale || (buyLuong == 0 ? eqEntry.giaXu : eqEntry.giaLuong) < 0) {
             return;
         }

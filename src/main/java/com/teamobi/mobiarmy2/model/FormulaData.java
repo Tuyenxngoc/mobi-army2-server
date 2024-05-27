@@ -1,5 +1,7 @@
 package com.teamobi.mobiarmy2.model;
 
+import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
+
 import java.util.ArrayList;
 
 /**
@@ -10,8 +12,8 @@ public class FormulaData {
     public static final class FormulaDataEntry {
         public SpecialItemData.SpecialItemEntry ins;
         public byte equipType;
-        public NVData.EquipmentEntry[] equip;
-        public NVData.EquipmentEntry[] equipNeed;
+        public EquipmentEntry[] equip;
+        public EquipmentEntry[] equipNeed;
         public ArrayList<FormulaEntry> entrys;
     }
 
@@ -42,8 +44,8 @@ public class FormulaData {
             fDatEntry = new FormulaDataEntry();
             fDatEntry.ins = SpecialItemData.getSpecialItemById(materialId);
             fDatEntry.equipType = equipType;
-            fDatEntry.equip = new NVData.EquipmentEntry[eqId.length];
-            fDatEntry.equipNeed = new NVData.EquipmentEntry[eqNeedId.length];
+            fDatEntry.equip = new EquipmentEntry[eqId.length];
+            fDatEntry.equipNeed = new EquipmentEntry[eqNeedId.length];
             for (int i = 0; i < eqId.length; i++) {
                 fDatEntry.equip[i] = NVData.getEquipEntryById(i, equipType, eqId[i]);
                 fDatEntry.equipNeed[i] = NVData.getEquipEntryById(i, equipType, eqNeedId[i]);

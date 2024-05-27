@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.model;
 
+import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,6 +21,6 @@ public class ruongDoTBEntry {
     public short[] anAdd;
     public int[] slot;
     public boolean isUse;
-    public NVData.EquipmentEntry entry;
+    public EquipmentEntry entry;
     public byte cap;
 }

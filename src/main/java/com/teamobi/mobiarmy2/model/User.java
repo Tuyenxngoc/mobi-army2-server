@@ -3,6 +3,7 @@ package com.teamobi.mobiarmy2.model;
 import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.fight.FightWait;
+import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.server.ServerManager;
@@ -27,7 +28,7 @@ import java.util.List;
 @Setter
 public class User {
 
-    public static NVData.EquipmentEntry[][] nvEquipDefault;
+    public static EquipmentEntry[][] nvEquipDefault;
     public ISession session;
     public UserState state;
     public int userId;
@@ -240,7 +241,7 @@ public class User {
         return 0;
     }
 
-    public ruongDoTBEntry getEquipNoNgoc(NVData.EquipmentEntry eqE, byte level) {
+    public ruongDoTBEntry getEquipNoNgoc(EquipmentEntry eqE, byte level) {
         for (int i = 0; i < ruongDoTB.size(); i++) {
             ruongDoTBEntry rdE = ruongDoTB.get(i);
             if (rdE != null && rdE.entry == eqE && !rdE.isUse && rdE.vipLevel == level && rdE.slotNull == 3 && rdE.entry.hanSD - Until.getNumDay(rdE.dayBuy, new Date()) > 0) {

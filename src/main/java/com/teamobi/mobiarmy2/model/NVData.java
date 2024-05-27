@@ -1,59 +1,17 @@
 package com.teamobi.mobiarmy2.model;
 
 import com.teamobi.mobiarmy2.json.CharacterData;
+import com.teamobi.mobiarmy2.model.equip.EquipmentData;
+import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
+import com.teamobi.mobiarmy2.model.equip.NVEntry;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author tuyen
  */
 public class NVData {
 
-    public static class EquipmentData {
-        public byte id;
-        public List<EquipmentEntry> entrys = new ArrayList<>();
-    }
-
-    public static class EquipmentEntry {
-        public int indexEquip;
-        public int indexSale;
-        public byte characterId;
-        public byte idEquipDat;
-        public short id;
-        public String name;
-        public int giaXu;
-        public int giaLuong;
-        public int hanSD;
-        public byte bullId;
-        public short frame;
-        public byte lvRequire;
-        public short[] bigImageCutX;
-        public short[] bigImageCutY;
-        public byte[] bigImageSizeX;
-        public byte[] bigImageSizeY;
-        public byte[] bigImageAlignX;
-        public byte[] bigImageAlignY;
-        public byte[] invAdd;
-        public byte[] percentAdd;
-        public boolean onSale;
-        public boolean isSet;
-        public short[] arraySet;
-        public byte cap;
-    }
-
-    public static final class NVEntry {
-        public byte id;
-        public String name;
-        public int buyXu;
-        public int buyLuong;
-        public byte ma_sat_gio;
-        public byte goc_min;
-        public byte so_dan;
-        public short sat_thuong;
-        public byte sat_thuong_dan;
-        public ArrayList<EquipmentData> trangbis = new ArrayList<>();
-    }
 
     public static ArrayList<NVEntry> entrys = new ArrayList<>();
     public static ArrayList<EquipmentEntry> equips = new ArrayList<>();
@@ -123,7 +81,7 @@ public class NVData {
         short[] data = new short[5];
         if (index >= 0 && index < trangBi.length) {
             com.teamobi.mobiarmy2.json.EquipmentData equipmentData = trangBi[index];
-            NVData.EquipmentEntry entry = NVData.getEquipEntryById(equipmentData.getNvId(), equipmentData.getEquipType(), equipmentData.getId());
+            EquipmentEntry entry = NVData.getEquipEntryById(equipmentData.getNvId(), equipmentData.getEquipType(), equipmentData.getId());
             if (entry != null && entry.arraySet != null) {
                 data[0] = entry.arraySet[0];
                 data[1] = entry.arraySet[1];
