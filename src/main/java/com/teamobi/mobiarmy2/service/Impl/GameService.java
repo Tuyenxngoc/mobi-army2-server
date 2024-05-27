@@ -75,12 +75,12 @@ public class GameService implements IGameService {
                     ds1.writeByte(numEquip);
                     for (int k = 0; k < numEquip; k++) {
                         EquipmentEntry equipEntry = equipDataEntry.entrys.get(k);
-                        ds1.writeShort(equipEntry.id);
+                        ds1.writeShort(equipEntry.index);
                         if (equipDataEntry.id == 0) {
-                            ds1.writeByte(equipEntry.bullId);
+                            ds1.writeByte(equipEntry.bulletId);
                         }
-                        ds1.writeShort(equipEntry.frame);
-                        ds1.writeByte(equipEntry.lvRequire);
+                        ds1.writeShort(equipEntry.frameCount);
+                        ds1.writeByte(equipEntry.levelRequirement);
                         for (int l = 0; l < 6; l++) {
                             ds1.writeShort(equipEntry.bigImageCutX[l]);
                             ds1.writeShort(equipEntry.bigImageCutY[l]);
@@ -90,8 +90,8 @@ public class GameService implements IGameService {
                             ds1.writeByte(equipEntry.bigImageAlignY[l]);
                         }
                         for (int l = 0; l < 5; l++) {
-                            ds1.writeByte(equipEntry.invAdd[l]);
-                            ds1.writeByte(equipEntry.percentAdd[l]);
+                            ds1.writeByte(equipEntry.additionalPoints[l]);
+                            ds1.writeByte(equipEntry.additionalPercent[l]);
                         }
                     }
                 }
@@ -193,7 +193,7 @@ public class GameService implements IGameService {
         for (int i = 0; i < NVData.entrys.size(); i++) {
             NVEntry nvdat = NVData.entrys.get(i);
             for (int j = 0; j < 3; j++) {
-                defaultNvData[i][j] = nvdat.trangbis.get(j).entrys.get(0).id;
+                defaultNvData[i][j] = nvdat.trangbis.get(j).entrys.get(0).index;
             }
             defaultNvData[i][3] = 0;
             defaultNvData[i][4] = 0;

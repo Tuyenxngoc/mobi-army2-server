@@ -10,13 +10,13 @@ import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.json.GiftCodeRewardData;
 import com.teamobi.mobiarmy2.json.ItemData;
 import com.teamobi.mobiarmy2.model.*;
-import com.teamobi.mobiarmy2.model.giftcode.GetGiftCode;
 import com.teamobi.mobiarmy2.model.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.clan.ClanItem;
 import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
 import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
 import com.teamobi.mobiarmy2.model.equip.NVEntry;
+import com.teamobi.mobiarmy2.model.giftcode.GetGiftCode;
 import com.teamobi.mobiarmy2.model.mission.Mission;
 import com.teamobi.mobiarmy2.model.response.GetFriendResponse;
 import com.teamobi.mobiarmy2.network.Impl.Message;
@@ -360,10 +360,10 @@ public class UserService implements IUserService {
                             }
                         }
                         gia = gia / 20;
-                        if (rdE.entry.giaXu > 0) {
-                            gia += rdE.entry.giaXu;
-                        } else if (rdE.entry.giaLuong > 0) {
-                            gia += rdE.entry.giaLuong * 1000;
+                        if (rdE.entry.priceXu > 0) {
+                            gia += rdE.entry.priceXu;
+                        } else if (rdE.entry.priceLuong > 0) {
+                            gia += rdE.entry.priceLuong * 1000;
                         }
                         ms = new Message(-25);
                         ds = ms.writer();
@@ -387,10 +387,10 @@ public class UserService implements IUserService {
                             }
                         }
                         gia = gia / 20;
-                        if (rdE.entry.giaXu > 0) {
-                            gia += rdE.entry.giaXu;
-                        } else if (rdE.entry.giaLuong > 0) {
-                            gia += rdE.entry.giaLuong * 1000;
+                        if (rdE.entry.priceXu > 0) {
+                            gia += rdE.entry.priceXu;
+                        } else if (rdE.entry.priceLuong > 0) {
+                            gia += rdE.entry.priceLuong * 1000;
                         }
                         if (user.getXu() < gia) {
                             ms = new Message(45);
@@ -512,9 +512,9 @@ public class UserService implements IUserService {
                 ds.writeBoolean(false);
                 for (int j = 0; j < 5; j++) {
                     if (user.nvEquip[i][j] != null) {
-                        ds.writeShort(user.nvEquip[i][j].entry.id);
+                        ds.writeShort(user.nvEquip[i][j].entry.index);
                     } else if (User.nvEquipDefault[i][j] != null) {
-                        ds.writeShort(User.nvEquipDefault[i][j].id);
+                        ds.writeShort(User.nvEquipDefault[i][j].index);
                     } else {
                         ds.writeShort(-1);
                     }
@@ -647,7 +647,7 @@ public class UserService implements IUserService {
                 ds.writeByte(fDatE.entrys.size());
                 for (int i = 0; i < fDatE.entrys.size(); i++) {
                     FormulaData.FormulaEntry fE = fDatE.entrys.get(i);
-                    ds.writeByte(fDatE.equip[user.getNvUsed()].id);
+                    ds.writeByte(fDatE.equip[user.getNvUsed()].index);
                     ds.writeUTF(fDatE.equip[user.getNvUsed()].name + " " + nvE.name + " cấp " + fE.level);
                     ds.writeByte(fE.levelRequire);
                     ds.writeByte(user.getNvUsed());
@@ -666,11 +666,11 @@ public class UserService implements IUserService {
                     }
                     boolean isHave;
                     if (fE.level == 1) {
-                        ds.writeByte(fDatE.equipNeed[user.getNvUsed()].id);
+                        ds.writeByte(fDatE.equipNeed[user.getNvUsed()].index);
                         ds.writeUTF(fDatE.equipNeed[user.getNvUsed()].name);
                         isHave = user.getEquipNoNgoc(fDatE.equipNeed[user.getNvUsed()], (byte) 0) != null;
                     } else {
-                        ds.writeByte(fDatE.equip[user.getNvUsed()].id);
+                        ds.writeByte(fDatE.equip[user.getNvUsed()].index);
                         ds.writeUTF(fDatE.equip[user.getNvUsed()].name);
                         isHave = user.getEquipNoNgoc(fDatE.equip[user.getNvUsed()], (byte) (fE.level - 1)) != null;
                     }
@@ -1809,9 +1809,9 @@ public class UserService implements IUserService {
                 // idNV
                 ds.writeByte(rdtbEntry.entry.characterId);
                 // EquipType
-                ds.writeByte(rdtbEntry.entry.idEquipDat);
+                ds.writeByte(rdtbEntry.entry.equipType);
                 // idEquip
-                ds.writeShort(rdtbEntry.entry.id);
+                ds.writeShort(rdtbEntry.entry.index);
                 // Name
                 ds.writeUTF(rdtbEntry.entry.name + (rdtbEntry.cap > 0 ? String.format(" (+%d)", rdtbEntry.cap) : ""));
                 // pointNV
@@ -1821,7 +1821,7 @@ public class UserService implements IUserService {
                     ds.writeByte(rdtbEntry.percentAdd[j]);
                 }
                 // Ngay het han
-                int hanSD = rdtbEntry.entry.hanSD - Until.getNumDay(rdtbEntry.dayBuy, new Date());
+                int hanSD = rdtbEntry.entry.expirationDays - Until.getNumDay(rdtbEntry.dayBuy, new Date());
                 if (hanSD < 0) {
                     hanSD = 0;
                 }
@@ -1914,24 +1914,21 @@ public class UserService implements IUserService {
     @Override
     public void shopTrangBi() {
         try {
-            Message ms = new Message(103);
+            Message ms = new Message(Cmd.SHOP_EQUIP);
             DataOutputStream ds = ms.writer();
-            // Size
             ds.writeShort(NVData.nSaleEquip);
-            // Cac trang bi
-            for (EquipmentEntry eqEntry : NVData.equips) {
-                if (!eqEntry.onSale) {
+            for (EquipmentEntry equip : NVData.equips) {
+                if (!equip.isOnSale()) {
                     continue;
                 }
-                // idNV
-                ds.writeByte(eqEntry.characterId);
-                ds.writeByte(eqEntry.idEquipDat);
-                ds.writeShort(eqEntry.id);
-                ds.writeUTF(eqEntry.name);
-                ds.writeInt(eqEntry.giaXu);
-                ds.writeInt(eqEntry.giaLuong);
-                ds.writeByte(eqEntry.hanSD);
-                ds.writeByte(eqEntry.lvRequire);
+                ds.writeByte(equip.getCharacterId());
+                ds.writeByte(equip.getEquipType());
+                ds.writeShort(equip.getIndex());
+                ds.writeUTF(equip.getName());
+                ds.writeInt(equip.getPriceXu());
+                ds.writeInt(equip.getPriceLuong());
+                ds.writeByte(equip.getExpirationDays());
+                ds.writeByte(equip.getLevelRequirement());
             }
             ds.flush();
             user.sendMessage(ms);
@@ -1974,24 +1971,24 @@ public class UserService implements IUserService {
             return;
         }
         EquipmentEntry eqEntry = NVData.getEquipEntryByIndexSale(indexSale);
-        if (eqEntry == null || !eqEntry.onSale || (buyLuong == 0 ? eqEntry.giaXu : eqEntry.giaLuong) < 0) {
+        if (eqEntry == null || !eqEntry.onSale || (buyLuong == 0 ? eqEntry.priceXu : eqEntry.priceLuong) < 0) {
             return;
         }
 
         switch (buyLuong) {
             case 0 -> {
-                if (user.getXu() < eqEntry.giaXu) {
+                if (user.getXu() < eqEntry.priceXu) {
                     sendServerMessage(GameString.xuNotEnought());
                     return;
                 }
-                user.updateXu(-eqEntry.giaXu);
+                user.updateXu(-eqEntry.priceXu);
             }
             case 1 -> {
-                if (user.getLuong() < eqEntry.giaLuong) {
+                if (user.getLuong() < eqEntry.priceLuong) {
                     sendServerMessage(GameString.xuNotEnought());
                     return;
                 }
-                user.updateLuong(-eqEntry.giaLuong);
+                user.updateLuong(-eqEntry.priceLuong);
             }
             default -> {
                 return;

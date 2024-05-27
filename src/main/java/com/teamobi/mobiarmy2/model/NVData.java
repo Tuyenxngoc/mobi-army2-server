@@ -12,10 +12,13 @@ import java.util.ArrayList;
  */
 public class NVData {
 
-
     public static ArrayList<NVEntry> entrys = new ArrayList<>();
     public static ArrayList<EquipmentEntry> equips = new ArrayList<>();
     public static int nSaleEquip = 0;
+
+    public static void addEquip(EquipmentEntry equip) {
+
+    }
 
     public static void addEquipEntryById(int nvId, int equipDatId, int equipId, EquipmentEntry eqEntry) {
         NVEntry nvEntry = null;
@@ -44,7 +47,7 @@ public class NVData {
         }
         for (EquipmentEntry equipEntry : equipDataEntry.entrys) {
             // Neu ton tai => thoat
-            if (equipEntry.id == equipId) {
+            if (equipEntry.index == equipId) {
                 return;
             }
         }
@@ -60,7 +63,7 @@ public class NVData {
 
     public static EquipmentEntry getEquipEntryById(int nvId, int equipDatId, int equipId) {
         for (EquipmentEntry equipEntry : equips) {
-            if (equipEntry.characterId == nvId && equipEntry.idEquipDat == equipDatId && equipEntry.id == equipId) {
+            if (equipEntry.characterId == nvId && equipEntry.equipType == equipDatId && equipEntry.index == equipId) {
                 return equipEntry;
             }
         }
@@ -95,7 +98,7 @@ public class NVData {
                 if (index >= 0 && index < trangBi.length) {
                     data[i] = (short) trangBi[index].getId();
                 } else if (User.nvEquipDefault[nvUsed - 1][i] != null) {
-                    data[i] = User.nvEquipDefault[nvUsed - 1][i].id;
+                    data[i] = User.nvEquipDefault[nvUsed - 1][i].index;
                 } else {
                     data[i] = -1;
                 }

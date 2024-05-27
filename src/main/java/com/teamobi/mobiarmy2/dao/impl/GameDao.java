@@ -81,29 +81,29 @@ public class GameDao implements IGameDao {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `equip`")) {
                 while (resultSet.next()) {
                     EquipmentEntry equipEntry = new EquipmentEntry();
-                    equipEntry.characterId = resultSet.getByte("character_id");
-                    equipEntry.idEquipDat = resultSet.getByte("equip_type");
-                    equipEntry.id = resultSet.getShort("equipId");
-                    equipEntry.name = resultSet.getString("name");
-                    equipEntry.giaXu = resultSet.getInt("giaXu");
-                    equipEntry.giaLuong = resultSet.getInt("giaLuong");
-                    equipEntry.hanSD = resultSet.getInt("hanSD");
-                    equipEntry.lvRequire = resultSet.getByte("lvRequire");
-                    equipEntry.frame = resultSet.getShort("frame");
-                    equipEntry.bullId = resultSet.getByte("bullId");
-                    equipEntry.onSale = resultSet.getBoolean("onSale");
-                    equipEntry.isSet = resultSet.getBoolean("isSet");
-                    equipEntry.cap = resultSet.getByte("cap");
-                    equipEntry.bigImageCutX = GsonUtil.GSON.fromJson(resultSet.getString("bigCutX"), short[].class);
-                    equipEntry.bigImageCutY = GsonUtil.GSON.fromJson(resultSet.getString("bigCutY"), short[].class);
-                    equipEntry.bigImageSizeX = GsonUtil.GSON.fromJson(resultSet.getString("bigSizeX"), byte[].class);
-                    equipEntry.bigImageSizeY = GsonUtil.GSON.fromJson(resultSet.getString("bigSizeY"), byte[].class);
-                    equipEntry.bigImageAlignX = GsonUtil.GSON.fromJson(resultSet.getString("bigAlignX"), byte[].class);
-                    equipEntry.bigImageAlignY = GsonUtil.GSON.fromJson(resultSet.getString("bigAlignY"), byte[].class);
-                    equipEntry.arraySet = GsonUtil.GSON.fromJson(resultSet.getString("arraySet"), short[].class);
-                    equipEntry.invAdd = GsonUtil.GSON.fromJson(resultSet.getString("addPN"), byte[].class);
-                    equipEntry.percentAdd = GsonUtil.GSON.fromJson(resultSet.getString("addPN100"), byte[].class);
-                    NVData.addEquipEntryById(equipEntry.characterId, equipEntry.idEquipDat, equipEntry.id, equipEntry);
+                    equipEntry.setCharacterId(resultSet.getByte("character_id"));
+                    equipEntry.setEquipType(resultSet.getByte("equip_type"));
+                    equipEntry.setIndex(resultSet.getShort("equip_index"));
+                    equipEntry.setName(resultSet.getString("name"));
+                    equipEntry.setPriceXu(resultSet.getInt("price_xu"));
+                    equipEntry.setPriceLuong(resultSet.getInt("price_luong"));
+                    equipEntry.setExpirationDays(resultSet.getByte("expiration_days"));
+                    equipEntry.setLevelRequirement(resultSet.getByte("level_requirement"));
+                    equipEntry.setFrameCount(resultSet.getShort("frame_count"));
+                    equipEntry.setBulletId(resultSet.getByte("bullet_id"));
+                    equipEntry.setOnSale(resultSet.getBoolean("on_sale"));
+                    equipEntry.isSet = (resultSet.getBoolean("is_set"));
+                    equipEntry.setArraySet(GsonUtil.GSON.fromJson(resultSet.getString("array_set"), short[].class));
+                    equipEntry.setBigImageCutX(GsonUtil.GSON.fromJson(resultSet.getString("big_image_cut_x"), short[].class));
+                    equipEntry.setBigImageCutY(GsonUtil.GSON.fromJson(resultSet.getString("big_image_cut_y"), short[].class));
+                    equipEntry.setBigImageSizeX(GsonUtil.GSON.fromJson(resultSet.getString("big_image_size_x"), byte[].class));
+                    equipEntry.setBigImageSizeY(GsonUtil.GSON.fromJson(resultSet.getString("big_image_size_y"), byte[].class));
+                    equipEntry.setBigImageAlignX(GsonUtil.GSON.fromJson(resultSet.getString("big_image_align_x"), byte[].class));
+                    equipEntry.setBigImageAlignY(GsonUtil.GSON.fromJson(resultSet.getString("big_image_align_y"), byte[].class));
+                    equipEntry.setAdditionalPoints(GsonUtil.GSON.fromJson(resultSet.getString("additional_points"), byte[].class));
+                    equipEntry.setAdditionalPercent(GsonUtil.GSON.fromJson(resultSet.getString("additional_percent"), byte[].class));
+
+                    NVData.addEquip(equipEntry);
                 }
             }
         } catch (SQLException e) {

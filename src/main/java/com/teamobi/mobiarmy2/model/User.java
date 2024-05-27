@@ -208,9 +208,9 @@ public class User {
         } else {
             for (int i = 0; i < 5; i++) {
                 if (this.nvEquip[getNvUsed()][i] != null && !this.nvEquip[getNvUsed()][i].entry.isSet) {
-                    equip[i] = this.nvEquip[getNvUsed()][i].entry.id;
+                    equip[i] = this.nvEquip[getNvUsed()][i].entry.index;
                 } else if (nvEquipDefault[getNvUsed()][i] != null) {
-                    equip[i] = nvEquipDefault[getNvUsed()][i].id;
+                    equip[i] = nvEquipDefault[getNvUsed()][i].index;
                 } else {
                     equip[i] = -1;
                 }
@@ -244,7 +244,7 @@ public class User {
     public ruongDoTBEntry getEquipNoNgoc(EquipmentEntry eqE, byte level) {
         for (int i = 0; i < ruongDoTB.size(); i++) {
             ruongDoTBEntry rdE = ruongDoTB.get(i);
-            if (rdE != null && rdE.entry == eqE && !rdE.isUse && rdE.vipLevel == level && rdE.slotNull == 3 && rdE.entry.hanSD - Until.getNumDay(rdE.dayBuy, new Date()) > 0) {
+            if (rdE != null && rdE.entry == eqE && !rdE.isUse && rdE.vipLevel == level && rdE.slotNull == 3 && rdE.entry.expirationDays - Until.getNumDay(rdE.dayBuy, new Date()) > 0) {
                 return rdE;
             }
         }
@@ -267,19 +267,19 @@ public class User {
                 addTB.dayBuy = new Date();
                 addTB.isUse = false;
                 if (addTB.invAdd == null) {
-                    addTB.invAdd = new short[addTB.entry.invAdd.length];
-                    for (int j = 0; j < addTB.entry.invAdd.length; j++) {
-                        addTB.invAdd[j] = addTB.entry.invAdd[j];
+                    addTB.invAdd = new short[addTB.entry.additionalPoints.length];
+                    for (int j = 0; j < addTB.entry.additionalPoints.length; j++) {
+                        addTB.invAdd[j] = addTB.entry.additionalPoints[j];
                     }
                 }
                 if (addTB.percentAdd == null) {
-                    addTB.percentAdd = new short[addTB.entry.percentAdd.length];
-                    for (int j = 0; j < addTB.entry.percentAdd.length; j++) {
-                        addTB.percentAdd[j] = addTB.entry.percentAdd[j];
+                    addTB.percentAdd = new short[addTB.entry.additionalPercent.length];
+                    for (int j = 0; j < addTB.entry.additionalPercent.length; j++) {
+                        addTB.percentAdd[j] = addTB.entry.additionalPercent[j];
                     }
                 }
                 addTB.slotNull = 3;
-                addTB.cap = addTB.entry.cap;
+                addTB.cap = 0;
                 addTB.slot = new int[3];
                 for (int i = 0; i < 3; i++) {
                     addTB.slot[i] = -1;
@@ -296,15 +296,15 @@ public class User {
                 ds.writeByte(0);
                 ds.writeInt(addTB.index | 0x10000);
                 ds.writeByte(addTB.entry.characterId);
-                ds.writeByte(addTB.entry.idEquipDat);
-                ds.writeShort(addTB.entry.id);
+                ds.writeByte(addTB.entry.equipType);
+                ds.writeShort(addTB.entry.index);
                 ds.writeUTF(addTB.entry.name);
                 ds.writeByte(addTB.invAdd.length * 2);
                 for (int i = 0; i < addTB.invAdd.length; i++) {
                     ds.writeByte(addTB.invAdd[i]);
                     ds.writeByte(addTB.percentAdd[i]);
                 }
-                ds.writeByte(addTB.entry.hanSD);
+                ds.writeByte(addTB.entry.expirationDays);
                 ds.writeByte(addTB.entry.isSet ? 1 : 0);
                 ds.writeByte(addTB.vipLevel);
                 ds.flush();
@@ -324,7 +324,7 @@ public class User {
                 }
                 ds1.writeByte(tbUpdate.slotNull);
                 // Ngay het han
-                int hanSD = tbUpdate.entry.hanSD - Until.getNumDay(tbUpdate.dayBuy, new Date());
+                int hanSD = tbUpdate.entry.expirationDays - Until.getNumDay(tbUpdate.dayBuy, new Date());
                 if (hanSD < 0) {
                     hanSD = 0;
                 }

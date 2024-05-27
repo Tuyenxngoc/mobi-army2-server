@@ -198,7 +198,7 @@ public class UserDao implements IUserDao {
                                     user.NvData[i][j] = data.get(j);
                                     if (user.NvData[i][j] >= 0 && user.NvData[i][j] < user.ruongDoTB.size()) {
                                         ruongDoTBEntry rdE = user.ruongDoTB.get(user.NvData[i][j]);
-                                        if (rdE.entry.hanSD - Until.getNumDay(rdE.dayBuy, new Date()) > 0) {
+                                        if (rdE.entry.expirationDays - Until.getNumDay(rdE.dayBuy, new Date()) > 0) {
                                             user.nvEquip[i][j] = rdE;
                                         } else {
                                             rdE.isUse = false;
