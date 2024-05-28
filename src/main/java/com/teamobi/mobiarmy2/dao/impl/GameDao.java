@@ -119,8 +119,8 @@ public class GameDao implements IGameDao {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `captionlv`")) {
                 while (resultSet.next()) {
                     CaptionData.Caption capEntry = new CaptionData.Caption();
-                    capEntry.level = resultSet.getByte("lvl");
-                    capEntry.caption = resultSet.getString("caption");
+                    capEntry.setLevel(resultSet.getByte("lvl"));
+                    capEntry.setCaption(resultSet.getString("caption"));
                     CaptionData.captions.add(capEntry);
                 }
             }

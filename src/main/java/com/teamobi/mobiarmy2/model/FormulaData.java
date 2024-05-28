@@ -46,7 +46,7 @@ public class FormulaData {
             fDatEntry.equipType = equipType;
             fDatEntry.equip = new EquipmentEntry[eqId.length];
             fDatEntry.equipNeed = new EquipmentEntry[eqNeedId.length];
-            for (int i = 0; i < eqId.length; i++) {
+            for (byte i = 0; i < eqId.length; i++) {
                 fDatEntry.equip[i] = NVData.getEquipEntryById(i, equipType, eqId[i]);
                 fDatEntry.equipNeed[i] = NVData.getEquipEntryById(i, equipType, eqNeedId[i]);
             }

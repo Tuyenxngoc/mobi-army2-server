@@ -65,10 +65,10 @@ public class GameService implements IGameService {
             for (CharacterEntry characterEntry : NVData.characterEntries) {
                 ds.writeByte(characterEntry.getId());
                 ds.writeShort(characterEntry.getDamage());
-                ds.writeByte(characterEntry.equips.size());
+                ds.writeByte(characterEntry.getEquips().size());
 
-                for (byte i = 0; i < characterEntry.equips.size(); i++) {
-                    List<EquipmentEntry> equipmentEntries = characterEntry.equips.get(i);
+                for (byte i = 0; i < characterEntry.getEquips().size(); i++) {
+                    List<EquipmentEntry> equipmentEntries = characterEntry.getEquips().get(i);
                     ds.writeByte(i);
                     ds.writeByte(equipmentEntries.size());
 
@@ -124,19 +124,19 @@ public class GameService implements IGameService {
     @Override
     public void setCacheCaptionLevels() {
         try {
-            ByteArrayOutputStream bas2 = new ByteArrayOutputStream();
-            DataOutputStream ds2 = new DataOutputStream(bas2);
-            int numCaption = CaptionData.captions.size();
-            ds2.writeByte(numCaption);
-            for (int i = numCaption - 1; i >= 0; i--) {
+            ByteArrayOutputStream bas = new ByteArrayOutputStream();
+            DataOutputStream ds = new DataOutputStream(bas);
+            int size = CaptionData.captions.size();
+            ds.writeByte(size);
+            for (int i = size - 1; i >= 0; i--) {
                 CaptionData.Caption capEntry = CaptionData.captions.get(i);
-                ds2.writeUTF(capEntry.caption);
-                ds2.writeByte(capEntry.level);
+                ds.writeUTF(capEntry.getCaption());
+                ds.writeByte(capEntry.getLevel());
             }
-            byte[] ab2 = bas2.toByteArray();
-            Until.saveFile(CommonConstant.levelCacheName, ab2);
-            bas2.close();
-            ds2.close();
+            byte[] data = bas.toByteArray();
+            Until.saveFile(CommonConstant.levelCacheName, data);
+            bas.close();
+            ds.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -145,7 +145,7 @@ public class GameService implements IGameService {
     @Override
     public void setCachePlayerImages() {
         try {
-            TeamImageOutput tos = new TeamImageOutput();
+            TeamImageOutput tio = new TeamImageOutput();
             File playerDir = new File("res/player");
             if (!playerDir.exists()) {
                 throw new IOException("Folder player not found!");
@@ -155,10 +155,10 @@ public class GameService implements IGameService {
                 System.exit(1);
             }
             for (File f : playerFiles) {
-                tos.addFile(f.getName(), f.getPath());
+                tio.addFile(f.getName(), f.getPath());
             }
-            byte[] ab3 = tos.output();
-            Until.saveFile(CommonConstant.playerCacheName, ab3);
+            byte[] data = tio.output();
+            Until.saveFile(CommonConstant.playerCacheName, data);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -167,7 +167,7 @@ public class GameService implements IGameService {
     @Override
     public void setCacheMapIcons() {
         try {
-            TeamImageOutput tos2 = new TeamImageOutput();
+            TeamImageOutput tio = new TeamImageOutput();
             File mapDir = new File("res/map/icon");
             if (!mapDir.exists()) {
                 throw new IOException("Folder map icon not found!");
@@ -177,10 +177,10 @@ public class GameService implements IGameService {
                 System.exit(1);
             }
             for (File f : mapFiles) {
-                tos2.addFile(f.getName(), f.getPath());
+                tio.addFile(f.getName(), f.getPath());
             }
-            byte[] ab4 = tos2.output();
-            Until.saveFile(CommonConstant.iconCacheName, ab4);
+            byte[] data = tio.output();
+            Until.saveFile(CommonConstant.iconCacheName, data);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -198,8 +198,8 @@ public class GameService implements IGameService {
             defaultNvData[i][3] = 0;
             defaultNvData[i][4] = 0;
         }
-        for (int i = 0; i < NVData.characterEntries.size(); i++) {
-            for (int j = 0; j < 3; j++) {
+        for (byte i = 0; i < NVData.characterEntries.size(); i++) {
+            for (byte j = 0; j < 3; j++) {
                 User.nvEquipDefault[i][j] = NVData.getEquipEntryById(i, j, defaultNvData[i][j]);
             }
         }

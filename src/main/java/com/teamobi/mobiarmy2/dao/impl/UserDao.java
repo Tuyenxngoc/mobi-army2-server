@@ -138,16 +138,23 @@ public class UserDao implements IUserDao {
                                 nvstt = nvstt / 2;
                             }
 
-                            user.items = gson.fromJson(playerResultSet.getString("item"), byte[].class);
+                            byte[] items = gson.fromJson(playerResultSet.getString("item"), byte[].class);
+                            if (items.length != ItemFightData.ITEM_FIGHTS.size()) {
+                                byte[] adjustedItems = new byte[ItemFightData.ITEM_FIGHTS.size()];
+                                System.arraycopy(items, 0, adjustedItems, 0, Math.min(items.length, adjustedItems.length));
+                                user.setItems(adjustedItems);
+                            } else {
+                                user.setItems(items);
+                            }
 
                             EquipmentData[] equipmentDatas = gson.fromJson(playerResultSet.getString("ruongTrangBi"), EquipmentData[].class);
                             for (int i = 0; i < equipmentDatas.length; i++) {
                                 EquipmentData equipmentData = equipmentDatas[i];
                                 ruongDoTBEntry rdtbEntry = new ruongDoTBEntry();
 
-                                int nvId = equipmentData.getNvId();
-                                int equipType = equipmentData.getEquipType();
-                                int equipId = equipmentData.getId();
+                                byte nvId = equipmentData.getNvId();
+                                byte equipType = equipmentData.getEquipType();
+                                byte equipId = equipmentData.getId();
 
                                 rdtbEntry.index = i;
                                 rdtbEntry.entry = NVData.getEquipEntryById(nvId, equipType, equipId);

@@ -1,5 +1,8 @@
 package com.teamobi.mobiarmy2.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,11 +11,13 @@ import java.util.List;
  */
 public class CaptionData {
 
+    @Getter
+    @Setter
     public static final class Caption {
-        public byte level;
-        public String caption;
+        private byte level;
+        private String caption;
     }
 
-    public static List<Caption> captions = new ArrayList<>();
+    public static final List<Caption> captions = new ArrayList<>();
 
 }

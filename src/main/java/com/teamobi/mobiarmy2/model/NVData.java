@@ -7,14 +7,15 @@ import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author tuyen
  */
 public class NVData {
 
-    public static List<CharacterEntry> characterEntries = new ArrayList<>();
-    public static List<EquipmentEntry> equipmentEntries = new ArrayList<>();
+    public static final List<CharacterEntry> characterEntries = new ArrayList<>();
+    public static final List<EquipmentEntry> equipmentEntries = new ArrayList<>();
     public static short totalSaleEquipments = 0;
 
     public static void addEquip(EquipmentEntry newEquip) {
@@ -43,22 +44,35 @@ public class NVData {
         equipmentEntries.add(newEquip);
     }
 
-    public static EquipmentEntry getEquipEntryById(int nvId, int equipDatId, int equipId) {
-        for (EquipmentEntry equipEntry : equipmentEntries) {
-            if (equipEntry.characterId == nvId && equipEntry.equipType == equipDatId && equipEntry.index == equipId) {
-                return equipEntry;
-            }
+    public static EquipmentEntry getEquipEntryById(byte characterId, byte equipType, int equipIndex) {
+        // Find the character entry by ID
+        Optional<CharacterEntry> characterEntryOpt = characterEntries.stream()
+                .filter(entry -> entry.id == characterId)
+                .findFirst();
+
+        if (characterEntryOpt.isEmpty()) {
+            return null;
         }
-        return null;
+
+        // Get the equipment list for the given type
+        List<EquipmentEntry> entries = characterEntryOpt.get().getEquips().get(equipType);
+
+        if (entries == null) {
+            return null;
+        }
+
+        // Find the equipment entry by index
+        return entries.stream()
+                .filter(equipmentEntry -> equipmentEntry.getIndex() == equipIndex)
+                .findFirst()
+                .orElse(null);
     }
 
     public static EquipmentEntry getEquipEntryByIndexSale(int indexSale) {
-        for (EquipmentEntry equipEntry : equipmentEntries) {
-            if (equipEntry.onSale && equipEntry.indexSale == indexSale) {
-                return equipEntry;
-            }
-        }
-        return null;
+        return equipmentEntries.stream()
+                .filter(equipEntry -> equipEntry.onSale && equipEntry.indexSale == indexSale)
+                .findFirst()
+                .orElse(null);
     }
 
     public static short[] getEquipData(EquipmentData[] trangBi, CharacterData character, byte nvUsed) {
@@ -78,7 +92,7 @@ public class NVData {
             for (byte i = 0; i < 5; i++) {
                 index = character.getData().get(i);
                 if (index >= 0 && index < trangBi.length) {
-                    data[i] = (short) trangBi[index].getId();
+                    data[i] = trangBi[index].getId();
                 } else if (User.nvEquipDefault[nvUsed][i] != null) {
                     data[i] = User.nvEquipDefault[nvUsed][i].index;
                 } else {

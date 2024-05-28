@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 public class EquipmentData {
     @SerializedName("nvId")
-    private int nvId;
+    private byte nvId;
 
     @SerializedName("isUse")
     private boolean isUse;
@@ -25,13 +25,13 @@ public class EquipmentData {
     private List<Short> invAdd;
 
     @SerializedName("equipType")
-    private int equipType;
+    private byte equipType;
 
     @SerializedName("dayBuy")
     private String dayBuy;
 
     @SerializedName("id")
-    private int id;
+    private byte id;
 
     @SerializedName("slot")
     private List<Integer> slot;
