@@ -13,7 +13,7 @@ public class ItemClanData {
 
     @Getter
     @Setter
-    public static final class ClanItemDetail {
+    public static class ClanItemDetail {
         byte id;
         byte level;
         String name;

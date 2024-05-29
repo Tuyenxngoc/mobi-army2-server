@@ -93,7 +93,7 @@ public class GameDao implements IGameDao {
                     equipEntry.setBulletId(resultSet.getByte("bullet_id"));
                     equipEntry.setOnSale(resultSet.getBoolean("on_sale"));
                     equipEntry.setDisguise(resultSet.getBoolean("is_disguise"));
-                    equipEntry.setArraySet(GsonUtil.GSON.fromJson(resultSet.getString("disguise_equipped_indexes"), short[].class));
+                    equipEntry.setDisguiseEquippedIndexes(GsonUtil.GSON.fromJson(resultSet.getString("disguise_equipped_indexes"), short[].class));
                     equipEntry.setBigImageCutX(GsonUtil.GSON.fromJson(resultSet.getString("big_image_cut_x"), short[].class));
                     equipEntry.setBigImageCutY(GsonUtil.GSON.fromJson(resultSet.getString("big_image_cut_y"), short[].class));
                     equipEntry.setBigImageSizeX(GsonUtil.GSON.fromJson(resultSet.getString("big_image_size_x"), byte[].class));

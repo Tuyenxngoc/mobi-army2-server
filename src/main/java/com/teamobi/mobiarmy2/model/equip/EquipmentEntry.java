@@ -27,5 +27,5 @@ public class EquipmentEntry {
     public byte[] additionalPercent;
     public boolean onSale;
     public boolean isDisguise;
-    public short[] arraySet;
+    public short[] disguiseEquippedIndexes;
 }

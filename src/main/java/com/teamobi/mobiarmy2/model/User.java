@@ -200,11 +200,11 @@ public class User {
     public short[] getEquip() {
         short[] equip = new short[5];
         if (this.nvEquip[getNvUsed()][5] != null && this.nvEquip[getNvUsed()][5].equipmentEntry.isDisguise) {
-            equip[0] = this.nvEquip[getNvUsed()][5].equipmentEntry.arraySet[0];
-            equip[1] = this.nvEquip[getNvUsed()][5].equipmentEntry.arraySet[1];
-            equip[2] = this.nvEquip[getNvUsed()][5].equipmentEntry.arraySet[2];
-            equip[3] = this.nvEquip[getNvUsed()][5].equipmentEntry.arraySet[3];
-            equip[4] = this.nvEquip[getNvUsed()][5].equipmentEntry.arraySet[4];
+            equip[0] = this.nvEquip[getNvUsed()][5].equipmentEntry.disguiseEquippedIndexes[0];
+            equip[1] = this.nvEquip[getNvUsed()][5].equipmentEntry.disguiseEquippedIndexes[1];
+            equip[2] = this.nvEquip[getNvUsed()][5].equipmentEntry.disguiseEquippedIndexes[2];
+            equip[3] = this.nvEquip[getNvUsed()][5].equipmentEntry.disguiseEquippedIndexes[3];
+            equip[4] = this.nvEquip[getNvUsed()][5].equipmentEntry.disguiseEquippedIndexes[4];
         } else {
             for (int i = 0; i < 5; i++) {
                 if (this.nvEquip[getNvUsed()][i] != null && !this.nvEquip[getNvUsed()][i].equipmentEntry.isDisguise) {

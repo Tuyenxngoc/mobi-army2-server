@@ -76,17 +76,18 @@ public class NVData {
     }
 
     public static short[] getEquipData(EquipmentData[] trangBi, CharacterData character, byte nvUsed) {
-        int index = character.getData().get(5);
         short[] data = new short[5];
+
+        int index = character.getData().get(5);
         if (index >= 0 && index < trangBi.length) {
             EquipmentData equipmentData = trangBi[index];
             EquipmentEntry entry = NVData.getEquipEntryById(equipmentData.getNvId(), equipmentData.getEquipType(), equipmentData.getId());
-            if (entry != null && entry.arraySet != null) {
-                data[0] = entry.arraySet[0];
-                data[1] = entry.arraySet[1];
-                data[2] = entry.arraySet[2];
-                data[3] = entry.arraySet[3];
-                data[4] = entry.arraySet[4];
+            if (entry != null && entry.disguiseEquippedIndexes != null) {
+                data[0] = entry.disguiseEquippedIndexes[0];
+                data[1] = entry.disguiseEquippedIndexes[1];
+                data[2] = entry.disguiseEquippedIndexes[2];
+                data[3] = entry.disguiseEquippedIndexes[3];
+                data[4] = entry.disguiseEquippedIndexes[4];
             }
         } else {
             for (byte i = 0; i < 5; i++) {
