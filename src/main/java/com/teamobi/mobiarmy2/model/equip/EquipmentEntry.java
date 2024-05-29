@@ -7,7 +7,6 @@ import lombok.Setter;
 @Setter
 public class EquipmentEntry {
     public int indexSale;
-
     public Byte characterId;
     public byte equipType;
     public short index;

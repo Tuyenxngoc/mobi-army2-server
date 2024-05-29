@@ -354,16 +354,16 @@ public class UserService implements IUserService {
                     if (idKey < user.ruongDoTB.size()) {
                         ruongDoTBEntry rdE = user.ruongDoTB.get(idKey);
                         for (int i = 0; i < 3; i++) {
-                            if (rdE.slot[i] >= 0) {
-                                SpecialItemData.SpecialItemEntry spE = SpecialItemData.getSpecialItemById(rdE.slot[i]);
+                            if (rdE.slots[i] >= 0) {
+                                SpecialItemData.SpecialItemEntry spE = SpecialItemData.getSpecialItemById(rdE.slots[i]);
                                 gia += spE.buyXu;
                             }
                         }
                         gia = gia / 20;
-                        if (rdE.entry.priceXu > 0) {
-                            gia += rdE.entry.priceXu;
-                        } else if (rdE.entry.priceLuong > 0) {
-                            gia += rdE.entry.priceLuong * 1000;
+                        if (rdE.equipmentEntry.priceXu > 0) {
+                            gia += rdE.equipmentEntry.priceXu;
+                        } else if (rdE.equipmentEntry.priceLuong > 0) {
+                            gia += rdE.equipmentEntry.priceLuong * 1000;
                         }
                         ms = new Message(-25);
                         ds = ms.writer();
@@ -381,16 +381,16 @@ public class UserService implements IUserService {
                     if (idKey < user.ruongDoTB.size()) {
                         ruongDoTBEntry rdE = user.ruongDoTB.get(idKey);
                         for (int i = 0; i < 3; i++) {
-                            if (rdE.slot[i] >= 0) {
-                                SpecialItemData.SpecialItemEntry spE = SpecialItemData.getSpecialItemById(rdE.slot[i]);
+                            if (rdE.slots[i] >= 0) {
+                                SpecialItemData.SpecialItemEntry spE = SpecialItemData.getSpecialItemById(rdE.slots[i]);
                                 gia += spE.buyXu;
                             }
                         }
                         gia = gia / 20;
-                        if (rdE.entry.priceXu > 0) {
-                            gia += rdE.entry.priceXu;
-                        } else if (rdE.entry.priceLuong > 0) {
-                            gia += rdE.entry.priceLuong * 1000;
+                        if (rdE.equipmentEntry.priceXu > 0) {
+                            gia += rdE.equipmentEntry.priceXu;
+                        } else if (rdE.equipmentEntry.priceLuong > 0) {
+                            gia += rdE.equipmentEntry.priceLuong * 1000;
                         }
                         if (user.getXu() < gia) {
                             ms = new Message(45);
@@ -401,7 +401,7 @@ public class UserService implements IUserService {
                             return;
                         }
                         user.updateXu(-gia);
-                        rdE.dayBuy = new Date();
+                        rdE.purchaseDate = new Date();
                         user.updateRuong(rdE, null, -1, null, null);
                         ms = new Message(45);
                         ds = ms.writer();
@@ -512,7 +512,7 @@ public class UserService implements IUserService {
                 ds.writeBoolean(false);
                 for (int j = 0; j < 5; j++) {
                     if (user.nvEquip[i][j] != null) {
-                        ds.writeShort(user.nvEquip[i][j].entry.index);
+                        ds.writeShort(user.nvEquip[i][j].equipmentEntry.index);
                     } else if (User.nvEquipDefault[i][j] != null) {
                         ds.writeShort(User.nvEquipDefault[i][j].index);
                     } else {
@@ -693,7 +693,7 @@ public class UserService implements IUserService {
                 }
                 ArrayList<ruongDoItemEntry> arrayI = new ArrayList<>();
                 ruongDoTBEntry rdE = new ruongDoTBEntry(), rdE2;
-                rdE.entry = fDatE.equip[user.getNvUsed()];
+                rdE.equipmentEntry = fDatE.equip[user.getNvUsed()];
                 FormulaData.FormulaEntry fE = fDatE.entrys.get(index);
                 boolean isFinish = true;
                 for (int j = 0; j < fE.itemNeed.length; j++) {
@@ -726,11 +726,11 @@ public class UserService implements IUserService {
                         arrayI.add(rdE1);
                     }
                     rdE.vipLevel = fE.level;
-                    rdE.invAdd = new short[5];
-                    rdE.percentAdd = new short[5];
+                    rdE.invAdd = new byte[5];
+                    rdE.percentAdd = new byte[5];
                     for (int i = 0; i < 5; i++) {
-                        rdE.invAdd[i] = (short) Until.nextInt(fE.invAddMin[i], fE.invAddMax[i]);
-                        rdE.percentAdd[i] = (short) Until.nextInt(fE.percenAddMin[i], fE.percenAddMax[i]);
+                        rdE.invAdd[i] = (byte) Until.nextInt(fE.invAddMin[i], fE.invAddMax[i]);
+                        rdE.percentAdd[i] = (byte) Until.nextInt(fE.percenAddMin[i], fE.percenAddMax[i]);
                     }
                     user.updateRuong(null, rdE, rdE2.index, null, arrayI);
                     ds.writeByte(0);
@@ -908,9 +908,6 @@ public class UserService implements IUserService {
 
     @Override
     public void luyenTap(Message ms) {
-        if (user.isNotWaiting()) {
-            return;
-        }
     }
 
     @Override
@@ -993,9 +990,6 @@ public class UserService implements IUserService {
 
     @Override
     public void macTrangBiVip(Message ms) {
-        if (user.isNotWaiting()) {
-            return;
-        }
     }
 
     @Override
@@ -1800,7 +1794,6 @@ public class UserService implements IUserService {
 
     private void sendRuongDoInfo() {
         try {
-            // Ruong trang bi
             Message ms = new Message(Cmd.INVENTORY);
             DataOutputStream ds = ms.writer();
             int lent = user.ruongDoTB.size();
@@ -1810,13 +1803,13 @@ public class UserService implements IUserService {
                 // dbKey
                 ds.writeInt(i | 0x10000);
                 // idNV
-                ds.writeByte(rdtbEntry.entry.characterId);
+                ds.writeByte(rdtbEntry.equipmentEntry.characterId);
                 // EquipType
-                ds.writeByte(rdtbEntry.entry.equipType);
+                ds.writeByte(rdtbEntry.equipmentEntry.equipType);
                 // idEquip
-                ds.writeShort(rdtbEntry.entry.index);
+                ds.writeShort(rdtbEntry.equipmentEntry.index);
                 // Name
-                ds.writeUTF(rdtbEntry.entry.name + (rdtbEntry.cap > 0 ? String.format(" (+%d)", rdtbEntry.cap) : ""));
+                ds.writeUTF(rdtbEntry.equipmentEntry.name);
                 // pointNV
                 ds.writeByte(rdtbEntry.invAdd.length * 2);
                 for (int j = 0; j < rdtbEntry.invAdd.length; j++) {
@@ -1824,15 +1817,15 @@ public class UserService implements IUserService {
                     ds.writeByte(rdtbEntry.percentAdd[j]);
                 }
                 // Ngay het han
-                int hanSD = rdtbEntry.entry.expirationDays - Until.getNumDay(rdtbEntry.dayBuy, new Date());
+                int hanSD = rdtbEntry.equipmentEntry.expirationDays - Until.getNumDay(rdtbEntry.purchaseDate, new Date());
                 if (hanSD < 0) {
                     hanSD = 0;
                 }
                 ds.writeByte(hanSD);
                 // Slot trong
-                ds.writeByte(rdtbEntry.slotNull);
+                ds.writeByte(rdtbEntry.emptySlot);
                 // Vip I != 0 -> co tang % thoc tinh
-                ds.writeByte(rdtbEntry.entry.isDisguise ? 1 : 0);
+                ds.writeByte(rdtbEntry.equipmentEntry.isDisguise ? 1 : 0);
                 // Vip Level
                 ds.writeByte(rdtbEntry.vipLevel);
             }
@@ -1915,7 +1908,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void shopTrangBi() {
+    public void handleSendShopEquipments() {
         try {
             Message ms = new Message(Cmd.SHOP_EQUIP);
             DataOutputStream ds = ms.writer();
@@ -1943,21 +1936,19 @@ public class UserService implements IUserService {
     @Override
     public void handleEquipmentPurchases(Message ms) {
         DataInputStream dis = ms.reader();
-
         try {
             byte type = dis.readByte();
             switch (type) {
-                case 0 -> {
-                    //Mua trang bi
+                case 0 -> {//Mua trang bi
                     short indexSale = dis.readShort();
-                    byte buyLuong = dis.readByte();
-                    muaTrangBi(indexSale, buyLuong);
+                    byte unit = dis.readByte();
+                    purchaseEquipment(indexSale, unit);
                 }
-                case 1 -> {
-                    //Ban trang bi
+                case 1 -> {//Ban trang bi
                     byte size = dis.readByte();
                     for (int i = 0; i < size; i++) {
                         int id = dis.readInt();
+                        System.out.println(id);
                     }
                 }
                 case 2 -> {//Xac nhan ban trang bi
@@ -1968,38 +1959,37 @@ public class UserService implements IUserService {
         }
     }
 
-    private void muaTrangBi(short indexSale, byte buyLuong) {
+    private void purchaseEquipment(short indexSale, byte unit) {
         if (user.getRuongDoTB().size() >= ServerManager.getInstance().config().getMax_ruong_tb()) {
             sendServerMessage(GameString.ruongNoSlot());
             return;
         }
-        EquipmentEntry eqEntry = NVData.getEquipEntryByIndexSale(indexSale);
-        if (eqEntry == null || !eqEntry.onSale || (buyLuong == 0 ? eqEntry.priceXu : eqEntry.priceLuong) < 0) {
+        EquipmentEntry equipmentEntry = NVData.getEquipEntryByIndexSale(indexSale);
+        if (equipmentEntry == null || (unit == 0 ? equipmentEntry.getPriceXu() : equipmentEntry.getPriceLuong()) < 0) {
             return;
         }
-
-        switch (buyLuong) {
+        switch (unit) {
             case 0 -> {
-                if (user.getXu() < eqEntry.priceXu) {
+                if (user.getXu() < equipmentEntry.getPriceXu()) {
                     sendServerMessage(GameString.xuNotEnought());
                     return;
                 }
-                user.updateXu(-eqEntry.priceXu);
+                user.updateXu(-equipmentEntry.getPriceXu());
             }
             case 1 -> {
-                if (user.getLuong() < eqEntry.priceLuong) {
+                if (user.getLuong() < equipmentEntry.getPriceLuong()) {
                     sendServerMessage(GameString.xuNotEnought());
                     return;
                 }
-                user.updateLuong(-eqEntry.priceLuong);
+                user.updateLuong(-equipmentEntry.getPriceLuong());
             }
             default -> {
                 return;
             }
         }
-        ruongDoTBEntry rdE = new ruongDoTBEntry();
-        rdE.entry = eqEntry;
-        user.updateRuong(null, rdE, -1, null, null);
+        ruongDoTBEntry newTb = new ruongDoTBEntry();
+        newTb.equipmentEntry = equipmentEntry;
+        user.updateRuong(null, newTb, -1, null, null);
         sendServerMessage(GameString.buySuccess());
     }
 

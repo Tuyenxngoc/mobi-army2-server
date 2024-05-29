@@ -13,14 +13,12 @@ import java.util.Date;
 @Setter
 public class ruongDoTBEntry {
     public int index;
-    public Date dayBuy;
+    public Date purchaseDate;
     public byte vipLevel;
-    public byte slotNull;
-    public short[] invAdd;
-    public short[] percentAdd;
-    public short[] anAdd;
-    public int[] slot;
+    public byte emptySlot;
+    public byte[] invAdd;
+    public byte[] percentAdd;
+    public int[] slots = {-1, -1, -1};
     public boolean isUse;
-    public EquipmentEntry entry;
-    public byte cap;
+    public EquipmentEntry equipmentEntry;
 }

@@ -199,16 +199,16 @@ public class User {
 
     public short[] getEquip() {
         short[] equip = new short[5];
-        if (this.nvEquip[getNvUsed()][5] != null && this.nvEquip[getNvUsed()][5].entry.isDisguise) {
-            equip[0] = this.nvEquip[getNvUsed()][5].entry.arraySet[0];
-            equip[1] = this.nvEquip[getNvUsed()][5].entry.arraySet[1];
-            equip[2] = this.nvEquip[getNvUsed()][5].entry.arraySet[2];
-            equip[3] = this.nvEquip[getNvUsed()][5].entry.arraySet[3];
-            equip[4] = this.nvEquip[getNvUsed()][5].entry.arraySet[4];
+        if (this.nvEquip[getNvUsed()][5] != null && this.nvEquip[getNvUsed()][5].equipmentEntry.isDisguise) {
+            equip[0] = this.nvEquip[getNvUsed()][5].equipmentEntry.arraySet[0];
+            equip[1] = this.nvEquip[getNvUsed()][5].equipmentEntry.arraySet[1];
+            equip[2] = this.nvEquip[getNvUsed()][5].equipmentEntry.arraySet[2];
+            equip[3] = this.nvEquip[getNvUsed()][5].equipmentEntry.arraySet[3];
+            equip[4] = this.nvEquip[getNvUsed()][5].equipmentEntry.arraySet[4];
         } else {
             for (int i = 0; i < 5; i++) {
-                if (this.nvEquip[getNvUsed()][i] != null && !this.nvEquip[getNvUsed()][i].entry.isDisguise) {
-                    equip[i] = this.nvEquip[getNvUsed()][i].entry.index;
+                if (this.nvEquip[getNvUsed()][i] != null && !this.nvEquip[getNvUsed()][i].equipmentEntry.isDisguise) {
+                    equip[i] = this.nvEquip[getNvUsed()][i].equipmentEntry.index;
                 } else if (nvEquipDefault[getNvUsed()][i] != null) {
                     equip[i] = nvEquipDefault[getNvUsed()][i].index;
                 } else {
@@ -232,8 +232,7 @@ public class User {
 
     public int getNumItemRuong(int id) {
         // Kiem tra trong ruong co=>tang so luong. ko co=> tao moi
-        for (int i = 0; i < ruongDoItem.size(); i++) {
-            ruongDoItemEntry spE1 = ruongDoItem.get(i);
+        for (ruongDoItemEntry spE1 : ruongDoItem) {
             if (spE1.entry.id == id) {
                 return spE1.numb;
             }
@@ -242,9 +241,8 @@ public class User {
     }
 
     public ruongDoTBEntry getEquipNoNgoc(EquipmentEntry eqE, byte level) {
-        for (int i = 0; i < ruongDoTB.size(); i++) {
-            ruongDoTBEntry rdE = ruongDoTB.get(i);
-            if (rdE != null && rdE.entry == eqE && !rdE.isUse && rdE.vipLevel == level && rdE.slotNull == 3 && rdE.entry.expirationDays - Until.getNumDay(rdE.dayBuy, new Date()) > 0) {
+        for (ruongDoTBEntry rdE : ruongDoTB) {
+            if (rdE != null && rdE.equipmentEntry == eqE && !rdE.isUse && rdE.vipLevel == level && rdE.emptySlot == 3 && rdE.equipmentEntry.expirationDays - Until.getNumDay(rdE.purchaseDate, new Date()) > 0) {
                 return rdE;
             }
         }
@@ -264,26 +262,15 @@ public class User {
                         break;
                     }
                 }
-                addTB.dayBuy = new Date();
+                addTB.purchaseDate = new Date();
                 addTB.isUse = false;
                 if (addTB.invAdd == null) {
-                    addTB.invAdd = new short[addTB.entry.additionalPoints.length];
-                    for (int j = 0; j < addTB.entry.additionalPoints.length; j++) {
-                        addTB.invAdd[j] = addTB.entry.additionalPoints[j];
-                    }
+                    addTB.invAdd = addTB.equipmentEntry.additionalPoints;
                 }
                 if (addTB.percentAdd == null) {
-                    addTB.percentAdd = new short[addTB.entry.additionalPercent.length];
-                    for (int j = 0; j < addTB.entry.additionalPercent.length; j++) {
-                        addTB.percentAdd[j] = addTB.entry.additionalPercent[j];
-                    }
+                    addTB.percentAdd = addTB.equipmentEntry.additionalPercent;
                 }
-                addTB.slotNull = 3;
-                addTB.cap = 0;
-                addTB.slot = new int[3];
-                for (int i = 0; i < 3; i++) {
-                    addTB.slot[i] = -1;
-                }
+                addTB.emptySlot = 3;
                 if (bestLocation == -1) {
                     addTB.index = ruongDoTB.size();
                     ruongDoTB.add(addTB);
@@ -295,17 +282,17 @@ public class User {
                 ds = ms.writer();
                 ds.writeByte(0);
                 ds.writeInt(addTB.index | 0x10000);
-                ds.writeByte(addTB.entry.characterId);
-                ds.writeByte(addTB.entry.equipType);
-                ds.writeShort(addTB.entry.index);
-                ds.writeUTF(addTB.entry.name);
+                ds.writeByte(addTB.equipmentEntry.characterId);
+                ds.writeByte(addTB.equipmentEntry.equipType);
+                ds.writeShort(addTB.equipmentEntry.index);
+                ds.writeUTF(addTB.equipmentEntry.name);
                 ds.writeByte(addTB.invAdd.length * 2);
                 for (int i = 0; i < addTB.invAdd.length; i++) {
                     ds.writeByte(addTB.invAdd[i]);
                     ds.writeByte(addTB.percentAdd[i]);
                 }
-                ds.writeByte(addTB.entry.expirationDays);
-                ds.writeByte(addTB.entry.isDisguise ? 1 : 0);
+                ds.writeByte(addTB.equipmentEntry.expirationDays);
+                ds.writeByte(addTB.equipmentEntry.isDisguise ? 1 : 0);
                 ds.writeByte(addTB.vipLevel);
                 ds.flush();
                 sendMessage(ms);
@@ -322,9 +309,9 @@ public class User {
                     ds1.writeByte(tbUpdate.invAdd[i]);
                     ds1.writeByte(tbUpdate.percentAdd[i]);
                 }
-                ds1.writeByte(tbUpdate.slotNull);
+                ds1.writeByte(tbUpdate.emptySlot);
                 // Ngay het han
-                int hanSD = tbUpdate.entry.expirationDays - Until.getNumDay(tbUpdate.dayBuy, new Date());
+                int hanSD = tbUpdate.equipmentEntry.expirationDays - Until.getNumDay(tbUpdate.purchaseDate, new Date());
                 if (hanSD < 0) {
                     hanSD = 0;
                 }

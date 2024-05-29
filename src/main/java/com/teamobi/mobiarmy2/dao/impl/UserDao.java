@@ -157,16 +157,14 @@ public class UserDao implements IUserDao {
                                 byte equipId = equipmentData.getId();
 
                                 rdtbEntry.index = i;
-                                rdtbEntry.entry = NVData.getEquipEntryById(nvId, equipType, equipId);
-                                rdtbEntry.dayBuy = Until.getDate(equipmentData.getDayBuy());
+                                rdtbEntry.equipmentEntry = NVData.getEquipEntryById(nvId, equipType, equipId);
+                                rdtbEntry.purchaseDate = Until.getDate(equipmentData.getDayBuy());
                                 rdtbEntry.vipLevel = equipmentData.getVipLevel();
                                 rdtbEntry.isUse = equipmentData.isUse();
-                                rdtbEntry.invAdd = new short[5];
-                                rdtbEntry.percentAdd = new short[5];
-                                rdtbEntry.slot = new int[3];
-                                rdtbEntry.anAdd = new short[5];
-                                rdtbEntry.slotNull = 0;
-                                rdtbEntry.cap = 0;
+                                rdtbEntry.invAdd = new byte[5];
+                                rdtbEntry.percentAdd = new byte[5];
+                                rdtbEntry.slots = new int[3];
+                                rdtbEntry.emptySlot = 0;
                                 for (int l = 0; l < 5; l++) {
                                     rdtbEntry.invAdd[l] = equipmentData.getInvAdd().get(l);
                                 }
@@ -174,9 +172,9 @@ public class UserDao implements IUserDao {
                                     rdtbEntry.percentAdd[l] = equipmentData.getPercenAdd().get(l);
                                 }
                                 for (int l = 0; l < 3; l++) {
-                                    rdtbEntry.slot[l] = equipmentData.getSlot().get(l);
-                                    if (rdtbEntry.slot[l] == -1) {
-                                        rdtbEntry.slotNull++;
+                                    rdtbEntry.slots[l] = equipmentData.getSlot().get(l);
+                                    if (rdtbEntry.slots[l] == -1) {
+                                        rdtbEntry.emptySlot++;
                                     }
                                 }
                                 user.ruongDoTB.add(rdtbEntry);
@@ -205,7 +203,7 @@ public class UserDao implements IUserDao {
                                     user.NvData[i][j] = data.get(j);
                                     if (user.NvData[i][j] >= 0 && user.NvData[i][j] < user.ruongDoTB.size()) {
                                         ruongDoTBEntry rdE = user.ruongDoTB.get(user.NvData[i][j]);
-                                        if (rdE.entry.expirationDays - Until.getNumDay(rdE.dayBuy, new Date()) > 0) {
+                                        if (rdE.equipmentEntry.expirationDays - Until.getNumDay(rdE.purchaseDate, new Date()) > 0) {
                                             user.nvEquip[i][j] = rdE;
                                         } else {
                                             rdE.isUse = false;

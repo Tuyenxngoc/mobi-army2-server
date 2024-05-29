@@ -122,7 +122,7 @@ public interface IUserService {
 
     void macTrangBi(Message ms);
 
-    void shopTrangBi();
+    void handleSendShopEquipments();
 
     void handleEquipmentPurchases(Message ms);
 

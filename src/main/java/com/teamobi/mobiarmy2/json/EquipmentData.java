@@ -22,7 +22,7 @@ public class EquipmentData {
     private byte vipLevel;
 
     @SerializedName("invAdd")
-    private List<Short> invAdd;
+    private List<Byte> invAdd;
 
     @SerializedName("equipType")
     private byte equipType;
@@ -37,5 +37,5 @@ public class EquipmentData {
     private List<Integer> slot;
 
     @SerializedName("percenAdd")
-    private List<Short> percenAdd;
+    private List<Byte> percenAdd;
 }
