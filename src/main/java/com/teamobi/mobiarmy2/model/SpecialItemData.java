@@ -7,8 +7,7 @@ import java.util.ArrayList;
  */
 public class SpecialItemData {
 
-    public static final class SpecialItemEntry {
-
+    public static class SpecialItemEntry {
         public int id;
         public int indexSale;
         public String name;

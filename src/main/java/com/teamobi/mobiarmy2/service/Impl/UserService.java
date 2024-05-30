@@ -17,6 +17,7 @@ import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
 import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
 import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
 import com.teamobi.mobiarmy2.model.giftcode.GetGiftCode;
+import com.teamobi.mobiarmy2.model.item.FightItem;
 import com.teamobi.mobiarmy2.model.mission.Mission;
 import com.teamobi.mobiarmy2.model.response.GetFriendResponse;
 import com.teamobi.mobiarmy2.network.Impl.Message;
@@ -117,10 +118,10 @@ public class UserService implements IUserService {
             LocalDateTime now = LocalDateTime.now();
             if (Until.hasLoggedInOnNewDay(user.getLastOnline(), now)) {
                 //Gửi item
-                byte indexItem = ItemFightData.randomItem();
+                byte indexItem = FightItemData.getRandomItem();
                 byte quantity = 1;
                 user.updateItems(indexItem, quantity);
-                sendMSSToUser(GameString.dailyReward(quantity, ItemFightData.ITEM_FIGHTS.get(indexItem).getName()));
+                sendMSSToUser(GameString.dailyReward(quantity, FightItemData.fightItems.get(indexItem).getName()));
                 //Cập nhật quà top
                 if (user.getTopEarningsXu() > 0) {
                     user.updateXu(user.getTopEarningsXu());
@@ -522,13 +523,13 @@ public class UserService implements IUserService {
             }
 
             //Item
-            for (int i = 0; i < ItemFightData.ITEM_FIGHTS.size(); i++) {
+            for (int i = 0; i < FightItemData.fightItems.size(); i++) {
                 ds.writeByte(user.items[i]);
-                ItemFightData.ItemFight itemFight = ItemFightData.ITEM_FIGHTS.get(i);
+                FightItem fightItem = FightItemData.fightItems.get(i);
                 // Gia xu
-                ds.writeInt(itemFight.getBuyXu());
+                ds.writeInt(fightItem.getBuyXu());
                 // Gia luong
-                ds.writeInt(itemFight.getBuyLuong());
+                ds.writeInt(fightItem.getBuyLuong());
             }
 
             //Nhan vat
@@ -1479,7 +1480,7 @@ public class UserService implements IUserService {
             byte unit = dis.readByte();
             byte itemIndex = dis.readByte();
             byte quantity = dis.readByte();
-            if (itemIndex < 0 || itemIndex >= ItemFightData.ITEM_FIGHTS.size()) {
+            if (itemIndex < 0 || itemIndex >= FightItemData.fightItems.size()) {
                 return;
             }
             if (user.getItems()[itemIndex] + quantity > ServerManager.getInstance().config().getMax_item()) {
@@ -1488,7 +1489,7 @@ public class UserService implements IUserService {
 
             switch (unit) {
                 case 0 -> {
-                    int total = ItemFightData.ITEM_FIGHTS.get(itemIndex).getBuyXu() * quantity;
+                    int total = FightItemData.fightItems.get(itemIndex).getBuyXu() * quantity;
                     if (user.getXu() < total || total < 0) {
                         return;
                     }
@@ -1496,7 +1497,7 @@ public class UserService implements IUserService {
                     user.updateItems(itemIndex, quantity);
                 }
                 case 1 -> {
-                    int total = ItemFightData.ITEM_FIGHTS.get(itemIndex).getBuyLuong() * quantity;
+                    int total = FightItemData.fightItems.get(itemIndex).getBuyLuong() * quantity;
                     if (user.getLuong() < total || total < 0) {
                         return;
                     }
@@ -2028,7 +2029,7 @@ public class UserService implements IUserService {
 
                 switch (type) {
                     case 0 -> {
-                        itemId = ItemFightData.randomItem();
+                        itemId = FightItemData.getRandomItem();
                         quantity = SpinWheelConstants.ITEM_COUNTS[Until.nextInt(SpinWheelConstants.ITEM_PROBABILITIES)];
                         if (i == luckyIndex) {
                             user.updateItems(itemId, quantity);

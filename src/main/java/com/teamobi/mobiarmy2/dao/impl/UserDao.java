@@ -139,8 +139,8 @@ public class UserDao implements IUserDao {
                             }
 
                             byte[] items = gson.fromJson(playerResultSet.getString("item"), byte[].class);
-                            if (items.length != ItemFightData.ITEM_FIGHTS.size()) {
-                                byte[] adjustedItems = new byte[ItemFightData.ITEM_FIGHTS.size()];
+                            if (items.length != FightItemData.fightItems.size()) {
+                                byte[] adjustedItems = new byte[FightItemData.fightItems.size()];
                                 System.arraycopy(items, 0, adjustedItems, 0, Math.min(items.length, adjustedItems.length));
                                 user.setItems(adjustedItems);
                             } else {

@@ -5,6 +5,7 @@ import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
 import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
+import com.teamobi.mobiarmy2.model.item.FightItem;
 import com.teamobi.mobiarmy2.model.mission.Mission;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Until;
@@ -134,15 +135,15 @@ public class GameDao implements IGameDao {
     public void getAllItem() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `item`")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT name, xu, luong, carried_item_count FROM `fight_item`")) {
                 while (resultSet.next()) {
-                    ItemFightData.ItemFight iEntry = new ItemFightData.ItemFight();
-                    iEntry.setName(resultSet.getString("name"));
-                    iEntry.setBuyXu(resultSet.getInt("xu"));
-                    iEntry.setBuyLuong(resultSet.getInt("luong"));
-                    iEntry.setCarriedItemCount(resultSet.getByte("carried_item_count"));
+                    FightItem fightItem = new FightItem();
+                    fightItem.setName(resultSet.getString("name"));
+                    fightItem.setBuyXu(resultSet.getShort("xu"));
+                    fightItem.setBuyLuong(resultSet.getShort("luong"));
+                    fightItem.setCarriedItemCount(resultSet.getByte("carried_item_count"));
 
-                    ItemFightData.ITEM_FIGHTS.add(iEntry);
+                    FightItemData.fightItems.add(fightItem);
                 }
             }
         } catch (SQLException e) {
