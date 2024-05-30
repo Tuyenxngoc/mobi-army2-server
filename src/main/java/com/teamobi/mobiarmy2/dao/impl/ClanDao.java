@@ -4,9 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.teamobi.mobiarmy2.dao.IClanDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
-import com.teamobi.mobiarmy2.json.CharacterData;
-import com.teamobi.mobiarmy2.json.ClanItemData;
-import com.teamobi.mobiarmy2.json.EquipmentData;
+import com.teamobi.mobiarmy2.json.CharacterJson;
+import com.teamobi.mobiarmy2.json.ClanItemJson;
+import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.serialization.LocalDateTimeAdapter;
 import com.teamobi.mobiarmy2.model.ItemClanData;
 import com.teamobi.mobiarmy2.model.NVData;
@@ -183,10 +183,10 @@ public class ClanDao implements IClanDao {
                     clanInfo.setDescription(red.getString("description"));
                     clanInfo.setDateCreated(red.getString("date_created"));
 
-                    ClanItemData[] clanItemDataArray = gson.fromJson(red.getString("item"), ClanItemData[].class);
+                    ClanItemJson[] clanItemJsonArray = gson.fromJson(red.getString("item"), ClanItemJson[].class);
                     LocalDateTime currentDate = LocalDateTime.now();
 
-                    List<ClanItem> filteredItems = Arrays.stream(clanItemDataArray)
+                    List<ClanItem> filteredItems = Arrays.stream(clanItemJsonArray)
                             .filter(item -> !item.getTime().isBefore(currentDate))
                             .map(item -> {
                                 ClanItemEntry clanItemEntry = ItemClanData.getItemClanById(item.getId());
@@ -242,14 +242,14 @@ public class ClanDao implements IClanDao {
                     entry.setNvUsed(resultSet.getByte("nv_used"));
                     entry.setOnline(resultSet.getByte("p.online"));
 
-                    CharacterData characterData = gson.fromJson(resultSet.getString("NV" + entry.getNvUsed()), CharacterData.class);
-                    EquipmentData[] trangBi = gson.fromJson(resultSet.getString("ruongTrangBi"), EquipmentData[].class);
+                    CharacterJson characterJson = gson.fromJson(resultSet.getString("NV" + entry.getNvUsed()), CharacterJson.class);
+                    EquipmentChestJson[] trangBi = gson.fromJson(resultSet.getString("ruongTrangBi"), EquipmentChestJson[].class);
 
-                    entry.setLever((byte) characterData.getLevel());
+                    entry.setLever((byte) characterJson.getLevel());
                     entry.setLevelPt((byte) 0);
                     entry.setIndex((byte) ((page * 10) + index));
                     entry.setCup(resultSet.getInt("p.dvong"));
-                    entry.setDataEquip(NVData.getEquipData(trangBi, characterData, entry.getNvUsed()));
+                    entry.setDataEquip(NVData.getEquipData(trangBi, characterJson, entry.getNvUsed()));
 
                     short contributeCount = resultSet.getShort("c.contribute_count");
                     if (contributeCount > 0) {
@@ -279,13 +279,13 @@ public class ClanDao implements IClanDao {
     }
 
     @Override
-    public ClanItemData[] getClanItems(short clanId) {
+    public ClanItemJson[] getClanItems(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT item FROM clan WHERE clan_id = ?")) {
             statement.setInt(1, clanId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    return gson.fromJson(resultSet.getString("item"), ClanItemData[].class);
+                    return gson.fromJson(resultSet.getString("item"), ClanItemJson[].class);
                 }
             }
         } catch (SQLException e) {
@@ -296,7 +296,7 @@ public class ClanDao implements IClanDao {
     }
 
     @Override
-    public void updateClanItems(short clanId, ClanItemData[] items) {
+    public void updateClanItems(short clanId, ClanItemJson[] items) {
         String sql = "UPDATE clan SET item = ? WHERE clan_id = ?";
         HikariCPManager.getInstance().update(sql, gson.toJson(items), clanId);
     }

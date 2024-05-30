@@ -2,7 +2,7 @@ package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.dao.IClanDao;
 import com.teamobi.mobiarmy2.dao.impl.ClanDao;
-import com.teamobi.mobiarmy2.json.ClanItemData;
+import com.teamobi.mobiarmy2.json.ClanItemJson;
 import com.teamobi.mobiarmy2.model.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
@@ -59,11 +59,11 @@ public class ClanManager {
             clanDao.gopClanContribute("Mua item đội -" + Until.getStringNumber(clanItemEntry.getLuong()) + " lượng", playerId, 0, -clanItemEntry.getLuong());
         }
 
-        ClanItemData[] items = clanDao.getClanItems(clanId);
+        ClanItemJson[] items = clanDao.getClanItems(clanId);
         boolean found = false;
         LocalDateTime now = LocalDateTime.now();
 
-        for (ClanItemData item : items) {
+        for (ClanItemJson item : items) {
             if (item.getId() == clanItemEntry.getId()) {
                 if (item.getTime().isBefore(now)) {
                     item.setTime(now);
@@ -75,12 +75,12 @@ public class ClanManager {
         }
 
         if (!found) {
-            List<ClanItemData> updatedItems = new ArrayList<>(Arrays.asList(items));
-            ClanItemData newItem = new ClanItemData();
+            List<ClanItemJson> updatedItems = new ArrayList<>(Arrays.asList(items));
+            ClanItemJson newItem = new ClanItemJson();
             newItem.setId(clanItemEntry.getId());
             newItem.setTime(now.plusHours(clanItemEntry.getTime()));
             updatedItems.add(newItem);
-            items = updatedItems.toArray(new ClanItemData[0]);
+            items = updatedItems.toArray(new ClanItemJson[0]);
         }
         clanDao.updateClanItems(clanId, items);
     }

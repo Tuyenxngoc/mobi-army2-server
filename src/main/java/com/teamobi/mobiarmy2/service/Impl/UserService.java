@@ -7,7 +7,7 @@ import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.dao.impl.GiftCodeDao;
 import com.teamobi.mobiarmy2.dao.impl.UserDao;
 import com.teamobi.mobiarmy2.fight.FightWait;
-import com.teamobi.mobiarmy2.json.GiftCodeRewardData;
+import com.teamobi.mobiarmy2.json.GiftCodeRewardJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.clan.ClanEntry;
@@ -1426,18 +1426,18 @@ public class UserService implements IUserService {
             }
         }
 
-        GiftCodeRewardData rewardData = GsonUtil.GSON.fromJson(giftCode.getReward(), GiftCodeRewardData.class);
+        GiftCodeRewardJson rewardData = GsonUtil.GSON.fromJson(giftCode.getReward(), GiftCodeRewardJson.class);
 
         StringBuilder totalRewardBuilder = new StringBuilder();
-        if (rewardData.getXu() > 0) {
+        if (rewardData.getXu() != null && rewardData.getXu() > 0) {
             user.updateXu(rewardData.getXu());
             totalRewardBuilder.append("+ ").append(rewardData.getXu()).append(" xu, ");
         }
-        if (rewardData.getLuong() > 0) {
+        if (rewardData.getLuong() != null && rewardData.getLuong() > 0) {
             user.updateLuong(rewardData.getLuong());
             totalRewardBuilder.append("+ ").append(rewardData.getLuong()).append(" lượng, ");
         }
-        if (rewardData.getExp() > 0) {
+        if (rewardData.getExp() != null && rewardData.getExp() > 0) {
             user.updateXp(rewardData.getExp());
             totalRewardBuilder.append("+ ").append(rewardData.getExp()).append(" exp");
         }

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-public class ClanItemData {
+public class ClanItemJson {
 
     @SerializedName("id")
     private byte id;

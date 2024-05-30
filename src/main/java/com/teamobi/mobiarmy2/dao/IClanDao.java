@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.dao;
 
-import com.teamobi.mobiarmy2.json.ClanItemData;
+import com.teamobi.mobiarmy2.json.ClanItemJson;
 import com.teamobi.mobiarmy2.model.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
@@ -29,9 +29,9 @@ public interface IClanDao {
 
     List<ClanMemEntry> getClanMember(short clanId, byte page);
 
-    ClanItemData[] getClanItems(short clanId);
+    ClanItemJson[] getClanItems(short clanId);
 
-    void updateClanItems(short clanId, ClanItemData[] items);
+    void updateClanItems(short clanId, ClanItemJson[] items);
 
     short getCountClan();
 

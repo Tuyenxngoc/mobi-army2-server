@@ -4,8 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
-import com.teamobi.mobiarmy2.json.CharacterData;
-import com.teamobi.mobiarmy2.json.EquipmentData;
+import com.teamobi.mobiarmy2.json.CharacterJson;
+import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.response.GetFriendResponse;
@@ -150,32 +150,32 @@ public class UserDao implements IUserDao {
                                 user.setItems(items);
                             }
 
-                            EquipmentData[] equipmentDatas = gson.fromJson(playerResultSet.getString("ruongTrangBi"), EquipmentData[].class);
-                            for (int i = 0; i < equipmentDatas.length; i++) {
-                                EquipmentData equipmentData = equipmentDatas[i];
+                            EquipmentChestJson[] equipmentChestJsons = gson.fromJson(playerResultSet.getString("ruongTrangBi"), EquipmentChestJson[].class);
+                            for (int i = 0; i < equipmentChestJsons.length; i++) {
+                                EquipmentChestJson equipmentChestJson = equipmentChestJsons[i];
                                 EquipmentChestEntry rdtbEntry = new EquipmentChestEntry();
 
-                                byte nvId = equipmentData.getNvId();
-                                byte equipType = equipmentData.getEquipType();
-                                byte equipId = equipmentData.getId();
+                                byte nvId = equipmentChestJson.getNvId();
+                                byte equipType = equipmentChestJson.getEquipType();
+                                byte equipId = equipmentChestJson.getId();
 
                                 rdtbEntry.index = i;
                                 rdtbEntry.equipmentEntry = NVData.getEquipEntryById(nvId, equipType, equipId);
-                                rdtbEntry.purchaseDate = Until.getDate(equipmentData.getDayBuy());
-                                rdtbEntry.vipLevel = equipmentData.getVipLevel();
-                                rdtbEntry.isUse = equipmentData.isUse();
+                                rdtbEntry.purchaseDate = Until.getDate(equipmentChestJson.getDayBuy());
+                                rdtbEntry.vipLevel = equipmentChestJson.getVipLevel();
+                                rdtbEntry.isUse = equipmentChestJson.isUse();
                                 rdtbEntry.invAdd = new byte[5];
                                 rdtbEntry.percentAdd = new byte[5];
                                 rdtbEntry.slots = new int[3];
                                 rdtbEntry.emptySlot = 0;
                                 for (int l = 0; l < 5; l++) {
-                                    rdtbEntry.invAdd[l] = equipmentData.getInvAdd().get(l);
+                                    rdtbEntry.invAdd[l] = equipmentChestJson.getInvAdd().get(l);
                                 }
                                 for (int l = 0; l < 5; l++) {
-                                    rdtbEntry.percentAdd[l] = equipmentData.getPercenAdd().get(l);
+                                    rdtbEntry.percentAdd[l] = equipmentChestJson.getPercenAdd().get(l);
                                 }
                                 for (int l = 0; l < 3; l++) {
-                                    rdtbEntry.slots[l] = equipmentData.getSlot().get(l);
+                                    rdtbEntry.slots[l] = equipmentChestJson.getSlot().get(l);
                                     if (rdtbEntry.slots[l] == -1) {
                                         rdtbEntry.emptySlot++;
                                     }
@@ -197,16 +197,16 @@ public class UserDao implements IUserDao {
                             }
 
                             for (int i = 0; i < 10; i++) {
-                                CharacterData characterData = gson.fromJson(playerResultSet.getString("NV" + (i + 1)), CharacterData.class);
-                                user.levels[i] = characterData.getLevel();
-                                user.xps[i] = characterData.getXp();
+                                CharacterJson characterJson = gson.fromJson(playerResultSet.getString("NV" + (i + 1)), CharacterJson.class);
+                                user.levels[i] = characterJson.getLevel();
+                                user.xps[i] = characterJson.getXp();
                                 user.levelPercents[i] = 0;
-                                user.points[i] = characterData.getPoint();
+                                user.points[i] = characterJson.getPoint();
                                 for (int j = 0; j < 5; j++) {
-                                    user.pointAdd[i][j] = characterData.getPointAdd().get(j);
+                                    user.pointAdd[i][j] = characterJson.getPointAdd().get(j);
                                 }
 
-                                List<Integer> data = characterData.getData();
+                                List<Integer> data = characterJson.getData();
                                 for (int j = 0; j < 5; j++) {
                                     user.NvData[i][j] = data.get(j);
                                     if (user.NvData[i][j] >= 0 && user.NvData[i][j] < user.ruongDoTB.size()) {
@@ -299,16 +299,16 @@ public class UserDao implements IUserDao {
                     friend.setNvUsed(resultSet.getByte("nv_used"));
                     friend.setClanId(resultSet.getShort("clan_id"));
                     friend.setOnline(resultSet.getByte("online"));
-                    CharacterData characterData = gson.fromJson(resultSet.getString("NV" + friend.getNvUsed()), CharacterData.class);
+                    CharacterJson characterJson = gson.fromJson(resultSet.getString("NV" + friend.getNvUsed()), CharacterJson.class);
 
-                    int level = characterData.getLevel();
-                    int xp = characterData.getXp();
+                    int level = characterJson.getLevel();
+                    int xp = characterJson.getXp();
                     int xpRequired = XpData.getXpRequestLevel(level);
 
                     friend.setLevel((byte) level);
                     friend.setLevelPt((byte) Until.calculateLevelPercent(xp, xpRequired));
-                    EquipmentData[] trangBi = gson.fromJson(resultSet.getString("ruongTrangBi"), EquipmentData[].class);
-                    friend.setData(NVData.getEquipData(trangBi, characterData, friend.getNvUsed()));
+                    EquipmentChestJson[] trangBi = gson.fromJson(resultSet.getString("ruongTrangBi"), EquipmentChestJson[].class);
+                    friend.setData(NVData.getEquipData(trangBi, characterJson, friend.getNvUsed()));
 
                     friendsList.add(friend);
                 }

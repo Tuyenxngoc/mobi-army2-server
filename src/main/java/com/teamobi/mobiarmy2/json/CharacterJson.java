@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class CharacterData {
+public class CharacterJson {
 
     @SerializedName("xp")
     private int xp;

@@ -8,15 +8,15 @@ import java.util.List;
 
 @Getter
 @Setter
-public class GiftCodeRewardData {
+public class GiftCodeRewardJson {
     @SerializedName("xu")
-    private int xu;
+    private Integer xu;
 
     @SerializedName("luong")
-    private int luong;
+    private Integer luong;
 
     @SerializedName("exp")
-    private int exp;
+    private Integer exp;
 
     @SerializedName("item")
     private List<SpecialItemChestJson> items;

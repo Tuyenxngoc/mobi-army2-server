@@ -4,8 +4,8 @@ import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dao.IRankingDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
-import com.teamobi.mobiarmy2.json.CharacterData;
-import com.teamobi.mobiarmy2.json.EquipmentData;
+import com.teamobi.mobiarmy2.json.CharacterJson;
+import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.model.NVData;
 import com.teamobi.mobiarmy2.model.PlayerLeaderboardEntry;
 import com.teamobi.mobiarmy2.util.GsonUtil;
@@ -34,8 +34,8 @@ public class RankingDao implements IRankingDao {
         entry.setClanId(resultSet.getShort("clan_id"));
 
         byte nvUsed = resultSet.getByte("nv_used");
-        CharacterData character = GsonUtil.GSON.fromJson(resultSet.getString("NV%s".formatted(nvUsed + 1)), CharacterData.class);
-        EquipmentData[] equipmentData = GsonUtil.GSON.fromJson(resultSet.getString("ruongTrangBi"), EquipmentData[].class);
+        CharacterJson character = GsonUtil.GSON.fromJson(resultSet.getString("NV%s".formatted(nvUsed + 1)), CharacterJson.class);
+        EquipmentChestJson[] equipmentData = GsonUtil.GSON.fromJson(resultSet.getString("ruongTrangBi"), EquipmentChestJson[].class);
 
         entry.setNvUsed(nvUsed);
         entry.setLevel((byte) character.getLevel());

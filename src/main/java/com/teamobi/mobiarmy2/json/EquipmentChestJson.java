@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class EquipmentData {
+public class EquipmentChestJson {
     @SerializedName("nvId")
     private byte nvId;
 
