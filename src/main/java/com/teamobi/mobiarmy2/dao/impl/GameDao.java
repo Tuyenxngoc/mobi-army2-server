@@ -5,6 +5,7 @@ import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
 import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
+import com.teamobi.mobiarmy2.model.item.ClanItemDetail;
 import com.teamobi.mobiarmy2.model.item.FightItem;
 import com.teamobi.mobiarmy2.model.mission.Mission;
 import com.teamobi.mobiarmy2.util.GsonUtil;
@@ -158,7 +159,7 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `clanshop`")) {
                 while (resultSet.next()) {
-                    ItemClanData.ClanItemDetail item = new ItemClanData.ClanItemDetail();
+                    ClanItemDetail item = new ClanItemDetail();
                     item.setId(resultSet.getByte("clanshop_id"));
                     item.setLevel(resultSet.getByte("level"));
                     item.setName(resultSet.getString("name"));

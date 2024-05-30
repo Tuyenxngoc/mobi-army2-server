@@ -17,6 +17,7 @@ import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
 import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
 import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
 import com.teamobi.mobiarmy2.model.giftcode.GetGiftCode;
+import com.teamobi.mobiarmy2.model.item.ClanItemDetail;
 import com.teamobi.mobiarmy2.model.item.FightItem;
 import com.teamobi.mobiarmy2.model.mission.Mission;
 import com.teamobi.mobiarmy2.model.response.GetFriendResponse;
@@ -849,7 +850,7 @@ public class UserService implements IUserService {
 
     private void buyClanShop(byte unit, byte itemId) {
         ClanManager clanManager = ClanManager.getInstance();
-        ItemClanData.ClanItemDetail clanItemDetail = ItemClanData.getItemClanById(itemId);
+        ClanItemDetail clanItemDetail = ItemClanData.getItemClanById(itemId);
 
         if (clanItemDetail == null || clanItemDetail.getOnSale() != 1) {
             return;
@@ -892,7 +893,7 @@ public class UserService implements IUserService {
             Message ms = new Message(Cmd.SHOP_BIETDOI);
             DataOutputStream ds = ms.writer();
             ds.writeByte(ItemClanData.clanItemsMap.size());
-            for (ItemClanData.ClanItemDetail clanItemDetail : ItemClanData.clanItemsMap.values()) {
+            for (ClanItemDetail clanItemDetail : ItemClanData.clanItemsMap.values()) {
                 ds.writeByte(clanItemDetail.getId());
                 ds.writeUTF(clanItemDetail.getName());
                 ds.writeInt(clanItemDetail.getXu());

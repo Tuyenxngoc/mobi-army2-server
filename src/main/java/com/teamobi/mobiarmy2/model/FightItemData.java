@@ -2,8 +2,6 @@ package com.teamobi.mobiarmy2.model;
 
 import com.teamobi.mobiarmy2.model.item.FightItem;
 import com.teamobi.mobiarmy2.util.Until;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;

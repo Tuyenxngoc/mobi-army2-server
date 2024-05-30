@@ -3,10 +3,10 @@ package com.teamobi.mobiarmy2.server;
 import com.teamobi.mobiarmy2.dao.IClanDao;
 import com.teamobi.mobiarmy2.dao.impl.ClanDao;
 import com.teamobi.mobiarmy2.json.ClanItemData;
-import com.teamobi.mobiarmy2.model.ItemClanData;
 import com.teamobi.mobiarmy2.model.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
+import com.teamobi.mobiarmy2.model.item.ClanItemDetail;
 import com.teamobi.mobiarmy2.util.Until;
 
 import java.time.LocalDateTime;
@@ -50,7 +50,7 @@ public class ClanManager {
         return clanDao.getLuong(clanId);
     }
 
-    public void updateItemClan(short clanId, int playerId, ItemClanData.ClanItemDetail clanItemDetail, boolean isBuyXu) {
+    public void updateItemClan(short clanId, int playerId, ClanItemDetail clanItemDetail, boolean isBuyXu) {
         if (isBuyXu) {
             clanDao.updateXu(clanId, -clanItemDetail.getXu());
             clanDao.gopClanContribute("Mua item đội -" + Until.getStringNumber(clanItemDetail.getXu()) + " xu", playerId, -clanItemDetail.getXu(), 0);
