@@ -5,8 +5,9 @@ import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
 import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
-import com.teamobi.mobiarmy2.model.item.ClanItemDetail;
-import com.teamobi.mobiarmy2.model.item.FightItem;
+import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
+import com.teamobi.mobiarmy2.model.item.FightItemEntry;
+import com.teamobi.mobiarmy2.model.item.SpecialItemEntry;
 import com.teamobi.mobiarmy2.model.mission.Mission;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Until;
@@ -138,13 +139,13 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT name, xu, luong, carried_item_count FROM `fight_item`")) {
                 while (resultSet.next()) {
-                    FightItem fightItem = new FightItem();
-                    fightItem.setName(resultSet.getString("name"));
-                    fightItem.setBuyXu(resultSet.getShort("xu"));
-                    fightItem.setBuyLuong(resultSet.getShort("luong"));
-                    fightItem.setCarriedItemCount(resultSet.getByte("carried_item_count"));
+                    FightItemEntry fightItemEntry = new FightItemEntry();
+                    fightItemEntry.setName(resultSet.getString("name"));
+                    fightItemEntry.setBuyXu(resultSet.getShort("xu"));
+                    fightItemEntry.setBuyLuong(resultSet.getShort("luong"));
+                    fightItemEntry.setCarriedItemCount(resultSet.getByte("carried_item_count"));
 
-                    FightItemData.fightItems.add(fightItem);
+                    FightItemData.FIGHT_ITEM_ENTRIES.add(fightItemEntry);
                 }
             }
         } catch (SQLException e) {
@@ -159,7 +160,7 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `clanshop`")) {
                 while (resultSet.next()) {
-                    ClanItemDetail item = new ClanItemDetail();
+                    ClanItemEntry item = new ClanItemEntry();
                     item.setId(resultSet.getByte("clanshop_id"));
                     item.setLevel(resultSet.getByte("level"));
                     item.setName(resultSet.getString("name"));
@@ -181,31 +182,21 @@ public class GameDao implements IGameDao {
     public void getAllSpecialItem() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet res = statement.executeQuery("SELECT * FROM `specialItem`")) {
-                while (res.next()) {
-                    SpecialItemData.SpecialItemEntry iEntry = new SpecialItemData.SpecialItemEntry();
-                    // Id
-                    iEntry.id = res.getInt("id");
-                    // Ten
-                    iEntry.name = res.getString("name");
-                    // Detail
-                    iEntry.detail = res.getString("detail");
-                    // Gia xu
-                    iEntry.buyXu = res.getInt("giaXu");
-                    // Gia luong
-                    iEntry.buyLuong = res.getInt("giaLuong");
-                    // Han SD
-                    iEntry.hanSD = res.getShort("hanSD");
-                    // Show Chon
-                    iEntry.showChon = res.getBoolean("showChon");
-                    // OnSale
-                    iEntry.onSale = res.getBoolean("onSale");
-                    if (iEntry.onSale) {
-                        iEntry.indexSale = SpecialItemData.nSaleItem;
-                        SpecialItemData.nSaleItem++;
-                    }
-                    iEntry.ability = GsonUtil.GSON.fromJson(res.getString("ability"), short[].class);
-                    SpecialItemData.entrys.add(iEntry);
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `special_item`")) {
+                while (resultSet.next()) {
+                    SpecialItemEntry specialItemEntry = new SpecialItemEntry();
+                    specialItemEntry.setId(resultSet.getShort("special_item_id"));
+                    specialItemEntry.setName(resultSet.getString("name"));
+                    specialItemEntry.setDetail(resultSet.getString("detail"));
+                    specialItemEntry.setPriceXu(resultSet.getInt("priceXu"));
+                    specialItemEntry.setPriceLuong(resultSet.getInt("priceLuong"));
+                    specialItemEntry.setPriceSellXu(resultSet.getInt("priceSellXu"));
+                    specialItemEntry.setExpiration_days(resultSet.getShort("expiration_days"));
+                    specialItemEntry.setShowSelection(resultSet.getBoolean("showSelection"));
+                    specialItemEntry.setOnSale(resultSet.getBoolean("isOnSale"));
+                    specialItemEntry.setAbility(GsonUtil.GSON.fromJson(resultSet.getString("ability"), short[].class));
+
+                    SpecialItemData.specialItemEntries.add(specialItemEntry);
                 }
             }
         } catch (SQLException e) {

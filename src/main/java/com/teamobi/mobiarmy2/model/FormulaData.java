@@ -1,76 +1,8 @@
 package com.teamobi.mobiarmy2.model;
 
-import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
-
-import java.util.ArrayList;
-
 /**
  * @author tuyen
  */
 public class FormulaData {
-
-    public static final class FormulaDataEntry {
-        public SpecialItemData.SpecialItemEntry ins;
-        public byte equipType;
-        public EquipmentEntry[] equip;
-        public EquipmentEntry[] equipNeed;
-        public ArrayList<FormulaEntry> entrys;
-    }
-
-    public static class FormulaEntry {
-        public byte level;
-        public int levelRequire;
-        public short[] invAddMin;
-        public short[] invAddMax;
-        public short[] percenAddMin;
-        public short[] percenAddMax;
-        public SpecialItemData.SpecialItemEntry[] itemNeed;
-        public short[] itemNeedNum;
-        public String[] detail;
-    }
-
-    public static ArrayList<FormulaDataEntry> entrys = new ArrayList<>();
-
-    public static void addFomularEntry(int materialId, byte equipType, short[] eqId, short[] eqNeedId, FormulaEntry fEntry) {
-        FormulaDataEntry fDatEntry = null;
-        for (FormulaDataEntry fDatEntry2 : entrys) {
-            if (fDatEntry2.ins.id == materialId) {
-                fDatEntry = fDatEntry2;
-                break;
-            }
-        }
-        // Neu ko ton tai -> tao moi
-        if (fDatEntry == null) {
-            fDatEntry = new FormulaDataEntry();
-            fDatEntry.ins = SpecialItemData.getSpecialItemById(materialId);
-            fDatEntry.equipType = equipType;
-            fDatEntry.equip = new EquipmentEntry[eqId.length];
-            fDatEntry.equipNeed = new EquipmentEntry[eqNeedId.length];
-            for (byte i = 0; i < eqId.length; i++) {
-                fDatEntry.equip[i] = NVData.getEquipEntryById(i, equipType, eqId[i]);
-                fDatEntry.equipNeed[i] = NVData.getEquipEntryById(i, equipType, eqNeedId[i]);
-            }
-            fDatEntry.entrys = new ArrayList<>();
-            entrys.add(fDatEntry);
-        }
-        // Them fomular entry neu ko ton tai
-        for (FormulaEntry fE1 : fDatEntry.entrys) {
-            // Neu ton tai -> thoat
-            if (fE1.level == fEntry.level) {
-                return;
-            }
-        }
-        // Neu ko ton tai -> tao moi
-        fDatEntry.entrys.add(fEntry);
-    }
-
-    public static FormulaDataEntry getFomularDataEntryById(int materialId) {
-        for (FormulaDataEntry fDatEntry : entrys) {
-            if (fDatEntry.ins.id == materialId) {
-                return fDatEntry;
-            }
-        }
-        return null;
-    }
 
 }

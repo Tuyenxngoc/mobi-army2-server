@@ -8,7 +8,7 @@ import com.teamobi.mobiarmy2.dao.impl.GiftCodeDao;
 import com.teamobi.mobiarmy2.dao.impl.UserDao;
 import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.json.GiftCodeRewardData;
-import com.teamobi.mobiarmy2.json.ItemData;
+import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.clan.ClanInfo;
@@ -17,8 +17,9 @@ import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
 import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
 import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
 import com.teamobi.mobiarmy2.model.giftcode.GetGiftCode;
-import com.teamobi.mobiarmy2.model.item.ClanItemDetail;
-import com.teamobi.mobiarmy2.model.item.FightItem;
+import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
+import com.teamobi.mobiarmy2.model.item.FightItemEntry;
+import com.teamobi.mobiarmy2.model.item.SpecialItemEntry;
 import com.teamobi.mobiarmy2.model.mission.Mission;
 import com.teamobi.mobiarmy2.model.response.GetFriendResponse;
 import com.teamobi.mobiarmy2.network.Impl.Message;
@@ -122,7 +123,7 @@ public class UserService implements IUserService {
                 byte indexItem = FightItemData.getRandomItem();
                 byte quantity = 1;
                 user.updateItems(indexItem, quantity);
-                sendMSSToUser(GameString.dailyReward(quantity, FightItemData.fightItems.get(indexItem).getName()));
+                sendMSSToUser(GameString.dailyReward(quantity, FightItemData.FIGHT_ITEM_ENTRIES.get(indexItem).getName()));
                 //Cập nhật quà top
                 if (user.getTopEarningsXu() > 0) {
                     user.updateXu(user.getTopEarningsXu());
@@ -354,11 +355,11 @@ public class UserService implements IUserService {
                 if ((idKey & 0x10000) > 0) {
                     idKey &= 0xFFFF;
                     if (idKey < user.ruongDoTB.size()) {
-                        ruongDoTBEntry rdE = user.ruongDoTB.get(idKey);
+                        EquipmentChestEntry rdE = user.ruongDoTB.get(idKey);
                         for (int i = 0; i < 3; i++) {
                             if (rdE.slots[i] >= 0) {
-                                SpecialItemData.SpecialItemEntry spE = SpecialItemData.getSpecialItemById(rdE.slots[i]);
-                                gia += spE.buyXu;
+                                SpecialItemEntry spE = SpecialItemData.getSpecialItemById(rdE.slots[i]);
+                                gia += spE.getPriceXu();
                             }
                         }
                         gia = gia / 20;
@@ -381,11 +382,11 @@ public class UserService implements IUserService {
                 if ((idKey & 0x10000) > 0) {
                     idKey &= 0xFFFF;
                     if (idKey < user.ruongDoTB.size()) {
-                        ruongDoTBEntry rdE = user.ruongDoTB.get(idKey);
+                        EquipmentChestEntry rdE = user.ruongDoTB.get(idKey);
                         for (int i = 0; i < 3; i++) {
                             if (rdE.slots[i] >= 0) {
-                                SpecialItemData.SpecialItemEntry spE = SpecialItemData.getSpecialItemById(rdE.slots[i]);
-                                gia += spE.buyXu;
+                                SpecialItemEntry spE = SpecialItemData.getSpecialItemById(rdE.slots[i]);
+                                gia += spE.getPriceXu();
                             }
                         }
                         gia = gia / 20;
@@ -524,13 +525,13 @@ public class UserService implements IUserService {
             }
 
             //Item
-            for (int i = 0; i < FightItemData.fightItems.size(); i++) {
+            for (int i = 0; i < FightItemData.FIGHT_ITEM_ENTRIES.size(); i++) {
                 ds.writeByte(user.items[i]);
-                FightItem fightItem = FightItemData.fightItems.get(i);
+                FightItemEntry fightItemEntry = FightItemData.FIGHT_ITEM_ENTRIES.get(i);
                 // Gia xu
-                ds.writeInt(fightItem.getBuyXu());
+                ds.writeInt(fightItemEntry.getBuyXu());
                 // Gia luong
-                ds.writeInt(fightItem.getBuyLuong());
+                ds.writeInt(fightItemEntry.getBuyLuong());
             }
 
             //Nhan vat
@@ -625,128 +626,7 @@ public class UserService implements IUserService {
 
     @Override
     public void hopTrangBi(Message ms) {
-        if (user.isNotWaiting()) {
-            return;
-        }
-        try {
-            byte materialId = ms.reader().readByte();
-            byte action = ms.reader().readByte();
-            byte index = -1;
-            if (action == 2) {
-                index = ms.reader().readByte();
-            }
-            DataOutputStream ds;
-            ms = new Message(-18);
-            ds = ms.writer();
-            if (action == 1) {
-                ds.writeByte(1);
-                FormulaData.FormulaDataEntry fDatE = FormulaData.getFomularDataEntryById(materialId);
-                if (fDatE == null) {
-                    return;
-                }
-                CharacterEntry nvE = NVData.characterEntries.get(user.getNvUsed());
-                ds.writeByte(fDatE.ins.id);
-                ds.writeByte(fDatE.entrys.size());
-                for (int i = 0; i < fDatE.entrys.size(); i++) {
-                    FormulaData.FormulaEntry fE = fDatE.entrys.get(i);
-                    ds.writeByte(fDatE.equip[user.getNvUsed()].index);
-                    ds.writeUTF(fDatE.equip[user.getNvUsed()].name + " " + nvE.name + " cấp " + fE.level);
-                    ds.writeByte(fE.levelRequire);
-                    ds.writeByte(user.getNvUsed());
-                    ds.writeByte(fDatE.equipType);
-                    ds.writeByte(fE.itemNeed.length);
-                    boolean isFinish = true;
-                    for (int j = 0; j < fE.itemNeed.length; j++) {
-                        int itemNumHave = user.getNumItemRuong(fE.itemNeed[j].id);
-                        ds.writeByte(fE.itemNeed[j].id);
-                        ds.writeUTF(fE.itemNeed[j].name);
-                        ds.writeByte(fE.itemNeedNum[j]);
-                        ds.writeByte(itemNumHave > fE.itemNeedNum[j] ? fE.itemNeedNum[j] : itemNumHave);
-                        if (itemNumHave < fE.itemNeedNum[j]) {
-                            isFinish = false;
-                        }
-                    }
-                    boolean isHave;
-                    if (fE.level == 1) {
-                        ds.writeByte(fDatE.equipNeed[user.getNvUsed()].index);
-                        ds.writeUTF(fDatE.equipNeed[user.getNvUsed()].name);
-                        isHave = user.getEquipNoNgoc(fDatE.equipNeed[user.getNvUsed()], (byte) 0) != null;
-                    } else {
-                        ds.writeByte(fDatE.equip[user.getNvUsed()].index);
-                        ds.writeUTF(fDatE.equip[user.getNvUsed()].name);
-                        isHave = user.getEquipNoNgoc(fDatE.equip[user.getNvUsed()], (byte) (fE.level - 1)) != null;
-                    }
-                    if (!isHave) {
-                        isFinish = false;
-                    }
-                    ds.writeByte(fE.level - 1);
-                    ds.writeBoolean(isHave);
-                    ds.writeBoolean(isFinish);
-                    ds.writeByte(fE.detail.length);
-                    for (int j = 0; j < fE.detail.length; j++) {
-                        ds.writeUTF(fE.detail[j]);
-                    }
-                }
-            }
-            if (action == 2) {
-                FormulaData.FormulaDataEntry fDatE = FormulaData.getFomularDataEntryById(materialId);
-                if (fDatE == null || index < 0 || index >= fDatE.entrys.size()) {
-                    return;
-                }
-                ArrayList<ruongDoItemEntry> arrayI = new ArrayList<>();
-                ruongDoTBEntry rdE = new ruongDoTBEntry(), rdE2;
-                rdE.equipmentEntry = fDatE.equip[user.getNvUsed()];
-                FormulaData.FormulaEntry fE = fDatE.entrys.get(index);
-                boolean isFinish = true;
-                for (int j = 0; j < fE.itemNeed.length; j++) {
-                    int itemNumHave = user.getNumItemRuong(fE.itemNeed[j].id);
-                    if (itemNumHave < fE.itemNeedNum[j]) {
-                        isFinish = false;
-                        break;
-                    }
-                    ruongDoItemEntry rdE1 = new ruongDoItemEntry();
-                    rdE1.entry = fE.itemNeed[j];
-                    rdE1.numb = fE.itemNeedNum[j];
-                    arrayI.add(rdE1);
-                }
-                if (fE.level == 1) {
-                    rdE2 = user.getEquipNoNgoc(fDatE.equipNeed[user.getNvUsed()], (byte) 0);
-                } else {
-                    rdE2 = user.getEquipNoNgoc(fDatE.equip[user.getNvUsed()], (byte) (fE.level - 1));
-                }
-                if (rdE2 == null) {
-                    isFinish = false;
-                }
-                int numFomular = user.getNumItemRuong(materialId);
-                if (isFinish && (numFomular > 0 || user.xu >= fDatE.ins.buyXu)) {
-                    if (numFomular == 0) {
-                        user.updateXu(fDatE.ins.buyXu);
-                    } else {
-                        ruongDoItemEntry rdE1 = new ruongDoItemEntry();
-                        rdE1.entry = fDatE.ins;
-                        rdE1.numb = 1;
-                        arrayI.add(rdE1);
-                    }
-                    rdE.vipLevel = fE.level;
-                    rdE.invAdd = new byte[5];
-                    rdE.percentAdd = new byte[5];
-                    for (int i = 0; i < 5; i++) {
-                        rdE.invAdd[i] = (byte) Until.nextInt(fE.invAddMin[i], fE.invAddMax[i]);
-                        rdE.percentAdd[i] = (byte) Until.nextInt(fE.percenAddMin[i], fE.percenAddMax[i]);
-                    }
-                    user.updateRuong(null, rdE, rdE2.index, null, arrayI);
-                    ds.writeByte(0);
-                    ds.writeUTF(GameString.cheDoSuccess());
-                } else {
-                    ds.writeByte(0);
-                    ds.writeUTF(GameString.cheDoFail());
-                }
-            }
-            ds.flush();
-            user.sendMessage(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
 
     @Override
@@ -850,40 +730,40 @@ public class UserService implements IUserService {
 
     private void buyClanShop(byte unit, byte itemId) {
         ClanManager clanManager = ClanManager.getInstance();
-        ClanItemDetail clanItemDetail = ItemClanData.getItemClanById(itemId);
+        ClanItemEntry clanItemEntry = ItemClanData.getItemClanById(itemId);
 
-        if (clanItemDetail == null || clanItemDetail.getOnSale() != 1) {
+        if (clanItemEntry == null || clanItemEntry.getOnSale() != 1) {
             return;
         }
 
         byte currentLevel = clanManager.getClanLevel(user.getClanId());
-        if (currentLevel < clanItemDetail.getLevel()) {
+        if (currentLevel < clanItemEntry.getLevel()) {
             sendServerMessage(GameString.clanLevelNotEnought());
             return;
         }
 
         if (unit == 0) {//Xu
-            if (clanItemDetail.getXu() < 0) {
+            if (clanItemEntry.getXu() < 0) {
                 return;
             }
             int xuClan = clanManager.getClanXu(user.getClanId());
-            if (xuClan < clanItemDetail.getXu()) {
+            if (xuClan < clanItemEntry.getXu()) {
                 sendServerMessage(GameString.clanXuNotEnought());
                 return;
             }
 
-            clanManager.updateItemClan(user.getClanId(), user.getPlayerId(), clanItemDetail, true);
+            clanManager.updateItemClan(user.getClanId(), user.getPlayerId(), clanItemEntry, true);
         } else if (unit == 1) {//Luong
-            if (clanItemDetail.getLuong() < 0) {
+            if (clanItemEntry.getLuong() < 0) {
                 return;
             }
             int luongClan = clanManager.getClanLuong(user.getClanId());
-            if (luongClan < clanItemDetail.getLuong()) {
+            if (luongClan < clanItemEntry.getLuong()) {
                 sendServerMessage(GameString.clanLuongNotEnought());
                 return;
             }
 
-            clanManager.updateItemClan(user.getClanId(), user.getPlayerId(), clanItemDetail, false);
+            clanManager.updateItemClan(user.getClanId(), user.getPlayerId(), clanItemEntry, false);
         }
         sendServerMessage(GameString.buySuccess());
     }
@@ -893,13 +773,13 @@ public class UserService implements IUserService {
             Message ms = new Message(Cmd.SHOP_BIETDOI);
             DataOutputStream ds = ms.writer();
             ds.writeByte(ItemClanData.clanItemsMap.size());
-            for (ClanItemDetail clanItemDetail : ItemClanData.clanItemsMap.values()) {
-                ds.writeByte(clanItemDetail.getId());
-                ds.writeUTF(clanItemDetail.getName());
-                ds.writeInt(clanItemDetail.getXu());
-                ds.writeInt(clanItemDetail.getLuong());
-                ds.writeByte(clanItemDetail.getTime());
-                ds.writeByte(clanItemDetail.getLevel());
+            for (ClanItemEntry clanItemEntry : ItemClanData.clanItemsMap.values()) {
+                ds.writeByte(clanItemEntry.getId());
+                ds.writeUTF(clanItemEntry.getName());
+                ds.writeInt(clanItemEntry.getXu());
+                ds.writeInt(clanItemEntry.getLuong());
+                ds.writeByte(clanItemEntry.getTime());
+                ds.writeByte(clanItemEntry.getLevel());
             }
             ds.flush();
             user.sendMessage(ms);
@@ -928,41 +808,48 @@ public class UserService implements IUserService {
             if (type == 0) {//send item
                 sendDoDacBietShop();
             } else if (type == 1) {//buy item
-                byte isBuyXu = dis.readByte();
+                byte unit = dis.readByte();
                 byte itemId = dis.readByte();
                 int quantity = dis.readUnsignedByte();
-                muaDoDacBietShop(isBuyXu, itemId, quantity);
+                muaDoDacBietShop(unit, itemId, quantity);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void muaDoDacBietShop(byte type, byte itemId, int quantity) {
+    private void muaDoDacBietShop(byte unit, byte itemId, int quantity) {
         //Todo check num ruong
         if (quantity < 1) {
             return;
         }
-        SpecialItemData.SpecialItemEntry spE = SpecialItemData.getSpecialItemById(itemId);
-        if (!spE.onSale || (type == 0 ? spE.buyXu : spE.buyLuong) < 0) {
+        SpecialItemEntry item = SpecialItemData.getSpecialItemById(itemId);
+        if (!item.isOnSale() || (unit == 0 ? item.getPriceXu() : item.getPriceLuong()) < 0) {
             return;
         }
 
-        if (type == 0) {// mua xu
-            int gia = quantity * spE.buyXu;
+        if (unit == 0) {// mua xu
+            int gia = quantity * item.getPriceXu();
             if (user.getXu() < gia) {
                 sendServerMessage(GameString.xuNotEnought());
                 return;
             }
             user.updateXu(-gia);
-        } else if (type == 1) {// mua luong
-            int gia = quantity * spE.buyLuong;
+        } else if (unit == 1) {// mua luong
+            int gia = quantity * item.getPriceLuong();
             if (user.getLuong() < gia) {
                 sendServerMessage(GameString.xuNotEnought());
                 return;
             }
             user.updateLuong(-gia);
         }
+
+        ArrayList<SpecialItemChestEntry> array = new ArrayList<>();
+        SpecialItemChestEntry rdE = new SpecialItemChestEntry();
+        rdE.item = item;
+        rdE.quantity = (short) quantity;
+        array.add(rdE);
+        user.updateRuong(null, null, -1, array, null);
 
         sendServerMessage(GameString.buySuccess());
     }
@@ -971,17 +858,17 @@ public class UserService implements IUserService {
         try {
             Message ms = new Message(Cmd.SHOP_LINHTINH);
             DataOutputStream ds = ms.writer();
-            for (SpecialItemData.SpecialItemEntry spEntry : SpecialItemData.entrys) {
-                if (!spEntry.onSale) {
+            for (SpecialItemEntry spEntry : SpecialItemData.specialItemEntries) {
+                if (!spEntry.isOnSale()) {
                     continue;
                 }
-                ds.writeByte(spEntry.id);
-                ds.writeUTF(spEntry.name);
-                ds.writeUTF(spEntry.detail);
-                ds.writeInt(spEntry.buyXu);
-                ds.writeInt(spEntry.buyLuong);
-                ds.writeByte(spEntry.hanSD);
-                ds.writeByte(spEntry.showChon ? 0 : 1);
+                ds.writeByte(spEntry.getId());
+                ds.writeUTF(spEntry.getName());
+                ds.writeUTF(spEntry.getDetail());
+                ds.writeInt(spEntry.getPriceXu());
+                ds.writeInt(spEntry.getPriceLuong());
+                ds.writeByte(spEntry.getExpiration_days());
+                ds.writeByte(spEntry.isShowSelection() ? 0 : 1);
             }
             ds.flush();
             user.sendMessage(ms);
@@ -1481,7 +1368,7 @@ public class UserService implements IUserService {
             byte unit = dis.readByte();
             byte itemIndex = dis.readByte();
             byte quantity = dis.readByte();
-            if (itemIndex < 0 || itemIndex >= FightItemData.fightItems.size()) {
+            if (itemIndex < 0 || itemIndex >= FightItemData.FIGHT_ITEM_ENTRIES.size()) {
                 return;
             }
             if (user.getItems()[itemIndex] + quantity > ServerManager.getInstance().config().getMax_item()) {
@@ -1490,7 +1377,7 @@ public class UserService implements IUserService {
 
             switch (unit) {
                 case 0 -> {
-                    int total = FightItemData.fightItems.get(itemIndex).getBuyXu() * quantity;
+                    int total = FightItemData.FIGHT_ITEM_ENTRIES.get(itemIndex).getBuyXu() * quantity;
                     if (user.getXu() < total || total < 0) {
                         return;
                     }
@@ -1498,7 +1385,7 @@ public class UserService implements IUserService {
                     user.updateItems(itemIndex, quantity);
                 }
                 case 1 -> {
-                    int total = FightItemData.fightItems.get(itemIndex).getBuyLuong() * quantity;
+                    int total = FightItemData.FIGHT_ITEM_ENTRIES.get(itemIndex).getBuyLuong() * quantity;
                     if (user.getLuong() < total || total < 0) {
                         return;
                     }
@@ -1629,7 +1516,7 @@ public class UserService implements IUserService {
             totalRewardBuilder.append("+ ").append(rewardData.getExp()).append(" exp");
         }
         if (rewardData.getItems() != null) {
-            for (ItemData item : rewardData.getItems()) {
+            for (SpecialItemChestJson item : rewardData.getItems()) {
                 //todo update items
             }
         }
@@ -1801,7 +1688,7 @@ public class UserService implements IUserService {
             int lent = user.ruongDoTB.size();
             ds.writeByte(lent);
             for (int i = 0; i < lent; i++) {
-                ruongDoTBEntry rdtbEntry = user.ruongDoTB.get(i);
+                EquipmentChestEntry rdtbEntry = user.ruongDoTB.get(i);
                 // dbKey
                 ds.writeInt(i | 0x10000);
                 // idNV
@@ -1845,15 +1732,15 @@ public class UserService implements IUserService {
             ds.writeByte(0);
             ds.writeByte(lent);
             for (int i = 0; i < lent; i++) {
-                ruongDoItemEntry rdiE = user.ruongDoItem.get(i);
+                SpecialItemChestEntry rdiE = user.ruongDoItem.get(i);
                 // Id
-                ds.writeByte(rdiE.entry.id);
+                ds.writeByte(rdiE.item.getId());
                 // Numb
-                ds.writeShort(rdiE.numb);
+                ds.writeShort(rdiE.quantity);
                 // Name
-                ds.writeUTF(rdiE.entry.name);
+                ds.writeUTF(rdiE.item.getName());
                 // Detail
-                ds.writeUTF(rdiE.entry.detail);
+                ds.writeUTF(rdiE.item.getDetail());
             }
             ds.flush();
             user.sendMessage(ms);
@@ -1989,7 +1876,7 @@ public class UserService implements IUserService {
                 return;
             }
         }
-        ruongDoTBEntry newTb = new ruongDoTBEntry();
+        EquipmentChestEntry newTb = new EquipmentChestEntry();
         newTb.equipmentEntry = equipmentEntry;
         user.updateRuong(null, newTb, -1, null, null);
         sendServerMessage(GameString.buySuccess());

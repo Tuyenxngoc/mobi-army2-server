@@ -19,6 +19,6 @@ public class GiftCodeRewardData {
     private int exp;
 
     @SerializedName("item")
-    private List<ItemData> items;
+    private List<SpecialItemChestJson> items;
 
 }

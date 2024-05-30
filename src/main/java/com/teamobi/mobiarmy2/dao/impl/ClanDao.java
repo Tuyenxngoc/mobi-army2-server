@@ -14,7 +14,7 @@ import com.teamobi.mobiarmy2.model.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.clan.ClanItem;
 import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
-import com.teamobi.mobiarmy2.model.item.ClanItemDetail;
+import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
 import com.teamobi.mobiarmy2.util.Until;
 
 import java.sql.*;
@@ -189,10 +189,10 @@ public class ClanDao implements IClanDao {
                     List<ClanItem> filteredItems = Arrays.stream(clanItemDataArray)
                             .filter(item -> !item.getTime().isBefore(currentDate))
                             .map(item -> {
-                                ClanItemDetail clanItemDetail = ItemClanData.getItemClanById(item.getId());
-                                if (clanItemDetail != null) {
+                                ClanItemEntry clanItemEntry = ItemClanData.getItemClanById(item.getId());
+                                if (clanItemEntry != null) {
                                     ClanItem newClanItem = new ClanItem();
-                                    newClanItem.setName(clanItemDetail.getName());
+                                    newClanItem.setName(clanItemEntry.getName());
                                     newClanItem.setTime((int) Duration.between(currentDate, item.getTime()).getSeconds());
                                     return newClanItem;
                                 }

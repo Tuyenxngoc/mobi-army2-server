@@ -6,7 +6,7 @@ import com.teamobi.mobiarmy2.json.ClanItemData;
 import com.teamobi.mobiarmy2.model.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
-import com.teamobi.mobiarmy2.model.item.ClanItemDetail;
+import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
 import com.teamobi.mobiarmy2.util.Until;
 
 import java.time.LocalDateTime;
@@ -50,13 +50,13 @@ public class ClanManager {
         return clanDao.getLuong(clanId);
     }
 
-    public void updateItemClan(short clanId, int playerId, ClanItemDetail clanItemDetail, boolean isBuyXu) {
+    public void updateItemClan(short clanId, int playerId, ClanItemEntry clanItemEntry, boolean isBuyXu) {
         if (isBuyXu) {
-            clanDao.updateXu(clanId, -clanItemDetail.getXu());
-            clanDao.gopClanContribute("Mua item đội -" + Until.getStringNumber(clanItemDetail.getXu()) + " xu", playerId, -clanItemDetail.getXu(), 0);
+            clanDao.updateXu(clanId, -clanItemEntry.getXu());
+            clanDao.gopClanContribute("Mua item đội -" + Until.getStringNumber(clanItemEntry.getXu()) + " xu", playerId, -clanItemEntry.getXu(), 0);
         } else {
-            clanDao.updateLuong(clanId, -clanItemDetail.getLuong());
-            clanDao.gopClanContribute("Mua item đội -" + Until.getStringNumber(clanItemDetail.getLuong()) + " lượng", playerId, 0, -clanItemDetail.getLuong());
+            clanDao.updateLuong(clanId, -clanItemEntry.getLuong());
+            clanDao.gopClanContribute("Mua item đội -" + Until.getStringNumber(clanItemEntry.getLuong()) + " lượng", playerId, 0, -clanItemEntry.getLuong());
         }
 
         ClanItemData[] items = clanDao.getClanItems(clanId);
@@ -64,11 +64,11 @@ public class ClanManager {
         LocalDateTime now = LocalDateTime.now();
 
         for (ClanItemData item : items) {
-            if (item.getId() == clanItemDetail.getId()) {
+            if (item.getId() == clanItemEntry.getId()) {
                 if (item.getTime().isBefore(now)) {
                     item.setTime(now);
                 }
-                item.setTime(item.getTime().plusHours(clanItemDetail.getTime()));
+                item.setTime(item.getTime().plusHours(clanItemEntry.getTime()));
                 found = true;
                 break;
             }
@@ -77,8 +77,8 @@ public class ClanManager {
         if (!found) {
             List<ClanItemData> updatedItems = new ArrayList<>(Arrays.asList(items));
             ClanItemData newItem = new ClanItemData();
-            newItem.setId(clanItemDetail.getId());
-            newItem.setTime(now.plusHours(clanItemDetail.getTime()));
+            newItem.setId(clanItemEntry.getId());
+            newItem.setTime(now.plusHours(clanItemEntry.getTime()));
             updatedItems.add(newItem);
             items = updatedItems.toArray(new ClanItemData[0]);
         }

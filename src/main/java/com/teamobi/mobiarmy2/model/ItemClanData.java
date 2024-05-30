@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.model;
 
-import com.teamobi.mobiarmy2.model.item.ClanItemDetail;
+import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,9 +10,9 @@ import java.util.Map;
  */
 public class ItemClanData {
 
-    public static final Map<Byte, ClanItemDetail> clanItemsMap = new HashMap<>();
+    public static final Map<Byte, ClanItemEntry> clanItemsMap = new HashMap<>();
 
-    public static ClanItemDetail getItemClanById(byte id) {
+    public static ClanItemEntry getItemClanById(byte id) {
         return clanItemsMap.get(id);
     }
 

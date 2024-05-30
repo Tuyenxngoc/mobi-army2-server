@@ -55,10 +55,10 @@ public class User {
     public int[][] NvData;
     public int[] mission;
     public byte[] missionLevel;
-    public ruongDoTBEntry[][] nvEquip;
+    public EquipmentChestEntry[][] nvEquip;
     public List<Integer> friends;
-    public List<ruongDoItemEntry> ruongDoItem;
-    public List<ruongDoTBEntry> ruongDoTB;
+    public List<SpecialItemChestEntry> ruongDoItem;
+    public List<EquipmentChestEntry> ruongDoTB;
     private FightWait fightWait;
     private final IUserService userService;
     private boolean openingGift;
@@ -232,16 +232,16 @@ public class User {
 
     public int getNumItemRuong(int id) {
         // Kiem tra trong ruong co=>tang so luong. ko co=> tao moi
-        for (ruongDoItemEntry spE1 : ruongDoItem) {
-            if (spE1.entry.id == id) {
-                return spE1.numb;
+        for (SpecialItemChestEntry spE1 : ruongDoItem) {
+            if (spE1.item.getId() == id) {
+                return spE1.quantity;
             }
         }
         return 0;
     }
 
-    public ruongDoTBEntry getEquipNoNgoc(EquipmentEntry eqE, byte level) {
-        for (ruongDoTBEntry rdE : ruongDoTB) {
+    public EquipmentChestEntry getEquipNoNgoc(EquipmentEntry eqE, byte level) {
+        for (EquipmentChestEntry rdE : ruongDoTB) {
             if (rdE != null && rdE.equipmentEntry == eqE && !rdE.isUse && rdE.vipLevel == level && rdE.emptySlot == 3 && rdE.equipmentEntry.expirationDays - Until.getNumDay(rdE.purchaseDate, new Date()) > 0) {
                 return rdE;
             }
@@ -249,15 +249,15 @@ public class User {
         return null;
     }
 
-    public synchronized void updateRuong(ruongDoTBEntry tbUpdate, ruongDoTBEntry addTB, int removeTB, ArrayList<ruongDoItemEntry> addItem, ArrayList<ruongDoItemEntry> removeItem) {
+    public synchronized void updateRuong(EquipmentChestEntry tbUpdate, EquipmentChestEntry addTB, int removeTB, ArrayList<SpecialItemChestEntry> addItem, ArrayList<SpecialItemChestEntry> removeItem) {
         try {
             Message ms;
             DataOutputStream ds;
             if (addTB != null) {
                 int bestLocation = -1;
                 for (int i = 0; i < ruongDoTB.size(); i++) {
-                    ruongDoTBEntry ruongDoTBEntry = ruongDoTB.get(i);
-                    if (ruongDoTBEntry == null) {
+                    EquipmentChestEntry EquipmentChestEntry = ruongDoTB.get(i);
+                    if (EquipmentChestEntry == null) {
                         bestLocation = i;
                         break;
                     }
@@ -319,24 +319,24 @@ public class User {
             }
             if (addItem != null && !addItem.isEmpty()) {
                 for (int i = 0; i < addItem.size(); i++) {
-                    ruongDoItemEntry spE = addItem.get(i);
-                    if (spE.numb > 100) {
-                        ruongDoItemEntry spE2 = new ruongDoItemEntry();
-                        spE2.entry = spE.entry;
-                        spE2.numb = spE.numb - 100;
-                        spE.numb = 100;
+                    SpecialItemChestEntry spE = addItem.get(i);
+                    if (spE.quantity > 100) {
+                        SpecialItemChestEntry spE2 = new SpecialItemChestEntry();
+                        spE2.item = spE.item;
+                        spE2.quantity = (short) (spE.quantity - 100);
+                        spE.quantity = 100;
                         addItem.add(spE2);
                     }
-                    if (spE.numb <= 0) {
+                    if (spE.quantity <= 0) {
                         continue;
                     }
                     nUpdate++;
                     // Kiem tra trong ruong co=>tang so luong. ko co=> tao moi
                     boolean isHave = false;
-                    for (ruongDoItemEntry spE1 : ruongDoItem) {
-                        if (spE1.entry.id == spE.entry.id) {
+                    for (SpecialItemChestEntry spE1 : ruongDoItem) {
+                        if (spE1.item.getId() == spE.item.getId()) {
                             isHave = true;
-                            spE1.numb += spE.numb;
+                            spE1.quantity += spE.quantity;
                             break;
                         }
                     }
@@ -344,43 +344,43 @@ public class User {
                     if (!isHave) {
                         ruongDoItem.add(spE);
                     }
-                    ds1.writeByte(spE.numb > 1 ? 3 : 1);
-                    ds1.writeByte(spE.entry.id);
-                    if (spE.numb > 1) {
-                        ds1.writeByte(spE.numb);
+                    ds1.writeByte(spE.quantity > 1 ? 3 : 1);
+                    ds1.writeByte(spE.item.getId());
+                    if (spE.quantity > 1) {
+                        ds1.writeByte(spE.quantity);
                     }
-                    ds1.writeUTF(spE.entry.name);
-                    ds1.writeUTF(spE.entry.detail);
+                    ds1.writeUTF(spE.item.getName());
+                    ds1.writeUTF(spE.item.getDetail());
                 }
             }
             if (removeItem != null && !removeItem.isEmpty()) {
                 for (int k = 0; k < removeItem.size(); k++) {
-                    ruongDoItemEntry spE = removeItem.get(k);
-                    if (spE.numb > 100) {
-                        ruongDoItemEntry spE2 = new ruongDoItemEntry();
-                        spE2.entry = spE.entry;
-                        spE2.numb = spE.numb - 100;
-                        spE.numb = 100;
+                    SpecialItemChestEntry spE = removeItem.get(k);
+                    if (spE.quantity > 100) {
+                        SpecialItemChestEntry spE2 = new SpecialItemChestEntry();
+                        spE2.item = spE.item;
+                        spE2.quantity = (short) (spE.quantity - 100);
+                        spE.quantity = 100;
                         removeItem.add(spE2);
                     }
-                    if (spE.numb <= 0) {
+                    if (spE.quantity <= 0) {
                         continue;
                     }
                     // Kiem tra trong ruong co=>giam so luong
                     for (int i = 0; i < ruongDoItem.size(); i++) {
-                        ruongDoItemEntry spE1 = ruongDoItem.get(i);
-                        if (spE1.entry.id == spE.entry.id) {
-                            if (spE1.numb < spE.numb) {
-                                spE.numb = spE1.numb;
+                        SpecialItemChestEntry spE1 = ruongDoItem.get(i);
+                        if (spE1.item.getId() == spE.item.getId()) {
+                            if (spE1.quantity < spE.quantity) {
+                                spE.quantity = spE1.quantity;
                             }
-                            spE1.numb -= spE.numb;
-                            if (spE1.numb == 0) {
+                            spE1.quantity -= spE.quantity;
+                            if (spE1.quantity == 0) {
                                 ruongDoItem.remove(i);
                             }
                             nUpdate++;
                             ds1.writeByte(0);
-                            ds1.writeInt(spE.entry.id);
-                            ds1.writeByte(spE.numb);
+                            ds1.writeInt(spE.item.getId());
+                            ds1.writeByte(spE.quantity);
                             break;
                         }
                     }

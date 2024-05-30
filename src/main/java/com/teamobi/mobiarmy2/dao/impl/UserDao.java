@@ -6,9 +6,10 @@ import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.CharacterData;
 import com.teamobi.mobiarmy2.json.EquipmentData;
-import com.teamobi.mobiarmy2.json.ItemData;
+import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.response.GetFriendResponse;
+import com.teamobi.mobiarmy2.util.JsonConverter;
 import com.teamobi.mobiarmy2.util.Until;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -41,6 +42,8 @@ public class UserDao implements IUserDao {
             pow <<= 1;
         }
 
+        String ruongdoItem = JsonConverter.convertRuongDoItemToJson(user.getRuongDoItem());
+
         String sql = "UPDATE `player` SET " +
                 "`friends` = ?, " +
                 "`xu` = ?, " +
@@ -65,7 +68,7 @@ public class UserDao implements IUserDao {
                 user.getClanId() == 0 ? null : user.getClanId(),
                 Arrays.toString(user.getItems()),
                 user.getRuongDoTB().toString(),
-                user.getRuongDoItem().toString(),
+                ruongdoItem,
                 nvstt,
                 false,
                 Arrays.toString(user.getMission()),
@@ -119,7 +122,7 @@ public class UserDao implements IUserDao {
                         user.points = new int[len];
                         user.pointAdd = new short[len][5];
                         user.NvData = new int[len][6];
-                        user.nvEquip = new ruongDoTBEntry[len][6];
+                        user.nvEquip = new EquipmentChestEntry[len][6];
                         user.setRuongDoItem(new ArrayList<>());
                         user.setRuongDoTB(new ArrayList<>());
 
@@ -139,8 +142,8 @@ public class UserDao implements IUserDao {
                             }
 
                             byte[] items = gson.fromJson(playerResultSet.getString("item"), byte[].class);
-                            if (items.length != FightItemData.fightItems.size()) {
-                                byte[] adjustedItems = new byte[FightItemData.fightItems.size()];
+                            if (items.length != FightItemData.FIGHT_ITEM_ENTRIES.size()) {
+                                byte[] adjustedItems = new byte[FightItemData.FIGHT_ITEM_ENTRIES.size()];
                                 System.arraycopy(items, 0, adjustedItems, 0, Math.min(items.length, adjustedItems.length));
                                 user.setItems(adjustedItems);
                             } else {
@@ -150,7 +153,7 @@ public class UserDao implements IUserDao {
                             EquipmentData[] equipmentDatas = gson.fromJson(playerResultSet.getString("ruongTrangBi"), EquipmentData[].class);
                             for (int i = 0; i < equipmentDatas.length; i++) {
                                 EquipmentData equipmentData = equipmentDatas[i];
-                                ruongDoTBEntry rdtbEntry = new ruongDoTBEntry();
+                                EquipmentChestEntry rdtbEntry = new EquipmentChestEntry();
 
                                 byte nvId = equipmentData.getNvId();
                                 byte equipType = equipmentData.getEquipType();
@@ -180,12 +183,15 @@ public class UserDao implements IUserDao {
                                 user.ruongDoTB.add(rdtbEntry);
                             }
 
-                            ItemData[] itemData = gson.fromJson(playerResultSet.getString("ruongItem"), ItemData[].class);
-                            for (ItemData item : itemData) {
-                                ruongDoItemEntry rdiEntry = new ruongDoItemEntry();
-                                rdiEntry.entry = SpecialItemData.getSpecialItemById(item.getId());
-                                rdiEntry.numb = item.getNumb();
-                                user.getRuongDoItem().add(rdiEntry);
+                            SpecialItemChestJson[] specialItemChestJsons = gson.fromJson(playerResultSet.getString("ruongItem"), SpecialItemChestJson[].class);
+                            for (SpecialItemChestJson item : specialItemChestJsons) {
+                                SpecialItemChestEntry specialItemChestEntry = new SpecialItemChestEntry();
+                                specialItemChestEntry.setItem(SpecialItemData.getSpecialItemById(item.getId()));
+                                if (specialItemChestEntry.getItem() == null) {
+                                    continue;
+                                }
+                                specialItemChestEntry.setQuantity(item.getQuantity());
+                                user.getRuongDoItem().add(specialItemChestEntry);
                             }
 
                             for (int i = 0; i < 10; i++) {
@@ -202,7 +208,7 @@ public class UserDao implements IUserDao {
                                 for (int j = 0; j < 5; j++) {
                                     user.NvData[i][j] = data.get(j);
                                     if (user.NvData[i][j] >= 0 && user.NvData[i][j] < user.ruongDoTB.size()) {
-                                        ruongDoTBEntry rdE = user.ruongDoTB.get(user.NvData[i][j]);
+                                        EquipmentChestEntry rdE = user.ruongDoTB.get(user.NvData[i][j]);
                                         if (rdE.equipmentEntry.expirationDays - Until.getNumDay(rdE.purchaseDate, new Date()) > 0) {
                                             user.nvEquip[i][j] = rdE;
                                         } else {

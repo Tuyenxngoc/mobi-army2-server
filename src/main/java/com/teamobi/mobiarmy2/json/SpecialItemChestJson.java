@@ -9,11 +9,12 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class ItemData {
+public class SpecialItemChestJson {
 
     @SerializedName("id")
-    private int id;
+    private short id;
 
-    @SerializedName("numb")
-    private int numb;
+    @SerializedName("quantity")
+    private short quantity;
+
 }

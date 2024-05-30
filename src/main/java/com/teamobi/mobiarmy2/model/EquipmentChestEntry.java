@@ -11,7 +11,7 @@ import java.util.Date;
  */
 @Getter
 @Setter
-public class ruongDoTBEntry {
+public class EquipmentChestEntry {
     public int index;
     public Date purchaseDate;
     public byte vipLevel;
