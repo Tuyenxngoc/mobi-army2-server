@@ -185,7 +185,7 @@ public class GameDao implements IGameDao {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `special_item`")) {
                 while (resultSet.next()) {
                     SpecialItemEntry specialItemEntry = new SpecialItemEntry();
-                    specialItemEntry.setId(resultSet.getShort("special_item_id"));
+                    specialItemEntry.setId(resultSet.getByte("special_item_id"));
                     specialItemEntry.setName(resultSet.getString("name"));
                     specialItemEntry.setDetail(resultSet.getString("detail"));
                     specialItemEntry.setPriceXu(resultSet.getInt("priceXu"));

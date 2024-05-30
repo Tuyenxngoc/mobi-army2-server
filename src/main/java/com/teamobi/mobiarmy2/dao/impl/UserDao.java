@@ -185,13 +185,15 @@ public class UserDao implements IUserDao {
 
                             SpecialItemChestJson[] specialItemChestJsons = gson.fromJson(playerResultSet.getString("ruongItem"), SpecialItemChestJson[].class);
                             for (SpecialItemChestJson item : specialItemChestJsons) {
-                                SpecialItemChestEntry specialItemChestEntry = new SpecialItemChestEntry();
-                                specialItemChestEntry.setItem(SpecialItemData.getSpecialItemById(item.getId()));
-                                if (specialItemChestEntry.getItem() == null) {
-                                    continue;
+                                if (item.getId() != null && item.getQuantity() != null) {
+                                    SpecialItemChestEntry specialItemChestEntry = new SpecialItemChestEntry();
+                                    specialItemChestEntry.setItem(SpecialItemData.getSpecialItemById(item.getId()));
+                                    if (specialItemChestEntry.getItem() == null) {
+                                        continue;
+                                    }
+                                    specialItemChestEntry.setQuantity(item.getQuantity());
+                                    user.getRuongDoItem().add(specialItemChestEntry);
                                 }
-                                specialItemChestEntry.setQuantity(item.getQuantity());
-                                user.getRuongDoItem().add(specialItemChestEntry);
                             }
 
                             for (int i = 0; i < 10; i++) {

@@ -343,80 +343,6 @@ public class UserService implements IUserService {
 
     @Override
     public void giaHanDo(Message ms) {
-        if (user.isNotWaiting()) {
-            return;
-        }
-        try {
-            byte action = ms.reader().readByte();
-            int idKey = ms.reader().readInt();
-            DataOutputStream ds;
-            if (action == 0) {
-                int gia = 0;
-                if ((idKey & 0x10000) > 0) {
-                    idKey &= 0xFFFF;
-                    if (idKey < user.ruongDoTB.size()) {
-                        EquipmentChestEntry rdE = user.ruongDoTB.get(idKey);
-                        for (int i = 0; i < 3; i++) {
-                            if (rdE.slots[i] >= 0) {
-                                SpecialItemEntry spE = SpecialItemData.getSpecialItemById(rdE.slots[i]);
-                                gia += spE.getPriceXu();
-                            }
-                        }
-                        gia = gia / 20;
-                        if (rdE.equipmentEntry.priceXu > 0) {
-                            gia += rdE.equipmentEntry.priceXu;
-                        } else if (rdE.equipmentEntry.priceLuong > 0) {
-                            gia += rdE.equipmentEntry.priceLuong * 1000;
-                        }
-                        ms = new Message(-25);
-                        ds = ms.writer();
-                        ds.writeInt(rdE.index | 0x10000);
-                        ds.writeUTF(String.format(GameString.giaHanRequest(), gia));
-                        ds.flush();
-                        user.sendMessage(ms);
-                    }
-                }
-            }
-            if (action == 1) {
-                int gia = 0;
-                if ((idKey & 0x10000) > 0) {
-                    idKey &= 0xFFFF;
-                    if (idKey < user.ruongDoTB.size()) {
-                        EquipmentChestEntry rdE = user.ruongDoTB.get(idKey);
-                        for (int i = 0; i < 3; i++) {
-                            if (rdE.slots[i] >= 0) {
-                                SpecialItemEntry spE = SpecialItemData.getSpecialItemById(rdE.slots[i]);
-                                gia += spE.getPriceXu();
-                            }
-                        }
-                        gia = gia / 20;
-                        if (rdE.equipmentEntry.priceXu > 0) {
-                            gia += rdE.equipmentEntry.priceXu;
-                        } else if (rdE.equipmentEntry.priceLuong > 0) {
-                            gia += rdE.equipmentEntry.priceLuong * 1000;
-                        }
-                        if (user.getXu() < gia) {
-                            ms = new Message(45);
-                            ds = ms.writer();
-                            ds.writeUTF(GameString.xuNotEnought());
-                            ds.flush();
-                            user.sendMessage(ms);
-                            return;
-                        }
-                        user.updateXu(-gia);
-                        rdE.purchaseDate = new Date();
-                        user.updateRuong(rdE, null, -1, null, null);
-                        ms = new Message(45);
-                        ds = ms.writer();
-                        ds.writeUTF(GameString.giaHanSucess());
-                        ds.flush();
-                        user.sendMessage(ms);
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -810,7 +736,7 @@ public class UserService implements IUserService {
             } else if (type == 1) {//buy item
                 byte unit = dis.readByte();
                 byte itemId = dis.readByte();
-                int quantity = dis.readUnsignedByte();
+                short quantity = (short) dis.readUnsignedByte();
                 muaDoDacBietShop(unit, itemId, quantity);
             }
         } catch (IOException e) {
@@ -818,7 +744,7 @@ public class UserService implements IUserService {
         }
     }
 
-    private void muaDoDacBietShop(byte unit, byte itemId, int quantity) {
+    private void muaDoDacBietShop(byte unit, byte itemId, short quantity) {
         //Todo check num ruong
         if (quantity < 1) {
             return;
@@ -847,7 +773,7 @@ public class UserService implements IUserService {
         ArrayList<SpecialItemChestEntry> array = new ArrayList<>();
         SpecialItemChestEntry rdE = new SpecialItemChestEntry();
         rdE.item = item;
-        rdE.quantity = (short) quantity;
+        rdE.quantity = quantity;
         array.add(rdE);
         user.updateRuong(null, null, -1, array, null);
 
@@ -1731,16 +1657,11 @@ public class UserService implements IUserService {
             lent = user.ruongDoItem.size();
             ds.writeByte(0);
             ds.writeByte(lent);
-            for (int i = 0; i < lent; i++) {
-                SpecialItemChestEntry rdiE = user.ruongDoItem.get(i);
-                // Id
-                ds.writeByte(rdiE.item.getId());
-                // Numb
-                ds.writeShort(rdiE.quantity);
-                // Name
-                ds.writeUTF(rdiE.item.getName());
-                // Detail
-                ds.writeUTF(rdiE.item.getDetail());
+            for (SpecialItemChestEntry rdiE : user.ruongDoItem) {
+                ds.writeByte(rdiE.getItem().getId());
+                ds.writeShort(rdiE.getQuantity());
+                ds.writeUTF(rdiE.getItem().getName());
+                ds.writeUTF(rdiE.getItem().getDetail());
             }
             ds.flush();
             user.sendMessage(ms);

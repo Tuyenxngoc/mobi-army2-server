@@ -18,7 +18,7 @@ public class SpecialItemData {
      * @param id the ID of the special item entry.
      * @return the special item entry with the given ID, or null if not found.
      */
-    public static SpecialItemEntry getSpecialItemById(int id) {
+    public static SpecialItemEntry getSpecialItemById(byte id) {
         return specialItemEntries.stream()
                 .filter(entry -> entry.getId() == id)
                 .findFirst()

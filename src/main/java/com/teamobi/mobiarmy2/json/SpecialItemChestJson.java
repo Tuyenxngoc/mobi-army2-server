@@ -11,10 +11,10 @@ import lombok.Setter;
 @Setter
 public class SpecialItemChestJson {
 
-    @SerializedName("id")
-    private short id;
+    @SerializedName("i")
+    private Byte id;
 
-    @SerializedName("quantity")
-    private short quantity;
+    @SerializedName("q")
+    private Short quantity;
 
 }

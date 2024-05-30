@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SpecialItemEntry {
-    private short id;
+    private byte id;
     private int indexSale;
     private String name;
     private String detail;
