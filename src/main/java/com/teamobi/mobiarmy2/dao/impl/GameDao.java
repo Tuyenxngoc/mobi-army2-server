@@ -31,19 +31,24 @@ public class GameDao implements IGameDao {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `map`")) {
                 while (resultSet.next()) {
                     MapEntry map = new MapEntry();
-                    map.id = (byte) (resultSet.getByte("id") - 1);
+                    map.id = resultSet.getByte("map_id");
                     map.name = resultSet.getString("name");
                     map.fileName = resultSet.getString("file");
                     if (map.id == 27) {
                         map.data = new byte[0];
                     } else {
-                        map.data = Until.getFile("res/map/" + map.fileName);
+                        byte[] dataMap = Until.getFile("res/map/" + map.fileName);
+                        if (dataMap == null) {
+                            System.exit(1);
+                        }
+                        map.data = dataMap;
                     }
-                    map.bg = resultSet.getShort("bg");
-                    map.mapAddY = resultSet.getShort("mapAddY");
-                    map.bullEffShower = resultSet.getShort("bullEffShower");
-                    map.inWaterAddY = resultSet.getShort("inWaterAddY");
-                    map.cl2AddY = resultSet.getShort("cl2AddY");
+                    map.bg = resultSet.getShort("background");
+                    map.mapAddY = resultSet.getShort("map_add_y");
+                    map.bullEffShower = resultSet.getShort("bullet_effect_shower");
+                    map.inWaterAddY = resultSet.getShort("in_water_add_y");
+                    map.cl2AddY = resultSet.getShort("cl2_add_y");
+
                     MapData.MAP_ENTRIES.add(map);
                 }
             }
