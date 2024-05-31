@@ -16,7 +16,7 @@ import com.teamobi.mobiarmy2.model.clan.ClanItem;
 import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
 import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
 import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
-import com.teamobi.mobiarmy2.model.giftcode.GetGiftCode;
+import com.teamobi.mobiarmy2.model.giftcode.GiftCodeEntry;
 import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
 import com.teamobi.mobiarmy2.model.item.FightItemEntry;
 import com.teamobi.mobiarmy2.model.item.SpecialItemEntry;
@@ -1406,7 +1406,7 @@ public class UserService implements IUserService {
     }
 
     private void handleGiftCode(String code) {
-        GetGiftCode giftCode = giftCodeDao.getGiftCode(code);
+        GiftCodeEntry giftCode = giftCodeDao.getGiftCode(code);
         if (giftCode == null) {
             sendServerMessage(GameString.giftCodeError1());
             return;
@@ -1415,7 +1415,7 @@ public class UserService implements IUserService {
             sendServerMessage(GameString.giftCodeError2());
             return;
         }
-        if (LocalDateTime.now().isAfter(giftCode.getExpiryDate())) {
+        if (giftCode.getExpiryDate() != null && LocalDateTime.now().isAfter(giftCode.getExpiryDate())) {
             sendServerMessage(GameString.giftCodeError3(giftCode.getExpiryDate()));
             return;
         }
@@ -1426,8 +1426,9 @@ public class UserService implements IUserService {
             }
         }
 
-        GiftCodeRewardJson rewardData = GsonUtil.GSON.fromJson(giftCode.getReward(), GiftCodeRewardJson.class);
+        giftCodeDao.updateGiftCode(code, user.getPlayerId());
 
+        GiftCodeRewardJson rewardData = GsonUtil.GSON.fromJson(giftCode.getReward(), GiftCodeRewardJson.class);
         StringBuilder totalRewardBuilder = new StringBuilder();
         if (rewardData.getXu() != null && rewardData.getXu() > 0) {
             user.updateXu(rewardData.getXu());
@@ -1451,9 +1452,6 @@ public class UserService implements IUserService {
         if (!totalReward.isEmpty()) {
             sendMSSToUser(String.format("CODE %s: %s", code, totalReward));
         }
-
-        giftCode.addUsedPlayerId(user.getPlayerId());
-        giftCodeDao.updateGiftCode(giftCode);
 
         sendServerMessage(GameString.giftCodeSuccess());
     }

@@ -231,12 +231,10 @@ public class ClanDao implements IClanDao {
                     ClanMemEntry entry = new ClanMemEntry();
                     entry.setPlayerId(resultSet.getInt("p.player_id"));
                     byte rights = resultSet.getByte("c.rights");
-                    if (rights == 2) {
-                        entry.setUsername(resultSet.getString("username") + " (Đội trưởng)");
-                    } else if (rights == 1) {
-                        entry.setUsername(resultSet.getString("username") + " (Đội phó %d)".formatted(index));
-                    } else {
-                        entry.setUsername(resultSet.getString("username"));
+                    switch (rights) {
+                        case 2 -> entry.setUsername(resultSet.getString("username") + " (Đội trưởng)");
+                        case 1 -> entry.setUsername(resultSet.getString("username") + " (Đội phó %d)".formatted(index));
+                        default -> entry.setUsername(resultSet.getString("username"));
                     }
                     entry.setPoint(resultSet.getInt("c.clan_point"));
                     entry.setNvUsed(resultSet.getByte("nv_used"));
