@@ -10,10 +10,10 @@ import java.util.Map;
  */
 public class ItemClanData {
 
-    public static final Map<Byte, ClanItemEntry> clanItemsMap = new HashMap<>();
+    public static final Map<Byte, ClanItemEntry> CLAN_ITEM_ENTRY_MAP = new HashMap<>();
 
     public static ClanItemEntry getItemClanById(byte id) {
-        return clanItemsMap.get(id);
+        return CLAN_ITEM_ENTRY_MAP.get(id);
     }
 
 }

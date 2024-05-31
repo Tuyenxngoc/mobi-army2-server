@@ -22,6 +22,9 @@ import com.teamobi.mobiarmy2.model.item.FightItemEntry;
 import com.teamobi.mobiarmy2.model.item.SpecialItemEntry;
 import com.teamobi.mobiarmy2.model.mission.Mission;
 import com.teamobi.mobiarmy2.model.response.GetFriendResponse;
+import com.teamobi.mobiarmy2.model.user.EquipmentChestEntry;
+import com.teamobi.mobiarmy2.model.user.PlayerLeaderboardEntry;
+import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.server.ClanManager;
 import com.teamobi.mobiarmy2.server.LeaderboardManager;
@@ -199,7 +202,7 @@ public class UserService implements IUserService {
             // Send mss 64
             Message ms = new Message(64);
             DataOutputStream ds = ms.writer();
-            List<CharacterEntry> nvdatas = NVData.characterEntries;
+            List<CharacterEntry> nvdatas = NVData.CHARACTER_ENTRIES;
             int len = nvdatas.size();
             ds.writeByte(len);
             // Ma sat gio cac nv
@@ -464,7 +467,7 @@ public class UserService implements IUserService {
             for (int i = 0; i < 10; i++) {
                 if (i > 2) {
                     ds.writeByte(user.nvStt[i] ? 1 : 0);
-                    CharacterEntry characterEntry = NVData.characterEntries.get(i);
+                    CharacterEntry characterEntry = NVData.CHARACTER_ENTRIES.get(i);
                     ds.writeShort(characterEntry.buyXu / 1000);
                     ds.writeShort(characterEntry.buyLuong);
                 }
@@ -698,8 +701,8 @@ public class UserService implements IUserService {
         try {
             Message ms = new Message(Cmd.SHOP_BIETDOI);
             DataOutputStream ds = ms.writer();
-            ds.writeByte(ItemClanData.clanItemsMap.size());
-            for (ClanItemEntry clanItemEntry : ItemClanData.clanItemsMap.values()) {
+            ds.writeByte(ItemClanData.CLAN_ITEM_ENTRY_MAP.size());
+            for (ClanItemEntry clanItemEntry : ItemClanData.CLAN_ITEM_ENTRY_MAP.values()) {
                 ds.writeByte(clanItemEntry.getId());
                 ds.writeUTF(clanItemEntry.getName());
                 ds.writeInt(clanItemEntry.getXu());
@@ -784,7 +787,7 @@ public class UserService implements IUserService {
         try {
             Message ms = new Message(Cmd.SHOP_LINHTINH);
             DataOutputStream ds = ms.writer();
-            for (SpecialItemEntry spEntry : SpecialItemData.specialItemEntries) {
+            for (SpecialItemEntry spEntry : SpecialItemData.SPECIAL_ITEM_ENTRIES) {
                 if (!spEntry.isOnSale()) {
                     continue;
                 }
@@ -1251,7 +1254,7 @@ public class UserService implements IUserService {
     public void handleChoseCharacter(Message ms) {
         try {
             byte idNv = ms.reader().readByte();
-            if (idNv >= NVData.characterEntries.size() || idNv < 0 || !user.nvStt[idNv]) {
+            if (idNv >= NVData.CHARACTER_ENTRIES.size() || idNv < 0 || !user.nvStt[idNv]) {
                 return;
             }
             user.setNvUsed(idNv);
@@ -1344,7 +1347,7 @@ public class UserService implements IUserService {
             if (user.nvStt[idnv]) {
                 return;
             }
-            CharacterEntry nventry = NVData.characterEntries.get(idnv);
+            CharacterEntry nventry = NVData.CHARACTER_ENTRIES.get(idnv);
             byte buyLuong = ms.reader().readByte();
             boolean buyOK = false;
             if (buyLuong == 1) {
@@ -1721,7 +1724,7 @@ public class UserService implements IUserService {
             Message ms = new Message(Cmd.SHOP_EQUIP);
             DataOutputStream ds = ms.writer();
             ds.writeShort(NVData.totalSaleEquipments);
-            for (EquipmentEntry equip : NVData.equipmentEntries) {
+            for (EquipmentEntry equip : NVData.EQUIPMENT_ENTRIES) {
                 if (!equip.isOnSale()) {
                     continue;
                 }
@@ -2042,23 +2045,23 @@ public class UserService implements IUserService {
                     ms = new Message(Cmd.CHARGE_MONEY_2);
                     DataOutputStream ds = ms.writer();
                     ds.writeByte(0);
-                    for (PaymentData.Payment payment : PaymentData.payments.values()) {
-                        ds.writeUTF(payment.id);
-                        ds.writeUTF(payment.info);
-                        ds.writeUTF(payment.url);
+                    for (PaymentData.PaymentEntry paymentEntry : PaymentData.PAYMENT_ENTRY_MAP.values()) {
+                        ds.writeUTF(paymentEntry.getId());
+                        ds.writeUTF(paymentEntry.getInfo());
+                        ds.writeUTF(paymentEntry.getUrl());
                     }
                     ds.flush();
                     user.sendMessage(ms);
                 }
                 case 1 -> {
                     String id = dis.readUTF();
-                    PaymentData.Payment payment = PaymentData.payments.get(id);
-                    if (payment != null) {
+                    PaymentData.PaymentEntry paymentEntry = PaymentData.PAYMENT_ENTRY_MAP.get(id);
+                    if (paymentEntry != null) {
                         ms = new Message(Cmd.CHARGE_MONEY_2);
                         DataOutputStream ds = ms.writer();
                         ds.writeByte(2);
-                        ds.writeUTF(payment.mssTo);
-                        ds.writeUTF(payment.mssContent);
+                        ds.writeUTF(paymentEntry.getMssTo());
+                        ds.writeUTF(paymentEntry.getMssContent());
                         ds.flush();
                         user.sendMessage(ms);
                     }

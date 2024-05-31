@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.model;
+package com.teamobi.mobiarmy2.model.user;
 
 import com.teamobi.mobiarmy2.model.item.SpecialItemEntry;
 import lombok.Getter;

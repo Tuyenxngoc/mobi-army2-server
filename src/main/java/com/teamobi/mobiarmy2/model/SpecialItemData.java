@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class SpecialItemData {
 
-    public static final List<SpecialItemEntry> specialItemEntries = new ArrayList<>();
+    public static final List<SpecialItemEntry> SPECIAL_ITEM_ENTRIES = new ArrayList<>();
 
     /**
      * Retrieves a special item entry by its ID.
@@ -19,7 +19,7 @@ public class SpecialItemData {
      * @return the special item entry with the given ID, or null if not found.
      */
     public static SpecialItemEntry getSpecialItemById(byte id) {
-        return specialItemEntries.stream()
+        return SPECIAL_ITEM_ENTRIES.stream()
                 .filter(entry -> entry.getId() == id)
                 .findFirst()
                 .orElse(null);

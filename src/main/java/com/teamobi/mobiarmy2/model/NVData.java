@@ -14,13 +14,13 @@ import java.util.Optional;
  */
 public class NVData {
 
-    public static final List<CharacterEntry> characterEntries = new ArrayList<>();
-    public static final List<EquipmentEntry> equipmentEntries = new ArrayList<>();
+    public static final List<CharacterEntry> CHARACTER_ENTRIES = new ArrayList<>();
+    public static final List<EquipmentEntry> EQUIPMENT_ENTRIES = new ArrayList<>();
     public static short totalSaleEquipments = 0;
 
     public static void addEquip(EquipmentEntry newEquip) {
         //Tìm nhân vật theo id
-        CharacterEntry characterEntry = characterEntries.stream()
+        CharacterEntry characterEntry = CHARACTER_ENTRIES.stream()
                 .filter(entry -> entry.id == newEquip.characterId)
                 .findFirst()
                 .orElse(null);
@@ -41,12 +41,12 @@ public class NVData {
         }
 
         entryList.add(newEquip);
-        equipmentEntries.add(newEquip);
+        EQUIPMENT_ENTRIES.add(newEquip);
     }
 
     public static EquipmentEntry getEquipEntryById(byte characterId, byte equipType, int equipIndex) {
         // Find the character entry by ID
-        Optional<CharacterEntry> characterEntryOpt = characterEntries.stream()
+        Optional<CharacterEntry> characterEntryOpt = CHARACTER_ENTRIES.stream()
                 .filter(entry -> entry.id == characterId)
                 .findFirst();
 
@@ -69,7 +69,7 @@ public class NVData {
     }
 
     public static EquipmentEntry getEquipEntryByIndexSale(int indexSale) {
-        return equipmentEntries.stream()
+        return EQUIPMENT_ENTRIES.stream()
                 .filter(equipEntry -> equipEntry.onSale && equipEntry.indexSale == indexSale)
                 .findFirst()
                 .orElse(null);

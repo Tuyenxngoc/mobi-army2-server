@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.dao;
 
-import com.teamobi.mobiarmy2.model.PlayerLeaderboardEntry;
+import com.teamobi.mobiarmy2.model.user.PlayerLeaderboardEntry;
 
 import java.util.List;
 

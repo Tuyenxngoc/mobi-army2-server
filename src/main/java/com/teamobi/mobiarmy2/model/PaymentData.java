@@ -1,5 +1,8 @@
 package com.teamobi.mobiarmy2.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,14 +11,16 @@ import java.util.Map;
  */
 public class PaymentData {
 
-    public static class Payment {
-        public String id;
-        public String info;
-        public String url;
-        public String mssContent;
-        public String mssTo;
+    @Getter
+    @Setter
+    public static class PaymentEntry {
+        private String id;
+        private String info;
+        private String url;
+        private String mssContent;
+        private String mssTo;
     }
 
-    public static Map<String, Payment> payments = new HashMap<>();
+    public static final Map<String, PaymentEntry> PAYMENT_ENTRY_MAP = new HashMap<>();
 
 }

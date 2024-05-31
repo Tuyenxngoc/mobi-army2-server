@@ -9,6 +9,8 @@ import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.response.GetFriendResponse;
+import com.teamobi.mobiarmy2.model.user.EquipmentChestEntry;
+import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
 import com.teamobi.mobiarmy2.util.JsonConverter;
 import com.teamobi.mobiarmy2.util.Until;
 import org.mindrot.jbcrypt.BCrypt;
@@ -114,7 +116,7 @@ public class UserDao implements IUserDao {
                     try (ResultSet playerResultSet = playerStatement.executeQuery()) {
                         Gson gson = new Gson();
                         //init
-                        int len = NVData.characterEntries.size();
+                        int len = NVData.CHARACTER_ENTRIES.size();
                         user.nvStt = new boolean[len];
                         user.levels = new int[len];
                         user.levelPercents = new byte[len];

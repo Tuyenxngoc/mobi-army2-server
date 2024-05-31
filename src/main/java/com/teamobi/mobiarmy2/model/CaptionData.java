@@ -18,6 +18,6 @@ public class CaptionData {
         private String caption;
     }
 
-    public static final List<Caption> captions = new ArrayList<>();
+    public static final List<Caption> CAPTIONS = new ArrayList<>();
 
 }

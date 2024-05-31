@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.util;
 
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
-import com.teamobi.mobiarmy2.model.SpecialItemChestEntry;
+import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
 
 import java.util.List;
 import java.util.stream.Collectors;

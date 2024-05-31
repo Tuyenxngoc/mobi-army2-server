@@ -8,6 +8,7 @@ import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
 import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
 import com.teamobi.mobiarmy2.model.item.FightItemEntry;
 import com.teamobi.mobiarmy2.model.item.SpecialItemEntry;
+import com.teamobi.mobiarmy2.model.map.MapEntry;
 import com.teamobi.mobiarmy2.model.mission.Mission;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Until;
@@ -29,7 +30,7 @@ public class GameDao implements IGameDao {
 
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `map`")) {
                 while (resultSet.next()) {
-                    MapData.Map map = new MapData.Map();
+                    MapEntry map = new MapEntry();
                     map.id = (byte) (resultSet.getByte("id") - 1);
                     map.name = resultSet.getString("name");
                     map.fileName = resultSet.getString("file");
@@ -43,7 +44,7 @@ public class GameDao implements IGameDao {
                     map.bullEffShower = resultSet.getShort("bullEffShower");
                     map.inWaterAddY = resultSet.getShort("inWaterAddY");
                     map.cl2AddY = resultSet.getShort("cl2AddY");
-                    MapData.MAPS.add(map);
+                    MapData.MAP_ENTRIES.add(map);
                 }
             }
         } catch (SQLException e) {
@@ -68,7 +69,7 @@ public class GameDao implements IGameDao {
                     characterEntry.bulletCount = resultSet.getByte("so_dan");
                     characterEntry.damage = resultSet.getShort("sat_thuong");
                     characterEntry.bulletDamage = resultSet.getByte("sat_thuong_dan");
-                    NVData.characterEntries.add(characterEntry);
+                    NVData.CHARACTER_ENTRIES.add(characterEntry);
                 }
             }
         } catch (SQLException e) {
@@ -124,7 +125,7 @@ public class GameDao implements IGameDao {
                     CaptionData.Caption capEntry = new CaptionData.Caption();
                     capEntry.setLevel(resultSet.getByte("lvl"));
                     capEntry.setCaption(resultSet.getString("caption"));
-                    CaptionData.captions.add(capEntry);
+                    CaptionData.CAPTIONS.add(capEntry);
                 }
             }
         } catch (SQLException e) {
@@ -169,7 +170,7 @@ public class GameDao implements IGameDao {
                     item.setXu(resultSet.getInt("xu"));
                     item.setLuong(resultSet.getInt("luong"));
 
-                    ItemClanData.clanItemsMap.put(item.getId(), item);
+                    ItemClanData.CLAN_ITEM_ENTRY_MAP.put(item.getId(), item);
                 }
             }
         } catch (SQLException e) {
@@ -196,7 +197,7 @@ public class GameDao implements IGameDao {
                     specialItemEntry.setOnSale(resultSet.getBoolean("isOnSale"));
                     specialItemEntry.setAbility(GsonUtil.GSON.fromJson(resultSet.getString("ability"), short[].class));
 
-                    SpecialItemData.specialItemEntries.add(specialItemEntry);
+                    SpecialItemData.SPECIAL_ITEM_ENTRIES.add(specialItemEntry);
                 }
             }
         } catch (SQLException e) {
@@ -227,14 +228,14 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `payment`")) {
                 while (resultSet.next()) {
-                    PaymentData.Payment payment = new PaymentData.Payment();
-                    payment.id = resultSet.getString("payment_id");
-                    payment.info = resultSet.getString("info");
-                    payment.url = resultSet.getString("url");
-                    payment.mssTo = resultSet.getString("mss_to");
-                    payment.mssContent = resultSet.getString("mss_content");
+                    PaymentData.PaymentEntry paymentEntry = new PaymentData.PaymentEntry();
+                    paymentEntry.setId(resultSet.getString("payment_id"));
+                    paymentEntry.setInfo(resultSet.getString("info"));
+                    paymentEntry.setUrl(resultSet.getString("url"));
+                    paymentEntry.setMssTo(resultSet.getString("mss_to"));
+                    paymentEntry.setMssContent(resultSet.getString("mss_content"));
 
-                    PaymentData.payments.put(payment.id, payment);
+                    PaymentData.PAYMENT_ENTRY_MAP.put(paymentEntry.getId(), paymentEntry);
                 }
             }
         } catch (SQLException e) {

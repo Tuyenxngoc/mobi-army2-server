@@ -8,6 +8,7 @@ import com.teamobi.mobiarmy2.model.NVData;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
 import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
+import com.teamobi.mobiarmy2.model.map.MapEntry;
 import com.teamobi.mobiarmy2.service.IGameService;
 import com.teamobi.mobiarmy2.team.TeamImageOutput;
 import com.teamobi.mobiarmy2.util.Until;
@@ -33,10 +34,10 @@ public class GameService implements IGameService {
     public void setCacheMaps() {
         try (ByteArrayOutputStream bas = new ByteArrayOutputStream();
              DataOutputStream ds = new DataOutputStream(bas)) {
-            int size = MapData.MAPS.size();
+            int size = MapData.MAP_ENTRIES.size();
             ds.writeByte(size);
             for (int i = 0; i < size; i++) {
-                MapData.Map mapEntry = MapData.MAPS.get(i);
+                MapEntry mapEntry = MapData.MAP_ENTRIES.get(i);
                 ds.writeByte(mapEntry.id);
                 ds.writeShort(mapEntry.data.length);
                 ds.write(mapEntry.data);
@@ -60,9 +61,9 @@ public class GameService implements IGameService {
         try {
             ByteArrayOutputStream bas = new ByteArrayOutputStream();
             DataOutputStream ds = new DataOutputStream(bas);
-            ds.writeByte(NVData.characterEntries.size());
+            ds.writeByte(NVData.CHARACTER_ENTRIES.size());
 
-            for (CharacterEntry characterEntry : NVData.characterEntries) {
+            for (CharacterEntry characterEntry : NVData.CHARACTER_ENTRIES) {
                 ds.writeByte(characterEntry.getId());
                 ds.writeShort(characterEntry.getDamage());
                 ds.writeByte(characterEntry.getEquips().size());
@@ -103,7 +104,7 @@ public class GameService implements IGameService {
             }
             ds.writeShort(bytes.length);
             ds.write(bytes);
-            for (int i = 0; i < NVData.characterEntries.size(); i++) {
+            for (int i = 0; i < NVData.CHARACTER_ENTRIES.size(); i++) {
                 bytes = Until.getFile("res/bullet/bullet" + i + ".png");
                 if (bytes == null) {
                     System.exit(1);
@@ -126,10 +127,10 @@ public class GameService implements IGameService {
         try {
             ByteArrayOutputStream bas = new ByteArrayOutputStream();
             DataOutputStream ds = new DataOutputStream(bas);
-            int size = CaptionData.captions.size();
+            int size = CaptionData.CAPTIONS.size();
             ds.writeByte(size);
             for (int i = size - 1; i >= 0; i--) {
-                CaptionData.Caption capEntry = CaptionData.captions.get(i);
+                CaptionData.Caption capEntry = CaptionData.CAPTIONS.get(i);
                 ds.writeUTF(capEntry.getCaption());
                 ds.writeByte(capEntry.getLevel());
             }
@@ -188,17 +189,17 @@ public class GameService implements IGameService {
 
     @Override
     public void setDefaultNvData() {
-        short[][] defaultNvData = new short[NVData.characterEntries.size()][5];
-        User.nvEquipDefault = new EquipmentEntry[NVData.characterEntries.size()][5];
-        for (byte i = 0; i < NVData.characterEntries.size(); i++) {
-            CharacterEntry characterEntry = NVData.characterEntries.get(i);
+        short[][] defaultNvData = new short[NVData.CHARACTER_ENTRIES.size()][5];
+        User.nvEquipDefault = new EquipmentEntry[NVData.CHARACTER_ENTRIES.size()][5];
+        for (byte i = 0; i < NVData.CHARACTER_ENTRIES.size(); i++) {
+            CharacterEntry characterEntry = NVData.CHARACTER_ENTRIES.get(i);
             for (byte j = 0; j < 3; j++) {
                 defaultNvData[i][j] = characterEntry.equips.get(j).get(0).getIndex();
             }
             defaultNvData[i][3] = 0;
             defaultNvData[i][4] = 0;
         }
-        for (byte i = 0; i < NVData.characterEntries.size(); i++) {
+        for (byte i = 0; i < NVData.CHARACTER_ENTRIES.size(); i++) {
             for (byte j = 0; j < 3; j++) {
                 User.nvEquipDefault[i][j] = NVData.getEquipEntryById(i, j, defaultNvData[i][j]);
             }
