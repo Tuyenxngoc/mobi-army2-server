@@ -1,8 +1,11 @@
-package com.teamobi.mobiarmy2.model.equip;
+package com.teamobi.mobiarmy2.model.entry.equip;
 
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * @author tuyen
+ */
 @Getter
 @Setter
 public class EquipmentEntry {

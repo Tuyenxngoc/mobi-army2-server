@@ -3,13 +3,15 @@ package com.teamobi.mobiarmy2.dao.impl;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.*;
-import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
-import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
-import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
-import com.teamobi.mobiarmy2.model.item.FightItemEntry;
-import com.teamobi.mobiarmy2.model.item.SpecialItemEntry;
-import com.teamobi.mobiarmy2.model.map.MapEntry;
-import com.teamobi.mobiarmy2.model.mission.Mission;
+import com.teamobi.mobiarmy2.model.entry.CaptionEntry;
+import com.teamobi.mobiarmy2.model.entry.equip.CharacterEntry;
+import com.teamobi.mobiarmy2.model.entry.equip.EquipmentEntry;
+import com.teamobi.mobiarmy2.model.entry.item.ClanItemEntry;
+import com.teamobi.mobiarmy2.model.entry.item.FightItemEntry;
+import com.teamobi.mobiarmy2.model.entry.item.SpecialItemEntry;
+import com.teamobi.mobiarmy2.model.entry.map.MapEntry;
+import com.teamobi.mobiarmy2.model.entry.Mission;
+import com.teamobi.mobiarmy2.model.entry.PaymentEntry;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Until;
 
@@ -127,7 +129,7 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `captionlv`")) {
                 while (resultSet.next()) {
-                    CaptionData.CaptionEntry capEntry = new CaptionData.CaptionEntry();
+                    CaptionEntry capEntry = new CaptionEntry();
                     capEntry.setLevel(resultSet.getByte("lvl"));
                     capEntry.setCaption(resultSet.getString("caption"));
                     CaptionData.CAPTION_ENTRIES.add(capEntry);
@@ -233,7 +235,7 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `payment`")) {
                 while (resultSet.next()) {
-                    PaymentData.PaymentEntry paymentEntry = new PaymentData.PaymentEntry();
+                    PaymentEntry paymentEntry = new PaymentEntry();
                     paymentEntry.setId(resultSet.getString("payment_id"));
                     paymentEntry.setInfo(resultSet.getString("info"));
                     paymentEntry.setUrl(resultSet.getString("url"));

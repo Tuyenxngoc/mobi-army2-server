@@ -7,7 +7,7 @@ import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.CharacterJson;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.model.NVData;
-import com.teamobi.mobiarmy2.model.user.PlayerLeaderboardEntry;
+import com.teamobi.mobiarmy2.model.entry.user.PlayerLeaderboardEntry;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Until;
 

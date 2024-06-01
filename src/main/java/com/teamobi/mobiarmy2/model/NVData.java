@@ -2,8 +2,8 @@ package com.teamobi.mobiarmy2.model;
 
 import com.teamobi.mobiarmy2.json.CharacterJson;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
-import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
-import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
+import com.teamobi.mobiarmy2.model.entry.equip.CharacterEntry;
+import com.teamobi.mobiarmy2.model.entry.equip.EquipmentEntry;
 
 import java.util.ArrayList;
 import java.util.List;

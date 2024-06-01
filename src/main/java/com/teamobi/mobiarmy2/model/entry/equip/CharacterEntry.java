@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.model.equip;
+package com.teamobi.mobiarmy2.model.entry.equip;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author tuyen
+ */
 @Getter
 @Setter
 public class CharacterEntry {

@@ -1,8 +1,11 @@
-package com.teamobi.mobiarmy2.model.item;
+package com.teamobi.mobiarmy2.model.entry.item;
 
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * @author tuyen
+ */
 @Getter
 @Setter
 public class ClanItemEntry {

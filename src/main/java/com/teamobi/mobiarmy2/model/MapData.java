@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.model;
 
-import com.teamobi.mobiarmy2.model.map.MapBrick;
-import com.teamobi.mobiarmy2.model.map.MapEntry;
+import com.teamobi.mobiarmy2.model.entry.map.MapBrick;
+import com.teamobi.mobiarmy2.model.entry.map.MapEntry;
 
 import java.util.ArrayList;
 import java.util.List;

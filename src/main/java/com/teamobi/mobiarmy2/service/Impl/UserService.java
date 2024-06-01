@@ -10,21 +10,22 @@ import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.json.GiftCodeRewardJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.*;
-import com.teamobi.mobiarmy2.model.clan.ClanEntry;
-import com.teamobi.mobiarmy2.model.clan.ClanInfo;
-import com.teamobi.mobiarmy2.model.clan.ClanItem;
-import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
-import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
-import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
-import com.teamobi.mobiarmy2.model.giftcode.GiftCodeEntry;
-import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
-import com.teamobi.mobiarmy2.model.item.FightItemEntry;
-import com.teamobi.mobiarmy2.model.item.SpecialItemEntry;
-import com.teamobi.mobiarmy2.model.mission.Mission;
-import com.teamobi.mobiarmy2.model.user.FriendEntry;
-import com.teamobi.mobiarmy2.model.user.EquipmentChestEntry;
-import com.teamobi.mobiarmy2.model.user.PlayerLeaderboardEntry;
-import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
+import com.teamobi.mobiarmy2.model.entry.clan.ClanEntry;
+import com.teamobi.mobiarmy2.model.entry.clan.ClanInfo;
+import com.teamobi.mobiarmy2.model.entry.clan.ClanItem;
+import com.teamobi.mobiarmy2.model.entry.clan.ClanMemEntry;
+import com.teamobi.mobiarmy2.model.entry.equip.CharacterEntry;
+import com.teamobi.mobiarmy2.model.entry.equip.EquipmentEntry;
+import com.teamobi.mobiarmy2.model.entry.GiftCodeEntry;
+import com.teamobi.mobiarmy2.model.entry.item.ClanItemEntry;
+import com.teamobi.mobiarmy2.model.entry.item.FightItemEntry;
+import com.teamobi.mobiarmy2.model.entry.item.SpecialItemEntry;
+import com.teamobi.mobiarmy2.model.entry.Mission;
+import com.teamobi.mobiarmy2.model.entry.PaymentEntry;
+import com.teamobi.mobiarmy2.model.entry.user.EquipmentChestEntry;
+import com.teamobi.mobiarmy2.model.entry.user.FriendEntry;
+import com.teamobi.mobiarmy2.model.entry.user.PlayerLeaderboardEntry;
+import com.teamobi.mobiarmy2.model.entry.user.SpecialItemChestEntry;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.server.ClanManager;
 import com.teamobi.mobiarmy2.server.LeaderboardManager;
@@ -2045,7 +2046,7 @@ public class UserService implements IUserService {
                     ms = new Message(Cmd.CHARGE_MONEY_2);
                     DataOutputStream ds = ms.writer();
                     ds.writeByte(0);
-                    for (PaymentData.PaymentEntry paymentEntry : PaymentData.PAYMENT_ENTRY_MAP.values()) {
+                    for (PaymentEntry paymentEntry : PaymentData.PAYMENT_ENTRY_MAP.values()) {
                         ds.writeUTF(paymentEntry.getId());
                         ds.writeUTF(paymentEntry.getInfo());
                         ds.writeUTF(paymentEntry.getUrl());
@@ -2055,7 +2056,7 @@ public class UserService implements IUserService {
                 }
                 case 1 -> {
                     String id = dis.readUTF();
-                    PaymentData.PaymentEntry paymentEntry = PaymentData.PAYMENT_ENTRY_MAP.get(id);
+                    PaymentEntry paymentEntry = PaymentData.PAYMENT_ENTRY_MAP.get(id);
                     if (paymentEntry != null) {
                         ms = new Message(Cmd.CHARGE_MONEY_2);
                         DataOutputStream ds = ms.writer();

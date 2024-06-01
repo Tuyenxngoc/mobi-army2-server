@@ -10,11 +10,11 @@ import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.serialization.LocalDateTimeAdapter;
 import com.teamobi.mobiarmy2.model.ItemClanData;
 import com.teamobi.mobiarmy2.model.NVData;
-import com.teamobi.mobiarmy2.model.clan.ClanEntry;
-import com.teamobi.mobiarmy2.model.clan.ClanInfo;
-import com.teamobi.mobiarmy2.model.clan.ClanItem;
-import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
-import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
+import com.teamobi.mobiarmy2.model.entry.clan.ClanEntry;
+import com.teamobi.mobiarmy2.model.entry.clan.ClanInfo;
+import com.teamobi.mobiarmy2.model.entry.clan.ClanItem;
+import com.teamobi.mobiarmy2.model.entry.clan.ClanMemEntry;
+import com.teamobi.mobiarmy2.model.entry.item.ClanItemEntry;
 import com.teamobi.mobiarmy2.util.Until;
 
 import java.sql.*;

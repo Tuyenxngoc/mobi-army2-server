@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.model;
 
-import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
+import com.teamobi.mobiarmy2.model.entry.item.ClanItemEntry;
 
 import java.util.HashMap;
 import java.util.Map;

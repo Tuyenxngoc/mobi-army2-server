@@ -3,10 +3,10 @@ package com.teamobi.mobiarmy2.server;
 import com.teamobi.mobiarmy2.dao.IClanDao;
 import com.teamobi.mobiarmy2.dao.impl.ClanDao;
 import com.teamobi.mobiarmy2.json.ClanItemJson;
-import com.teamobi.mobiarmy2.model.clan.ClanEntry;
-import com.teamobi.mobiarmy2.model.clan.ClanInfo;
-import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
-import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
+import com.teamobi.mobiarmy2.model.entry.clan.ClanEntry;
+import com.teamobi.mobiarmy2.model.entry.clan.ClanInfo;
+import com.teamobi.mobiarmy2.model.entry.clan.ClanMemEntry;
+import com.teamobi.mobiarmy2.model.entry.item.ClanItemEntry;
 import com.teamobi.mobiarmy2.util.Until;
 
 import java.time.LocalDateTime;

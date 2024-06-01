@@ -6,9 +6,10 @@ import com.teamobi.mobiarmy2.model.CaptionData;
 import com.teamobi.mobiarmy2.model.MapData;
 import com.teamobi.mobiarmy2.model.NVData;
 import com.teamobi.mobiarmy2.model.User;
-import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
-import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
-import com.teamobi.mobiarmy2.model.map.MapEntry;
+import com.teamobi.mobiarmy2.model.entry.CaptionEntry;
+import com.teamobi.mobiarmy2.model.entry.equip.CharacterEntry;
+import com.teamobi.mobiarmy2.model.entry.equip.EquipmentEntry;
+import com.teamobi.mobiarmy2.model.entry.map.MapEntry;
 import com.teamobi.mobiarmy2.service.IGameService;
 import com.teamobi.mobiarmy2.team.TeamImageOutput;
 import com.teamobi.mobiarmy2.util.Until;
@@ -130,7 +131,7 @@ public class GameService implements IGameService {
             int size = CaptionData.CAPTION_ENTRIES.size();
             ds.writeByte(size);
             for (int i = size - 1; i >= 0; i--) {
-                CaptionData.CaptionEntry capEntry = CaptionData.CAPTION_ENTRIES.get(i);
+                CaptionEntry capEntry = CaptionData.CAPTION_ENTRIES.get(i);
                 ds.writeUTF(capEntry.getCaption());
                 ds.writeByte(capEntry.getLevel());
             }

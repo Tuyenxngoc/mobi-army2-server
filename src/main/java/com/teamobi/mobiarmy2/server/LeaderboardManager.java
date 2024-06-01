@@ -3,7 +3,7 @@ package com.teamobi.mobiarmy2.server;
 import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.dao.IRankingDao;
 import com.teamobi.mobiarmy2.dao.impl.RankingDao;
-import com.teamobi.mobiarmy2.model.user.PlayerLeaderboardEntry;
+import com.teamobi.mobiarmy2.model.entry.user.PlayerLeaderboardEntry;
 import lombok.Getter;
 
 import java.util.*;

@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.dao;
 
-import com.teamobi.mobiarmy2.model.giftcode.GiftCodeEntry;
+import com.teamobi.mobiarmy2.model.entry.GiftCodeEntry;
 
 public interface IGiftCodeDao {
 

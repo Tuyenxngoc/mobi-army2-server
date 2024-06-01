@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.model.clan;
+package com.teamobi.mobiarmy2.model.entry.clan;
 
 import lombok.Getter;
 import lombok.Setter;

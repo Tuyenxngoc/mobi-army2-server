@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.model;
 
-import com.teamobi.mobiarmy2.model.item.FightItemEntry;
+import com.teamobi.mobiarmy2.model.entry.item.FightItemEntry;
 import com.teamobi.mobiarmy2.util.Until;
 
 import java.util.ArrayList;
