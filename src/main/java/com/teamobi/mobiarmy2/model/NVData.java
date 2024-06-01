@@ -13,7 +13,6 @@ import java.util.Optional;
  * @author tuyen
  */
 public class NVData {
-
     public static final List<CharacterEntry> CHARACTER_ENTRIES = new ArrayList<>();
     public static final List<EquipmentEntry> EQUIPMENT_ENTRIES = new ArrayList<>();
     public static short totalSaleEquipments = 0;

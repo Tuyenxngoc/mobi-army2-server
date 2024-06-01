@@ -9,7 +9,6 @@ import java.util.List;
  * @author tuyen
  */
 public class SpecialItemData {
-
     public static final List<SpecialItemEntry> SPECIAL_ITEM_ENTRIES = new ArrayList<>();
 
     /**
@@ -24,5 +23,4 @@ public class SpecialItemData {
                 .findFirst()
                 .orElse(null);
     }
-
 }

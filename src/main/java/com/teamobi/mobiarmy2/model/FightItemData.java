@@ -10,7 +10,6 @@ import java.util.List;
  * @author tuyen
  */
 public class FightItemData {
-
     public static final List<FightItemEntry> FIGHT_ITEM_ENTRIES = new ArrayList<>();
 
     public static byte getRandomItem() {

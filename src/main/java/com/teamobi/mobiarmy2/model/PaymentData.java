@@ -9,7 +9,5 @@ import java.util.Map;
  * @author tuyen
  */
 public class PaymentData {
-
     public static final Map<String, PaymentEntry> PAYMENT_ENTRY_MAP = new HashMap<>();
-
 }

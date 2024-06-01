@@ -9,7 +9,5 @@ import java.util.List;
  * @author tuyen
  */
 public class CaptionData {
-
     public static final List<CaptionEntry> CAPTION_ENTRIES = new ArrayList<>();
-
 }

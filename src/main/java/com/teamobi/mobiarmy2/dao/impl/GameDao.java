@@ -4,14 +4,15 @@ import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.entry.CaptionEntry;
+import com.teamobi.mobiarmy2.model.entry.LevelXpRequiredEntry;
+import com.teamobi.mobiarmy2.model.entry.Mission;
+import com.teamobi.mobiarmy2.model.entry.PaymentEntry;
 import com.teamobi.mobiarmy2.model.entry.equip.CharacterEntry;
 import com.teamobi.mobiarmy2.model.entry.equip.EquipmentEntry;
 import com.teamobi.mobiarmy2.model.entry.item.ClanItemEntry;
 import com.teamobi.mobiarmy2.model.entry.item.FightItemEntry;
 import com.teamobi.mobiarmy2.model.entry.item.SpecialItemEntry;
 import com.teamobi.mobiarmy2.model.entry.map.MapEntry;
-import com.teamobi.mobiarmy2.model.entry.Mission;
-import com.teamobi.mobiarmy2.model.entry.PaymentEntry;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Until;
 
@@ -282,17 +283,17 @@ public class GameDao implements IGameDao {
     public void getAllXpData() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `xp_lv` ORDER BY lvl")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT experience_points, level FROM `experience_level` ORDER BY level")) {
                 int previousXp = 0;
                 while (resultSet.next()) {
-                    int currentXp = resultSet.getInt("exp");
+                    int currentXp = resultSet.getInt("experience_points");
                     if (currentXp < previousXp) {
                         throw new SQLException(String.format("XP of the next level (%d) is lower than the XP of the previous level (%d)!", currentXp, previousXp));
                     }
-                    XpData.LevelXpRequired xpRequired = new XpData.LevelXpRequired();
-                    xpRequired.level = resultSet.getInt("lvl");
-                    xpRequired.xp = currentXp;
-                    XpData.xpList.add(xpRequired);
+                    LevelXpRequiredEntry xpRequired = new LevelXpRequiredEntry();
+                    xpRequired.setLevel(resultSet.getShort("level"));
+                    xpRequired.setXp(currentXp);
+                    XpData.LEVEL_XP_REQUIRED_ENTRIES.add(xpRequired);
                     previousXp = currentXp;
                 }
             }

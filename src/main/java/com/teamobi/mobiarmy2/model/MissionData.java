@@ -11,7 +11,6 @@ import java.util.Map;
  * @author tuyen
  */
 public class MissionData {
-
     public static final Map<Byte, List<Mission>> MISSION_LIST = new HashMap<>();
 
     public static void addMission(Mission mission) {

@@ -1,5 +1,7 @@
 package com.teamobi.mobiarmy2.model;
 
+import com.teamobi.mobiarmy2.model.entry.LevelXpRequiredEntry;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,22 +9,16 @@ import java.util.List;
  * @author tuyen
  */
 public class XpData {
-
-    public static final class LevelXpRequired {
-        public int level;
-        public int xp;
-    }
-
-    public static final List<LevelXpRequired> xpList = new ArrayList<>();
+    public static final List<LevelXpRequiredEntry> LEVEL_XP_REQUIRED_ENTRIES = new ArrayList<>();
 
     public static int getXpRequestLevel(int currentLevel) {
-        return xpList.get(currentLevel).xp;
+        return LEVEL_XP_REQUIRED_ENTRIES.get(currentLevel).getXp();
     }
 
     public static int getLevelByEXP(long exp) {
-        for (LevelXpRequired levelXpRequired : xpList) {
-            if (exp < levelXpRequired.xp) {
-                return levelXpRequired.level - 1;
+        for (LevelXpRequiredEntry levelXpRequiredEntry : LEVEL_XP_REQUIRED_ENTRIES) {
+            if (exp < levelXpRequiredEntry.getXp()) {
+                return levelXpRequiredEntry.getLevel() - 1;
             }
         }
         return -1;
