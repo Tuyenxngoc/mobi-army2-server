@@ -5,7 +5,7 @@ import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.entry.CaptionEntry;
 import com.teamobi.mobiarmy2.model.entry.LevelXpRequiredEntry;
-import com.teamobi.mobiarmy2.model.entry.Mission;
+import com.teamobi.mobiarmy2.model.entry.MissionEntry;
 import com.teamobi.mobiarmy2.model.entry.PaymentEntry;
 import com.teamobi.mobiarmy2.model.entry.equip.CharacterEntry;
 import com.teamobi.mobiarmy2.model.entry.equip.EquipmentEntry;
@@ -258,19 +258,19 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `mission` ORDER BY mission_type, level")) {
                 while (resultSet.next()) {
-                    Mission mission = new Mission();
-                    mission.setId(resultSet.getByte("mission_id"));
-                    mission.setType(resultSet.getByte("mission_type"));
-                    mission.setLevel(resultSet.getByte("level"));
-                    mission.setName(resultSet.getString("mission_name"));
-                    mission.setRequirement(resultSet.getInt("requirement"));
-                    mission.setReward(resultSet.getString("reward_items"));
-                    mission.setRewardXu(resultSet.getInt("reward_xu"));
-                    mission.setRewardLuong(resultSet.getInt("reward_luong"));
-                    mission.setRewardXp(resultSet.getInt("reward_xp"));
-                    mission.setRewardCup(resultSet.getInt("reward_cup"));
+                    MissionEntry missionEntry = new MissionEntry();
+                    missionEntry.setId(resultSet.getByte("mission_id"));
+                    missionEntry.setType(resultSet.getByte("mission_type"));
+                    missionEntry.setLevel(resultSet.getByte("level"));
+                    missionEntry.setName(resultSet.getString("mission_name"));
+                    missionEntry.setRequirement(resultSet.getInt("requirement"));
+                    missionEntry.setReward(resultSet.getString("reward_items"));
+                    missionEntry.setRewardXu(resultSet.getInt("reward_xu"));
+                    missionEntry.setRewardLuong(resultSet.getInt("reward_luong"));
+                    missionEntry.setRewardXp(resultSet.getInt("reward_xp"));
+                    missionEntry.setRewardCup(resultSet.getInt("reward_cup"));
 
-                    MissionData.addMission(mission);
+                    MissionData.addMission(missionEntry);
                 }
             }
         } catch (SQLException e) {

@@ -11,7 +11,7 @@ import com.teamobi.mobiarmy2.json.GiftCodeRewardJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.entry.GiftCodeEntry;
-import com.teamobi.mobiarmy2.model.entry.Mission;
+import com.teamobi.mobiarmy2.model.entry.MissionEntry;
 import com.teamobi.mobiarmy2.model.entry.PaymentEntry;
 import com.teamobi.mobiarmy2.model.entry.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.entry.clan.ClanInfo;
@@ -370,32 +370,32 @@ public class UserService implements IUserService {
 
     private void missionComplete(byte missionId) throws IOException {
         String message;
-        Mission mission = MissionData.getMissionById(missionId);
-        if (mission == null) {
+        MissionEntry missionEntry = MissionData.getMissionById(missionId);
+        if (missionEntry == null) {
             message = GameString.missionError1();
         } else {
-            byte missionType = mission.getType();
+            byte missionType = missionEntry.getType();
             byte missionLevel = user.getMissionLevel()[missionType];
-            byte requiredLevel = mission.getLevel();
+            byte requiredLevel = missionEntry.getLevel();
 
-            if (user.getMission()[missionType] < mission.getRequirement()) {
+            if (user.getMission()[missionType] < missionEntry.getRequirement()) {
                 message = GameString.missionError2();
             } else if (missionLevel == requiredLevel) {
-                user.getMissionLevel()[mission.getType()]++;
-                if (mission.getRewardXu() > 0) {
-                    user.updateXu(mission.getRewardXu());
+                user.getMissionLevel()[missionEntry.getType()]++;
+                if (missionEntry.getRewardXu() > 0) {
+                    user.updateXu(missionEntry.getRewardXu());
                 }
-                if (mission.getRewardLuong() > 0) {
-                    user.updateLuong(mission.getRewardLuong());
+                if (missionEntry.getRewardLuong() > 0) {
+                    user.updateLuong(missionEntry.getRewardLuong());
                 }
-                if (mission.getRewardXp() > 0) {
-                    user.updateXp(mission.getRewardXp());
+                if (missionEntry.getRewardXp() > 0) {
+                    user.updateXp(missionEntry.getRewardXp());
                 }
-                if (mission.getRewardCup() > 0) {
-                    user.updateDanhVong(mission.getRewardCup());
+                if (missionEntry.getRewardCup() > 0) {
+                    user.updateDanhVong(missionEntry.getRewardCup());
                 }
                 sendMissionInfo();
-                message = GameString.missionComplete(mission.getReward());
+                message = GameString.missionComplete(missionEntry.getReward());
             } else if (missionLevel < requiredLevel) {
                 message = GameString.missionError2();
             } else {
@@ -409,19 +409,19 @@ public class UserService implements IUserService {
         Message ms = new Message(Cmd.MISSISON);
         DataOutputStream ds = ms.writer();
         int i = 0;
-        for (List<Mission> missionList : MissionData.MISSION_LIST.values()) {
+        for (List<MissionEntry> missionEntryList : MissionData.MISSION_LIST.values()) {
             int index = user.getMissionLevel()[i] - 1;// Subtracting 1 to access the correct index
-            if (index >= missionList.size()) {
-                index = missionList.size() - 1;
+            if (index >= missionEntryList.size()) {
+                index = missionEntryList.size() - 1;
             }
-            Mission mission = missionList.get(index);
-            ds.writeByte(mission.getId());
-            ds.writeByte(mission.getLevel());
-            ds.writeUTF(mission.getName());
-            ds.writeUTF(mission.getReward());
-            ds.writeInt(mission.getRequirement());
-            ds.writeInt(Math.min(user.getMission()[i], mission.getRequirement()));
-            ds.writeBoolean(user.getMission()[i] >= mission.getRequirement());
+            MissionEntry missionEntry = missionEntryList.get(index);
+            ds.writeByte(missionEntry.getId());
+            ds.writeByte(missionEntry.getLevel());
+            ds.writeUTF(missionEntry.getName());
+            ds.writeUTF(missionEntry.getReward());
+            ds.writeInt(missionEntry.getRequirement());
+            ds.writeInt(Math.min(user.getMission()[i], missionEntry.getRequirement()));
+            ds.writeBoolean(user.getMission()[i] >= missionEntry.getRequirement());
             i++;
         }
         ds.flush();

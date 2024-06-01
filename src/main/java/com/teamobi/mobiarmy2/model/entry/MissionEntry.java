@@ -8,7 +8,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class Mission {
+public class MissionEntry {
     private byte id;
     private byte type;
     private byte level;
