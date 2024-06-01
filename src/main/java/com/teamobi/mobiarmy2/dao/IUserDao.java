@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.dao;
 
 import com.teamobi.mobiarmy2.model.User;
-import com.teamobi.mobiarmy2.model.response.GetFriendResponse;
+import com.teamobi.mobiarmy2.model.user.FriendEntry;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,7 +12,7 @@ public interface IUserDao extends Dao<User> {
 
     void updateOnline(boolean flag, int playerId);
 
-    List<GetFriendResponse> getFriendsList(int playerId, List<Integer> friends);
+    List<FriendEntry> getFriendsList(int playerId, List<Integer> friends);
 
     boolean existsByUserIdAndPassword(int userId, String oldPass);
 

@@ -13,11 +13,11 @@ public class CaptionData {
 
     @Getter
     @Setter
-    public static final class Caption {
+    public static class CaptionEntry {
         private byte level;
         private String caption;
     }
 
-    public static final List<Caption> CAPTIONS = new ArrayList<>();
+    public static final List<CaptionEntry> CAPTION_ENTRIES = new ArrayList<>();
 
 }

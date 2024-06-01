@@ -8,7 +8,7 @@ import com.teamobi.mobiarmy2.json.CharacterJson;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.*;
-import com.teamobi.mobiarmy2.model.response.GetFriendResponse;
+import com.teamobi.mobiarmy2.model.user.FriendEntry;
 import com.teamobi.mobiarmy2.model.user.EquipmentChestEntry;
 import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
 import com.teamobi.mobiarmy2.util.JsonConverter;
@@ -270,8 +270,8 @@ public class UserDao implements IUserDao {
     }
 
     @Override
-    public List<GetFriendResponse> getFriendsList(int playerId, List<Integer> friendIds) {
-        List<GetFriendResponse> friendsList = new ArrayList<>();
+    public List<FriendEntry> getFriendsList(int playerId, List<Integer> friendIds) {
+        List<FriendEntry> friendsList = new ArrayList<>();
 
         StringBuilder queryBuilder = new StringBuilder("SELECT user.*, player.* FROM player INNER JOIN user ON user.user_id = player.user_id WHERE player.player_id IN (");
         for (int i = 0; i < friendIds.size(); i++) {
@@ -294,7 +294,7 @@ public class UserDao implements IUserDao {
                     if (resultSet.getBoolean("lock") || !resultSet.getBoolean("active")) {
                         continue;
                     }
-                    GetFriendResponse friend = new GetFriendResponse();
+                    FriendEntry friend = new FriendEntry();
                     friend.setId(resultSet.getInt("player_id"));
                     friend.setName(resultSet.getString("username"));
                     friend.setXu(resultSet.getInt("xu"));

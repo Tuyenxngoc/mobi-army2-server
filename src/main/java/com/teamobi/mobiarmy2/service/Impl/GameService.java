@@ -127,10 +127,10 @@ public class GameService implements IGameService {
         try {
             ByteArrayOutputStream bas = new ByteArrayOutputStream();
             DataOutputStream ds = new DataOutputStream(bas);
-            int size = CaptionData.CAPTIONS.size();
+            int size = CaptionData.CAPTION_ENTRIES.size();
             ds.writeByte(size);
             for (int i = size - 1; i >= 0; i--) {
-                CaptionData.Caption capEntry = CaptionData.CAPTIONS.get(i);
+                CaptionData.CaptionEntry capEntry = CaptionData.CAPTION_ENTRIES.get(i);
                 ds.writeUTF(capEntry.getCaption());
                 ds.writeByte(capEntry.getLevel());
             }

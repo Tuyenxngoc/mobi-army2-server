@@ -127,10 +127,10 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `captionlv`")) {
                 while (resultSet.next()) {
-                    CaptionData.Caption capEntry = new CaptionData.Caption();
+                    CaptionData.CaptionEntry capEntry = new CaptionData.CaptionEntry();
                     capEntry.setLevel(resultSet.getByte("lvl"));
                     capEntry.setCaption(resultSet.getString("caption"));
-                    CaptionData.CAPTIONS.add(capEntry);
+                    CaptionData.CAPTION_ENTRIES.add(capEntry);
                 }
             }
         } catch (SQLException e) {

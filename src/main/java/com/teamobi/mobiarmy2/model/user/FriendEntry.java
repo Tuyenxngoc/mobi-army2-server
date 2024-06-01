@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.model.response;
+package com.teamobi.mobiarmy2.model.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetFriendResponse {
+public class FriendEntry {
     public int id;
     public String name;
     public int xu;

@@ -21,7 +21,7 @@ import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
 import com.teamobi.mobiarmy2.model.item.FightItemEntry;
 import com.teamobi.mobiarmy2.model.item.SpecialItemEntry;
 import com.teamobi.mobiarmy2.model.mission.Mission;
-import com.teamobi.mobiarmy2.model.response.GetFriendResponse;
+import com.teamobi.mobiarmy2.model.user.FriendEntry;
 import com.teamobi.mobiarmy2.model.user.EquipmentChestEntry;
 import com.teamobi.mobiarmy2.model.user.PlayerLeaderboardEntry;
 import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
@@ -1090,8 +1090,8 @@ public class UserService implements IUserService {
             DataOutputStream ds = ms.writer();
 
             if (!user.getFriends().isEmpty()) {
-                List<GetFriendResponse> friends = userDao.getFriendsList(user.getPlayerId(), user.getFriends());
-                for (GetFriendResponse friend : friends) {
+                List<FriendEntry> friends = userDao.getFriendsList(user.getPlayerId(), user.getFriends());
+                for (FriendEntry friend : friends) {
                     ds.writeInt(friend.getId());
                     ds.writeUTF(friend.getName());
                     ds.writeInt(friend.getXu());
