@@ -18,7 +18,7 @@ public class EquipmentChestEntry {
     public byte emptySlot;
     public byte[] additionalPoints;
     public byte[] additionalPercent;
-    public byte[] slots = {-1, -1, -1};
+    public byte[] slots;
     public boolean inUse;
     public EquipmentEntry equipmentEntry;
 }

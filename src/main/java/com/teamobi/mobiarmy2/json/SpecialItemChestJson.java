@@ -12,9 +12,9 @@ import lombok.Setter;
 public class SpecialItemChestJson {
 
     @SerializedName("i")
-    private Byte id;
+    private byte id;
 
     @SerializedName("q")
-    private Short quantity;
+    private short quantity;
 
 }

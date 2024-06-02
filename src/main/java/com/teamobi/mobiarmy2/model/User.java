@@ -267,8 +267,6 @@ public class User {
             int updateQuantity = 0;
 
             if (addEquipment != null) {
-                int bestLocation = ruongDoTB.indexOf(null);
-
                 addEquipment.purchaseDate = new Date();
                 addEquipment.inUse = false;
                 if (addEquipment.additionalPoints == null) {
@@ -278,7 +276,9 @@ public class User {
                     addEquipment.additionalPercent = addEquipment.equipmentEntry.additionalPercent;
                 }
                 addEquipment.emptySlot = 3;
+                addEquipment.slots = new byte[]{-1, -1, -1};
 
+                int bestLocation = ruongDoTB.indexOf(null);
                 if (bestLocation == -1) {
                     addEquipment.index = ruongDoTB.size();
                     ruongDoTB.add(addEquipment);

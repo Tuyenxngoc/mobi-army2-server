@@ -77,7 +77,7 @@ public class NVData {
     public static short[] getEquipData(EquipmentChestJson[] trangBi, CharacterJson character, byte nvUsed) {
         short[] data = new short[5];
 
-        int index = character.getData().get(5);
+        int index = character.getData()[5];
         if (index >= 0 && index < trangBi.length) {
             EquipmentChestJson equipmentChestJson = trangBi[index];
             EquipmentEntry entry = NVData.getEquipEntry(equipmentChestJson.getCharacterId(), equipmentChestJson.getEquipType(), equipmentChestJson.getEquipIndex());
@@ -90,7 +90,7 @@ public class NVData {
             }
         } else {
             for (byte i = 0; i < 5; i++) {
-                index = character.getData().get(i);
+                index = character.getData()[i];
                 if (index >= 0 && index < trangBi.length) {
                     data[i] = trangBi[index].getEquipIndex();
                 } else if (User.nvEquipDefault[nvUsed][i] != null) {

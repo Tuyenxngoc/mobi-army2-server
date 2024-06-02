@@ -4,8 +4,6 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 /**
  * @author tuyen
  */
@@ -23,9 +21,9 @@ public class CharacterJson {
     private int point;
 
     @SerializedName("pointAdd")
-    private List<Short> pointAdd;
+    private short[] pointAdd;
 
     @SerializedName("data")
-    private List<Integer> data;
+    private int[] data;
 
 }

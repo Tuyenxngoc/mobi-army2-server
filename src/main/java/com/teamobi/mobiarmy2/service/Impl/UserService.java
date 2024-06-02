@@ -1427,15 +1427,15 @@ public class UserService implements IUserService {
 
         GiftCodeRewardJson rewardData = GsonUtil.GSON.fromJson(giftCode.getReward(), GiftCodeRewardJson.class);
         StringBuilder totalRewardBuilder = new StringBuilder();
-        if (rewardData.getXu() != null && rewardData.getXu() > 0) {
+        if (rewardData.getXu() > 0) {
             user.updateXu(rewardData.getXu());
             totalRewardBuilder.append("+ ").append(rewardData.getXu()).append(" xu, ");
         }
-        if (rewardData.getLuong() != null && rewardData.getLuong() > 0) {
+        if (rewardData.getLuong() > 0) {
             user.updateLuong(rewardData.getLuong());
             totalRewardBuilder.append("+ ").append(rewardData.getLuong()).append(" lượng, ");
         }
-        if (rewardData.getExp() != null && rewardData.getExp() > 0) {
+        if (rewardData.getExp() > 0) {
             user.updateXp(rewardData.getExp());
             totalRewardBuilder.append("+ ").append(rewardData.getExp()).append(" exp");
         }
