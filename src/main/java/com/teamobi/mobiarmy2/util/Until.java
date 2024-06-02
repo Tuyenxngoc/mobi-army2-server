@@ -10,6 +10,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
@@ -165,6 +166,10 @@ public class Until {
 
     public static int getNumDay(Date from, Date to) {
         return (int) ((to.getTime() - from.getTime()) / 1000 / 86400);
+    }
+
+    public static int getNumDay(LocalDateTime from, LocalDateTime to) {
+        return (int) ChronoUnit.DAYS.between(from, to);
     }
 
     public static String arrayToString(byte[] bArr) {

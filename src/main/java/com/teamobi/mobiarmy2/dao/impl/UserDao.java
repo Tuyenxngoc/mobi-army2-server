@@ -23,7 +23,6 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -60,6 +59,7 @@ public class UserDao implements IUserDao {
                 "`online` = ?, " +
                 "`mission` = ?, " +
                 "`missionLevel` = ?, " +
+                "`top_earnings_xu` = ?, " +
                 //...//
                 "`nv_used` = ? " +
                 " WHERE player_id = ?";
@@ -76,6 +76,7 @@ public class UserDao implements IUserDao {
                 false,
                 Arrays.toString(user.getMission()),
                 Arrays.toString(user.getMissionLevel()),
+                user.getTopEarningsXu(),
                 //...//
                 user.getNvUsed(),
                 user.getPlayerId());
@@ -205,7 +206,7 @@ public class UserDao implements IUserDao {
                                     user.NvData[i][j] = data[j];
                                     if (user.NvData[i][j] >= 0 && user.NvData[i][j] < user.ruongDoTB.size()) {
                                         EquipmentChestEntry rdE = user.ruongDoTB.get(user.NvData[i][j]);
-                                        if (rdE.equipmentEntry.expirationDays - Until.getNumDay(rdE.purchaseDate, new Date()) > 0) {
+                                        if (rdE.equipmentEntry.expirationDays - Until.getNumDay(rdE.purchaseDate, LocalDateTime.now()) > 0) {
                                             user.nvEquip[i][j] = rdE;
                                         } else {
                                             rdE.inUse = false;
@@ -357,7 +358,7 @@ public class UserDao implements IUserDao {
     @Override
     public void updateLastOnline(LocalDateTime now, int playerId) {
         String sql = "UPDATE `player` SET `last_online` = ? WHERE user_id = ?";
-        HikariCPManager.getInstance().update(sql, now, playerId);
+        HikariCPManager.getInstance().update(sql, now.toString(), playerId);
     }
 
 }

@@ -21,7 +21,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -243,15 +242,6 @@ public class User {
         return 0;
     }
 
-    public EquipmentChestEntry getEquipNoNgoc(EquipmentEntry eqE, byte level) {
-        for (EquipmentChestEntry rdE : ruongDoTB) {
-            if (rdE != null && rdE.equipmentEntry == eqE && !rdE.inUse && rdE.vipLevel == level && rdE.emptySlot == 3 && rdE.equipmentEntry.expirationDays - Until.getNumDay(rdE.purchaseDate, new Date()) > 0) {
-                return rdE;
-            }
-        }
-        return null;
-    }
-
     public synchronized void updateInventory(
             EquipmentChestEntry updateEquipment,
             EquipmentChestEntry addEquipment,
@@ -267,7 +257,7 @@ public class User {
             int updateQuantity = 0;
 
             if (addEquipment != null) {
-                addEquipment.purchaseDate = new Date();
+                addEquipment.purchaseDate = LocalDateTime.now();
                 addEquipment.inUse = false;
                 if (addEquipment.additionalPoints == null) {
                     addEquipment.additionalPoints = addEquipment.equipmentEntry.additionalPoints;
@@ -318,7 +308,7 @@ public class User {
                 }
                 ds1.writeByte(updateEquipment.emptySlot);
                 // Ngay het han
-                int hanSD = updateEquipment.equipmentEntry.expirationDays - Until.getNumDay(updateEquipment.purchaseDate, new Date());
+                int hanSD = updateEquipment.equipmentEntry.expirationDays - Until.getNumDay(updateEquipment.purchaseDate, LocalDateTime.now());
                 if (hanSD < 0) {
                     hanSD = 0;
                 }

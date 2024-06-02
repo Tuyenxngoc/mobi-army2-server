@@ -4,7 +4,7 @@ import com.teamobi.mobiarmy2.model.entry.equip.EquipmentEntry;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * @author tuyen
@@ -13,7 +13,7 @@ import java.util.Date;
 @Setter
 public class EquipmentChestEntry {
     public int index;
-    public Date purchaseDate;
+    public LocalDateTime purchaseDate;
     public byte vipLevel;
     public byte emptySlot;
     public byte[] additionalPoints;

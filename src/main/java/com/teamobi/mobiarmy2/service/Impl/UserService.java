@@ -41,7 +41,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -131,6 +130,7 @@ public class UserService implements IUserService {
                 sendMSSToUser(GameString.dailyReward(quantity, FightItemData.FIGHT_ITEM_ENTRIES.get(indexItem).getName()));
                 //Cập nhật quà top
                 if (user.getTopEarningsXu() > 0) {
+                    user.setTopEarningsXu(0);
                     user.updateXu(user.getTopEarningsXu());
                     sendMSSToUser(GameString.dailyTopReward(user.getTopEarningsXu()));
                 }
@@ -1641,7 +1641,7 @@ public class UserService implements IUserService {
                     ds.writeByte(equipmentChestEntry.additionalPercent[j]);
                 }
                 // Ngay het han
-                int hanSD = equipmentChestEntry.equipmentEntry.expirationDays - Until.getNumDay(equipmentChestEntry.purchaseDate, new Date());
+                int hanSD = equipmentChestEntry.equipmentEntry.expirationDays - Until.getNumDay(equipmentChestEntry.purchaseDate, LocalDateTime.now());
                 if (hanSD < 0) {
                     hanSD = 0;
                 }

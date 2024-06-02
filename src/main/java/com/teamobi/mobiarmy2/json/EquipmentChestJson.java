@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * @author tuyen
@@ -23,7 +23,7 @@ public class EquipmentChestJson {
     private byte vipLevel;
 
     @SerializedName("pD")
-    private Date purchaseDate;
+    private LocalDateTime purchaseDate;
 
     @SerializedName("cId")
     private byte characterId;
