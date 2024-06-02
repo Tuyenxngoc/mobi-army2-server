@@ -45,6 +45,7 @@ public class UserDao implements IUserDao {
         }
 
         String ruongdoItem = JsonConverter.convertRuongDoItemToJson(user.getRuongDoItem());
+        String ruongdoTb = JsonConverter.convertRuongDoTBToJson(user.getRuongDoTB());
 
         String sql = "UPDATE `player` SET " +
                 "`friends` = ?, " +
@@ -69,7 +70,7 @@ public class UserDao implements IUserDao {
                 user.getDanhVong(),
                 user.getClanId() == 0 ? null : user.getClanId(),
                 Arrays.toString(user.getItems()),
-                user.getRuongDoTB().toString(),
+                ruongdoTb,
                 ruongdoItem,
                 nvstt,
                 false,
@@ -155,34 +156,30 @@ public class UserDao implements IUserDao {
                             EquipmentChestJson[] equipmentChestJsons = gson.fromJson(playerResultSet.getString("ruongTrangBi"), EquipmentChestJson[].class);
                             for (int i = 0; i < equipmentChestJsons.length; i++) {
                                 EquipmentChestJson equipmentChestJson = equipmentChestJsons[i];
-                                EquipmentChestEntry rdtbEntry = new EquipmentChestEntry();
+                                EquipmentChestEntry equipmentChestEntry = new EquipmentChestEntry();
 
-                                byte nvId = equipmentChestJson.getNvId();
+                                byte characterId = equipmentChestJson.getCharacterId();
                                 byte equipType = equipmentChestJson.getEquipType();
-                                byte equipId = equipmentChestJson.getId();
+                                byte equipIndex = equipmentChestJson.getEquipIndex();
 
-                                rdtbEntry.index = i;
-                                rdtbEntry.equipmentEntry = NVData.getEquipEntryById(nvId, equipType, equipId);
-                                rdtbEntry.purchaseDate = Until.getDate(equipmentChestJson.getDayBuy());
-                                rdtbEntry.vipLevel = equipmentChestJson.getVipLevel();
-                                rdtbEntry.isUse = equipmentChestJson.isUse();
-                                rdtbEntry.invAdd = new byte[5];
-                                rdtbEntry.percentAdd = new byte[5];
-                                rdtbEntry.slots = new int[3];
-                                rdtbEntry.emptySlot = 0;
-                                for (int l = 0; l < 5; l++) {
-                                    rdtbEntry.invAdd[l] = equipmentChestJson.getInvAdd().get(l);
-                                }
-                                for (int l = 0; l < 5; l++) {
-                                    rdtbEntry.percentAdd[l] = equipmentChestJson.getPercenAdd().get(l);
-                                }
+                                equipmentChestEntry.setIndex(i);
+                                equipmentChestEntry.setEquipmentEntry(NVData.getEquipEntry(characterId, equipType, equipIndex));
+                                equipmentChestEntry.setPurchaseDate(equipmentChestJson.getPurchaseDate());
+                                equipmentChestEntry.setVipLevel(equipmentChestJson.getVipLevel());
+                                equipmentChestEntry.setInUse(equipmentChestJson.getInUse() == 1);
+                                equipmentChestEntry.setAdditionalPoints(equipmentChestJson.getAdditionalPoints());
+                                equipmentChestEntry.setAdditionalPercent(equipmentChestJson.getAdditionalPercent());
+                                equipmentChestEntry.setSlots(equipmentChestJson.getSlots());
+
+                                byte emptySlot = 0;
                                 for (int l = 0; l < 3; l++) {
-                                    rdtbEntry.slots[l] = equipmentChestJson.getSlot().get(l);
-                                    if (rdtbEntry.slots[l] == -1) {
-                                        rdtbEntry.emptySlot++;
+                                    if (equipmentChestEntry.getSlots()[l] == -1) {
+                                        emptySlot++;
                                     }
                                 }
-                                user.ruongDoTB.add(rdtbEntry);
+                                equipmentChestEntry.setEmptySlot(emptySlot);
+
+                                user.getRuongDoTB().add(equipmentChestEntry);
                             }
 
                             SpecialItemChestJson[] specialItemChestJsons = gson.fromJson(playerResultSet.getString("ruongItem"), SpecialItemChestJson[].class);
@@ -216,7 +213,7 @@ public class UserDao implements IUserDao {
                                         if (rdE.equipmentEntry.expirationDays - Until.getNumDay(rdE.purchaseDate, new Date()) > 0) {
                                             user.nvEquip[i][j] = rdE;
                                         } else {
-                                            rdE.isUse = false;
+                                            rdE.inUse = false;
                                         }
                                     }
                                 }

@@ -16,9 +16,9 @@ public class EquipmentChestEntry {
     public Date purchaseDate;
     public byte vipLevel;
     public byte emptySlot;
-    public byte[] invAdd;
-    public byte[] percentAdd;
-    public int[] slots = {-1, -1, -1};
-    public boolean isUse;
+    public byte[] additionalPoints;
+    public byte[] additionalPercent;
+    public byte[] slots = {-1, -1, -1};
+    public boolean inUse;
     public EquipmentEntry equipmentEntry;
 }

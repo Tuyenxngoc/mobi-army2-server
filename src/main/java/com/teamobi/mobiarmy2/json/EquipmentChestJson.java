@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.Date;
 
 /**
  * @author tuyen
@@ -12,30 +12,32 @@ import java.util.List;
 @Getter
 @Setter
 public class EquipmentChestJson {
-    @SerializedName("nvId")
-    private byte nvId;
 
-    @SerializedName("isUse")
-    private boolean isUse;
+    @SerializedName("i")
+    private byte equipIndex;
 
-    @SerializedName("vipLevel")
-    private byte vipLevel;
-
-    @SerializedName("invAdd")
-    private List<Byte> invAdd;
-
-    @SerializedName("equipType")
+    @SerializedName("eT")
     private byte equipType;
 
-    @SerializedName("dayBuy")
-    private String dayBuy;
+    @SerializedName("vL")
+    private byte vipLevel;
 
-    @SerializedName("id")
-    private byte id;
+    @SerializedName("pD")
+    private Date purchaseDate;
 
-    @SerializedName("slot")
-    private List<Integer> slot;
+    @SerializedName("cId")
+    private byte characterId;
 
-    @SerializedName("percenAdd")
-    private List<Byte> percenAdd;
+    @SerializedName("iU")
+    private byte inUse;
+
+    @SerializedName("s")
+    private byte[] slots;
+
+    @SerializedName("aP")
+    private byte[] additionalPoints;
+
+    @SerializedName("aPct")
+    private byte[] additionalPercent;
+
 }

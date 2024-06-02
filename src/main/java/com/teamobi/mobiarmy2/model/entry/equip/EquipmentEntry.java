@@ -12,7 +12,7 @@ public class EquipmentEntry {
     public int indexSale;
     public Byte characterId;
     public byte equipType;
-    public short index;
+    public byte equipIndex;
     public String name;
     public int priceXu;
     public int priceLuong;

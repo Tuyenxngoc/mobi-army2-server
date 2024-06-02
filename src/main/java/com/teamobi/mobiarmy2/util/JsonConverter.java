@@ -1,6 +1,8 @@
 package com.teamobi.mobiarmy2.util;
 
+import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
+import com.teamobi.mobiarmy2.model.entry.user.EquipmentChestEntry;
 import com.teamobi.mobiarmy2.model.entry.user.SpecialItemChestEntry;
 
 import java.util.List;
@@ -22,6 +24,27 @@ public class JsonConverter {
 
         // Convert the list of SpecialItemChestJson to JSON string
         return GsonUtil.GSON.toJson(specialItemChestJsons);
+    }
+
+    public static String convertRuongDoTBToJson(List<EquipmentChestEntry> ruongdoTB) {
+        // Convert the list of EquipmentChestEntry to EquipmentChestJson
+        List<EquipmentChestJson> equipmentChestJsons = ruongdoTB.stream().map(entry -> {
+            EquipmentChestJson jsonItem = new EquipmentChestJson();
+            jsonItem.setCharacterId(entry.getEquipmentEntry().getCharacterId());
+            jsonItem.setEquipIndex(entry.getEquipmentEntry().getEquipIndex());
+            jsonItem.setEquipType(entry.getEquipmentEntry().getEquipType());
+            jsonItem.setInUse((byte) (entry.isInUse() ? 1 : 0));
+            jsonItem.setVipLevel(entry.getVipLevel());
+            jsonItem.setPurchaseDate(entry.getPurchaseDate());
+            jsonItem.setSlots(entry.getSlots());
+            jsonItem.setAdditionalPoints(entry.getAdditionalPoints());
+            jsonItem.setAdditionalPercent(entry.getAdditionalPercent());
+
+            return jsonItem;
+        }).collect(Collectors.toList());
+
+        // Convert the list of EquipmentChestJson to JSON string
+        return GsonUtil.GSON.toJson(equipmentChestJsons);
     }
 
 }

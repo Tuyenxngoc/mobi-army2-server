@@ -438,9 +438,9 @@ public class UserService implements IUserService {
                 ds.writeBoolean(false);
                 for (int j = 0; j < 5; j++) {
                     if (user.nvEquip[i][j] != null) {
-                        ds.writeShort(user.nvEquip[i][j].equipmentEntry.index);
+                        ds.writeShort(user.nvEquip[i][j].equipmentEntry.equipIndex);
                     } else if (User.nvEquipDefault[i][j] != null) {
-                        ds.writeShort(User.nvEquipDefault[i][j].index);
+                        ds.writeShort(User.nvEquipDefault[i][j].equipIndex);
                     } else {
                         ds.writeShort(-1);
                     }
@@ -1617,14 +1617,14 @@ public class UserService implements IUserService {
                 // EquipType
                 ds.writeByte(equipmentChestEntry.equipmentEntry.equipType);
                 // idEquip
-                ds.writeShort(equipmentChestEntry.equipmentEntry.index);
+                ds.writeShort(equipmentChestEntry.equipmentEntry.equipIndex);
                 // Name
                 ds.writeUTF(equipmentChestEntry.equipmentEntry.name);
                 // pointNV
-                ds.writeByte(equipmentChestEntry.invAdd.length * 2);
-                for (int j = 0; j < equipmentChestEntry.invAdd.length; j++) {
-                    ds.writeByte(equipmentChestEntry.invAdd[j]);
-                    ds.writeByte(equipmentChestEntry.percentAdd[j]);
+                ds.writeByte(equipmentChestEntry.additionalPoints.length * 2);
+                for (int j = 0; j < equipmentChestEntry.additionalPoints.length; j++) {
+                    ds.writeByte(equipmentChestEntry.additionalPoints[j]);
+                    ds.writeByte(equipmentChestEntry.additionalPercent[j]);
                 }
                 // Ngay het han
                 int hanSD = equipmentChestEntry.equipmentEntry.expirationDays - Until.getNumDay(equipmentChestEntry.purchaseDate, new Date());
@@ -1724,7 +1724,7 @@ public class UserService implements IUserService {
                 }
                 ds.writeByte(equip.getCharacterId());
                 ds.writeByte(equip.getEquipType());
-                ds.writeShort(equip.getIndex());
+                ds.writeShort(equip.getEquipIndex());
                 ds.writeUTF(equip.getName());
                 ds.writeInt(equip.getPriceXu());
                 ds.writeInt(equip.getPriceLuong());

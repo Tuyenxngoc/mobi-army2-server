@@ -75,7 +75,7 @@ public class GameService implements IGameService {
                     ds.writeByte(equipmentEntries.size());
 
                     for (EquipmentEntry equipEntry : equipmentEntries) {
-                        ds.writeShort(equipEntry.getIndex());
+                        ds.writeShort(equipEntry.getEquipIndex());
                         if (i == 0) {
                             ds.writeByte(equipEntry.getBulletId());
                         }
@@ -195,14 +195,14 @@ public class GameService implements IGameService {
         for (byte i = 0; i < NVData.CHARACTER_ENTRIES.size(); i++) {
             CharacterEntry characterEntry = NVData.CHARACTER_ENTRIES.get(i);
             for (byte j = 0; j < 3; j++) {
-                defaultNvData[i][j] = characterEntry.equips.get(j).get(0).getIndex();
+                defaultNvData[i][j] = characterEntry.equips.get(j).get(0).getEquipIndex();
             }
             defaultNvData[i][3] = 0;
             defaultNvData[i][4] = 0;
         }
         for (byte i = 0; i < NVData.CHARACTER_ENTRIES.size(); i++) {
             for (byte j = 0; j < 3; j++) {
-                User.nvEquipDefault[i][j] = NVData.getEquipEntryById(i, j, defaultNvData[i][j]);
+                User.nvEquipDefault[i][j] = NVData.getEquipEntry(i, j, defaultNvData[i][j]);
             }
         }
     }

@@ -211,9 +211,9 @@ public class User {
         } else {
             for (int i = 0; i < 5; i++) {
                 if (this.nvEquip[getNvUsed()][i] != null && !this.nvEquip[getNvUsed()][i].equipmentEntry.isDisguise) {
-                    equip[i] = this.nvEquip[getNvUsed()][i].equipmentEntry.index;
+                    equip[i] = this.nvEquip[getNvUsed()][i].equipmentEntry.equipIndex;
                 } else if (nvEquipDefault[getNvUsed()][i] != null) {
-                    equip[i] = nvEquipDefault[getNvUsed()][i].index;
+                    equip[i] = nvEquipDefault[getNvUsed()][i].equipIndex;
                 } else {
                     equip[i] = -1;
                 }
@@ -245,7 +245,7 @@ public class User {
 
     public EquipmentChestEntry getEquipNoNgoc(EquipmentEntry eqE, byte level) {
         for (EquipmentChestEntry rdE : ruongDoTB) {
-            if (rdE != null && rdE.equipmentEntry == eqE && !rdE.isUse && rdE.vipLevel == level && rdE.emptySlot == 3 && rdE.equipmentEntry.expirationDays - Until.getNumDay(rdE.purchaseDate, new Date()) > 0) {
+            if (rdE != null && rdE.equipmentEntry == eqE && !rdE.inUse && rdE.vipLevel == level && rdE.emptySlot == 3 && rdE.equipmentEntry.expirationDays - Until.getNumDay(rdE.purchaseDate, new Date()) > 0) {
                 return rdE;
             }
         }
@@ -270,12 +270,12 @@ public class User {
                 int bestLocation = ruongDoTB.indexOf(null);
 
                 addEquipment.purchaseDate = new Date();
-                addEquipment.isUse = false;
-                if (addEquipment.invAdd == null) {
-                    addEquipment.invAdd = addEquipment.equipmentEntry.additionalPoints;
+                addEquipment.inUse = false;
+                if (addEquipment.additionalPoints == null) {
+                    addEquipment.additionalPoints = addEquipment.equipmentEntry.additionalPoints;
                 }
-                if (addEquipment.percentAdd == null) {
-                    addEquipment.percentAdd = addEquipment.equipmentEntry.additionalPercent;
+                if (addEquipment.additionalPercent == null) {
+                    addEquipment.additionalPercent = addEquipment.equipmentEntry.additionalPercent;
                 }
                 addEquipment.emptySlot = 3;
 
@@ -293,12 +293,12 @@ public class User {
                 ds.writeInt(addEquipment.index | 0x10000);
                 ds.writeByte(addEquipment.equipmentEntry.characterId);
                 ds.writeByte(addEquipment.equipmentEntry.equipType);
-                ds.writeShort(addEquipment.equipmentEntry.index);
+                ds.writeShort(addEquipment.equipmentEntry.equipIndex);
                 ds.writeUTF(addEquipment.equipmentEntry.name);
-                ds.writeByte(addEquipment.invAdd.length * 2);
-                for (int i = 0; i < addEquipment.invAdd.length; i++) {
-                    ds.writeByte(addEquipment.invAdd[i]);
-                    ds.writeByte(addEquipment.percentAdd[i]);
+                ds.writeByte(addEquipment.additionalPoints.length * 2);
+                for (int i = 0; i < addEquipment.additionalPoints.length; i++) {
+                    ds.writeByte(addEquipment.additionalPoints[i]);
+                    ds.writeByte(addEquipment.additionalPercent[i]);
                 }
                 ds.writeByte(addEquipment.equipmentEntry.expirationDays);
                 ds.writeByte(addEquipment.equipmentEntry.isDisguise ? 1 : 0);
@@ -311,10 +311,10 @@ public class User {
                 updateQuantity++;
                 ds1.writeByte(2);
                 ds1.writeInt(updateEquipment.index | 0x10000);
-                ds1.writeByte(updateEquipment.invAdd.length * 2);
-                for (int i = 0; i < updateEquipment.invAdd.length; i++) {
-                    ds1.writeByte(updateEquipment.invAdd[i]);
-                    ds1.writeByte(updateEquipment.percentAdd[i]);
+                ds1.writeByte(updateEquipment.additionalPoints.length * 2);
+                for (int i = 0; i < updateEquipment.additionalPoints.length; i++) {
+                    ds1.writeByte(updateEquipment.additionalPoints[i]);
+                    ds1.writeByte(updateEquipment.additionalPercent[i]);
                 }
                 ds1.writeByte(updateEquipment.emptySlot);
                 // Ngay het han
