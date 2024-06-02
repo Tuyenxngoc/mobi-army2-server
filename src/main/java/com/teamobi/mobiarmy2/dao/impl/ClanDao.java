@@ -1,13 +1,10 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.teamobi.mobiarmy2.dao.IClanDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.CharacterJson;
 import com.teamobi.mobiarmy2.json.ClanItemJson;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
-import com.teamobi.mobiarmy2.json.serialization.LocalDateTimeAdapter;
 import com.teamobi.mobiarmy2.model.ItemClanData;
 import com.teamobi.mobiarmy2.model.NVData;
 import com.teamobi.mobiarmy2.model.entry.clan.ClanEntry;
@@ -15,6 +12,7 @@ import com.teamobi.mobiarmy2.model.entry.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.entry.clan.ClanItem;
 import com.teamobi.mobiarmy2.model.entry.clan.ClanMemEntry;
 import com.teamobi.mobiarmy2.model.entry.item.ClanItemEntry;
+import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Until;
 
 import java.sql.*;
@@ -30,14 +28,6 @@ import java.util.stream.Collectors;
  * @author tuyen
  */
 public class ClanDao implements IClanDao {
-
-    private final Gson gson;
-
-    public ClanDao() {
-        this.gson = new GsonBuilder()
-                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-                .create();
-    }
 
     @Override
     public Short getClanIcon(int clanId) {
@@ -183,7 +173,7 @@ public class ClanDao implements IClanDao {
                     clanInfo.setDescription(red.getString("description"));
                     clanInfo.setDateCreated(red.getString("date_created"));
 
-                    ClanItemJson[] clanItemJsonArray = gson.fromJson(red.getString("item"), ClanItemJson[].class);
+                    ClanItemJson[] clanItemJsonArray = GsonUtil.GSON.fromJson(red.getString("item"), ClanItemJson[].class);
                     LocalDateTime currentDate = LocalDateTime.now();
 
                     List<ClanItem> filteredItems = Arrays.stream(clanItemJsonArray)
@@ -240,8 +230,8 @@ public class ClanDao implements IClanDao {
                     entry.setNvUsed(resultSet.getByte("nv_used"));
                     entry.setOnline(resultSet.getByte("p.online"));
 
-                    CharacterJson characterJson = gson.fromJson(resultSet.getString("NV" + entry.getNvUsed()), CharacterJson.class);
-                    EquipmentChestJson[] trangBi = gson.fromJson(resultSet.getString("ruongTrangBi"), EquipmentChestJson[].class);
+                    CharacterJson characterJson = GsonUtil.GSON.fromJson(resultSet.getString("NV" + entry.getNvUsed()), CharacterJson.class);
+                    EquipmentChestJson[] trangBi = GsonUtil.GSON.fromJson(resultSet.getString("ruongTrangBi"), EquipmentChestJson[].class);
 
                     entry.setLever((byte) characterJson.getLevel());
                     entry.setLevelPt((byte) 0);
@@ -283,7 +273,7 @@ public class ClanDao implements IClanDao {
             statement.setInt(1, clanId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    return gson.fromJson(resultSet.getString("item"), ClanItemJson[].class);
+                    return GsonUtil.GSON.fromJson(resultSet.getString("item"), ClanItemJson[].class);
                 }
             }
         } catch (SQLException e) {
@@ -296,7 +286,7 @@ public class ClanDao implements IClanDao {
     @Override
     public void updateClanItems(short clanId, ClanItemJson[] items) {
         String sql = "UPDATE clan SET item = ? WHERE clan_id = ?";
-        HikariCPManager.getInstance().update(sql, gson.toJson(items), clanId);
+        HikariCPManager.getInstance().update(sql, GsonUtil.GSON.toJson(items), clanId);
     }
 
     @Override

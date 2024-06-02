@@ -1,6 +1,5 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
@@ -11,6 +10,7 @@ import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.entry.user.EquipmentChestEntry;
 import com.teamobi.mobiarmy2.model.entry.user.FriendEntry;
 import com.teamobi.mobiarmy2.model.entry.user.SpecialItemChestEntry;
+import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.JsonConverter;
 import com.teamobi.mobiarmy2.util.Until;
 import org.mindrot.jbcrypt.BCrypt;
@@ -115,7 +115,6 @@ public class UserDao implements IUserDao {
                 try (PreparedStatement playerStatement = connection.prepareStatement(playerQuery)) {
                     playerStatement.setInt(1, user.getUserId());
                     try (ResultSet playerResultSet = playerStatement.executeQuery()) {
-                        Gson gson = new Gson();
                         //init
                         int len = NVData.CHARACTER_ENTRIES.size();
                         user.nvStt = new boolean[len];
@@ -144,7 +143,7 @@ public class UserDao implements IUserDao {
                                 nvstt = nvstt / 2;
                             }
 
-                            byte[] items = gson.fromJson(playerResultSet.getString("item"), byte[].class);
+                            byte[] items = GsonUtil.GSON.fromJson(playerResultSet.getString("item"), byte[].class);
                             if (items.length != FightItemData.FIGHT_ITEM_ENTRIES.size()) {
                                 byte[] adjustedItems = new byte[FightItemData.FIGHT_ITEM_ENTRIES.size()];
                                 System.arraycopy(items, 0, adjustedItems, 0, Math.min(items.length, adjustedItems.length));
@@ -153,7 +152,7 @@ public class UserDao implements IUserDao {
                                 user.setItems(items);
                             }
 
-                            EquipmentChestJson[] equipmentChestJsons = gson.fromJson(playerResultSet.getString("ruongTrangBi"), EquipmentChestJson[].class);
+                            EquipmentChestJson[] equipmentChestJsons = GsonUtil.GSON.fromJson(playerResultSet.getString("ruongTrangBi"), EquipmentChestJson[].class);
                             for (int i = 0; i < equipmentChestJsons.length; i++) {
                                 EquipmentChestJson equipmentChestJson = equipmentChestJsons[i];
                                 EquipmentChestEntry equipmentChestEntry = new EquipmentChestEntry();
@@ -182,7 +181,7 @@ public class UserDao implements IUserDao {
                                 user.getRuongDoTB().add(equipmentChestEntry);
                             }
 
-                            SpecialItemChestJson[] specialItemChestJsons = gson.fromJson(playerResultSet.getString("ruongItem"), SpecialItemChestJson[].class);
+                            SpecialItemChestJson[] specialItemChestJsons = GsonUtil.GSON.fromJson(playerResultSet.getString("ruongItem"), SpecialItemChestJson[].class);
                             for (SpecialItemChestJson item : specialItemChestJsons) {
                                 if (item.getId() != null && item.getQuantity() != null) {
                                     SpecialItemChestEntry specialItemChestEntry = new SpecialItemChestEntry();
@@ -196,7 +195,7 @@ public class UserDao implements IUserDao {
                             }
 
                             for (int i = 0; i < 10; i++) {
-                                CharacterJson characterJson = gson.fromJson(playerResultSet.getString("NV" + (i + 1)), CharacterJson.class);
+                                CharacterJson characterJson = GsonUtil.GSON.fromJson(playerResultSet.getString("NV" + (i + 1)), CharacterJson.class);
                                 user.levels[i] = characterJson.getLevel();
                                 user.xps[i] = characterJson.getXp();
                                 user.levelPercents[i] = 0;
@@ -221,10 +220,10 @@ public class UserDao implements IUserDao {
 
                             Type listType = new TypeToken<List<Integer>>() {
                             }.getType();
-                            user.setFriends(gson.fromJson(playerResultSet.getString("friends"), listType));
+                            user.setFriends(GsonUtil.GSON.fromJson(playerResultSet.getString("friends"), listType));
 
-                            int[] missions = gson.fromJson(playerResultSet.getString("mission"), int[].class);
-                            byte[] missionLevels = gson.fromJson(playerResultSet.getString("missionLevel"), byte[].class);
+                            int[] missions = GsonUtil.GSON.fromJson(playerResultSet.getString("mission"), int[].class);
+                            byte[] missionLevels = GsonUtil.GSON.fromJson(playerResultSet.getString("missionLevel"), byte[].class);
 
                             if (missions.length != MissionData.MISSION_LIST.size()) {
                                 int[] adjustedMissions = new int[MissionData.MISSION_LIST.size()];
@@ -285,7 +284,6 @@ public class UserDao implements IUserDao {
             for (int i = 0; i < friendIds.size(); i++) {
                 statement.setInt(i + 1, friendIds.get(i));
             }
-            Gson gson = new Gson();
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     if (resultSet.getBoolean("lock") || !resultSet.getBoolean("active")) {
@@ -298,7 +296,7 @@ public class UserDao implements IUserDao {
                     friend.setNvUsed(resultSet.getByte("nv_used"));
                     friend.setClanId(resultSet.getShort("clan_id"));
                     friend.setOnline(resultSet.getByte("online"));
-                    CharacterJson characterJson = gson.fromJson(resultSet.getString("NV" + friend.getNvUsed()), CharacterJson.class);
+                    CharacterJson characterJson = GsonUtil.GSON.fromJson(resultSet.getString("NV" + friend.getNvUsed()), CharacterJson.class);
 
                     int level = characterJson.getLevel();
                     int xp = characterJson.getXp();
@@ -306,7 +304,7 @@ public class UserDao implements IUserDao {
 
                     friend.setLevel((byte) level);
                     friend.setLevelPt((byte) Until.calculateLevelPercent(xp, xpRequired));
-                    EquipmentChestJson[] trangBi = gson.fromJson(resultSet.getString("ruongTrangBi"), EquipmentChestJson[].class);
+                    EquipmentChestJson[] trangBi = GsonUtil.GSON.fromJson(resultSet.getString("ruongTrangBi"), EquipmentChestJson[].class);
                     friend.setData(NVData.getEquipData(trangBi, characterJson, friend.getNvUsed()));
 
                     friendsList.add(friend);
