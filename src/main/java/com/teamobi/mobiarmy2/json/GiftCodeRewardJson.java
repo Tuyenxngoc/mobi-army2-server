@@ -9,6 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 public class GiftCodeRewardJson {
+
     @SerializedName("xu")
     private int xu;
 
@@ -20,5 +21,8 @@ public class GiftCodeRewardJson {
 
     @SerializedName("item")
     private List<SpecialItemChestJson> items;
+
+    @SerializedName("equip")
+    private List<EquipmentChestJson> equips;
 
 }

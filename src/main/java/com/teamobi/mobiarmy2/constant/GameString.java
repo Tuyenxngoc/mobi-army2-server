@@ -426,6 +426,14 @@ public class GameString {
     }
 
     public static String giftCodeSuccess() {
-        return "Sử dụng thành công Giftcode";
+        return "Sử dụng thành công";
+    }
+
+    public static String giftCodeReward(String code, String reward) {
+        return String.format("Sử dụng mã quà tặng %s thành công, nhận được %s", code, reward);
+    }
+
+    public static String giftCodeReward(String code, int quantity, String reward) {
+        return String.format("Sử dụng mã quà tặng %s thành công, nhận được %s %s", code, Until.getStringNumber(quantity), reward);
     }
 }

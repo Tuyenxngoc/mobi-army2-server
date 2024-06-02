@@ -256,8 +256,8 @@ public class User {
             EquipmentChestEntry updateEquipment,
             EquipmentChestEntry addEquipment,
             int removeEquipmentIndex,
-            ArrayList<SpecialItemChestEntry> addItems,
-            ArrayList<SpecialItemChestEntry> removeItems
+            List<SpecialItemChestEntry> addItems,
+            List<SpecialItemChestEntry> removeItems
     ) {
         try {
             Message ms;
