@@ -68,15 +68,16 @@ public class GameDao implements IGameDao {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `character`")) {
                 while (resultSet.next()) {
                     CharacterEntry characterEntry = new CharacterEntry();
-                    characterEntry.id = resultSet.getByte("character_id");
-                    characterEntry.name = resultSet.getString("name");
-                    characterEntry.buyXu = resultSet.getInt("xu");
-                    characterEntry.buyLuong = resultSet.getInt("luong");
-                    characterEntry.windResistance = resultSet.getByte("ma_sat_gio");
-                    characterEntry.minAngle = resultSet.getByte("goc_min");
-                    characterEntry.bulletCount = resultSet.getByte("so_dan");
-                    characterEntry.damage = resultSet.getShort("sat_thuong");
-                    characterEntry.bulletDamage = resultSet.getByte("sat_thuong_dan");
+                    characterEntry.setId(resultSet.getByte("character_id"));
+                    characterEntry.setName(resultSet.getString("name"));
+                    characterEntry.setPriceXu(resultSet.getInt("xu"));
+                    characterEntry.setPriceLuong(resultSet.getInt("luong"));
+                    characterEntry.setWindResistance(resultSet.getByte("wind_resistance"));
+                    characterEntry.setMinAngle(resultSet.getByte("min_angle"));
+                    characterEntry.setDamage(resultSet.getShort("damage"));
+                    characterEntry.setBulletDamage(resultSet.getByte("bullet_damage"));
+                    characterEntry.setBulletCount(resultSet.getByte("bullet_count"));
+
                     NVData.CHARACTER_ENTRIES.add(characterEntry);
                 }
             }

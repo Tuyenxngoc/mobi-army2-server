@@ -149,7 +149,7 @@ public class UserService implements IUserService {
 
             sendLoginSuccess();
             IServerConfig config = serverManager.config();
-            sendNVData(config);
+            sendCharacterData(config);
             sendRoomInfo(config);
             sendMapCollisionInfo();
 
@@ -198,45 +198,38 @@ public class UserService implements IUserService {
         userDao.update(user);
     }
 
-    public void sendNVData(IServerConfig config) {
+    public void sendCharacterData(IServerConfig config) {
         try {
-            // Send mss 64
+            List<CharacterEntry> characterEntries = NVData.CHARACTER_ENTRIES;
+            int characterCount = characterEntries.size();
+
             Message ms = new Message(64);
             DataOutputStream ds = ms.writer();
-            List<CharacterEntry> nvdatas = NVData.CHARACTER_ENTRIES;
-            int len = nvdatas.size();
-            ds.writeByte(len);
-            // Ma sat gio cac nv
-            for (CharacterEntry nvdata : nvdatas) {
-                ds.writeByte(nvdata.windResistance);
+            ds.writeByte(characterCount);
+            for (CharacterEntry characterEntry : characterEntries) {
+                ds.writeByte(characterEntry.getWindResistance());
             }
-            // Goc cuu tieu
-            ds.writeByte(len);
-            for (CharacterEntry nvdata : nvdatas) {
-                ds.writeShort(nvdata.minAngle);
+            ds.writeByte(characterCount);
+            for (CharacterEntry characterEntry : characterEntries) {
+                ds.writeShort(characterEntry.getMinAngle());
             }
-            // Sat thuong 1 vien dan
-            ds.writeByte(len);
-            for (CharacterEntry nvdata : nvdatas) {
-                ds.writeByte(nvdata.bulletDamage);
+            ds.writeByte(characterCount);
+            for (CharacterEntry characterEntry : characterEntries) {
+                ds.writeByte(characterEntry.getBulletDamage());
             }
-            // So dan
-            ds.writeByte(len);
-            for (CharacterEntry nvdata : nvdatas) {
-                ds.writeByte(nvdata.bulletCount);
+            ds.writeByte(characterCount);
+            for (CharacterEntry characterEntry : characterEntries) {
+                ds.writeByte(characterEntry.getBulletCount());
             }
-            // Max player
+
             ds.writeByte(config.getMaxElementFight());
-            // Map boss
             ds.writeByte(config.getNumMapBoss());
             for (int i = 0; i < config.getNumMapBoss(); i++) {
                 ds.writeByte(config.getStartMapBoss() + i);
             }
-            // Type map boss
             for (int i = 0; i < config.getNumMapBoss(); i++) {
                 ds.writeByte(config.getMapIdBoss()[i]);
             }
-            // NUMB Player
             ds.writeByte(config.getNumbPlayers());
             ds.flush();
             user.sendMessage(ms);
@@ -469,8 +462,8 @@ public class UserService implements IUserService {
                 if (i > 2) {
                     ds.writeByte(user.nvStt[i] ? 1 : 0);
                     CharacterEntry characterEntry = NVData.CHARACTER_ENTRIES.get(i);
-                    ds.writeShort(characterEntry.buyXu / 1000);
-                    ds.writeShort(characterEntry.buyLuong);
+                    ds.writeShort(characterEntry.getPriceXu() / 1000);
+                    ds.writeShort(characterEntry.getPriceLuong());
                 }
             }
 
@@ -1352,13 +1345,13 @@ public class UserService implements IUserService {
             byte buyLuong = ms.reader().readByte();
             boolean buyOK = false;
             if (buyLuong == 1) {
-                if (user.luong >= nventry.buyLuong && nventry.buyLuong >= 0) {
-                    user.updateLuong(-nventry.buyLuong);
+                if (user.luong >= nventry.priceLuong && nventry.priceLuong >= 0) {
+                    user.updateLuong(-nventry.priceLuong);
                     buyOK = true;
                 }
             } else {
-                if (user.xu >= nventry.buyXu && nventry.buyXu >= 0) {
-                    user.updateXu(-nventry.buyXu);
+                if (user.xu >= nventry.priceXu && nventry.priceXu >= 0) {
+                    user.updateXu(-nventry.priceXu);
                     buyOK = true;
                 }
             }

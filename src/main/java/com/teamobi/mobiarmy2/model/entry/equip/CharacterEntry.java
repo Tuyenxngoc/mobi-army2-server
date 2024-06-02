@@ -15,12 +15,12 @@ import java.util.Map;
 public class CharacterEntry {
     public byte id;
     public String name;
-    public int buyXu;
-    public int buyLuong;
+    public int priceXu;
+    public int priceLuong;
     public byte windResistance;
     public byte minAngle;
-    public byte bulletCount;
     public short damage;
     public byte bulletDamage;
+    public byte bulletCount;
     public Map<Byte, List<EquipmentEntry>> equips = new HashMap<>();
 }
