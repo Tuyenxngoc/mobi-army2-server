@@ -12,4 +12,12 @@ import lombok.Setter;
 public class SpecialItemChestEntry {
     public short quantity;
     public SpecialItemEntry item;
+
+    public void increaseQuantity(int quantityToAdd) {
+        quantity += quantityToAdd;
+    }
+
+    public void decreaseQuantity(int quantityToDecrease) {
+        quantity -= quantityToDecrease;
+    }
 }

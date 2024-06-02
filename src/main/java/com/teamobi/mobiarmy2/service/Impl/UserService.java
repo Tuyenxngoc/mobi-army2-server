@@ -733,7 +733,7 @@ public class UserService implements IUserService {
             } else if (type == 1) {//buy item
                 byte unit = dis.readByte();
                 byte itemId = dis.readByte();
-                short quantity = (short) dis.readUnsignedByte();
+                byte quantity = dis.readByte();
                 muaDoDacBietShop(unit, itemId, quantity);
             }
         } catch (IOException e) {
@@ -741,7 +741,7 @@ public class UserService implements IUserService {
         }
     }
 
-    private void muaDoDacBietShop(byte unit, byte itemId, short quantity) {
+    private void muaDoDacBietShop(byte unit, byte itemId, byte quantity) {
         //Todo check num ruong
         if (quantity < 1) {
             return;
@@ -772,7 +772,7 @@ public class UserService implements IUserService {
         rdE.item = item;
         rdE.quantity = quantity;
         array.add(rdE);
-        user.updateRuong(null, null, -1, array, null);
+        user.updateInventory(null, null, -1, array, null);
 
         sendServerMessage(GameString.buySuccess());
     }
@@ -1609,35 +1609,35 @@ public class UserService implements IUserService {
             int lent = user.ruongDoTB.size();
             ds.writeByte(lent);
             for (int i = 0; i < lent; i++) {
-                EquipmentChestEntry rdtbEntry = user.ruongDoTB.get(i);
+                EquipmentChestEntry equipmentChestEntry = user.ruongDoTB.get(i);
                 // dbKey
                 ds.writeInt(i | 0x10000);
                 // idNV
-                ds.writeByte(rdtbEntry.equipmentEntry.characterId);
+                ds.writeByte(equipmentChestEntry.equipmentEntry.characterId);
                 // EquipType
-                ds.writeByte(rdtbEntry.equipmentEntry.equipType);
+                ds.writeByte(equipmentChestEntry.equipmentEntry.equipType);
                 // idEquip
-                ds.writeShort(rdtbEntry.equipmentEntry.index);
+                ds.writeShort(equipmentChestEntry.equipmentEntry.index);
                 // Name
-                ds.writeUTF(rdtbEntry.equipmentEntry.name);
+                ds.writeUTF(equipmentChestEntry.equipmentEntry.name);
                 // pointNV
-                ds.writeByte(rdtbEntry.invAdd.length * 2);
-                for (int j = 0; j < rdtbEntry.invAdd.length; j++) {
-                    ds.writeByte(rdtbEntry.invAdd[j]);
-                    ds.writeByte(rdtbEntry.percentAdd[j]);
+                ds.writeByte(equipmentChestEntry.invAdd.length * 2);
+                for (int j = 0; j < equipmentChestEntry.invAdd.length; j++) {
+                    ds.writeByte(equipmentChestEntry.invAdd[j]);
+                    ds.writeByte(equipmentChestEntry.percentAdd[j]);
                 }
                 // Ngay het han
-                int hanSD = rdtbEntry.equipmentEntry.expirationDays - Until.getNumDay(rdtbEntry.purchaseDate, new Date());
+                int hanSD = equipmentChestEntry.equipmentEntry.expirationDays - Until.getNumDay(equipmentChestEntry.purchaseDate, new Date());
                 if (hanSD < 0) {
                     hanSD = 0;
                 }
                 ds.writeByte(hanSD);
                 // Slot trong
-                ds.writeByte(rdtbEntry.emptySlot);
+                ds.writeByte(equipmentChestEntry.emptySlot);
                 // Vip I != 0 -> co tang % thoc tinh
-                ds.writeByte(rdtbEntry.equipmentEntry.isDisguise ? 1 : 0);
+                ds.writeByte(equipmentChestEntry.equipmentEntry.isDisguise ? 1 : 0);
                 // Vip Level
-                ds.writeByte(rdtbEntry.vipLevel);
+                ds.writeByte(equipmentChestEntry.vipLevel);
             }
             // DB Key
             for (int i = 0; i < 5; i++) {
@@ -1794,7 +1794,7 @@ public class UserService implements IUserService {
         }
         EquipmentChestEntry newTb = new EquipmentChestEntry();
         newTb.equipmentEntry = equipmentEntry;
-        user.updateRuong(null, newTb, -1, null, null);
+        user.updateInventory(null, newTb, -1, null, null);
         sendServerMessage(GameString.buySuccess());
     }
 

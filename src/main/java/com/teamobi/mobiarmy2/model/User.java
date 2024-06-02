@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.model;
 
+import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.fight.FightWait;
@@ -79,7 +80,7 @@ public class User {
     public static void setDefaultValue(User user) {
         user.xu = 1000;
         user.luong = 0;
-        user.items = new byte[36];
+        user.items = new byte[FightItemData.FIGHT_ITEM_ENTRIES.size()];
         user.friends = new ArrayList<>();
     }
 
@@ -251,158 +252,144 @@ public class User {
         return null;
     }
 
-    public synchronized void updateRuong(EquipmentChestEntry tbUpdate, EquipmentChestEntry addTB, int removeTB, ArrayList<SpecialItemChestEntry> addItem, ArrayList<SpecialItemChestEntry> removeItem) {
+    public synchronized void updateInventory(
+            EquipmentChestEntry updateEquipment,
+            EquipmentChestEntry addEquipment,
+            int removeEquipmentIndex,
+            ArrayList<SpecialItemChestEntry> addItems,
+            ArrayList<SpecialItemChestEntry> removeItems
+    ) {
         try {
             Message ms;
             DataOutputStream ds;
-            if (addTB != null) {
-                int bestLocation = -1;
-                for (int i = 0; i < ruongDoTB.size(); i++) {
-                    EquipmentChestEntry EquipmentChestEntry = ruongDoTB.get(i);
-                    if (EquipmentChestEntry == null) {
-                        bestLocation = i;
-                        break;
-                    }
+            ByteArrayOutputStream bas = new ByteArrayOutputStream();
+            DataOutputStream ds1 = new DataOutputStream(bas);
+            int updateQuantity = 0;
+
+            if (addEquipment != null) {
+                int bestLocation = ruongDoTB.indexOf(null);
+
+                addEquipment.purchaseDate = new Date();
+                addEquipment.isUse = false;
+                if (addEquipment.invAdd == null) {
+                    addEquipment.invAdd = addEquipment.equipmentEntry.additionalPoints;
                 }
-                addTB.purchaseDate = new Date();
-                addTB.isUse = false;
-                if (addTB.invAdd == null) {
-                    addTB.invAdd = addTB.equipmentEntry.additionalPoints;
+                if (addEquipment.percentAdd == null) {
+                    addEquipment.percentAdd = addEquipment.equipmentEntry.additionalPercent;
                 }
-                if (addTB.percentAdd == null) {
-                    addTB.percentAdd = addTB.equipmentEntry.additionalPercent;
-                }
-                addTB.emptySlot = 3;
+                addEquipment.emptySlot = 3;
+
                 if (bestLocation == -1) {
-                    addTB.index = ruongDoTB.size();
-                    ruongDoTB.add(addTB);
+                    addEquipment.index = ruongDoTB.size();
+                    ruongDoTB.add(addEquipment);
                 } else {
-                    addTB.index = bestLocation;
-                    ruongDoTB.set(bestLocation, addTB);
+                    addEquipment.index = bestLocation;
+                    ruongDoTB.set(bestLocation, addEquipment);
                 }
+
                 ms = new Message(104);
                 ds = ms.writer();
                 ds.writeByte(0);
-                ds.writeInt(addTB.index | 0x10000);
-                ds.writeByte(addTB.equipmentEntry.characterId);
-                ds.writeByte(addTB.equipmentEntry.equipType);
-                ds.writeShort(addTB.equipmentEntry.index);
-                ds.writeUTF(addTB.equipmentEntry.name);
-                ds.writeByte(addTB.invAdd.length * 2);
-                for (int i = 0; i < addTB.invAdd.length; i++) {
-                    ds.writeByte(addTB.invAdd[i]);
-                    ds.writeByte(addTB.percentAdd[i]);
+                ds.writeInt(addEquipment.index | 0x10000);
+                ds.writeByte(addEquipment.equipmentEntry.characterId);
+                ds.writeByte(addEquipment.equipmentEntry.equipType);
+                ds.writeShort(addEquipment.equipmentEntry.index);
+                ds.writeUTF(addEquipment.equipmentEntry.name);
+                ds.writeByte(addEquipment.invAdd.length * 2);
+                for (int i = 0; i < addEquipment.invAdd.length; i++) {
+                    ds.writeByte(addEquipment.invAdd[i]);
+                    ds.writeByte(addEquipment.percentAdd[i]);
                 }
-                ds.writeByte(addTB.equipmentEntry.expirationDays);
-                ds.writeByte(addTB.equipmentEntry.isDisguise ? 1 : 0);
-                ds.writeByte(addTB.vipLevel);
+                ds.writeByte(addEquipment.equipmentEntry.expirationDays);
+                ds.writeByte(addEquipment.equipmentEntry.isDisguise ? 1 : 0);
+                ds.writeByte(addEquipment.vipLevel);
                 ds.flush();
                 sendMessage(ms);
             }
-            ByteArrayOutputStream bas = new ByteArrayOutputStream();
-            DataOutputStream ds1 = new DataOutputStream(bas);
-            int nUpdate = 0;
-            if (tbUpdate != null) {
-                nUpdate++;
+
+            if (updateEquipment != null) {
+                updateQuantity++;
                 ds1.writeByte(2);
-                ds1.writeInt(tbUpdate.index | 0x10000);
-                ds1.writeByte(tbUpdate.invAdd.length * 2);
-                for (int i = 0; i < tbUpdate.invAdd.length; i++) {
-                    ds1.writeByte(tbUpdate.invAdd[i]);
-                    ds1.writeByte(tbUpdate.percentAdd[i]);
+                ds1.writeInt(updateEquipment.index | 0x10000);
+                ds1.writeByte(updateEquipment.invAdd.length * 2);
+                for (int i = 0; i < updateEquipment.invAdd.length; i++) {
+                    ds1.writeByte(updateEquipment.invAdd[i]);
+                    ds1.writeByte(updateEquipment.percentAdd[i]);
                 }
-                ds1.writeByte(tbUpdate.emptySlot);
+                ds1.writeByte(updateEquipment.emptySlot);
                 // Ngay het han
-                int hanSD = tbUpdate.equipmentEntry.expirationDays - Until.getNumDay(tbUpdate.purchaseDate, new Date());
+                int hanSD = updateEquipment.equipmentEntry.expirationDays - Until.getNumDay(updateEquipment.purchaseDate, new Date());
                 if (hanSD < 0) {
                     hanSD = 0;
                 }
                 ds1.writeByte(hanSD);
             }
-            if (addItem != null && !addItem.isEmpty()) {
-                for (int i = 0; i < addItem.size(); i++) {
-                    SpecialItemChestEntry spE = addItem.get(i);
-                    if (spE.quantity > 100) {
-                        SpecialItemChestEntry spE2 = new SpecialItemChestEntry();
-                        spE2.item = spE.item;
-                        spE2.quantity = (short) (spE.quantity - 100);
-                        spE.quantity = 100;
-                        addItem.add(spE2);
-                    }
-                    if (spE.quantity <= 0) {
+
+            if (addItems != null && !addItems.isEmpty()) {
+                for (SpecialItemChestEntry newItem : addItems) {
+                    if (newItem.getQuantity() <= 0) {
                         continue;
                     }
-                    nUpdate++;
-                    // Kiem tra trong ruong co=>tang so luong. ko co=> tao moi
-                    boolean isHave = false;
-                    for (SpecialItemChestEntry spE1 : ruongDoItem) {
-                        if (spE1.item.getId() == spE.item.getId()) {
-                            isHave = true;
-                            spE1.quantity += spE.quantity;
-                            break;
-                        }
+                    updateQuantity++;
+                    SpecialItemChestEntry existingItem = ruongDoItem.stream()
+                            .filter(item -> item.getItem().getId() == newItem.getItem().getId())
+                            .findFirst()
+                            .orElse(null);
+                    if (existingItem != null) {
+                        existingItem.increaseQuantity(newItem.getQuantity());
+                    } else {
+                        ruongDoItem.add(newItem);
                     }
-                    // ko co=> Tao moi
-                    if (!isHave) {
-                        ruongDoItem.add(spE);
+                    ds1.writeByte(newItem.getQuantity() > 1 ? 3 : 1);
+                    ds1.writeByte(newItem.getItem().getId());
+                    if (newItem.getQuantity() > 1) {
+                        ds1.writeByte(newItem.getQuantity());
                     }
-                    ds1.writeByte(spE.quantity > 1 ? 3 : 1);
-                    ds1.writeByte(spE.item.getId());
-                    if (spE.quantity > 1) {
-                        ds1.writeByte(spE.quantity);
-                    }
-                    ds1.writeUTF(spE.item.getName());
-                    ds1.writeUTF(spE.item.getDetail());
+                    ds1.writeUTF(newItem.getItem().getName());
+                    ds1.writeUTF(newItem.getItem().getDetail());
                 }
             }
-            if (removeItem != null && !removeItem.isEmpty()) {
-                for (int k = 0; k < removeItem.size(); k++) {
-                    SpecialItemChestEntry spE = removeItem.get(k);
-                    if (spE.quantity > 100) {
-                        SpecialItemChestEntry spE2 = new SpecialItemChestEntry();
-                        spE2.item = spE.item;
-                        spE2.quantity = (short) (spE.quantity - 100);
-                        spE.quantity = 100;
-                        removeItem.add(spE2);
-                    }
-                    if (spE.quantity <= 0) {
+
+            if (removeItems != null && !removeItems.isEmpty()) {
+                for (SpecialItemChestEntry itemToRemove : removeItems) {
+                    if (itemToRemove.getQuantity() <= 0) {
                         continue;
                     }
-                    // Kiem tra trong ruong co=>giam so luong
-                    for (int i = 0; i < ruongDoItem.size(); i++) {
-                        SpecialItemChestEntry spE1 = ruongDoItem.get(i);
-                        if (spE1.item.getId() == spE.item.getId()) {
-                            if (spE1.quantity < spE.quantity) {
-                                spE.quantity = spE1.quantity;
-                            }
-                            spE1.quantity -= spE.quantity;
-                            if (spE1.quantity == 0) {
-                                ruongDoItem.remove(i);
-                            }
-                            nUpdate++;
-                            ds1.writeByte(0);
-                            ds1.writeInt(spE.item.getId());
-                            ds1.writeByte(spE.quantity);
-                            break;
+                    SpecialItemChestEntry existingItem = ruongDoItem.stream()
+                            .filter(item -> item.getItem().getId() == itemToRemove.getItem().getId())
+                            .findFirst()
+                            .orElse(null);
+                    if (existingItem != null) {
+                        existingItem.decreaseQuantity(itemToRemove.getQuantity());
+                        if (existingItem.getQuantity() <= 0) {
+                            ruongDoItem.remove(existingItem);
                         }
+                        updateQuantity++;
+                        ds1.writeByte(0);
+                        ds1.writeInt(itemToRemove.getItem().getId());
+                        ds1.writeByte(itemToRemove.getQuantity());
                     }
                 }
             }
-            if (removeTB >= 0 && removeTB < ruongDoTB.size() && ruongDoTB.get(removeTB) != null) {
-                nUpdate++;
-                ruongDoTB.set(removeTB, null);
+
+            if (removeEquipmentIndex >= 0 && removeEquipmentIndex < ruongDoTB.size() && ruongDoTB.get(removeEquipmentIndex) != null) {
+                updateQuantity++;
+                ruongDoTB.set(removeEquipmentIndex, null);
                 ds1.writeByte(0);
-                ds1.writeInt(removeTB | 0x10000);
+                ds1.writeInt(removeEquipmentIndex | 0x10000);
                 ds1.writeByte(1);
             }
+
             ds1.flush();
             bas.flush();
-            if (nUpdate == 0) {
+
+            if (updateQuantity == 0) {
                 return;
             }
-            ms = new Message(27);
+
+            ms = new Message(Cmd.INVENTORY_UPDATE);
             ds = ms.writer();
-            ds.writeByte(nUpdate);
+            ds.writeByte(updateQuantity);
             ds.write(bas.toByteArray());
             ds.flush();
             sendMessage(ms);

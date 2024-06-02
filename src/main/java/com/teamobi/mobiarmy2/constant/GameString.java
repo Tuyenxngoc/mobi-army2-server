@@ -386,7 +386,7 @@ public class GameString {
     }
 
     public static String loginLock() {
-        return "Tài khoản của bạn đang bị khóa";
+        return "Tài khoản này đang bị khóa. Liên hệ tổng đài hỗ trợ khách hàng để biết thêm thông tin.";
     }
 
     public static String loginActive() {
