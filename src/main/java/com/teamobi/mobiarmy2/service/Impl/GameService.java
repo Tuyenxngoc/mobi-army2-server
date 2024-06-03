@@ -39,16 +39,16 @@ public class GameService implements IGameService {
             ds.writeByte(size);
             for (int i = 0; i < size; i++) {
                 MapEntry mapEntry = MapData.MAP_ENTRIES.get(i);
-                ds.writeByte(mapEntry.id);
-                ds.writeShort(mapEntry.data.length);
-                ds.write(mapEntry.data);
-                ds.writeShort(mapEntry.bg);
-                ds.writeShort(mapEntry.mapAddY);
-                ds.writeShort(mapEntry.bullEffShower);
-                ds.writeShort(mapEntry.inWaterAddY);
-                ds.writeShort(mapEntry.cl2AddY);
-                ds.writeUTF(mapEntry.name);
-                ds.writeUTF(mapEntry.fileName);
+                ds.writeByte(mapEntry.getId());
+                ds.writeShort(mapEntry.getData().length);
+                ds.write(mapEntry.getData());
+                ds.writeShort(mapEntry.getBg());
+                ds.writeShort(mapEntry.getMapAddY());
+                ds.writeShort(mapEntry.getBullEffShower());
+                ds.writeShort(mapEntry.getInWaterAddY());
+                ds.writeShort(mapEntry.getCl2AddY());
+                ds.writeUTF(mapEntry.getName());
+                ds.writeUTF(mapEntry.getFileName());
             }
             byte[] ab = bas.toByteArray();
             Until.saveFile(CommonConstant.mapCacheName, ab);

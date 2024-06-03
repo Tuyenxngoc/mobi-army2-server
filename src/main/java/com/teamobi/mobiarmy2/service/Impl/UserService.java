@@ -770,8 +770,8 @@ public class UserService implements IUserService {
 
         ArrayList<SpecialItemChestEntry> array = new ArrayList<>();
         SpecialItemChestEntry rdE = new SpecialItemChestEntry();
-        rdE.item = item;
-        rdE.quantity = quantity;
+        rdE.setItem(item);
+        rdE.setQuantity(quantity);
         array.add(rdE);
         user.updateInventory(null, -1, array, null);
 
@@ -1248,15 +1248,15 @@ public class UserService implements IUserService {
     @Override
     public void handleChoseCharacter(Message ms) {
         try {
-            byte idNv = ms.reader().readByte();
-            if (idNv >= NVData.CHARACTER_ENTRIES.size() || idNv < 0 || !user.getOwnedCharacters()[idNv]) {
+            byte characterId = ms.reader().readByte();
+            if (characterId >= NVData.CHARACTER_ENTRIES.size() || characterId < 0 || !user.getOwnedCharacters()[characterId]) {
                 return;
             }
-            user.setNvUsed(idNv);
+            user.setNvUsed(characterId);
             ms = new Message(Cmd.CHOOSE_GUN);
             DataOutputStream ds = ms.writer();
             ds.writeInt(user.getPlayerId());
-            ds.writeByte(idNv);
+            ds.writeByte(characterId);
             ds.flush();
             user.sendMessage(ms);
             sendCharacterInfo();
@@ -1298,28 +1298,20 @@ public class UserService implements IUserService {
             if (user.getItems()[itemIndex] + quantity > ServerManager.getInstance().config().getMax_item()) {
                 return;
             }
-
-            switch (unit) {
-                case 0 -> {
-                    int total = FightItemData.FIGHT_ITEM_ENTRIES.get(itemIndex).getBuyXu() * quantity;
-                    if (user.getXu() < total || total < 0) {
-                        return;
-                    }
-                    user.updateXu(-total);
-                    user.updateItems(itemIndex, quantity);
-                }
-                case 1 -> {
-                    int total = FightItemData.FIGHT_ITEM_ENTRIES.get(itemIndex).getBuyLuong() * quantity;
-                    if (user.getLuong() < total || total < 0) {
-                        return;
-                    }
-                    user.updateLuong(-total);
-                    user.updateItems(itemIndex, quantity);
-                }
-                default -> {
+            if (unit == 0) {
+                int total = FightItemData.FIGHT_ITEM_ENTRIES.get(itemIndex).getBuyXu() * quantity;
+                if (user.getXu() < total || total < 0) {
                     return;
                 }
+                user.updateXu(-total);
+            } else {
+                int total = FightItemData.FIGHT_ITEM_ENTRIES.get(itemIndex).getBuyLuong() * quantity;
+                if (user.getLuong() < total || total < 0) {
+                    return;
+                }
+                user.updateLuong(-total);
             }
+            user.updateItems(itemIndex, quantity);
             ms = new Message(72);
             DataOutputStream ds = ms.writer();
             ds.writeByte(1);
@@ -1340,6 +1332,9 @@ public class UserService implements IUserService {
             DataInputStream dis = ms.reader();
             byte index = dis.readByte();
             byte unit = dis.readByte();
+            if (index < 0 || index >= user.getOwnedCharacters().length - 3) {
+                return;
+            }
             index += 3;
             if (user.getOwnedCharacters()[index]) {
                 return;
@@ -1377,7 +1372,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void chonBanDo(Message ms) {
+    public void handleSelectMap(Message ms) {
         try {
             byte mapId = ms.reader().readByte();
             user.getFightWait().setMap(user.getPlayerId(), mapId);
@@ -1387,7 +1382,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void napTheCao(Message ms) {
+    public void handleCardRecharge(Message ms) {
         try {
             DataInputStream dis = ms.reader();
             String type = dis.readUTF().trim();

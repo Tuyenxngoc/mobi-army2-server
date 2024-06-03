@@ -104,9 +104,9 @@ public interface IUserService {
 
     void handleBuyCharacter(Message ms);
 
-    void chonBanDo(Message ms);
+    void handleSelectMap(Message ms);
 
-    void napTheCao(Message ms);
+    void handleCardRecharge(Message ms);
 
     void handleFindPlayerWait(Message ms);
 

@@ -13,13 +13,13 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FriendEntry {
-    public int id;
-    public String name;
-    public int xu;
-    public byte nvUsed;
-    public short clanId;
-    public byte online;
-    public byte level;
-    public byte levelPt;
-    public short[] data;
+    private int id;
+    private String name;
+    private int xu;
+    private byte nvUsed;
+    private short clanId;
+    private byte online;
+    private byte level;
+    private byte levelPt;
+    private short[] data;
 }

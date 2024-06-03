@@ -9,15 +9,15 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MapEntry {
-    public byte id;
-    public String name;
-    public String fileName;
-    public byte[] data;
-    public short bg;
-    public short mapAddY;
-    public short cl2AddY;
-    public short inWaterAddY;
-    public short bullEffShower;
-    public short[] XPlayer;
-    public short[] YPlayer;
+    private byte id;
+    private String name;
+    private String fileName;
+    private byte[] data;
+    private short bg;
+    private short mapAddY;
+    private short cl2AddY;
+    private short inWaterAddY;
+    private short bullEffShower;
+    private short[] XPlayer;
+    private short[] YPlayer;
 }

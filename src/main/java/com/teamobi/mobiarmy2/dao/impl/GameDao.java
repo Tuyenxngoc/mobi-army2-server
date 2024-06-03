@@ -34,23 +34,23 @@ public class GameDao implements IGameDao {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `map`")) {
                 while (resultSet.next()) {
                     MapEntry map = new MapEntry();
-                    map.id = resultSet.getByte("map_id");
-                    map.name = resultSet.getString("name");
-                    map.fileName = resultSet.getString("file");
-                    if (map.id == 27) {
-                        map.data = new byte[0];
+                    map.setId(resultSet.getByte("map_id"));
+                    map.setName(resultSet.getString("name"));
+                    map.setFileName(resultSet.getString("file"));
+                    if (map.getId() == 27) {
+                        map.setData(new byte[0]);
                     } else {
-                        byte[] dataMap = Until.getFile("res/map/" + map.fileName);
+                        byte[] dataMap = Until.getFile("res/map/" + map.getFileName());
                         if (dataMap == null) {
                             System.exit(1);
                         }
-                        map.data = dataMap;
+                        map.setData(dataMap);
                     }
-                    map.bg = resultSet.getShort("background");
-                    map.mapAddY = resultSet.getShort("map_add_y");
-                    map.bullEffShower = resultSet.getShort("bullet_effect_shower");
-                    map.inWaterAddY = resultSet.getShort("in_water_add_y");
-                    map.cl2AddY = resultSet.getShort("cl2_add_y");
+                    map.setBg(resultSet.getShort("background"));
+                    map.setMapAddY(resultSet.getShort("map_add_y"));
+                    map.setBullEffShower(resultSet.getShort("bullet_effect_shower"));
+                    map.setInWaterAddY(resultSet.getShort("in_water_add_y"));
+                    map.setCl2AddY(resultSet.getShort("cl2_add_y"));
 
                     MapData.MAP_ENTRIES.add(map);
                 }

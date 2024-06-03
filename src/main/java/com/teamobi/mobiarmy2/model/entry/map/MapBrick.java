@@ -9,8 +9,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MapBrick {
-    public int id;
-    public int[] data;
-    public int Width;
-    public int Height;
+    private int id;
+    private int[] data;
+    private int Width;
+    private int Height;
 }

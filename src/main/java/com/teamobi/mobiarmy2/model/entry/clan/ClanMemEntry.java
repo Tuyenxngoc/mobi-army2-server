@@ -9,16 +9,16 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ClanMemEntry {
-    int playerId;
-    String username;
-    int point;
-    byte nvUsed;
-    byte online;
-    byte lever;
-    byte levelPt;
-    byte index;
-    int cup;
-    short[] dataEquip;
-    String contribute_text;
-    String contribute_count;
+    private int playerId;
+    private String username;
+    private int point;
+    private byte nvUsed;
+    private byte online;
+    private byte lever;
+    private byte levelPt;
+    private byte index;
+    private int cup;
+    private short[] dataEquip;
+    private String contribute_text;
+    private String contribute_count;
 }

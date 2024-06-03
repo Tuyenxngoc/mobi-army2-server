@@ -16,8 +16,8 @@ import lombok.Setter;
 public class SpecialItemChestEntry {
     private static final short MAX_QUANTITY = 30_000;
 
-    public short quantity;
-    public SpecialItemEntry item;
+    private short quantity;
+    private SpecialItemEntry item;
 
     public void increaseQuantity(int quantityToAdd) {
         if (quantityToAdd < 0) {

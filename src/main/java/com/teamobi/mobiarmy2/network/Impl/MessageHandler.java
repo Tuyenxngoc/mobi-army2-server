@@ -112,9 +112,9 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.BUY_GUN -> userService.handleBuyCharacter(ms);
 
-                case Cmd.MAP_SELECT -> userService.chonBanDo(ms);
+                case Cmd.MAP_SELECT -> userService.handleSelectMap(ms);
 
-                case Cmd.LOAD_CARD -> userService.napTheCao(ms);
+                case Cmd.LOAD_CARD -> userService.handleCardRecharge(ms);
 
                 case Cmd.FIND_PLAYER -> userService.handleFindPlayerWait(ms);
 

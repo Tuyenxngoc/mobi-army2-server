@@ -235,8 +235,8 @@ public class User {
     public int getNumItemRuong(int id) {
         // Kiem tra trong ruong co=>tang so luong. ko co=> tao moi
         for (SpecialItemChestEntry spE1 : ruongDoItem) {
-            if (spE1.item.getId() == id) {
-                return spE1.quantity;
+            if (spE1.getItem().getId() == id) {
+                return spE1.getQuantity();
             }
         }
         return 0;
