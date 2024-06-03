@@ -20,7 +20,7 @@ public class NVData {
     public static void addEquip(EquipmentEntry newEquip) {
         //Tìm nhân vật theo id
         CharacterEntry characterEntry = CHARACTER_ENTRIES.stream()
-                .filter(entry -> entry.id == newEquip.characterId)
+                .filter(entry -> entry.id == newEquip.getCharacterId())
                 .findFirst()
                 .orElse(null);
         if (characterEntry == null) {
@@ -69,7 +69,7 @@ public class NVData {
 
     public static EquipmentEntry getEquipEntryByIndexSale(int indexSale) {
         return EQUIPMENT_ENTRIES.stream()
-                .filter(equipEntry -> equipEntry.onSale && equipEntry.indexSale == indexSale)
+                .filter(equipEntry -> equipEntry.isOnSale() && equipEntry.getIndexSale() == indexSale)
                 .findFirst()
                 .orElse(null);
     }
@@ -81,12 +81,12 @@ public class NVData {
         if (index >= 0 && index < trangBi.length) {
             EquipmentChestJson equipmentChestJson = trangBi[index];
             EquipmentEntry entry = NVData.getEquipEntry(equipmentChestJson.getCharacterId(), equipmentChestJson.getEquipType(), equipmentChestJson.getEquipIndex());
-            if (entry != null && entry.disguiseEquippedIndexes != null) {
-                data[0] = entry.disguiseEquippedIndexes[0];
-                data[1] = entry.disguiseEquippedIndexes[1];
-                data[2] = entry.disguiseEquippedIndexes[2];
-                data[3] = entry.disguiseEquippedIndexes[3];
-                data[4] = entry.disguiseEquippedIndexes[4];
+            if (entry != null && entry.getDisguiseEquippedIndexes() != null) {
+                data[0] = entry.getDisguiseEquippedIndexes()[0];
+                data[1] = entry.getDisguiseEquippedIndexes()[1];
+                data[2] = entry.getDisguiseEquippedIndexes()[2];
+                data[3] = entry.getDisguiseEquippedIndexes()[3];
+                data[4] = entry.getDisguiseEquippedIndexes()[4];
             }
         } else {
             for (byte i = 0; i < 5; i++) {
@@ -94,7 +94,7 @@ public class NVData {
                 if (index >= 0 && index < trangBi.length) {
                     data[i] = trangBi[index].getEquipIndex();
                 } else if (User.nvEquipDefault[nvUsed][i] != null) {
-                    data[i] = User.nvEquipDefault[nvUsed][i].equipIndex;
+                    data[i] = User.nvEquipDefault[nvUsed][i].getEquipIndex();
                 } else {
                     data[i] = -1;
                 }

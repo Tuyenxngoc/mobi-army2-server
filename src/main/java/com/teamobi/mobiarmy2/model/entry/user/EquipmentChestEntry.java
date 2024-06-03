@@ -12,13 +12,13 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class EquipmentChestEntry {
-    public int index;
-    public LocalDateTime purchaseDate;
-    public byte vipLevel;
-    public byte emptySlot;
-    public byte[] additionalPoints;
-    public byte[] additionalPercent;
-    public byte[] slots;
-    public boolean inUse;
-    public EquipmentEntry equipmentEntry;
+    private int index;
+    private LocalDateTime purchaseDate;
+    private byte vipLevel;
+    private byte emptySlot;
+    private byte[] additionalPoints;
+    private byte[] additionalPercent;
+    private byte[] slots;
+    private boolean inUse;
+    private EquipmentEntry equipmentEntry;
 }

@@ -38,8 +38,8 @@ public class UserDao implements IUserDao {
     @Override
     public void update(User user) {
         int nvstt = 1, pow = 1;
-        for (int i = 0; i < user.nvStt.length; i++) {
-            nvstt |= user.nvStt[i] ? pow : 0;
+        for (int i = 0; i < user.getNvStt().length; i++) {
+            nvstt |= user.getNvStt()[i] ? pow : 0;
             pow <<= 1;
         }
 
@@ -118,14 +118,14 @@ public class UserDao implements IUserDao {
                     try (ResultSet playerResultSet = playerStatement.executeQuery()) {
                         //init
                         int len = NVData.CHARACTER_ENTRIES.size();
-                        user.nvStt = new boolean[len];
-                        user.levels = new int[len];
-                        user.levelPercents = new byte[len];
-                        user.xps = new int[len];
-                        user.points = new int[len];
-                        user.pointAdd = new short[len][5];
-                        user.NvData = new int[len][6];
-                        user.nvEquip = new EquipmentChestEntry[len][6];
+                        user.setNvStt(new boolean[len]);
+                        user.setLevels(new int[len]);
+                        user.setLevelPercents(new byte[len]);
+                        user.setXps(new int[len]);
+                        user.setPoints(new int[len]);
+                        user.setPointAdd(new short[len][5]);
+                        user.setNvData(new int[len][6]);
+                        user.setNvEquip(new EquipmentChestEntry[len][6]);
                         user.setRuongDoItem(new ArrayList<>());
                         user.setRuongDoTB(new ArrayList<>());
 
@@ -140,7 +140,7 @@ public class UserDao implements IUserDao {
 
                             int nvstt = playerResultSet.getInt("sttnhanvat");
                             for (byte i = 0; i < 10; i++) {
-                                user.nvStt[i] = (nvstt & 1) > 0;
+                                user.getNvStt()[i] = (nvstt & 1) > 0;
                                 nvstt = nvstt / 2;
                             }
 
@@ -195,21 +195,21 @@ public class UserDao implements IUserDao {
 
                             for (int i = 0; i < 10; i++) {
                                 CharacterJson characterJson = GsonUtil.GSON.fromJson(playerResultSet.getString("NV" + (i + 1)), CharacterJson.class);
-                                user.levels[i] = characterJson.getLevel();
-                                user.xps[i] = characterJson.getXp();
-                                user.levelPercents[i] = 0;
-                                user.points[i] = characterJson.getPoint();
-                                user.pointAdd[i] = characterJson.getPointAdd();
+                                user.getLevels()[i] = characterJson.getLevel();
+                                user.getXps()[i] = characterJson.getXp();
+                                user.getLevelPercents()[i] = 0;
+                                user.getPoints()[i] = characterJson.getPoint();
+                                user.getPointAdd()[i] = characterJson.getPointAdd();
 
                                 int[] data = characterJson.getData();
                                 for (int j = 0; j < 5; j++) {
-                                    user.NvData[i][j] = data[j];
-                                    if (user.NvData[i][j] >= 0 && user.NvData[i][j] < user.ruongDoTB.size()) {
-                                        EquipmentChestEntry rdE = user.ruongDoTB.get(user.NvData[i][j]);
-                                        if (rdE.equipmentEntry.expirationDays - Until.getNumDay(rdE.purchaseDate, LocalDateTime.now()) > 0) {
-                                            user.nvEquip[i][j] = rdE;
+                                    user.getNvData()[i][j] = data[j];
+                                    if (user.getNvData()[i][j] >= 0 && user.getNvData()[i][j] < user.getRuongDoTB().size()) {
+                                        EquipmentChestEntry rdE = user.getRuongDoTB().get(user.getNvData()[i][j]);
+                                        if (rdE.getEquipmentEntry().getExpirationDays() - Until.getNumDay(rdE.getPurchaseDate(), LocalDateTime.now()) > 0) {
+                                            user.getNvEquip()[i][j] = rdE;
                                         } else {
-                                            rdE.inUse = false;
+                                            rdE.setInUse(false);
                                         }
                                     }
                                 }
