@@ -160,7 +160,7 @@ public class UserDao implements IUserDao {
 
                                 byte characterId = equipmentChestJson.getCharacterId();
                                 byte equipType = equipmentChestJson.getEquipType();
-                                byte equipIndex = equipmentChestJson.getEquipIndex();
+                                short equipIndex = equipmentChestJson.getEquipIndex();
 
                                 equipmentChestEntry.setIndex(i);
                                 equipmentChestEntry.setEquipmentEntry(NVData.getEquipEntry(characterId, equipType, equipIndex));

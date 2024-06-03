@@ -96,7 +96,7 @@ public class GameDao implements IGameDao {
                     EquipmentEntry equipEntry = new EquipmentEntry();
                     equipEntry.setCharacterId(resultSet.getByte("character_id"));
                     equipEntry.setEquipType(resultSet.getByte("equip_type"));
-                    equipEntry.setEquipIndex(resultSet.getByte("equip_index"));
+                    equipEntry.setEquipIndex(resultSet.getShort("equip_index"));
                     equipEntry.setName(resultSet.getString("name"));
                     equipEntry.setPriceXu(resultSet.getInt("price_xu"));
                     equipEntry.setPriceLuong(resultSet.getInt("price_luong"));

@@ -10,9 +10,9 @@ import lombok.Setter;
 @Setter
 public class EquipmentEntry {
     public int indexSale;
-    public Byte characterId;
+    public byte characterId;
     public byte equipType;
-    public byte equipIndex;
+    public short equipIndex;
     public String name;
     public int priceXu;
     public int priceLuong;

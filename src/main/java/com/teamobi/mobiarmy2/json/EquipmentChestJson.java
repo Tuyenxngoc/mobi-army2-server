@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class EquipmentChestJson {
 
     @SerializedName("i")
-    private byte equipIndex;
+    private short equipIndex;
 
     @SerializedName("eT")
     private byte equipType;
