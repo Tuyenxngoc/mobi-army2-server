@@ -38,8 +38,8 @@ public class UserDao implements IUserDao {
     @Override
     public void update(User user) {
         int nvstt = 1, pow = 1;
-        for (int i = 0; i < user.getNvStt().length; i++) {
-            nvstt |= user.getNvStt()[i] ? pow : 0;
+        for (int i = 0; i < user.getOwnedCharacters().length; i++) {
+            nvstt |= user.getOwnedCharacters()[i] ? pow : 0;
             pow <<= 1;
         }
 
@@ -118,7 +118,7 @@ public class UserDao implements IUserDao {
                     try (ResultSet playerResultSet = playerStatement.executeQuery()) {
                         //init
                         int len = NVData.CHARACTER_ENTRIES.size();
-                        user.setNvStt(new boolean[len]);
+                        user.setOwnedCharacters(new boolean[len]);
                         user.setLevels(new int[len]);
                         user.setLevelPercents(new byte[len]);
                         user.setXps(new int[len]);
@@ -140,7 +140,7 @@ public class UserDao implements IUserDao {
 
                             int nvstt = playerResultSet.getInt("sttnhanvat");
                             for (byte i = 0; i < 10; i++) {
-                                user.getNvStt()[i] = (nvstt & 1) > 0;
+                                user.getOwnedCharacters()[i] = (nvstt & 1) > 0;
                                 nvstt = nvstt / 2;
                             }
 

@@ -20,14 +20,14 @@ public class NVData {
     public static void addEquip(EquipmentEntry newEquip) {
         //Tìm nhân vật theo id
         CharacterEntry characterEntry = CHARACTER_ENTRIES.stream()
-                .filter(entry -> entry.id == newEquip.getCharacterId())
+                .filter(entry -> entry.getId() == newEquip.getCharacterId())
                 .findFirst()
                 .orElse(null);
         if (characterEntry == null) {
             return;
         }
         //Lấy danh sách theo loại trang bị, chưa có thì tạo mới
-        List<EquipmentEntry> entryList = characterEntry.equips.computeIfAbsent(newEquip.getEquipType(), k -> new ArrayList<>());
+        List<EquipmentEntry> entryList = characterEntry.getEquips().computeIfAbsent(newEquip.getEquipType(), k -> new ArrayList<>());
         if (entryList.stream().anyMatch(entry -> entry.getEquipIndex() == newEquip.getEquipIndex())) {//Nếu tồn tại trong danh sách rồi thì bỏ qua
             return;
         }
@@ -46,7 +46,7 @@ public class NVData {
     public static EquipmentEntry getEquipEntry(byte characterId, byte equipType, short equipIndex) {
         // Find the character entry by ID
         Optional<CharacterEntry> characterEntryOpt = CHARACTER_ENTRIES.stream()
-                .filter(entry -> entry.id == characterId)
+                .filter(entry -> entry.getId() == characterId)
                 .findFirst();
 
         if (characterEntryOpt.isEmpty()) {

@@ -195,7 +195,7 @@ public class GameService implements IGameService {
         for (byte i = 0; i < NVData.CHARACTER_ENTRIES.size(); i++) {
             CharacterEntry characterEntry = NVData.CHARACTER_ENTRIES.get(i);
             for (byte j = 0; j < 3; j++) {
-                defaultNvData[i][j] = characterEntry.equips.get(j).get(0).getEquipIndex();
+                defaultNvData[i][j] = characterEntry.getEquips().get(j).get(0).getEquipIndex();
             }
             defaultNvData[i][3] = 0;
             defaultNvData[i][4] = 0;

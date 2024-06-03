@@ -175,7 +175,7 @@ public class UserService implements IUserService {
         target.setLevels(source.getLevels());
         target.setLevelPercents(source.getLevelPercents());
         target.setNvUsed(source.getNvUsed());
-        target.setNvStt(source.getNvStt());
+        target.setOwnedCharacters(source.getOwnedCharacters());
         target.setXps(source.getXps());
         target.setPoints(source.getPoints());
         target.setPointAdd(source.getPointAdd());
@@ -461,7 +461,7 @@ public class UserService implements IUserService {
             //Nhan vat
             for (int i = 0; i < 10; i++) {
                 if (i > 2) {
-                    ds.writeByte(user.getNvStt()[i] ? 1 : 0);
+                    ds.writeByte(user.getOwnedCharacters()[i] ? 1 : 0);
                     CharacterEntry characterEntry = NVData.CHARACTER_ENTRIES.get(i);
                     ds.writeShort(characterEntry.getPriceXu() / 1000);
                     ds.writeShort(characterEntry.getPriceLuong());
@@ -1249,7 +1249,7 @@ public class UserService implements IUserService {
     public void handleChoseCharacter(Message ms) {
         try {
             byte idNv = ms.reader().readByte();
-            if (idNv >= NVData.CHARACTER_ENTRIES.size() || idNv < 0 || !user.getNvStt()[idNv]) {
+            if (idNv >= NVData.CHARACTER_ENTRIES.size() || idNv < 0 || !user.getOwnedCharacters()[idNv]) {
                 return;
             }
             user.setNvUsed(idNv);
@@ -1337,39 +1337,40 @@ public class UserService implements IUserService {
     @Override
     public void handleBuyCharacter(Message ms) {
         try {
-            byte idnv = ms.reader().readByte();
-            idnv += 3;
-            if (user.getNvStt()[idnv]) {
+            DataInputStream dis = ms.reader();
+            byte index = dis.readByte();
+            byte unit = dis.readByte();
+            index += 3;
+            if (user.getOwnedCharacters()[index]) {
                 return;
             }
-            CharacterEntry nventry = NVData.CHARACTER_ENTRIES.get(idnv);
-            byte buyLuong = ms.reader().readByte();
-            boolean buyOK = false;
-            if (buyLuong == 1) {
-                if (user.getLuong() >= nventry.priceLuong && nventry.priceLuong >= 0) {
-                    user.updateLuong(-nventry.priceLuong);
-                    buyOK = true;
+            CharacterEntry characterEntry = NVData.CHARACTER_ENTRIES.get(index);
+            if (unit == 0) {
+                if (characterEntry.getPriceXu() <= 0) {
+                    return;
                 }
-            } else {
-                if (user.getXu() >= nventry.priceXu && nventry.priceXu >= 0) {
-                    user.updateXu(-nventry.priceXu);
-                    buyOK = true;
+                if (user.getXu() < characterEntry.getPriceXu()) {
+                    sendServerMessage(GameString.xuNotEnought());
+                    return;
                 }
-            }
-            if (buyOK) {
-                user.getNvStt()[idnv] = true;
-                ms = new Message(74);
-                DataOutputStream ds = ms.writer();
-                ds.writeByte(idnv - 3);
-                ds.flush();
-                user.sendMessage(ms);
+                user.updateXu(-characterEntry.getPriceXu());
             } else {
-                ms = new Message(45);
-                DataOutputStream ds = ms.writer();
-                ds.writeUTF(GameString.xuNotEnought());
-                ds.flush();
-                user.sendMessage(ms);
+                if (characterEntry.getPriceLuong() <= 0) {
+                    return;
+                }
+                if (user.getLuong() < characterEntry.getPriceLuong()) {
+                    sendServerMessage(GameString.xuNotEnought());
+                    return;
+                }
+                user.updateLuong(-characterEntry.getPriceLuong());
             }
+
+            user.getOwnedCharacters()[index] = true;
+            ms = new Message(Cmd.BUY_GUN);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(index - 3);
+            ds.flush();
+            user.sendMessage(ms);
         } catch (IOException e) {
             e.printStackTrace();
         }

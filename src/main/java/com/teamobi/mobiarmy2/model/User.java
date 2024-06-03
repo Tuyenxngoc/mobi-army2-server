@@ -47,7 +47,7 @@ public class User {
     private int pointEvent;
     private LocalDateTime xpX2Time;
     private LocalDateTime lastOnline;
-    private boolean[] nvStt;
+    private boolean[] ownedCharacters;
     private int[] levels;
     private byte[] levelPercents;
     private int[] xps;
