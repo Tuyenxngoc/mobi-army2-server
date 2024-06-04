@@ -33,6 +33,6 @@ public class EquipmentChestEntry {
             return true;
         }
         long daysSincePurchase = ChronoUnit.DAYS.between(purchaseDate, LocalDateTime.now());
-        return equipmentEntry.getExpirationDays() - daysSincePurchase > 0;
+        return daysSincePurchase - equipmentEntry.getExpirationDays() > 0;
     }
 }

@@ -341,6 +341,50 @@ public class UserService implements IUserService {
 
     @Override
     public void giaHanDo(Message ms) {
+        try {
+            DataInputStream dis = ms.reader();
+            byte action = dis.readByte();
+            int key = dis.readInt();
+            EquipmentChestEntry equip = user.getEquipmentByKey(key);
+            if (equip == null) {
+                return;
+            }
+            int gia = 0;
+            for (byte itemId : equip.getSlots()) {
+                SpecialItemEntry item = SpecialItemData.getSpecialItemById(itemId);
+                if (item != null) {
+                    gia += item.getPriceXu();
+                }
+            }
+            gia /= 20;
+            if (equip.getEquipmentEntry().getPriceXu() > 0) {
+                gia += equip.getEquipmentEntry().getPriceXu();
+            } else if (equip.getEquipmentEntry().getPriceLuong() > 0) {
+                gia += equip.getEquipmentEntry().getPriceLuong() * 1000;
+            }
+            if (gia <= 0) {
+                return;
+            }
+            if (action == 0) {
+                ms = new Message(Cmd.GET_MORE_DAY);
+                DataOutputStream ds = ms.writer();
+                ds.writeInt(equip.getKey());
+                ds.writeUTF(GameString.giaHanRequest(gia));
+                ds.flush();
+                user.sendMessage(ms);
+            } else {
+                if (user.getXu() < gia) {
+                    sendServerMessage(GameString.xuNotEnought());
+                    return;
+                }
+                user.updateXu(-gia);
+                equip.setPurchaseDate(LocalDateTime.now());
+                user.updateInventory(equip, -1, null, null);
+                sendServerMessage(GameString.giaHanSucess());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -436,7 +480,16 @@ public class UserService implements IUserService {
 
             // Trang bị
             for (int i = 0; i < 10; i++) {
-                ds.writeBoolean(false);
+                EquipmentChestEntry caiTrang = user.getNvEquip()[i][5];
+                if (caiTrang != null) {
+                    ds.writeBoolean(true);
+                    for (short s : caiTrang.getEquipmentEntry().getDisguiseEquippedIndexes()) {
+                        ds.writeShort(s);
+                    }
+                } else {
+                    ds.writeBoolean(false);
+                }
+
                 for (int j = 0; j < 5; j++) {
                     if (user.getNvEquip()[i][j] != null) {
                         ds.writeShort(user.getNvEquip()[i][j].getEquipmentEntry().getEquipIndex());
@@ -803,6 +856,42 @@ public class UserService implements IUserService {
 
     @Override
     public void macTrangBiVip(Message ms) {
+        try {
+            DataInputStream dis = ms.reader();
+            byte action = dis.readByte();
+            int key = dis.readInt();
+            EquipmentChestEntry equip = user.getEquipmentByKey(key);
+            if (equip == null ||
+                    equip.isExpired() ||
+                    !equip.getEquipmentEntry().isDisguise() ||
+                    equip.getEquipmentEntry().getLevelRequirement() > user.getCurrentLevel() ||
+                    equip.getEquipmentEntry().getCharacterId() != user.getNvUsed()
+            ) {
+                return;
+            }
+            EquipmentChestEntry oldEquip = user.getNvEquip()[user.getNvUsed()][5];
+            if (oldEquip != null) {
+                oldEquip.setInUse(false);
+            }
+            ms = new Message(Cmd.VIP_EQUIP);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(action);
+            if (action == 0) {
+                user.getEquipData()[user.getNvUsed()][5] = -1;
+                user.getNvEquip()[user.getNvUsed()][5] = null;
+            } else {
+                equip.setInUse(true);
+                user.getEquipData()[user.getNvUsed()][5] = equip.getKey();
+                user.getNvEquip()[user.getNvUsed()][5] = equip;
+                for (short a : equip.getEquipmentEntry().getDisguiseEquippedIndexes()) {
+                    ds.writeShort(a);
+                }
+            }
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -1701,15 +1790,28 @@ public class UserService implements IUserService {
     @Override
     public void handleChangeEquipment(Message ms) {
         try {
-            int[] keys = new int[5];
-            for (int i = 0; i < 5; i++) {
-                keys[i] = ms.reader().readInt();
-            }
-            for (int i = 0; i < 5; i++) {
-                System.out.println(keys[i]);
-            }
             boolean changeSuccessful = false;
-
+            for (int i = 0; i < 5; i++) {
+                int key = ms.reader().readInt();
+                EquipmentChestEntry equip = user.getEquipmentByKey(key);
+                if (equip == null ||
+                        equip.isInUse() ||
+                        equip.isExpired() ||
+                        equip.getEquipmentEntry().isDisguise() ||
+                        equip.getEquipmentEntry().getLevelRequirement() > user.getCurrentLevel() ||
+                        equip.getEquipmentEntry().getCharacterId() != user.getNvUsed() || equip.getEquipmentEntry().getEquipType() != i
+                ) {
+                    continue;
+                }
+                EquipmentChestEntry oldEquip = user.getNvEquip()[user.getNvUsed()][i];
+                if (oldEquip != null) {
+                    oldEquip.setInUse(false);
+                }
+                equip.setInUse(true);
+                user.getNvEquip()[user.getNvUsed()][i] = equip;
+                user.getEquipData()[user.getNvUsed()][i] = equip.getKey();
+                changeSuccessful = true;
+            }
             ms = new Message(Cmd.CHANGE_EQUIP);
             DataOutputStream ds = ms.writer();
             ds.writeByte(changeSuccessful ? 1 : 0);
@@ -1761,7 +1863,6 @@ public class UserService implements IUserService {
                     byte size = dis.readByte();
                     for (int i = 0; i < size; i++) {
                         int id = dis.readInt();
-                        System.out.println(id);
                     }
                 }
                 case 2 -> {//Xac nhan ban trang bi

@@ -204,9 +204,22 @@ public class UserDao implements IUserDao {
                                 CharacterJson characterJson = GsonUtil.GSON.fromJson(playerResultSet.getString("NV" + (i + 1)), CharacterJson.class);
                                 user.getLevels()[i] = characterJson.getLevel();
                                 user.getXps()[i] = characterJson.getXp();
-                                user.getLevelPercents()[i] = Until.calculateLevelPercent(characterJson.getXp(), XpData.getXpRequestLevel(characterJson.getLevel()));
+                                user.getLevelPercents()[i] = Until.calculateLevelPercent(characterJson.getXp(), XpData.getXpRequestLevel(characterJson.getLevel() + 1));
                                 user.getPoints()[i] = characterJson.getPoint();
                                 user.getPointAdd()[i] = characterJson.getPointAdd();
+                                user.getEquipData()[i] = new int[]{-1, -1, -1, -1, -1, -1};
+                                for (int j = 0; j < characterJson.getData().length; j++) {
+                                    int key = characterJson.getData()[j];
+                                    EquipmentChestEntry equip = user.getEquipmentByKey(key);
+                                    if (equip != null) {
+                                        if (equip.isExpired()) {
+                                            equip.setInUse(false);
+                                        } else {
+                                            user.getNvEquip()[i][j] = equip;
+                                            user.getEquipData()[i][j] = equip.getKey();
+                                        }
+                                    }
+                                }
                             }
 
                             Type listType = new TypeToken<List<Integer>>() {

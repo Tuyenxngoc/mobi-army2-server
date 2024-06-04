@@ -399,4 +399,11 @@ public class User {
         }
         mission[missionId] += quantity;
     }
+
+    public EquipmentChestEntry getEquipmentByKey(int key) {
+        return ruongDoTB.stream()
+                .filter(equip -> equip.getKey() == key)
+                .findFirst()
+                .orElse(null);
+    }
 }

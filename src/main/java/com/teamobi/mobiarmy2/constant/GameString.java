@@ -213,8 +213,8 @@ public class GameString {
         return "Thao tác thành công!";
     }
 
-    public static String giaHanRequest() {
-        return "Bạn có muốn gia hạn trang bị này với giá %d xu?";
+    public static String giaHanRequest(int xu) {
+        return String.format("Bạn có muốn gia hạn trang bị này với giá %d xu?", xu);
     }
 
     public static String giaHanSucess() {
