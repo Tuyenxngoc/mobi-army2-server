@@ -247,16 +247,8 @@ public class User {
         }
         addEquipment.setEmptySlot((byte) 3);
         addEquipment.setSlots(new byte[]{-1, -1, -1});
-
-        int bestLocation = ruongDoTB.indexOf(null);
-        if (bestLocation == -1) {
-            addEquipment.setKey(ruongDoTB.size());
-            ruongDoTB.add(addEquipment);
-        } else {
-            addEquipment.setKey(bestLocation);
-            ruongDoTB.set(bestLocation, addEquipment);
-        }
-        addEquipment.setKey(addEquipment.getKey() | 0x10000);
+        addEquipment.setKey(ruongDoTB.size());//todo random unique key
+        ruongDoTB.add(addEquipment);
 
         try {
             Message ms = new Message(Cmd.BUY_EQUIP);
@@ -284,7 +276,7 @@ public class User {
 
     public synchronized void updateInventory(
             EquipmentChestEntry updateEquipment,
-            int removeEquipmentIndex,
+            EquipmentChestEntry removeEquipment,
             List<SpecialItemChestEntry> addItems,
             List<SpecialItemChestEntry> removeItems
     ) {
@@ -305,7 +297,6 @@ public class User {
                     ds1.writeByte(updateEquipment.getAddPercents()[i]);
                 }
                 ds1.writeByte(updateEquipment.getEmptySlot());
-                // Ngay het han
                 int hanSD = updateEquipment.getEquipmentEntry().getExpirationDays() - Until.getNumDay(updateEquipment.getPurchaseDate(), LocalDateTime.now());
                 if (hanSD < 0) {
                     hanSD = 0;
@@ -360,11 +351,11 @@ public class User {
                 }
             }
 
-            if (removeEquipmentIndex >= 0 && removeEquipmentIndex < ruongDoTB.size() && ruongDoTB.get(removeEquipmentIndex) != null) {
+            if (removeEquipment != null) {
                 updateQuantity++;
-                ruongDoTB.set(removeEquipmentIndex, null);
+                ruongDoTB.remove(removeEquipment);
                 ds1.writeByte(0);
-                ds1.writeInt(removeEquipmentIndex | 0x10000);
+                ds1.writeInt(removeEquipment.getKey());
                 ds1.writeByte(1);
             }
 

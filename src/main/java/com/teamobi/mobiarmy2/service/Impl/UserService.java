@@ -379,7 +379,7 @@ public class UserService implements IUserService {
                 }
                 user.updateXu(-gia);
                 equip.setPurchaseDate(LocalDateTime.now());
-                user.updateInventory(equip, -1, null, null);
+                user.updateInventory(equip, null, null, null);
                 sendServerMessage(GameString.giaHanSucess());
             }
         } catch (IOException e) {
@@ -826,7 +826,7 @@ public class UserService implements IUserService {
         rdE.setItem(item);
         rdE.setQuantity(quantity);
         array.add(rdE);
-        user.updateInventory(null, -1, array, null);
+        user.updateInventory(null, null, array, null);
 
         sendServerMessage(GameString.buySuccess());
     }
@@ -1534,7 +1534,7 @@ public class UserService implements IUserService {
                 additionalItems.add(newItem);
                 sendMSSToUser(GameString.giftCodeReward(code, newItem.getQuantity(), newItem.getItem().getName()));
             }
-            user.updateInventory(null, -1, additionalItems, null);
+            user.updateInventory(null, null, additionalItems, null);
         }
         if (rewardData.getEquips() != null) {
             for (EquipmentChestJson json : rewardData.getEquips()) {
