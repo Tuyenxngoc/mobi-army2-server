@@ -13,12 +13,12 @@ import java.time.temporal.ChronoUnit;
 @Getter
 @Setter
 public class EquipmentChestEntry {
-    private int index;
+    private int key;
     private LocalDateTime purchaseDate;
     private byte vipLevel;
     private byte emptySlot;
-    private byte[] additionalPoints;
-    private byte[] additionalPercent;
+    private byte[] addPoints;
+    private byte[] addPercents;
     private byte[] slots;
     private boolean inUse;
     private EquipmentEntry equipmentEntry;

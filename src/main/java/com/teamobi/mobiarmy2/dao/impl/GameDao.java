@@ -113,8 +113,8 @@ public class GameDao implements IGameDao {
                     equipEntry.setBigImageSizeY(GsonUtil.GSON.fromJson(resultSet.getString("big_image_size_y"), byte[].class));
                     equipEntry.setBigImageAlignX(GsonUtil.GSON.fromJson(resultSet.getString("big_image_align_x"), byte[].class));
                     equipEntry.setBigImageAlignY(GsonUtil.GSON.fromJson(resultSet.getString("big_image_align_y"), byte[].class));
-                    equipEntry.setAdditionalPoints(GsonUtil.GSON.fromJson(resultSet.getString("additional_points"), byte[].class));
-                    equipEntry.setAdditionalPercent(GsonUtil.GSON.fromJson(resultSet.getString("additional_percent"), byte[].class));
+                    equipEntry.setAddPoints(GsonUtil.GSON.fromJson(resultSet.getString("additional_points"), byte[].class));
+                    equipEntry.setAddPercents(GsonUtil.GSON.fromJson(resultSet.getString("additional_percent"), byte[].class));
 
                     NVData.addEquip(equipEntry);
                 }

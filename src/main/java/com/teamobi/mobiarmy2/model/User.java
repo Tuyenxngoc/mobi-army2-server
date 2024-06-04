@@ -239,37 +239,38 @@ public class User {
 
         addEquipment.setPurchaseDate(LocalDateTime.now());
         addEquipment.setInUse(false);
-        if (addEquipment.getAdditionalPoints() == null) {
-            addEquipment.setAdditionalPoints(addEquipment.getEquipmentEntry().getAdditionalPoints());
+        if (addEquipment.getAddPoints() == null) {
+            addEquipment.setAddPoints(addEquipment.getEquipmentEntry().getAddPoints());
         }
-        if (addEquipment.getAdditionalPercent() == null) {
-            addEquipment.setAdditionalPercent(addEquipment.getEquipmentEntry().getAdditionalPercent());
+        if (addEquipment.getAddPercents() == null) {
+            addEquipment.setAddPercents(addEquipment.getEquipmentEntry().getAddPercents());
         }
         addEquipment.setEmptySlot((byte) 3);
         addEquipment.setSlots(new byte[]{-1, -1, -1});
 
         int bestLocation = ruongDoTB.indexOf(null);
         if (bestLocation == -1) {
-            addEquipment.setIndex(ruongDoTB.size());
+            addEquipment.setKey(ruongDoTB.size());
             ruongDoTB.add(addEquipment);
         } else {
-            addEquipment.setIndex(bestLocation);
+            addEquipment.setKey(bestLocation);
             ruongDoTB.set(bestLocation, addEquipment);
         }
+        addEquipment.setKey(addEquipment.getKey() | 0x10000);
 
         try {
             Message ms = new Message(Cmd.BUY_EQUIP);
             DataOutputStream ds = ms.writer();
             ds.writeByte(0);
-            ds.writeInt(addEquipment.getIndex() | 0x10000);
+            ds.writeInt(addEquipment.getKey());
             ds.writeByte(addEquipment.getEquipmentEntry().getCharacterId());
             ds.writeByte(addEquipment.getEquipmentEntry().getEquipType());
             ds.writeShort(addEquipment.getEquipmentEntry().getEquipIndex());
             ds.writeUTF(addEquipment.getEquipmentEntry().getName());
-            ds.writeByte(addEquipment.getAdditionalPoints().length * 2);
-            for (int i = 0; i < addEquipment.getAdditionalPoints().length; i++) {
-                ds.writeByte(addEquipment.getAdditionalPoints()[i]);
-                ds.writeByte(addEquipment.getAdditionalPercent()[i]);
+            ds.writeByte(addEquipment.getAddPoints().length * 2);
+            for (int i = 0; i < addEquipment.getAddPoints().length; i++) {
+                ds.writeByte(addEquipment.getAddPoints()[i]);
+                ds.writeByte(addEquipment.getAddPercents()[i]);
             }
             ds.writeByte(addEquipment.getEquipmentEntry().getExpirationDays());
             ds.writeByte(addEquipment.getEquipmentEntry().isDisguise() ? 1 : 0);
@@ -297,11 +298,11 @@ public class User {
             if (updateEquipment != null) {
                 updateQuantity++;
                 ds1.writeByte(2);
-                ds1.writeInt(updateEquipment.getIndex() | 0x10000);
-                ds1.writeByte(updateEquipment.getAdditionalPoints().length * 2);
-                for (int i = 0; i < updateEquipment.getAdditionalPoints().length; i++) {
-                    ds1.writeByte(updateEquipment.getAdditionalPoints()[i]);
-                    ds1.writeByte(updateEquipment.getAdditionalPercent()[i]);
+                ds1.writeInt(updateEquipment.getKey());
+                ds1.writeByte(updateEquipment.getAddPoints().length * 2);
+                for (int i = 0; i < updateEquipment.getAddPoints().length; i++) {
+                    ds1.writeByte(updateEquipment.getAddPoints()[i]);
+                    ds1.writeByte(updateEquipment.getAddPercents()[i]);
                 }
                 ds1.writeByte(updateEquipment.getEmptySlot());
                 // Ngay het han

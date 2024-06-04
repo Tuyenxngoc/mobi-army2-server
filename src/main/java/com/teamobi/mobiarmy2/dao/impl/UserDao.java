@@ -170,12 +170,12 @@ public class UserDao implements IUserDao {
                                 if (equip.getEquipmentEntry() == null) {
                                     continue;
                                 }
-                                equip.setIndex(0);
+                                equip.setKey(json.getKey());
                                 equip.setPurchaseDate(json.getPurchaseDate());
                                 equip.setVipLevel(json.getVipLevel());
                                 equip.setInUse(json.getInUse() == 1);
-                                equip.setAdditionalPoints(json.getAdditionalPoints());
-                                equip.setAdditionalPercent(json.getAdditionalPercent());
+                                equip.setAddPoints(json.getAdditionalPoints());
+                                equip.setAddPercents(json.getAdditionalPercent());
                                 equip.setSlots(json.getSlots());
                                 byte emptySlot = 0;
                                 for (int l = 0; l < equip.getSlots().length; l++) {

@@ -26,8 +26,8 @@ public class EquipmentEntry {
     private byte[] bigImageSizeY;
     private byte[] bigImageAlignX;
     private byte[] bigImageAlignY;
-    private byte[] additionalPoints;
-    private byte[] additionalPercent;
+    private byte[] addPoints;
+    private byte[] addPercents;
     private boolean onSale;
     private boolean isDisguise;
     private short[] disguiseEquippedIndexes;

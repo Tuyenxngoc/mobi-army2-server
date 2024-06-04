@@ -33,12 +33,13 @@ public class JsonConverter {
             jsonItem.setCharacterId(entry.getEquipmentEntry().getCharacterId());
             jsonItem.setEquipIndex(entry.getEquipmentEntry().getEquipIndex());
             jsonItem.setEquipType(entry.getEquipmentEntry().getEquipType());
+            jsonItem.setKey(entry.getKey());
             jsonItem.setInUse((byte) (entry.isInUse() ? 1 : 0));
             jsonItem.setVipLevel(entry.getVipLevel());
             jsonItem.setPurchaseDate(entry.getPurchaseDate());
             jsonItem.setSlots(entry.getSlots());
-            jsonItem.setAdditionalPoints(entry.getAdditionalPoints());
-            jsonItem.setAdditionalPercent(entry.getAdditionalPercent());
+            jsonItem.setAdditionalPoints(entry.getAddPoints());
+            jsonItem.setAdditionalPercent(entry.getAddPercents());
 
             return jsonItem;
         }).collect(Collectors.toList());

@@ -1452,8 +1452,8 @@ public class UserService implements IUserService {
                 EquipmentChestEntry addEquip = new EquipmentChestEntry();
                 addEquip.setEquipmentEntry(NVData.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
                 addEquip.setVipLevel(json.getVipLevel());
-                addEquip.setAdditionalPoints(json.getAdditionalPoints());
-                addEquip.setAdditionalPercent(json.getAdditionalPercent());
+                addEquip.setAddPoints(json.getAdditionalPoints());
+                addEquip.setAddPercents(json.getAdditionalPercent());
 
                 user.addEquipment(addEquip);
                 sendMSSToUser(GameString.giftCodeReward(code, addEquip.getEquipmentEntry().getName()));
@@ -1618,15 +1618,15 @@ public class UserService implements IUserService {
             DataOutputStream ds = ms.writer();
             ds.writeByte(user.getRuongDoTB().size());
             for (EquipmentChestEntry entry : user.getRuongDoTB()) {
-                ds.writeInt(entry.getIndex() | 0x10000);
+                ds.writeInt(entry.getKey());
                 ds.writeByte(entry.getEquipmentEntry().getCharacterId());
                 ds.writeByte(entry.getEquipmentEntry().getEquipType());
                 ds.writeShort(entry.getEquipmentEntry().getEquipIndex());
                 ds.writeUTF(entry.getEquipmentEntry().getName());
-                ds.writeByte(entry.getAdditionalPoints().length * 2);
-                for (int j = 0; j < entry.getAdditionalPoints().length; j++) {
-                    ds.writeByte(entry.getAdditionalPoints()[j]);
-                    ds.writeByte(entry.getAdditionalPercent()[j]);
+                ds.writeByte(entry.getAddPoints().length * 2);
+                for (int j = 0; j < entry.getAddPoints().length; j++) {
+                    ds.writeByte(entry.getAddPoints()[j]);
+                    ds.writeByte(entry.getAddPercents()[j]);
                 }
                 ds.writeByte(Math.max(entry.getEquipmentEntry().getExpirationDays() - Until.getNumDay(entry.getPurchaseDate(), LocalDateTime.now()), 0));
                 ds.writeByte(entry.getEmptySlot());
@@ -1706,10 +1706,6 @@ public class UserService implements IUserService {
                 keys[i] = ms.reader().readInt();
             }
             for (int i = 0; i < 5; i++) {
-                if ((keys[i] & 0x10000) == 0) {
-                    continue;
-                }
-                keys[i] = keys[i] & 0xFFFF;
                 System.out.println(keys[i]);
             }
             boolean changeSuccessful = false;
