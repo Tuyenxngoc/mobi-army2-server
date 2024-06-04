@@ -166,8 +166,8 @@ public class UserDao implements IUserDao {
                             EquipmentChestJson[] equipmentChestJsons = GsonUtil.GSON.fromJson(playerResultSet.getString("ruongTrangBi"), EquipmentChestJson[].class);
                             for (EquipmentChestJson json : equipmentChestJsons) {
                                 EquipmentChestEntry equip = new EquipmentChestEntry();
-                                equip.setEquipmentEntry(NVData.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
-                                if (equip.getEquipmentEntry() == null) {
+                                equip.setEquipEntry(NVData.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
+                                if (equip.getEquipEntry() == null) {
                                     continue;
                                 }
                                 equip.setKey(json.getKey());

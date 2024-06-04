@@ -10,14 +10,15 @@ import lombok.Setter;
 @Setter
 public class SpecialItemEntry {
     private byte id;
-    private int indexSale;
+    private int saleIndex;
     private String name;
     private String detail;
     private short[] ability;
     private int priceXu;
     private int priceLuong;
     private int priceSellXu;
-    private short expiration_days;
+    private short expirationDays;
     private boolean showSelection;
     private boolean isOnSale;
+    private boolean isGem;
 }

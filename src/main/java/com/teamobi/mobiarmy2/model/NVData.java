@@ -33,10 +33,10 @@ public class NVData {
         }
 
         if (newEquip.isOnSale()) {
-            newEquip.setIndexSale(totalSaleEquipments);
+            newEquip.setSaleIndex(totalSaleEquipments);
             totalSaleEquipments++;
         } else {
-            newEquip.setIndexSale(-1);
+            newEquip.setSaleIndex(-1);
         }
 
         entryList.add(newEquip);
@@ -67,9 +67,9 @@ public class NVData {
                 .orElse(null);
     }
 
-    public static EquipmentEntry getEquipEntryByIndexSale(int indexSale) {
+    public static EquipmentEntry getEquipEntryBySaleIndex(int saleIndex) {
         return EQUIPMENT_ENTRIES.stream()
-                .filter(equipEntry -> equipEntry.isOnSale() && equipEntry.getIndexSale() == indexSale)
+                .filter(equipEntry -> equipEntry.isOnSale() && equipEntry.getSaleIndex() == saleIndex)
                 .findFirst()
                 .orElse(null);
     }

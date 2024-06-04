@@ -30,9 +30,9 @@ public class JsonConverter {
         // Convert the list of EquipmentChestEntry to EquipmentChestJson
         List<EquipmentChestJson> equipmentChestJsons = ruongdoTB.stream().map(entry -> {
             EquipmentChestJson jsonItem = new EquipmentChestJson();
-            jsonItem.setCharacterId(entry.getEquipmentEntry().getCharacterId());
-            jsonItem.setEquipIndex(entry.getEquipmentEntry().getEquipIndex());
-            jsonItem.setEquipType(entry.getEquipmentEntry().getEquipType());
+            jsonItem.setCharacterId(entry.getEquipEntry().getCharacterId());
+            jsonItem.setEquipIndex(entry.getEquipEntry().getEquipIndex());
+            jsonItem.setEquipType(entry.getEquipEntry().getEquipType());
             jsonItem.setKey(entry.getKey());
             jsonItem.setInUse((byte) (entry.isInUse() ? 1 : 0));
             jsonItem.setVipLevel(entry.getVipLevel());

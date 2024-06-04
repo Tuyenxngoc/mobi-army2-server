@@ -121,7 +121,7 @@ public class User {
         return pointAdd[nvUsed];
     }
 
-    public void updateXu(int xuUp) {
+    public synchronized void updateXu(int xuUp) {
         if (xuUp == 0) {
             return;
         }
@@ -136,7 +136,7 @@ public class User {
         userService.sendUpdateMoney();
     }
 
-    public void updateLuong(int luongUp) {
+    public synchronized void updateLuong(int luongUp) {
         if (luongUp == 0) {
             return;
         }
@@ -151,7 +151,7 @@ public class User {
         userService.sendUpdateMoney();
     }
 
-    public void updateDanhVong(int danhVongUp) {
+    public synchronized void updateDanhVong(int danhVongUp) {
         if (danhVongUp == 0) {
             return;
         }
@@ -166,11 +166,11 @@ public class User {
         userService.sendUpdateDanhVong(danhVongUp);
     }
 
-    public void updateXp(int xpUp) {
+    public synchronized void updateXp(int xpUp) {
         updateXp(xpUp, false);
     }
 
-    public void updateXp(int xpUp, boolean isXpMultiplier) {
+    public synchronized void updateXp(int xpUp, boolean isXpMultiplier) {
         if (xpUp <= 0) {
             return;
         }
@@ -201,16 +201,16 @@ public class User {
 
     public short[] getEquip() {
         short[] equip = new short[5];
-        if (this.nvEquip[getNvUsed()][5] != null && this.nvEquip[getNvUsed()][5].getEquipmentEntry().isDisguise()) {
-            equip[0] = this.nvEquip[getNvUsed()][5].getEquipmentEntry().getDisguiseEquippedIndexes()[0];
-            equip[1] = this.nvEquip[getNvUsed()][5].getEquipmentEntry().getDisguiseEquippedIndexes()[1];
-            equip[2] = this.nvEquip[getNvUsed()][5].getEquipmentEntry().getDisguiseEquippedIndexes()[2];
-            equip[3] = this.nvEquip[getNvUsed()][5].getEquipmentEntry().getDisguiseEquippedIndexes()[3];
-            equip[4] = this.nvEquip[getNvUsed()][5].getEquipmentEntry().getDisguiseEquippedIndexes()[4];
+        if (this.nvEquip[getNvUsed()][5] != null && this.nvEquip[getNvUsed()][5].getEquipEntry().isDisguise()) {
+            equip[0] = this.nvEquip[getNvUsed()][5].getEquipEntry().getDisguiseEquippedIndexes()[0];
+            equip[1] = this.nvEquip[getNvUsed()][5].getEquipEntry().getDisguiseEquippedIndexes()[1];
+            equip[2] = this.nvEquip[getNvUsed()][5].getEquipEntry().getDisguiseEquippedIndexes()[2];
+            equip[3] = this.nvEquip[getNvUsed()][5].getEquipEntry().getDisguiseEquippedIndexes()[3];
+            equip[4] = this.nvEquip[getNvUsed()][5].getEquipEntry().getDisguiseEquippedIndexes()[4];
         } else {
             for (int i = 0; i < 5; i++) {
-                if (this.nvEquip[getNvUsed()][i] != null && !this.nvEquip[getNvUsed()][i].getEquipmentEntry().isDisguise()) {
-                    equip[i] = this.nvEquip[getNvUsed()][i].getEquipmentEntry().getEquipIndex();
+                if (this.nvEquip[getNvUsed()][i] != null && !this.nvEquip[getNvUsed()][i].getEquipEntry().isDisguise()) {
+                    equip[i] = this.nvEquip[getNvUsed()][i].getEquipEntry().getEquipIndex();
                 } else if (nvEquipDefault[getNvUsed()][i] != null) {
                     equip[i] = nvEquipDefault[getNvUsed()][i].getEquipIndex();
                 } else {
@@ -221,7 +221,7 @@ public class User {
         return equip;
     }
 
-    public void updateItems(byte itemIndex, int quantity) {
+    public synchronized void updateItems(byte itemIndex, int quantity) {
         this.items[itemIndex] += quantity;
         if (this.items[itemIndex] < 0) {
             this.items[itemIndex] = 0;
@@ -240,14 +240,14 @@ public class User {
         addEquipment.setPurchaseDate(LocalDateTime.now());
         addEquipment.setInUse(false);
         if (addEquipment.getAddPoints() == null) {
-            addEquipment.setAddPoints(addEquipment.getEquipmentEntry().getAddPoints());
+            addEquipment.setAddPoints(addEquipment.getEquipEntry().getAddPoints());
         }
         if (addEquipment.getAddPercents() == null) {
-            addEquipment.setAddPercents(addEquipment.getEquipmentEntry().getAddPercents());
+            addEquipment.setAddPercents(addEquipment.getEquipEntry().getAddPercents());
         }
         addEquipment.setEmptySlot((byte) 3);
         addEquipment.setSlots(new byte[]{-1, -1, -1});
-        addEquipment.setKey(ruongDoTB.size());//todo random unique key
+        addEquipment.setKey((int) (System.currentTimeMillis() & 0xFFFFFF));
         ruongDoTB.add(addEquipment);
 
         try {
@@ -255,17 +255,17 @@ public class User {
             DataOutputStream ds = ms.writer();
             ds.writeByte(0);
             ds.writeInt(addEquipment.getKey());
-            ds.writeByte(addEquipment.getEquipmentEntry().getCharacterId());
-            ds.writeByte(addEquipment.getEquipmentEntry().getEquipType());
-            ds.writeShort(addEquipment.getEquipmentEntry().getEquipIndex());
-            ds.writeUTF(addEquipment.getEquipmentEntry().getName());
+            ds.writeByte(addEquipment.getEquipEntry().getCharacterId());
+            ds.writeByte(addEquipment.getEquipEntry().getEquipType());
+            ds.writeShort(addEquipment.getEquipEntry().getEquipIndex());
+            ds.writeUTF(addEquipment.getEquipEntry().getName());
             ds.writeByte(addEquipment.getAddPoints().length * 2);
             for (int i = 0; i < addEquipment.getAddPoints().length; i++) {
                 ds.writeByte(addEquipment.getAddPoints()[i]);
                 ds.writeByte(addEquipment.getAddPercents()[i]);
             }
-            ds.writeByte(addEquipment.getEquipmentEntry().getExpirationDays());
-            ds.writeByte(addEquipment.getEquipmentEntry().isDisguise() ? 1 : 0);
+            ds.writeByte(addEquipment.getEquipEntry().getExpirationDays());
+            ds.writeByte(addEquipment.getEquipEntry().isDisguise() ? 1 : 0);
             ds.writeByte(addEquipment.getVipLevel());
             ds.flush();
             sendMessage(ms);
@@ -297,7 +297,7 @@ public class User {
                     ds1.writeByte(updateEquipment.getAddPercents()[i]);
                 }
                 ds1.writeByte(updateEquipment.getEmptySlot());
-                int hanSD = updateEquipment.getEquipmentEntry().getExpirationDays() - Until.getNumDay(updateEquipment.getPurchaseDate(), LocalDateTime.now());
+                int hanSD = updateEquipment.getEquipEntry().getExpirationDays() - Until.getNumDay(updateEquipment.getPurchaseDate(), LocalDateTime.now());
                 if (hanSD < 0) {
                     hanSD = 0;
                 }
@@ -377,14 +377,14 @@ public class User {
         }
     }
 
-    public void updatePoints(short[] pointsToAdd, short totalPointsToSubtract) {
+    public synchronized void updatePoints(short[] pointsToAdd, short totalPointsToSubtract) {
         for (int i = 0; i < 5; i++) {
             pointAdd[nvUsed][i] += pointsToAdd[i];
         }
         points[nvUsed] -= totalPointsToSubtract;
     }
 
-    public void updateMission(int missionId, int quantity) {
+    public synchronized void updateMission(int missionId, int quantity) {
         if (missionId < 0 || missionId >= mission.length) {
             return;
         }

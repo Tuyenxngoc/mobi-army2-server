@@ -189,16 +189,20 @@ public class GameString {
         return "Số lượng đã quá mức tối đa!";
     }
 
-    public static String thaoNgocRequest() {
-        return "Bạn có muốn tháo ngọc khỏi trang bị? Bạn cần %d xu?";
+    public static String thaoNgocRequest(int xu) {
+        return String.format("Bạn có muốn tháo hết ngọc trong trang bị này ra? Chi phí là %d xu", xu);
     }
 
-    public static String sellTBRequest() {
-        return "Bạn có muốn bán trang bị này với giá %d xu?";
+    public static String sellTBRequest(int quantity, int xu) {
+        return String.format("Bạn có muốn bán %d trang bị này với giá %d xu không?", quantity, xu);
     }
 
     public static String sellTBError1() {
         return "Không thể bán trang bị đang sử dụng!";
+    }
+
+    public static String sellTBError2() {
+        return "Vui lòng tháo hết ngọc trước khi bán trang bị.";
     }
 
     public static String thaoNgocError1() {

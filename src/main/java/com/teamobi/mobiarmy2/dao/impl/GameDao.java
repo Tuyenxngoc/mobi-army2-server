@@ -198,12 +198,13 @@ public class GameDao implements IGameDao {
                     specialItemEntry.setId(resultSet.getByte("special_item_id"));
                     specialItemEntry.setName(resultSet.getString("name"));
                     specialItemEntry.setDetail(resultSet.getString("detail"));
-                    specialItemEntry.setPriceXu(resultSet.getInt("priceXu"));
-                    specialItemEntry.setPriceLuong(resultSet.getInt("priceLuong"));
-                    specialItemEntry.setPriceSellXu(resultSet.getInt("priceSellXu"));
-                    specialItemEntry.setExpiration_days(resultSet.getShort("expiration_days"));
-                    specialItemEntry.setShowSelection(resultSet.getBoolean("showSelection"));
-                    specialItemEntry.setOnSale(resultSet.getBoolean("isOnSale"));
+                    specialItemEntry.setPriceXu(resultSet.getInt("price_xu"));
+                    specialItemEntry.setPriceLuong(resultSet.getInt("price_luong"));
+                    specialItemEntry.setPriceSellXu(resultSet.getInt("price_sell_xu"));
+                    specialItemEntry.setExpirationDays(resultSet.getShort("expiration_days"));
+                    specialItemEntry.setShowSelection(resultSet.getBoolean("show_selection"));
+                    specialItemEntry.setOnSale(resultSet.getBoolean("is_on_sale"));
+                    specialItemEntry.setGem(resultSet.getBoolean("is_gem"));
                     specialItemEntry.setAbility(GsonUtil.GSON.fromJson(resultSet.getString("ability"), short[].class));
 
                     SpecialItemData.SPECIAL_ITEM_ENTRIES.add(specialItemEntry);

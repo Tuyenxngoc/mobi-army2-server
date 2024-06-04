@@ -21,7 +21,7 @@ public class EquipmentChestEntry {
     private byte[] addPercents;
     private byte[] slots;
     private boolean inUse;
-    private EquipmentEntry equipmentEntry;
+    private EquipmentEntry equipEntry;
 
     /**
      * Checks if the equipment is expired based on its expiration days and the current date.
@@ -29,10 +29,10 @@ public class EquipmentChestEntry {
      * @return true if the equipment is expired, false otherwise
      */
     public boolean isExpired() {
-        if (equipmentEntry == null) {
+        if (equipEntry == null) {
             return true;
         }
         long daysSincePurchase = ChronoUnit.DAYS.between(purchaseDate, LocalDateTime.now());
-        return daysSincePurchase - equipmentEntry.getExpirationDays() > 0;
+        return daysSincePurchase - equipEntry.getExpirationDays() > 0;
     }
 }
