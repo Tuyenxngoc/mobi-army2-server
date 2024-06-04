@@ -111,7 +111,7 @@ public class ServerManager {
                 if (j == 0) {
                     config.getRoomTypeStartNum()[i] = k;
                 }
-                rooms[k] = new Room(k, i, config.getN_area(), j);
+                rooms[k] = new Room(k, i, config.getNArea(), j);
                 k++;
             }
         }

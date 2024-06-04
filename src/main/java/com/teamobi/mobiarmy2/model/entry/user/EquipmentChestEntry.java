@@ -29,10 +29,28 @@ public class EquipmentChestEntry {
      * @return true if the equipment is expired, false otherwise
      */
     public boolean isExpired() {
+        return equipEntry != null && ChronoUnit.DAYS.between(purchaseDate, LocalDateTime.now()) > equipEntry.getExpirationDays();
+    }
+
+    /**
+     * Gets the number of days since the equipment was purchased.
+     *
+     * @return the number of days since purchase
+     */
+    public int getDaysSincePurchase() {
+        return (int) ChronoUnit.DAYS.between(purchaseDate, LocalDateTime.now());
+    }
+
+    /**
+     * Returns the number of remaining days for the equipment entry.
+     * If there is no equipment entry, it returns 0.
+     *
+     * @return the number of remaining days for the equipment entry
+     */
+    public int getRemainingDays() {
         if (equipEntry == null) {
-            return true;
+            return 0;
         }
-        long daysSincePurchase = ChronoUnit.DAYS.between(purchaseDate, LocalDateTime.now());
-        return daysSincePurchase - equipEntry.getExpirationDays() > 0;
+        return Math.max(equipEntry.getExpirationDays() - getDaysSincePurchase(), 0);
     }
 }

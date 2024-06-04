@@ -124,7 +124,7 @@ public interface IUserService {
 
     void handleSendShopEquipments();
 
-    void handleEquipmentPurchases(Message ms);
+    void handleEquipmentTransactions(Message ms);
 
     void handleSpinWheel(Message ms);
 

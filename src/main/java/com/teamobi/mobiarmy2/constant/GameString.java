@@ -214,7 +214,7 @@ public class GameString {
     }
 
     public static String thaoNgocSuccess() {
-        return "Thao tác thành công!";
+        return "Tháo lấy ngọc thành công.";
     }
 
     public static String giaHanRequest(int xu) {

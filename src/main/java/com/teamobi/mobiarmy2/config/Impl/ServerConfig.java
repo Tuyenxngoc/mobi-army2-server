@@ -416,7 +416,7 @@ public class ServerConfig implements IServerConfig {
     }
 
     @Override
-    public byte getN_area() {
+    public byte getNArea() {
         return n_area;
     }
 
@@ -541,12 +541,12 @@ public class ServerConfig implements IServerConfig {
     }
 
     @Override
-    public int getMax_clients() {
+    public int getMaxClients() {
         return max_clients;
     }
 
     @Override
-    public int getMax_ruong_tb() {
+    public int getMaxRuongTB() {
         return max_ruong_tb;
     }
 
@@ -561,12 +561,12 @@ public class ServerConfig implements IServerConfig {
     }
 
     @Override
-    public int getMax_item() {
+    public int getMaxItem() {
         return max_item;
     }
 
     @Override
-    public int getMax_friends() {
+    public int getMaxFriends() {
         return max_friends;
     }
 

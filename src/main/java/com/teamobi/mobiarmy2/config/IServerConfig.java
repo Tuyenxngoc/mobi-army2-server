@@ -4,7 +4,7 @@ public interface IServerConfig {
 
     boolean isDebug();
 
-    byte getN_area();
+    byte getNArea();
 
     short getPort();
 
@@ -54,17 +54,17 @@ public interface IServerConfig {
 
     String getTaiGameURL();
 
-    int getMax_clients();
+    int getMaxClients();
 
-    int getMax_ruong_tb();
+    int getMaxRuongTB();
 
     int getMax_ruong_item();
 
     int getMax_ruong_itemslot();
 
-    int getMax_item();
+    int getMaxItem();
 
-    int getMax_friends();
+    int getMaxFriends();
 
     String[] getRoomTypes();
 

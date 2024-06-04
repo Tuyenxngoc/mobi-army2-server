@@ -226,8 +226,8 @@ public class User {
         if (this.items[itemIndex] < 0) {
             this.items[itemIndex] = 0;
         }
-        if (this.items[itemIndex] > ServerManager.getInstance().config().getMax_item()) {
-            this.items[itemIndex] = (byte) ServerManager.getInstance().config().getMax_item();
+        if (this.items[itemIndex] > ServerManager.getInstance().config().getMaxItem()) {
+            this.items[itemIndex] = (byte) ServerManager.getInstance().config().getMaxItem();
         }
         this.items[0] = this.items[1] = 99;
     }
@@ -275,8 +275,8 @@ public class User {
     }
 
     public synchronized void updateInventory(
-            EquipmentChestEntry updateEquipment,
-            EquipmentChestEntry removeEquipment,
+            EquipmentChestEntry updateEquip,
+            EquipmentChestEntry removeEquip,
             List<SpecialItemChestEntry> addItems,
             List<SpecialItemChestEntry> removeItems
     ) {
@@ -287,21 +287,17 @@ public class User {
             DataOutputStream ds1 = new DataOutputStream(bas);
             int updateQuantity = 0;
 
-            if (updateEquipment != null) {
+            if (updateEquip != null) {
                 updateQuantity++;
                 ds1.writeByte(2);
-                ds1.writeInt(updateEquipment.getKey());
-                ds1.writeByte(updateEquipment.getAddPoints().length * 2);
-                for (int i = 0; i < updateEquipment.getAddPoints().length; i++) {
-                    ds1.writeByte(updateEquipment.getAddPoints()[i]);
-                    ds1.writeByte(updateEquipment.getAddPercents()[i]);
+                ds1.writeInt(updateEquip.getKey());
+                ds1.writeByte(updateEquip.getAddPoints().length * 2);
+                for (int i = 0; i < updateEquip.getAddPoints().length; i++) {
+                    ds1.writeByte(updateEquip.getAddPoints()[i]);
+                    ds1.writeByte(updateEquip.getAddPercents()[i]);
                 }
-                ds1.writeByte(updateEquipment.getEmptySlot());
-                int hanSD = updateEquipment.getEquipEntry().getExpirationDays() - Until.getNumDay(updateEquipment.getPurchaseDate(), LocalDateTime.now());
-                if (hanSD < 0) {
-                    hanSD = 0;
-                }
-                ds1.writeByte(hanSD);
+                ds1.writeByte(updateEquip.getEmptySlot());
+                ds1.writeByte(updateEquip.getRemainingDays());
             }
 
             if (addItems != null && !addItems.isEmpty()) {
@@ -351,11 +347,11 @@ public class User {
                 }
             }
 
-            if (removeEquipment != null) {
+            if (removeEquip != null) {
                 updateQuantity++;
-                ruongDoTB.remove(removeEquipment);
+                ruongDoTB.remove(removeEquip);
                 ds1.writeByte(0);
-                ds1.writeInt(removeEquipment.getKey());
+                ds1.writeInt(removeEquip.getKey());
                 ds1.writeByte(1);
             }
 

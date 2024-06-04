@@ -52,9 +52,9 @@ public class UserService implements IUserService {
     private final IUserDao userDao = new UserDao();
     private final IGiftCodeDao giftCodeDao = new GiftCodeDao();
 
-    private byte banTrangBiAction;
-    private int giaBanTrangBi;
-    private final List<EquipmentChestEntry> banTrangBi = new ArrayList<>();
+    private byte equipAction;
+    private int totalEquipTransaction;
+    private final List<EquipmentChestEntry> selectedEquip = new ArrayList<>();
 
     public UserService(User user) {
         this.user = user;
@@ -1204,7 +1204,7 @@ public class UserService implements IUserService {
     public void handleAddFriend(Message ms) {
         try {
             Integer id = ms.reader().readInt();
-            if (user.getFriends().size() > ServerManager.getInstance().config().getMax_friends()) {
+            if (user.getFriends().size() > ServerManager.getInstance().config().getMaxFriends()) {
                 sendMessageUpdateFriends(Boolean.FALSE, 2);
                 return;
             }
@@ -1388,7 +1388,7 @@ public class UserService implements IUserService {
             if (itemIndex < 0 || itemIndex >= FightItemData.FIGHT_ITEM_ENTRIES.size()) {
                 return;
             }
-            if (user.getItems()[itemIndex] + quantity > ServerManager.getInstance().config().getMax_item()) {
+            if (user.getItems()[itemIndex] + quantity > ServerManager.getInstance().config().getMaxItem()) {
                 return;
             }
             if (unit == 0) {
@@ -1721,7 +1721,7 @@ public class UserService implements IUserService {
                     ds.writeByte(entry.getAddPoints()[j]);
                     ds.writeByte(entry.getAddPercents()[j]);
                 }
-                ds.writeByte(Math.max(entry.getEquipEntry().getExpirationDays() - Until.getNumDay(entry.getPurchaseDate(), LocalDateTime.now()), 0));
+                ds.writeByte(entry.getRemainingDays());
                 ds.writeByte(entry.getEmptySlot());
                 ds.writeByte(entry.getEquipEntry().isDisguise() ? 1 : 0);
                 ds.writeByte(entry.getVipLevel());
@@ -1853,21 +1853,21 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleEquipmentPurchases(Message ms) {
+    public void handleEquipmentTransactions(Message ms) {
         DataInputStream dis = ms.reader();
         try {
             byte type = dis.readByte();
             switch (type) {
                 case 0 -> {//Mua trang bi
-                    short indexSale = dis.readShort();
+                    short saleIndex = dis.readShort();
                     byte unit = dis.readByte();
-                    purchaseEquipment(indexSale, unit);
+                    purchaseEquipment(saleIndex, unit);
                 }
                 case 1 -> {//Ban trang bi
                     // Đặt lại giá trị
-                    banTrangBi.clear();
-                    giaBanTrangBi = 0;
-                    banTrangBiAction = 0;
+                    selectedEquip.clear();
+                    totalEquipTransaction = 0;
+                    equipAction = 0;
                     //Lấy dữ liệu và tính tiền
                     byte size = dis.readByte();
                     for (int i = 0; i < size; i++) {
@@ -1876,28 +1876,35 @@ public class UserService implements IUserService {
                         if (equip == null) {
                             continue;
                         }
-                        giaBanTrangBi += equip.getEquipEntry().getPriceXu() / 2;
-                        banTrangBi.add(equip);
+                        int days = equip.getEquipEntry().getExpirationDays() - equip.getDaysSincePurchase();
+                        if (days > 0) {
+                            if (equip.getEquipEntry().getPriceXu() > 0) {
+                                totalEquipTransaction += Math.round((float) (equip.getEquipEntry().getPriceXu() * days) / (equip.getEquipEntry().getExpirationDays() * 2));
+                            } else if (equip.getEquipEntry().getPriceLuong() > 0) {
+                                totalEquipTransaction += Math.round((float) (equip.getEquipEntry().getPriceLuong() * 1000 * days) / (equip.getEquipEntry().getExpirationDays() * 2));
+                            }
+                        }
+                        selectedEquip.add(equip);
                     }
                     //Gửi thông báo
                     ms = new Message(104);
                     DataOutputStream ds = ms.writer();
-                    if (banTrangBi.size() > 0) {//Trường hợp có trang bị hợp lệ
+                    if (selectedEquip.size() > 0) {//Trường hợp có trang bị hợp lệ
                         ds.writeByte(1);
-                        if (banTrangBi.size() == 1 && banTrangBi.get(0).getEmptySlot() < 3) {//Tháo ngọc
-                            banTrangBiAction = 1;
-                            giaBanTrangBi = 0;
+                        if (selectedEquip.size() == 1 && selectedEquip.get(0).getEmptySlot() < 3) {//Tháo ngọc
+                            equipAction = 1;
+                            totalEquipTransaction = 0;
                             //Tính tiền gia hạn theo 25% giá ngọc
-                            for (byte itemId : banTrangBi.get(0).getSlots()) {
+                            for (byte itemId : selectedEquip.get(0).getSlots()) {
                                 SpecialItemEntry item = SpecialItemData.getSpecialItemById(itemId);
                                 if (item != null) {
-                                    giaBanTrangBi += item.getPriceXu() * 0.25;
+                                    totalEquipTransaction += item.getPriceXu() * 0.25;
                                 }
                             }
-                            ds.writeUTF(GameString.thaoNgocRequest(giaBanTrangBi));
+                            ds.writeUTF(GameString.thaoNgocRequest(totalEquipTransaction));
                         } else {//Bán trang bị
-                            banTrangBiAction = 2;
-                            ds.writeUTF(GameString.sellTBRequest(banTrangBi.size(), giaBanTrangBi));
+                            equipAction = 2;
+                            ds.writeUTF(GameString.sellTBRequest(selectedEquip.size(), totalEquipTransaction));
                         }
                     } else {//Trường hợp không trang bị nào hợp lệ
                         ds.writeByte(0);
@@ -1906,38 +1913,35 @@ public class UserService implements IUserService {
                     user.sendMessage(ms);
                 }
                 case 2 -> {//Xac nhan ban trang bi
-                    if (banTrangBiAction == 1) {//Xác nhận tháo ngọc
-                        if (user.getXu() < giaBanTrangBi) {
+                    if (equipAction == 1) {//Xác nhận tháo ngọc
+                        if (user.getXu() < totalEquipTransaction) {
                             sendServerMessage(GameString.xuNotEnought());
                             return;
                         }
                         //Trừ phí tháo ngọc
-                        user.updateXu(-giaBanTrangBi);
+                        user.updateXu(-totalEquipTransaction);
                         //Lấy lại ngọc vào rương
-                        EquipmentChestEntry equip = banTrangBi.get(0);
+                        EquipmentChestEntry equip = selectedEquip.get(0);
                         if (equip == null) {
                             return;
                         }
                         List<SpecialItemChestEntry> ngocLayLai = new ArrayList<>();
-                        for (int i = 0; i < equip.getSlots().length; i++) {
-                            byte itemId = equip.getSlots()[i];
+                        for (byte itemId : equip.getSlots()) {
                             if (itemId > -1) {
-                                equip.getSlots()[i] = -1;
-                                SpecialItemChestEntry item = new SpecialItemChestEntry();
-                                item.setQuantity((short) 1);
-                                item.setItem(SpecialItemData.getSpecialItemById(itemId));
+                                SpecialItemChestEntry item = new SpecialItemChestEntry((short) 1, SpecialItemData.getSpecialItemById(itemId));
                                 if (item.getItem() != null) {
                                     ngocLayLai.add(item);
                                 }
                             }
                         }
+                        equip.setSlots(new byte[]{-1, -1, -1});
                         equip.setEmptySlot((byte) 3);
                         //Cập nhật vô rương
                         user.updateInventory(equip, null, ngocLayLai, null);
                         //Gửi thông báo
                         sendServerMessage(GameString.thaoNgocSuccess());
-                    } else if (banTrangBiAction == 2) {//Xác nhận bán trang bị
-                        for (EquipmentChestEntry equip : banTrangBi) {
+                    } else if (equipAction == 2) {//Xác nhận bán trang bị
+                        for (EquipmentChestEntry equip : selectedEquip) {
                             if (equip.isInUse()) {
                                 sendServerMessage(GameString.sellTBError1());
                                 return;
@@ -1946,11 +1950,12 @@ public class UserService implements IUserService {
                                 sendServerMessage(GameString.sellTBError2());
                                 return;
                             }
-
-                            user.updateXu(giaBanTrangBi);
+                            user.updateInventory(null, equip, null, null);
+                            user.updateXu(totalEquipTransaction);
                             sendServerMessage(GameString.buySuccess());
                         }
                     }
+                    equipAction = 0;
                 }
             }
         } catch (IOException e) {
@@ -1958,12 +1963,12 @@ public class UserService implements IUserService {
         }
     }
 
-    private void purchaseEquipment(short indexSale, byte unit) {
-        if (user.getRuongDoTB().size() >= ServerManager.getInstance().config().getMax_ruong_tb()) {
+    private void purchaseEquipment(short saleIndex, byte unit) {
+        if (user.getRuongDoTB().size() >= ServerManager.getInstance().config().getMaxRuongTB()) {
             sendServerMessage(GameString.ruongNoSlot());
             return;
         }
-        EquipmentEntry equipmentEntry = NVData.getEquipEntryBySaleIndex(indexSale);
+        EquipmentEntry equipmentEntry = NVData.getEquipEntryBySaleIndex(saleIndex);
         if (equipmentEntry == null || (unit == 0 ? equipmentEntry.getPriceXu() : equipmentEntry.getPriceLuong()) < 0) {
             return;
         }

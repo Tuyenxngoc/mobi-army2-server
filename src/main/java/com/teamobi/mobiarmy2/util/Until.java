@@ -168,10 +168,6 @@ public class Until {
         return (int) ((to.getTime() - from.getTime()) / 1000 / 86400);
     }
 
-    public static int getNumDay(LocalDateTime from, LocalDateTime to) {
-        return (int) ChronoUnit.DAYS.between(from, to);
-    }
-
     public static String arrayToString(byte[] bArr) {
         return Arrays.toString(bArr);
     }

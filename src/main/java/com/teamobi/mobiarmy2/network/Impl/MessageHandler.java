@@ -134,7 +134,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.SHOP_EQUIP -> userService.handleSendShopEquipments();
 
-                case Cmd.BUY_EQUIP -> userService.handleEquipmentPurchases(ms);
+                case Cmd.BUY_EQUIP -> userService.handleEquipmentTransactions(ms);
 
                 case Cmd.RULET -> userService.handleSpinWheel(ms);
 
