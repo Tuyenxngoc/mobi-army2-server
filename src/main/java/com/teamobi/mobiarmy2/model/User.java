@@ -54,7 +54,7 @@ public class User {
     private int[] points;
     private short[][] pointAdd;
     private byte[] items;
-    private int[][] NvData;
+    private int[][] equipData;
     private int[] mission;
     private byte[] missionLevel;
     private EquipmentChestEntry[][] nvEquip;
@@ -230,16 +230,6 @@ public class User {
             this.items[itemIndex] = (byte) ServerManager.getInstance().config().getMax_item();
         }
         this.items[0] = this.items[1] = 99;
-    }
-
-    public int getNumItemRuong(int id) {
-        // Kiem tra trong ruong co=>tang so luong. ko co=> tao moi
-        for (SpecialItemChestEntry spE1 : ruongDoItem) {
-            if (spE1.getItem().getId() == id) {
-                return spE1.getQuantity();
-            }
-        }
-        return 0;
     }
 
     public synchronized void addEquipment(EquipmentChestEntry addEquipment) {

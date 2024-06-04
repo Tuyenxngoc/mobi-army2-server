@@ -314,12 +314,12 @@ public class Until {
         }
     }
 
-    public static int calculateLevelPercent(float currentXp, float requiredXp) {
+    public static byte calculateLevelPercent(float currentXp, float requiredXp) {
         if (requiredXp == 0) {
             return 0;
         }
         int percentage = Math.round((currentXp / requiredXp) * 100);
-        return Math.min(percentage, 100);
+        return (byte) Math.min(percentage, 100);
     }
 
     public static int calculateTimeDifferenceInSeconds(Date time, Date currentDate) {

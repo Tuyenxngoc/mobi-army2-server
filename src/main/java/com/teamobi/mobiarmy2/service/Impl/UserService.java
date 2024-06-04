@@ -179,7 +179,7 @@ public class UserService implements IUserService {
         target.setXps(source.getXps());
         target.setPoints(source.getPoints());
         target.setPointAdd(source.getPointAdd());
-        target.setNvData(source.getNvData());
+        target.setEquipData(source.getEquipData());
         target.setNvEquip(source.getNvEquip());
         target.setFriends(source.getFriends());
         target.setMission(source.getMission());
@@ -1271,7 +1271,7 @@ public class UserService implements IUserService {
             Message ms = new Message(-7);
             DataOutputStream ds = ms.writer();
             for (int i = 0; i < 5; i++) {
-                ds.writeInt(user.getNvData()[user.getNvUsed()][i] | 0x10000);
+                ds.writeInt(user.getEquipData()[user.getNvUsed()][i] | 0x10000);
             }
             ds.flush();
             user.sendMessage(ms);
@@ -1634,7 +1634,7 @@ public class UserService implements IUserService {
                 ds.writeByte(entry.getVipLevel());
             }
             for (int i = 0; i < 5; i++) {
-                ds.writeInt(user.getNvData()[user.getNvUsed()][i] | 0x10000);
+                ds.writeInt(user.getEquipData()[user.getNvUsed()][i] | 0x10000);
             }
             ds.flush();
             user.sendMessage(ms);
@@ -1699,13 +1699,26 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void macTrangBi(Message ms) {
+    public void handleChangeEquipment(Message ms) {
         try {
-            int[] dbKey = new int[5];
+            int[] keys = new int[5];
             for (int i = 0; i < 5; i++) {
-                dbKey[i] = ms.reader().readInt();
-                System.out.println(dbKey[i]);
+                keys[i] = ms.reader().readInt();
             }
+            for (int i = 0; i < 5; i++) {
+                if ((keys[i] & 0x10000) == 0) {
+                    continue;
+                }
+                keys[i] = keys[i] & 0xFFFF;
+                System.out.println(keys[i]);
+            }
+            boolean changeSuccessful = false;
+
+            ms = new Message(Cmd.CHANGE_EQUIP);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(changeSuccessful ? 1 : 0);
+            ds.flush();
+            user.sendMessage(ms);
         } catch (IOException e) {
             e.printStackTrace();
         }

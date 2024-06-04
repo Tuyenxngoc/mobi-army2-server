@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 /**
  * @author tuyen
@@ -21,4 +22,17 @@ public class EquipmentChestEntry {
     private byte[] slots;
     private boolean inUse;
     private EquipmentEntry equipmentEntry;
+
+    /**
+     * Checks if the equipment is expired based on its expiration days and the current date.
+     *
+     * @return true if the equipment is expired, false otherwise
+     */
+    public boolean isExpired() {
+        if (equipmentEntry == null) {
+            return true;
+        }
+        long daysSincePurchase = ChronoUnit.DAYS.between(purchaseDate, LocalDateTime.now());
+        return equipmentEntry.getExpirationDays() - daysSincePurchase > 0;
+    }
 }

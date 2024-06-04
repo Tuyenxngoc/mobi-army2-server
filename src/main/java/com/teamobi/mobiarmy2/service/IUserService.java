@@ -120,7 +120,7 @@ public interface IUserService {
 
     void sendCharacterInfo();
 
-    void macTrangBi(Message ms);
+    void handleChangeEquipment(Message ms);
 
     void handleSendShopEquipments();
 

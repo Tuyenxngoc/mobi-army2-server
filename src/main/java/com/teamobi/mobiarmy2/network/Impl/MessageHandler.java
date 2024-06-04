@@ -130,7 +130,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.CHARACTOR_INFO -> userService.sendCharacterInfo();
 
-                case Cmd.CHANGE_EQUIP -> userService.macTrangBi(ms);
+                case Cmd.CHANGE_EQUIP -> userService.handleChangeEquipment(ms);
 
                 case Cmd.SHOP_EQUIP -> userService.handleSendShopEquipments();
 

@@ -45,6 +45,12 @@ public class UserDao implements IUserDao {
 
         String ruongdoItem = JsonConverter.convertRuongDoItemToJson(user.getRuongDoItem());
         String ruongdoTb = JsonConverter.convertRuongDoTBToJson(user.getRuongDoTB());
+        CharacterJson nv1 = new CharacterJson();
+        nv1.setPoint(user.getPoints()[0]);
+        nv1.setLevel(user.getLevels()[0]);
+        nv1.setXp(user.getXps()[0]);
+        nv1.setPointAdd(user.getPointAdd()[0]);
+        nv1.setData(user.getEquipData()[0]);
 
         String sql = "UPDATE `player` SET " +
                 "`friends` = ?, " +
@@ -60,6 +66,8 @@ public class UserDao implements IUserDao {
                 "`mission` = ?, " +
                 "`missionLevel` = ?, " +
                 "`top_earnings_xu` = ?, " +
+                "`NV1` = ?, " +
+
                 //...//
                 "`nv_used` = ? " +
                 " WHERE player_id = ?";
@@ -77,6 +85,7 @@ public class UserDao implements IUserDao {
                 Arrays.toString(user.getMission()),
                 Arrays.toString(user.getMissionLevel()),
                 user.getTopEarningsXu(),
+                GsonUtil.GSON.toJson(nv1),
                 //...//
                 user.getNvUsed(),
                 user.getPlayerId());
@@ -124,7 +133,7 @@ public class UserDao implements IUserDao {
                         user.setXps(new int[len]);
                         user.setPoints(new int[len]);
                         user.setPointAdd(new short[len][5]);
-                        user.setNvData(new int[len][6]);
+                        user.setEquipData(new int[len][6]);
                         user.setNvEquip(new EquipmentChestEntry[len][6]);
                         user.setRuongDoItem(new ArrayList<>());
                         user.setRuongDoTB(new ArrayList<>());
@@ -153,35 +162,32 @@ public class UserDao implements IUserDao {
                                 user.setItems(items);
                             }
 
+                            //Đọc dữ liệu trang bị
                             EquipmentChestJson[] equipmentChestJsons = GsonUtil.GSON.fromJson(playerResultSet.getString("ruongTrangBi"), EquipmentChestJson[].class);
-                            for (int i = 0; i < equipmentChestJsons.length; i++) {
-                                EquipmentChestJson equipmentChestJson = equipmentChestJsons[i];
-                                EquipmentChestEntry equipmentChestEntry = new EquipmentChestEntry();
-
-                                byte characterId = equipmentChestJson.getCharacterId();
-                                byte equipType = equipmentChestJson.getEquipType();
-                                short equipIndex = equipmentChestJson.getEquipIndex();
-
-                                equipmentChestEntry.setIndex(i);
-                                equipmentChestEntry.setEquipmentEntry(NVData.getEquipEntry(characterId, equipType, equipIndex));
-                                equipmentChestEntry.setPurchaseDate(equipmentChestJson.getPurchaseDate());
-                                equipmentChestEntry.setVipLevel(equipmentChestJson.getVipLevel());
-                                equipmentChestEntry.setInUse(equipmentChestJson.getInUse() == 1);
-                                equipmentChestEntry.setAdditionalPoints(equipmentChestJson.getAdditionalPoints());
-                                equipmentChestEntry.setAdditionalPercent(equipmentChestJson.getAdditionalPercent());
-                                equipmentChestEntry.setSlots(equipmentChestJson.getSlots());
-
+                            for (EquipmentChestJson json : equipmentChestJsons) {
+                                EquipmentChestEntry equip = new EquipmentChestEntry();
+                                equip.setEquipmentEntry(NVData.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
+                                if (equip.getEquipmentEntry() == null) {
+                                    continue;
+                                }
+                                equip.setIndex(0);
+                                equip.setPurchaseDate(json.getPurchaseDate());
+                                equip.setVipLevel(json.getVipLevel());
+                                equip.setInUse(json.getInUse() == 1);
+                                equip.setAdditionalPoints(json.getAdditionalPoints());
+                                equip.setAdditionalPercent(json.getAdditionalPercent());
+                                equip.setSlots(json.getSlots());
                                 byte emptySlot = 0;
-                                for (int l = 0; l < equipmentChestEntry.getSlots().length; l++) {
-                                    if (equipmentChestEntry.getSlots()[l] < 0) {
+                                for (int l = 0; l < equip.getSlots().length; l++) {
+                                    if (equip.getSlots()[l] < 0) {
                                         emptySlot++;
                                     }
                                 }
-                                equipmentChestEntry.setEmptySlot(emptySlot);
-
-                                user.getRuongDoTB().add(equipmentChestEntry);
+                                equip.setEmptySlot(emptySlot);
+                                user.getRuongDoTB().add(equip);
                             }
 
+                            //Đọc dữ liệu item
                             SpecialItemChestJson[] specialItemChestJsons = GsonUtil.GSON.fromJson(playerResultSet.getString("ruongItem"), SpecialItemChestJson[].class);
                             for (SpecialItemChestJson item : specialItemChestJsons) {
                                 SpecialItemChestEntry specialItemChestEntry = new SpecialItemChestEntry();
@@ -193,26 +199,14 @@ public class UserDao implements IUserDao {
                                 user.getRuongDoItem().add(specialItemChestEntry);
                             }
 
+                            //Đọc dữ liệu nhân vật
                             for (int i = 0; i < 10; i++) {
                                 CharacterJson characterJson = GsonUtil.GSON.fromJson(playerResultSet.getString("NV" + (i + 1)), CharacterJson.class);
                                 user.getLevels()[i] = characterJson.getLevel();
                                 user.getXps()[i] = characterJson.getXp();
-                                user.getLevelPercents()[i] = 0;
+                                user.getLevelPercents()[i] = Until.calculateLevelPercent(characterJson.getXp(), XpData.getXpRequestLevel(characterJson.getLevel()));
                                 user.getPoints()[i] = characterJson.getPoint();
                                 user.getPointAdd()[i] = characterJson.getPointAdd();
-
-                                int[] data = characterJson.getData();
-                                for (int j = 0; j < 5; j++) {
-                                    user.getNvData()[i][j] = data[j];
-                                    if (user.getNvData()[i][j] >= 0 && user.getNvData()[i][j] < user.getRuongDoTB().size()) {
-                                        EquipmentChestEntry rdE = user.getRuongDoTB().get(user.getNvData()[i][j]);
-                                        if (rdE.getEquipmentEntry().getExpirationDays() - Until.getNumDay(rdE.getPurchaseDate(), LocalDateTime.now()) > 0) {
-                                            user.getNvEquip()[i][j] = rdE;
-                                        } else {
-                                            rdE.setInUse(false);
-                                        }
-                                    }
-                                }
                             }
 
                             Type listType = new TypeToken<List<Integer>>() {
@@ -300,7 +294,7 @@ public class UserDao implements IUserDao {
                     int xpRequired = XpData.getXpRequestLevel(level);
 
                     friend.setLevel((byte) level);
-                    friend.setLevelPt((byte) Until.calculateLevelPercent(xp, xpRequired));
+                    friend.setLevelPt(Until.calculateLevelPercent(xp, xpRequired));
                     EquipmentChestJson[] trangBi = GsonUtil.GSON.fromJson(resultSet.getString("ruongTrangBi"), EquipmentChestJson[].class);
                     friend.setData(NVData.getEquipData(trangBi, characterJson, friend.getNvUsed()));
 
