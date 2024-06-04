@@ -1951,9 +1951,9 @@ public class UserService implements IUserService {
                                 return;
                             }
                             user.updateInventory(null, equip, null, null);
-                            user.updateXu(totalEquipTransaction);
-                            sendServerMessage(GameString.buySuccess());
                         }
+                        user.updateXu(totalEquipTransaction);
+                        sendServerMessage(GameString.buySuccess());
                     }
                     equipAction = 0;
                 }
