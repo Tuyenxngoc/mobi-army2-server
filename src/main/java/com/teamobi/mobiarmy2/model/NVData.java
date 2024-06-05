@@ -82,16 +82,19 @@ public class NVData {
 
         //Tìm cải trang
         boolean found = false;
-        for (EquipmentChestJson json : equipmentChestJsons) {
-            if (json != null && json.getKey() == character.getData()[5]) {
-                EquipmentEntry equip = getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex());
-                if (equip != null) {
+        int disguiseKey = character.getData()[5];
+        if (disguiseKey >= 0) {
+            for (EquipmentChestJson json : equipmentChestJsons) {
+                if (json != null && json.getKey() == disguiseKey) {
+                    EquipmentEntry equip = getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex());
+                    if (equip != null) {
 
-                    //Kiểm tra cải trang còn hạn sử dụng hay không
-                    if (equip.getExpirationDays() - ChronoUnit.DAYS.between(json.getPurchaseDate(), LocalDateTime.now()) > 0) {
-                        System.arraycopy(equip.getDisguiseEquippedIndexes(), 0, equipData, 0, equipData.length);
-                        found = true;
-                        break;
+                        //Kiểm tra cải trang còn hạn sử dụng hay không
+                        if (equip.getExpirationDays() - ChronoUnit.DAYS.between(json.getPurchaseDate(), LocalDateTime.now()) > 0) {
+                            System.arraycopy(equip.getDisguiseEquippedIndexes(), 0, equipData, 0, equipData.length);
+                            found = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -103,16 +106,19 @@ public class NVData {
 
                 //Kiểm tra có trang bị trong rương hay không
                 boolean exists = false;
-                for (EquipmentChestJson json : equipmentChestJsons) {
-                    if (json != null && json.getKey() == character.getData()[i]) {
-                        EquipmentEntry equip = getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex());
-                        if (equip != null) {
+                int equipKey = character.getData()[i];
+                if (equipKey >= 0) {
+                    for (EquipmentChestJson json : equipmentChestJsons) {
+                        if (json != null && json.getKey() == equipKey) {
+                            EquipmentEntry equip = getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex());
+                            if (equip != null) {
 
-                            //Kiểm tra trang bị còn hạn sử dụng hay không
-                            if (equip.getExpirationDays() - ChronoUnit.DAYS.between(json.getPurchaseDate(), LocalDateTime.now()) > 0) {
-                                equipData[i] = json.getEquipIndex();
-                                exists = true;
-                                break;
+                                //Kiểm tra trang bị còn hạn sử dụng hay không
+                                if (equip.getExpirationDays() - ChronoUnit.DAYS.between(json.getPurchaseDate(), LocalDateTime.now()) > 0) {
+                                    equipData[i] = json.getEquipIndex();
+                                    exists = true;
+                                    break;
+                                }
                             }
                         }
                     }
