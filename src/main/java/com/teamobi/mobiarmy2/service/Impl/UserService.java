@@ -1858,16 +1858,17 @@ public class UserService implements IUserService {
         try {
             byte type = dis.readByte();
             switch (type) {
-                case 0 -> {//Mua trang bi
+                case 0 -> {//Mua trang bị
                     short saleIndex = dis.readShort();
                     byte unit = dis.readByte();
                     purchaseEquipment(saleIndex, unit);
                 }
-                case 1 -> {//Ban trang bi
+                case 1 -> {//Gửi lệnh bán trang bị
                     // Đặt lại giá trị
-                    selectedEquip.clear();
-                    totalEquipTransaction = 0;
                     equipAction = 0;
+                    totalEquipTransaction = 0;
+                    selectedEquip.clear();
+
                     //Lấy dữ liệu và tính tiền
                     byte size = dis.readByte();
                     for (int i = 0; i < size; i++) {
@@ -1876,16 +1877,17 @@ public class UserService implements IUserService {
                         if (equip == null) {
                             continue;
                         }
-                        int days = equip.getEquipEntry().getExpirationDays() - equip.getDaysSincePurchase();
-                        if (days > 0) {
+                        int remainingDays = equip.getRemainingDays();
+                        if (remainingDays > 0) {
                             if (equip.getEquipEntry().getPriceXu() > 0) {
-                                totalEquipTransaction += Math.round((float) (equip.getEquipEntry().getPriceXu() * days) / (equip.getEquipEntry().getExpirationDays() * 2));
+                                totalEquipTransaction += Math.round((float) (equip.getEquipEntry().getPriceXu() * remainingDays) / (equip.getEquipEntry().getExpirationDays() * 2));
                             } else if (equip.getEquipEntry().getPriceLuong() > 0) {
-                                totalEquipTransaction += Math.round((float) (equip.getEquipEntry().getPriceLuong() * 1000 * days) / (equip.getEquipEntry().getExpirationDays() * 2));
+                                totalEquipTransaction += Math.round((float) (equip.getEquipEntry().getPriceLuong() * 1000 * remainingDays) / (equip.getEquipEntry().getExpirationDays() * 2));
                             }
                         }
                         selectedEquip.add(equip);
                     }
+
                     //Gửi thông báo
                     ms = new Message(104);
                     DataOutputStream ds = ms.writer();
@@ -1894,9 +1896,10 @@ public class UserService implements IUserService {
                         if (selectedEquip.size() == 1 && selectedEquip.get(0).getEmptySlot() < 3) {//Tháo ngọc
                             equipAction = 1;
                             totalEquipTransaction = 0;
+
                             //Tính tiền gia hạn theo 25% giá ngọc
-                            for (byte itemId : selectedEquip.get(0).getSlots()) {
-                                SpecialItemEntry item = SpecialItemData.getSpecialItemById(itemId);
+                            for (byte slotItemId : selectedEquip.get(0).getSlots()) {
+                                SpecialItemEntry item = SpecialItemData.getSpecialItemById(slotItemId);
                                 if (item != null) {
                                     totalEquipTransaction += item.getPriceXu() * 0.25;
                                 }
@@ -1912,45 +1915,55 @@ public class UserService implements IUserService {
                     ds.flush();
                     user.sendMessage(ms);
                 }
-                case 2 -> {//Xac nhan ban trang bi
+                case 2 -> {//Xác nhận bán trang bị
                     if (equipAction == 1) {//Xác nhận tháo ngọc
                         if (user.getXu() < totalEquipTransaction) {
                             sendServerMessage(GameString.xuNotEnought());
                             return;
                         }
-                        //Trừ phí tháo ngọc
+
+                        // Trừ phí tháo ngọc
                         user.updateXu(-totalEquipTransaction);
-                        //Lấy lại ngọc vào rương
-                        EquipmentChestEntry equip = selectedEquip.get(0);
-                        if (equip == null) {
+
+                        // Lấy lại ngọc vào rương
+                        EquipmentChestEntry selectedEquipment = selectedEquip.get(0);
+                        if (selectedEquipment == null) {
                             return;
                         }
-                        List<SpecialItemChestEntry> ngocLayLai = new ArrayList<>();
-                        for (byte itemId : equip.getSlots()) {
-                            if (itemId > -1) {
-                                SpecialItemChestEntry item = new SpecialItemChestEntry((short) 1, SpecialItemData.getSpecialItemById(itemId));
-                                if (item.getItem() != null) {
-                                    ngocLayLai.add(item);
+                        List<SpecialItemChestEntry> recoveredGems = new ArrayList<>();
+                        for (byte slotItemId : selectedEquipment.getSlots()) {
+                            if (slotItemId > -1) {
+                                SpecialItemChestEntry gem = new SpecialItemChestEntry((short) 1, SpecialItemData.getSpecialItemById(slotItemId));
+                                if (gem.getItem() != null) {
+                                    recoveredGems.add(gem);
                                 }
                             }
                         }
-                        equip.setSlots(new byte[]{-1, -1, -1});
-                        equip.setEmptySlot((byte) 3);
-                        //Cập nhật vô rương
-                        user.updateInventory(equip, null, ngocLayLai, null);
-                        //Gửi thông báo
+
+                        // Đặt các slot ngọc thành trống
+                        selectedEquipment.setSlots(new byte[]{-1, -1, -1});
+                        selectedEquipment.setEmptySlot((byte) 3);
+
+                        // Cập nhật rương
+                        user.updateInventory(selectedEquipment, null, recoveredGems, null);
+
+                        // Gửi thông báo thành công
                         sendServerMessage(GameString.thaoNgocSuccess());
                     } else if (equipAction == 2) {//Xác nhận bán trang bị
-                        for (EquipmentChestEntry equip : selectedEquip) {
-                            if (equip.isInUse()) {
+                        List<EquipmentChestEntry> validEquipments = new ArrayList<>();
+                        for (EquipmentChestEntry equipment : selectedEquip) {
+                            if (equipment.isInUse()) {
                                 sendServerMessage(GameString.sellTBError1());
                                 return;
                             }
-                            if (equip.getEmptySlot() < 3) {
+                            if (equipment.getEmptySlot() < 3) {
                                 sendServerMessage(GameString.sellTBError2());
                                 return;
                             }
-                            user.updateInventory(null, equip, null, null);
+                            validEquipments.add(equipment);
+                        }
+                        for (EquipmentChestEntry validEquipment : validEquipments) {
+                            user.updateInventory(null, validEquipment, null, null);
                         }
                         user.updateXu(totalEquipTransaction);
                         sendServerMessage(GameString.buySuccess());
