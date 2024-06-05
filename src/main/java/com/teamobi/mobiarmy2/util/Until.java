@@ -7,11 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.NumberFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.Random;
 
 /**
@@ -19,193 +16,66 @@ import java.util.Random;
  */
 public class Until {
 
-    private static final Random rand;
-    private static final SimpleDateFormat dateFormat;
-    private static final short[] sinData;
-    private static final short[] cosData;
-    private static final int[] tanData;
+    private static final Random RANDOM;
+    private static final SimpleDateFormat DATE_FORMAT;
+    private static final short[] SIN_DATA;
+    private static final short[] COS_DATA;
+    private static final int[] TAN_DATA;
 
     static {
-        rand = new Random();
-        dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        sinData = (new short[]{0, 18, 36, 54, 71, 89, 107, 125, 143, 160, 178, 195, 213, 230, 248, 265, 282, 299, 316, 333, 350, 367, 384, 400, 416, 433, 449, 465, 481, 496, 512, 527, 543, 558, 573, 587, 602, 616, 630, 644, 658, 672, 685, 698, 711, 724, 737, 749, 761, 773, 784, 796, 807, 818, 828, 839, 849, 859, 868, 878, 887, 896, 904, 912, 920, 928, 935, 943, 949, 956, 962, 968, 974, 979, 984, 989, 994, 998, 1002, 1005, 1008, 1011, 1014, 1016, 1018, 1020, 1022, 1023, 1023, 1024, 1024});
-        cosData = new short[91];
-        tanData = new int[91];
+        RANDOM = new Random();
+        DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SIN_DATA = new short[]{
+                0, 18, 36, 54, 71, 89, 107, 125, 143, 160, 178, 195, 213, 230, 248, 265, 282, 299, 316, 333, 350, 367, 384, 400,
+                416, 433, 449, 465, 481, 496, 512, 527, 543, 558, 573, 587, 602, 616, 630, 644, 658, 672, 685, 698, 711, 724, 737,
+                749, 761, 773, 784, 796, 807, 818, 828, 839, 849, 859, 868, 878, 887, 896, 904, 912, 920, 928, 935, 943, 949, 956,
+                962, 968, 974, 979, 984, 989, 994, 998, 1002, 1005, 1008, 1011, 1014, 1016, 1018, 1020, 1022, 1023, 1023, 1024,
+                1024,
+        };
+        COS_DATA = new short[91];
+        TAN_DATA = new int[91];
         for (int i = 0; i <= 90; i++) {
-            cosData[i] = sinData[90 - i];
-            if (cosData[i] == 0) {
-                tanData[i] = 0x7fffffff;
+            COS_DATA[i] = SIN_DATA[90 - i];
+            if (COS_DATA[i] == 0) {
+                TAN_DATA[i] = 0x7fffffff;
             } else {
-                tanData[i] = (sinData[i] << 10) / cosData[i];
+                TAN_DATA[i] = (SIN_DATA[i] << 10) / COS_DATA[i];
             }
         }
-    }
-
-    public static final int sin(int arg) {
-        if ((arg = toArg0_360(arg)) >= 0 && arg < 90) {
-            return sinData[arg];
-        }
-        if (arg >= 90 && arg < 180) {
-            return sinData[180 - arg];
-        }
-        if (arg >= 180 && arg < 270) {
-            return -sinData[arg - 180];
-        } else {
-            return -sinData[360 - arg];
-        }
-    }
-
-    public static final int cos(int arg) {
-        if ((arg = toArg0_360(arg)) >= 0 && arg < 90) {
-            return cosData[arg];
-        }
-        if (arg >= 90 && arg < 180) {
-            return -cosData[180 - arg];
-        }
-        if (arg >= 180 && arg < 270) {
-            return -cosData[arg - 180];
-        } else {
-            return cosData[360 - arg];
-        }
-    }
-
-    public static final int getArg(int cos, int sin) {
-        if (cos == 0) {
-            return sin == 0 ? 0 : (sin < 0 ? 270 : 90);
-        }
-        int arg;
-        label2:
-        {
-            arg = Math.abs((sin << 10) / cos);
-            for (int i = 0; i <= 90; i++) {
-                if (tanData[i] < arg) {
-                    continue;
-                }
-                arg = i;
-                break label2;
-            }
-            arg = 0;
-        }
-        if (sin >= 0 && cos < 0) {
-            arg = 180 - arg;
-        }
-        if (sin < 0 && cos < 0) {
-            arg += 180;
-        }
-        if (sin < 0 && cos >= 0) {
-            arg = 360 - arg;
-        }
-        return arg;
-    }
-
-    public static final int toArg0_360(int arg) {
-        if (arg >= 360) {
-            arg -= 360;
-        }
-        if (arg < 0) {
-            arg += 360;
-        }
-        return arg;
-    }
-
-    public static int getSqrt(int num) {
-        if (num <= 0) {
-            return 0;
-        }
-        int newS = (num + 1) / 2;
-        int oddS;
-        do {
-            oddS = newS;
-            newS = newS / 2 + num / (newS * 2);
-        } while (Math.abs(oddS - newS) > 1);
-        return newS;
     }
 
     public static int nextInt(int x1, int x2) {
-        int to = x2;
-        int from = x1;
-        if (x2 > x1) {
-            to = x2;
-            from = x1;
-        }
-        return from + rand.nextInt((to + 1) - from);
+        int from = Math.min(x1, x2);
+        int to = Math.max(x1, x2) + 1;
+        return from + RANDOM.nextInt(to - from);
     }
 
     public static int nextInt(int max) {
-        return rand.nextInt(max);
+        return RANDOM.nextInt(max);
     }
 
-    public static int nextInt(int[] percen) {
+    public static int nextInt(int[] percent) {
         int next = nextInt(1000), i;
-        for (i = 0; i < percen.length; i++) {
-            if (next < percen[i]) {
+        for (i = 0; i < percent.length; i++) {
+            if (next < percent[i]) {
                 return i;
             }
-            next -= percen[i];
+            next -= percent[i];
         }
         return i;
     }
 
-    public static Date getDate(String dateString) {
-        try {
-            return dateFormat.parse(dateString);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static String toDateString(Date date) {
-        return dateFormat.format(date);
-    }
-
-    public static void addNumDay(Date dat, int nDays) {
-        dat.setTime(dat.getTime() + nDays * 86400000L);
-    }
-
-    public static int getNumDay(Date from, Date to) {
-        return (int) ((to.getTime() - from.getTime()) / 1000 / 86400);
-    }
-
-    public static String arrayToString(byte[] bArr) {
-        return Arrays.toString(bArr);
-    }
-
-    public static String arrayToString(int[] iArr) {
-        return Arrays.toString(iArr);
-    }
-
-    public static String arrayToString(short[] sArr) {
-        return Arrays.toString(sArr);
-    }
-
-    public static String arrayToString(boolean[] zArr) {
-        return Arrays.toString(zArr);
-    }
-
-    public static String arrayToString(long[] lArr) {
-        return Arrays.toString(lArr);
-    }
-
-    public static String arrayToString(String[] Arr) {
-        return Arrays.toString(Arr);
-    }
-
-    public static String arrayToString(Object[] objArr) {
-        return Arrays.toString(objArr);
-    }
-
     public static String getStringNumber(float num) {
-        NumberFormat numf = NumberFormat.getNumberInstance();
-        numf.setMaximumFractionDigits(2);
-        numf.setMinimumFractionDigits(0);
-        numf.setRoundingMode(RoundingMode.DOWN);
+        NumberFormat format = NumberFormat.getNumberInstance();
+        format.setMaximumFractionDigits(2);
+        format.setMinimumFractionDigits(0);
+        format.setRoundingMode(RoundingMode.DOWN);
         if (num >= 1000000000) {
-            return numf.format((num / 1000000000)) + "b";
+            return format.format((num / 1000000000)) + "b";
         } else if (num >= 1000000) {
-            return numf.format((num / 1000000)) + "m";
+            return format.format((num / 1000000)) + "m";
         } else if (num >= 1000) {
-            return numf.format((num / 1000)) + "k";
+            return format.format((num / 1000)) + "k";
         } else {
             return String.valueOf((int) num);
         }
@@ -228,63 +98,6 @@ public class Until {
         } else {
             return s + " giây";
         }
-    }
-
-    public static short getShort(byte[] ab, int off) {
-        return (short) ((ab[off] & 0xff) << 8 | ab[off + 1] & 0xff);
-    }
-
-    public static boolean inRegion(int x, int y, int x0, int y0, int w, int h) {
-        return x >= x0 && x < x0 + w && y >= y0 && y < y0 + h;
-    }
-
-    public static boolean intersecRegions(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2) {
-        //return x1 + w1 >= x2 && x1 <= x2 + w2 && y1 + h1 >= y2 && y1 <= y2 + h2;
-        return Math.abs(x1 - x2) <= w2 + w1 && Math.abs(y1 - y2) <= h2 + h1;
-    }
-
-    public static boolean isNotAlpha(int rgb) {
-        return (rgb >> 24) != 0;
-    }
-
-    public static int getTeamPoint(int TongDD, int nteam) {
-        if (nteam == 1) {
-            return 0;
-        }
-        return (TongDD - 100) / 100 + (TongDD - 100) * nteam / 1000;
-    }
-
-    public static boolean compare_Day(Date dnew, Date dold) throws ParseException {
-        SimpleDateFormat FM = new SimpleDateFormat("yyyy-MM-dd");
-        Date date1 = FM.parse(FM.format(dnew));
-        Date date2 = FM.parse(FM.format(dold));
-        if (date1.equals(date2)) {
-            return false;
-        } else {
-            return !date1.before(date2);
-        }
-    }
-
-    public static float getArgXY(float Ax, float Ay, float Bx, float By) {
-        float K = Math.abs(Ay - By);
-        float D = Math.abs(Ax - Bx);
-        float tan = (D / K);
-        float IntArg = (float) (Math.toDegrees(Math.atan(tan)));
-        if (Ax >= Bx && Ay > By) {
-            IntArg += 90;
-        } else if (Ax > Bx && Ay <= By) {
-            IntArg = (270 - IntArg);
-        } else if (Ax <= Bx && Ay < By) {
-            IntArg -= 90;
-        } else if (Ax < Bx && Ay >= By) {
-            IntArg = (270 + IntArg);
-        }
-        return IntArg;
-    }
-
-    public static String addNumHours(Date dat, int hours) {
-        dat.setTime(dat.getTime() + hours * 3600000L);
-        return dateFormat.format(dat);
     }
 
     public static byte[] getFile(String url) {
@@ -317,10 +130,6 @@ public class Until {
         return (byte) Math.min(percentage, 100);
     }
 
-    public static int calculateTimeDifferenceInSeconds(Date time, Date currentDate) {
-        return (int) ((time.getTime() / 1000) - (currentDate.getTime() / 1000));
-    }
-
     public static byte calculateLevelClan(float xp) {
         int level = ((int) Math.sqrt(1 + xp / 6250) + 1) >> 1;
         return (byte) Math.min(level, 127);
@@ -336,7 +145,7 @@ public class Until {
             sum += prob;
         }
 
-        int randomNumber = rand.nextInt(sum);
+        int randomNumber = RANDOM.nextInt(sum);
 
         int cumulativeSum = 0;
         for (byte i = 0; i < probabilities.length; i++) {
