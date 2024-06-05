@@ -12,7 +12,7 @@ import com.teamobi.mobiarmy2.model.entry.equip.EquipmentEntry;
 import com.teamobi.mobiarmy2.model.entry.map.MapEntry;
 import com.teamobi.mobiarmy2.service.IGameService;
 import com.teamobi.mobiarmy2.team.TeamImageOutput;
-import com.teamobi.mobiarmy2.util.Until;
+import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -51,7 +51,7 @@ public class GameService implements IGameService {
                 ds.writeUTF(mapEntry.getFileName());
             }
             byte[] ab = bas.toByteArray();
-            Until.saveFile(CommonConstant.mapCacheName, ab);
+            Utils.saveFile(CommonConstant.mapCacheName, ab);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -99,14 +99,14 @@ public class GameService implements IGameService {
                 }
             }
 
-            byte[] bytes = Until.getFile("res/itemSpecial.png");
+            byte[] bytes = Utils.getFile("res/itemSpecial.png");
             if (bytes == null) {
                 System.exit(1);
             }
             ds.writeShort(bytes.length);
             ds.write(bytes);
             for (int i = 0; i < NVData.CHARACTER_ENTRIES.size(); i++) {
-                bytes = Until.getFile("res/bullet/bullet" + i + ".png");
+                bytes = Utils.getFile("res/bullet/bullet" + i + ".png");
                 if (bytes == null) {
                     System.exit(1);
                 }
@@ -115,7 +115,7 @@ public class GameService implements IGameService {
             }
 
             byte[] data = bas.toByteArray();
-            Until.saveFile(CommonConstant.equipCacheName, data);
+            Utils.saveFile(CommonConstant.equipCacheName, data);
             bas.close();
             ds.close();
         } catch (IOException e) {
@@ -136,7 +136,7 @@ public class GameService implements IGameService {
                 ds.writeByte(capEntry.getLevel());
             }
             byte[] data = bas.toByteArray();
-            Until.saveFile(CommonConstant.levelCacheName, data);
+            Utils.saveFile(CommonConstant.levelCacheName, data);
             bas.close();
             ds.close();
         } catch (IOException e) {
@@ -160,7 +160,7 @@ public class GameService implements IGameService {
                 tio.addFile(f.getName(), f.getPath());
             }
             byte[] data = tio.output();
-            Until.saveFile(CommonConstant.playerCacheName, data);
+            Utils.saveFile(CommonConstant.playerCacheName, data);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -182,7 +182,7 @@ public class GameService implements IGameService {
                 tio.addFile(f.getName(), f.getPath());
             }
             byte[] data = tio.output();
-            Until.saveFile(CommonConstant.iconCacheName, data);
+            Utils.saveFile(CommonConstant.iconCacheName, data);
         } catch (IOException e) {
             e.printStackTrace();
         }

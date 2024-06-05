@@ -34,7 +34,7 @@ import com.teamobi.mobiarmy2.server.Room;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.util.GsonUtil;
-import com.teamobi.mobiarmy2.util.Until;
+import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -126,7 +126,7 @@ public class UserService implements IUserService {
 
             //Kiểm tra chưa online hơn 1 ngày;
             LocalDateTime now = LocalDateTime.now();
-            if (Until.hasLoggedInOnNewDay(user.getLastOnline(), now)) {
+            if (Utils.hasLoggedInOnNewDay(user.getLastOnline(), now)) {
                 //Gửi item
                 byte indexItem = FightItemData.getRandomItem();
                 byte quantity = 1;
@@ -1516,15 +1516,15 @@ public class UserService implements IUserService {
         GiftCodeRewardJson rewardData = GsonUtil.GSON.fromJson(giftCode.getReward(), GiftCodeRewardJson.class);
         if (rewardData.getXu() > 0) {
             user.updateXu(rewardData.getXu());
-            sendMSSToUser(GameString.giftCodeReward(code, Until.getStringNumber(rewardData.getXu()) + " xu"));
+            sendMSSToUser(GameString.giftCodeReward(code, Utils.getStringNumber(rewardData.getXu()) + " xu"));
         }
         if (rewardData.getLuong() > 0) {
             user.updateLuong(rewardData.getLuong());
-            sendMSSToUser(GameString.giftCodeReward(code, Until.getStringNumber(rewardData.getLuong()) + " lượng"));
+            sendMSSToUser(GameString.giftCodeReward(code, Utils.getStringNumber(rewardData.getLuong()) + " lượng"));
         }
         if (rewardData.getExp() > 0) {
             user.updateXp(rewardData.getExp());
-            sendMSSToUser(GameString.giftCodeReward(code, Until.getStringNumber(rewardData.getExp()) + " exp"));
+            sendMSSToUser(GameString.giftCodeReward(code, Utils.getStringNumber(rewardData.getExp()) + " exp"));
         }
         if (rewardData.getItems() != null) {
             List<SpecialItemChestEntry> additionalItems = new ArrayList<>();
@@ -1616,7 +1616,7 @@ public class UserService implements IUserService {
                     ds.writeByte(type);
                     ds.writeByte(config.getIconversion2());
                     if (version != config.getIconversion2()) {
-                        byte[] ab = Until.getFile(CommonConstant.iconCacheName);
+                        byte[] ab = Utils.getFile(CommonConstant.iconCacheName);
                         if (ab == null) {
                             return;
                         }
@@ -1634,7 +1634,7 @@ public class UserService implements IUserService {
                     ds.writeByte(type);
                     ds.writeByte(config.getValuesversion2());
                     if (version != config.getValuesversion2()) {
-                        byte[] ab = Until.getFile(CommonConstant.mapCacheName);
+                        byte[] ab = Utils.getFile(CommonConstant.mapCacheName);
                         if (ab == null) {
                             return;
                         }
@@ -1651,7 +1651,7 @@ public class UserService implements IUserService {
                     ds.writeByte(type);
                     ds.writeByte(config.getPlayerVersion2());
                     if (version != config.getPlayerVersion2()) {
-                        byte[] ab = Until.getFile(CommonConstant.playerCacheName);
+                        byte[] ab = Utils.getFile(CommonConstant.playerCacheName);
                         if (ab == null) {
                             return;
                         }
@@ -1668,7 +1668,7 @@ public class UserService implements IUserService {
                     ds.writeByte(type);
                     ds.writeByte(config.getEquipVersion2());
                     if (version != config.getEquipVersion2()) {
-                        byte[] ab = Until.getFile(CommonConstant.equipCacheName);
+                        byte[] ab = Utils.getFile(CommonConstant.equipCacheName);
                         if (ab == null) {
                             return;
                         }
@@ -1685,7 +1685,7 @@ public class UserService implements IUserService {
                     ds.writeByte(type);
                     ds.writeByte(config.getLevelCVersion2());
                     if (version != config.getLevelCVersion2()) {
-                        byte[] ab = Until.getFile(CommonConstant.levelCacheName);
+                        byte[] ab = Utils.getFile(CommonConstant.levelCacheName);
                         if (ab == null) {
                             return;
                         }
@@ -2037,28 +2037,28 @@ public class UserService implements IUserService {
             ms = new Message(Cmd.RULET);
             DataOutputStream ds = ms.writer();
 
-            int luckyIndex = Until.nextInt(10);
+            int luckyIndex = Utils.nextInt(10);
             for (byte i = 0; i < 10; i++) {
-                byte type = Until.nextByte(SpinWheelConstants.TYPE_PROBABILITIES);
+                byte type = Utils.nextByte(SpinWheelConstants.TYPE_PROBABILITIES);
                 byte itemId = 0;
                 int quantity = 0;
 
                 switch (type) {
                     case 0 -> {
                         itemId = FightItemData.getRandomItem();
-                        quantity = SpinWheelConstants.ITEM_COUNTS[Until.nextInt(SpinWheelConstants.ITEM_PROBABILITIES)];
+                        quantity = SpinWheelConstants.ITEM_COUNTS[Utils.nextInt(SpinWheelConstants.ITEM_PROBABILITIES)];
                         if (i == luckyIndex) {
                             user.updateItems(itemId, quantity);
                         }
                     }
                     case 1 -> {
-                        quantity = SpinWheelConstants.XU_COUNTS[Until.nextInt(SpinWheelConstants.XU_PROBABILITIES)];
+                        quantity = SpinWheelConstants.XU_COUNTS[Utils.nextInt(SpinWheelConstants.XU_PROBABILITIES)];
                         if (i == luckyIndex) {
                             user.updateXu(quantity);
                         }
                     }
                     case 2 -> {
-                        quantity = SpinWheelConstants.XP_COUNTS[Until.nextInt(SpinWheelConstants.XP_PROBABILITIES)];
+                        quantity = SpinWheelConstants.XP_COUNTS[Utils.nextInt(SpinWheelConstants.XP_PROBABILITIES)];
                         if (i == luckyIndex) {
                             user.updateXp(quantity);
                         }
@@ -2222,7 +2222,7 @@ public class UserService implements IUserService {
             ms = new Message(120);
             DataOutputStream ds = ms.writer();
             ds.writeByte(idS);
-            byte[] ab1 = Until.getFile("res/bigImage/bigImage" + idS + ".png");
+            byte[] ab1 = Utils.getFile("res/bigImage/bigImage" + idS + ".png");
             if (ab1 != null) {
                 ds.writeShort(ab1.length);
                 ds.write(ab1);
@@ -2288,11 +2288,11 @@ public class UserService implements IUserService {
             byte indexIcon = 0;
             byte[] data = null;
             switch (typeIcon) {
-                case 0, 1 -> data = Until.getFile("res/icon/item/" + iconId + ".png");
-                case 2 -> data = Until.getFile("res/icon/map/" + iconId + ".png");
+                case 0, 1 -> data = Utils.getFile("res/icon/item/" + iconId + ".png");
+                case 2 -> data = Utils.getFile("res/icon/map/" + iconId + ".png");
                 case 3, 4 -> {
                     indexIcon = dis.readByte();
-                    data = Until.getFile("res/icon/item/" + iconId + ".png");
+                    data = Utils.getFile("res/icon/item/" + iconId + ".png");
                 }
             }
             if (data == null) {

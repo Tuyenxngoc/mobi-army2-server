@@ -14,7 +14,7 @@ import com.teamobi.mobiarmy2.model.entry.item.FightItemEntry;
 import com.teamobi.mobiarmy2.model.entry.item.SpecialItemEntry;
 import com.teamobi.mobiarmy2.model.entry.map.MapEntry;
 import com.teamobi.mobiarmy2.util.GsonUtil;
-import com.teamobi.mobiarmy2.util.Until;
+import com.teamobi.mobiarmy2.util.Utils;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -40,7 +40,7 @@ public class GameDao implements IGameDao {
                     if (map.getId() == 27) {
                         map.setData(new byte[0]);
                     } else {
-                        byte[] dataMap = Until.getFile("res/map/" + map.getFileName());
+                        byte[] dataMap = Utils.getFile("res/map/" + map.getFileName());
                         if (dataMap == null) {
                             System.exit(1);
                         }

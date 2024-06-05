@@ -2,7 +2,7 @@ package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.fight.FightWait;
-import com.teamobi.mobiarmy2.util.Until;
+import com.teamobi.mobiarmy2.util.Utils;
 
 import java.util.ArrayList;
 
@@ -120,7 +120,7 @@ public class Room {
         }
         this.entrys = new FightWait[maxEntrys];
         for (int i = 0; i < maxEntrys; i++) {
-            this.entrys[i] = new FightWait(this, this.type, (byte) i, config.getMaxPlayers(), maxPlayerInit, map, (byte) Until.nextInt(0, 2), isLH, isSieuBoss);
+            this.entrys[i] = new FightWait(this, this.type, (byte) i, config.getMaxPlayers(), maxPlayerInit, map, (byte) Utils.nextInt(0, 2), isLH, isSieuBoss);
         }
     }
 

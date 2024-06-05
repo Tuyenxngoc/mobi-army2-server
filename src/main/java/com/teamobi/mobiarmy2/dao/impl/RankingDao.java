@@ -9,7 +9,7 @@ import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.model.NVData;
 import com.teamobi.mobiarmy2.model.entry.user.PlayerLeaderboardEntry;
 import com.teamobi.mobiarmy2.util.GsonUtil;
-import com.teamobi.mobiarmy2.util.Until;
+import com.teamobi.mobiarmy2.util.Utils;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -27,7 +27,7 @@ public class RankingDao implements IRankingDao {
         PlayerLeaderboardEntry entry = new PlayerLeaderboardEntry();
         entry.setPlayerId(resultSet.getInt("player_id"));
         if (index <= 3 && isBonus) {
-            entry.setUsername(GameString.topBonus(resultSet.getString("username"), Until.getStringNumber(CommonConstant.TOP_BONUS[index - 1])));
+            entry.setUsername(GameString.topBonus(resultSet.getString("username"), Utils.getStringNumber(CommonConstant.TOP_BONUS[index - 1])));
         } else {
             entry.setUsername(resultSet.getString("username"));
         }
@@ -60,7 +60,7 @@ public class RankingDao implements IRankingDao {
                 byte index = 1;
                 while (resultSet.next()) {
                     PlayerLeaderboardEntry entry = createPlayerLeaderboardEntry(resultSet, index, true);
-                    entry.setDetail(Until.getStringNumber(resultSet.getInt("dvong")));
+                    entry.setDetail(Utils.getStringNumber(resultSet.getInt("dvong")));
                     top.add(entry);
                     index++;
                 }
@@ -85,7 +85,7 @@ public class RankingDao implements IRankingDao {
                 byte index = 1;
                 while (resultSet.next()) {
                     PlayerLeaderboardEntry entry = createPlayerLeaderboardEntry(resultSet, index, false);
-                    entry.setDetail(Until.getStringNumber(resultSet.getInt("dvong")));
+                    entry.setDetail(Utils.getStringNumber(resultSet.getInt("dvong")));
                     top.add(entry);
                     index++;
                 }
@@ -110,7 +110,7 @@ public class RankingDao implements IRankingDao {
                 byte index = 1;
                 while (resultSet.next()) {
                     PlayerLeaderboardEntry entry = createPlayerLeaderboardEntry(resultSet, index, false);
-                    entry.setDetail(Until.getStringNumber(resultSet.getInt("xu")));
+                    entry.setDetail(Utils.getStringNumber(resultSet.getInt("xu")));
                     top.add(entry);
                     index++;
                 }
@@ -135,7 +135,7 @@ public class RankingDao implements IRankingDao {
                 byte index = 1;
                 while (resultSet.next()) {
                     PlayerLeaderboardEntry entry = createPlayerLeaderboardEntry(resultSet, index, false);
-                    entry.setDetail(Until.getStringNumber(resultSet.getInt("luong")));
+                    entry.setDetail(Utils.getStringNumber(resultSet.getInt("luong")));
                     top.add(entry);
                     index++;
                 }
@@ -160,7 +160,7 @@ public class RankingDao implements IRankingDao {
                 byte index = 1;
                 while (resultSet.next()) {
                     PlayerLeaderboardEntry entry = createPlayerLeaderboardEntry(resultSet, index, false);
-                    entry.setDetail(Until.getStringNumber(resultSet.getInt("weekly_earnings_cup")));
+                    entry.setDetail(Utils.getStringNumber(resultSet.getInt("weekly_earnings_cup")));
                     top.add(entry);
                     index++;
                 }
@@ -185,7 +185,7 @@ public class RankingDao implements IRankingDao {
                 byte index = 1;
                 while (resultSet.next()) {
                     PlayerLeaderboardEntry entry = createPlayerLeaderboardEntry(resultSet, index, false);
-                    entry.setDetail(Until.getStringNumber(resultSet.getInt("weekly_earnings_xu")));
+                    entry.setDetail(Utils.getStringNumber(resultSet.getInt("weekly_earnings_xu")));
                     top.add(entry);
                     index++;
                 }

@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.team;
 
-import com.teamobi.mobiarmy2.util.Until;
+import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -38,7 +38,7 @@ public class TeamImageOutput {
                 byte[] namePack = name.getBytes();
                 TeamImageData.pack(namePack);
                 ds.write(namePack, 0, namePack.length);
-                byte[] ab = Until.getFile(files.get(i));
+                byte[] ab = Utils.getFile(files.get(i));
                 if (ab == null) {
                     throw new IOException("File " + name + " not found!");
                 }

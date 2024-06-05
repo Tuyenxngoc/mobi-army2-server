@@ -14,7 +14,7 @@ import java.util.Random;
 /**
  * @author tuyen
  */
-public class Until {
+public class Utils {
 
     private static final Random RANDOM;
     private static final SimpleDateFormat DATE_FORMAT;

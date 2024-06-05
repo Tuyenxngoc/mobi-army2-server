@@ -13,7 +13,7 @@ import com.teamobi.mobiarmy2.model.entry.clan.ClanItem;
 import com.teamobi.mobiarmy2.model.entry.clan.ClanMemEntry;
 import com.teamobi.mobiarmy2.model.entry.item.ClanItemEntry;
 import com.teamobi.mobiarmy2.util.GsonUtil;
-import com.teamobi.mobiarmy2.util.Until;
+import com.teamobi.mobiarmy2.util.Utils;
 
 import java.sql.*;
 import java.time.Duration;
@@ -159,9 +159,9 @@ public class ClanDao implements IClanDao {
                     clanInfo.setCup(red.getInt("cup"));
 
                     int exp = red.getInt("xp");
-                    byte level = Until.calculateLevelClan(exp);
-                    int expUpLevel = Until.calculateXPRequired(level + 1);
-                    int expCurrentLevel = Until.calculateXPRequired(level);
+                    byte level = Utils.calculateLevelClan(exp);
+                    int expUpLevel = Utils.calculateXPRequired(level + 1);
+                    int expCurrentLevel = Utils.calculateXPRequired(level);
 
                     double expProgress = (exp - expCurrentLevel) * 100 / (double) expUpLevel;
 
@@ -247,10 +247,10 @@ public class ClanDao implements IClanDao {
                         int xuContribution = resultSet.getInt("c.xu");
                         int luongContribution = resultSet.getInt("c.luong");
 
-                        String formattedTime = Until.getStringTimeBySecond(Duration.between(currentTime, contributionTime).getSeconds());
+                        String formattedTime = Utils.getStringTimeBySecond(Duration.between(currentTime, contributionTime).getSeconds());
 
                         entry.setContribute_text(String.format("%s %s trước", contributionText, formattedTime));
-                        entry.setContribute_count("%d lần: %s xu và %s lượng".formatted(contributeCount, Until.getStringNumber(xuContribution), Until.getStringNumber(luongContribution)));
+                        entry.setContribute_count("%d lần: %s xu và %s lượng".formatted(contributeCount, Utils.getStringNumber(xuContribution), Utils.getStringNumber(luongContribution)));
                     } else {
                         entry.setContribute_text("Chưa đóng góp");
                         entry.setContribute_count("");
@@ -331,9 +331,9 @@ public class ClanDao implements IClanDao {
                     clanInfo.setCup(red.getInt("cup"));
 
                     int exp = red.getInt("xp");
-                    byte level = Until.calculateLevelClan(exp);
-                    int expUpLevel = Until.calculateXPRequired(level + 1);
-                    int expCurrentLevel = Until.calculateXPRequired(level);
+                    byte level = Utils.calculateLevelClan(exp);
+                    int expUpLevel = Utils.calculateXPRequired(level + 1);
+                    int expCurrentLevel = Utils.calculateXPRequired(level);
                     double expProgress = (exp - expCurrentLevel) * 100 / (double) expUpLevel;
 
                     clanInfo.setLevel(level);

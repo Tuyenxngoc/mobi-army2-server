@@ -12,7 +12,7 @@ import com.teamobi.mobiarmy2.model.entry.user.FriendEntry;
 import com.teamobi.mobiarmy2.model.entry.user.SpecialItemChestEntry;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.JsonConverter;
-import com.teamobi.mobiarmy2.util.Until;
+import com.teamobi.mobiarmy2.util.Utils;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.lang.reflect.Type;
@@ -204,7 +204,7 @@ public class UserDao implements IUserDao {
                                 CharacterJson characterJson = GsonUtil.GSON.fromJson(playerResultSet.getString("NV" + (i + 1)), CharacterJson.class);
                                 user.getLevels()[i] = characterJson.getLevel();
                                 user.getXps()[i] = characterJson.getXp();
-                                user.getLevelPercents()[i] = Until.calculateLevelPercent(characterJson.getXp(), XpData.getXpRequestLevel(characterJson.getLevel() + 1));
+                                user.getLevelPercents()[i] = Utils.calculateLevelPercent(characterJson.getXp(), XpData.getXpRequestLevel(characterJson.getLevel() + 1));
                                 user.getPoints()[i] = characterJson.getPoint();
                                 user.getPointAdd()[i] = characterJson.getPointAdd();
                                 user.getEquipData()[i] = new int[]{-1, -1, -1, -1, -1, -1};
@@ -307,7 +307,7 @@ public class UserDao implements IUserDao {
                     int xpRequired = XpData.getXpRequestLevel(level);
 
                     friend.setLevel((byte) level);
-                    friend.setLevelPt(Until.calculateLevelPercent(xp, xpRequired));
+                    friend.setLevelPt(Utils.calculateLevelPercent(xp, xpRequired));
                     EquipmentChestJson[] trangBi = GsonUtil.GSON.fromJson(resultSet.getString("ruongTrangBi"), EquipmentChestJson[].class);
                     friend.setData(NVData.getEquipData(trangBi, characterJson, friend.getNvUsed()));
 

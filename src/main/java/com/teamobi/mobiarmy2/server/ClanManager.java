@@ -7,7 +7,7 @@ import com.teamobi.mobiarmy2.model.entry.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.entry.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.entry.clan.ClanMemEntry;
 import com.teamobi.mobiarmy2.model.entry.item.ClanItemEntry;
-import com.teamobi.mobiarmy2.util.Until;
+import com.teamobi.mobiarmy2.util.Utils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class ClanManager {
 
     public byte getClanLevel(short clanId) {
         int exp = clanDao.getExp(clanId);
-        return Until.calculateLevelClan(exp);
+        return Utils.calculateLevelClan(exp);
     }
 
     public int getClanXu(short clanId) {
@@ -53,10 +53,10 @@ public class ClanManager {
     public void updateItemClan(short clanId, int playerId, ClanItemEntry clanItemEntry, boolean isBuyXu) {
         if (isBuyXu) {
             clanDao.updateXu(clanId, -clanItemEntry.getXu());
-            clanDao.gopClanContribute("Mua item đội -" + Until.getStringNumber(clanItemEntry.getXu()) + " xu", playerId, -clanItemEntry.getXu(), 0);
+            clanDao.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItemEntry.getXu()) + " xu", playerId, -clanItemEntry.getXu(), 0);
         } else {
             clanDao.updateLuong(clanId, -clanItemEntry.getLuong());
-            clanDao.gopClanContribute("Mua item đội -" + Until.getStringNumber(clanItemEntry.getLuong()) + " lượng", playerId, 0, -clanItemEntry.getLuong());
+            clanDao.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItemEntry.getLuong()) + " lượng", playerId, 0, -clanItemEntry.getLuong());
         }
 
         ClanItemJson[] items = clanDao.getClanItems(clanId);
@@ -86,7 +86,7 @@ public class ClanManager {
     }
 
     public byte[] getClanIcon(short clanId) {
-        return Until.getFile("res/icon/clan/" + clanDao.getClanIcon(clanId) + ".png");
+        return Utils.getFile("res/icon/clan/" + clanDao.getClanIcon(clanId) + ".png");
     }
 
     public byte getTotalPage(short clanId) {
@@ -100,10 +100,10 @@ public class ClanManager {
     public void contributeClan(short clanId, int playerId, int quantity, boolean isXu) {
         if (isXu) {
             clanDao.updateXu(clanId, quantity);
-            clanDao.gopClanContribute("Góp " + Until.getStringNumber(quantity) + " xu", playerId, quantity, 0);
+            clanDao.gopClanContribute("Góp " + Utils.getStringNumber(quantity) + " xu", playerId, quantity, 0);
         } else {
             clanDao.updateLuong(clanId, quantity);
-            clanDao.gopClanContribute("Góp " + Until.getStringNumber(quantity) + " lượng", playerId, 0, quantity);
+            clanDao.gopClanContribute("Góp " + Utils.getStringNumber(quantity) + " lượng", playerId, 0, quantity);
         }
     }
 

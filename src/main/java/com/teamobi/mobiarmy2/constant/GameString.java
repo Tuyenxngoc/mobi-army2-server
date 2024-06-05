@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.constant;
 
-import com.teamobi.mobiarmy2.util.Until;
+import com.teamobi.mobiarmy2.util.Utils;
 
 import java.time.LocalDateTime;
 
@@ -98,7 +98,7 @@ public class GameString {
     }
 
     public static String dailyTopReward(int quantity) {
-        return String.format("Chúc mừng bạn nhận được phần thưởng top là %s xu", Until.getStringNumber(quantity));
+        return String.format("Chúc mừng bạn nhận được phần thưởng top là %s xu", Utils.getStringNumber(quantity));
     }
 
     public static String loginErr1() {
@@ -398,7 +398,7 @@ public class GameString {
     }
 
     public static String gopClanMinXu(int xu) {
-        return String.format("Mức góp ít nhất là %s xu", Until.getStringNumber(xu));
+        return String.format("Mức góp ít nhất là %s xu", Utils.getStringNumber(xu));
     }
 
     public static String gopClanThanhCong() {
@@ -438,6 +438,6 @@ public class GameString {
     }
 
     public static String giftCodeReward(String code, int quantity, String reward) {
-        return String.format("Sử dụng mã quà tặng %s thành công, nhận được %s %s", code, Until.getStringNumber(quantity), reward);
+        return String.format("Sử dụng mã quà tặng %s thành công, nhận được %s %s", code, Utils.getStringNumber(quantity), reward);
     }
 }
