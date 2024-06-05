@@ -38,8 +38,8 @@ public class JsonConverter {
             jsonItem.setVipLevel(entry.getVipLevel());
             jsonItem.setPurchaseDate(entry.getPurchaseDate());
             jsonItem.setSlots(entry.getSlots());
-            jsonItem.setAdditionalPoints(entry.getAddPoints());
-            jsonItem.setAdditionalPercent(entry.getAddPercents());
+            jsonItem.setAddPoints(entry.getAddPoints());
+            jsonItem.setAddPercents(entry.getAddPercents());
 
             return jsonItem;
         }).collect(Collectors.toList());

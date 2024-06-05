@@ -38,9 +38,9 @@ public class EquipmentChestJson {
     private byte[] slots;
 
     @SerializedName("additionalPoints")
-    private byte[] additionalPoints;
+    private byte[] addPoints;
 
     @SerializedName("additionalPercent")
-    private byte[] additionalPercent;
+    private byte[] addPercents;
 
 }

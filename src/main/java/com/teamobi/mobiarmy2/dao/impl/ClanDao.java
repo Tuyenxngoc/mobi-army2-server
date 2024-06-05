@@ -230,7 +230,7 @@ public class ClanDao implements IClanDao {
                     entry.setNvUsed(resultSet.getByte("nv_used"));
                     entry.setOnline(resultSet.getByte("p.online"));
 
-                    CharacterJson characterJson = GsonUtil.GSON.fromJson(resultSet.getString("NV" + entry.getNvUsed()), CharacterJson.class);
+                    CharacterJson characterJson = GsonUtil.GSON.fromJson(resultSet.getString("NV" + (entry.getNvUsed() + 1)), CharacterJson.class);
                     EquipmentChestJson[] trangBi = GsonUtil.GSON.fromJson(resultSet.getString("ruongTrangBi"), EquipmentChestJson[].class);
 
                     entry.setLever((byte) characterJson.getLevel());

@@ -174,8 +174,8 @@ public class UserDao implements IUserDao {
                                 equip.setPurchaseDate(json.getPurchaseDate());
                                 equip.setVipLevel(json.getVipLevel());
                                 equip.setInUse(json.getInUse() == 1);
-                                equip.setAddPoints(json.getAdditionalPoints());
-                                equip.setAddPercents(json.getAdditionalPercent());
+                                equip.setAddPoints(json.getAddPoints());
+                                equip.setAddPercents(json.getAddPercents());
                                 equip.setSlots(json.getSlots());
                                 byte emptySlot = 0;
                                 for (int l = 0; l < equip.getSlots().length; l++) {
@@ -300,7 +300,7 @@ public class UserDao implements IUserDao {
                     friend.setNvUsed(resultSet.getByte("nv_used"));
                     friend.setClanId(resultSet.getShort("clan_id"));
                     friend.setOnline(resultSet.getByte("online"));
-                    CharacterJson characterJson = GsonUtil.GSON.fromJson(resultSet.getString("NV" + friend.getNvUsed()), CharacterJson.class);
+                    CharacterJson characterJson = GsonUtil.GSON.fromJson(resultSet.getString("NV" + (friend.getNvUsed() + 1)), CharacterJson.class);
 
                     int level = characterJson.getLevel();
                     int xp = characterJson.getXp();

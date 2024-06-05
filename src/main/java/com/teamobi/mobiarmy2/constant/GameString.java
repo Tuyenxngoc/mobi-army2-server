@@ -158,7 +158,7 @@ public class GameString {
     }
 
     public static String buySuccess() {
-        return "Giao dịch thành công. Xin cảm ơn!";
+        return "Giao dịch thành công. Xin cảm ơn.";
     }
 
     public static String addFrienvError1() {

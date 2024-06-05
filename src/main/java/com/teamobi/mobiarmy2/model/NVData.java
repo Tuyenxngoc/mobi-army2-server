@@ -5,6 +5,8 @@ import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.model.entry.equip.CharacterEntry;
 import com.teamobi.mobiarmy2.model.entry.equip.EquipmentEntry;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -74,32 +76,59 @@ public class NVData {
                 .orElse(null);
     }
 
-    public static short[] getEquipData(EquipmentChestJson[] trangBi, CharacterJson character, byte nvUsed) {
-        short[] data = new short[5];
+    //Todo optimize this method
+    public static short[] getEquipData(EquipmentChestJson[] equipmentChestJsons, CharacterJson character, byte nvUsed) {
+        short[] equipData = new short[5];
 
-        int index = character.getData()[5];
-        if (index >= 0 && index < trangBi.length) {
-            EquipmentChestJson equipmentChestJson = trangBi[index];
-            EquipmentEntry entry = NVData.getEquipEntry(equipmentChestJson.getCharacterId(), equipmentChestJson.getEquipType(), equipmentChestJson.getEquipIndex());
-            if (entry != null && entry.getDisguiseEquippedIndexes() != null) {
-                data[0] = entry.getDisguiseEquippedIndexes()[0];
-                data[1] = entry.getDisguiseEquippedIndexes()[1];
-                data[2] = entry.getDisguiseEquippedIndexes()[2];
-                data[3] = entry.getDisguiseEquippedIndexes()[3];
-                data[4] = entry.getDisguiseEquippedIndexes()[4];
-            }
-        } else {
-            for (byte i = 0; i < 5; i++) {
-                index = character.getData()[i];
-                if (index >= 0 && index < trangBi.length) {
-                    data[i] = trangBi[index].getEquipIndex();
-                } else if (User.nvEquipDefault[nvUsed][i] != null) {
-                    data[i] = User.nvEquipDefault[nvUsed][i].getEquipIndex();
-                } else {
-                    data[i] = -1;
+        //Tìm cải trang
+        boolean found = false;
+        for (EquipmentChestJson json : equipmentChestJsons) {
+            if (json != null && json.getKey() == character.getData()[5]) {
+                EquipmentEntry equip = getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex());
+                if (equip != null) {
+
+                    //Kiểm tra cải trang còn hạn sử dụng hay không
+                    if (equip.getExpirationDays() - ChronoUnit.DAYS.between(json.getPurchaseDate(), LocalDateTime.now()) > 0) {
+                        System.arraycopy(equip.getDisguiseEquippedIndexes(), 0, equipData, 0, equipData.length);
+                        found = true;
+                        break;
+                    }
                 }
             }
         }
-        return data;
+
+        //Tìm trang bị
+        if (!found) {
+            for (int i = 0; i < equipData.length; i++) {
+
+                //Kiểm tra có trang bị trong rương hay không
+                boolean exists = false;
+                for (EquipmentChestJson json : equipmentChestJsons) {
+                    if (json != null && json.getKey() == character.getData()[i]) {
+                        EquipmentEntry equip = getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex());
+                        if (equip != null) {
+
+                            //Kiểm tra trang bị còn hạn sử dụng hay không
+                            if (equip.getExpirationDays() - ChronoUnit.DAYS.between(json.getPurchaseDate(), LocalDateTime.now()) > 0) {
+                                equipData[i] = json.getEquipIndex();
+                                exists = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                //Nếu không tìm thấy thì lấy dữ liệu mặc định
+                if (!exists) {
+                    if (User.nvEquipDefault[nvUsed][i] != null) {
+                        equipData[i] = User.nvEquipDefault[nvUsed][i].getEquipIndex();
+                    } else {
+                        equipData[i] = -1;
+                    }
+                }
+            }
+        }
+
+        return equipData;
     }
 }

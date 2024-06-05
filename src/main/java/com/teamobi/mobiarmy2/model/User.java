@@ -373,7 +373,7 @@ public class User {
         }
     }
 
-    public synchronized void updatePoints(short[] pointsToAdd, short totalPointsToSubtract) {
+    public synchronized void updatePoints(short[] pointsToAdd, int totalPointsToSubtract) {
         for (int i = 0; i < 5; i++) {
             pointAdd[nvUsed][i] += pointsToAdd[i];
         }

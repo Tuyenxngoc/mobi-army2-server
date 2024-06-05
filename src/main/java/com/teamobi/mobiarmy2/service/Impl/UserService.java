@@ -134,9 +134,9 @@ public class UserService implements IUserService {
                 sendMSSToUser(GameString.dailyReward(quantity, FightItemData.FIGHT_ITEM_ENTRIES.get(indexItem).getName()));
                 //Cập nhật quà top
                 if (user.getTopEarningsXu() > 0) {
-                    user.setTopEarningsXu(0);
                     user.updateXu(user.getTopEarningsXu());
                     sendMSSToUser(GameString.dailyTopReward(user.getTopEarningsXu()));
+                    user.setTopEarningsXu(0);
                 }
                 //Gửi messeage khi login
                 sendMSSToUser(serverManager.config().getSEND_THU1());
@@ -298,12 +298,11 @@ public class UserService implements IUserService {
 
     public void sendMapCollisionInfo() {
         try {
-            // Send mss 92
             Message ms = new Message(92);
             DataOutputStream ds = ms.writer();
             ds.writeShort(MapData.idNotCollisions.length);
-            for (int i = 0; i < MapData.idNotCollisions.length; i++) {
-                ds.writeShort(MapData.idNotCollisions[i]);
+            for (short i : MapData.idNotCollisions) {
+                ds.writeShort(i);
             }
             ds.flush();
             user.sendMessage(ms);
@@ -1364,7 +1363,7 @@ public class UserService implements IUserService {
             Message ms = new Message(-7);
             DataOutputStream ds = ms.writer();
             for (int i = 0; i < 5; i++) {
-                ds.writeInt(user.getEquipData()[user.getNvUsed()][i] | 0x10000);
+                ds.writeInt(user.getEquipData()[user.getNvUsed()][i]);
             }
             ds.flush();
             user.sendMessage(ms);
@@ -1414,6 +1413,7 @@ public class UserService implements IUserService {
             ds.writeInt(user.getLuong());
             ds.flush();
             user.sendMessage(ms);
+            sendServerMessage(GameString.buySuccess());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1486,7 +1486,7 @@ public class UserService implements IUserService {
                 handleGiftCode(serial);
                 return;
             }
-            sendServerMessage("..." + serial + " " + pin);
+            sendServerMessage(serial + " " + type);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1544,10 +1544,12 @@ public class UserService implements IUserService {
             for (EquipmentChestJson json : rewardData.getEquips()) {
                 EquipmentChestEntry addEquip = new EquipmentChestEntry();
                 addEquip.setEquipEntry(NVData.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
+                if (addEquip.getEquipEntry() == null) {
+                    continue;
+                }
                 addEquip.setVipLevel(json.getVipLevel());
-                addEquip.setAddPoints(json.getAdditionalPoints());
-                addEquip.setAddPercents(json.getAdditionalPercent());
-
+                addEquip.setAddPoints(json.getAddPoints());
+                addEquip.setAddPercents(json.getAddPercents());
                 user.addEquipment(addEquip);
                 sendMSSToUser(GameString.giftCodeReward(code, addEquip.getEquipEntry().getName()));
             }
@@ -1581,8 +1583,8 @@ public class UserService implements IUserService {
     public void handleChangePassword(Message ms) {
         DataInputStream dis = ms.reader();
         try {
-            String oldPass = dis.readUTF();
-            String newPass = dis.readUTF();
+            String oldPass = dis.readUTF().trim();
+            String newPass = dis.readUTF().trim();
 
             if (isInvalidInput(oldPass) || isInvalidInput(newPass)) {
                 sendServerMessage(GameString.changPassError1());
@@ -1727,7 +1729,7 @@ public class UserService implements IUserService {
                 ds.writeByte(entry.getVipLevel());
             }
             for (int i = 0; i < 5; i++) {
-                ds.writeInt(user.getEquipData()[user.getNvUsed()][i] | 0x10000);
+                ds.writeInt(user.getEquipData()[user.getNvUsed()][i]);
             }
             ds.flush();
             user.sendMessage(ms);
@@ -1753,7 +1755,7 @@ public class UserService implements IUserService {
     public void handleAddPoints(Message ms) {
         try {
             short[] points = new short[5];
-            short totalPoints = 0;
+            int totalPoints = 0;
             for (int i = 0; i < points.length; i++) {
                 points[i] = ms.reader().readShort();
                 if (points[i] < 0) {
@@ -1950,7 +1952,6 @@ public class UserService implements IUserService {
                         // Gửi thông báo thành công
                         sendServerMessage(GameString.thaoNgocSuccess());
                     } else if (equipAction == 2) {//Xác nhận bán trang bị
-                        List<EquipmentChestEntry> validEquipments = new ArrayList<>();
                         for (EquipmentChestEntry equipment : selectedEquip) {
                             if (equipment.isInUse()) {
                                 sendServerMessage(GameString.sellTBError1());
@@ -1960,9 +1961,8 @@ public class UserService implements IUserService {
                                 sendServerMessage(GameString.sellTBError2());
                                 return;
                             }
-                            validEquipments.add(equipment);
                         }
-                        for (EquipmentChestEntry validEquipment : validEquipments) {
+                        for (EquipmentChestEntry validEquipment : selectedEquip) {
                             user.updateInventory(null, validEquipment, null, null);
                         }
                         user.updateXu(totalEquipTransaction);
@@ -1985,24 +1985,18 @@ public class UserService implements IUserService {
         if (equipmentEntry == null || (unit == 0 ? equipmentEntry.getPriceXu() : equipmentEntry.getPriceLuong()) < 0) {
             return;
         }
-        switch (unit) {
-            case 0 -> {
-                if (user.getXu() < equipmentEntry.getPriceXu()) {
-                    sendServerMessage(GameString.xuNotEnought());
-                    return;
-                }
-                user.updateXu(-equipmentEntry.getPriceXu());
-            }
-            case 1 -> {
-                if (user.getLuong() < equipmentEntry.getPriceLuong()) {
-                    sendServerMessage(GameString.xuNotEnought());
-                    return;
-                }
-                user.updateLuong(-equipmentEntry.getPriceLuong());
-            }
-            default -> {
+        if (unit == 0) {
+            if (user.getXu() < equipmentEntry.getPriceXu()) {
+                sendServerMessage(GameString.xuNotEnought());
                 return;
             }
+            user.updateXu(-equipmentEntry.getPriceXu());
+        } else {
+            if (user.getLuong() < equipmentEntry.getPriceLuong()) {
+                sendServerMessage(GameString.xuNotEnought());
+                return;
+            }
+            user.updateLuong(-equipmentEntry.getPriceLuong());
         }
         EquipmentChestEntry newTb = new EquipmentChestEntry();
         newTb.setEquipEntry(equipmentEntry);
@@ -2014,26 +2008,19 @@ public class UserService implements IUserService {
     public void handleSpinWheel(Message ms) {
         try {
             byte unit = ms.reader().readByte();
-            switch (unit) {
-                case 0 -> {
-                    if (user.getXu() < SpinWheelConstants.XU_COST) {
-                        sendServerMessage(GameString.xuNotEnought());
-                        return;
-                    }
-                    user.updateXu(-SpinWheelConstants.XU_COST);
-                }
-                case 1 -> {
-                    if (user.getLuong() < SpinWheelConstants.LUONG_COST) {
-                        sendServerMessage(GameString.xuNotEnought());
-                        return;
-                    }
-                    user.updateLuong(-SpinWheelConstants.LUONG_COST);
-                }
-                default -> {
+            if (unit == 0) {
+                if (user.getXu() < SpinWheelConstants.XU_COST) {
+                    sendServerMessage(GameString.xuNotEnought());
                     return;
                 }
+                user.updateXu(-SpinWheelConstants.XU_COST);
+            } else {
+                if (user.getLuong() < SpinWheelConstants.LUONG_COST) {
+                    sendServerMessage(GameString.xuNotEnought());
+                    return;
+                }
+                user.updateLuong(-SpinWheelConstants.LUONG_COST);
             }
-
             ms = new Message(Cmd.RULET);
             DataOutputStream ds = ms.writer();
 
