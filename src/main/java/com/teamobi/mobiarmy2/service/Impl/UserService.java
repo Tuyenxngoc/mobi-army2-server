@@ -791,47 +791,68 @@ public class UserService implements IUserService {
                 byte unit = dis.readByte();
                 byte itemId = dis.readByte();
                 byte quantity = dis.readByte();
-                muaDoDacBietShop(unit, itemId, quantity);
+                purchaseSpecialItem(unit, itemId, quantity);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void muaDoDacBietShop(byte unit, byte itemId, byte quantity) {
-        //Todo check num ruong
+    private void purchaseSpecialItem(byte unit, byte itemId, byte quantity) {
+        //Kiểm tra số lượng mua hợp lệ
         if (quantity < 1) {
             return;
         }
+
+        //Kiểm tra số lượng đang có trong rương
+        // Todo check inventory count
+
         SpecialItemEntry item = SpecialItemData.getSpecialItemById(itemId);
         if (!item.isOnSale() || (unit == 0 ? item.getPriceXu() : item.getPriceLuong()) < 0) {
             return;
         }
 
-        if (unit == 0) {// mua xu
-            int gia = quantity * item.getPriceXu();
-            if (user.getXu() < gia) {
+        if (unit == 0) {// Mua bằng xu
+            int totalPrice = quantity * item.getPriceXu();
+            if (user.getXu() < totalPrice) {
                 sendServerMessage(GameString.xuNotEnought());
                 return;
             }
-            user.updateXu(-gia);
-        } else if (unit == 1) {// mua luong
-            int gia = quantity * item.getPriceLuong();
-            if (user.getLuong() < gia) {
+            user.updateXu(-totalPrice);
+        } else {// Mua bằng lượng
+            int totalPrice = quantity * item.getPriceLuong();
+            if (user.getLuong() < totalPrice) {
                 sendServerMessage(GameString.xuNotEnought());
                 return;
             }
-            user.updateLuong(-gia);
+            user.updateLuong(-totalPrice);
         }
 
-        ArrayList<SpecialItemChestEntry> array = new ArrayList<>();
-        SpecialItemChestEntry rdE = new SpecialItemChestEntry();
-        rdE.setItem(item);
-        rdE.setQuantity(quantity);
-        array.add(rdE);
-        user.updateInventory(null, null, array, null);
+        //Xử lý khi mua item đặc biệt
+        boolean saveItem = handleSpecialItemPurchase(itemId);
 
+        //Tạo item mới
+        SpecialItemChestEntry newItem = new SpecialItemChestEntry();
+        newItem.setItem(item);
+        newItem.setQuantity(quantity);
+
+        //Thêm vào rương đồ
+        if (saveItem) {
+            user.updateInventory(null, null, List.of(newItem), null);
+        }
+
+        //Gửi thông báo mua thành công
         sendServerMessage(GameString.buySuccess());
+    }
+
+    private boolean handleSpecialItemPurchase(byte itemId) {
+        if (itemId == 50) {
+            user.resetPoints();
+            sendCharacterInfo();
+            return false;
+        }
+
+        return true;
     }
 
     private void sendDoDacBietShop() {
@@ -1107,7 +1128,25 @@ public class UserService implements IUserService {
 
     @Override
     public void hopNgoc(Message ms) {
+        try {
+            DataInputStream dis = ms.reader();
+            byte action = dis.readByte();
+            if (action == 0) {
+                byte size = dis.readByte();
+                for (int i = 0; i < size; i++) {
+                    int id = dis.readInt();
+                    int quantity = dis.readUnsignedByte();
+                    if (quantity <= 0) {
+                        continue;
+                    }
+                    System.out.println(id + " " + quantity);
+                }
+            } else if (action == 1) {
 
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -393,4 +393,13 @@ public class User {
                 .findFirst()
                 .orElse(null);
     }
+
+    public synchronized void resetPoints() {
+        int total = -30;
+        for (short point : pointAdd[nvUsed]) {
+            total += point;
+        }
+        pointAdd[nvUsed] = new short[]{0, 0, 10, 10, 10};
+        points[nvUsed] += total;
+    }
 }
