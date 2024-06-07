@@ -92,6 +92,9 @@ public class GameDao implements IGameDao {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `equip`")) {
+
+                //Khởi tại danh sách trang bị mặc định ban đầu
+                User.nvEquipDefault = new EquipmentEntry[NVData.CHARACTER_ENTRIES.size()][5];
                 while (resultSet.next()) {
                     EquipmentEntry equipEntry = new EquipmentEntry();
                     equipEntry.setCharacterId(resultSet.getByte("character_id"));
@@ -115,6 +118,11 @@ public class GameDao implements IGameDao {
                     equipEntry.setBigImageAlignY(GsonUtil.GSON.fromJson(resultSet.getString("big_image_align_y"), byte[].class));
                     equipEntry.setAddPoints(GsonUtil.GSON.fromJson(resultSet.getString("additional_points"), byte[].class));
                     equipEntry.setAddPercents(GsonUtil.GSON.fromJson(resultSet.getString("additional_percent"), byte[].class));
+
+                    //Đặt trang bị mặc định cho nhân vật
+                    if (resultSet.getBoolean("is_default")) {
+                        User.nvEquipDefault[equipEntry.getCharacterId()][equipEntry.getEquipType()] = equipEntry;
+                    }
 
                     NVData.addEquip(equipEntry);
                 }

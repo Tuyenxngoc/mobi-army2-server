@@ -5,7 +5,6 @@ import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.model.CaptionData;
 import com.teamobi.mobiarmy2.model.MapData;
 import com.teamobi.mobiarmy2.model.NVData;
-import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.model.entry.CaptionEntry;
 import com.teamobi.mobiarmy2.model.entry.equip.CharacterEntry;
 import com.teamobi.mobiarmy2.model.entry.equip.EquipmentEntry;
@@ -185,34 +184,6 @@ public class GameService implements IGameService {
             Utils.saveFile(CommonConstant.iconCacheName, data);
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void setDefaultNvData() {
-        short[][] defaultNvData = new short[NVData.CHARACTER_ENTRIES.size()][5];
-        User.nvEquipDefault = new EquipmentEntry[NVData.CHARACTER_ENTRIES.size()][5];
-        for (byte i = 0; i < NVData.CHARACTER_ENTRIES.size(); i++) {
-            CharacterEntry characterEntry = NVData.CHARACTER_ENTRIES.get(i);
-            if (i != 3) {
-                for (byte j = 0; j < 3; j++) {
-                    defaultNvData[i][j] = characterEntry.getEquips().get(j).get(0).getEquipIndex();
-                }
-                defaultNvData[i][3] = -1;
-                defaultNvData[i][4] = -1;
-            } else {  //Trang bị mặc định đặc biệt cho kingkong
-                defaultNvData[3][0] = characterEntry.getEquips().get((byte) 0).get(0).getEquipIndex();
-                defaultNvData[3][1] = characterEntry.getEquips().get((byte) 1).get(0).getEquipIndex();
-                defaultNvData[3][2] = -1;
-                defaultNvData[3][3] = -1;
-                defaultNvData[3][4] = characterEntry.getEquips().get((byte) 4).get(0).getEquipIndex();
-            }
-        }
-
-        for (byte i = 0; i < NVData.CHARACTER_ENTRIES.size(); i++) {
-            for (byte j = 0; j < 5; j++) {
-                User.nvEquipDefault[i][j] = NVData.getEquipEntry(i, j, defaultNvData[i][j]);
-            }
         }
     }
 

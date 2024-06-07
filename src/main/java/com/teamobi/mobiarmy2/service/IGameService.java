@@ -14,8 +14,6 @@ public interface IGameService {
 
     void getItemData();
 
-    void setDefaultNvData();
-
     void getClanShopData();
 
     void getSpecialItemData();

@@ -90,8 +90,6 @@ public class ServerManager {
         gameService.getCharacterData();
         gameService.getEquipData();
         gameService.setCaptionLevelData();
-
-        gameService.setDefaultNvData();
     }
 
     private void setCache() {
