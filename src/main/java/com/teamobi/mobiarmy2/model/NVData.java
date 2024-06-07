@@ -46,6 +46,10 @@ public class NVData {
     }
 
     public static EquipmentEntry getEquipEntry(byte characterId, byte equipType, short equipIndex) {
+        if (equipIndex < 0) {
+            return null;
+        }
+
         // Find the character entry by ID
         Optional<CharacterEntry> characterEntryOpt = CHARACTER_ENTRIES.stream()
                 .filter(entry -> entry.getId() == characterId)
