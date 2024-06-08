@@ -814,7 +814,10 @@ public class UserService implements IUserService {
         }
 
         //Kiểm tra số lượng đang có trong rương
-        // Todo check inventory count
+        if (user.getInventorySpecialItemCount(itemId) + quantity > ServerManager.getInstance().config().getMax_ruong_itemslot()) {
+            sendServerMessage(GameString.ruongMaxSlot());
+            return;
+        }
 
         SpecialItemEntry item = SpecialItemData.getSpecialItemById(itemId);
         if (!item.isOnSale() || (unit == 0 ? item.getPriceXu() : item.getPriceLuong()) < 0) {

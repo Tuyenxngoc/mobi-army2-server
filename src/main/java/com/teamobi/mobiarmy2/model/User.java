@@ -410,4 +410,15 @@ public class User {
     public synchronized void incrementMaterialsPurchased(byte quantity) {
         materialsPurchased += quantity;
     }
+
+    public short getInventorySpecialItemCount(byte itemId) {
+        SpecialItemChestEntry specialItemChestEntry = ruongDoItem.stream()
+                .filter(item -> item.getItem().getId() == itemId)
+                .findFirst()
+                .orElse(null);
+        if (specialItemChestEntry == null) {
+            return 0;
+        }
+        return specialItemChestEntry.getQuantity();
+    }
 }
