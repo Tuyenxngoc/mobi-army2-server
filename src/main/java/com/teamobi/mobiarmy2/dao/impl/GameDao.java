@@ -219,6 +219,7 @@ public class GameDao implements IGameDao {
                     switch (specialItemType) {
                         case 1 -> specialItemEntry.setGem(true);
                         case 2 -> specialItemEntry.setMaterial(true);
+                        case 3 -> specialItemEntry.setUsable(true);
                     }
 
                     SpecialItemData.SPECIAL_ITEM_ENTRIES.add(specialItemEntry);

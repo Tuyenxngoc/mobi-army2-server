@@ -398,6 +398,13 @@ public class User {
                 .orElse(null);
     }
 
+    public SpecialItemChestEntry getSpecialItemById(int id) {
+        return ruongDoItem.stream()
+                .filter(item -> item.getItem().getId() == id)
+                .findFirst()
+                .orElse(null);
+    }
+
     public synchronized void resetPoints() {
         int total = -30;
         for (short point : pointAdd[nvUsed]) {

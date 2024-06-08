@@ -53,4 +53,19 @@ public class EquipmentChestEntry {
         }
         return Math.max(equipEntry.getExpirationDays() - getDaysSincePurchase(), 0);
     }
+
+    public void decrementEmptySlot() {
+        emptySlot--;
+        if (emptySlot < 0) {
+            emptySlot = 0;
+        }
+    }
+
+    public void setNewSlot(byte itemId) {
+        if (emptySlot <= 0 || emptySlot > 3) {
+            return;
+        }
+        slots[3 - emptySlot] = itemId;
+    }
+
 }

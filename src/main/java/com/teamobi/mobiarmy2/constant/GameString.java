@@ -130,7 +130,7 @@ public class GameString {
     }
 
     public static String hopNgocError() {
-        return "Lỗi kết hợp";
+        return "Không thể kết hợp.";
     }
 
     public static String hopNgocCantDo() {
@@ -141,16 +141,20 @@ public class GameString {
         return "Bạn có muốn gắn ngọc vào trang bị?";
     }
 
+    public static String hopNgocSuccess() {
+        return "Chúc mừng bạn đã kết hợp thành công.";
+    }
+
     public static String hopNgocNC() {
         return "Bạn có muốn hợp thành ngọc cấp cao hơn? Tỉ lệ thành công là %s";
     }
 
-    public static String hopNgocSell() {
-        return "Bạn có muốn bán %d vật phẩm với giá %d xu?";
+    public static String hopNgocSell(int quantity, int total) {
+        return String.format("Bạn có muốn bán %d vật phẩm này với giá %d xu không?", quantity, total);
     }
 
     public static String hopNgocNoSlot() {
-        return "Trang bị đã chọn không còn đủ chỗ";
+        return "Trang bị đã chọn không còn đủ chỗ.";
     }
 
     public static String xuNotEnought() {

@@ -22,4 +22,5 @@ public class SpecialItemEntry {
     private boolean isOnSale;
     private boolean isGem;
     private boolean isMaterial;
+    private boolean isUsable;
 }
