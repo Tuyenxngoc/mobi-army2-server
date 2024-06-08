@@ -11,6 +11,7 @@ import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.GiftCodeRewardJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.*;
+import com.teamobi.mobiarmy2.model.entry.FabricateItemEntry;
 import com.teamobi.mobiarmy2.model.entry.GiftCodeEntry;
 import com.teamobi.mobiarmy2.model.entry.MissionEntry;
 import com.teamobi.mobiarmy2.model.entry.PaymentEntry;
@@ -56,6 +57,7 @@ public class UserService implements IUserService {
     private int totalEquipTransaction;
     private final List<EquipmentChestEntry> selectedEquips = new ArrayList<>();
     private final List<SpecialItemChestEntry> selectedSpecialItems = new ArrayList<>();
+    private FabricateItemEntry fabricateItemEntry;
 
     public UserService(User user) {
         this.user = user;
@@ -1164,6 +1166,7 @@ public class UserService implements IUserService {
 
                 //Đặt lại dữ liệu
                 commonAction = 0;
+                fabricateItemEntry = null;
                 selectedEquips.clear();
                 selectedSpecialItems.clear();
 
@@ -1195,7 +1198,15 @@ public class UserService implements IUserService {
                 if (selectedEquips.isEmpty() && selectedSpecialItems.isEmpty()) {
                     return;
                 }
-                //Trường hợp gép ngọc vào trang bị
+
+                if (selectedEquips.isEmpty()) {
+                    FabricateItemEntry fabricateItem = FabricateItemData.getFabricateItem(selectedSpecialItems);
+                    if (fabricateItem != null) {
+                        commonAction = 5;
+                        fabricateItemEntry = fabricateItem;
+                        sendMessageConfirm(fabricateItem.getConfirmationMessage());
+                    }
+                }
 
             } else if (action == 1) {
                 switch (commonAction) {
@@ -1212,6 +1223,23 @@ public class UserService implements IUserService {
 
                     case 4 -> {//Dùng item
                         //Cần 1 item
+                    }
+
+                    case 5 -> {//Ghép item
+                        if (fabricateItemEntry.getRewardXu() > 0) {
+                            user.updateXu(fabricateItemEntry.getRewardXu());
+                        }
+                        if (fabricateItemEntry.getRewardLuong() > 0) {
+                            user.updateLuong(fabricateItemEntry.getRewardLuong());
+                        }
+                        if (fabricateItemEntry.getRewardCup() > 0) {
+                            user.updateDanhVong(fabricateItemEntry.getRewardCup());
+                        }
+                        if (fabricateItemEntry.getRewardExp() > 0) {
+                            user.updateXp(fabricateItemEntry.getRewardExp());
+                        }
+
+                        sendServerMessage(fabricateItemEntry.getCompletionMessage());
                     }
                 }
 

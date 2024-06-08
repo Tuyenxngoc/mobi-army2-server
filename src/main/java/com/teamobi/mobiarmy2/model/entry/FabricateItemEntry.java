@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.model.entry;
 
+import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,13 +14,13 @@ public class FabricateItemEntry {
 
     private int xuRequire;
     private int luongRequire;
-    private String itemRequire;
+    private SpecialItemChestJson[] itemRequire;
 
     private int rewardXu;
     private int rewardLuong;
     private int rewardCup;
     private int rewardExp;
-    private String rewardItem;
+    private SpecialItemChestJson[] rewardItem;
 
     private String confirmationMessage;
     private String completionMessage;

@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.dao.impl;
 
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
+import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.entry.*;
 import com.teamobi.mobiarmy2.model.entry.equip.CharacterEntry;
@@ -333,6 +334,8 @@ public class GameDao implements IGameDao {
                     entry.setRewardExp(resultSet.getInt("reward_exp"));
                     entry.setConfirmationMessage(resultSet.getString("confirmation_message"));
                     entry.setCompletionMessage(resultSet.getString("completion_message"));
+                    entry.setItemRequire(GsonUtil.GSON.fromJson(resultSet.getString("item_require"), SpecialItemChestJson[].class));
+                    entry.setRewardItem(GsonUtil.GSON.fromJson(resultSet.getString("reward_item"), SpecialItemChestJson[].class));
 
                     FabricateItemData.FABRICATE_ITEM_ENTRIES.add(entry);
                 }
