@@ -55,7 +55,7 @@ public class RankingDao implements IRankingDao {
                     "SELECT p.*, u.username " +
                             "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
                             "WHERE p.dvong > 0 " +
-                            "ORDER BY p.dvong LIMIT 100"
+                            "ORDER BY p.dvong DESC LIMIT 100"
             )) {
                 byte index = 1;
                 while (resultSet.next()) {
@@ -80,7 +80,7 @@ public class RankingDao implements IRankingDao {
                     "SELECT *, u.username " +
                             "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
                             "WHERE p.xpMax > 0 " +
-                            "ORDER BY p.xpMax LIMIT 100"
+                            "ORDER BY p.xpMax DESC LIMIT 100"
             )) {
                 byte index = 1;
                 while (resultSet.next()) {
@@ -105,7 +105,7 @@ public class RankingDao implements IRankingDao {
                     "SELECT *, u.username " +
                             "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
                             "WHERE p.xu > 0 " +
-                            "ORDER BY p.xu LIMIT 100"
+                            "ORDER BY p.xu DESC LIMIT 100"
             )) {
                 byte index = 1;
                 while (resultSet.next()) {
@@ -130,7 +130,7 @@ public class RankingDao implements IRankingDao {
                     "SELECT *, u.username " +
                             "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
                             "WHERE p.luong > 0 " +
-                            "ORDER BY p.luong LIMIT 100"
+                            "ORDER BY p.luong DESC LIMIT 100"
             )) {
                 byte index = 1;
                 while (resultSet.next()) {
@@ -155,7 +155,7 @@ public class RankingDao implements IRankingDao {
                     "SELECT *, u.username " +
                             "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
                             "WHERE p.weekly_earnings_cup IS NOT NULL AND p.weekly_earnings_cup > 0 " +
-                            "ORDER BY p.weekly_earnings_cup LIMIT 100"
+                            "ORDER BY p.weekly_earnings_cup DESC LIMIT 100"
             )) {
                 byte index = 1;
                 while (resultSet.next()) {
@@ -180,7 +180,7 @@ public class RankingDao implements IRankingDao {
                     "SELECT *, u.username " +
                             "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
                             "WHERE p.weekly_earnings_xu IS NOT NULL AND p.weekly_earnings_xu > 0 " +
-                            "ORDER BY p.weekly_earnings_xu LIMIT 100"
+                            "ORDER BY p.weekly_earnings_xu DESC LIMIT 100"
             )) {
                 byte index = 1;
                 while (resultSet.next()) {

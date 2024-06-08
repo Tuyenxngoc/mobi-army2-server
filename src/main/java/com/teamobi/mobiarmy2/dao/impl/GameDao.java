@@ -91,7 +91,7 @@ public class GameDao implements IGameDao {
     public void getAllEquip() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `equip`")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `equip` ORDER BY equip_type, equip_index, character_id")) {
 
                 //Khởi tại danh sách trang bị mặc định ban đầu
                 User.nvEquipDefault = new EquipmentEntry[NVData.CHARACTER_ENTRIES.size()][5];
