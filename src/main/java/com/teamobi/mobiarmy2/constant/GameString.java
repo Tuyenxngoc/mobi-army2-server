@@ -440,4 +440,12 @@ public class GameString {
     public static String giftCodeReward(String code, int quantity, String reward) {
         return String.format("Sử dụng mã quà tặng %s thành công, nhận được %s %s", code, Utils.getStringNumber(quantity), reward);
     }
+
+    public static String materialLimit() {
+        return "Bạn đã mua hết số lượng cho phép.";
+    }
+
+    public static String materialLimit1(int quantity) {
+        return String.format("Bạn chỉ có thể mua thêm %d nguyên liệu.", quantity);
+    }
 }

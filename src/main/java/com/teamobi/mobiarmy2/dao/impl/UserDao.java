@@ -68,6 +68,8 @@ public class UserDao implements IUserDao {
                 "`top_earnings_xu` = ?, " +
                 "`NV1` = ?, " +
 
+                "`materials_purchased` = ?, " +
+                "`equipment_purchased` = ?, " +
                 //...//
                 "`nv_used` = ? " +
                 " WHERE player_id = ?";
@@ -86,6 +88,9 @@ public class UserDao implements IUserDao {
                 Arrays.toString(user.getMissionLevel()),
                 user.getTopEarningsXu(),
                 GsonUtil.GSON.toJson(nv1),
+
+                user.getMaterialsPurchased(),
+                user.getEquipmentPurchased(),
                 //...//
                 user.getNvUsed(),
                 user.getPlayerId());
@@ -146,6 +151,8 @@ public class UserDao implements IUserDao {
                             user.setNvUsed(playerResultSet.getByte("nv_used"));
                             user.setClanId(playerResultSet.getShort("clan_id"));
                             user.setPointEvent(playerResultSet.getInt("point_event"));
+                            user.setMaterialsPurchased(playerResultSet.getByte("materials_purchased"));
+                            user.setEquipmentPurchased(playerResultSet.getShort("equipment_purchased"));
 
                             int nvstt = playerResultSet.getInt("sttnhanvat");
                             for (byte i = 0; i < 10; i++) {

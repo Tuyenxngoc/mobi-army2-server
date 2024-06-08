@@ -212,8 +212,14 @@ public class GameDao implements IGameDao {
                     specialItemEntry.setExpirationDays(resultSet.getShort("expiration_days"));
                     specialItemEntry.setShowSelection(resultSet.getBoolean("show_selection"));
                     specialItemEntry.setOnSale(resultSet.getBoolean("is_on_sale"));
-                    specialItemEntry.setGem(resultSet.getBoolean("is_gem"));
                     specialItemEntry.setAbility(GsonUtil.GSON.fromJson(resultSet.getString("ability"), short[].class));
+
+                    //Phân loại item
+                    byte specialItemType = resultSet.getByte("type");
+                    switch (specialItemType) {
+                        case 1 -> specialItemEntry.setGem(true);
+                        case 2 -> specialItemEntry.setMaterial(true);
+                    }
 
                     SpecialItemData.SPECIAL_ITEM_ENTRIES.add(specialItemEntry);
                 }

@@ -45,6 +45,8 @@ public class User {
     private boolean isActive;
     private byte nvUsed;
     private int pointEvent;
+    private byte materialsPurchased;
+    private short equipmentPurchased;
     private LocalDateTime xpX2Time;
     private LocalDateTime lastOnline;
     private boolean[] ownedCharacters;
@@ -247,8 +249,10 @@ public class User {
         }
         addEquipment.setEmptySlot((byte) 3);
         addEquipment.setSlots(new byte[]{-1, -1, -1});
-        addEquipment.setKey((int) (System.currentTimeMillis() & 0xFFFFFF));
+        addEquipment.setKey(equipmentPurchased | 0x10000);
         ruongDoTB.add(addEquipment);
+        //Tăng số lượng trang bị mua
+        equipmentPurchased++;
 
         try {
             Message ms = new Message(Cmd.BUY_EQUIP);
@@ -401,5 +405,9 @@ public class User {
         }
         pointAdd[nvUsed] = new short[]{0, 0, 10, 10, 10};
         points[nvUsed] += total;
+    }
+
+    public synchronized void incrementMaterialsPurchased(byte quantity) {
+        materialsPurchased += quantity;
     }
 }

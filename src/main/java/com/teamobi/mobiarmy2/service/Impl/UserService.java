@@ -132,20 +132,27 @@ public class UserService implements IUserService {
                 byte quantity = 1;
                 user.updateItems(indexItem, quantity);
                 sendMSSToUser(GameString.dailyReward(quantity, FightItemData.FIGHT_ITEM_ENTRIES.get(indexItem).getName()));
+
                 //Cập nhật quà top
                 if (user.getTopEarningsXu() > 0) {
                     user.updateXu(user.getTopEarningsXu());
                     sendMSSToUser(GameString.dailyTopReward(user.getTopEarningsXu()));
                     user.setTopEarningsXu(0);
                 }
+
+                //Đặt lại số lần mua nguyên liệu
+                user.setMaterialsPurchased((byte) 0);
+
                 //Gửi messeage khi login
                 sendMSSToUser(serverManager.config().getSEND_THU1());
                 sendMSSToUser(serverManager.config().getSEND_THU2());
                 sendMSSToUser(serverManager.config().getSEND_THU3());
                 sendMSSToUser(serverManager.config().getSEND_THU4());
                 sendMSSToUser(serverManager.config().getSEND_THU5());
+
                 //Cập nhật nhiệm vụ
                 user.updateMission(16, 1);
+
                 //Lưu lại lần đăng nhập
                 userDao.updateLastOnline(now, user.getPlayerId());
             }
@@ -195,6 +202,8 @@ public class UserService implements IUserService {
         target.setXpX2Time(source.getXpX2Time());
         target.setLastOnline(source.getLastOnline());
         target.setTopEarningsXu(source.getTopEarningsXu());
+        target.setMaterialsPurchased(source.getMaterialsPurchased());
+        target.setEquipmentPurchased(source.getEquipmentPurchased());
     }
 
     @Override
@@ -812,6 +821,17 @@ public class UserService implements IUserService {
             return;
         }
 
+        //Giới hạn số lần mua vật liệu
+        if (item.isMaterial()) {
+            if (user.getMaterialsPurchased() >= 20) {
+                sendServerMessage(GameString.materialLimit());
+                return;
+            } else if (user.getMaterialsPurchased() + quantity > 20) {
+                sendServerMessage(GameString.materialLimit1(20 - user.getMaterialsPurchased()));
+                return;
+            }
+        }
+
         if (unit == 0) {// Mua bằng xu
             int totalPrice = quantity * item.getPriceXu();
             if (user.getXu() < totalPrice) {
@@ -839,6 +859,11 @@ public class UserService implements IUserService {
         //Thêm vào rương đồ
         if (saveItem) {
             user.updateInventory(null, null, List.of(newItem), null);
+        }
+
+        //Cập nhật số lượng mua nếu là vật liệu
+        if (item.isMaterial()) {
+            user.incrementMaterialsPurchased(quantity);
         }
 
         //Gửi thông báo mua thành công

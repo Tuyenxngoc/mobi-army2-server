@@ -21,4 +21,5 @@ public class SpecialItemEntry {
     private boolean showSelection;
     private boolean isOnSale;
     private boolean isGem;
+    private boolean isMaterial;
 }
