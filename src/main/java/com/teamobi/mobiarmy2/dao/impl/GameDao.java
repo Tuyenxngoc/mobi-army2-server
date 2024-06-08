@@ -3,10 +3,7 @@ package com.teamobi.mobiarmy2.dao.impl;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.*;
-import com.teamobi.mobiarmy2.model.entry.CaptionEntry;
-import com.teamobi.mobiarmy2.model.entry.LevelXpRequiredEntry;
-import com.teamobi.mobiarmy2.model.entry.MissionEntry;
-import com.teamobi.mobiarmy2.model.entry.PaymentEntry;
+import com.teamobi.mobiarmy2.model.entry.*;
 import com.teamobi.mobiarmy2.model.entry.equip.CharacterEntry;
 import com.teamobi.mobiarmy2.model.entry.equip.EquipmentEntry;
 import com.teamobi.mobiarmy2.model.entry.item.ClanItemEntry;
@@ -312,6 +309,32 @@ public class GameDao implements IGameDao {
                     xpRequired.setXp(currentXp);
                     XpData.LEVEL_XP_REQUIRED_ENTRIES.add(xpRequired);
                     previousXp = currentXp;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    @Override
+    public void getAllFabricateItems() {
+        try (Connection connection = HikariCPManager.getInstance().getConnection();
+             Statement statement = connection.createStatement()) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `fabricate_item`")) {
+                while (resultSet.next()) {
+                    FabricateItemEntry entry = new FabricateItemEntry();
+                    entry.setId(resultSet.getInt("fabricate_item_id"));
+                    entry.setXuRequire(resultSet.getInt("xu_require"));
+                    entry.setLuongRequire(resultSet.getInt("luong_require"));
+                    entry.setRewardXu(resultSet.getInt("reward_xu"));
+                    entry.setRewardLuong(resultSet.getInt("reward_luong"));
+                    entry.setRewardCup(resultSet.getInt("reward_cup"));
+                    entry.setRewardExp(resultSet.getInt("reward_exp"));
+                    entry.setConfirmationMessage(resultSet.getString("confirmation_message"));
+                    entry.setCompletionMessage(resultSet.getString("completion_message"));
+
+                    FabricateItemData.FABRICATE_ITEM_ENTRIES.add(entry);
                 }
             }
         } catch (SQLException e) {

@@ -24,4 +24,5 @@ public interface IGameDao {
 
     void getAllXpData();
 
+    void getAllFabricateItems();
 }

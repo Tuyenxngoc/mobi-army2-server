@@ -52,13 +52,10 @@ public class UserService implements IUserService {
     private final IUserDao userDao = new UserDao();
     private final IGiftCodeDao giftCodeDao = new GiftCodeDao();
 
-    private byte equipAction;
+    private byte commonAction;
     private int totalEquipTransaction;
     private final List<EquipmentChestEntry> selectedEquips = new ArrayList<>();
-
-    private byte specialItemAction;
-    private EquipmentChestEntry selectedEquip;
-    private SpecialItemChestEntry selectedSpecialItem;
+    private final List<SpecialItemChestEntry> selectedSpecialItems = new ArrayList<>();
 
     public UserService(User user) {
         this.user = user;
@@ -1164,11 +1161,13 @@ public class UserService implements IUserService {
             DataInputStream dis = ms.reader();
             byte action = dis.readByte();
             if (action == 0) {
+
+                //Đặt lại dữ liệu
+                commonAction = 0;
+                selectedEquips.clear();
+                selectedSpecialItems.clear();
+
                 byte size = dis.readByte();
-                if (size < 0 || size >= 3) {//todo fix bug
-                    sendServerMessage(GameString.hopNgocError());
-                    return;
-                }
                 for (byte i = 0; i < size; i++) {
                     int id = dis.readInt();
                     short quantity = (short) dis.readUnsignedByte();
@@ -1180,67 +1179,34 @@ public class UserService implements IUserService {
 
                     //Lấy thông tin vật phẩm từ rương người chơi
                     if (id > Byte.MAX_VALUE) {//Trường hợp trang bị
-                        selectedEquip = user.getEquipmentByKey(id);
+                        EquipmentChestEntry equip = user.getEquipmentByKey(id);
+                        if (equip != null) {
+                            selectedEquips.add(equip);
+                        }
                     } else {//Trường hợp là ngọc
-                        SpecialItemChestEntry itemChestEntry = user.getSpecialItemById(id);
-                        if (itemChestEntry != null && itemChestEntry.getQuantity() >= quantity) {
-                            selectedSpecialItem = new SpecialItemChestEntry(quantity, itemChestEntry.getItem());
+                        SpecialItemChestEntry item = user.getSpecialItemById(id);
+                        if (item != null && item.getQuantity() >= quantity) {
+                            selectedSpecialItems.add(new SpecialItemChestEntry(quantity, item.getItem()));
                         }
                     }
                 }
 
                 //Thoát nếu không tồn tại trong rương
-                if (selectedEquip == null && selectedSpecialItem == null) {
+                if (selectedEquips.isEmpty() && selectedSpecialItems.isEmpty()) {
                     return;
                 }
-
                 //Trường hợp gép ngọc vào trang bị
-                if (selectedEquip != null && selectedSpecialItem != null) {
-                    specialItemAction = 1;
-                    sendMessageConfirm(GameString.hopNgocRequest());
-                    return;
-                }
 
-                if (selectedSpecialItem != null) {//todo fix bugs
-                    if (selectedSpecialItem.getItem().isGem()) {//Nếu là ngọc
-                        if (selectedSpecialItem.getQuantity() == 5) { //Trường hợp nâng ngọc
-                            specialItemAction = 2;
-                            sendMessageConfirm(GameString.hopNgocNC());
-                        } else { //Trường hợp bán ngọc
-                            specialItemAction = 3;
-                            sendMessageConfirm(GameString.hopNgocSell(selectedSpecialItem.getQuantity(),
-                                    selectedSpecialItem.getQuantity() * selectedSpecialItem.getItem().getPriceSellXu()
-                            ));
-                        }
-                    } else if (selectedSpecialItem.getItem().isUsable()) {
-                        specialItemAction = 4;
-                        sendMessageConfirm("Bạn có muốn sử dụng vật phẩm này không");
-                        //Todo tách hàm và xử lý riêng
-                    } else {
-                        sendServerMessage(GameString.hopNgocError());
-                    }
-                }
             } else if (action == 1) {
-                switch (specialItemAction) {
+                switch (commonAction) {
                     case 1 -> {//Ghép ngọc
-                        if (selectedEquip.getEmptySlot() >= selectedSpecialItem.getQuantity()) {
-                            for (int i = 0; i < selectedSpecialItem.getQuantity(); i++) {
-                                selectedEquip.setNewSlot(selectedSpecialItem.getItem().getId());
-                                selectedEquip.decrementEmptySlot();
-                            }
-                            user.updateInventory(selectedEquip, null, null, List.of(selectedSpecialItem));
-                            sendServerMessage(GameString.hopNgocSuccess());
-                        } else {
-                            sendServerMessage(GameString.hopNgocNoSlot());
-                        }
+                        sendServerMessage(GameString.hopNgocSuccess());
                     }
                     case 2 -> {//Nâng ngọc
                         //Cần 1 ngọc
                     }
 
                     case 3 -> {//Bán ngọc
-                        user.updateInventory(null, null, null, List.of(selectedSpecialItem));
-                        user.updateXu(selectedSpecialItem.getQuantity() * selectedSpecialItem.getItem().getPriceSellXu());
                         sendServerMessage(GameString.buySuccess());
                     }
 
@@ -1250,9 +1216,7 @@ public class UserService implements IUserService {
                 }
 
                 //Đặt lại dữ liệu
-                specialItemAction = 0;
-                selectedEquip = null;
-                selectedSpecialItem = null;
+                commonAction = 0;
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -2028,8 +1992,9 @@ public class UserService implements IUserService {
                     purchaseEquipment(saleIndex, unit);
                 }
                 case 1 -> {//Gửi lệnh bán trang bị
+
                     // Đặt lại giá trị
-                    equipAction = 0;
+                    commonAction = 0;
                     totalEquipTransaction = 0;
                     selectedEquips.clear();
 
@@ -2058,7 +2023,7 @@ public class UserService implements IUserService {
                     if (selectedEquips.size() > 0) {//Trường hợp có trang bị hợp lệ
                         ds.writeByte(1);
                         if (selectedEquips.size() == 1 && selectedEquips.get(0).getEmptySlot() < 3) {//Tháo ngọc
-                            equipAction = 1;
+                            commonAction = 1;
                             totalEquipTransaction = 0;
 
                             //Tính tiền gia hạn theo 25% giá ngọc
@@ -2070,7 +2035,7 @@ public class UserService implements IUserService {
                             }
                             ds.writeUTF(GameString.thaoNgocRequest(totalEquipTransaction));
                         } else {//Bán trang bị
-                            equipAction = 2;
+                            commonAction = 2;
                             ds.writeUTF(GameString.sellTBRequest(selectedEquips.size(), totalEquipTransaction));
                         }
                     } else {//Trường hợp không trang bị nào hợp lệ
@@ -2080,7 +2045,7 @@ public class UserService implements IUserService {
                     user.sendMessage(ms);
                 }
                 case 2 -> {//Xác nhận bán trang bị
-                    if (equipAction == 1) {//Xác nhận tháo ngọc
+                    if (commonAction == 1) {//Xác nhận tháo ngọc
                         if (user.getXu() < totalEquipTransaction) {
                             sendServerMessage(GameString.xuNotEnought());
                             return;
@@ -2113,7 +2078,7 @@ public class UserService implements IUserService {
 
                         // Gửi thông báo thành công
                         sendServerMessage(GameString.thaoNgocSuccess());
-                    } else if (equipAction == 2) {//Xác nhận bán trang bị
+                    } else if (commonAction == 2) {//Xác nhận bán trang bị
                         for (EquipmentChestEntry equipment : selectedEquips) {
                             if (equipment.isInUse()) {
                                 sendServerMessage(GameString.sellTBError1());
@@ -2130,7 +2095,7 @@ public class UserService implements IUserService {
                         user.updateXu(totalEquipTransaction);
                         sendServerMessage(GameString.buySuccess());
                     }
-                    equipAction = 0;
+                    commonAction = 0;
                 }
             }
         } catch (IOException e) {

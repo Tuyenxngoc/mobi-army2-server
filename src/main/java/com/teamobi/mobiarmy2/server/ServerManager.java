@@ -84,6 +84,7 @@ public class ServerManager {
         gameService.getPaymentData();
         gameService.getMissionData();
         gameService.getLvXpData();
+        gameService.getFabricateItemData();
 
         //Data to set up cache
         gameService.getMapData();
