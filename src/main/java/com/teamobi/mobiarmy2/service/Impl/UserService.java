@@ -53,7 +53,7 @@ public class UserService implements IUserService {
     private final IUserDao userDao = new UserDao();
     private final IGiftCodeDao giftCodeDao = new GiftCodeDao();
 
-    private byte commonAction;
+    private UserAction userAction;
     private int totalEquipTransaction;
     private final List<EquipmentChestEntry> selectedEquips = new ArrayList<>();
     private final List<SpecialItemChestEntry> selectedSpecialItems = new ArrayList<>();
@@ -1165,7 +1165,7 @@ public class UserService implements IUserService {
             if (action == 0) {
 
                 //Đặt lại dữ liệu
-                commonAction = 0;
+                userAction = null;
                 fabricateItemEntry = null;
                 selectedEquips.clear();
                 selectedSpecialItems.clear();
@@ -1188,7 +1188,7 @@ public class UserService implements IUserService {
                         }
                     } else {//Trường hợp là ngọc
                         SpecialItemChestEntry item = user.getSpecialItemById(id);
-                        if (item != null && item.getQuantity() >= quantity) {
+                        if (item != null && item.getItem() != null && item.getQuantity() >= quantity) {
                             selectedSpecialItems.add(new SpecialItemChestEntry(quantity, item.getItem()));
                         }
                     }
@@ -1199,33 +1199,58 @@ public class UserService implements IUserService {
                     return;
                 }
 
-                if (selectedEquips.isEmpty()) {
+                //Ghép ngọc vào trang bị
+                if (!selectedEquips.isEmpty() && !selectedSpecialItems.isEmpty()) {
+                    if (selectedEquips.size() == 1 &&
+                            selectedSpecialItems.size() == 1 &&
+                            selectedSpecialItems.get(0).getItem().isGem()
+                    ) {
+                        userAction = UserAction.GHEP_NGOC_VAO_TRANG_BI;
+                        sendMessageConfirm(GameString.hopNgocRequest());
+                    } else {
+                        sendServerMessage(GameString.hopNgocError());
+                    }
+                    return;
+                }
+
+                if (!selectedSpecialItems.isEmpty()) {
                     FabricateItemEntry fabricateItem = FabricateItemData.getFabricateItem(selectedSpecialItems);
                     if (fabricateItem != null) {
-                        commonAction = 5;
+                        userAction = UserAction.GHEP_SPEC_ITEM;
                         fabricateItemEntry = fabricateItem;
                         sendMessageConfirm(fabricateItem.getConfirmationMessage());
                     }
+                    return;
                 }
-
             } else if (action == 1) {
-                switch (commonAction) {
-                    case 1 -> {//Ghép ngọc
-                        sendServerMessage(GameString.hopNgocSuccess());
+                switch (userAction) {
+                    case GHEP_NGOC_VAO_TRANG_BI -> {//Ghép ngọc
+                        EquipmentChestEntry equip = selectedEquips.get(0);
+                        SpecialItemChestEntry specialItem = selectedSpecialItems.get(0);
+                        if (equip.getEmptySlot() >= specialItem.getQuantity()) {
+                            for (int i = 0; i < specialItem.getQuantity(); i++) {
+                                equip.setNewSlot(specialItem.getItem().getId());
+                                equip.decrementEmptySlot();
+                            }
+                            user.updateInventory(equip, null, null, selectedSpecialItems);
+                            sendServerMessage(GameString.hopNgocSuccess());
+                        } else {
+                            sendServerMessage(GameString.hopNgocNoSlot());
+                        }
                     }
-                    case 2 -> {//Nâng ngọc
+                    case NANG_CAP_NGOC -> {//Nâng ngọc
                         //Cần 1 ngọc
                     }
 
-                    case 3 -> {//Bán ngọc
+                    case BAN_NGOC -> {//Bán ngọc
                         sendServerMessage(GameString.buySuccess());
                     }
 
-                    case 4 -> {//Dùng item
+                    case DUNG_SPEC_ITEM -> {//Dùng item
                         //Cần 1 item
                     }
 
-                    case 5 -> {//Ghép item
+                    case GHEP_SPEC_ITEM -> {//Ghép item
                         if (fabricateItemEntry.getRewardXu() > 0) {
                             user.updateXu(fabricateItemEntry.getRewardXu());
                         }
@@ -1244,7 +1269,7 @@ public class UserService implements IUserService {
                 }
 
                 //Đặt lại dữ liệu
-                commonAction = 0;
+                userAction = null;
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -2022,7 +2047,7 @@ public class UserService implements IUserService {
                 case 1 -> {//Gửi lệnh bán trang bị
 
                     // Đặt lại giá trị
-                    commonAction = 0;
+                    userAction = null;
                     totalEquipTransaction = 0;
                     selectedEquips.clear();
 
@@ -2051,7 +2076,7 @@ public class UserService implements IUserService {
                     if (selectedEquips.size() > 0) {//Trường hợp có trang bị hợp lệ
                         ds.writeByte(1);
                         if (selectedEquips.size() == 1 && selectedEquips.get(0).getEmptySlot() < 3) {//Tháo ngọc
-                            commonAction = 1;
+                            userAction = UserAction.THAO_NGOC;
                             totalEquipTransaction = 0;
 
                             //Tính tiền gia hạn theo 25% giá ngọc
@@ -2063,7 +2088,7 @@ public class UserService implements IUserService {
                             }
                             ds.writeUTF(GameString.thaoNgocRequest(totalEquipTransaction));
                         } else {//Bán trang bị
-                            commonAction = 2;
+                            userAction = UserAction.BAN_TRANG_BI;
                             ds.writeUTF(GameString.sellTBRequest(selectedEquips.size(), totalEquipTransaction));
                         }
                     } else {//Trường hợp không trang bị nào hợp lệ
@@ -2073,7 +2098,7 @@ public class UserService implements IUserService {
                     user.sendMessage(ms);
                 }
                 case 2 -> {//Xác nhận bán trang bị
-                    if (commonAction == 1) {//Xác nhận tháo ngọc
+                    if (userAction == UserAction.THAO_NGOC) {//Xác nhận tháo ngọc
                         if (user.getXu() < totalEquipTransaction) {
                             sendServerMessage(GameString.xuNotEnought());
                             return;
@@ -2106,7 +2131,7 @@ public class UserService implements IUserService {
 
                         // Gửi thông báo thành công
                         sendServerMessage(GameString.thaoNgocSuccess());
-                    } else if (commonAction == 2) {//Xác nhận bán trang bị
+                    } else if (userAction == UserAction.BAN_TRANG_BI) {//Xác nhận bán trang bị
                         for (EquipmentChestEntry equipment : selectedEquips) {
                             if (equipment.isInUse()) {
                                 sendServerMessage(GameString.sellTBError1());
@@ -2123,7 +2148,7 @@ public class UserService implements IUserService {
                         user.updateXu(totalEquipTransaction);
                         sendServerMessage(GameString.buySuccess());
                     }
-                    commonAction = 0;
+                    userAction = null;
                 }
             }
         } catch (IOException e) {
