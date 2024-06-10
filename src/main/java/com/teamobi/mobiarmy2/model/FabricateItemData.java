@@ -13,6 +13,6 @@ public class FabricateItemData {
     public static final List<FabricateItemEntry> FABRICATE_ITEM_ENTRIES = new ArrayList<>();
 
     public static FabricateItemEntry getFabricateItem(List<SpecialItemChestEntry> selectedSpecialItems) {
-        return FABRICATE_ITEM_ENTRIES.get(0);
+        return null;
     }
 }

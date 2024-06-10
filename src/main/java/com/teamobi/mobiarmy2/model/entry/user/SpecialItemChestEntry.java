@@ -40,4 +40,11 @@ public class SpecialItemChestEntry {
         }
         quantity -= quantityToDecrease;
     }
+
+    public int getSellPrice() {
+        if (item == null) {
+            return 0;
+        }
+        return quantity * item.getPriceSellXu();
+    }
 }

@@ -114,7 +114,7 @@ public class GameString {
     }
 
     public static String hopNgocFail() {
-        return "Chế ngọc thất bại, hao phí %d %s!";
+        return "Chúc bạn may mắn lần sau.";
     }
 
     public static String hopNgocSucess() {
@@ -145,8 +145,12 @@ public class GameString {
         return "Chúc mừng bạn đã kết hợp thành công.";
     }
 
-    public static String hopNgocNC() {
-        return "Bạn có muốn hợp thành ngọc cấp cao hơn? Tỉ lệ thành công là %s";
+    public static String nangNgocSuccess(int quantity, String name) {
+        return String.format("Chúc mừng, bạn đã kết hợp thành công %d viên %s", quantity, name);
+    }
+
+    public static String hopNgocNC(int pt) {
+        return String.format("Bạn có muốn kết hợp 5 viên ngọc này thành 1 viên ngọc cấp cao hơn? Tỉ lệ thành công là %d%%", pt);
     }
 
     public static String hopNgocSell(int quantity, int total) {
