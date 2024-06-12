@@ -9,6 +9,21 @@ import java.time.LocalDateTime;
  */
 public class GameString {
 
+    public static final String specialItemId54Request = "Bạn có muốn sử dụng item này không? Hiệu lực 1 ngày!";
+    public static final String specialItemId54Success = "Sử dụng thành công. Bạn có 1 ngày x2 kinh nghiệm!";
+
+    public static final String specialItemId86Request = "Dùng bánh trưng thành công";
+    public static final String specialItemId86Request1 = "Dùng bánh trưng thành công";
+    public static final String specialItemId86Request2 = "Dùng bánh trưng thành công";
+    public static final String specialItemId86Request3 = "Dùng bánh trưng thành công";
+    public static final String specialItemId86Success = "Dùng bánh trưng thành công";
+
+    public static final String specialItemId87Request = "Dùng bánh tét thành công";
+    public static final String specialItemId87Request1 = "Dùng bánh tét thành công";
+    public static final String specialItemId87Request2 = "Dùng bánh tét thành công";
+    public static final String specialItemId87Request3 = "Dùng bánh tét thành công";
+    public static final String specialItemId87Success = "Dùng bánh trưng thành công";
+
     public static String getNotFinishedLoadingRanking() {
         return "Chưa tải xong bảng xếp hạng";
     }
@@ -55,34 +70,6 @@ public class GameString {
 
     public static String exchangeGift() {
         return "Bạn muốn sử dụng vật phẩm sự kiện!";
-    }
-
-    public static String x2XPSuccess() {
-        return "Sử dụng thành công. Bạn có 1 ngày x2 kinh nghiệm!";
-    }
-
-    public static String x6XPSuccess() {
-        return "Sử dụng thành công. Bạn có 1 ngày x6 kinh nghiệm!";
-    }
-
-    public static String x0XPSuccess() {
-        return "Sử dụng thành công. Bạn sẽ không nhận mọi kinh nghiệm trong 1 ngày!";
-    }
-
-    public static String x0XPHuy() {
-        return "Sử dụng thành công. Bạn đã hủy không nhận kinh nghiệm!";
-    }
-
-    public static String x2XPRequest() {
-        return "Bạn có muốn sử dụng item này không? Hiệu lực 1 ngày!";
-    }
-
-    public static String x6XPRequest() {
-        return "Bạn có muốn sử dụng item này không? Hiệu lực 1 ngày!";
-    }
-
-    public static String x0XPRequest() {
-        return "Bạn có muốn không nhận kinh nghiệm không? Hiệu lực 1 ngày!";
     }
 
     public static String phucHoiDiemString() {

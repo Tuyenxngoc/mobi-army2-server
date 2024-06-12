@@ -1223,16 +1223,22 @@ public class UserService implements IUserService {
                     }
 
                     if (selectedSpecialItems.size() == 1) {
-                        SpecialItemChestEntry item = selectedSpecialItems.get(0);
-                        if (item.getItem().isGem()) {
-                            if (item.getQuantity() == 5 && ((item.getItem().getId() + 1) % 10 != 0)) {
+                        SpecialItemChestEntry itemChestEntry = selectedSpecialItems.get(0);
+                        if (itemChestEntry.getItem().isGem()) {
+                            if (itemChestEntry.getQuantity() == 5 && ((itemChestEntry.getItem().getId() + 1) % 10 != 0)) {
                                 userAction = UserAction.NANG_CAP_NGOC;
-                                sendMessageConfirm(GameString.hopNgocNC((90 - (item.getItem().getId() % 10) * 10)));
+                                sendMessageConfirm(GameString.hopNgocNC((90 - (itemChestEntry.getItem().getId() % 10) * 10)));
                             } else {
                                 userAction = UserAction.BAN_NGOC;
-                                totalTransaction = item.getSellPrice();
-                                sendMessageConfirm(GameString.hopNgocSell(item.getQuantity(), totalTransaction));
+                                totalTransaction = itemChestEntry.getSellPrice();
+                                sendMessageConfirm(GameString.hopNgocSell(itemChestEntry.getQuantity(), totalTransaction));
                             }
+                            return;
+                        }
+
+                        if (itemChestEntry.getItem().isUsable()) {
+                            userAction = UserAction.DUNG_SPEC_ITEM;
+                            confirmSpecialItemUse(itemChestEntry);
                             return;
                         }
                     }
@@ -1255,19 +1261,19 @@ public class UserService implements IUserService {
                         }
                     }
                     case NANG_CAP_NGOC -> {//Nâng ngọc
-                        SpecialItemChestEntry item = selectedSpecialItems.get(0);
-                        int successRate = (90 - (item.getItem().getId() % 10) * 10);
+                        SpecialItemChestEntry specialItemChestEntry = selectedSpecialItems.get(0);
+                        int successRate = (90 - (specialItemChestEntry.getItem().getId() % 10) * 10);
                         int randomNumber = Utils.nextInt(100);
                         if (randomNumber < successRate) {
                             SpecialItemChestEntry newItem = new SpecialItemChestEntry();
                             newItem.setQuantity((short) 1);
-                            newItem.setItem(SpecialItemData.getSpecialItemById((byte) (item.getItem().getId() + 1)));
+                            newItem.setItem(SpecialItemData.getSpecialItemById((byte) (specialItemChestEntry.getItem().getId() + 1)));
 
-                            user.updateInventory(null, null, List.of(newItem), List.of(item));
+                            user.updateInventory(null, null, List.of(newItem), List.of(specialItemChestEntry));
                             sendServerMessage(GameString.nangNgocSuccess(newItem.getQuantity(), newItem.getItem().getName()));
                         } else {
-                            item.setQuantity((short) 1);
-                            user.updateInventory(null, null, null, List.of(item));
+                            specialItemChestEntry.setQuantity((short) 1);
+                            user.updateInventory(null, null, null, List.of(specialItemChestEntry));
                             sendServerMessage(GameString.hopNgocFail());
                         }
                     }
@@ -1279,7 +1285,7 @@ public class UserService implements IUserService {
                     }
 
                     case DUNG_SPEC_ITEM -> {//Dùng item
-                        //Cần 1 item
+                        handleUseSpecialItem(selectedSpecialItems.get(0));
                     }
 
                     case GHEP_SPEC_ITEM -> {//Ghép item
@@ -1305,6 +1311,77 @@ public class UserService implements IUserService {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void handleUseSpecialItem(SpecialItemChestEntry itemChestEntry) {
+        switch (itemChestEntry.getItem().getId()) {
+            case 54 -> {
+                user.addDaysToXpX2Time(1);
+                user.updateInventory(null, null, null, List.of(itemChestEntry));
+                sendServerMessage(GameString.specialItemId54Success);
+            }
+            case 86 -> {
+                if (itemChestEntry.getQuantity() == 50) {
+                    System.out.println("Cong trang bi vang 1");
+                } else if (itemChestEntry.getQuantity() == 100) {
+                    System.out.println("Cong trang bi vang 2");
+                } else if (itemChestEntry.getQuantity() == 150) {
+                    System.out.println("Cong trang bi vang 3");
+                } else {
+                    user.updateXp(1000 * itemChestEntry.getQuantity());
+                    user.updateInventory(null, null, null, List.of(itemChestEntry));
+                    sendServerMessage(GameString.specialItemId86Success);
+                }
+            }
+            case 87 -> {
+                if (itemChestEntry.getQuantity() == 50) {
+                    System.out.println("Cong trang bi bac 1");
+                } else if (itemChestEntry.getQuantity() == 100) {
+                    System.out.println("Cong trang bi bac 2");
+                } else if (itemChestEntry.getQuantity() == 150) {
+                    System.out.println("Cong trang bi bac 3");
+                } else {
+                    user.updateXp(500 * itemChestEntry.getQuantity());
+                    user.updateInventory(null, null, null, List.of(itemChestEntry));
+                    sendServerMessage(GameString.specialItemId87Success);
+                }
+            }
+        }
+
+    }
+
+    private void confirmSpecialItemUse(SpecialItemChestEntry itemChestEntry) {
+        switch (itemChestEntry.getItem().getId()) {
+            case 54 -> {
+                if (itemChestEntry.getQuantity() == 1) {
+                    sendMessageConfirm(GameString.specialItemId54Request);
+                } else {
+                    sendServerMessage(GameString.hopNgocError());
+                }
+            }
+            case 86 -> {
+                if (itemChestEntry.getQuantity() == 50) {
+                    sendMessageConfirm(GameString.specialItemId86Request1);
+                } else if (itemChestEntry.getQuantity() == 100) {
+                    sendMessageConfirm(GameString.specialItemId86Request2);
+                } else if (itemChestEntry.getQuantity() == 150) {
+                    sendMessageConfirm(GameString.specialItemId86Request3);
+                } else {
+                    sendMessageConfirm(GameString.specialItemId86Request);
+                }
+            }
+            case 87 -> {
+                if (itemChestEntry.getQuantity() == 50) {
+                    sendMessageConfirm(GameString.specialItemId87Request1);
+                } else if (itemChestEntry.getQuantity() == 100) {
+                    sendMessageConfirm(GameString.specialItemId87Request2);
+                } else if (itemChestEntry.getQuantity() == 150) {
+                    sendMessageConfirm(GameString.specialItemId87Request3);
+                } else {
+                    sendMessageConfirm(GameString.specialItemId87Request);
+                }
+            }
         }
     }
 
