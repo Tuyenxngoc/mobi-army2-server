@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 
 /**
  * @author tuyen
@@ -66,6 +67,19 @@ public class EquipmentChestEntry {
             return;
         }
         slots[3 - emptySlot] = itemId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EquipmentChestEntry that = (EquipmentChestEntry) o;
+        return key == that.key;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(key);
     }
 
 }

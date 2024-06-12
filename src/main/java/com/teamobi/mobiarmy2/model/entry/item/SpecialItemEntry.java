@@ -3,6 +3,8 @@ package com.teamobi.mobiarmy2.model.entry.item;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
+
 /**
  * @author tuyen
  */
@@ -23,4 +25,18 @@ public class SpecialItemEntry {
     private boolean isGem;
     private boolean isMaterial;
     private boolean isUsable;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SpecialItemEntry that = (SpecialItemEntry) o;
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
 }
