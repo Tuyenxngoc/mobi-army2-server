@@ -21,8 +21,13 @@ public class SpecialItemChestEntry {
     private short quantity;
     private SpecialItemEntry item;
 
+    public SpecialItemChestEntry(SpecialItemChestEntry other) {
+        this.quantity = other.quantity;
+        this.item = other.item;
+    }
+
     public void increaseQuantity(int quantityToAdd) {
-        if (quantityToAdd < 0) {
+        if (quantityToAdd <= 0) {
             return;
         }
         if (quantityToAdd + quantity > MAX_QUANTITY) {
@@ -33,7 +38,7 @@ public class SpecialItemChestEntry {
     }
 
     public void decreaseQuantity(int quantityToDecrease) {
-        if (quantityToDecrease < 0) {
+        if (quantityToDecrease <= 0) {
             return;
         }
         if (quantityToDecrease > quantity) {
@@ -61,6 +66,14 @@ public class SpecialItemChestEntry {
     @Override
     public int hashCode() {
         return Objects.hash(quantity, item);
+    }
+
+    @Override
+    public String toString() {
+        return "SpecialItemChestEntry{" +
+                "quantity=" + quantity +
+                ", item=" + item +
+                '}';
     }
 
 }

@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author tuyen
@@ -1218,11 +1219,10 @@ public class UserService implements IUserService {
                 }
 
                 if (!selectedSpecialItems.isEmpty()) {
-                    FabricateItemEntry fabricateItem = FabricateItemData.getFabricateItem(selectedSpecialItems);
-                    if (fabricateItem != null) {
+                    fabricateItemEntry = FabricateItemData.getFabricateItem(selectedSpecialItems);
+                    if (fabricateItemEntry != null) {
                         userAction = UserAction.GHEP_SPEC_ITEM;
-                        fabricateItemEntry = fabricateItem;
-                        sendMessageConfirm(fabricateItem.getConfirmationMessage());
+                        sendMessageConfirm(fabricateItemEntry.getConfirmationMessage());
                         return;
                     }
 
@@ -1306,7 +1306,12 @@ public class UserService implements IUserService {
                             user.updateXp(fabricateItemEntry.getRewardExp());
                         }
 
-                        user.updateInventory(null, null, fabricateItemEntry.getRewardItem(), selectedSpecialItems);
+                        List<SpecialItemChestEntry> addItems = fabricateItemEntry.getRewardItem()
+                                .stream()
+                                .map(SpecialItemChestEntry::new)
+                                .collect(Collectors.toCollection(ArrayList::new));
+
+                        user.updateInventory(null, null, addItems, selectedSpecialItems);
 
                         if (!fabricateItemEntry.getCompletionMessage().isEmpty()) {
                             sendServerMessage(fabricateItemEntry.getCompletionMessage());

@@ -39,4 +39,12 @@ public class SpecialItemEntry {
         return Objects.hash(id);
     }
 
+    @Override
+    public String toString() {
+        return "SpecialItemEntry{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
+
 }
