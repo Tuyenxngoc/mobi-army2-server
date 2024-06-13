@@ -1306,7 +1306,11 @@ public class UserService implements IUserService {
                             user.updateXp(fabricateItemEntry.getRewardExp());
                         }
 
-                        sendServerMessage(fabricateItemEntry.getCompletionMessage());
+                        user.updateInventory(null, null, fabricateItemEntry.getRewardItem(), selectedSpecialItems);
+
+                        if (!fabricateItemEntry.getCompletionMessage().isEmpty()) {
+                            sendServerMessage(fabricateItemEntry.getCompletionMessage());
+                        }
                     }
                 }
 

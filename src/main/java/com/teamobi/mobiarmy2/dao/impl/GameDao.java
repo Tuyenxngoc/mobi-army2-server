@@ -11,6 +11,7 @@ import com.teamobi.mobiarmy2.model.entry.item.ClanItemEntry;
 import com.teamobi.mobiarmy2.model.entry.item.FightItemEntry;
 import com.teamobi.mobiarmy2.model.entry.item.SpecialItemEntry;
 import com.teamobi.mobiarmy2.model.entry.map.MapEntry;
+import com.teamobi.mobiarmy2.model.entry.user.SpecialItemChestEntry;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -334,10 +335,28 @@ public class GameDao implements IGameDao {
                     entry.setRewardExp(resultSet.getInt("reward_exp"));
                     entry.setConfirmationMessage(resultSet.getString("confirmation_message"));
                     entry.setCompletionMessage(resultSet.getString("completion_message"));
-                    entry.setItemRequire(GsonUtil.GSON.fromJson(resultSet.getString("item_require"), SpecialItemChestJson[].class));
-                    entry.setRewardItem(GsonUtil.GSON.fromJson(resultSet.getString("reward_item"), SpecialItemChestJson[].class));
 
-                    FabricateItemData.FABRICATE_ITEM_ENTRIES.add(entry);
+                    SpecialItemChestJson[] jsonArray = GsonUtil.GSON.fromJson(resultSet.getString("item_require"), SpecialItemChestJson[].class);
+                    for (SpecialItemChestJson specialItemChestJson : jsonArray) {
+                        SpecialItemEntry specialItemEntry = SpecialItemData.SPECIAL_ITEM_ENTRIES.get(specialItemChestJson.getId());
+                        if (specialItemEntry == null) {
+                            continue;
+                        }
+                        entry.getItemRequire().add(new SpecialItemChestEntry(specialItemChestJson.getQuantity(), specialItemEntry));
+                    }
+
+                    jsonArray = GsonUtil.GSON.fromJson(resultSet.getString("reward_item"), SpecialItemChestJson[].class);
+                    for (SpecialItemChestJson specialItemChestJson : jsonArray) {
+                        SpecialItemEntry specialItemEntry = SpecialItemData.SPECIAL_ITEM_ENTRIES.get(specialItemChestJson.getId());
+                        if (specialItemEntry == null) {
+                            continue;
+                        }
+                        entry.getRewardItem().add(new SpecialItemChestEntry(specialItemChestJson.getQuantity(), specialItemEntry));
+                    }
+
+                   if(!entry.getItemRequire().isEmpty() && !entry.getRewardItem().isEmpty()){
+                       FabricateItemData.FABRICATE_ITEM_ENTRIES.add(entry);
+                   }
                 }
             }
         } catch (SQLException e) {
