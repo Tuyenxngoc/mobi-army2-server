@@ -1187,7 +1187,7 @@ public class UserService implements IUserService {
                             selectedEquips.add(equip);
                         }
                     } else {//Trường hợp là ngọc
-                        SpecialItemChestEntry item = user.getSpecialItemById(id);
+                        SpecialItemChestEntry item = user.getSpecialItemById((byte) id);
                         if (item != null &&
                                 item.getItem() != null &&
                                 item.getQuantity() >= quantity &&

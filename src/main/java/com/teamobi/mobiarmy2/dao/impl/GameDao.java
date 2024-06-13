@@ -354,9 +354,9 @@ public class GameDao implements IGameDao {
                         entry.getRewardItem().add(new SpecialItemChestEntry(specialItemChestJson.getQuantity(), specialItemEntry));
                     }
 
-                   if(!entry.getItemRequire().isEmpty() && !entry.getRewardItem().isEmpty()){
-                       FabricateItemData.FABRICATE_ITEM_ENTRIES.add(entry);
-                   }
+                    if (!entry.getItemRequire().isEmpty() && !entry.getRewardItem().isEmpty()) {
+                        FabricateItemData.FABRICATE_ITEM_ENTRIES.add(entry);
+                    }
                 }
             }
         } catch (SQLException e) {

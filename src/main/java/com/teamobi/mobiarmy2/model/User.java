@@ -285,23 +285,21 @@ public class User {
             List<SpecialItemChestEntry> removeItems
     ) {
         try {
-            Message ms;
-            DataOutputStream ds;
             ByteArrayOutputStream bas = new ByteArrayOutputStream();
-            DataOutputStream ds1 = new DataOutputStream(bas);
+            DataOutputStream ds = new DataOutputStream(bas);
             int updateQuantity = 0;
 
             if (updateEquip != null) {
                 updateQuantity++;
-                ds1.writeByte(2);
-                ds1.writeInt(updateEquip.getKey());
-                ds1.writeByte(updateEquip.getAddPoints().length * 2);
+                ds.writeByte(2);
+                ds.writeInt(updateEquip.getKey());
+                ds.writeByte(updateEquip.getAddPoints().length * 2);
                 for (int i = 0; i < updateEquip.getAddPoints().length; i++) {
-                    ds1.writeByte(updateEquip.getAddPoints()[i]);
-                    ds1.writeByte(updateEquip.getAddPercents()[i]);
+                    ds.writeByte(updateEquip.getAddPoints()[i]);
+                    ds.writeByte(updateEquip.getAddPercents()[i]);
                 }
-                ds1.writeByte(updateEquip.getEmptySlot());
-                ds1.writeByte(updateEquip.getRemainingDays());
+                ds.writeByte(updateEquip.getEmptySlot());
+                ds.writeByte(updateEquip.getRemainingDays());
             }
 
             if (addItems != null && !addItems.isEmpty()) {
@@ -310,22 +308,19 @@ public class User {
                         continue;
                     }
                     updateQuantity++;
-                    SpecialItemChestEntry existingItem = ruongDoItem.stream()
-                            .filter(item -> item.getItem().getId() == newItem.getItem().getId())
-                            .findFirst()
-                            .orElse(null);
+                    SpecialItemChestEntry existingItem = getSpecialItemById(newItem.getItem().getId());
                     if (existingItem != null) {
                         existingItem.increaseQuantity(newItem.getQuantity());
                     } else {
                         ruongDoItem.add(newItem);
                     }
-                    ds1.writeByte(newItem.getQuantity() > 1 ? 3 : 1);
-                    ds1.writeByte(newItem.getItem().getId());
+                    ds.writeByte(newItem.getQuantity() > 1 ? 3 : 1);
+                    ds.writeByte(newItem.getItem().getId());
                     if (newItem.getQuantity() > 1) {
-                        ds1.writeByte(newItem.getQuantity());
+                        ds.writeByte(newItem.getQuantity());
                     }
-                    ds1.writeUTF(newItem.getItem().getName());
-                    ds1.writeUTF(newItem.getItem().getDetail());
+                    ds.writeUTF(newItem.getItem().getName());
+                    ds.writeUTF(newItem.getItem().getDetail());
                 }
             }
 
@@ -334,19 +329,16 @@ public class User {
                     if (itemToRemove.getQuantity() <= 0) {
                         continue;
                     }
-                    SpecialItemChestEntry existingItem = ruongDoItem.stream()
-                            .filter(item -> item.getItem().getId() == itemToRemove.getItem().getId())
-                            .findFirst()
-                            .orElse(null);
+                    SpecialItemChestEntry existingItem = getSpecialItemById(itemToRemove.getItem().getId());
                     if (existingItem != null) {
                         existingItem.decreaseQuantity(itemToRemove.getQuantity());
                         if (existingItem.getQuantity() <= 0) {
                             ruongDoItem.remove(existingItem);
                         }
                         updateQuantity++;
-                        ds1.writeByte(0);
-                        ds1.writeInt(itemToRemove.getItem().getId());
-                        ds1.writeByte(itemToRemove.getQuantity());
+                        ds.writeByte(0);
+                        ds.writeInt(itemToRemove.getItem().getId());
+                        ds.writeByte(itemToRemove.getQuantity());
                     }
                 }
             }
@@ -354,19 +346,19 @@ public class User {
             if (removeEquip != null) {
                 updateQuantity++;
                 ruongDoTB.remove(removeEquip);
-                ds1.writeByte(0);
-                ds1.writeInt(removeEquip.getKey());
-                ds1.writeByte(1);
+                ds.writeByte(0);
+                ds.writeInt(removeEquip.getKey());
+                ds.writeByte(1);
             }
 
-            ds1.flush();
+            ds.flush();
             bas.flush();
 
             if (updateQuantity == 0) {
                 return;
             }
 
-            ms = new Message(Cmd.INVENTORY_UPDATE);
+            Message ms = new Message(Cmd.INVENTORY_UPDATE);
             ds = ms.writer();
             ds.writeByte(updateQuantity);
             ds.write(bas.toByteArray());
@@ -398,7 +390,7 @@ public class User {
                 .orElse(null);
     }
 
-    public SpecialItemChestEntry getSpecialItemById(int id) {
+    public SpecialItemChestEntry getSpecialItemById(byte id) {
         return ruongDoItem.stream()
                 .filter(item -> item.getItem().getId() == id)
                 .findFirst()
