@@ -235,9 +235,26 @@ public class GameDao implements IGameDao {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
 
-            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `fomular`;")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM formula_detail fd INNER JOIN formula f on fd.formula_id = f.formula_id ORDER BY f.material_id, fd.character_id")) {
                 while (resultSet.next()) {
-                    //Todo create fomular
+                    FormulaEntry entry = new FormulaEntry();
+                    entry.setMaterialId(resultSet.getByte("f.material_id"));
+                    entry.setLevel(resultSet.getByte("f.level"));
+                    entry.setLevelRequired(resultSet.getByte("f.level_required"));
+                    entry.setEquipType(resultSet.getByte("f.equip_type"));
+                    entry.setCharacterId(resultSet.getByte("fd.character_id"));
+                    entry.setDetails(GsonUtil.GSON.fromJson(resultSet.getString("f.detail"), String[].class));
+                    entry.setRequiredEquip(NVData.getEquipEntry(entry.getCharacterId(), entry.getEquipType(), resultSet.getShort("fd.required_equip")));
+                    entry.setResultEquip(NVData.getEquipEntry(entry.getCharacterId(), entry.getEquipType(), resultSet.getShort("fd.result_equip")));
+                    SpecialItemChestJson[] json = GsonUtil.GSON.fromJson(resultSet.getString("fd.required_items"), SpecialItemChestJson[].class);
+                    for (SpecialItemChestJson a : json) {
+                        SpecialItemEntry specialItemEntry = SpecialItemData.getSpecialItemById(a.getId());
+                        if (specialItemEntry != null) {
+                            entry.getRequiredItems().add(new SpecialItemChestEntry(a.getQuantity(), specialItemEntry));
+                        }
+                    }
+
+                    FormulaData.addFormulaEntry(entry);
                 }
             }
         } catch (SQLException e) {

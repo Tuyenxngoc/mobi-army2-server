@@ -428,4 +428,15 @@ public class User {
         }
         xpX2Time = xpX2Time.plusDays(days);
     }
+
+    public boolean hasEquipment(short equipIndex, byte vipLevel) {
+        return ruongDoTB.stream()
+                .anyMatch(equip -> equip != null && equip.getEquipEntry() != null &&
+                        equip.getEquipEntry().getEquipIndex() == equipIndex &&
+                        equip.getVipLevel() == vipLevel &&
+                        equip.getEmptySlot() == 3 &&
+                        !equip.isInUse() &&
+                        equip.getRemainingDays() > 0
+                );
+    }
 }

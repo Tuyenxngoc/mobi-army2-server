@@ -11,10 +11,7 @@ import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.GiftCodeRewardJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.*;
-import com.teamobi.mobiarmy2.model.entry.FabricateItemEntry;
-import com.teamobi.mobiarmy2.model.entry.GiftCodeEntry;
-import com.teamobi.mobiarmy2.model.entry.MissionEntry;
-import com.teamobi.mobiarmy2.model.entry.PaymentEntry;
+import com.teamobi.mobiarmy2.model.entry.*;
 import com.teamobi.mobiarmy2.model.entry.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.entry.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.entry.clan.ClanItem;
@@ -618,8 +615,65 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void hopTrangBi(Message ms) {
+    public void handleMergeEquipments(Message ms) {
+        try {
+            DataInputStream dis = ms.reader();
+            byte id = dis.readByte();
+            byte action = dis.readByte();
+            if (action == 1) {
+                sendFormulaInfo(id);
+            } else if (action == 2) {
+                byte level = dis.readByte();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    private void sendFormulaInfo(byte id) {
+        try {
+            Message ms = new Message(Cmd.FOMULA);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(1);
+            ds.writeByte(id);
+            ds.writeByte(FormulaData.FORMULA.get(id).size());
+            for (FormulaEntry formula : FormulaData.FORMULA.get(id)) {
+                boolean hasRequiredItem = true;
+                boolean hasRequiredEquip = user.hasEquipment(formula.getRequiredEquip().getEquipIndex(), formula.getLevel());
+
+                ds.writeByte(formula.getResultEquip().getEquipIndex());
+                ds.writeUTF(formula.getResultEquip().getName());
+                ds.writeByte(formula.getLevelRequired());
+                ds.writeByte(formula.getCharacterId());
+                ds.writeByte(formula.getEquipType());
+                ds.writeByte(formula.getRequiredItems().size());
+                for (SpecialItemChestEntry item : formula.getRequiredItems()) {
+                    short itemCountInInventory = user.getInventorySpecialItemCount(item.getItem().getId());
+                    ds.writeByte(item.getItem().getId());
+                    ds.writeUTF(item.getItem().getName());
+                    ds.writeByte(item.getQuantity());
+                    if (itemCountInInventory < item.getQuantity()) {
+                        hasRequiredItem = false;
+                        ds.writeByte(itemCountInInventory);
+                    } else {
+                        ds.writeByte(item.getQuantity());
+                    }
+                }
+                ds.writeByte(formula.getRequiredEquip().getEquipIndex());
+                ds.writeUTF(formula.getRequiredEquip().getName());
+                ds.writeByte(formula.getLevel());
+                ds.writeBoolean(hasRequiredEquip);
+                ds.writeBoolean(hasRequiredEquip && hasRequiredItem);
+                ds.writeByte(formula.getDetails().length);
+                for (String detail : formula.getDetails()) {
+                    ds.writeUTF(detail);
+                }
+            }
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

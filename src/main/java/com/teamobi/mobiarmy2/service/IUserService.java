@@ -26,7 +26,7 @@ public interface IUserService {
 
     void getProvider(Message ms);
 
-    void hopTrangBi(Message ms);
+    void handleMergeEquipments(Message ms);
 
     void moHopQua(Message ms);
 
