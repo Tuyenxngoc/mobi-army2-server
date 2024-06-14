@@ -235,22 +235,26 @@ public class GameDao implements IGameDao {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
 
-            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM formula_detail fd INNER JOIN formula f on fd.formula_id = f.formula_id ORDER BY f.material_id, fd.character_id")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM formula_detail fd INNER JOIN formula f on fd.formula_id = f.formula_id ORDER BY f.material_id, fd.character_id, f.level")) {
                 while (resultSet.next()) {
                     FormulaEntry entry = new FormulaEntry();
-                    entry.setMaterialId(resultSet.getByte("f.material_id"));
+                    entry.setMaterial(SpecialItemData.getSpecialItemById(resultSet.getByte("f.material_id")));
                     entry.setLevel(resultSet.getByte("f.level"));
                     entry.setLevelRequired(resultSet.getByte("f.level_required"));
                     entry.setEquipType(resultSet.getByte("f.equip_type"));
                     entry.setCharacterId(resultSet.getByte("fd.character_id"));
-                    entry.setDetails(GsonUtil.GSON.fromJson(resultSet.getString("f.detail"), String[].class));
+                    entry.setDetails(GsonUtil.GSON.fromJson(resultSet.getString("f.details"), String[].class));
+                    entry.setAddPointsMax(GsonUtil.GSON.fromJson(resultSet.getString("f.add_points_max"), byte[].class));
+                    entry.setAddPointsMin(GsonUtil.GSON.fromJson(resultSet.getString("f.add_points_min"), byte[].class));
+                    entry.setAddPercentsMax(GsonUtil.GSON.fromJson(resultSet.getString("f.add_percents_max"), byte[].class));
+                    entry.setAddPercentsMin(GsonUtil.GSON.fromJson(resultSet.getString("f.add_percents_min"), byte[].class));
                     entry.setRequiredEquip(NVData.getEquipEntry(entry.getCharacterId(), entry.getEquipType(), resultSet.getShort("fd.required_equip")));
                     entry.setResultEquip(NVData.getEquipEntry(entry.getCharacterId(), entry.getEquipType(), resultSet.getShort("fd.result_equip")));
                     SpecialItemChestJson[] json = GsonUtil.GSON.fromJson(resultSet.getString("fd.required_items"), SpecialItemChestJson[].class);
-                    for (SpecialItemChestJson a : json) {
-                        SpecialItemEntry specialItemEntry = SpecialItemData.getSpecialItemById(a.getId());
+                    for (SpecialItemChestJson itemChestJson : json) {
+                        SpecialItemEntry specialItemEntry = SpecialItemData.getSpecialItemById(itemChestJson.getId());
                         if (specialItemEntry != null) {
-                            entry.getRequiredItems().add(new SpecialItemChestEntry(a.getQuantity(), specialItemEntry));
+                            entry.getRequiredItems().add(new SpecialItemChestEntry(itemChestJson.getQuantity(), specialItemEntry));
                         }
                     }
 

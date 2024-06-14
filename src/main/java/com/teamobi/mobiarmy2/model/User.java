@@ -439,4 +439,16 @@ public class User {
                         equip.getRemainingDays() > 0
                 );
     }
+
+    public EquipmentChestEntry getEquipment(short equipIndex, byte vipLevel) {
+        return ruongDoTB.stream()
+                .filter(equip -> equip != null && equip.getEquipEntry() != null &&
+                        equip.getEquipEntry().getEquipIndex() == equipIndex &&
+                        equip.getVipLevel() == vipLevel &&
+                        equip.getEmptySlot() == 3 &&
+                        !equip.isInUse() &&
+                        equip.getRemainingDays() > 0)
+                .findFirst()
+                .orElse(null);
+    }
 }

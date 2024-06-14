@@ -77,6 +77,12 @@ public class ServerManager {
     }
 
     private void initServerData() {
+        //Data to set up cache
+        gameService.getMapData();
+        gameService.getCharacterData();
+        gameService.getEquipData();
+        gameService.setCaptionLevelData();
+
         gameService.getItemData();
         gameService.getClanShopData();
         gameService.getSpecialItemData();
@@ -85,12 +91,6 @@ public class ServerManager {
         gameService.getMissionData();
         gameService.getLvXpData();
         gameService.getFabricateItemData();
-
-        //Data to set up cache
-        gameService.getMapData();
-        gameService.getCharacterData();
-        gameService.getEquipData();
-        gameService.setCaptionLevelData();
     }
 
     private void setCache() {

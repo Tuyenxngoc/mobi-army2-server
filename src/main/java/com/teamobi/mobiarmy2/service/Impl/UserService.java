@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -624,7 +625,93 @@ public class UserService implements IUserService {
                 sendFormulaInfo(id);
             } else if (action == 2) {
                 byte level = dis.readByte();
+                processFormula(id, level);
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void processFormula(byte id, byte level) {
+        Map<Byte, List<FormulaEntry>> listMap = FormulaData.FORMULA.get(id);
+        if (listMap == null) {
+            return;
+        }
+        List<FormulaEntry> formulaEntries = listMap.get(user.getNvUsed());
+        if (formulaEntries == null) {
+            return;
+        }
+        FormulaEntry formula = formulaEntries.get(level);
+        if (formula == null) {
+            return;
+        }
+
+        //Kiểm tra có trang bị yêu cầu không
+        EquipmentChestEntry requiredEquip = user.getEquipment(formula.getRequiredEquip().getEquipIndex(), formula.getLevel());
+        if (requiredEquip == null) {
+            sendMessageCheDo(GameString.cheDoFail());
+            return;
+        }
+
+        //Tạo một danh sách item cần xóa
+        List<SpecialItemChestEntry> itemsToRemove = new ArrayList<>();
+
+        //Kiểm tra có đủ item yêu cầu không
+        for (SpecialItemChestEntry item : formula.getRequiredItems()) {
+            short itemCountInInventory = user.getInventorySpecialItemCount(item.getItem().getId());
+            if (itemCountInInventory < item.getQuantity()) {
+                sendMessageCheDo(GameString.cheDoFail());
+                return;
+            }
+            itemsToRemove.add(item);
+        }
+
+        //Kiểm tra có công thức hoặc đủ xu không
+        SpecialItemChestEntry material = user.getSpecialItemById(formula.getMaterial().getId());
+        if (material == null && user.getXu() < formula.getMaterial().getPriceXu()) {
+            sendMessageCheDo(GameString.cheDoFail());
+            return;
+        } else {
+            if (material != null) {//Nếu có công thức thì thêm vào danh sách item xóa
+                itemsToRemove.add(new SpecialItemChestEntry((short) 1, material.getItem()));
+            } else {//Nếu chưu có thì trừ xu
+                user.updateXu(-formula.getMaterial().getPriceXu());
+            }
+        }
+
+        //Xoá trang bị và item yêu cầu
+        user.updateInventory(null, requiredEquip, null, itemsToRemove);
+
+        //Random chỉ số
+        byte[] addPoints = new byte[5];
+        byte[] addPercents = new byte[5];
+        for (int i = 0; i < 5; i++) {
+            addPoints[i] = (byte) Utils.nextInt(formula.getAddPointsMax()[i], formula.getAddPointsMin()[i]);
+            addPercents[i] = (byte) Utils.nextInt(formula.getAddPercentsMax()[i], formula.getAddPercentsMin()[i]);
+        }
+
+        //Tạo trang bị mới
+        EquipmentChestEntry newEquip = new EquipmentChestEntry();
+        newEquip.setEquipEntry(formula.getResultEquip());
+        newEquip.setVipLevel((byte) (formula.getLevel() + 1));
+        newEquip.setAddPoints(addPoints);
+        newEquip.setAddPercents(addPercents);
+
+        //Thêm trang bị vào rương
+        user.addEquipment(newEquip);
+
+        //Gửi thông báo
+        sendMessageCheDo(GameString.cheDoSuccess());
+    }
+
+    private void sendMessageCheDo(String message) {
+        try {
+            Message ms = new Message(Cmd.FOMULA);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(0);
+            ds.writeUTF(message);
+            ds.flush();
+            user.sendMessage(ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -632,17 +719,25 @@ public class UserService implements IUserService {
 
     private void sendFormulaInfo(byte id) {
         try {
+            Map<Byte, List<FormulaEntry>> listMap = FormulaData.FORMULA.get(id);
+            if (listMap == null) {
+                return;
+            }
+            List<FormulaEntry> formulaEntries = listMap.get(user.getNvUsed());
+            if (formulaEntries == null) {
+                return;
+            }
             Message ms = new Message(Cmd.FOMULA);
             DataOutputStream ds = ms.writer();
             ds.writeByte(1);
             ds.writeByte(id);
-            ds.writeByte(FormulaData.FORMULA.get(id).size());
-            for (FormulaEntry formula : FormulaData.FORMULA.get(id)) {
+            ds.writeByte(formulaEntries.size());
+            for (FormulaEntry formula : formulaEntries) {
                 boolean hasRequiredItem = true;
                 boolean hasRequiredEquip = user.hasEquipment(formula.getRequiredEquip().getEquipIndex(), formula.getLevel());
 
                 ds.writeByte(formula.getResultEquip().getEquipIndex());
-                ds.writeUTF(formula.getResultEquip().getName());
+                ds.writeUTF("%s cấp %d".formatted(formula.getResultEquip().getName(), (formula.getLevel() + 1)));
                 ds.writeByte(formula.getLevelRequired());
                 ds.writeByte(formula.getCharacterId());
                 ds.writeByte(formula.getEquipType());
@@ -2354,9 +2449,9 @@ public class UserService implements IUserService {
             }
             user.updateLuong(-equipmentEntry.getPriceLuong());
         }
-        EquipmentChestEntry newTb = new EquipmentChestEntry();
-        newTb.setEquipEntry(equipmentEntry);
-        user.addEquipment(newTb);
+        EquipmentChestEntry newEquip = new EquipmentChestEntry();
+        newEquip.setEquipEntry(equipmentEntry);
+        user.addEquipment(newEquip);
         sendServerMessage(GameString.buySuccess());
     }
 
