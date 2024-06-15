@@ -251,6 +251,7 @@ public class User {
         addEquipment.setSlots(new byte[]{-1, -1, -1});
         addEquipment.setKey(equipmentPurchased | 0x10000);
         ruongDoTB.add(addEquipment);
+
         //Tăng số lượng trang bị mua
         equipmentPurchased++;
 
@@ -440,10 +441,11 @@ public class User {
                 );
     }
 
-    public EquipmentChestEntry getEquipment(short equipIndex, byte vipLevel) {
+    public EquipmentChestEntry getEquipment(short equipIndex, byte characterId, byte vipLevel) {
         return ruongDoTB.stream()
                 .filter(equip -> equip != null && equip.getEquipEntry() != null &&
                         equip.getEquipEntry().getEquipIndex() == equipIndex &&
+                        equip.getEquipEntry().getCharacterId() == characterId &&
                         equip.getVipLevel() == vipLevel &&
                         equip.getEmptySlot() == 3 &&
                         !equip.isInUse() &&

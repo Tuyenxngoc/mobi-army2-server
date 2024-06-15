@@ -625,31 +625,37 @@ public class UserService implements IUserService {
                 sendFormulaInfo(id);
             } else if (action == 2) {
                 byte level = dis.readByte();
-                processFormula(id, level);
+                processFormulaCrafting(id, level);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void processFormula(byte id, byte level) {
-        Map<Byte, List<FormulaEntry>> listMap = FormulaData.FORMULA.get(id);
-        if (listMap == null) {
+    private void processFormulaCrafting(byte id, byte level) {
+        Map<Byte, List<FormulaEntry>> formulaMap = FormulaData.FORMULA.get(id);
+        if (formulaMap == null) {
             return;
         }
-        List<FormulaEntry> formulaEntries = listMap.get(user.getNvUsed());
-        if (formulaEntries == null) {
+        List<FormulaEntry> formulas = formulaMap.get(user.getNvUsed());
+        if (formulas == null) {
             return;
         }
-        FormulaEntry formula = formulaEntries.get(level);
+        FormulaEntry formula = formulas.get(level);
         if (formula == null) {
             return;
         }
 
+        //Kiểm tra có đủ level chế đồ yêu cầu không
+        if (user.getCurrentLevel() < formula.getLevelRequired()) {
+            sendFormulaProcessingResult(GameString.cheDoFail());
+            return;
+        }
+
         //Kiểm tra có trang bị yêu cầu không
-        EquipmentChestEntry requiredEquip = user.getEquipment(formula.getRequiredEquip().getEquipIndex(), formula.getLevel());
+        EquipmentChestEntry requiredEquip = user.getEquipment(formula.getRequiredEquip().getEquipIndex(), user.getNvUsed(), formula.getLevel());
         if (requiredEquip == null) {
-            sendMessageCheDo(GameString.cheDoFail());
+            sendFormulaProcessingResult(GameString.cheDoFail());
             return;
         }
 
@@ -660,7 +666,7 @@ public class UserService implements IUserService {
         for (SpecialItemChestEntry item : formula.getRequiredItems()) {
             short itemCountInInventory = user.getInventorySpecialItemCount(item.getItem().getId());
             if (itemCountInInventory < item.getQuantity()) {
-                sendMessageCheDo(GameString.cheDoFail());
+                sendFormulaProcessingResult(GameString.cheDoFail());
                 return;
             }
             itemsToRemove.add(item);
@@ -669,7 +675,7 @@ public class UserService implements IUserService {
         //Kiểm tra có công thức hoặc đủ xu không
         SpecialItemChestEntry material = user.getSpecialItemById(formula.getMaterial().getId());
         if (material == null && user.getXu() < formula.getMaterial().getPriceXu()) {
-            sendMessageCheDo(GameString.cheDoFail());
+            sendFormulaProcessingResult(GameString.cheDoFail());
             return;
         } else {
             if (material != null) {//Nếu có công thức thì thêm vào danh sách item xóa
@@ -701,10 +707,10 @@ public class UserService implements IUserService {
         user.addEquipment(newEquip);
 
         //Gửi thông báo
-        sendMessageCheDo(GameString.cheDoSuccess());
+        sendFormulaProcessingResult(GameString.cheDoSuccess());
     }
 
-    private void sendMessageCheDo(String message) {
+    private void sendFormulaProcessingResult(String message) {
         try {
             Message ms = new Message(Cmd.FOMULA);
             DataOutputStream ds = ms.writer();
@@ -719,11 +725,11 @@ public class UserService implements IUserService {
 
     private void sendFormulaInfo(byte id) {
         try {
-            Map<Byte, List<FormulaEntry>> listMap = FormulaData.FORMULA.get(id);
-            if (listMap == null) {
+            Map<Byte, List<FormulaEntry>> formulaMap = FormulaData.FORMULA.get(id);
+            if (formulaMap == null) {
                 return;
             }
-            List<FormulaEntry> formulaEntries = listMap.get(user.getNvUsed());
+            List<FormulaEntry> formulaEntries = formulaMap.get(user.getNvUsed());
             if (formulaEntries == null) {
                 return;
             }
@@ -735,6 +741,7 @@ public class UserService implements IUserService {
             for (FormulaEntry formula : formulaEntries) {
                 boolean hasRequiredItem = true;
                 boolean hasRequiredEquip = user.hasEquipment(formula.getRequiredEquip().getEquipIndex(), formula.getLevel());
+                boolean hasRequiredLevel = user.getCurrentLevel() >= formula.getLevelRequired();
 
                 ds.writeByte(formula.getResultEquip().getEquipIndex());
                 ds.writeUTF("%s cấp %d".formatted(formula.getResultEquip().getName(), (formula.getLevel() + 1)));
@@ -758,7 +765,7 @@ public class UserService implements IUserService {
                 ds.writeUTF(formula.getRequiredEquip().getName());
                 ds.writeByte(formula.getLevel());
                 ds.writeBoolean(hasRequiredEquip);
-                ds.writeBoolean(hasRequiredEquip && hasRequiredItem);
+                ds.writeBoolean(hasRequiredEquip && hasRequiredItem && hasRequiredLevel);
                 ds.writeByte(formula.getDetails().length);
                 for (String detail : formula.getDetails()) {
                     ds.writeUTF(detail);
