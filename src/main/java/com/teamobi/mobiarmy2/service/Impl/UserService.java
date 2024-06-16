@@ -1014,13 +1014,11 @@ public class UserService implements IUserService {
         //Xử lý khi mua item đặc biệt
         boolean saveItem = handleSpecialItemPurchase(itemId);
 
-        //Tạo item mới
-        SpecialItemChestEntry newItem = new SpecialItemChestEntry();
-        newItem.setItem(item);
-        newItem.setQuantity(quantity);
-
-        //Thêm vào rương đồ
         if (saveItem) {
+            //Tạo item mới
+            SpecialItemChestEntry newItem = new SpecialItemChestEntry(quantity, item);
+
+            //Thêm vào rương đồ
             user.updateInventory(null, null, List.of(newItem), null);
         }
 
@@ -1406,7 +1404,7 @@ public class UserService implements IUserService {
                 sendServerMessage(GameString.hopNgocError());
             } else if (action == 1) {
                 switch (userAction) {
-                    case GHEP_NGOC_VAO_TRANG_BI -> {//Ghép ngọc
+                    case GHEP_NGOC_VAO_TRANG_BI -> {
                         EquipmentChestEntry equip = selectedEquips.get(0);
                         SpecialItemChestEntry specialItem = selectedSpecialItems.get(0);
                         if (equip.getEmptySlot() >= specialItem.getQuantity()) {
@@ -1420,7 +1418,7 @@ public class UserService implements IUserService {
                             sendServerMessage(GameString.hopNgocNoSlot());
                         }
                     }
-                    case NANG_CAP_NGOC -> {//Nâng ngọc
+                    case NANG_CAP_NGOC -> {
                         SpecialItemChestEntry specialItemChestEntry = selectedSpecialItems.get(0);
                         int successRate = (90 - (specialItemChestEntry.getItem().getId() % 10) * 10);
                         int randomNumber = Utils.nextInt(100);
@@ -1438,17 +1436,15 @@ public class UserService implements IUserService {
                         }
                     }
 
-                    case BAN_NGOC -> {//Bán ngọc
+                    case BAN_NGOC -> {
                         user.updateInventory(null, null, null, selectedSpecialItems);
                         user.updateXu(totalTransactionAmount);
                         sendServerMessage(GameString.buySuccess());
                     }
 
-                    case DUNG_SPEC_ITEM -> {//Dùng item
-                        handleUseSpecialItem(selectedSpecialItems.get(0));
-                    }
+                    case DUNG_SPEC_ITEM -> handleUseSpecialItem(selectedSpecialItems.get(0));
 
-                    case GHEP_SPEC_ITEM -> {//Ghép item
+                    case GHEP_SPEC_ITEM -> {
                         if (fabricateItemEntry.getRewardXu() > 0) {
                             user.updateXu(fabricateItemEntry.getRewardXu());
                         }

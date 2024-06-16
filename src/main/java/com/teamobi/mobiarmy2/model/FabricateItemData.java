@@ -24,14 +24,10 @@ public class FabricateItemData {
         // Convert the list to a set to eliminate duplicates and for faster comparison
         Set<SpecialItemChestEntry> entrySet = new HashSet<>(selectedSpecialItems);
 
-        // Iterate through the list of fabricate item entries to find a match
-        for (FabricateItemEntry fabricateItemEntry : FABRICATE_ITEM_ENTRIES) {
-            if (fabricateItemEntry.getItemRequire().size() == entrySet.size() &&
-                    fabricateItemEntry.getItemRequire().equals(entrySet)) {
-                return fabricateItemEntry;
-            }
-        }
-        return null;
+        return FABRICATE_ITEM_ENTRIES.stream()
+                .filter(entry -> entry.getItemRequire().equals(entrySet))
+                .findFirst()
+                .orElse(null);
     }
 
 }
