@@ -49,17 +49,39 @@ import java.util.stream.Collectors;
 public class UserService implements IUserService {
 
     private final User user;
-    private final IUserDao userDao = new UserDao();
-    private final IGiftCodeDao giftCodeDao = new GiftCodeDao();
+    private final IUserDao userDao;
+    private IGiftCodeDao giftCodeDao;
 
     private UserAction userAction;
     private int totalTransactionAmount;
-    private final List<EquipmentChestEntry> selectedEquips = new ArrayList<>();
-    private final List<SpecialItemChestEntry> selectedSpecialItems = new ArrayList<>();
+    private List<EquipmentChestEntry> selectedEquips;
+    private List<SpecialItemChestEntry> selectedSpecialItems;
     private FabricateItemEntry fabricateItemEntry;
 
     public UserService(User user) {
         this.user = user;
+        this.userDao = new UserDao();
+    }
+
+    private IGiftCodeDao getGiftCodeDao() {
+        if (giftCodeDao == null) {
+            giftCodeDao = new GiftCodeDao();
+        }
+        return giftCodeDao;
+    }
+
+    private List<EquipmentChestEntry> getSelectedEquips() {
+        if (selectedEquips == null) {
+            selectedEquips = new ArrayList<>();
+        }
+        return selectedEquips;
+    }
+
+    private List<SpecialItemChestEntry> getSelectedSpecialItems() {
+        if (selectedSpecialItems == null) {
+            selectedSpecialItems = new ArrayList<>();
+        }
+        return selectedSpecialItems;
     }
 
     private void sendMessageLoginFail(String message) {
@@ -1314,6 +1336,9 @@ public class UserService implements IUserService {
 
     @Override
     public synchronized void hopNgoc(Message ms) {
+        List<EquipmentChestEntry> equipList = getSelectedEquips();
+        List<SpecialItemChestEntry> specialItemList = getSelectedSpecialItems();
+
         try {
             DataInputStream dis = ms.reader();
             byte action = dis.readByte();
@@ -1322,8 +1347,8 @@ public class UserService implements IUserService {
                 //Đặt lại dữ liệu
                 userAction = null;
                 fabricateItemEntry = null;
-                selectedEquips.clear();
-                selectedSpecialItems.clear();
+                equipList.clear();
+                specialItemList.clear();
 
                 byte size = dis.readByte();
                 for (byte i = 0; i < size; i++) {
@@ -1338,31 +1363,31 @@ public class UserService implements IUserService {
                     //Lấy thông tin vật phẩm từ rương người chơi
                     if (id > Byte.MAX_VALUE) {//Trường hợp trang bị
                         EquipmentChestEntry equip = user.getEquipmentByKey(id);
-                        if (equip != null && !selectedEquips.contains(equip)) {
-                            selectedEquips.add(equip);
+                        if (equip != null && !equipList.contains(equip)) {
+                            equipList.add(equip);
                         }
                     } else {//Trường hợp là ngọc
                         SpecialItemChestEntry item = user.getSpecialItemById((byte) id);
                         if (item != null &&
                                 item.getItem() != null &&
                                 item.getQuantity() >= quantity &&
-                                !selectedSpecialItems.contains(item)
+                                !specialItemList.contains(item)
                         ) {
-                            selectedSpecialItems.add(new SpecialItemChestEntry(quantity, item.getItem()));
+                            specialItemList.add(new SpecialItemChestEntry(quantity, item.getItem()));
                         }
                     }
                 }
 
                 //Thoát nếu không tồn tại trong rương
-                if (selectedEquips.isEmpty() && selectedSpecialItems.isEmpty()) {
+                if (equipList.isEmpty() && specialItemList.isEmpty()) {
                     return;
                 }
 
                 //Ghép ngọc vào trang bị
-                if (!selectedEquips.isEmpty() && !selectedSpecialItems.isEmpty()) {
-                    if (selectedEquips.size() == 1 &&
-                            selectedSpecialItems.size() == 1 &&
-                            selectedSpecialItems.get(0).getItem().isGem()
+                if (!equipList.isEmpty() && !specialItemList.isEmpty()) {
+                    if (equipList.size() == 1 &&
+                            specialItemList.size() == 1 &&
+                            specialItemList.get(0).getItem().isGem()
                     ) {
                         userAction = UserAction.GHEP_NGOC_VAO_TRANG_BI;
                         sendMessageConfirm(GameString.hopNgocRequest());
@@ -1372,16 +1397,16 @@ public class UserService implements IUserService {
                     return;
                 }
 
-                if (!selectedSpecialItems.isEmpty()) {
-                    fabricateItemEntry = FabricateItemData.getFabricateItem(selectedSpecialItems);
+                if (!specialItemList.isEmpty()) {
+                    fabricateItemEntry = FabricateItemData.getFabricateItem(specialItemList);
                     if (fabricateItemEntry != null) {
                         userAction = UserAction.GHEP_SPEC_ITEM;
                         sendMessageConfirm(fabricateItemEntry.getConfirmationMessage());
                         return;
                     }
 
-                    if (selectedSpecialItems.size() == 1) {
-                        SpecialItemChestEntry itemChestEntry = selectedSpecialItems.get(0);
+                    if (specialItemList.size() == 1) {
+                        SpecialItemChestEntry itemChestEntry = specialItemList.get(0);
                         if (itemChestEntry.getItem().isGem()) {
                             if (itemChestEntry.getQuantity() == 5 && ((itemChestEntry.getItem().getId() + 1) % 10 != 0)) {
                                 userAction = UserAction.NANG_CAP_NGOC;
@@ -1405,21 +1430,21 @@ public class UserService implements IUserService {
             } else if (action == 1) {
                 switch (userAction) {
                     case GHEP_NGOC_VAO_TRANG_BI -> {
-                        EquipmentChestEntry equip = selectedEquips.get(0);
-                        SpecialItemChestEntry specialItem = selectedSpecialItems.get(0);
+                        EquipmentChestEntry equip = equipList.get(0);
+                        SpecialItemChestEntry specialItem = specialItemList.get(0);
                         if (equip.getEmptySlot() >= specialItem.getQuantity()) {
                             for (int i = 0; i < specialItem.getQuantity(); i++) {
                                 equip.setNewSlot(specialItem.getItem().getId());
                                 equip.decrementEmptySlot();
                             }
-                            user.updateInventory(equip, null, null, selectedSpecialItems);
+                            user.updateInventory(equip, null, null, specialItemList);
                             sendServerMessage(GameString.hopNgocSuccess());
                         } else {
                             sendServerMessage(GameString.hopNgocNoSlot());
                         }
                     }
                     case NANG_CAP_NGOC -> {
-                        SpecialItemChestEntry specialItemChestEntry = selectedSpecialItems.get(0);
+                        SpecialItemChestEntry specialItemChestEntry = specialItemList.get(0);
                         int successRate = (90 - (specialItemChestEntry.getItem().getId() % 10) * 10);
                         int randomNumber = Utils.nextInt(100);
                         if (randomNumber < successRate) {
@@ -1437,12 +1462,12 @@ public class UserService implements IUserService {
                     }
 
                     case BAN_NGOC -> {
-                        user.updateInventory(null, null, null, selectedSpecialItems);
+                        user.updateInventory(null, null, null, specialItemList);
                         user.updateXu(totalTransactionAmount);
                         sendServerMessage(GameString.buySuccess());
                     }
 
-                    case DUNG_SPEC_ITEM -> handleUseSpecialItem(selectedSpecialItems.get(0));
+                    case DUNG_SPEC_ITEM -> handleUseSpecialItem(specialItemList.get(0));
 
                     case GHEP_SPEC_ITEM -> {
                         if (fabricateItemEntry.getRewardXu() > 0) {
@@ -1463,7 +1488,7 @@ public class UserService implements IUserService {
                                 .map(SpecialItemChestEntry::new)
                                 .collect(Collectors.toCollection(ArrayList::new));
 
-                        user.updateInventory(null, null, addItems, selectedSpecialItems);
+                        user.updateInventory(null, null, addItems, specialItemList);
 
                         if (!fabricateItemEntry.getCompletionMessage().isEmpty()) {
                             sendServerMessage(fabricateItemEntry.getCompletionMessage());
@@ -1946,7 +1971,9 @@ public class UserService implements IUserService {
     }
 
     private void handleGiftCode(String code) {
-        GiftCodeEntry giftCode = giftCodeDao.getGiftCode(code);
+        IGiftCodeDao dao = getGiftCodeDao();
+
+        GiftCodeEntry giftCode = dao.getGiftCode(code);
         if (giftCode == null) {
             sendServerMessage(GameString.giftCodeError1());
             return;
@@ -1965,7 +1992,7 @@ public class UserService implements IUserService {
                 return;
             }
         }
-        giftCodeDao.updateGiftCode(code, user.getPlayerId());
+        dao.updateGiftCode(code, user.getPlayerId());
         GiftCodeRewardJson rewardData = GsonUtil.GSON.fromJson(giftCode.getReward(), GiftCodeRewardJson.class);
         if (rewardData.getXu() > 0) {
             user.updateXu(rewardData.getXu());
@@ -2309,7 +2336,9 @@ public class UserService implements IUserService {
 
     @Override
     public void handleEquipmentTransactions(Message ms) {
+        List<EquipmentChestEntry> selectedEquips = getSelectedEquips();
         DataInputStream dis = ms.reader();
+
         try {
             byte type = dis.readByte();
             switch (type) {
