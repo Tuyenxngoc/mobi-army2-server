@@ -229,7 +229,7 @@ public class User {
             this.items[itemIndex] = 0;
         }
         if (this.items[itemIndex] > ServerManager.getInstance().config().getMaxItem()) {
-            this.items[itemIndex] = (byte) ServerManager.getInstance().config().getMaxItem();
+            this.items[itemIndex] = ServerManager.getInstance().config().getMaxItem();
         }
         this.items[0] = this.items[1] = 99;
     }

@@ -3,7 +3,6 @@ package com.teamobi.mobiarmy2.server;
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.config.Impl.ServerConfig;
 import com.teamobi.mobiarmy2.constant.CommonConstant;
-import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.dao.impl.GameDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
@@ -22,7 +21,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author tuyen
@@ -77,12 +75,10 @@ public class ServerManager {
     }
 
     private void initServerData() {
-        //Data to set up cache
         gameService.getMapData();
         gameService.getCharacterData();
         gameService.getEquipData();
         gameService.setCaptionLevelData();
-
         gameService.getItemData();
         gameService.getClanShopData();
         gameService.getSpecialItemData();
@@ -102,18 +98,6 @@ public class ServerManager {
     }
 
     private void initRooms() {
-        rooms = new Room[config.getnRoomAll()];
-        config.setRoomTypeStartNum(new int[config.getRoomTypes().length]);
-        int k = 0;
-        for (int i = 0; i < config.getRoomTypes().length; i++) {
-            for (int j = 0; j < config.getnRoom()[i]; j++) {
-                if (j == 0) {
-                    config.getRoomTypeStartNum()[i] = k;
-                }
-                rooms[k] = new Room(k, i, config.getNArea(), j);
-                k++;
-            }
-        }
     }
 
     private void initRankings() {
@@ -122,8 +106,8 @@ public class ServerManager {
 
     public void start() {
         log.logMessage("Start server!");
+        isStart = true;
         try {
-            isStart = true;
             server = new ServerSocket(config.getPort());
             log.logMessage("Server start at port: " + config.getPort());
             while (isStart) {
@@ -142,7 +126,7 @@ public class ServerManager {
     }
 
     public void stop() {
-        log.logMessage("Stop server");
+        log.logMessage("Stop server!");
         isStart = false;
         try {
             while (users.size() > 0) {
@@ -182,12 +166,6 @@ public class ServerManager {
     }
 
     public List<User> findWaitPlayers(int excludedPlayerId) {
-        synchronized (users) {
-            return users.stream()
-                    .filter(session -> session != null && session.getUser() != null)
-                    .map(ISession::getUser)
-                    .filter(user -> UserState.WAITING.equals(user.getState()) && user.getPlayerId() != excludedPlayerId)
-                    .collect(Collectors.toList());
-        }
+        return null;
     }
 }

@@ -4,150 +4,74 @@ public interface IServerConfig {
 
     boolean isDebug();
 
-    byte getNArea();
-
     short getPort();
 
     byte getEquipVersion2();
 
-    byte getIconversion2();
+    byte getIconVersion2();
 
     byte getLevelCVersion2();
 
-    byte getValuesversion2();
+    byte getValuesVersion2();
 
     byte getPlayerVersion2();
 
-    byte[] getnRoom();
+    String[] getRoomNameVi();
 
-    byte getnRoomAll();
+    String[] getRoomNameEn();
+
+    String[] getRoomBossName();
+
+    byte[] getRoomQuantity();
+
+    int[] getRoomMaxXu();
+
+    int[] getRoomMinXu();
+
+    byte[] getMapIdBoss();
+
+    byte getNumArea();
+
+    byte getMaxPlayerFight();
 
     byte getMaxElementFight();
 
-    byte getMaxPlayers();
+    byte getNumPlayer();
 
-    byte getNumbPlayers();
+    byte getNumPlayerInitRoom();
 
-    boolean isMgtBullNew();
+    byte getStartMapBoss();
 
-    byte getnPlayersInitRoom();
+    byte getNumMapBoss();
 
-    byte getLtapMap();
-
-    short[] getXltap();
-
-    short[] getYltap();
-
-    byte getInitMap();
+    byte getInitMapId();
 
     byte getInitMapBoss();
 
     String getAddInfo();
 
-    String getAddInfoURL();
+    String getAddInfoUrl();
 
-    String getRegTeamURL();
+    String getRegTeamUrl();
 
-    String getTaiGameName();
+    String getDownloadTitle();
 
-    String getTaiGameInfo();
+    String getDownloadInfo();
 
-    String getTaiGameURL();
+    String getDownloadUrl();
 
     int getMaxClients();
 
-    int getMaxRuongTB();
+    byte getMaxRuongTrangBi();
 
-    int getMax_ruong_item();
+    byte getMaxRuongItem();
 
-    int getMax_ruong_itemslot();
+    byte getMaxItem();
 
-    int getMaxItem();
+    byte getMaxFriends();
 
-    int getMaxFriends();
+    String getMessageLogin();
 
-    String[] getRoomTypes();
-
-    String[] getRoomTypesEng();
-
-    int[] getRoomTypeStartNum();
-
-    void setRoomTypeStartNum(int[] roomTypeStartNum);
-
-    String[] getNameRooms();
-
-    int[] getNameRoomNumbers();
-
-    int[] getNameRoomTypes();
-
-    int getStartRoomBoss();
-
-    int getStartMapBoss();
-
-    int getNumMapBoss();
-
-    byte[] getMapIdBoss();
-
-    int getMIN_XU_BOSS();
-
-    int getMAX_XU_BOSS();
-
-    int getMIN_XU_SO_CAP();
-
-    int getMAX_XU_SO_CAP();
-
-    int getMIN_XU_TRUNG_CAP();
-
-    int getMAX_XU_TRUNG_CAP();
-
-    int getMIN_XU_CAO_CAP();
-
-    int getMAX_XU_CAO_CAP();
-
-    int getMIN_XU_DAU_TRUONG();
-
-    int getMAX_XU_DAU_TRUONG();
-
-    int getMIN_XU_TU_DO();
-
-    int getMAX_XU_TU_DO();
-
-    int getMIN_XU_CLAN();
-
-    int getMAX_XU_CLAN();
-
-    int getMIN_TIME_X6_1();
-
-    int getMAX_TIME_X6_1();
-
-    int getMIN_TIME_X6_2();
-
-    int getMAX_TIME_X6_2();
-
-    int getMIN_TIME_X6_3();
-
-    int getMAX_TIME_X6_3();
-
-    int getXU_NHAN_DUOC();
-
-    int getLUONG_NHAN_DUOC();
-
-    int getXU_BI_TRU();
-
-    int getLUONG_BI_TRU();
-
-    String getSEND_CHAT_LOGIN();
-
-    String getSEND_THU1();
-
-    String getSEND_THU2();
-
-    String getSEND_THU3();
-
-    String getSEND_THU4();
-
-    String getSEND_THU5();
-
-    int getKINH_NGHIEM_UP();
+    String[] getMessage();
 
 }

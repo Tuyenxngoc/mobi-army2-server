@@ -168,11 +168,9 @@ public class UserService implements IUserService {
                 user.setMaterialsPurchased((byte) 0);
 
                 //Gửi messeage khi login
-                sendMSSToUser(serverManager.config().getSEND_THU1());
-                sendMSSToUser(serverManager.config().getSEND_THU2());
-                sendMSSToUser(serverManager.config().getSEND_THU3());
-                sendMSSToUser(serverManager.config().getSEND_THU4());
-                sendMSSToUser(serverManager.config().getSEND_THU5());
+                for (String msg : serverManager.config().getMessage()) {
+                    sendMSSToUser(msg);
+                }
 
                 //Cập nhật nhiệm vụ
                 user.updateMission(16, 1);
@@ -186,10 +184,9 @@ public class UserService implements IUserService {
             sendLoginSuccess();
             IServerConfig config = serverManager.config();
             sendCharacterData(config);
-            sendRoomInfo(config);
             sendMapCollisionInfo();
 
-            sendServerInfo(config.getSEND_CHAT_LOGIN());
+            sendServerInfo(config.getMessageLogin());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -268,7 +265,7 @@ public class UserService implements IUserService {
             for (int i = 0; i < config.getNumMapBoss(); i++) {
                 ds.writeByte(config.getMapIdBoss()[i]);
             }
-            ds.writeByte(config.getNumbPlayers());
+            ds.writeByte(config.getNumPlayer());
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
@@ -283,29 +280,8 @@ public class UserService implements IUserService {
 
     private void sendRoomName(IServerConfig config) {
         try {
-            Message ms = new Message(-19);
+            Message ms = new Message(Cmd.CHANGE_ROOM_NAME);
             DataOutputStream ds = ms.writer();
-            // Size
-            ds.writeByte(config.getNameRooms().length);
-            for (int i = 0; i < config.getNameRooms().length; i++) {
-                // He so cong
-                int namen = config.getNameRoomNumbers()[i];
-                int typen = config.getNameRoomTypes()[i];
-                if (namen > (config.getnRoom()[typen] + config.getRoomTypeStartNum()[typen])) {
-                    continue;
-                }
-                int notRoom = 0;
-                for (int j = 0; j < typen; j++) {
-                    if (config.getnRoom()[j] > 0) {
-                        notRoom++;
-                    }
-                }
-                ds.writeByte(config.getRoomTypeStartNum()[typen] + notRoom);
-                // Ten cho phong viet hoa
-                ds.writeUTF("Phòng " + (config.getRoomTypeStartNum()[typen] + namen) + ": " + config.getNameRooms()[i]);
-                // So
-                ds.writeByte(namen);
-            }
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
@@ -317,11 +293,6 @@ public class UserService implements IUserService {
         try {
             Message ms = new Message(Cmd.ROOM_CAPTION);
             DataOutputStream ds = ms.writer();
-            ds.writeByte(config.getRoomTypes().length);
-            for (int i = 0; i < config.getRoomTypes().length; i++) {
-                ds.writeUTF(config.getRoomTypes()[i]);
-                ds.writeUTF(config.getRoomTypesEng()[i]);
-            }
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
@@ -561,9 +532,9 @@ public class UserService implements IUserService {
             // Thong tin them
             ds.writeUTF(config.getAddInfo());
             // Dia chi cua About me
-            ds.writeUTF(config.getTaiGameInfo());
+            ds.writeUTF(config.getDownloadInfo());
             // Dia chi dang ki doi
-            ds.writeUTF(config.getRegTeamURL());
+            ds.writeUTF(config.getRegTeamUrl());
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
@@ -996,7 +967,7 @@ public class UserService implements IUserService {
         }
 
         //Kiểm tra số lượng đang có trong rương
-        if (user.getInventorySpecialItemCount(itemId) + quantity > ServerManager.getInstance().config().getMax_ruong_itemslot()) {
+        if (user.getInventorySpecialItemCount(itemId) + quantity > ServerManager.getInstance().config().getMaxRuongItem()) {
             sendServerMessage(GameString.ruongMaxSlot());
             return;
         }
@@ -1219,7 +1190,6 @@ public class UserService implements IUserService {
             }
             ds.flush();
             user.sendMessage(ms);
-            sendRoomInfo(server.config());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1241,8 +1211,8 @@ public class UserService implements IUserService {
             DataOutputStream ds = ms.writer();
             ds.writeByte(roomNumber);
             synchronized (ServerManager.getInstance().getRooms()) {
-                for (int i = 0; i < room.entrys.length; i++) {
-                    FightWait fightWait = room.entrys[i];
+                for (int i = 0; i < room.fightWaits.length; i++) {
+                    FightWait fightWait = room.fightWaits[i];
                     synchronized (fightWait.users) {
                         if (fightWait.numPlayer == fightWait.maxSetPlayer || fightWait.started || (fightWait.isLienHoan && fightWait.ntLH > 0)) {
                             continue;
@@ -1283,7 +1253,7 @@ public class UserService implements IUserService {
             byte soPhong = dis.readByte();
             byte soKhuVuc = dis.readByte();
             String password = dis.readUTF();
-            FightWait fightWait = ServerManager.getInstance().getRooms()[soPhong].entrys[soKhuVuc];
+            FightWait fightWait = ServerManager.getInstance().getRooms()[soPhong].fightWaits[soKhuVuc];
 
             if (fightWait.passSet && !fightWait.pass.equals(password)) {
                 sendServerMessage(GameString.joinKVError1());
@@ -2096,8 +2066,8 @@ public class UserService implements IUserService {
                     ms = new Message(Cmd.GET_FILEPACK);
                     DataOutputStream ds = ms.writer();
                     ds.writeByte(type);
-                    ds.writeByte(config.getIconversion2());
-                    if (version != config.getIconversion2()) {
+                    ds.writeByte(config.getIconVersion2());
+                    if (version != config.getIconVersion2()) {
                         byte[] ab = Utils.getFile(CommonConstant.iconCacheName);
                         if (ab == null) {
                             return;
@@ -2114,8 +2084,8 @@ public class UserService implements IUserService {
                     ms = new Message(Cmd.GET_FILEPACK);
                     DataOutputStream ds = ms.writer();
                     ds.writeByte(type);
-                    ds.writeByte(config.getValuesversion2());
-                    if (version != config.getValuesversion2()) {
+                    ds.writeByte(config.getValuesVersion2());
+                    if (version != config.getValuesVersion2()) {
                         byte[] ab = Utils.getFile(CommonConstant.mapCacheName);
                         if (ab == null) {
                             return;
@@ -2460,7 +2430,7 @@ public class UserService implements IUserService {
     }
 
     private void purchaseEquipment(short saleIndex, byte unit) {
-        if (user.getRuongDoTB().size() >= ServerManager.getInstance().config().getMaxRuongTB()) {
+        if (user.getRuongDoTB().size() >= ServerManager.getInstance().config().getMaxRuongTrangBi()) {
             sendServerMessage(GameString.ruongNoSlot());
             return;
         }
