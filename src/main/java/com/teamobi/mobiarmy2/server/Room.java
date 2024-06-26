@@ -39,4 +39,8 @@ public class Room {
         // 2: xanh
         return 2;
     }
+
+    public int getFightWaitsAvailable() {
+        return 0;
+    }
 }

@@ -1189,7 +1189,7 @@ public class UserService implements IUserService {
             for (Room room : server.getRooms()) {
                 ds.writeByte(room.getId());
                 ds.writeByte(room.getStatus());
-                ds.writeByte(0);
+                ds.writeByte(room.getFightWaitsAvailable());
                 ds.writeByte(room.getType());
             }
             ds.flush();
