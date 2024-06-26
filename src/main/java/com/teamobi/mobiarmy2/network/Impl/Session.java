@@ -235,7 +235,7 @@ public class Session implements ISession {
                 while (Session.this.isSendKeyComplete()) {
                     while (sendingMessage.size() > 0 && Session.this.dis != null) {
                         Message message = sendingMessage.remove(0);
-                        ServerManager.getInstance().logger().logMessage("Send mss " + message.getCommand() + " to " + Session.this);
+                        ServerManager.getInstance().logger().logMessage("   Send mss " + message.getCommand() + " to " + Session.this);
                         Session.this.doSendMessage(message);
                     }
                     try {

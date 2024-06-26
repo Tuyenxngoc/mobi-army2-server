@@ -1200,7 +1200,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void vaoPhong(Message ms) {
+    public void handleEnteringRoom(Message ms) {
         if (user.isNotWaiting()) {
             return;
         }
@@ -1211,33 +1211,31 @@ public class UserService implements IUserService {
                 sendServerMessage(GameString.notClan());
                 return;
             }
-            ms = new Message(7);
+            ms = new Message(Cmd.BOARD_LIST);
             DataOutputStream ds = ms.writer();
             ds.writeByte(roomNumber);
-            synchronized (ServerManager.getInstance().getRooms()) {
-                for (int i = 0; i < room.fightWaits.length; i++) {
-                    FightWait fightWait = room.fightWaits[i];
-                    synchronized (fightWait.users) {
-                        if (fightWait.numPlayer == fightWait.maxSetPlayer || fightWait.started || (fightWait.isLienHoan && fightWait.ntLH > 0)) {
-                            continue;
-                        }
-                        // So khu vuc
-                        ds.writeByte(i);
-                        // So nguoi trong khu vuc
-                        ds.writeByte(fightWait.numPlayer);
-                        // So nguoi toi da
-                        ds.writeByte(fightWait.maxSetPlayer);
-                        // Co mat khau or khong
-                        ds.writeBoolean(fightWait.passSet);
-                        // So tien
-                        ds.writeInt(fightWait.money);
-                        // Null boolean
-                        ds.writeBoolean(true);
-                        // Ten khu vuc
-                        ds.writeUTF(fightWait.name);
-                        // Kieu 0: Tea, 1: Free
-                        ds.writeByte(0);
+            for (int i = 0; i < room.fightWaits.length; i++) {
+                FightWait fightWait = room.fightWaits[i];
+                synchronized (fightWait.users) {
+                    if (fightWait.numPlayer == fightWait.maxSetPlayer || fightWait.started || (fightWait.isLienHoan && fightWait.ntLH > 0)) {
+                        continue;
                     }
+                    // So khu vuc
+                    ds.writeByte(i);
+                    // So nguoi trong khu vuc
+                    ds.writeByte(fightWait.numPlayer);
+                    // So nguoi toi da
+                    ds.writeByte(fightWait.maxSetPlayer);
+                    // Co mat khau or khong
+                    ds.writeBoolean(fightWait.passSet);
+                    // So tien
+                    ds.writeInt(fightWait.money);
+                    // Null boolean
+                    ds.writeBoolean(true);
+                    // Ten khu vuc
+                    ds.writeUTF(fightWait.name);
+                    // Kieu 0: Tea, 1: Free
+                    ds.writeByte(0);
                 }
             }
             ds.flush();

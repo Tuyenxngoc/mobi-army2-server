@@ -48,7 +48,7 @@ public interface IUserService {
 
     void handleSendRoomList();
 
-    void vaoPhong(Message ms);
+    void handleEnteringRoom(Message ms);
 
     void thamGiaKhuVuc(Message ms);
 

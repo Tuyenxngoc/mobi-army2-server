@@ -52,7 +52,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.ROOM_LIST -> userService.handleSendRoomList();
 
-                case Cmd.BOARD_LIST -> userService.vaoPhong(ms);
+                case Cmd.BOARD_LIST -> userService.handleEnteringRoom(ms);
 
                 case Cmd.JOIN_BOARD -> userService.thamGiaKhuVuc(ms);
 
