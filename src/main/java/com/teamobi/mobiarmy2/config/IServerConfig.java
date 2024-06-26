@@ -20,7 +20,7 @@ public interface IServerConfig {
 
     String[] getRoomNameEn();
 
-    String[] getRoomBossName();
+    String[] getBossRoomName();
 
     byte[] getRoomQuantity();
 
@@ -32,7 +32,7 @@ public interface IServerConfig {
 
     byte[] getRoomMinMap();
 
-    byte[] getMapIdBoss();
+    byte[] getBossRoomBossId();
 
     byte getNumArea();
 
@@ -45,8 +45,6 @@ public interface IServerConfig {
     byte getNumPlayerInitRoom();
 
     byte getStartMapBoss();
-
-    byte getNumMapBoss();
 
     byte getInitMapId();
 
@@ -77,5 +75,7 @@ public interface IServerConfig {
     String getMessageLogin();
 
     String[] getMessage();
+
+    byte[] getBossRoomMapId();
 
 }

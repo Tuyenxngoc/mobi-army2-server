@@ -38,15 +38,15 @@ public interface IUserService {
 
     void luyenTap(Message ms);
 
-    void dangXuat(Message ms);
+    void handleLogout(Message ms);
 
-    void doDacBietShop(Message ms);
+    void handleSpecialItemShop(Message ms);
 
     void macTrangBiVip(Message ms);
 
     void handleSendMessage(Message ms);
 
-    void denKhuVuc();
+    void handleSendRoomList();
 
     void vaoPhong(Message ms);
 

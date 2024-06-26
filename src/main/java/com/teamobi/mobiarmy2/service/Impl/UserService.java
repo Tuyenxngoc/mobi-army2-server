@@ -238,8 +238,7 @@ public class UserService implements IUserService {
         try {
             List<CharacterEntry> characterEntries = NVData.CHARACTER_ENTRIES;
             int characterCount = characterEntries.size();
-
-            Message ms = new Message(64);
+            Message ms = new Message(Cmd.SKIP_2);
             DataOutputStream ds = ms.writer();
             ds.writeByte(characterCount);
             for (CharacterEntry characterEntry : characterEntries) {
@@ -257,14 +256,13 @@ public class UserService implements IUserService {
             for (CharacterEntry characterEntry : characterEntries) {
                 ds.writeByte(characterEntry.getBulletCount());
             }
-
             ds.writeByte(config.getMaxElementFight());
-            ds.writeByte(config.getNumMapBoss());
-            for (int i = 0; i < config.getNumMapBoss(); i++) {
-                ds.writeByte(config.getStartMapBoss() + i);
+            ds.writeByte(config.getBossRoomMapId().length);
+            for (byte mapId : config.getBossRoomMapId()) {
+                ds.writeByte(mapId);
             }
-            for (int id : config.getMapIdBoss()) {
-                ds.writeByte(id);
+            for (byte bossId : config.getBossRoomBossId()) {
+                ds.writeByte(bossId);
             }
             ds.writeByte(config.getNumPlayer());
             ds.flush();
@@ -276,15 +274,15 @@ public class UserService implements IUserService {
 
     public void sendRoomName() {
         IServerConfig config = ServerManager.getInstance().config();
-        String[] names = config.getRoomBossName();
-
+        String[] names = config.getBossRoomName();
+        int startMapBoss = config.getStartMapBoss();
         try {
             Message ms = new Message(Cmd.CHANGE_ROOM_NAME);
             DataOutputStream ds = ms.writer();
             ds.writeByte(names.length);
             for (int i = 0; i < names.length; i++) {
-                ds.writeByte(28 + i);
-                ds.writeUTF(String.format("Phòng %d: %s", 28, names[i]));
+                ds.writeByte(startMapBoss + i);
+                ds.writeUTF(String.format("Phòng %d: %s", startMapBoss + i, names[i]));
                 ds.writeByte(5);
             }
             ds.flush();
@@ -946,21 +944,21 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void dangXuat(Message ms) {
+    public void handleLogout(Message ms) {
         user.getSession().close();
     }
 
     @Override
-    public void doDacBietShop(Message ms) {
+    public void handleSpecialItemShop(Message ms) {
         if (user.isNotWaiting()) {
             return;
         }
         try {
             DataInputStream dis = ms.reader();
             byte type = dis.readByte();
-            if (type == 0) {//send item
-                sendDoDacBietShop();
-            } else if (type == 1) {//buy item
+            if (type == 0) {
+                sendSpecialItem();
+            } else if (type == 1) {
                 byte unit = dis.readByte();
                 byte itemId = dis.readByte();
                 byte quantity = dis.readByte();
@@ -1045,7 +1043,7 @@ public class UserService implements IUserService {
         return true;
     }
 
-    private void sendDoDacBietShop() {
+    private void sendSpecialItem() {
         try {
             Message ms = new Message(Cmd.SHOP_LINHTINH);
             DataOutputStream ds = ms.writer();
@@ -1180,24 +1178,19 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void denKhuVuc() {
+    public void handleSendRoomList() {
         if (user.isNotWaiting()) {
             return;
         }
+        ServerManager server = ServerManager.getInstance();
         try {
             Message ms = new Message(Cmd.ROOM_LIST);
             DataOutputStream ds = ms.writer();
-            ServerManager server = ServerManager.getInstance();
-            for (int i = 0; i < server.getRooms().length; i++) {
-                // So phong
-                ds.writeByte(i);
-                Room room = server.getRooms()[i];
-                // Tinh trang 0: do 1: vang 2: xanh
-                ds.writeByte(2);
-                // Null byte
+            for (Room room : server.getRooms()) {
+                ds.writeByte(room.getId());
+                ds.writeByte(room.getStatus());
                 ds.writeByte(0);
-                // Loai phong 0->6
-                ds.writeByte(room.type);
+                ds.writeByte(room.getType());
             }
             ds.flush();
             user.sendMessage(ms);

@@ -40,9 +40,9 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.TRAINING_MAP -> userService.luyenTap(ms);
 
-                case Cmd.SIGN_OUT -> userService.dangXuat(ms);
+                case Cmd.SIGN_OUT -> userService.handleLogout(ms);
 
-                case Cmd.SHOP_LINHTINH -> userService.doDacBietShop(ms);
+                case Cmd.SHOP_LINHTINH -> userService.handleSpecialItemShop(ms);
 
                 case Cmd.VIP_EQUIP -> userService.macTrangBiVip(ms);
 
@@ -50,7 +50,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.CHAT_TO -> userService.handleSendMessage(ms);
 
-                case Cmd.ROOM_LIST -> userService.denKhuVuc();
+                case Cmd.ROOM_LIST -> userService.handleSendRoomList();
 
                 case Cmd.BOARD_LIST -> userService.vaoPhong(ms);
 

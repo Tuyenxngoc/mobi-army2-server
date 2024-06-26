@@ -24,20 +24,20 @@ public class ServerConfig implements IServerConfig {
     private byte playerVersion2;
     private String[] roomNameVi;
     private String[] roomNameEn;
-    private String[] roomBossName;
+    private String[] bossRoomName;
     private byte[] roomQuantity;
     private int[] roomMaxXu;
     private int[] roomMinXu;
     private byte[] roomMaxMap;
     private byte[] roomMinMap;
-    private byte[] mapIdBoss;
+    private byte[] bossRoomBossId;
     private byte numArea;
     private byte maxPlayerFight;
     private byte maxElementFight;
     private byte numPlayer;
     private byte numPlayerInitRoom;
     private byte startMapBoss;
-    private byte numMapBoss;
+    private byte[] bossRoomMapId;
     private byte initMapId;
     private byte initMapBoss;
     private String addInfo;
@@ -81,21 +81,26 @@ public class ServerConfig implements IServerConfig {
 
             roomNameVi = GsonUtil.GSON.fromJson(configMap.getProperty("room_name_vi", "[]"), String[].class);
             roomNameEn = GsonUtil.GSON.fromJson(configMap.getProperty("room_name_en", "[]"), String[].class);
-            roomBossName = GsonUtil.GSON.fromJson(configMap.getProperty("room_boss_name", "[]"), String[].class);
             roomQuantity = GsonUtil.GSON.fromJson(configMap.getProperty("room_quantity", "[]"), byte[].class);
+
+            bossRoomName = GsonUtil.GSON.fromJson(configMap.getProperty("boss_room_name", "[]"), String[].class);
+            bossRoomBossId = GsonUtil.GSON.fromJson(configMap.getProperty("boss_room_boss_id", "[]"), byte[].class);
+            bossRoomMapId = GsonUtil.GSON.fromJson(configMap.getProperty("boss_room_map_id", "[]"), byte[].class);
+
             roomMaxXu = GsonUtil.GSON.fromJson(configMap.getProperty("room_max_xu", "[]"), int[].class);
             roomMinXu = GsonUtil.GSON.fromJson(configMap.getProperty("room_min_xu", "[]"), int[].class);
             roomMaxMap = GsonUtil.GSON.fromJson(configMap.getProperty("room_max_map", "[]"), byte[].class);
             roomMinMap = GsonUtil.GSON.fromJson(configMap.getProperty("room_min_map", "[]"), byte[].class);
-            mapIdBoss = GsonUtil.GSON.fromJson(configMap.getProperty("room_boss_id", "[]"), byte[].class);
+
+            for (int i = 0; i < roomNameVi.length - 2; i++) {
+                startMapBoss += roomQuantity[i];
+            }
 
             numArea = Byte.parseByte(configMap.getProperty("num_area", "20"));
             maxPlayerFight = Byte.parseByte(configMap.getProperty("max_player_fight", "8"));
             maxElementFight = Byte.parseByte(configMap.getProperty("max_element_fight", "100"));
             numPlayer = Byte.parseByte(configMap.getProperty("num_player", "12"));
             numPlayerInitRoom = Byte.parseByte(configMap.getProperty("num_player_init_room", "4"));
-            startMapBoss = Byte.parseByte(configMap.getProperty("start_map_boss", "30"));
-            numMapBoss = Byte.parseByte(configMap.getProperty("num_map_boss", "10"));
             initMapId = Byte.parseByte(configMap.getProperty("init_map_id", "0"));
             initMapBoss = Byte.parseByte(configMap.getProperty("init_map_boss", "30"));
 
@@ -137,6 +142,11 @@ public class ServerConfig implements IServerConfig {
             System.out.println("room_min_xu:" + roomMinXu.length);
             System.out.println("room_max_map:" + roomMinMap.length);
             System.out.println("room_min_map:" + roomMaxMap.length);
+            System.exit(1);
+        }
+
+        if (bossRoomMapId.length != bossRoomBossId.length) {
+            System.out.println("room_boss_id, map_boss_id must have the same length");
             System.exit(1);
         }
     }
@@ -187,8 +197,8 @@ public class ServerConfig implements IServerConfig {
     }
 
     @Override
-    public String[] getRoomBossName() {
-        return roomBossName;
+    public String[] getBossRoomName() {
+        return bossRoomName;
     }
 
     @Override
@@ -217,8 +227,8 @@ public class ServerConfig implements IServerConfig {
     }
 
     @Override
-    public byte[] getMapIdBoss() {
-        return mapIdBoss;
+    public byte[] getBossRoomBossId() {
+        return bossRoomBossId;
     }
 
     @Override
@@ -249,11 +259,6 @@ public class ServerConfig implements IServerConfig {
     @Override
     public byte getStartMapBoss() {
         return startMapBoss;
-    }
-
-    @Override
-    public byte getNumMapBoss() {
-        return numMapBoss;
     }
 
     @Override
@@ -329,5 +334,10 @@ public class ServerConfig implements IServerConfig {
     @Override
     public String[] getMessage() {
         return message;
+    }
+
+    @Override
+    public byte[] getBossRoomMapId() {
+        return bossRoomMapId;
     }
 }

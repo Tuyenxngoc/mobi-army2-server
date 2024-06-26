@@ -1,10 +1,12 @@
 package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.fight.FightWait;
+import lombok.Getter;
 
 /**
  * @author tuyen
  */
+@Getter
 public class Room {
     public byte id;
     public byte type;
@@ -29,5 +31,12 @@ public class Room {
         for (int i = 0; i < fightWaits.length; i++) {
             fightWaits[i] = new FightWait(this, (byte) (i + 1), (byte) (i + 1), (byte) 4, (byte) 2, (byte) 1, (byte) 0, lienHoan, fe);
         }
+    }
+
+    public int getStatus() {
+        // 0: đỏ
+        // 1: vàng
+        // 2: xanh
+        return 2;
     }
 }
