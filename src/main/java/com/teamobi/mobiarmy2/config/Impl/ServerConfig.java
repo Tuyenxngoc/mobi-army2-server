@@ -87,6 +87,7 @@ public class ServerConfig implements IServerConfig {
             roomMinXu = GsonUtil.GSON.fromJson(configMap.getProperty("room_min_xu", "[]"), int[].class);
             roomMaxMap = GsonUtil.GSON.fromJson(configMap.getProperty("room_max_map", "[]"), byte[].class);
             roomMinMap = GsonUtil.GSON.fromJson(configMap.getProperty("room_min_map", "[]"), byte[].class);
+            mapIdBoss = GsonUtil.GSON.fromJson(configMap.getProperty("room_boss_id", "[]"), byte[].class);
 
             numArea = Byte.parseByte(configMap.getProperty("num_area", "20"));
             maxPlayerFight = Byte.parseByte(configMap.getProperty("max_player_fight", "8"));

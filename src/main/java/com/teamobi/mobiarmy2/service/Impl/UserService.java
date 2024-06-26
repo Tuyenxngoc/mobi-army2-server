@@ -184,6 +184,7 @@ public class UserService implements IUserService {
             sendLoginSuccess();
             IServerConfig config = serverManager.config();
             sendCharacterData(config);
+            sendRoomCaption(config);
             sendMapCollisionInfo();
 
             sendServerInfo(config.getMessageLogin());
@@ -262,8 +263,8 @@ public class UserService implements IUserService {
             for (int i = 0; i < config.getNumMapBoss(); i++) {
                 ds.writeByte(config.getStartMapBoss() + i);
             }
-            for (int i = 0; i < config.getNumMapBoss(); i++) {
-                ds.writeByte(config.getMapIdBoss()[i]);
+            for (int id : config.getMapIdBoss()) {
+                ds.writeByte(id);
             }
             ds.writeByte(config.getNumPlayer());
             ds.flush();
@@ -273,15 +274,19 @@ public class UserService implements IUserService {
         }
     }
 
-    public void sendRoomInfo(IServerConfig config) {
-        sendRoomCaption(config);
-        sendRoomName(config);
-    }
+    public void sendRoomName() {
+        IServerConfig config = ServerManager.getInstance().config();
+        String[] names = config.getRoomBossName();
 
-    private void sendRoomName(IServerConfig config) {
         try {
             Message ms = new Message(Cmd.CHANGE_ROOM_NAME);
             DataOutputStream ds = ms.writer();
+            ds.writeByte(names.length);
+            for (int i = 0; i < names.length; i++) {
+                ds.writeByte(28 + i);
+                ds.writeUTF(String.format("Phòng %d: %s", 28, names[i]));
+                ds.writeByte(5);
+            }
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
@@ -290,9 +295,15 @@ public class UserService implements IUserService {
     }
 
     private void sendRoomCaption(IServerConfig config) {
+        String[] names = config.getRoomNameVi();
         try {
             Message ms = new Message(Cmd.ROOM_CAPTION);
             DataOutputStream ds = ms.writer();
+            ds.writeByte(names.length);
+            for (int i = 0; i < names.length; i++) {
+                ds.writeUTF(names[i]);
+                ds.writeUTF(config.getRoomNameEn()[i]);
+            }
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {

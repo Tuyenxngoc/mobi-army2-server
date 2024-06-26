@@ -28,6 +28,8 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.CLAN_MONEY -> userService.gopClan(ms);
 
+                case Cmd.CHANGE_ROOM_NAME -> userService.sendRoomName();
+
                 case Cmd.FOMULA -> userService.handleMergeEquipments(ms);
 
                 case Cmd.GET_LUCKYGIFT -> userService.moHopQua(ms);

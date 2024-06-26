@@ -8,6 +8,8 @@ public interface IUserService {
 
     void handleLogout();
 
+    void sendRoomName();
+
     void sendServerMessage(String message);
 
     void sendServerMessage2(String message);
