@@ -98,6 +98,22 @@ public class ServerManager {
     }
 
     private void initRooms() {
+        byte[] roomQuantities = config.getRoomQuantity();
+        int totalRooms = 0;
+
+        for (int quantity : roomQuantities) {
+            totalRooms += quantity;
+        }
+
+        rooms = new Room[totalRooms];
+        byte roomIndex = 0;
+
+        for (byte type = 0; type < roomQuantities.length; type++) {
+            for (byte i = 0; i < roomQuantities[type]; i++) {
+                rooms[roomIndex] = new Room(roomIndex, type, i, config.getNumArea(), config.getRoomMinXu()[type], config.getRoomMaxXu()[type], config.getRoomMinMap()[type], config.getRoomMaxMap()[type]);
+                roomIndex++;
+            }
+        }
     }
 
     private void initRankings() {

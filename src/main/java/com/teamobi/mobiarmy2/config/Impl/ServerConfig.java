@@ -28,6 +28,8 @@ public class ServerConfig implements IServerConfig {
     private byte[] roomQuantity;
     private int[] roomMaxXu;
     private int[] roomMinXu;
+    private byte[] roomMaxMap;
+    private byte[] roomMinMap;
     private byte[] mapIdBoss;
     private byte numArea;
     private byte maxPlayerFight;
@@ -83,6 +85,8 @@ public class ServerConfig implements IServerConfig {
             roomQuantity = GsonUtil.GSON.fromJson(configMap.getProperty("room_quantity", "[]"), byte[].class);
             roomMaxXu = GsonUtil.GSON.fromJson(configMap.getProperty("room_max_xu", "[]"), int[].class);
             roomMinXu = GsonUtil.GSON.fromJson(configMap.getProperty("room_min_xu", "[]"), int[].class);
+            roomMaxMap = GsonUtil.GSON.fromJson(configMap.getProperty("room_max_map", "[]"), byte[].class);
+            roomMinMap = GsonUtil.GSON.fromJson(configMap.getProperty("room_min_map", "[]"), byte[].class);
 
             numArea = Byte.parseByte(configMap.getProperty("num_area", "20"));
             maxPlayerFight = Byte.parseByte(configMap.getProperty("max_player_fight", "8"));
@@ -116,148 +120,212 @@ public class ServerConfig implements IServerConfig {
     }
 
     private void validateConfigProperties() {
+        int totalRoomTypes = roomNameVi.length;
+        if (roomNameEn.length != totalRoomTypes ||
+                roomQuantity.length != totalRoomTypes ||
+                roomMaxXu.length != totalRoomTypes ||
+                roomMinXu.length != totalRoomTypes ||
+                roomMinMap.length != totalRoomTypes ||
+                roomMaxMap.length != totalRoomTypes
+        ) {
+            System.out.println("room_name_vi, room_name_en, room_quantity, room_max_xu, room_min_xu, room_max_map, room_min_map must have the same length");
+            System.out.println("room_name_vi: " + roomNameVi.length);
+            System.out.println("room_name_en:" + roomNameEn.length);
+            System.out.println("room_quantity:" + roomQuantity.length);
+            System.out.println("room_max_xu:" + roomMaxXu.length);
+            System.out.println("room_min_xu:" + roomMinXu.length);
+            System.out.println("room_max_map:" + roomMinMap.length);
+            System.out.println("room_min_map:" + roomMaxMap.length);
+            System.exit(1);
+        }
     }
 
+    @Override
     public boolean isDebug() {
         return debug;
     }
 
+    @Override
     public short getPort() {
         return port;
     }
 
+    @Override
     public byte getEquipVersion2() {
         return equipVersion2;
     }
 
+    @Override
     public byte getIconVersion2() {
         return iconVersion2;
     }
 
+    @Override
     public byte getLevelCVersion2() {
         return levelCVersion2;
     }
 
+    @Override
     public byte getValuesVersion2() {
         return valuesVersion2;
     }
 
+    @Override
     public byte getPlayerVersion2() {
         return playerVersion2;
     }
 
+    @Override
     public String[] getRoomNameVi() {
         return roomNameVi;
     }
 
+    @Override
     public String[] getRoomNameEn() {
         return roomNameEn;
     }
 
+    @Override
     public String[] getRoomBossName() {
         return roomBossName;
     }
 
+    @Override
     public byte[] getRoomQuantity() {
         return roomQuantity;
     }
 
+    @Override
     public int[] getRoomMaxXu() {
         return roomMaxXu;
     }
 
+    @Override
     public int[] getRoomMinXu() {
         return roomMinXu;
     }
 
+    @Override
+    public byte[] getRoomMaxMap() {
+        return roomMaxMap;
+    }
+
+    @Override
+    public byte[] getRoomMinMap() {
+        return roomMinMap;
+    }
+
+    @Override
     public byte[] getMapIdBoss() {
         return mapIdBoss;
     }
 
+    @Override
     public byte getNumArea() {
         return numArea;
     }
 
+    @Override
     public byte getMaxPlayerFight() {
         return maxPlayerFight;
     }
 
+    @Override
     public byte getMaxElementFight() {
         return maxElementFight;
     }
 
+    @Override
     public byte getNumPlayer() {
         return numPlayer;
     }
 
+    @Override
     public byte getNumPlayerInitRoom() {
         return numPlayerInitRoom;
     }
 
+    @Override
     public byte getStartMapBoss() {
         return startMapBoss;
     }
 
+    @Override
     public byte getNumMapBoss() {
         return numMapBoss;
     }
 
+    @Override
     public byte getInitMapId() {
         return initMapId;
     }
 
+    @Override
     public byte getInitMapBoss() {
         return initMapBoss;
     }
 
+    @Override
     public String getAddInfo() {
         return addInfo;
     }
 
+    @Override
     public String getAddInfoUrl() {
         return addInfoUrl;
     }
 
+    @Override
     public String getRegTeamUrl() {
         return regTeamUrl;
     }
 
+    @Override
     public String getDownloadTitle() {
         return downloadTitle;
     }
 
+    @Override
     public String getDownloadInfo() {
         return downloadInfo;
     }
 
+    @Override
     public String getDownloadUrl() {
         return downloadUrl;
     }
 
+    @Override
     public int getMaxClients() {
         return maxClients;
     }
 
+    @Override
     public byte getMaxRuongTrangBi() {
         return maxRuongTrangBi;
     }
 
+    @Override
     public byte getMaxRuongItem() {
         return maxRuongItem;
     }
 
+    @Override
     public byte getMaxItem() {
         return maxItem;
     }
 
+    @Override
     public byte getMaxFriends() {
         return maxFriends;
     }
 
+    @Override
     public String getMessageLogin() {
         return messageLogin;
     }
 
+    @Override
     public String[] getMessage() {
         return message;
     }

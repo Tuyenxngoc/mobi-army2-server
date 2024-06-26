@@ -28,6 +28,10 @@ public interface IServerConfig {
 
     int[] getRoomMinXu();
 
+    byte[] getRoomMaxMap();
+
+    byte[] getRoomMinMap();
+
     byte[] getMapIdBoss();
 
     byte getNumArea();
