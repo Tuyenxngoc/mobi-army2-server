@@ -111,13 +111,22 @@ public class ServerManager {
             server = new ServerSocket(config.getPort());
             log.logMessage("Server start at port: " + config.getPort());
             while (isStart) {
-                try {
-                    Socket socket = server.accept();
-                    ISession session = new Session(++countClients, socket);
-                    users.add(session);
-                    log.logMessage("Accept socket client " + countClients + " done!");
-                } catch (Exception e) {
-                    //Empty catch block
+                if (users.size() < config.getMaxClients()) {
+                    try {
+                        Socket socket = server.accept();
+                        ISession session = new Session(++countClients, socket);
+                        users.add(session);
+                        log.logMessage("Accept socket client " + countClients + " done!");
+                    } catch (Exception e) {
+                        //Empty catch block
+                    }
+                } else {
+                    try {
+                        log.logMessage("Maximum number of players reached. Waiting for a slot to be free.");
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         } catch (IOException e) {
