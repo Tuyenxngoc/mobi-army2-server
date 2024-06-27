@@ -1559,7 +1559,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void datMatKhau(Message ms) {
+    public void handleSetPasswordFightWait(Message ms) {
         try {
             String password = ms.reader().readUTF().trim();
             if (password.isEmpty() || password.length() > 10) {
@@ -1572,14 +1572,13 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void datCuoc(Message ms) {
+    public void handleSetMoneyFightWait(Message ms) {
         try {
             int xu = ms.reader().readInt();
             if (xu < 0) {
                 return;
             }
             user.getFightWait().setMoney(xu, user.getPlayerId());
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1761,7 +1760,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void datTenKhuVUc(Message ms) {
+    public void handleSetFightWaitName(Message ms) {
         try {
             String name = ms.reader().readUTF().trim();
             user.getFightWait().setRoomName(user.getPlayerId(), name);
@@ -1771,7 +1770,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void datSoNguoi(Message ms) {
+    public void handleSetMaxPlayerFightWait(Message ms) {
         try {
             byte maxPlayers = ms.reader().readByte();
             user.getFightWait().setMaxPlayers(user.getPlayerId(), maxPlayers);
@@ -1781,8 +1780,23 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void mangItem(Message ms) {
+    public void handleChoseItemFight(Message ms) {
+        DataInputStream dis = ms.reader();
+        byte[] items = new byte[8];
 
+        try {
+            for (int i = 0; i < items.length; i++) {
+                byte index = dis.readByte();
+                if (user.getItemFightQuantity(index) > 0) {
+                    items[i] = index;
+                } else {
+                    items[i] = -1;
+                }
+            }
+            user.getFightWait().setItems(user, items);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -1821,8 +1835,11 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void doiPhe(Message ms) {
-
+    public void handleChangeTeam(Message ms) {
+        if (user.getState() != UserState.WAIT_FIGHT) {
+            return;
+        }
+        user.getFightWait().changeTeam(user);
     }
 
     @Override

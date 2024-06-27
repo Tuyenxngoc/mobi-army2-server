@@ -66,9 +66,9 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.IMBUE -> userService.hopNgoc(ms);
 
-                case Cmd.SET_PASS -> userService.datMatKhau(ms);
+                case Cmd.SET_PASS -> userService.handleSetPasswordFightWait(ms);
 
-                case Cmd.SET_MONEY -> userService.datCuoc(ms);
+                case Cmd.SET_MONEY -> userService.handleSetMoneyFightWait(ms);
 
                 case Cmd.START_ARMY -> userService.batDau();
 
@@ -98,17 +98,17 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.UPDATE_XY -> userService.capNhatXY(ms);
 
-                case Cmd.SET_BOARD_NAME -> userService.datTenKhuVUc(ms);
+                case Cmd.SET_BOARD_NAME -> userService.handleSetFightWaitName(ms);
 
-                case Cmd.SET_MAX_PLAYER -> userService.datSoNguoi(ms);
+                case Cmd.SET_MAX_PLAYER -> userService.handleSetMaxPlayerFightWait(ms);
 
                 case Cmd.SET_PROVIDER -> userService.getProvider(ms);
 
-                case Cmd.CHOOSE_ITEM -> userService.mangItem(ms);
+                case Cmd.CHOOSE_ITEM -> userService.handleChoseItemFight(ms);
 
                 case Cmd.CHOOSE_GUN -> userService.handleChoseCharacter(ms);
 
-                case Cmd.CHANGE_TEAM -> userService.doiPhe(ms);
+                case Cmd.CHANGE_TEAM -> userService.handleChangeTeam(ms);
 
                 case Cmd.BUY_ITEM -> userService.handlePurchaseItem(ms);
 

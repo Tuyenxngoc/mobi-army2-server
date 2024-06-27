@@ -62,9 +62,9 @@ public interface IUserService {
 
     void hopNgoc(Message ms);
 
-    void datMatKhau(Message ms);
+    void handleSetPasswordFightWait(Message ms);
 
-    void datCuoc(Message ms);
+    void handleSetMoneyFightWait(Message ms);
 
     void batDau();
 
@@ -92,15 +92,15 @@ public interface IUserService {
 
     void capNhatXY(Message ms);
 
-    void datTenKhuVUc(Message ms);
+    void handleSetFightWaitName(Message ms);
 
-    void datSoNguoi(Message ms);
+    void handleSetMaxPlayerFightWait(Message ms);
 
-    void mangItem(Message ms);
+    void handleChoseItemFight(Message ms);
 
     void handleChoseCharacter(Message ms);
 
-    void doiPhe(Message ms);
+    void handleChangeTeam(Message ms);
 
     void handlePurchaseItem(Message ms);
 

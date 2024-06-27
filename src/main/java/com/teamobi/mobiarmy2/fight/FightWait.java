@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.fight;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
+import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.model.MapData;
 import com.teamobi.mobiarmy2.model.Room;
 import com.teamobi.mobiarmy2.model.User;
@@ -37,7 +38,6 @@ public class FightWait {
     public String password;
     public int money;
     public String name;
-    public byte type;
     public byte iconType;
     public byte mapId;
     public int bossIndex;
@@ -46,9 +46,8 @@ public class FightWait {
     public boolean isContinuous;
     public byte continuousLevel;
 
-    public FightWait(Room parentRoom, byte type, byte id, byte maxPlayers, byte maxInitialPlayers, byte mapId, byte iconType, boolean isContinuous, boolean isSieuBoss) {
+    public FightWait(Room parentRoom, byte id, byte maxPlayers, byte maxInitialPlayers, byte mapId, byte iconType, boolean isContinuous, boolean isSieuBoss) {
         this.parentRoom = parentRoom;
-        this.type = type;
         this.id = id;
         this.maxPlayer = maxPlayers;
         this.maxInitialPlayers = maxInitialPlayers;
@@ -80,7 +79,7 @@ public class FightWait {
     }
 
     public void enterFireOval(User us) throws IOException {
-        if (type == 6 && us.getClanId() == 0) {
+        if (parentRoom.getType() == 6 && us.getClanId() == 0) {
             us.getUserService().sendServerMessage(GameString.notClan());
             return;
         }
@@ -111,6 +110,7 @@ public class FightWait {
                 return;
             }
             us.setFightWait(this);
+            us.setState(UserState.WAIT_FIGHT);
             if (numPlayers == 0) {
                 changeBoss(bestLocation);
             }
@@ -226,35 +226,34 @@ public class FightWait {
         if (getRoomOwner().getPlayerId() != playerId) {
             return;
         }
+
         //Set new password
         isPassSet = true;
         this.password = password;
     }
 
-    public void setMoney(int xu, int playerId) {
+    public synchronized void setMoney(int newMoney, int playerId) {
         if (started) {
             return;
         }
         if (getRoomOwner().getPlayerId() != playerId) {
             return;
         }
-        if (xu < parentRoom.minXu || xu > parentRoom.maxXu) {
+        if (newMoney < parentRoom.minXu || newMoney > parentRoom.maxXu) {
             getRoomOwner().getUserService().sendServerMessage(GameString.datCuocError1(parentRoom.minXu, parentRoom.maxXu));
             return;
         }
-        if (getRoomOwner().getXu() < xu) {
+        if (getRoomOwner().getXu() < newMoney) {
             getRoomOwner().getUserService().sendServerMessage(GameString.xuNotEnought());
             return;
         }
-        // Reset ready
         resetReadies();
-        // Set new money
-        money = xu;
+        money = newMoney;
         try {
-            Message ms = new Message(19);
+            Message ms = new Message(Cmd.SET_MONEY);
             DataOutputStream ds = ms.writer();
             ds.writeShort(0);
-            ds.writeInt(xu);
+            ds.writeInt(newMoney);
             ds.flush();
             sendToTeam(ms);
         } catch (IOException e) {
@@ -537,5 +536,47 @@ public class FightWait {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void changeTeam(User user) {
+        if (started) {
+            return;
+        }
+        int index = getUserIndexByPlayerId(user.getPlayerId());
+        if (index == -1) {
+            return;
+        }
+        int i = (index % 2 == 0) ? 1 : 0;
+        for (; i < users.length; i += 2) {
+            if (users[i] == null) {
+                users[i] = user;
+                users[index] = null;
+                if (bossIndex == index) {
+                    bossIndex = i;
+                }
+                break;
+            }
+        }
+        try {
+            Message ms = new Message(Cmd.CHANGE_TEAM);
+            DataOutputStream ds = ms.writer();
+            ds.writeInt(user.getPlayerId());
+            ds.writeByte(i);
+            ds.flush();
+            sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setItems(User user, byte[] newItems) {
+        if (started) {
+            return;
+        }
+        int index = getUserIndexByPlayerId(user.getPlayerId());
+        if (index == -1) {
+            return;
+        }
+        items[index] = newItems;
     }
 }

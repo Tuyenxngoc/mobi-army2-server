@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -110,8 +111,14 @@ public class ServerManager {
         byte roomIndex = 0;
 
         for (byte type = 0; type < roomQuantities.length; type++) {
-            for (byte i = 0; i < roomQuantities[type]; i++) {
-                rooms[roomIndex] = new Room(roomIndex, type, i, config.getNumArea(), config.getRoomMinXu()[type], config.getRoomMaxXu()[type], config.getRoomMinMap()[type], config.getRoomMaxMap()[type], config.getInitMapId());
+            for (byte roomCount = 0; roomCount < roomQuantities[type]; roomCount++) {
+                rooms[roomIndex] = new Room(roomIndex, type, roomCount,
+                        config.getNumArea(),
+                        config.getRoomMinXu()[type],
+                        config.getRoomMaxXu()[type],
+                        config.getRoomMinMap()[type],
+                        config.getRoomMaxMap()[type],
+                        config.getInitMapId());
                 roomIndex++;
             }
         }
@@ -192,6 +199,6 @@ public class ServerManager {
     }
 
     public List<User> findWaitPlayers(int excludedPlayerId) {
-        return null;
+        return Collections.emptyList();
     }
 }

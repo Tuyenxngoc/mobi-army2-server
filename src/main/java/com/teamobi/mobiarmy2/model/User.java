@@ -224,14 +224,14 @@ public class User {
     }
 
     public synchronized void updateItems(byte itemIndex, int quantity) {
-        this.items[itemIndex] += quantity;
-        if (this.items[itemIndex] < 0) {
-            this.items[itemIndex] = 0;
+        items[itemIndex] += quantity;
+        if (items[itemIndex] < 0) {
+            items[itemIndex] = 0;
         }
-        if (this.items[itemIndex] > ServerManager.getInstance().config().getMaxItem()) {
-            this.items[itemIndex] = ServerManager.getInstance().config().getMaxItem();
+        if (items[itemIndex] > ServerManager.getInstance().config().getMaxItem()) {
+            items[itemIndex] = ServerManager.getInstance().config().getMaxItem();
         }
-        this.items[0] = this.items[1] = 99;
+        items[0] = items[1] = 99;
     }
 
     public synchronized void addEquipment(EquipmentChestEntry addEquipment) {
@@ -452,5 +452,12 @@ public class User {
                         equip.getRemainingDays() > 0)
                 .findFirst()
                 .orElse(null);
+    }
+
+    public byte getItemFightQuantity(byte index) {
+        if (index >= 0 && index < items.length) {
+            return items[index];
+        }
+        return 0;
     }
 }
