@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.server;
+package com.teamobi.mobiarmy2.model;
 
 import com.teamobi.mobiarmy2.fight.FightWait;
 import lombok.Getter;

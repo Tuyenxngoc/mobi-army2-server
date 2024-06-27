@@ -5,7 +5,7 @@ import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.model.MapData;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.Impl.Message;
-import com.teamobi.mobiarmy2.server.Room;
+import com.teamobi.mobiarmy2.model.Room;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import lombok.Getter;
 
