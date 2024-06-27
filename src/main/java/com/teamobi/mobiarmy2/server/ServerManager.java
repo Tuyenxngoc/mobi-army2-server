@@ -111,22 +111,21 @@ public class ServerManager {
         byte index = 0;
 
         for (byte type = 0; type < roomQuantities.length; type++) {
+            int minXu = config.getRoomMinXu()[type];
+            int maxXu = config.getRoomMaxXu()[type];
+            byte minMap = config.getRoomMinMap()[type];
+            byte maxMap = config.getRoomMaxMap()[type];
+            byte numArea = config.getNumArea();
+            byte maxPlayerFight = config.getMaxPlayerFight();
+            byte numPlayerInitRoom = config.getNumPlayerInitRoom();
+            byte roomIconType = config.getRoomIconType();
+
             for (byte roomCount = 0; roomCount < roomQuantities[type]; roomCount++) {
-
-                int minXu = config.getRoomMinXu()[type];
-                int maxXu = config.getRoomMaxXu()[type];
-                byte minMap = config.getRoomMinMap()[type];
-                byte maxMap = config.getRoomMaxMap()[type];
-                byte numArea = config.getNumArea();
-                byte maxPlayerFight = config.getMaxPlayerFight();
-                byte numPlayerInitRoom = config.getNumPlayerInitRoom();
-                byte roomIconType = config.getRoomIconType();
-
                 byte[] mapCanSelected = null;
                 boolean isContinuous = false;
                 boolean isSelectable = false;
                 if (type == 5) {
-                    mapCanSelected = config.getBossRoomMapLimit()[type];
+                    mapCanSelected = config.getBossRoomMapLimit()[roomCount];
                     if (roomCount == 8) {
                         isSelectable = true;
                     } else if (roomCount == 9) {
@@ -134,8 +133,7 @@ public class ServerManager {
                     }
                 }
 
-                rooms[index] = new Room(index, type, minXu, maxXu, minMap, maxMap,
-                        mapCanSelected, isContinuous, isSelectable, numArea, maxPlayerFight, numPlayerInitRoom, roomIconType);
+                rooms[index] = new Room(index, type, minXu, maxXu, minMap, maxMap, mapCanSelected, isContinuous, isSelectable, numArea, maxPlayerFight, numPlayerInitRoom, roomIconType);
                 index++;
             }
         }

@@ -15,15 +15,14 @@ public class Room {
     private final byte minMap;
     private final byte maxMap;
     private final byte[] mapCanSelected;
-    boolean isContinuous;
-    boolean isSelectable;
-    byte maxPlayerFight;
-    byte numPlayerInitRoom;
+    private final boolean isContinuous;
+    private final boolean isSelectable;
+    private final byte maxPlayerFight;
+    private final byte numPlayerInitRoom;
+    private final byte iconType;
     private final FightWait[] fightWaits;
 
-    public Room(byte index, byte type, int minXu, int maxXu, byte minMap,
-                byte maxMap, byte[] mapCanSelected, boolean isContinuous,
-                boolean isSelectable, byte numArea, byte maxPlayerFight, byte numPlayerInitRoom, byte iconType) {
+    public Room(byte index, byte type, int minXu, int maxXu, byte minMap, byte maxMap, byte[] mapCanSelected, boolean isContinuous, boolean isSelectable, byte numArea, byte maxPlayerFight, byte numPlayerInitRoom, byte iconType) {
         this.index = index;
         this.type = type;
         this.minXu = minXu;
@@ -35,10 +34,10 @@ public class Room {
         this.isSelectable = isSelectable;
         this.maxPlayerFight = maxPlayerFight;
         this.numPlayerInitRoom = numPlayerInitRoom;
+        this.iconType = iconType;
         this.fightWaits = new FightWait[numArea];
-
         for (byte i = 0; i < numArea; i++) {
-            fightWaits[i] = new FightWait(this, i, iconType);
+            fightWaits[i] = new FightWait(this, i);
         }
     }
 
@@ -76,4 +75,11 @@ public class Room {
         return fightWaits.length - startedFightsCount;
     }
 
+    public byte getMapId() {
+        if (type == 5) {
+            return mapCanSelected[0];
+        }
+
+        return minMap;
+    }
 }

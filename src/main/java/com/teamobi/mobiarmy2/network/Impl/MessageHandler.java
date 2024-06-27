@@ -56,7 +56,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.JOIN_BOARD -> userService.handleJoinArea(ms);
 
-                case Cmd.CHAT_TO_BOARD -> userService.nhanTinn(ms);
+                case Cmd.CHAT_TO_BOARD -> userService.handleChatMessage(ms);
 
                 case Cmd.KICK -> userService.handleKickPlayer(ms);
 

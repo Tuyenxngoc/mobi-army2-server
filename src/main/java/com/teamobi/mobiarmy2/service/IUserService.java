@@ -52,7 +52,7 @@ public interface IUserService {
 
     void handleJoinArea(Message ms);
 
-    void nhanTinn(Message ms);
+    void handleChatMessage(Message ms);
 
     void handleKickPlayer(Message ms);
 

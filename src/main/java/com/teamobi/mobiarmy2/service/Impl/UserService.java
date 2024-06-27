@@ -1228,7 +1228,7 @@ public class UserService implements IUserService {
                 ds.writeInt(fightWait.getMoney());
                 ds.writeBoolean(false);
                 ds.writeUTF(fightWait.getName());
-                ds.writeByte(fightWait.getIconType());
+                ds.writeByte(fightWait.getRoom().getIconType());
             }
             ds.flush();
             user.sendMessage(ms);
@@ -1267,7 +1267,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void nhanTinn(Message ms) {
+    public void handleChatMessage(Message ms) {
         try {
             String message = ms.reader().readUTF().trim();
             if (message.isEmpty() || message.length() > 100) {

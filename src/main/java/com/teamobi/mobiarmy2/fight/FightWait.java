@@ -20,35 +20,30 @@ import java.util.List;
  */
 @Getter
 public class FightWait {
-    private User[] users;
-    private boolean[] readies;
-    private FightManager fightManager;
+    private final FightManager fightManager;
     private final Room room;
     private final byte id;
-    private byte[][] items;
+    private final User[] users;
+    private final boolean[] readies;
+    private final byte[][] items;
     private boolean started;
-    private byte numReadyPlayers;
+    private byte numReady;
     private byte maxSetPlayers;
     private byte numPlayers;
     private boolean isPassSet;
     private String password;
     private int money;
     private String name;
-    private final byte iconType;
     private byte mapId;
     private byte bossIndex;
     private Thread bossKickThread;
     private long startTime;
     private byte continuousLevel;
 
-    public FightWait(Room room, byte id, byte iconType) {
+    public FightWait(Room room, byte id) {
         this.room = room;
         this.id = id;
-        this.iconType = iconType;
-        initFightWait();
-    }
 
-    private void initFightWait() {
         byte maxPlayers = room.getMaxPlayerFight();
 
         this.fightManager = new FightManager();
@@ -60,10 +55,10 @@ public class FightWait {
         this.password = "";
         this.isPassSet = false;
         this.started = false;
-        this.numReadyPlayers = 0;
+        this.numReady = 0;
         this.numPlayers = 0;
 
-        this.mapId = room.getMinMap();
+        this.mapId = room.getMapId();
         this.money = room.getMinXu();
 
         this.maxSetPlayers = room.getNumPlayerInitRoom();
@@ -263,7 +258,7 @@ public class FightWait {
     private void resetReadies() {
         Arrays.fill(readies, false);
         readies[bossIndex] = true;
-        numReadyPlayers = 0;
+        numReady = 0;
     }
 
     public void setReady(boolean ready, int playerId) {
@@ -282,9 +277,9 @@ public class FightWait {
         if (readies[index] != ready) {
             readies[index] = ready;
             if (ready) {
-                numReadyPlayers++;
+                numReady++;
             } else {
-                numReadyPlayers--;
+                numReady--;
             }
         }
         try {
@@ -431,11 +426,10 @@ public class FightWait {
         }
 
         //Kiểm tra phòng có người sẵn sàng không
-        if (numReadyPlayers == 0 && room.getType() != 5) {
+        if (numReady == 0 && room.getType() != 5) {
             roomOwner.getUserService().sendServerMessage(GameString.startGameError1());
             return;
         }
-
 
         started = true;
         fightManager.startGame();
