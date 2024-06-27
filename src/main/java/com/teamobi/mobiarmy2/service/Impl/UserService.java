@@ -1210,7 +1210,7 @@ public class UserService implements IUserService {
                 return;
             }
             Room room = rooms[roomNumber];
-            if (room.type == 6 && user.getClanId() == 0) {
+            if (room.getType() == 6 && user.getClanId() == 0) {
                 sendServerMessage(GameString.notClan());
                 return;
             }

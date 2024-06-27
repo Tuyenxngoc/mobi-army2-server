@@ -8,12 +8,12 @@ import lombok.Getter;
  */
 @Getter
 public class Room {
-    private byte index;
-    private byte type;
-    private int minXu;
-    private int maxXu;
-    private byte minMap;
-    private byte maxMap;
+    private final byte index;
+    private final byte type;
+    private final int minXu;
+    private final int maxXu;
+    private final byte minMap;
+    private final byte maxMap;
     private final byte[] mapCanSelected;
     boolean isContinuous;
     boolean isSelectable;
@@ -22,8 +22,8 @@ public class Room {
     private final FightWait[] fightWaits;
 
     public Room(byte index, byte type, int minXu, int maxXu, byte minMap,
-                byte maxMap, byte[] mapCanSelected, boolean isContinuous, boolean isSelectable, byte numArea,
-                byte maxPlayerFight, byte numPlayerInitRoom) {
+                byte maxMap, byte[] mapCanSelected, boolean isContinuous,
+                boolean isSelectable, byte numArea, byte maxPlayerFight, byte numPlayerInitRoom, byte iconType) {
         this.index = index;
         this.type = type;
         this.minXu = minXu;
@@ -36,8 +36,9 @@ public class Room {
         this.maxPlayerFight = maxPlayerFight;
         this.numPlayerInitRoom = numPlayerInitRoom;
         this.fightWaits = new FightWait[numArea];
+
         for (byte i = 0; i < numArea; i++) {
-            fightWaits[i] = new FightWait();
+            fightWaits[i] = new FightWait(this, i, iconType);
         }
     }
 

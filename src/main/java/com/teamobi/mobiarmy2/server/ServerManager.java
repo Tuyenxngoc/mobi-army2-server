@@ -120,6 +120,7 @@ public class ServerManager {
                 byte numArea = config.getNumArea();
                 byte maxPlayerFight = config.getMaxPlayerFight();
                 byte numPlayerInitRoom = config.getNumPlayerInitRoom();
+                byte roomIconType = config.getRoomIconType();
 
                 byte[] mapCanSelected = null;
                 boolean isContinuous = false;
@@ -134,7 +135,7 @@ public class ServerManager {
                 }
 
                 rooms[index] = new Room(index, type, minXu, maxXu, minMap, maxMap,
-                        mapCanSelected, isContinuous, isSelectable, numArea, maxPlayerFight, numPlayerInitRoom);
+                        mapCanSelected, isContinuous, isSelectable, numArea, maxPlayerFight, numPlayerInitRoom, roomIconType);
                 index++;
             }
         }
