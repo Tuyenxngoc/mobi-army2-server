@@ -111,7 +111,7 @@ public class ServerManager {
 
         for (byte type = 0; type < roomQuantities.length; type++) {
             for (byte i = 0; i < roomQuantities[type]; i++) {
-                rooms[roomIndex] = new Room(roomIndex, type, i, config.getNumArea(), config.getRoomMinXu()[type], config.getRoomMaxXu()[type], config.getRoomMinMap()[type], config.getRoomMaxMap()[type]);
+                rooms[roomIndex] = new Room(roomIndex, type, i, config.getNumArea(), config.getRoomMinXu()[type], config.getRoomMaxXu()[type], config.getRoomMinMap()[type], config.getRoomMaxMap()[type], config.getInitMapId());
                 roomIndex++;
             }
         }

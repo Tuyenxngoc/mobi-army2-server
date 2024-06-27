@@ -16,7 +16,7 @@ public class Room {
     public int maxMap;
     public final FightWait[] fightWaits;
 
-    public Room(byte id, byte type, byte i, byte maxFightWaits, int minXu, int maxXu, int minMap, int maxMap) {
+    public Room(byte id, byte type, byte i, byte maxFightWaits, int minXu, int maxXu, byte minMap, byte maxMap, byte initMapId) {
         this.id = id;
         this.type = type;
         this.fightWaits = new FightWait[maxFightWaits];
@@ -24,13 +24,10 @@ public class Room {
         this.maxXu = maxXu;
         this.minMap = minMap;
         this.maxMap = maxMap;
-        this.initFightWaits(type == 5 && i == 11, type == 5 && i == 12);
+        this.initFightWaits(i);
     }
 
-    private void initFightWaits(boolean lienHoan, boolean fe) {
-        for (byte i = 0; i < fightWaits.length; i++) {
-            fightWaits[i] = new FightWait(this, type, i, (byte) 8, (byte) 8, (byte) 1, (byte) 0, lienHoan, fe);
-        }
+    private void initFightWaits(byte i) {
     }
 
     public int getStatus() {

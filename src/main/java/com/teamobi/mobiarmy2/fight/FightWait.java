@@ -3,9 +3,9 @@ package com.teamobi.mobiarmy2.fight;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.model.MapData;
+import com.teamobi.mobiarmy2.model.Room;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.Impl.Message;
-import com.teamobi.mobiarmy2.model.Room;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import lombok.Getter;
 
@@ -26,7 +26,7 @@ public class FightWait {
     public FightManager fightManager;
     public final Room parentRoom;
     public final byte id;
-    public final int[][] items;
+    public final byte[][] items;
     public boolean started;
     public int numReadyPlayers;
     public int maxSetPlayers;
@@ -38,7 +38,7 @@ public class FightWait {
     public int money;
     public String name;
     public byte type;
-    public byte teaFree;
+    public byte iconType;
     public byte mapId;
     public int bossIndex;
     public Thread bossKickThread;
@@ -46,7 +46,7 @@ public class FightWait {
     public boolean isContinuous;
     public byte continuousLevel;
 
-    public FightWait(Room parentRoom, byte type, byte id, byte maxPlayers, byte maxInitialPlayers, byte mapId, byte teaFree, boolean isContinuous, boolean isSieuBoss) {
+    public FightWait(Room parentRoom, byte type, byte id, byte maxPlayers, byte maxInitialPlayers, byte mapId, byte iconType, boolean isContinuous, boolean isSieuBoss) {
         this.parentRoom = parentRoom;
         this.type = type;
         this.id = id;
@@ -57,9 +57,9 @@ public class FightWait {
         this.numReadyPlayers = 0;
         this.users = new User[maxPlayers];
         this.readies = new boolean[maxPlayers];
-        this.items = new int[maxPlayers][8];
-        this.teaFree = teaFree;
-        this.money = this.parentRoom.minXu;
+        this.items = new byte[maxPlayers][8];
+        this.iconType = iconType;
+        this.money = parentRoom.minXu;
         this.name = "";
         this.password = "";
         this.isContinuous = isContinuous;

@@ -28,7 +28,6 @@ import com.teamobi.mobiarmy2.model.entry.user.SpecialItemChestEntry;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.server.ClanManager;
 import com.teamobi.mobiarmy2.server.LeaderboardManager;
-import com.teamobi.mobiarmy2.model.Room;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.util.GsonUtil;
@@ -1229,7 +1228,7 @@ public class UserService implements IUserService {
                 ds.writeInt(fightWait.getMoney());
                 ds.writeBoolean(false);
                 ds.writeUTF(fightWait.getName());
-                ds.writeByte(fightWait.getTeaFree());
+                ds.writeByte(fightWait.getIconType());
             }
             ds.flush();
             user.sendMessage(ms);
