@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.config.Impl;
 
+import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.util.GsonUtil;
@@ -25,11 +26,13 @@ public class ServerConfig implements IServerConfig {
     private String[] roomNameVi;
     private String[] roomNameEn;
     private String[] bossRoomName;
+    private byte[][] bossRoomMapLimit;
     private byte[] roomQuantity;
     private int[] roomMaxXu;
     private int[] roomMinXu;
     private byte[] roomMaxMap;
     private byte[] roomMinMap;
+    private byte roomIconType;
     private byte[] bossRoomBossId;
     private byte numArea;
     private byte maxPlayerFight;
@@ -69,6 +72,7 @@ public class ServerConfig implements IServerConfig {
     }
 
     private void initializeConfigProperties() {
+        Gson gson = GsonUtil.GSON;
         try {
             debug = Boolean.parseBoolean(configMap.getProperty("debug", "false"));
             port = Short.parseShort(configMap.getProperty("port", "8122"));
@@ -79,18 +83,20 @@ public class ServerConfig implements IServerConfig {
             valuesVersion2 = Byte.parseByte(configMap.getProperty("values_version_2", "1"));
             playerVersion2 = Byte.parseByte(configMap.getProperty("player_version_2", "1"));
 
-            roomNameVi = GsonUtil.GSON.fromJson(configMap.getProperty("room_name_vi", "[]"), String[].class);
-            roomNameEn = GsonUtil.GSON.fromJson(configMap.getProperty("room_name_en", "[]"), String[].class);
-            roomQuantity = GsonUtil.GSON.fromJson(configMap.getProperty("room_quantity", "[]"), byte[].class);
+            roomNameVi = gson.fromJson(configMap.getProperty("room_name_vi", "[]"), String[].class);
+            roomNameEn = gson.fromJson(configMap.getProperty("room_name_en", "[]"), String[].class);
+            roomQuantity = gson.fromJson(configMap.getProperty("room_quantity", "[]"), byte[].class);
 
-            bossRoomName = GsonUtil.GSON.fromJson(configMap.getProperty("boss_room_name", "[]"), String[].class);
-            bossRoomBossId = GsonUtil.GSON.fromJson(configMap.getProperty("boss_room_boss_id", "[]"), byte[].class);
-            bossRoomMapId = GsonUtil.GSON.fromJson(configMap.getProperty("boss_room_map_id", "[]"), byte[].class);
+            bossRoomName = gson.fromJson(configMap.getProperty("boss_room_name", "[]"), String[].class);
+            bossRoomMapLimit = gson.fromJson(configMap.getProperty("boss_room_map_limit", "[]"), byte[][].class);
+            bossRoomBossId = gson.fromJson(configMap.getProperty("boss_room_boss_id", "[]"), byte[].class);
+            bossRoomMapId = gson.fromJson(configMap.getProperty("boss_room_map_id", "[]"), byte[].class);
 
-            roomMaxXu = GsonUtil.GSON.fromJson(configMap.getProperty("room_max_xu", "[]"), int[].class);
-            roomMinXu = GsonUtil.GSON.fromJson(configMap.getProperty("room_min_xu", "[]"), int[].class);
-            roomMaxMap = GsonUtil.GSON.fromJson(configMap.getProperty("room_max_map", "[]"), byte[].class);
-            roomMinMap = GsonUtil.GSON.fromJson(configMap.getProperty("room_min_map", "[]"), byte[].class);
+            roomMaxXu = gson.fromJson(configMap.getProperty("room_max_xu", "[]"), int[].class);
+            roomMinXu = gson.fromJson(configMap.getProperty("room_min_xu", "[]"), int[].class);
+            roomMaxMap = gson.fromJson(configMap.getProperty("room_max_map", "[]"), byte[].class);
+            roomMinMap = gson.fromJson(configMap.getProperty("room_min_map", "[]"), byte[].class);
+            roomIconType = gson.fromJson(configMap.getProperty("room_icon_type", "0"), byte.class);
 
             for (int i = 0; i < roomNameVi.length - 2; i++) {
                 startMapBoss += roomQuantity[i];
@@ -118,7 +124,7 @@ public class ServerConfig implements IServerConfig {
             maxFriends = Byte.parseByte(configMap.getProperty("max_friends", "10"));
 
             messageLogin = configMap.getProperty("message_login", "");
-            message = GsonUtil.GSON.fromJson(configMap.getProperty("message", "[]"), String[].class);
+            message = gson.fromJson(configMap.getProperty("message", "[]"), String[].class);
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
@@ -154,6 +160,14 @@ public class ServerConfig implements IServerConfig {
     @Override
     public boolean isDebug() {
         return debug;
+    }
+
+    public byte[][] getBossRoomMapLimit() {
+        return bossRoomMapLimit;
+    }
+
+    public byte getRoomIconType() {
+        return roomIconType;
     }
 
     @Override

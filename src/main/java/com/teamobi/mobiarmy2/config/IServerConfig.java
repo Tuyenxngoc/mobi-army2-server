@@ -2,6 +2,10 @@ package com.teamobi.mobiarmy2.config;
 
 public interface IServerConfig {
 
+    byte[][] getBossRoomMapLimit();
+
+    byte getRoomIconType();
+
     boolean isDebug();
 
     short getPort();

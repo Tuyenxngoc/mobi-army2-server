@@ -60,7 +60,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.KICK -> userService.handleKickPlayer(ms);
 
-                case Cmd.LEAVE_BOARD -> userService.roiKhuVuc(ms);
+                case Cmd.LEAVE_BOARD -> userService.handleLeaveBoard(ms);
 
                 case Cmd.READY -> userService.SanSang(ms);
 
@@ -70,7 +70,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.SET_MONEY -> userService.handleSetMoneyFightWait(ms);
 
-                case Cmd.START_ARMY -> userService.batDau();
+                case Cmd.START_ARMY -> userService.handleStartGame();
 
                 case Cmd.MOVE_ARMY -> userService.diChuyen(ms);
 

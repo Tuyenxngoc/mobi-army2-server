@@ -58,4 +58,8 @@ public class FightManager {
         }
         return -1;
     }
+
+    public void startGame() {
+
+    }
 }

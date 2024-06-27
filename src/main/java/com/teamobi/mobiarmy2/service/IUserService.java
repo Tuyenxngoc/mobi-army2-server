@@ -56,7 +56,7 @@ public interface IUserService {
 
     void handleKickPlayer(Message ms);
 
-    void roiKhuVuc(Message ms);
+    void handleLeaveBoard(Message ms);
 
     void SanSang(Message ms);
 
@@ -66,7 +66,7 @@ public interface IUserService {
 
     void handleSetMoneyFightWait(Message ms);
 
-    void batDau();
+    void handleStartGame();
 
     void diChuyen(Message ms);
 

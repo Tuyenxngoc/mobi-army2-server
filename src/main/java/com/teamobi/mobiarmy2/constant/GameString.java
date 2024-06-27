@@ -277,11 +277,11 @@ public class GameString {
     }
 
     public static String selectMapError1_3() {
-        return "Lỗi chọn map!";
+        return "Không thể chọn map.";
     }
 
-    public static String Wait_click() {
-        return "Vui lòng chờ sau: %s";
+    public static String waitClick(long time) {
+        return String.format("Vui lòng chờ sau: %s", time);
     }
 
     public static String reg_Error1() {

@@ -20,62 +20,33 @@ import java.util.List;
  */
 @Getter
 public class FightWait {
-    public static final byte[] CONTINUOUS_MAPS = new byte[]{30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
-
-    public final User[] users;
-    public final boolean[] readies;
-    public FightManager fightManager;
-    public final Room parentRoom;
-    public final byte id;
-    public final byte[][] items;
-    public boolean started;
-    public int numReadyPlayers;
-    public int maxSetPlayers;
-    public int maxInitialPlayers;
-    public int maxPlayer;
-    public int numPlayers;
-    public boolean isPassSet;
-    public String password;
-    public int money;
-    public String name;
-    public byte iconType;
-    public byte mapId;
-    public int bossIndex;
-    public Thread bossKickThread;
-    public long startTime;
-    public boolean isContinuous;
-    public byte continuousLevel;
-
-    public FightWait(Room parentRoom, byte id, byte maxPlayers, byte maxInitialPlayers, byte mapId, byte iconType, boolean isContinuous, boolean isSieuBoss) {
-        this.parentRoom = parentRoom;
-        this.id = id;
-        this.maxPlayer = maxPlayers;
-        this.maxInitialPlayers = maxInitialPlayers;
-        this.maxSetPlayers = maxInitialPlayers;
-        this.numPlayers = 0;
-        this.numReadyPlayers = 0;
-        this.users = new User[maxPlayers];
-        this.readies = new boolean[maxPlayers];
-        this.items = new byte[maxPlayers][8];
-        this.iconType = iconType;
-        this.money = parentRoom.minXu;
-        this.name = "";
-        this.password = "";
-        this.isContinuous = isContinuous;
-        this.continuousLevel = (byte) (isContinuous ? 0 : -1);
-        this.mapId = isContinuous ? CONTINUOUS_MAPS[continuousLevel] : mapId;
-        this.fightManager = new FightManager();
-        this.started = false;
-        this.bossIndex = -1;
-        this.startTime = 0L;
-    }
+    private User[] users;
+    private boolean[] readies;
+    private FightManager fightManager;
+    private Room parentRoom;
+    private byte id;
+    private byte[][] items;
+    private boolean started;
+    private byte numReadyPlayers;
+    private byte maxSetPlayers;
+    private byte numPlayers;
+    private boolean isPassSet;
+    private String password;
+    private int money;
+    private String name;
+    private byte iconType;
+    private byte mapId;
+    private byte bossIndex;
+    private Thread bossKickThread;
+    private long startTime;
+    private byte continuousLevel;
 
     private User getRoomOwner() {
         return users[bossIndex];
     }
 
     public boolean isFightWaitInvalid() {
-        return numPlayers == maxSetPlayers || started || (isContinuous && continuousLevel > 0);
+        return numPlayers == maxSetPlayers || started || (parentRoom.isContinuous() && continuousLevel > 0);
     }
 
     public void enterFireOval(User us) throws IOException {
@@ -83,7 +54,7 @@ public class FightWait {
             us.getUserService().sendServerMessage(GameString.notClan());
             return;
         }
-        if (started || (isContinuous && continuousLevel > 0)) {
+        if (started || (parentRoom.isContinuous() && continuousLevel > 0)) {
             us.getUserService().sendServerMessage(GameString.joinKVError0());
             return;
         }
@@ -99,7 +70,7 @@ public class FightWait {
         Message ms;
         DataOutputStream ds;
         synchronized (users) {
-            int bestLocation = -1;
+            byte bestLocation = -1;
             for (byte i = 0; i < users.length; i++) {
                 if (users[i] == null) {
                     bestLocation = i;
@@ -161,10 +132,10 @@ public class FightWait {
             // Update khu vuc
             ms = new Message(76);
             ds = ms.writer();
-            ds.writeByte(parentRoom.id);
+            ds.writeByte(parentRoom.getIndex());
             ds.writeByte(id);
             ds.writeUTF(name);
-            ds.writeByte(parentRoom.type);
+            ds.writeByte(parentRoom.getType());
             ds.flush();
             us.sendMessage(ms);
 
@@ -177,7 +148,7 @@ public class FightWait {
         }
     }
 
-    private void changeBoss(int index) {
+    private void changeBoss(byte index) {
         bossIndex = index;
         if (bossKickThread != null) {
             bossKickThread.interrupt();
@@ -239,8 +210,8 @@ public class FightWait {
         if (getRoomOwner().getPlayerId() != playerId) {
             return;
         }
-        if (newMoney < parentRoom.minXu || newMoney > parentRoom.maxXu) {
-            getRoomOwner().getUserService().sendServerMessage(GameString.datCuocError1(parentRoom.minXu, parentRoom.maxXu));
+        if (newMoney < parentRoom.getMinXu() || newMoney > parentRoom.getMaxXu()) {
+            getRoomOwner().getUserService().sendServerMessage(GameString.datCuocError1(parentRoom.getMinXu(), parentRoom.getMaxXu()));
             return;
         }
         if (getRoomOwner().getXu() < newMoney) {
@@ -335,7 +306,7 @@ public class FightWait {
         leaveTeam(targetPlayerId);
     }
 
-    private void leaveTeam(int targetPlayerId) {
+    public void leaveTeam(int targetPlayerId) {
         if (started) {
             fightManager.leaveFight(targetPlayerId);
         }
@@ -384,7 +355,7 @@ public class FightWait {
     }
 
     private void refreshFightWait() {
-        money = parentRoom.minXu;
+        money = parentRoom.getMinXu();
         name = "";
         password = "";
         isPassSet = false;
@@ -413,12 +384,33 @@ public class FightWait {
     }
 
     public void startGame(int playerId) {
-
-        if (started || getRoomOwner().getPlayerId() != playerId) {
+        if (started) {
             return;
         }
+        User roomOwner = getRoomOwner();
+        if (roomOwner.getPlayerId() != playerId) {
+            return;
+        }
+
+        if (startTime > 0) {
+            roomOwner.getUserService().sendServerMessage(GameString.waitClick(startTime));
+            return;
+        }
+
+        //Kiểm tra đấu đội
+        if (parentRoom.getType() == 6) {
+
+        }
+
+        //Kiểm tra phòng có người sẵn sàng không
+        if (numReadyPlayers == 0 && parentRoom.getType() != 5) {
+            roomOwner.getUserService().sendServerMessage(GameString.startGameError1());
+            return;
+        }
+
+
         started = true;
-        //fightManager.startGame();
+        fightManager.startGame();
     }
 
     public void setRoomName(int playerId, String name) {
@@ -447,11 +439,12 @@ public class FightWait {
         if (started) {
             return;
         }
-        if (getRoomOwner().getPlayerId() != playerId) {
+        User roomOwner = getRoomOwner();
+        if (roomOwner.getPlayerId() != playerId) {
             return;
         }
-        if (isContinuous) {
-            getRoomOwner().getUserService().sendServerMessage(GameString.selectMapError1_3());
+        if (parentRoom.isContinuous()) {
+            roomOwner.getUserService().sendServerMessage(GameString.selectMapError1_3());
             return;
         }
         for (User user : users) {
@@ -528,9 +521,9 @@ public class FightWait {
             DataOutputStream ds = ms.writer();
             ds.writeBoolean(false);
             ds.writeUTF(GameString.inviteMessage(user.getUsername()));
-            ds.writeByte(this.parentRoom.id);
-            ds.writeByte(this.id);
-            ds.writeUTF(this.password);
+            ds.writeByte(parentRoom.getIndex());
+            ds.writeByte(id);
+            ds.writeUTF(password);
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
@@ -546,7 +539,7 @@ public class FightWait {
         if (index == -1) {
             return;
         }
-        int i = (index % 2 == 0) ? 1 : 0;
+        byte i = (byte) ((index % 2 == 0) ? 1 : 0);
         for (; i < users.length; i += 2) {
             if (users[i] == null) {
                 users[i] = user;

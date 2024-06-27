@@ -108,18 +108,34 @@ public class ServerManager {
         }
 
         rooms = new Room[totalRooms];
-        byte roomIndex = 0;
+        byte index = 0;
 
         for (byte type = 0; type < roomQuantities.length; type++) {
             for (byte roomCount = 0; roomCount < roomQuantities[type]; roomCount++) {
-                rooms[roomIndex] = new Room(roomIndex, type, roomCount,
-                        config.getNumArea(),
-                        config.getRoomMinXu()[type],
-                        config.getRoomMaxXu()[type],
-                        config.getRoomMinMap()[type],
-                        config.getRoomMaxMap()[type],
-                        config.getInitMapId());
-                roomIndex++;
+
+                int minXu = config.getRoomMinXu()[type];
+                int maxXu = config.getRoomMaxXu()[type];
+                byte minMap = config.getRoomMinMap()[type];
+                byte maxMap = config.getRoomMaxMap()[type];
+                byte numArea = config.getNumArea();
+                byte maxPlayerFight = config.getMaxPlayerFight();
+                byte numPlayerInitRoom = config.getNumPlayerInitRoom();
+
+                byte[] mapCanSelected = null;
+                boolean isContinuous = false;
+                boolean isSelectable = false;
+                if (type == 5) {
+                    mapCanSelected = config.getBossRoomMapLimit()[type];
+                    if (roomCount == 8) {
+                        isSelectable = true;
+                    } else if (roomCount == 9) {
+                        isContinuous = true;
+                    }
+                }
+
+                rooms[index] = new Room(index, type, minXu, maxXu, minMap, maxMap,
+                        mapCanSelected, isContinuous, isSelectable, numArea, maxPlayerFight, numPlayerInitRoom);
+                index++;
             }
         }
     }

@@ -1186,7 +1186,7 @@ public class UserService implements IUserService {
             Message ms = new Message(Cmd.ROOM_LIST);
             DataOutputStream ds = ms.writer();
             for (Room room : server.getRooms()) {
-                ds.writeByte(room.getId());
+                ds.writeByte(room.getIndex());
                 ds.writeByte(room.getStatus());
                 ds.writeByte(room.getFightWaitsAvailable());
                 ds.writeByte(room.getType());
@@ -1290,8 +1290,12 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void roiKhuVuc(Message ms) {
-
+    public void handleLeaveBoard(Message ms) {
+        if (user.getState() == UserState.WAITING) {
+            return;
+        }
+        user.setState(UserState.WAITING);
+        user.getFightWait().leaveTeam(user.getPlayerId());
     }
 
     @Override
@@ -1585,7 +1589,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void batDau() {
+    public void handleStartGame() {
         if (user.getState() != UserState.WAIT_FIGHT) {
             return;
         }
