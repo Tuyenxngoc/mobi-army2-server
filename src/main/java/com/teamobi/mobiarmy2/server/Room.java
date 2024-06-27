@@ -28,8 +28,8 @@ public class Room {
     }
 
     private void initFightWaits(boolean lienHoan, boolean fe) {
-        for (int i = 0; i < fightWaits.length; i++) {
-            fightWaits[i] = new FightWait(this, (byte) (i + 1), (byte) (i + 1), (byte) 4, (byte) 2, (byte) 1, (byte) 0, lienHoan, fe);
+        for (byte i = 0; i < fightWaits.length; i++) {
+            fightWaits[i] = new FightWait(this, type, i, (byte) 8, (byte) 8, (byte) 1, (byte) 0, lienHoan, fe);
         }
     }
 

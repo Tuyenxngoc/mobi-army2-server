@@ -50,11 +50,11 @@ public interface IUserService {
 
     void handleEnteringRoom(Message ms);
 
-    void thamGiaKhuVuc(Message ms);
+    void handleJoinArea(Message ms);
 
     void nhanTinn(Message ms);
 
-    void duoiNguoiCHoi(Message ms);
+    void handleKickPlayer(Message ms);
 
     void roiKhuVuc(Message ms);
 

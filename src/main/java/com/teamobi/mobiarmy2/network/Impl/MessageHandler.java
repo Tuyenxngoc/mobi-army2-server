@@ -54,11 +54,11 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.BOARD_LIST -> userService.handleEnteringRoom(ms);
 
-                case Cmd.JOIN_BOARD -> userService.thamGiaKhuVuc(ms);
+                case Cmd.JOIN_BOARD -> userService.handleJoinArea(ms);
 
                 case Cmd.CHAT_TO_BOARD -> userService.nhanTinn(ms);
 
-                case Cmd.KICK -> userService.duoiNguoiCHoi(ms);
+                case Cmd.KICK -> userService.handleKickPlayer(ms);
 
                 case Cmd.LEAVE_BOARD -> userService.roiKhuVuc(ms);
 

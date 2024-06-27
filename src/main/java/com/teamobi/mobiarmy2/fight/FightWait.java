@@ -7,6 +7,7 @@ import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.server.Room;
 import com.teamobi.mobiarmy2.server.ServerManager;
+import lombok.Getter;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -16,62 +17,66 @@ import java.util.List;
 /**
  * @author tuyen
  */
+@Getter
 public class FightWait {
+    public static final byte[] CONTINUOUS_MAPS = new byte[]{30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
 
     public final User[] users;
     public final boolean[] readies;
-
     public FightManager fightManager;
-    public final Room parent;
+    public final Room parentRoom;
     public final byte id;
-    public final int[][] item;
+    public final int[][] items;
     public boolean started;
-    public int numReady;
-    public int maxSetPlayer;
-    public int maxPlayerInit;
+    public int numReadyPlayers;
+    public int maxSetPlayers;
+    public int maxInitialPlayers;
     public int maxPlayer;
-    public int numPlayer;
-    public boolean passSet;
-    public String pass;
+    public int numPlayers;
+    public boolean isPassSet;
+    public String password;
     public int money;
     public String name;
     public byte type;
     public byte teaFree;
     public byte mapId;
-    public int boss;
-    private Thread kickBoss;
-    protected long timeStart;
-    public boolean isLienHoan;
-    public byte ntLH;
-    public byte[] LHMap = new byte[]{30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
+    public int bossIndex;
+    public Thread bossKickThread;
+    public long startTime;
+    public boolean isContinuous;
+    public byte continuousLevel;
 
-    public FightWait(Room parent, byte type, byte id, byte maxPlayers, byte maxPlayerInit, byte mapId, byte teaFree, boolean isLienHoan, boolean isSieuBoss) {
-        this.parent = parent;
+    public FightWait(Room parentRoom, byte type, byte id, byte maxPlayers, byte maxInitialPlayers, byte mapId, byte teaFree, boolean isContinuous, boolean isSieuBoss) {
+        this.parentRoom = parentRoom;
+        this.type = type;
         this.id = id;
         this.maxPlayer = maxPlayers;
-        this.maxPlayerInit = maxPlayerInit;
-        this.maxSetPlayer = maxPlayerInit;
-        this.numPlayer = 0;
-        this.numReady = 0;
+        this.maxInitialPlayers = maxInitialPlayers;
+        this.maxSetPlayers = maxInitialPlayers;
+        this.numPlayers = 0;
+        this.numReadyPlayers = 0;
         this.users = new User[maxPlayers];
         this.readies = new boolean[maxPlayers];
-        this.item = new int[maxPlayers][8];
-        this.type = type;
+        this.items = new int[maxPlayers][8];
         this.teaFree = teaFree;
-        this.money = this.parent.minXu;
+        this.money = this.parentRoom.minXu;
         this.name = "";
-        this.pass = "";
-        this.isLienHoan = isLienHoan;
-        this.ntLH = (byte) (isLienHoan ? 0 : -1);
-        this.mapId = isLienHoan ? LHMap[ntLH] : mapId;
+        this.password = "";
+        this.isContinuous = isContinuous;
+        this.continuousLevel = (byte) (isContinuous ? 0 : -1);
+        this.mapId = isContinuous ? CONTINUOUS_MAPS[continuousLevel] : mapId;
         this.fightManager = new FightManager();
         this.started = false;
-        this.boss = -1;
-        this.timeStart = 0L;
+        this.bossIndex = -1;
+        this.startTime = 0L;
     }
 
     private User getRoomOwner() {
-        return users[boss];
+        return users[bossIndex];
+    }
+
+    public boolean isFightWaitInvalid() {
+        return numPlayers == maxSetPlayers || started || (isContinuous && continuousLevel > 0);
     }
 
     public void enterFireOval(User us) throws IOException {
@@ -79,7 +84,7 @@ public class FightWait {
             us.getUserService().sendServerMessage(GameString.notClan());
             return;
         }
-        if (started || (isLienHoan && ntLH > 0)) {
+        if (started || (isContinuous && continuousLevel > 0)) {
             us.getUserService().sendServerMessage(GameString.joinKVError0());
             return;
         }
@@ -87,7 +92,7 @@ public class FightWait {
             us.getUserService().sendServerMessage(GameString.joinKVError2());
             return;
         }
-        if (numPlayer >= maxSetPlayer) {
+        if (numPlayers >= maxSetPlayers) {
             us.getUserService().sendServerMessage(GameString.joinKVError3());
             return;
         }
@@ -106,7 +111,7 @@ public class FightWait {
                 return;
             }
             us.setFightWait(this);
-            if (numPlayer == 0) {
+            if (numPlayers == 0) {
                 changeBoss(bestLocation);
             }
             ms = new Message(Cmd.SOMEONE_JOINBOARD);
@@ -125,7 +130,7 @@ public class FightWait {
 
             users[bestLocation] = us;
             readies[bestLocation] = false;
-            numPlayer++;
+            numPlayers++;
 
             ms = new Message(Cmd.JOIN_BOARD);
             ds = ms.writer();
@@ -156,10 +161,10 @@ public class FightWait {
             // Update khu vuc
             ms = new Message(76);
             ds = ms.writer();
-            ds.writeByte(parent.id);
+            ds.writeByte(parentRoom.id);
             ds.writeByte(id);
             ds.writeUTF(name);
-            ds.writeByte(parent.type);
+            ds.writeByte(parentRoom.type);
             ds.flush();
             us.sendMessage(ms);
 
@@ -173,14 +178,14 @@ public class FightWait {
     }
 
     private void changeBoss(int index) {
-        boss = index;
-        if (kickBoss != null) {
-            kickBoss.interrupt();
+        bossIndex = index;
+        if (bossKickThread != null) {
+            bossKickThread.interrupt();
         }
-        kickBoss = new Thread(() -> {
+        bossKickThread = new Thread(() -> {
             try {
                 int second = 300;
-                while (!started && boss != -1) {
+                while (!started && bossIndex != -1) {
                     Thread.sleep(1000L);
                     second--;
                     if (second == 0) {
@@ -190,7 +195,7 @@ public class FightWait {
             } catch (Exception ignored) {
             }
         });
-        kickBoss.start();
+        bossKickThread.start();
     }
 
     public void sendToTeam(Message ms) {
@@ -222,8 +227,8 @@ public class FightWait {
             return;
         }
         //Set new password
-        passSet = true;
-        pass = password;
+        isPassSet = true;
+        this.password = password;
     }
 
     public void setMoney(int xu, int playerId) {
@@ -233,8 +238,8 @@ public class FightWait {
         if (getRoomOwner().getPlayerId() != playerId) {
             return;
         }
-        if (xu < parent.minXu || xu > parent.maxXu) {
-            getRoomOwner().getUserService().sendServerMessage(GameString.datCuocError1(parent.minXu, parent.maxXu));
+        if (xu < parentRoom.minXu || xu > parentRoom.maxXu) {
+            getRoomOwner().getUserService().sendServerMessage(GameString.datCuocError1(parentRoom.minXu, parentRoom.maxXu));
             return;
         }
         if (getRoomOwner().getXu() < xu) {
@@ -259,8 +264,8 @@ public class FightWait {
 
     private void resetReadies() {
         Arrays.fill(readies, false);
-        readies[boss] = true;
-        numReady = 0;
+        readies[bossIndex] = true;
+        numReadyPlayers = 0;
     }
 
     public void setReady(boolean ready, int playerId) {
@@ -279,9 +284,9 @@ public class FightWait {
         if (readies[index] != ready) {
             readies[index] = ready;
             if (ready) {
-                numReady++;
+                numReadyPlayers++;
             } else {
-                numReady--;
+                numReadyPlayers--;
             }
         }
         try {
@@ -336,7 +341,7 @@ public class FightWait {
             fightManager.leaveFight(targetPlayerId);
         }
         removeUser(targetPlayerId);
-        if (numPlayer == 0) {
+        if (numPlayers == 0) {
             return;
         }
         try {
@@ -356,11 +361,11 @@ public class FightWait {
             for (int i = 0; i < users.length; i++) {
                 if (users[i] != null && users[i].getPlayerId() == playerId) {
                     users[i] = null;
-                    numPlayer--;
-                    if (numPlayer == 0) {
+                    numPlayers--;
+                    if (numPlayers == 0) {
                         refreshFightWait();
                     } else {
-                        if (boss == i) {
+                        if (bossIndex == i) {
                             findNewBoss();
                         }
                     }
@@ -380,11 +385,11 @@ public class FightWait {
     }
 
     private void refreshFightWait() {
-        money = parent.minXu;
+        money = parentRoom.minXu;
         name = "";
-        pass = "";
-        passSet = false;
-        boss = -1;
+        password = "";
+        isPassSet = false;
+        bossIndex = -1;
     }
 
     public void chatMessage(int playerId, String message) {
@@ -434,8 +439,8 @@ public class FightWait {
         if (getRoomOwner().getPlayerId() != playerId) {
             return;
         }
-        if (maxPlayers > 0 && maxPlayers < 9 && maxPlayers % 2 == 0 && numPlayer < maxPlayers) {
-            maxSetPlayer = maxPlayers;
+        if (maxPlayers > 0 && maxPlayers < 9 && maxPlayers % 2 == 0 && numPlayers < maxPlayers) {
+            maxSetPlayers = maxPlayers;
         }
     }
 
@@ -446,7 +451,7 @@ public class FightWait {
         if (getRoomOwner().getPlayerId() != playerId) {
             return;
         }
-        if (isLienHoan) {
+        if (isContinuous) {
             getRoomOwner().getUserService().sendServerMessage(GameString.selectMapError1_3());
             return;
         }
@@ -524,9 +529,9 @@ public class FightWait {
             DataOutputStream ds = ms.writer();
             ds.writeBoolean(false);
             ds.writeUTF(GameString.inviteMessage(user.getUsername()));
-            ds.writeByte(this.parent.id);
+            ds.writeByte(this.parentRoom.id);
             ds.writeByte(this.id);
-            ds.writeUTF(this.pass);
+            ds.writeUTF(this.password);
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {

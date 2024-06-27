@@ -1204,9 +1204,13 @@ public class UserService implements IUserService {
         if (user.isNotWaiting()) {
             return;
         }
+        Room[] rooms = ServerManager.getInstance().getRooms();
         try {
             byte roomNumber = ms.reader().readByte();
-            Room room = ServerManager.getInstance().getRooms()[roomNumber];
+            if (roomNumber < 0 || roomNumber >= rooms.length) {
+                return;
+            }
+            Room room = rooms[roomNumber];
             if (room.type == 6 && user.getClanId() == 0) {
                 sendServerMessage(GameString.notClan());
                 return;
@@ -1214,29 +1218,18 @@ public class UserService implements IUserService {
             ms = new Message(Cmd.BOARD_LIST);
             DataOutputStream ds = ms.writer();
             ds.writeByte(roomNumber);
-            for (int i = 0; i < room.fightWaits.length; i++) {
-                FightWait fightWait = room.fightWaits[i];
-                synchronized (fightWait.users) {
-                    if (fightWait.numPlayer == fightWait.maxSetPlayer || fightWait.started || (fightWait.isLienHoan && fightWait.ntLH > 0)) {
-                        continue;
-                    }
-                    // So khu vuc
-                    ds.writeByte(i);
-                    // So nguoi trong khu vuc
-                    ds.writeByte(fightWait.numPlayer);
-                    // So nguoi toi da
-                    ds.writeByte(fightWait.maxSetPlayer);
-                    // Co mat khau or khong
-                    ds.writeBoolean(fightWait.passSet);
-                    // So tien
-                    ds.writeInt(fightWait.money);
-                    // Null boolean
-                    ds.writeBoolean(true);
-                    // Ten khu vuc
-                    ds.writeUTF(fightWait.name);
-                    // Kieu 0: Tea, 1: Free
-                    ds.writeByte(0);
+            for (FightWait fightWait : room.getFightWaits()) {
+                if (fightWait.isFightWaitInvalid()) {
+                    continue;
                 }
+                ds.writeByte(fightWait.getId());
+                ds.writeByte(fightWait.getNumPlayers());
+                ds.writeByte(fightWait.getMaxSetPlayers());
+                ds.writeBoolean(fightWait.isPassSet());
+                ds.writeInt(fightWait.getMoney());
+                ds.writeBoolean(false);
+                ds.writeUTF(fightWait.getName());
+                ds.writeByte(fightWait.getTeaFree());
             }
             ds.flush();
             user.sendMessage(ms);
@@ -1246,22 +1239,28 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void thamGiaKhuVuc(Message ms) {
+    public void handleJoinArea(Message ms) {
         if (user.isNotWaiting()) {
             return;
         }
+        Room[] rooms = ServerManager.getInstance().getRooms();
         try {
             DataInputStream dis = ms.reader();
-            byte soPhong = dis.readByte();
-            byte soKhuVuc = dis.readByte();
-            String password = dis.readUTF();
-            FightWait fightWait = ServerManager.getInstance().getRooms()[soPhong].fightWaits[soKhuVuc];
-
-            if (fightWait.passSet && !fightWait.pass.equals(password)) {
+            byte roomNumber = dis.readByte();
+            byte areaNumber = dis.readByte();
+            String password = dis.readUTF().trim();
+            if (roomNumber < 0 || roomNumber >= rooms.length) {
+                return;
+            }
+            FightWait[] fightWaits = rooms[roomNumber].getFightWaits();
+            if (areaNumber < 0 || areaNumber >= fightWaits.length) {
+                return;
+            }
+            FightWait fightWait = fightWaits[areaNumber];
+            if (fightWait.isPassSet() && !fightWait.getPassword().equals(password)) {
                 sendServerMessage(GameString.joinKVError1());
                 return;
             }
-
             fightWait.enterFireOval(user);
         } catch (IOException e) {
             e.printStackTrace();
@@ -1282,7 +1281,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void duoiNguoiCHoi(Message ms) {
+    public void handleKickPlayer(Message ms) {
         try {
             int playerId = ms.reader().readInt();
             user.getFightWait().kickPlayer(user.getPlayerId(), playerId);
