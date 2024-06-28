@@ -6,6 +6,8 @@ public interface IServerConfig {
 
     byte getRoomIconType();
 
+    byte getTrainingMapId();
+
     boolean isDebug();
 
     short getPort();
@@ -49,10 +51,6 @@ public interface IServerConfig {
     byte getNumPlayerInitRoom();
 
     byte getStartMapBoss();
-
-    byte getInitMapId();
-
-    byte getInitMapBoss();
 
     String getAddInfo();
 

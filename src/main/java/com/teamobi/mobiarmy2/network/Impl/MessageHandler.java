@@ -20,6 +20,8 @@ public class MessageHandler implements IMessageHandler {
     public void onMessage(Message ms) {
         try {
             switch (ms.getCommand()) {
+                case Cmd.MORE_GAME -> userService.getMoreGame();
+
                 case Cmd.GET_KEY -> userService.handleHandshakeMessage();
 
                 case Cmd.GET_MORE_DAY -> userService.extendItemDuration(ms);
@@ -38,7 +40,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.SHOP_BIETDOI -> userService.handlePurchaseClanItem(ms);
 
-                case Cmd.TRAINING_MAP -> userService.enterTrainingMap(ms);
+                case Cmd.TRAINING_MAP -> userService.enterTrainingMap();
 
                 case Cmd.SIGN_OUT -> userService.handleLogout(ms);
 

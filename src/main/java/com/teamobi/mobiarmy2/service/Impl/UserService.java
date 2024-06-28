@@ -544,7 +544,7 @@ public class UserService implements IUserService {
             // Thong tin them
             ds.writeUTF(config.getAddInfo());
             // Dia chi cua About me
-            ds.writeUTF(config.getDownloadInfo());
+            ds.writeUTF(config.getAddInfoUrl());
             // Dia chi dang ki doi
             ds.writeUTF(config.getRegTeamUrl());
             ds.flush();
@@ -943,7 +943,16 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void enterTrainingMap(Message ms) {
+    public void enterTrainingMap() {
+        try {
+            Message ms = new Message(Cmd.TRAINING_MAP);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(ServerManager.getInstance().config().getTrainingMapId());
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -2819,7 +2828,12 @@ public class UserService implements IUserService {
 
     @Override
     public void startTraining(Message ms) {
-
+        try {
+            byte type = ms.reader().readByte();
+            sendServerMessage("To be continued " + type);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -2876,5 +2890,21 @@ public class UserService implements IUserService {
 
     @Override
     public void ping(Message ms) {
+    }
+
+    @Override
+    public void getMoreGame() {
+        IServerConfig config = ServerManager.getInstance().config();
+        try {
+            Message ms = new Message(Cmd.MORE_GAME);
+            DataOutputStream ds = ms.writer();
+            ds.writeUTF(config.getDownloadTitle());
+            ds.writeUTF(config.getDownloadInfo());
+            ds.writeUTF(config.getDownloadUrl());
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

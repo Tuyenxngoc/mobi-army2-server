@@ -39,10 +39,9 @@ public class ServerConfig implements IServerConfig {
     private byte maxElementFight;
     private byte numPlayer;
     private byte numPlayerInitRoom;
+    private byte trainingMapId;
     private byte startMapBoss;
     private byte[] bossRoomMapId;
-    private byte initMapId;
-    private byte initMapBoss;
     private String addInfo;
     private String addInfoUrl;
     private String regTeamUrl;
@@ -107,8 +106,7 @@ public class ServerConfig implements IServerConfig {
             maxElementFight = Byte.parseByte(configMap.getProperty("max_element_fight", "100"));
             numPlayer = Byte.parseByte(configMap.getProperty("num_player", "12"));
             numPlayerInitRoom = Byte.parseByte(configMap.getProperty("num_player_init_room", "4"));
-            initMapId = Byte.parseByte(configMap.getProperty("init_map_id", "0"));
-            initMapBoss = Byte.parseByte(configMap.getProperty("init_map_boss", "30"));
+            trainingMapId = Byte.parseByte(configMap.getProperty("training_map_id", "0"));
 
             addInfo = configMap.getProperty("add_info", "ABOUT ME");
             addInfoUrl = configMap.getProperty("add_info_url", "http://localhost/about");
@@ -162,14 +160,6 @@ public class ServerConfig implements IServerConfig {
         return debug;
     }
 
-    public byte[][] getBossRoomMapLimit() {
-        return bossRoomMapLimit;
-    }
-
-    public byte getRoomIconType() {
-        return roomIconType;
-    }
-
     @Override
     public short getPort() {
         return port;
@@ -216,6 +206,11 @@ public class ServerConfig implements IServerConfig {
     }
 
     @Override
+    public byte[][] getBossRoomMapLimit() {
+        return bossRoomMapLimit;
+    }
+
+    @Override
     public byte[] getRoomQuantity() {
         return roomQuantity;
     }
@@ -238,6 +233,11 @@ public class ServerConfig implements IServerConfig {
     @Override
     public byte[] getRoomMinMap() {
         return roomMinMap;
+    }
+
+    @Override
+    public byte getRoomIconType() {
+        return roomIconType;
     }
 
     @Override
@@ -271,18 +271,18 @@ public class ServerConfig implements IServerConfig {
     }
 
     @Override
+    public byte getTrainingMapId() {
+        return trainingMapId;
+    }
+
+    @Override
     public byte getStartMapBoss() {
         return startMapBoss;
     }
 
     @Override
-    public byte getInitMapId() {
-        return initMapId;
-    }
-
-    @Override
-    public byte getInitMapBoss() {
-        return initMapBoss;
+    public byte[] getBossRoomMapId() {
+        return bossRoomMapId;
     }
 
     @Override
@@ -350,8 +350,4 @@ public class ServerConfig implements IServerConfig {
         return message;
     }
 
-    @Override
-    public byte[] getBossRoomMapId() {
-        return bossRoomMapId;
-    }
 }

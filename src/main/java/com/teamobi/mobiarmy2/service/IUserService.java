@@ -36,7 +36,7 @@ public interface IUserService {
 
     void handlePurchaseClanItem(Message ms);
 
-    void enterTrainingMap(Message ms);
+    void enterTrainingMap();
 
     void handleLogout(Message ms);
 
@@ -155,4 +155,6 @@ public interface IUserService {
     void sendUpdateXp(int xpUp, boolean updateLevel);
 
     void ping(Message ms);
+
+    void getMoreGame();
 }
