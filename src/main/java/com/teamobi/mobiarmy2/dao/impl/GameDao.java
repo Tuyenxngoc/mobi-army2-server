@@ -37,15 +37,11 @@ public class GameDao implements IGameDao {
                     map.setId(resultSet.getByte("map_id"));
                     map.setName(resultSet.getString("name"));
                     map.setFileName(resultSet.getString("file"));
-                    if (map.getId() == 27) {
-                        map.setData(new byte[0]);
-                    } else {
-                        byte[] dataMap = Utils.getFile("res/map/" + map.getFileName());
-                        if (dataMap == null) {
-                            System.exit(1);
-                        }
-                        map.setData(dataMap);
+                    byte[] dataMap = Utils.getFile("res/map/" + map.getFileName());
+                    if (dataMap == null) {
+                        System.exit(1);
                     }
+                    map.setData(dataMap);
                     map.setBg(resultSet.getShort("background"));
                     map.setMapAddY(resultSet.getShort("map_add_y"));
                     map.setBullEffShower(resultSet.getShort("bullet_effect_shower"));

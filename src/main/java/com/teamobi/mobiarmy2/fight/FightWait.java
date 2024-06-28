@@ -541,7 +541,16 @@ public class FightWait {
 
         mapId = mapIdSet;
         if (mapId == 27) {
-            mapId = MapData.randomMap(27);
+            byte mapRandom = MapData.randomMap(27);
+            try {
+                Message ms = new Message(Cmd.TRAINING_MAP);
+                DataOutputStream ds = ms.writer();
+                ds.writeByte(mapRandom);
+                ds.flush();
+                sendToTeam(ms);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         resetReadies();

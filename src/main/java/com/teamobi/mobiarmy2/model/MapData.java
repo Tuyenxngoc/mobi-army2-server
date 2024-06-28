@@ -18,7 +18,7 @@ public class MapData {
     public static byte randomMap(int idNotSelect) {
         byte selectedId;
         do {
-            selectedId = MAP_ENTRIES.get(Utils.nextInt(MAP_ENTRIES.size())).getId();
+            selectedId = MAP_ENTRIES.get(Utils.nextInt(30)).getId();
         } while (selectedId == idNotSelect);
 
         return selectedId;
