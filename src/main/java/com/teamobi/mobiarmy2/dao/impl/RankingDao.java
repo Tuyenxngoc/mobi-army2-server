@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
+import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dao.IRankingDao;
@@ -25,6 +26,8 @@ public class RankingDao implements IRankingDao {
 
     private PlayerLeaderboardEntry createPlayerLeaderboardEntry(ResultSet resultSet, byte index, boolean isBonus) throws SQLException {
         PlayerLeaderboardEntry entry = new PlayerLeaderboardEntry();
+        Gson gson = GsonUtil.GSON;
+
         entry.setPlayerId(resultSet.getInt("player_id"));
         if (index <= 3 && isBonus) {
             entry.setUsername(GameString.topBonus(resultSet.getString("username"), Utils.getStringNumber(CommonConstant.TOP_BONUS[index - 1])));
@@ -34,8 +37,8 @@ public class RankingDao implements IRankingDao {
         entry.setClanId(resultSet.getShort("clan_id"));
 
         byte nvUsed = resultSet.getByte("nv_used");
-        CharacterJson character = GsonUtil.GSON.fromJson(resultSet.getString("NV%s".formatted(nvUsed + 1)), CharacterJson.class);
-        EquipmentChestJson[] equipmentData = GsonUtil.GSON.fromJson(resultSet.getString("ruongTrangBi"), EquipmentChestJson[].class);
+        CharacterJson character = gson.fromJson(resultSet.getString("NV%s".formatted(nvUsed + 1)), CharacterJson.class);
+        EquipmentChestJson[] equipmentData = gson.fromJson(resultSet.getString("ruongTrangBi"), EquipmentChestJson[].class);
 
         entry.setNvUsed(nvUsed);
         entry.setLevel((byte) character.getLevel());

@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
+import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
@@ -94,6 +95,7 @@ public class GameDao implements IGameDao {
 
                 //Khởi tại danh sách trang bị mặc định ban đầu
                 User.nvEquipDefault = new EquipmentEntry[NVData.CHARACTER_ENTRIES.size()][5];
+                Gson gson = GsonUtil.GSON;
                 while (resultSet.next()) {
                     EquipmentEntry equipEntry = new EquipmentEntry();
                     equipEntry.setCharacterId(resultSet.getByte("character_id"));
@@ -108,15 +110,15 @@ public class GameDao implements IGameDao {
                     equipEntry.setBulletId(resultSet.getByte("bullet_id"));
                     equipEntry.setOnSale(resultSet.getBoolean("on_sale"));
                     equipEntry.setDisguise(resultSet.getBoolean("is_disguise"));
-                    equipEntry.setDisguiseEquippedIndexes(GsonUtil.GSON.fromJson(resultSet.getString("disguise_equipped_indexes"), short[].class));
-                    equipEntry.setBigImageCutX(GsonUtil.GSON.fromJson(resultSet.getString("big_image_cut_x"), short[].class));
-                    equipEntry.setBigImageCutY(GsonUtil.GSON.fromJson(resultSet.getString("big_image_cut_y"), short[].class));
-                    equipEntry.setBigImageSizeX(GsonUtil.GSON.fromJson(resultSet.getString("big_image_size_x"), byte[].class));
-                    equipEntry.setBigImageSizeY(GsonUtil.GSON.fromJson(resultSet.getString("big_image_size_y"), byte[].class));
-                    equipEntry.setBigImageAlignX(GsonUtil.GSON.fromJson(resultSet.getString("big_image_align_x"), byte[].class));
-                    equipEntry.setBigImageAlignY(GsonUtil.GSON.fromJson(resultSet.getString("big_image_align_y"), byte[].class));
-                    equipEntry.setAddPoints(GsonUtil.GSON.fromJson(resultSet.getString("additional_points"), byte[].class));
-                    equipEntry.setAddPercents(GsonUtil.GSON.fromJson(resultSet.getString("additional_percent"), byte[].class));
+                    equipEntry.setDisguiseEquippedIndexes(gson.fromJson(resultSet.getString("disguise_equipped_indexes"), short[].class));
+                    equipEntry.setBigImageCutX(gson.fromJson(resultSet.getString("big_image_cut_x"), short[].class));
+                    equipEntry.setBigImageCutY(gson.fromJson(resultSet.getString("big_image_cut_y"), short[].class));
+                    equipEntry.setBigImageSizeX(gson.fromJson(resultSet.getString("big_image_size_x"), byte[].class));
+                    equipEntry.setBigImageSizeY(gson.fromJson(resultSet.getString("big_image_size_y"), byte[].class));
+                    equipEntry.setBigImageAlignX(gson.fromJson(resultSet.getString("big_image_align_x"), byte[].class));
+                    equipEntry.setBigImageAlignY(gson.fromJson(resultSet.getString("big_image_align_y"), byte[].class));
+                    equipEntry.setAddPoints(gson.fromJson(resultSet.getString("additional_points"), byte[].class));
+                    equipEntry.setAddPercents(gson.fromJson(resultSet.getString("additional_percent"), byte[].class));
 
                     //Đặt trang bị mặc định cho nhân vật
                     if (resultSet.getBoolean("is_default")) {
@@ -200,6 +202,7 @@ public class GameDao implements IGameDao {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `special_item`")) {
+                Gson gson = GsonUtil.GSON;
                 while (resultSet.next()) {
                     SpecialItemEntry specialItemEntry = new SpecialItemEntry();
                     specialItemEntry.setId(resultSet.getByte("special_item_id"));
@@ -211,7 +214,7 @@ public class GameDao implements IGameDao {
                     specialItemEntry.setExpirationDays(resultSet.getShort("expiration_days"));
                     specialItemEntry.setShowSelection(resultSet.getBoolean("show_selection"));
                     specialItemEntry.setOnSale(resultSet.getBoolean("is_on_sale"));
-                    specialItemEntry.setAbility(GsonUtil.GSON.fromJson(resultSet.getString("ability"), short[].class));
+                    specialItemEntry.setAbility(gson.fromJson(resultSet.getString("ability"), short[].class));
 
                     //Phân loại item
                     byte specialItemType = resultSet.getByte("type");
@@ -236,6 +239,7 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
 
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM formula_detail fd INNER JOIN formula f on fd.formula_id = f.formula_id ORDER BY f.material_id, fd.character_id, f.level")) {
+                Gson gson = GsonUtil.GSON;
                 while (resultSet.next()) {
                     FormulaEntry entry = new FormulaEntry();
                     entry.setMaterial(SpecialItemData.getSpecialItemById(resultSet.getByte("f.material_id")));
@@ -243,14 +247,14 @@ public class GameDao implements IGameDao {
                     entry.setLevelRequired(resultSet.getByte("f.level_required"));
                     entry.setEquipType(resultSet.getByte("f.equip_type"));
                     entry.setCharacterId(resultSet.getByte("fd.character_id"));
-                    entry.setDetails(GsonUtil.GSON.fromJson(resultSet.getString("f.details"), String[].class));
-                    entry.setAddPointsMax(GsonUtil.GSON.fromJson(resultSet.getString("f.add_points_max"), byte[].class));
-                    entry.setAddPointsMin(GsonUtil.GSON.fromJson(resultSet.getString("f.add_points_min"), byte[].class));
-                    entry.setAddPercentsMax(GsonUtil.GSON.fromJson(resultSet.getString("f.add_percents_max"), byte[].class));
-                    entry.setAddPercentsMin(GsonUtil.GSON.fromJson(resultSet.getString("f.add_percents_min"), byte[].class));
+                    entry.setDetails(gson.fromJson(resultSet.getString("f.details"), String[].class));
+                    entry.setAddPointsMax(gson.fromJson(resultSet.getString("f.add_points_max"), byte[].class));
+                    entry.setAddPointsMin(gson.fromJson(resultSet.getString("f.add_points_min"), byte[].class));
+                    entry.setAddPercentsMax(gson.fromJson(resultSet.getString("f.add_percents_max"), byte[].class));
+                    entry.setAddPercentsMin(gson.fromJson(resultSet.getString("f.add_percents_min"), byte[].class));
                     entry.setRequiredEquip(NVData.getEquipEntry(entry.getCharacterId(), entry.getEquipType(), resultSet.getShort("fd.required_equip")));
                     entry.setResultEquip(NVData.getEquipEntry(entry.getCharacterId(), entry.getEquipType(), resultSet.getShort("fd.result_equip")));
-                    SpecialItemChestJson[] json = GsonUtil.GSON.fromJson(resultSet.getString("fd.required_items"), SpecialItemChestJson[].class);
+                    SpecialItemChestJson[] json = gson.fromJson(resultSet.getString("fd.required_items"), SpecialItemChestJson[].class);
                     for (SpecialItemChestJson itemChestJson : json) {
                         SpecialItemEntry specialItemEntry = SpecialItemData.getSpecialItemById(itemChestJson.getId());
                         if (specialItemEntry != null) {
@@ -345,6 +349,7 @@ public class GameDao implements IGameDao {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `fabricate_item`")) {
+                Gson gson = GsonUtil.GSON;
                 while (resultSet.next()) {
                     FabricateItemEntry entry = new FabricateItemEntry();
                     entry.setId(resultSet.getInt("fabricate_item_id"));
@@ -357,7 +362,7 @@ public class GameDao implements IGameDao {
                     entry.setConfirmationMessage(resultSet.getString("confirmation_message"));
                     entry.setCompletionMessage(resultSet.getString("completion_message"));
 
-                    SpecialItemChestJson[] jsonArray = GsonUtil.GSON.fromJson(resultSet.getString("item_require"), SpecialItemChestJson[].class);
+                    SpecialItemChestJson[] jsonArray = gson.fromJson(resultSet.getString("item_require"), SpecialItemChestJson[].class);
                     for (SpecialItemChestJson specialItemChestJson : jsonArray) {
                         SpecialItemEntry specialItemEntry = SpecialItemData.SPECIAL_ITEM_ENTRIES.get(specialItemChestJson.getId());
                         if (specialItemEntry == null) {
@@ -366,7 +371,7 @@ public class GameDao implements IGameDao {
                         entry.getItemRequire().add(new SpecialItemChestEntry(specialItemChestJson.getQuantity(), specialItemEntry));
                     }
 
-                    jsonArray = GsonUtil.GSON.fromJson(resultSet.getString("reward_item"), SpecialItemChestJson[].class);
+                    jsonArray = gson.fromJson(resultSet.getString("reward_item"), SpecialItemChestJson[].class);
                     for (SpecialItemChestJson specialItemChestJson : jsonArray) {
                         SpecialItemEntry specialItemEntry = SpecialItemData.SPECIAL_ITEM_ENTRIES.get(specialItemChestJson.getId());
                         if (specialItemEntry == null) {

@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
+import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.dao.IGiftCodeDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.entry.GiftCodeEntry;
@@ -50,12 +51,13 @@ public class GiftCodeDao implements IGiftCodeDao {
 
             try (ResultSet resultSet = selectStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    int[] usedPlayerIds = GsonUtil.GSON.fromJson(resultSet.getString("used_player_ids"), int[].class);
+                    Gson gson = GsonUtil.GSON;
+                    int[] usedPlayerIds = gson.fromJson(resultSet.getString("used_player_ids"), int[].class);
                     int[] newUsedPlayerIds = Arrays.copyOf(usedPlayerIds, usedPlayerIds.length + 1);
                     newUsedPlayerIds[newUsedPlayerIds.length - 1] = playerId;
 
                     updateStatement = connection.prepareStatement("UPDATE gift_code SET usage_limit = usage_limit - 1, used_player_ids = ? WHERE code = ?");
-                    updateStatement.setString(1, GsonUtil.GSON.toJson(newUsedPlayerIds));
+                    updateStatement.setString(1, gson.toJson(newUsedPlayerIds));
                     updateStatement.setString(2, code);
                     updateStatement.executeUpdate();
 

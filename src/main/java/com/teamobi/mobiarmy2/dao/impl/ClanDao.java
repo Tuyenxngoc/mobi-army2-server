@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
+import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.dao.IClanDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.CharacterJson;
@@ -217,6 +218,7 @@ public class ClanDao implements IClanDao {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 byte index = 0;
+                Gson gson = GsonUtil.GSON;
                 while (resultSet.next()) {
                     ClanMemEntry entry = new ClanMemEntry();
                     entry.setPlayerId(resultSet.getInt("p.player_id"));
@@ -230,8 +232,8 @@ public class ClanDao implements IClanDao {
                     entry.setNvUsed(resultSet.getByte("nv_used"));
                     entry.setOnline(resultSet.getByte("p.online"));
 
-                    CharacterJson characterJson = GsonUtil.GSON.fromJson(resultSet.getString("NV" + (entry.getNvUsed() + 1)), CharacterJson.class);
-                    EquipmentChestJson[] trangBi = GsonUtil.GSON.fromJson(resultSet.getString("ruongTrangBi"), EquipmentChestJson[].class);
+                    CharacterJson characterJson = gson.fromJson(resultSet.getString("NV" + (entry.getNvUsed() + 1)), CharacterJson.class);
+                    EquipmentChestJson[] trangBi = gson.fromJson(resultSet.getString("ruongTrangBi"), EquipmentChestJson[].class);
 
                     entry.setLever((byte) characterJson.getLevel());
                     entry.setLevelPt((byte) 0);
