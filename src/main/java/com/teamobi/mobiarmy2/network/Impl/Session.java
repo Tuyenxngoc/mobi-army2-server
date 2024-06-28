@@ -81,8 +81,9 @@ public class Session implements ISession {
     public void close() {
         try {
             if (user.isLogged()) {
-                user.logout();
+                user.getUserService().handleLogout();
             }
+
             ServerManager serverManager = ServerManager.getInstance();
             serverManager.logger().logMessage("Close " + this);
             serverManager.disconnect(this);

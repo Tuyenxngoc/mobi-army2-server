@@ -229,6 +229,10 @@ public class UserService implements IUserService {
 
     @Override
     public void handleLogout() {
+        if (user.getState() == UserState.FIGHTING || user.getState() == UserState.WAIT_FIGHT) {
+            user.getFightWait().leaveTeam(user.getPlayerId());
+        }
+
         user.setLogged(false);
         userDao.update(user);
     }

@@ -93,10 +93,6 @@ public class User {
         session.sendMessage(ms);
     }
 
-    public void logout() {
-        userService.handleLogout();
-    }
-
     public int getCurrentLevelPercent() {
         float requiredXp = getCurrentXpLevel();
         float currentXp = getCurrentXp();
@@ -203,18 +199,18 @@ public class User {
 
     public short[] getEquip() {
         short[] equip = new short[5];
-        if (this.nvEquip[getNvUsed()][5] != null && this.nvEquip[getNvUsed()][5].getEquipEntry().isDisguise()) {
-            equip[0] = this.nvEquip[getNvUsed()][5].getEquipEntry().getDisguiseEquippedIndexes()[0];
-            equip[1] = this.nvEquip[getNvUsed()][5].getEquipEntry().getDisguiseEquippedIndexes()[1];
-            equip[2] = this.nvEquip[getNvUsed()][5].getEquipEntry().getDisguiseEquippedIndexes()[2];
-            equip[3] = this.nvEquip[getNvUsed()][5].getEquipEntry().getDisguiseEquippedIndexes()[3];
-            equip[4] = this.nvEquip[getNvUsed()][5].getEquipEntry().getDisguiseEquippedIndexes()[4];
+        if (nvEquip[nvUsed][5] != null && nvEquip[nvUsed][5].getEquipEntry().isDisguise()) {
+            equip[0] = nvEquip[nvUsed][5].getEquipEntry().getDisguiseEquippedIndexes()[0];
+            equip[1] = nvEquip[nvUsed][5].getEquipEntry().getDisguiseEquippedIndexes()[1];
+            equip[2] = nvEquip[nvUsed][5].getEquipEntry().getDisguiseEquippedIndexes()[2];
+            equip[3] = nvEquip[nvUsed][5].getEquipEntry().getDisguiseEquippedIndexes()[3];
+            equip[4] = nvEquip[nvUsed][5].getEquipEntry().getDisguiseEquippedIndexes()[4];
         } else {
             for (int i = 0; i < 5; i++) {
-                if (this.nvEquip[getNvUsed()][i] != null && !this.nvEquip[getNvUsed()][i].getEquipEntry().isDisguise()) {
-                    equip[i] = this.nvEquip[getNvUsed()][i].getEquipEntry().getEquipIndex();
-                } else if (nvEquipDefault[getNvUsed()][i] != null) {
-                    equip[i] = nvEquipDefault[getNvUsed()][i].getEquipIndex();
+                if (nvEquip[nvUsed][i] != null && !nvEquip[nvUsed][i].getEquipEntry().isDisguise()) {
+                    equip[i] = nvEquip[nvUsed][i].getEquipEntry().getEquipIndex();
+                } else if (nvEquipDefault[nvUsed][i] != null) {
+                    equip[i] = nvEquipDefault[nvUsed][i].getEquipIndex();
                 } else {
                     equip[i] = -1;
                 }
@@ -454,7 +450,7 @@ public class User {
                 .orElse(null);
     }
 
-    public byte getItemFightQuantity(byte index) {
+    public byte getItemFightQuantity(int index) {
         if (index >= 0 && index < items.length) {
             return items[index];
         }

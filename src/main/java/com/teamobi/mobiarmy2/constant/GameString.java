@@ -225,7 +225,7 @@ public class GameString {
     }
 
     public static String joinKVError0() {
-        return "Khu vực đã bắt đầu!";
+        return "Không thể vào do còn đang chơi.";
     }
 
     public static String joinKVError1() {

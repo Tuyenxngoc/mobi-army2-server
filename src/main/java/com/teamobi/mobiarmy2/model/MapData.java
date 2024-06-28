@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.model;
 
 import com.teamobi.mobiarmy2.model.entry.map.MapBrick;
 import com.teamobi.mobiarmy2.model.entry.map.MapEntry;
+import com.teamobi.mobiarmy2.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,12 @@ public class MapData {
     public static final short[] idNotCollisions = new short[]{70, 71, 73, 74, 75, 77, 78, 79, 97};
 
     public static byte randomMap(int idNotSelect) {
-        return 0;
+        byte selectedId;
+        do {
+            selectedId = MAP_ENTRIES.get(Utils.nextInt(MAP_ENTRIES.size())).getId();
+        } while (selectedId == idNotSelect);
+
+        return selectedId;
     }
 
     public static String getMapNames(byte... ids) {

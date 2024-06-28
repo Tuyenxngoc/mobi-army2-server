@@ -153,8 +153,7 @@ public class ServerManager {
                         ISession session = new Session(++countClients, socket);
                         users.add(session);
                         log.logMessage("Accept socket client " + countClients + " done!");
-                    } catch (Exception e) {
-                        //Empty catch block
+                    } catch (Exception ignored) {
                     }
                 } else {
                     try {
