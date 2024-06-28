@@ -1762,7 +1762,7 @@ public class UserService implements IUserService {
                 ds.writeUTF(GameString.notRanking());
             }
             ds.flush();
-            this.user.sendMessage(ms);
+            user.sendMessage(ms);
         } catch (IOException e) {
             e.printStackTrace();
         }

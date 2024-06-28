@@ -334,8 +334,6 @@ public class FightWait {
             return;
         }
 
-        leaveTeam(targetPlayerId);
-
         try {
             Message ms = new Message(Cmd.KICK);
             DataOutputStream ds = ms.writer();
@@ -347,6 +345,8 @@ public class FightWait {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        leaveTeam(targetPlayerId);
     }
 
     public synchronized void leaveTeam(int targetPlayerId) {
