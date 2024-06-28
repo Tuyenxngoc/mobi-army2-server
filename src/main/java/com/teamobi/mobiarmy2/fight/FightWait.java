@@ -497,7 +497,7 @@ public class FightWait {
             byte minMap = room.getMinMap();
             byte maxMap = room.getMaxMap();
             if (mapIdSet < minMap || mapIdSet > maxMap) {
-                String msg = "";
+                String msg;
                 if (minMap == maxMap) {
                     msg = GameString.selectMapError1_1(MapData.getMapNames(minMap));
                 } else if (minMap == maxMap - 1) {

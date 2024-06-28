@@ -1617,8 +1617,45 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void choiNgay(Message ms) {
+    public void handleJoinAnyBoard(Message ms) {
+        ServerManager server = ServerManager.getInstance();
+        Room[] rooms = server.getRooms();
+        try {
+            byte type = ms.reader().readByte();
+            FightWait fightWait = null;
 
+            if (type == 5) {// Đấu trùm
+                int start = server.config().getStartMapBoss();
+                int end = start + server.config().getRoomQuantity()[5];
+                for (int i = start; i < end; i++) {
+                    Room room = rooms[i];
+                    for (FightWait fight : room.getFightWaits()) {
+                        if (!fight.isStarted() &&
+                                !fight.isPassSet() &&
+                                fight.getNumPlayers() < fight.getMaxSetPlayers() &&
+                                fight.getMoney() <= user.getXu()
+                        ) {
+                            fightWait = fight;
+                            break;
+                        }
+                    }
+                }
+            } else if (type < 5 && type > 1) {
+                //Todo
+            } else if (type == 0) {
+                //Todo
+            } else if (type == -1) {
+                //Todo
+            }
+
+            if (fightWait == null) {
+                sendServerMessage(GameString.findKVError1());
+            } else {
+                fightWait.enterFireOval(user);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -80,7 +80,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.USE_ITEM -> userService.dungItem(ms);
 
-                case Cmd.JOIN_ANY_BOARD -> userService.choiNgay(ms);
+                case Cmd.JOIN_ANY_BOARD -> userService.handleJoinAnyBoard(ms);
 
                 case Cmd.REQUEST_FRIENDLIST -> userService.handleViewFriendList();
 

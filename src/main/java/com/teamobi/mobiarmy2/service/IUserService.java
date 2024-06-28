@@ -76,7 +76,7 @@ public interface IUserService {
 
     void dungItem(Message ms);
 
-    void choiNgay(Message ms);
+    void handleJoinAnyBoard(Message ms);
 
     void handleViewFriendList();
 

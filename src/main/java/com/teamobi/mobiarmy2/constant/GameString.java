@@ -221,7 +221,7 @@ public class GameString {
     }
 
     public static String findKVError1() {
-        return "Không tìm được khu vực!";
+        return "Không tìm thấy khu vực yêu cầu!";
     }
 
     public static String joinKVError0() {
