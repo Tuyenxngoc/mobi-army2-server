@@ -268,8 +268,8 @@ public class GameString {
         return "Số lượng 2 bên chưa ngang nhau";
     }
 
-    public static String selectMapError1_1() {
-        return "Chỉ có thể chọn map %s!";
+    public static String selectMapError1_1(String srt) {
+        return String.format("Chỉ có thể chọn map %s", srt);
     }
 
     public static String selectMapError1_2() {

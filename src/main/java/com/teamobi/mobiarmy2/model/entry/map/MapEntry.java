@@ -1,13 +1,17 @@
 package com.teamobi.mobiarmy2.model.entry.map;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.Objects;
 
 /**
  * @author tuyen
  */
 @Getter
 @Setter
+@NoArgsConstructor
 public class MapEntry {
     private byte id;
     private String name;
@@ -20,4 +24,21 @@ public class MapEntry {
     private short bullEffShower;
     private short[] XPlayer;
     private short[] YPlayer;
+
+    public MapEntry(byte id) {
+        this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MapEntry entry = (MapEntry) o;
+        return id == entry.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

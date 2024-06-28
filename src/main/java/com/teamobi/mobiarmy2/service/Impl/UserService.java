@@ -1797,7 +1797,7 @@ public class UserService implements IUserService {
                     items[i] = -1;
                 }
             }
-            user.getFightWait().setItems(user, items);
+            user.getFightWait().setItems(user.getPlayerId(), items);
         } catch (IOException e) {
             e.printStackTrace();
         }

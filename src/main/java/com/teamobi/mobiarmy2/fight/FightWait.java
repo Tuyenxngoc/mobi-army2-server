@@ -57,6 +57,8 @@ public class FightWait {
         this.started = false;
         this.numReady = 0;
         this.numPlayers = 0;
+        this.startTime = 0L;
+        this.continuousLevel = (byte) (room.isContinuous() ? 0 : -1);
 
         this.mapId = room.getMapId();
         this.money = room.getMinXu();
@@ -72,7 +74,7 @@ public class FightWait {
         return numPlayers == maxSetPlayers || started || (room.isContinuous() && continuousLevel > 0);
     }
 
-    public void enterFireOval(User us) throws IOException {
+    public synchronized void enterFireOval(User us) throws IOException {
         if (room.getType() == 6 && us.getClanId() == 0) {
             us.getUserService().sendServerMessage(GameString.notClan());
             return;
@@ -92,83 +94,81 @@ public class FightWait {
 
         Message ms;
         DataOutputStream ds;
-        synchronized (users) {
-            byte bestLocation = -1;
-            for (byte i = 0; i < users.length; i++) {
-                if (users[i] == null) {
-                    bestLocation = i;
-                    break;
-                }
+        byte bestLocation = -1;
+        for (byte i = 0; i < users.length; i++) {
+            if (users[i] == null) {
+                bestLocation = i;
+                break;
             }
-            if (bestLocation == -1) {
-                return;
-            }
-            us.setFightWait(this);
-            us.setState(UserState.WAIT_FIGHT);
-            if (numPlayers == 0) {
-                changeBoss(bestLocation);
-            }
-            ms = new Message(Cmd.SOMEONE_JOINBOARD);
-            ds = ms.writer();
-            ds.writeByte(bestLocation);
-            ds.writeInt(us.getPlayerId());
-            ds.writeShort(us.getClanId());
-            ds.writeUTF(us.getUsername());
-            ds.writeByte(us.getCurrentLevel());
-            ds.writeByte(us.getNvUsed());
-            for (short i : us.getEquip()) {
-                ds.writeShort(i);
-            }
-            ds.flush();
-            sendToTeam(ms);
-
-            users[bestLocation] = us;
-            readies[bestLocation] = false;
-            numPlayers++;
-
-            ms = new Message(Cmd.JOIN_BOARD);
-            ds = ms.writer();
-            ds.writeInt(getRoomOwner().getPlayerId());
-            ds.writeInt(money);
-            ds.writeByte(mapId);
-            ds.writeByte(0);
-            for (byte i = 0; i < users.length; i++) {
-                User user = users[i];
-                if (user != null) {
-                    ds.writeInt(user.getPlayerId());
-                    ds.writeShort(user.getClanId());
-                    ds.writeUTF(user.getUsername());
-                    ds.writeInt(0);
-                    ds.writeByte(user.getCurrentLevel());
-                    ds.writeByte(user.getNvUsed());
-                    for (short k : user.getEquip()) {
-                        ds.writeShort(k);
-                    }
-                    ds.writeBoolean(readies[i]);
-                } else {
-                    ds.writeInt(-1);
-                }
-            }
-            ds.flush();
-            us.sendMessage(ms);
-
-            // Update khu vuc
-            ms = new Message(76);
-            ds = ms.writer();
-            ds.writeByte(room.getIndex());
-            ds.writeByte(id);
-            ds.writeUTF(name);
-            ds.writeByte(room.getType());
-            ds.flush();
-            us.sendMessage(ms);
-
-            // Send map
-            ms = new Message(75);
-            ds = ms.writer();
-            ds.writeByte(mapId);
-            ds.flush();
-            us.sendMessage(ms);
         }
+        if (bestLocation == -1) {
+            return;
+        }
+        us.setFightWait(this);
+        us.setState(UserState.WAIT_FIGHT);
+        if (numPlayers == 0) {
+            changeBoss(bestLocation);
+        }
+        ms = new Message(Cmd.SOMEONE_JOINBOARD);
+        ds = ms.writer();
+        ds.writeByte(bestLocation);
+        ds.writeInt(us.getPlayerId());
+        ds.writeShort(us.getClanId());
+        ds.writeUTF(us.getUsername());
+        ds.writeByte(us.getCurrentLevel());
+        ds.writeByte(us.getNvUsed());
+        for (short i : us.getEquip()) {
+            ds.writeShort(i);
+        }
+        ds.flush();
+        sendToTeam(ms);
+
+        users[bestLocation] = us;
+        readies[bestLocation] = false;
+        numPlayers++;
+
+        ms = new Message(Cmd.JOIN_BOARD);
+        ds = ms.writer();
+        ds.writeInt(getRoomOwner().getPlayerId());
+        ds.writeInt(money);
+        ds.writeByte(mapId);
+        ds.writeByte(0);
+        for (byte i = 0; i < users.length; i++) {
+            User user = users[i];
+            if (user != null) {
+                ds.writeInt(user.getPlayerId());
+                ds.writeShort(user.getClanId());
+                ds.writeUTF(user.getUsername());
+                ds.writeInt(0);
+                ds.writeByte(user.getCurrentLevel());
+                ds.writeByte(user.getNvUsed());
+                for (short k : user.getEquip()) {
+                    ds.writeShort(k);
+                }
+                ds.writeBoolean(readies[i]);
+            } else {
+                ds.writeInt(-1);
+            }
+        }
+        ds.flush();
+        us.sendMessage(ms);
+
+        // Update khu vuc
+        ms = new Message(Cmd.AUTO_BOARD);
+        ds = ms.writer();
+        ds.writeByte(room.getIndex());
+        ds.writeByte(id);
+        ds.writeUTF(name);
+        ds.writeByte(room.getType());
+        ds.flush();
+        us.sendMessage(ms);
+
+        // Send map
+        ms = new Message(Cmd.MAP_SELECT);
+        ds = ms.writer();
+        ds.writeByte(mapId);
+        ds.flush();
+        us.sendMessage(ms);
     }
 
     private void changeBoss(byte index) {
@@ -213,7 +213,7 @@ public class FightWait {
         return -1;
     }
 
-    public void setPassRoom(String password, int playerId) {
+    public synchronized void setPassRoom(String password, int playerId) {
         if (started) {
             return;
         }
@@ -261,7 +261,7 @@ public class FightWait {
         numReady = 0;
     }
 
-    public void setReady(boolean ready, int playerId) {
+    public synchronized void setReady(boolean ready, int playerId) {
         if (started) {
             return;
         }
@@ -294,7 +294,7 @@ public class FightWait {
         }
     }
 
-    public void kickPlayer(int playerId, int targetPlayerId) {
+    public synchronized void kickPlayer(int playerId, int targetPlayerId) {
         if (started) {
             return;
         }
@@ -329,7 +329,7 @@ public class FightWait {
         leaveTeam(targetPlayerId);
     }
 
-    public void leaveTeam(int targetPlayerId) {
+    public synchronized void leaveTeam(int targetPlayerId) {
         if (started) {
             fightManager.leaveFight(targetPlayerId);
         }
@@ -406,7 +406,7 @@ public class FightWait {
         }
     }
 
-    public void startGame(int playerId) {
+    public synchronized void startGame(int playerId) {
         if (started) {
             return;
         }
@@ -435,7 +435,7 @@ public class FightWait {
         fightManager.startGame();
     }
 
-    public void setRoomName(int playerId, String name) {
+    public synchronized void setRoomName(int playerId, String name) {
         if (started) {
             return;
         }
@@ -445,7 +445,7 @@ public class FightWait {
         this.name = name;
     }
 
-    public void setMaxPlayers(int playerId, byte maxPlayers) {
+    public synchronized void setMaxPlayers(int playerId, byte maxPlayers) {
         if (started) {
             return;
         }
@@ -457,7 +457,7 @@ public class FightWait {
         }
     }
 
-    public void setMap(int playerId, byte mapIdSet) {
+    public synchronized void setMap(int playerId, byte mapIdSet) {
         if (started) {
             return;
         }
@@ -479,7 +479,36 @@ public class FightWait {
             }
         }
 
-        //todo check map can select
+        //Kiểm tra map được chọn
+        if (room.getMapCanSelected() != null) {
+            boolean mapIdFound = false;
+            for (byte id : room.getMapCanSelected()) {
+                if (id == mapIdSet) {
+                    mapIdFound = true;
+                    break;
+                }
+            }
+
+            if (!mapIdFound) {
+                roomOwner.getUserService().sendServerMessage(GameString.selectMapError1_1(MapData.getMapNames(room.getMapCanSelected())));
+                return;
+            }
+        } else {
+            byte minMap = room.getMinMap();
+            byte maxMap = room.getMaxMap();
+            if (mapIdSet < minMap || mapIdSet > maxMap) {
+                String msg = "";
+                if (minMap == maxMap) {
+                    msg = GameString.selectMapError1_1(MapData.getMapNames(minMap));
+                } else if (minMap == maxMap - 1) {
+                    msg = GameString.selectMapError1_1(MapData.getMapNames(minMap, maxMap));
+                } else {
+                    msg = GameString.selectMapError1_3();
+                }
+                roomOwner.getUserService().sendServerMessage(msg);
+                return;
+            }
+        }
 
         mapId = mapIdSet;
         if (mapId == 27) {
@@ -501,7 +530,8 @@ public class FightWait {
         if (started) {
             return;
         }
-        if (getRoomOwner().getPlayerId() != playerId) {
+        User roomOwner = getRoomOwner();
+        if (roomOwner.getPlayerId() != playerId) {
             return;
         }
         List<User> userList = ServerManager.getInstance().findWaitPlayers(playerId);
@@ -522,7 +552,7 @@ public class FightWait {
                 }
             }
             ds.flush();
-            getRoomOwner().sendMessage(ms);
+            roomOwner.sendMessage(ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -530,12 +560,13 @@ public class FightWait {
 
     public void inviteToRoom(int playerId) {
         User user = ServerManager.getInstance().getUserByPlayerId(playerId);
+        User roomOwner = getRoomOwner();
         if (user == null) {
-            getRoomOwner().getUserService().sendServerMessage(GameString.inviteError1());
+            roomOwner.getUserService().sendServerMessage(GameString.inviteError1());
             return;
         }
         if (user.isNotWaiting()) {
-            getRoomOwner().getUserService().sendServerMessage(GameString.inviteError2());
+            roomOwner.getUserService().sendServerMessage(GameString.inviteError2());
             return;
         }
         try {
@@ -553,7 +584,7 @@ public class FightWait {
         }
     }
 
-    public void changeTeam(User user) {
+    public synchronized void changeTeam(User user) {
         if (started) {
             return;
         }
@@ -584,11 +615,11 @@ public class FightWait {
         }
     }
 
-    public void setItems(User user, byte[] newItems) {
+    public synchronized void setItems(int playerId, byte[] newItems) {
         if (started) {
             return;
         }
-        int index = getUserIndexByPlayerId(user.getPlayerId());
+        int index = getUserIndexByPlayerId(playerId);
         if (index == -1) {
             return;
         }

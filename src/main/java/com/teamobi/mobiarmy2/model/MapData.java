@@ -17,4 +17,19 @@ public class MapData {
     public static byte randomMap(int idNotSelect) {
         return 0;
     }
+
+    public static String getMapNames(byte... ids) {
+        StringBuilder result = new StringBuilder();
+        for (byte id : ids) {
+            int index = MAP_ENTRIES.indexOf(new MapEntry(id));
+            if (index != -1) {
+                result.append(MAP_ENTRIES.get(index).getName()).append(", ");
+            }
+        }
+        if (result.length() > 0) {
+            result.setLength(result.length() - 2);
+        }
+        return result.toString();
+    }
+
 }

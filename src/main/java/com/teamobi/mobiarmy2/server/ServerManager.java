@@ -123,17 +123,14 @@ public class ServerManager {
             for (byte roomCount = 0; roomCount < roomQuantities[type]; roomCount++) {
                 byte[] mapCanSelected = null;
                 boolean isContinuous = false;
-                boolean isSelectable = false;
                 if (type == 5) {
                     mapCanSelected = config.getBossRoomMapLimit()[roomCount];
-                    if (roomCount == 8) {
-                        isSelectable = true;
-                    } else if (roomCount == 9) {
+                    if (roomCount == 9) {
                         isContinuous = true;
                     }
                 }
 
-                rooms[index] = new Room(index, type, minXu, maxXu, minMap, maxMap, mapCanSelected, isContinuous, isSelectable, numArea, maxPlayerFight, numPlayerInitRoom, roomIconType);
+                rooms[index] = new Room(index, type, minXu, maxXu, minMap, maxMap, mapCanSelected, isContinuous, numArea, maxPlayerFight, numPlayerInitRoom, roomIconType);
                 index++;
             }
         }
