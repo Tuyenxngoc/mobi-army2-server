@@ -355,7 +355,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void giaHanDo(Message ms) {
+    public void extendItemDuration(Message ms) {
         try {
             DataInputStream dis = ms.reader();
             byte action = dis.readByte();
@@ -551,7 +551,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void gopClan(Message ms) {
+    public void contributeToClan(Message ms) {
         if (user.isNotWaiting()) {
             return;
         }
@@ -780,7 +780,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void moHopQua(Message ms) {
+    public void openLuckyGift(Message ms) {
         try {
             byte index = ms.reader().readByte();
 
@@ -803,7 +803,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void bangXepHang(Message ms) {
+    public void viewLeaderboard(Message ms) {
         try {
             DataInputStream dis = ms.reader();
             byte type = dis.readByte();
@@ -939,7 +939,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void luyenTap(Message ms) {
+    public void enterTrainingMap(Message ms) {
     }
 
     @Override
@@ -1066,7 +1066,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void macTrangBiVip(Message ms) {
+    public void equipVipItems(Message ms) {
         try {
             DataInputStream dis = ms.reader();
             byte action = dis.readByte();
@@ -1299,7 +1299,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void SanSang(Message ms) {
+    public void setReady(Message ms) {
         try {
             boolean ready = ms.reader().readBoolean();
             user.getFightWait().setReady(ready, user.getPlayerId());
@@ -1309,7 +1309,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public synchronized void hopNgoc(Message ms) {
+    public synchronized void imbueGem(Message ms) {
         List<EquipmentChestEntry> equipList = getSelectedEquips();
         List<SpecialItemChestEntry> specialItemList = getSelectedSpecialItems();
 
@@ -1597,22 +1597,22 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void diChuyen(Message ms) {
+    public void movePlayer(Message ms) {
 
     }
 
     @Override
-    public void Bann(Message ms) {
+    public void shoot(Message ms) {
 
     }
 
     @Override
-    public void ketQUaBan(Message ms) {
+    public void processShootingResult(Message ms) {
 
     }
 
     @Override
-    public void dungItem(Message ms) {
+    public void handleUseItem(Message ms) {
 
     }
 
@@ -1791,12 +1791,12 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void boLuot(Message ms) {
+    public void skipTurn(Message ms) {
 
     }
 
     @Override
-    public void capNhatXY(Message ms) {
+    public void updateCoordinates(Message ms) {
 
     }
 
@@ -2083,7 +2083,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void xoaDan(Message ms) {
+    public void clearBullet(Message ms) {
 
     }
 
@@ -2575,7 +2575,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void clanIcon(Message ms) {
+    public void getClanIcon(Message ms) {
         try {
             short clanId = ms.reader().readShort();
             byte[] data = ClanManager.getInstance().getClanIcon(clanId);
@@ -2740,7 +2740,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void napTien(Message ms) {
+    public void rechargeMoney(Message ms) {
         try {
             DataInputStream dis = ms.reader();
             byte type = dis.readByte();
@@ -2814,7 +2814,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void startLuyenTap(Message ms) {
+    public void startTraining(Message ms) {
 
     }
 

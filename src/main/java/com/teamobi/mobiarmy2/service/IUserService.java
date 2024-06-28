@@ -16,13 +16,13 @@ public interface IUserService {
 
     void handleHandshakeMessage();
 
-    void giaHanDo(Message ms);
+    void extendItemDuration(Message ms);
 
     void handleGetMissions(Message ms);
 
     void sendLoginSuccess();
 
-    void gopClan(Message ms);
+    void contributeToClan(Message ms);
 
     void getVersionCode(Message ms);
 
@@ -30,19 +30,19 @@ public interface IUserService {
 
     void handleMergeEquipments(Message ms);
 
-    void moHopQua(Message ms);
+    void openLuckyGift(Message ms);
 
-    void bangXepHang(Message ms);
+    void viewLeaderboard(Message ms);
 
     void handlePurchaseClanItem(Message ms);
 
-    void luyenTap(Message ms);
+    void enterTrainingMap(Message ms);
 
     void handleLogout(Message ms);
 
     void handleSpecialItemShop(Message ms);
 
-    void macTrangBiVip(Message ms);
+    void equipVipItems(Message ms);
 
     void handleSendMessage(Message ms);
 
@@ -58,9 +58,9 @@ public interface IUserService {
 
     void handleLeaveBoard(Message ms);
 
-    void SanSang(Message ms);
+    void setReady(Message ms);
 
-    void hopNgoc(Message ms);
+    void imbueGem(Message ms);
 
     void handleSetPasswordFightWait(Message ms);
 
@@ -68,13 +68,13 @@ public interface IUserService {
 
     void handleStartGame();
 
-    void diChuyen(Message ms);
+    void movePlayer(Message ms);
 
-    void Bann(Message ms);
+    void shoot(Message ms);
 
-    void ketQUaBan(Message ms);
+    void processShootingResult(Message ms);
 
-    void dungItem(Message ms);
+    void handleUseItem(Message ms);
 
     void handleJoinAnyBoard(Message ms);
 
@@ -88,9 +88,9 @@ public interface IUserService {
 
     void handleFindPlayer(Message ms);
 
-    void boLuot(Message ms);
+    void skipTurn(Message ms);
 
-    void capNhatXY(Message ms);
+    void updateCoordinates(Message ms);
 
     void handleSetFightWaitName(Message ms);
 
@@ -112,7 +112,7 @@ public interface IUserService {
 
     void handleFindPlayerWait(Message ms);
 
-    void xoaDan(Message ms);
+    void clearBullet(Message ms);
 
     void handleChangePassword(Message ms);
 
@@ -130,7 +130,7 @@ public interface IUserService {
 
     void handleSpinWheel(Message ms);
 
-    void clanIcon(Message ms);
+    void getClanIcon(Message ms);
 
     void getTopClan(Message ms);
 
@@ -142,11 +142,11 @@ public interface IUserService {
 
     void handleRegister(Message ms);
 
-    void napTien(Message ms);
+    void rechargeMoney(Message ms);
 
     void getMaterialIconMessage(Message ms);
 
-    void startLuyenTap(Message ms);
+    void startTraining(Message ms);
 
     void sendUpdateMoney();
 

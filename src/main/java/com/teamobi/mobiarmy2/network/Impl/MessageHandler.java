@@ -22,29 +22,29 @@ public class MessageHandler implements IMessageHandler {
             switch (ms.getCommand()) {
                 case Cmd.GET_KEY -> userService.handleHandshakeMessage();
 
-                case Cmd.GET_MORE_DAY -> userService.giaHanDo(ms);
+                case Cmd.GET_MORE_DAY -> userService.extendItemDuration(ms);
 
                 case Cmd.MISSISON -> userService.handleGetMissions(ms);
 
-                case Cmd.CLAN_MONEY -> userService.gopClan(ms);
+                case Cmd.CLAN_MONEY -> userService.contributeToClan(ms);
 
                 case Cmd.CHANGE_ROOM_NAME -> userService.sendRoomName();
 
                 case Cmd.FOMULA -> userService.handleMergeEquipments(ms);
 
-                case Cmd.GET_LUCKYGIFT -> userService.moHopQua(ms);
+                case Cmd.GET_LUCKYGIFT -> userService.openLuckyGift(ms);
 
-                case Cmd.BANGTHANHTICH -> userService.bangXepHang(ms);
+                case Cmd.BANGTHANHTICH -> userService.viewLeaderboard(ms);
 
                 case Cmd.SHOP_BIETDOI -> userService.handlePurchaseClanItem(ms);
 
-                case Cmd.TRAINING_MAP -> userService.luyenTap(ms);
+                case Cmd.TRAINING_MAP -> userService.enterTrainingMap(ms);
 
                 case Cmd.SIGN_OUT -> userService.handleLogout(ms);
 
                 case Cmd.SHOP_LINHTINH -> userService.handleSpecialItemShop(ms);
 
-                case Cmd.VIP_EQUIP -> userService.macTrangBiVip(ms);
+                case Cmd.VIP_EQUIP -> userService.equipVipItems(ms);
 
                 case Cmd.LOGIN -> userService.handleLogin(ms);
 
@@ -62,9 +62,9 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.LEAVE_BOARD -> userService.handleLeaveBoard(ms);
 
-                case Cmd.READY -> userService.SanSang(ms);
+                case Cmd.READY -> userService.setReady(ms);
 
-                case Cmd.IMBUE -> userService.hopNgoc(ms);
+                case Cmd.IMBUE -> userService.imbueGem(ms);
 
                 case Cmd.SET_PASS -> userService.handleSetPasswordFightWait(ms);
 
@@ -72,13 +72,13 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.START_ARMY -> userService.handleStartGame();
 
-                case Cmd.MOVE_ARMY -> userService.diChuyen(ms);
+                case Cmd.MOVE_ARMY -> userService.movePlayer(ms);
 
-                case Cmd.FIRE_ARMY -> userService.Bann(ms);
+                case Cmd.FIRE_ARMY -> userService.shoot(ms);
 
-                case Cmd.SHOOT_RESULT -> userService.ketQUaBan(ms);
+                case Cmd.SHOOT_RESULT -> userService.processShootingResult(ms);
 
-                case Cmd.USE_ITEM -> userService.dungItem(ms);
+                case Cmd.USE_ITEM -> userService.handleUseItem(ms);
 
                 case Cmd.JOIN_ANY_BOARD -> userService.handleJoinAnyBoard(ms);
 
@@ -94,9 +94,9 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.PING -> userService.ping(ms);
 
-                case Cmd.SKIP -> userService.boLuot(ms);
+                case Cmd.SKIP -> userService.skipTurn(ms);
 
-                case Cmd.UPDATE_XY -> userService.capNhatXY(ms);
+                case Cmd.UPDATE_XY -> userService.updateCoordinates(ms);
 
                 case Cmd.SET_BOARD_NAME -> userService.handleSetFightWaitName(ms);
 
@@ -120,11 +120,11 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.FIND_PLAYER -> userService.handleFindPlayerWait(ms);
 
-                case Cmd.CHECK_CROSS -> userService.xoaDan(ms);
+                case Cmd.CHECK_CROSS -> userService.clearBullet(ms);
 
                 case Cmd.CHANGE_PASS -> userService.handleChangePassword(ms);
 
-                case Cmd.TRAINING -> userService.startLuyenTap(ms);
+                case Cmd.TRAINING -> userService.startTraining(ms);
 
                 case Cmd.GET_FILEPACK -> userService.getFilePack(ms);
 
@@ -142,7 +142,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.VERSION_CODE -> userService.getVersionCode(ms);
 
-                case Cmd.CLAN_ICON -> userService.clanIcon(ms);
+                case Cmd.CLAN_ICON -> userService.getClanIcon(ms);
 
                 case Cmd.TOP_CLAN -> userService.getTopClan(ms);
 
@@ -154,7 +154,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.REGISTER_2 -> userService.handleRegister(ms);
 
-                case Cmd.CHARGE_MONEY_2 -> userService.napTien(ms);
+                case Cmd.CHARGE_MONEY_2 -> userService.rechargeMoney(ms);
 
                 case Cmd.MATERIAL_ICON -> userService.getMaterialIconMessage(ms);
 
