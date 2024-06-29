@@ -3,6 +3,7 @@ package com.teamobi.mobiarmy2.fight;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.constant.UserState;
+import com.teamobi.mobiarmy2.model.FightItemData;
 import com.teamobi.mobiarmy2.model.MapData;
 import com.teamobi.mobiarmy2.model.Room;
 import com.teamobi.mobiarmy2.model.User;
@@ -46,7 +47,7 @@ public class FightWait {
 
         byte maxPlayers = room.getMaxPlayerFight();
 
-        this.fightManager = new FightManager();
+        this.fightManager = new FightManager(this);
         this.users = new User[maxPlayers];
         this.items = new byte[maxPlayers][8];
         this.readies = new boolean[maxPlayers];
@@ -440,18 +441,103 @@ public class FightWait {
             return;
         }
 
-        if (startTime > 0) {
+        if (System.currentTimeMillis() - startTime < 5000) {
             roomOwner.getUserService().sendServerMessage(GameString.waitClick(startTime));
             return;
-        }
-
-        if (room.getType() == 6) {
-
         }
 
         if (numReady == 0 && room.getType() != 5) {
             roomOwner.getUserService().sendServerMessage(GameString.startGameError1());
             return;
+        }
+
+        //Kiểm tra phe còn lại có cùng clan hay không
+        if (room.getType() == 6) {
+            for (byte i = 0; i < users.length; i++) {
+                if (users[i] == null) {
+                    continue;
+                }
+                for (byte j = 0; j < users.length; j++) {
+                    if (j == i || users[j] == null || (j % 2 == 0 && i % 2 == 0) || (j % 2 != 0 && i % 2 != 0)) {
+                        continue;
+                    }
+                    if (users[j].getClanId() == users[i].getClanId()) {
+                        roomOwner.getUserService().sendServerMessage(GameString.startGameError());
+                        return;
+                    }
+                }
+            }
+        }
+
+        int numTeamRed = 0;
+        int numTeamBlue = 0;
+
+        for (byte i = 0; i < users.length; i++) {
+            User user = users[i];
+            if (user == null) {
+                continue;
+            }
+
+            if (user.isOpeningGift()) {
+                roomOwner.getUserService().sendServerMessage(GameString.openingGift(user.getUsername()));
+                return;
+            }
+
+            if (bossIndex != i && !readies[i]) {
+                roomOwner.getUserService().sendServerMessage(GameString.startGameError2(user.getUsername()));
+                return;
+            }
+
+            if (user.getXu() < money) {
+                roomOwner.getUserService().sendServerMessage(GameString.startGameError3(user.getUsername()));
+                return;
+            }
+
+            byte[] userItems = items[i];
+            byte[] itemUsageMap = new byte[FightItemData.FIGHT_ITEM_ENTRIES.size()];
+
+            // Đếm số lượng item mà người dùng đang có
+            for (byte itemIndex : userItems) {
+                itemUsageMap[itemIndex]++;
+            }
+
+            for (int j = 0; j < userItems.length; j++) {
+                byte itemIndex = userItems[j];
+                if (itemIndex < 0 || itemIndex >= itemUsageMap.length) {
+                    continue;
+                }
+
+                // Kiểm tra điều kiện số lượng item
+                if (itemUsageMap[itemIndex] > FightItemData.FIGHT_ITEM_ENTRIES.get(itemIndex).getCarriedItemCount() && // Số lượng vượt quá số lượng cho phép
+                        itemUsageMap[itemIndex] > user.getItemFightQuantity(itemIndex) && // Số lượng vượt quá số lượng đang có
+                        (j >= 4 && user.getItemFightQuantity(12 + j - 4) == 0) // Item chứa đã hết
+                ) {
+                    try {
+                        Message ms = new Message(Cmd.SERVER_MESSAGE);
+                        DataOutputStream ds = ms.writer();
+                        ds.writeUTF(GameString.startGameError4(user.getUsername(), j));
+                        ds.flush();
+                        sendToTeam(ms);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return;
+                }
+            }
+
+            if (room.getType() == 5) {
+                numTeamBlue++;
+            } else {
+                if (i % 2 == 0) {
+                    numTeamBlue++;
+                } else {
+                    numTeamRed++;
+                }
+            }
+        }
+
+        if (room.getType() != 5 && numTeamBlue != numTeamRed) {
+            roomOwner.getUserService().sendServerMessage(GameString.startGameError5());
         }
 
         started = true;

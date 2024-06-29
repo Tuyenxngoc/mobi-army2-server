@@ -10,9 +10,12 @@ import java.io.DataOutputStream;
  */
 public class FightManager {
 
-    private final Player[] players;
+    private FightWait fightWait;
+    private Player[] players;
+    private boolean isFight;
 
-    public FightManager() {
+    public FightManager(FightWait fightWait) {
+        this.fightWait = fightWait;
         this.players = new Player[8];
     }
 
@@ -59,7 +62,9 @@ public class FightManager {
         return -1;
     }
 
-    public void startGame() {
-
+    public synchronized void startGame() {
+        if (isFight) {
+            return;
+        }
     }
 }

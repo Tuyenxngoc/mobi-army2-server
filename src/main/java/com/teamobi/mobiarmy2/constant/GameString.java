@@ -248,20 +248,24 @@ public class GameString {
         return String.format("Chỉ có thể đặt cược từ %d xu đến %d xu!", min, max);
     }
 
+    public static String startGameError() {
+        return "Đội phải cùng phe!";
+    }
+
     public static String startGameError1() {
         return "Mọi người chưa sẵn sàng!";
     }
 
-    public static String startGameError2() {
-        return "Còn %s chưa sẵn sàng!";
+    public static String startGameError2(String username) {
+        return String.format("Còn %s chưa sẵn sàng!", username);
     }
 
-    public static String startGameError3() {
-        return "%s lỗi tiền đặt cược!";
+    public static String startGameError3(String username) {
+        return String.format("%s không đủ tiền đặt cược!", username);
     }
 
-    public static String startGameError4() {
-        return "%s lỗi item slot %d xin chọn lại!";
+    public static String startGameError4(String username, int slot) {
+        return String.format("%s lỗi item slot %d xin chọn lại!", username, slot);
     }
 
     public static String startGameError5() {

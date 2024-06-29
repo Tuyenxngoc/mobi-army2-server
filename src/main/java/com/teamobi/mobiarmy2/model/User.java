@@ -36,7 +36,7 @@ public class User {
     private int userId;
     private int playerId;
     private String username;
-    private Short clanId;
+    private short clanId;
     private int xu;
     private int luong;
     private int danhVong;
