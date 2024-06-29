@@ -7,9 +7,6 @@ import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.IOException;
 
-/*
-@ 
- */
 public class Ghost2 extends Boss {
 
     public Ghost2(FightManager fightMNG, byte idGun, String name, byte location, int HPMax, short X, short Y) throws IOException {

@@ -272,11 +272,11 @@ public class FightManager {
             short Y = (short) Utils.nextInt(-350, 100);
             players[allCount] = new Balloon(this, (byte) 17, "Balloon", (byte) allCount, 1, X, Y);
             allCount++;
-            players[allCount] = new Balloon_Gun(this, (byte) 18, "Balloon Gun", (byte) allCount, 2000 + (this.getLevelTeam() * 10), (short) (X + 51), (short) (Y + 19));
+            players[allCount] = new BalloonGun(this, (byte) 18, "Balloon Gun", (byte) allCount, 2000 + (this.getLevelTeam() * 10), (short) (X + 51), (short) (Y + 19));
             allCount++;
-            players[allCount] = new Balloon_GunBig(this, (byte) 19, "Balloon Gun Big", (byte) allCount, 2500 + (this.getLevelTeam() * 10), (short) (X - 5), (short) (Y + 30));
+            players[allCount] = new BalloonGunBig(this, (byte) 19, "Balloon Gun Big", (byte) allCount, 2500 + (this.getLevelTeam() * 10), (short) (X - 5), (short) (Y + 30));
             allCount++;
-            players[allCount] = new Balloon_FanBack(this, (byte) 20, "Fan Back", (byte) allCount, 1000 + (this.getLevelTeam() * 10), (short) (X - 67), (short) (Y - 6));
+            players[allCount] = new BalloonFanBack(this, (byte) 20, "Fan Back", (byte) allCount, 1000 + (this.getLevelTeam() * 10), (short) (X - 67), (short) (Y - 6));
             allCount++;
         }
 
@@ -313,96 +313,6 @@ public class FightManager {
             }
         }
 
-        //Super Boss
-        if (this.wait.getMapId() == 40) {
-            short X = (short) (Utils.nextInt(300, 800));
-            short Y = (short) Utils.nextInt(-350, 50);
-            players[allCount] = new Balloon(this, (byte) 17, "Balloon", (byte) allCount, 1, X, Y);
-            allCount++;
-            players[allCount] = new Balloon_Gun(this, (byte) 18, "Balloon Gun", (byte) allCount, 2000 + (this.getLevelTeam() * 10), (short) (X + 51), (short) (Y + 19));
-            allCount++;
-            players[allCount] = new Balloon_GunBig(this, (byte) 19, "Balloon Gun Big", (byte) allCount, 2500 + (this.getLevelTeam() * 10), (short) (X - 5), (short) (Y + 30));
-            allCount++;
-            players[allCount] = new Balloon_FanBack(this, (byte) 20, "Fan Back", (byte) allCount, 1000 + (this.getLevelTeam() * 10), (short) (X - 67), (short) (Y - 6));
-            allCount++;
-            players[allCount] = new Robot(this, (byte) 14, "Robot", (byte) allCount, 3700 + (this.getLevelTeam() * 10), (short) 142, (short) 83);
-            allCount++;
-            players[allCount] = new Robot(this, (byte) 14, "Robot", (byte) allCount, 3700 + (this.getLevelTeam() * 10), (short) 1069, (short) 83);
-            allCount++;
-            players[allCount] = new Robot(this, (byte) 14, "Robot", (byte) allCount, 3700 + (this.getLevelTeam() * 10), (short) 105, (short) 51);
-            allCount++;
-            players[allCount] = new Robot(this, (byte) 14, "Robot", (byte) allCount, 3700 + (this.getLevelTeam() * 10), (short) 1099, (short) 51);
-            allCount++;
-            players[allCount] = new Trex(this, (byte) 15, "T-rex", (byte) allCount, 15000 + (this.getLevelTeam() * 10), (short) 217, (short) 260);
-            allCount++;
-            players[allCount] = new Trex(this, (byte) 15, "T-rex", (byte) allCount, 15000 + (this.getLevelTeam() * 10), (short) 985, (short) 260);
-            allCount++;
-            for (byte i = 0; i < 10; i++) {
-                X = (short) ((i % 2 == 0) ? Utils.nextInt(75, 150) : Utils.nextInt(1050, 1125));
-                Y = (short) 200;
-                players[allCount] = new BigBoom(this, (byte) 12, "BigBoom", (byte) allCount, 1000 + (this.getLevelTeam() * 10), X, Y);
-                allCount++;
-
-            }
-
-        }
-        //TG Boss
-        if (this.wait.getMapId() == 41) {
-            short X = 600;
-            short Y = 99;
-            players[allCount] = new TrexTG(this, (byte) 15, "Trex-TG", (byte) allCount, 15000 + (this.getLevelTeam() * 1300), X, Y);
-            allCount++;
-
-        }
-        if (this.wait.getMapId() == 42) {
-            for (byte i = 0; i < 30; i++) {
-                short X = (short) (Utils.nextInt(300, 800));
-                short Y = (short) Utils.nextInt(0, 1);
-                X = (short) ((i % 2 == 0) ? Utils.nextInt(20, 530) : Utils.nextInt(950, 1450));
-                Y = (short) 500;
-                players[allCount] = new BigBoomHTCC(this, (byte) 12, "BigBoomHTCC", (byte) allCount, 1000 + (this.getLevelTeam() * 60), X, Y);
-                allCount++;
-
-            }
-            players[allCount] = new Robot(this, (byte) 14, "Robot", (byte) allCount, 3700 + (this.getLevelTeam() * 10), (short) 356, (short) 381);
-            allCount++;
-            players[allCount] = new Robot(this, (byte) 14, "Robot", (byte) allCount, 3700 + (this.getLevelTeam() * 10), (short) 485, (short) 337);
-            allCount++;
-            players[allCount] = new Robot(this, (byte) 14, "Robot", (byte) allCount, 3700 + (this.getLevelTeam() * 10), (short) 1010, (short) 335);
-            allCount++;
-            players[allCount] = new Robot(this, (byte) 14, "Robot", (byte) allCount, 3700 + (this.getLevelTeam() * 10), (short) 1139, (short) 385);
-            allCount++;
-            players[allCount] = new TrexTG(this, (byte) 15, "T-rex", (byte) allCount, 15000 + (this.getLevelTeam() * 400), (short) 1330, (short) 335);
-            allCount++;
-            players[allCount] = new TrexTG(this, (byte) 15, "T-rex", (byte) allCount, 15000 + (this.getLevelTeam() * 400), (short) 167, (short) 335);
-            allCount++;
-        }
-        if (this.wait.getMapId() == 43) {
-            short X = (short) (Utils.nextInt(275, 830));
-            short Y = (short) Utils.nextInt(95, 128);
-            players[allCount] = new Balloon(this, (byte) 17, "Balloon", (byte) allCount, 1, X, Y);
-            allCount++;
-            players[allCount] = new Balloon_Gun(this, (byte) 18, "Balloon Gun", (byte) allCount, 5000 + (this.getLevelTeam() * 100), (short) (X + 51), (short) (Y + 19));
-            allCount++;
-            players[allCount] = new Balloon_GunBig(this, (byte) 19, "Balloon Gun Big", (byte) allCount, 5500 + (this.getLevelTeam() * 100), (short) (X - 5), (short) (Y + 30));
-            allCount++;
-            players[allCount] = new Balloon_FanBack(this, (byte) 20, "Fan Back", (byte) allCount, 4000 + (this.getLevelTeam() * 100), (short) (X - 67), (short) (Y - 6));
-            allCount++;
-            players[allCount] = new TrexTG(this, (byte) 15, "T-rex", (byte) allCount, 15000 + (this.getLevelTeam() * 200), (short) 187, (short) 136);
-            allCount++;
-            players[allCount] = new TrexTG(this, (byte) 15, "T-rex", (byte) allCount, 15000 + (this.getLevelTeam() * 200), (short) 903, (short) 135);
-            allCount++;
-        }
-        if (this.wait.getMapId() == 44) {
-            for (byte i = 0; i < 5; i++) {
-                short X = (short) (Utils.nextInt(361, 710));
-                short Y = (short) (172);
-                players[allCount] = new Monkey(this, (byte) 3, "Monkey", (byte) allCount, 1500000 + (this.getLevelTeam() * 25000), X, Y
-                );
-                allCount++;
-
-            }
-        }
         int bossLen = this.allCount - 8;
         Message ms = new Message(89);
         DataOutputStream ds = ms.writer();
