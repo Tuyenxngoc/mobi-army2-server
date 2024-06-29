@@ -10,6 +10,7 @@ import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -20,6 +21,7 @@ import java.util.List;
  * @author tuyen
  */
 @Getter
+@Setter
 public class FightWait {
     private final FightManager fightManager;
     private final Room room;
@@ -33,13 +35,13 @@ public class FightWait {
     private byte numPlayers;
     private boolean isPassSet;
     private String password;
-    private int money;
+    public int money;
     private String name;
-    private byte mapId;
+    public byte mapId;
     private byte bossIndex;
     private Thread bossKickThread;
     private long startTime;
-    private byte continuousLevel;
+    public byte continuousLevel;
 
     public FightWait(Room room, byte id) {
         this.room = room;
@@ -352,7 +354,7 @@ public class FightWait {
 
     public synchronized void leaveTeam(int targetPlayerId) {
         if (started) {
-            fightManager.leaveFight(targetPlayerId);
+            fightManager.leave(targetPlayerId);
         }
 
         int index = getUserIndexByPlayerId(targetPlayerId);
@@ -541,7 +543,11 @@ public class FightWait {
         }
 
         started = true;
-        fightManager.startGame();
+        try {
+            fightManager.startGame(0, 0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public synchronized void setRoomName(int playerId, String name) {
@@ -768,5 +774,38 @@ public class FightWait {
         }
 
         items[index] = newItems;
+    }
+
+    public void fightComplete() throws IOException {
+        // Chien xong, refresh fight wait
+        Message ms;
+        DataOutputStream ds;
+        for (byte i = 0; i < this.users.length; i++) {
+            this.readies[i] = false;
+            User us = this.users[i];
+            if (us == null) {
+                continue;
+            }
+            ms = new Message(112);
+            ds = ms.writer();
+            for (byte j = 0; j < 4; j++) {
+                ds.writeByte(us.getItemFightQuantity(12 + j));
+            }
+            ds.flush();
+            us.sendMessage(ms);
+            us.setFightWait(this);
+        }
+        this.numReady = 0;
+        if (this.bossIndex != -1) {
+            changeBoss(this.bossIndex);
+        }
+        // Send map
+        ms = new Message(75);
+        ds = ms.writer();
+        ds.writeByte(this.mapId);
+        ds.flush();
+        this.sendToTeam(ms);
+
+        startTime = System.currentTimeMillis();
     }
 }

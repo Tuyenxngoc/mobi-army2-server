@@ -163,4 +163,113 @@ public class Utils {
         }
         return !lastOnline.toLocalDate().isEqual(now.toLocalDate());
     }
+
+    public static float getArgXY(float Ax, float Ay, float Bx, float By) {
+        float K = Math.abs(Ay - By);
+        float D = Math.abs(Ax - Bx);
+        float tan = (D / K);
+        float IntArg = (float) (Math.toDegrees(Math.atan(tan)));
+        if (Ax >= Bx && Ay > By) {
+            IntArg += 90;
+        } else if (Ax > Bx && Ay <= By) {
+            IntArg = (270 - IntArg);
+        } else if (Ax <= Bx && Ay < By) {
+            IntArg -= 90;
+        } else if (Ax < Bx && Ay >= By) {
+            IntArg = (270 + IntArg);
+        }
+        return IntArg;
+    }
+
+    public static final int toArg0_360(int arg) {
+        if (arg >= 360) {
+            arg -= 360;
+        }
+        if (arg < 0) {
+            arg += 360;
+        }
+        return arg;
+    }
+
+    public static final int cos(int arg) {
+        if ((arg = toArg0_360(arg)) >= 0 && arg < 90) {
+            return COS_DATA[arg];
+        }
+        if (arg >= 90 && arg < 180) {
+            return -COS_DATA[180 - arg];
+        }
+        if (arg >= 180 && arg < 270) {
+            return -COS_DATA[arg - 180];
+        } else {
+            return COS_DATA[360 - arg];
+        }
+    }
+
+    public static final int sin(int arg) {
+        if ((arg = toArg0_360(arg)) >= 0 && arg < 90) {
+            return SIN_DATA[arg];
+        }
+        if (arg >= 90 && arg < 180) {
+            return SIN_DATA[180 - arg];
+        }
+        if (arg >= 180 && arg < 270) {
+            return -SIN_DATA[arg - 180];
+        } else {
+            return -SIN_DATA[360 - arg];
+        }
+    }
+
+    public static boolean inRegion(int x, int y, int x0, int y0, int w, int h) {
+        return x >= x0 && x < x0 + w && y >= y0 && y < y0 + h;
+    }
+
+    public static boolean intersecRegions(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2) {
+        //return x1 + w1 >= x2 && x1 <= x2 + w2 && y1 + h1 >= y2 && y1 <= y2 + h2;
+        return Math.abs(x1 - x2) <= w2 + w1 && Math.abs(y1 - y2) <= h2 + h1;
+    }
+
+    public static boolean isNotAlpha(int rgb) {
+        return (rgb >> 24) != 0;
+    }
+
+    public static int getTeamPoint(int TongDD, int nteam) {
+        if (nteam == 1) {
+            return 0;
+        }
+        return (TongDD - 100) / 100 + (TongDD - 100) * nteam / 1000;
+    }
+
+    public static final int getArg(int cos, int sin) {
+        if (cos == 0) {
+            return sin == 0 ? 0 : (sin < 0 ? 270 : 90);
+        }
+        int arg;
+        label2:
+        {
+            arg = Math.abs((sin << 10) / cos);
+            for (int i = 0; i <= 90; i++) {
+                if (TAN_DATA[i] < arg) {
+                    continue;
+                }
+                arg = i;
+                break label2;
+            }
+            arg = 0;
+        }
+        if (sin >= 0 && cos < 0) {
+            arg = 180 - arg;
+        }
+        if (sin < 0 && cos < 0) {
+            arg += 180;
+        }
+        if (sin < 0 && cos >= 0) {
+            arg = 360 - arg;
+        }
+        return arg;
+    }
+
+    public static short getShort(byte[] ab, int off) {
+        return (short) ((ab[off] & 0xff) << 8 | ab[off + 1] & 0xff);
+    }
+
 }
