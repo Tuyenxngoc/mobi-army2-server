@@ -96,7 +96,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.PING -> userService.ping(ms);
 
-                case Cmd.SKIP -> userService.skipTurn(ms);
+                case Cmd.SKIP -> userService.skipTurn();
 
                 case Cmd.UPDATE_XY -> userService.updateCoordinates(ms);
 

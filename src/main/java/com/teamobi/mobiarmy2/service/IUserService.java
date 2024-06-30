@@ -88,7 +88,7 @@ public interface IUserService {
 
     void handleFindPlayer(Message ms);
 
-    void skipTurn(Message ms);
+    void skipTurn();
 
     void updateCoordinates(Message ms);
 

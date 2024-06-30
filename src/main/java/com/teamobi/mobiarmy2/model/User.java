@@ -458,15 +458,27 @@ public class User {
     }
 
     public short getIDBullet() {
-        return 0;
+        if (nvEquip[nvUsed][0] != null) {
+            return nvEquip[nvUsed][0].getEquipEntry().getBulletId();
+        }
+        return nvEquipDefault[nvUsed][0].getBulletId();
     }
 
     public short getGunId() {
-        return 0;
+        if (nvEquip[nvUsed][0] != null) {
+            return this.nvEquip[nvUsed][0].getEquipEntry().getEquipIndex();
+        }
+        return nvEquipDefault[nvUsed][0].getEquipIndex();
     }
 
     public int[] getAbility() {
-        return new int[0];
+        int[] ability = new int[5];
+        ability[0] = 1000;
+        ability[1] = 10;
+        ability[2] = 10;
+        ability[3] = 10;
+        ability[4] = 10;
+        return ability;
     }
 
     public void notifyNetWait() {

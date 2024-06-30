@@ -287,6 +287,13 @@ public class Bullet {
                 || bullId == 28;
     }
 
+    public static boolean isDoubleBull(int type) {
+        if (type == 17 || type == 19) {
+            return true;
+        }
+        return false;
+    }
+
     public static boolean isChicApa(int bullId) {
         return bullId == 17 || bullId == 19;
     }

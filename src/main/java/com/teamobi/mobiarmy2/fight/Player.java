@@ -67,7 +67,7 @@ public class Player {
     public short width;
     public short height;
     protected byte itemInit[];
-    protected int item[];
+    protected byte item[];
     protected byte itemUsed;
     protected boolean isUseItem;
     protected boolean isUsePow;
@@ -128,7 +128,7 @@ public class Player {
         this.GiftBox = new ArrayList<>();
         this.GiftBoxFalling = new ArrayList<>();
         if (item != null) {
-            this.item = new int[item.length];
+            this.item = new byte[item.length];
             System.arraycopy(item, 0, this.item, 0, item.length);
         }
         this.us = us;

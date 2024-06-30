@@ -500,6 +500,9 @@ public class FightWait {
 
             // Đếm số lượng item mà người dùng đang có
             for (byte itemIndex : userItems) {
+                if (itemIndex < 0 || itemIndex >= itemUsageMap.length) {
+                    continue;
+                }
                 itemUsageMap[itemIndex]++;
             }
 

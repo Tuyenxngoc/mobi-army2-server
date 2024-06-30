@@ -6,6 +6,7 @@ import com.teamobi.mobiarmy2.dao.IGiftCodeDao;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.dao.impl.GiftCodeDao;
 import com.teamobi.mobiarmy2.dao.impl.UserDao;
+import com.teamobi.mobiarmy2.fight.Bullet;
 import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.GiftCodeRewardJson;
@@ -38,6 +39,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -154,12 +156,12 @@ public class UserService implements IUserService {
                 byte indexItem = FightItemData.getRandomItem();
                 byte quantity = 1;
                 user.updateItems(indexItem, quantity);
-                sendMSSToUser(GameString.dailyReward(quantity, FightItemData.FIGHT_ITEM_ENTRIES.get(indexItem).getName()));
+                sendMessageToUser(GameString.dailyReward(quantity, FightItemData.FIGHT_ITEM_ENTRIES.get(indexItem).getName()));
 
                 //Cập nhật quà top
                 if (user.getTopEarningsXu() > 0) {
                     user.updateXu(user.getTopEarningsXu());
-                    sendMSSToUser(GameString.dailyTopReward(user.getTopEarningsXu()));
+                    sendMessageToUser(GameString.dailyTopReward(user.getTopEarningsXu()));
                     user.setTopEarningsXu(0);
                 }
 
@@ -168,7 +170,7 @@ public class UserService implements IUserService {
 
                 //Gửi messeage khi login
                 for (String msg : serverManager.config().getMessage()) {
-                    sendMSSToUser(msg);
+                    sendMessageToUser(msg);
                 }
 
                 //Cập nhật nhiệm vụ
@@ -186,7 +188,7 @@ public class UserService implements IUserService {
             sendRoomCaption(config);
             sendMapCollisionInfo();
 
-            sendServerInfo(config.getMessageLogin());
+            sendServerInfoToUser(config.getMessageLogin());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1138,41 +1140,57 @@ public class UserService implements IUserService {
                     return;
                 }
                 user.updateXu(-CommonConstant.PRICE_CHAT);
-                sendServerInfo(GameString.mssTGString(user.getUsername(), content));
+                sendServerInfoToServer(GameString.mssTGString(user.getUsername(), content));
                 return;
             }
             User receiver = ServerManager.getInstance().getUserByPlayerId(playerId);
             if (receiver == null) {
                 return;
             }
-            sendMSSToUser(receiver, content);
+            sendMessageToUser(receiver, content);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void sendServerInfo(String s) {
+    private void sendServerInfo(String message, boolean toServer) {
+        if (message == null || message.isEmpty()) {
+            return;
+        }
         try {
             Message ms = new Message(Cmd.SERVER_INFO);
             DataOutputStream ds = ms.writer();
-            ds.writeUTF(s);
+            ds.writeUTF(message);
             ds.flush();
-            ServerManager.getInstance().sendToServer(ms);
+
+            if (toServer) {
+                ServerManager.getInstance().sendToServer(ms);
+            } else {
+                user.sendMessage(ms);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void sendMSSToUser(String message) {
-        sendMSSToUser(null, message);
+    private void sendServerInfoToServer(String message) {
+        sendServerInfo(message, true);
     }
 
-    private void sendMSSToUser(User userSend, String message) {
+    private void sendServerInfoToUser(String message) {
+        sendServerInfo(message, false);
+    }
+
+    public void sendMessageToUser(String message) {
+        sendMessageToUser(null, message);
+    }
+
+    private void sendMessageToUser(User userSend, String message) {
         if (message.isEmpty()) {
             return;
         }
         try {
-            Message ms = new Message(5);
+            Message ms = new Message(Cmd.CHAT_TO);
             DataOutputStream ds = ms.writer();
             if (userSend != null) {
                 ds.writeInt(userSend.getPlayerId());
@@ -1611,12 +1629,53 @@ public class UserService implements IUserService {
 
     @Override
     public void movePlayer(Message ms) {
-
+        DataInputStream dis = ms.reader();
+        try {
+            short x = dis.readShort();
+            short y = dis.readShort();
+            user.getFightWait().getFightManager().changeLocationMessage(user, x, y);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void shoot(Message ms) {
+        DataInputStream dis = ms.reader();
+        try {
+            byte bullId = dis.readByte();
+            short x = dis.readShort();
+            short y = dis.readShort();
+            short angle = dis.readShort();
+            byte force = dis.readByte();
+            byte force2 = 0;
+            if (Bullet.isDoubleBull(bullId)) {
+                force2 = dis.readByte();
+            }
+            byte numShoot = dis.readByte();
 
+            if (angle < -360) {
+                angle = -360;
+            } else if (angle > 360) {
+                angle = 360;
+            }
+
+            if (force < 0) {
+                force = 0;
+            } else if (force > 30) {
+                force = 30;
+            }
+
+            if (force2 < 0) {
+                force2 = 0;
+            } else if (force2 > 30) {
+                force2 = 30;
+            }
+
+            user.getFightWait().getFightManager().shootMessage(user, bullId, x, y, angle, force, force2, numShoot);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -1626,7 +1685,13 @@ public class UserService implements IUserService {
 
     @Override
     public void handleUseItem(Message ms) {
+        try {
+            byte itemIndex = ms.reader().readByte();
 
+            sendServerMessage(GameString.unauthorized_Item());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -1804,13 +1869,25 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void skipTurn(Message ms) {
-
+    public void skipTurn() {
+        try {
+            user.getFightWait().getFightManager().boLuotMessage(user);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void updateCoordinates(Message ms) {
+        try {
+            DataInputStream dis = ms.reader();
+            short x = dis.readShort();
+            short y = dis.readShort();
 
+            System.out.println(x + " " + y);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -1868,15 +1945,15 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
             sendCharacterInfo();
-            sendTBInfo();
+            sendEquipInfo();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void sendTBInfo() {
+    private void sendEquipInfo() {
         try {
-            Message ms = new Message(-7);
+            Message ms = new Message(Cmd.CURR_EQUIP_DBKEY);
             DataOutputStream ds = ms.writer();
             for (int i = 0; i < 5; i++) {
                 ds.writeInt(user.getEquipData()[user.getNvUsed()][i]);
@@ -2037,15 +2114,15 @@ public class UserService implements IUserService {
         GiftCodeRewardJson rewardData = GsonUtil.GSON.fromJson(giftCode.getReward(), GiftCodeRewardJson.class);
         if (rewardData.getXu() > 0) {
             user.updateXu(rewardData.getXu());
-            sendMSSToUser(GameString.giftCodeReward(code, Utils.getStringNumber(rewardData.getXu()) + " xu"));
+            sendMessageToUser(GameString.giftCodeReward(code, Utils.getStringNumber(rewardData.getXu()) + " xu"));
         }
         if (rewardData.getLuong() > 0) {
             user.updateLuong(rewardData.getLuong());
-            sendMSSToUser(GameString.giftCodeReward(code, Utils.getStringNumber(rewardData.getLuong()) + " lượng"));
+            sendMessageToUser(GameString.giftCodeReward(code, Utils.getStringNumber(rewardData.getLuong()) + " lượng"));
         }
         if (rewardData.getExp() > 0) {
             user.updateXp(rewardData.getExp());
-            sendMSSToUser(GameString.giftCodeReward(code, Utils.getStringNumber(rewardData.getExp()) + " exp"));
+            sendMessageToUser(GameString.giftCodeReward(code, Utils.getStringNumber(rewardData.getExp()) + " exp"));
         }
         if (rewardData.getItems() != null) {
             List<SpecialItemChestEntry> additionalItems = new ArrayList<>();
@@ -2057,7 +2134,7 @@ public class UserService implements IUserService {
                 }
                 newItem.setQuantity(item.getQuantity());
                 additionalItems.add(newItem);
-                sendMSSToUser(GameString.giftCodeReward(code, newItem.getQuantity(), newItem.getItem().getName()));
+                sendMessageToUser(GameString.giftCodeReward(code, newItem.getQuantity(), newItem.getItem().getName()));
             }
             user.updateInventory(null, null, additionalItems, null);
         }
@@ -2072,7 +2149,7 @@ public class UserService implements IUserService {
                 addEquip.setAddPoints(json.getAddPoints());
                 addEquip.setAddPercents(json.getAddPercents());
                 user.addEquipment(addEquip);
-                sendMSSToUser(GameString.giftCodeReward(code, addEquip.getEquipEntry().getName()));
+                sendMessageToUser(GameString.giftCodeReward(code, addEquip.getEquipEntry().getName()));
             }
         }
 
@@ -2097,7 +2174,19 @@ public class UserService implements IUserService {
 
     @Override
     public void clearBullet(Message ms) {
-
+        DataInputStream dis = ms.reader();
+        try {
+            int size = dis.readByte();
+            int[] x = new int[size];
+            int[] y = new int[size];
+            for (byte i = 0; i < size; i++) {
+                x[i] = dis.readInt();
+                y[i] = dis.readInt();
+            }
+            System.out.println(Arrays.toString(x) + " : " + Arrays.toString(y));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
