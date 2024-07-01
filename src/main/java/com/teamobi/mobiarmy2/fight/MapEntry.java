@@ -137,13 +137,11 @@ public class MapEntry {
         this.setData(data, W, H);
     }
 
-    public final void setData(int[] data, short W, short H) {
-        this.width = W;
-        this.height = H;
+    public final void setData(int[] data, short width, short height) {
+        this.width = width;
+        this.height = height;
         this.argb = new int[data.length];
-        for (int i = 0; i < data.length; i++) {
-            this.argb[i] = data[i];
-        }
+        System.arraycopy(data, 0, this.argb, 0, data.length);
     }
 
     public final boolean isCollision(short X, short Y) {

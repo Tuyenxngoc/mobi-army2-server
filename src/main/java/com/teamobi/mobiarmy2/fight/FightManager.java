@@ -225,7 +225,7 @@ public class FightManager {
         } else if (this.wait.getMapId() == 37) {
             byte numBoss = (new byte[]{2, 3, 3, 4, 4, 5, 5, 6, 6})[playerCount];
             for (byte i = 0; i < numBoss; i++) {
-                short X = (short) Utils.nextInt(20, this.mapMNG.Width - 20);
+                short X = (short) Utils.nextInt(20, this.mapMNG.width - 20);
                 short Y = (short) 250;
                 players[allCount] = new SpiderPoisonous(this, (byte) 22, "Spider Poisonous", (byte) allCount, 3800 + (this.getLevelTeam() * 10), X, Y);
                 allCount++;
@@ -815,7 +815,7 @@ public class FightManager {
                         break;
                 }
                 // UFO
-                switch (this.mapMNG.Id) {
+                switch (this.mapMNG.id) {
                     case 35:
                         pl.us.updateMission(2, 1);
                         break;
@@ -923,10 +923,10 @@ public class FightManager {
             return;
         }
         if (!this.ltap) {
-            this.mapMNG.entrys.clear();
+            this.mapMNG.mapEntries.clear();
             this.setMap(this.wait.getMapId());
         } else {
-            this.mapMNG.setMapId(this.mapMNG.Id);
+            this.mapMNG.setMapId(this.mapMNG.id);
         }
         this.playerTurn = -1;
         this.nTurn = 0;
@@ -963,7 +963,7 @@ public class FightManager {
                 boolean exists;
                 int locaCount = -1;
                 do {
-                    locaCount = Utils.nextInt(this.mapMNG.XPlayerInit.length);
+                    locaCount = Utils.nextInt(this.mapMNG.xPlayerInit.length);
                     exists = false;
                     for (int j = 0; j < count; j++) {
                         if (location[j] == locaCount) {
@@ -973,8 +973,8 @@ public class FightManager {
                     }
                 } while (exists);
                 location[count++] = locaCount;
-                X = this.mapMNG.XPlayerInit[locaCount];
-                Y = this.mapMNG.YPlayerInit[locaCount];
+                X = this.mapMNG.xPlayerInit[locaCount];
+                Y = this.mapMNG.yPlayerInit[locaCount];
                 item = this.wait.getItems()[i];
                 for (byte j = 0; j < 4; j++) {
                     if (item[4 + j] > 0) {
@@ -1128,7 +1128,7 @@ public class FightManager {
         ds.writeShort(pl.Y);
         ds.flush();
         sendToTeam(ms);
-        if (pl.Y > this.mapMNG.Height) {
+        if (pl.Y > this.mapMNG.height) {
             pl.isDie = true;
             pl.HP = 0;
             pl.isUpdateHP = true;
@@ -1425,7 +1425,7 @@ public class FightManager {
                 y -= 25;
             }
             while (true) {
-                if ((x < -200) || (x > bull.fm.mapMNG.Width + 200) || (y > bull.fm.mapMNG.Height + 200)) {
+                if ((x < -200) || (x > bull.fm.mapMNG.width + 200) || (y > bull.fm.mapMNG.height + 200)) {
                     break;
                 }
                 short preX = x, preY = y;

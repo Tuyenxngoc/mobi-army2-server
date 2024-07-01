@@ -18,7 +18,7 @@ public class MGTBulletOld extends Bullet {
         frame++;
         XArray.add((short) X);
         YArray.add((short) Y);
-        if ((X < -200) || (X > fm.mapMNG.Width + 200) || (Y > fm.mapMNG.Height + 200)) {
+        if ((X < -200) || (X > fm.mapMNG.width + 200) || (Y > fm.mapMNG.height + 200)) {
             collect = true;
             return;
         }

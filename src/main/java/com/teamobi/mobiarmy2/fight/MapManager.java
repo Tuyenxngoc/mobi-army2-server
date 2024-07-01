@@ -8,38 +8,38 @@ import java.util.ArrayList;
 
 public class MapManager {
 
-    private final FightManager fm;
-    public short Width;
-    public short Height;
-    protected int Id;
-    protected ArrayList<MapEntry> entrys;
-    protected short[] XPlayerInit;
-    protected short[] YPlayerInit;
+    private final FightManager fightManager;
+    protected int id;
+    public short width;
+    public short height;
+    protected ArrayList<MapEntry> mapEntries;
+    protected short[] xPlayerInit;
+    protected short[] yPlayerInit;
 
-    public MapManager(FightManager fm) {
-        this.fm = fm;
-        this.Id = 0;
-        this.entrys = new ArrayList<>();
-        this.Width = 0;
-        this.Height = 0;
+    public MapManager(FightManager fightManager) {
+        this.fightManager = fightManager;
+        this.id = 0;
+        this.mapEntries = new ArrayList<>();
+        this.width = 0;
+        this.height = 0;
     }
 
-    public MapManager(FightManager fm, int map) {
-        this.fm = fm;
-        this.entrys = new ArrayList<>();
-        this.Id = map;
+    public MapManager(FightManager fightManager, int map) {
+        this.fightManager = fightManager;
+        this.mapEntries = new ArrayList<>();
+        this.id = map;
     }
 
     public int getWidth() {
-        return this.Width;
+        return this.width;
     }
 
     public int getHeight() {
-        return this.Height;
+        return this.height;
     }
 
     public void setMapId(int id) {
-        this.Id = id;
+        this.id = id;
         int i, off;
 
         byte ab[] = null;
@@ -54,9 +54,9 @@ public class MapManager {
         }
 
         off = 0;
-        this.Width = Utils.getShort(ab, off);
+        this.width = Utils.getShort(ab, off);
         off += 2;
-        this.Height = Utils.getShort(ab, off);
+        this.height = Utils.getShort(ab, off);
         off += 2;
         byte len = ab[off++];
 
@@ -74,26 +74,26 @@ public class MapManager {
             } else {
                 me = new MapEntry(brickId, Utils.getShort(ab, off + 1), Utils.getShort(ab, off + 3), null, (short) 0, (short) 0, !MapData.isNotColision(brickId));
             }
-            entrys.add(me);
+            mapEntries.add(me);
             off += 5;
         }
         int nPlayerPoint = ab[off++];
-        this.XPlayerInit = new short[nPlayerPoint];
-        this.YPlayerInit = new short[nPlayerPoint];
+        this.xPlayerInit = new short[nPlayerPoint];
+        this.yPlayerInit = new short[nPlayerPoint];
         for (i = 0; i < nPlayerPoint; i++) {
-            this.XPlayerInit[i] = Utils.getShort(ab, off);
+            this.xPlayerInit[i] = Utils.getShort(ab, off);
             off += 2;
-            this.YPlayerInit[i] = Utils.getShort(ab, off);
+            this.yPlayerInit[i] = Utils.getShort(ab, off);
             off += 2;
         }
     }
 
     public final void addEntry(MapEntry me) {
-        this.entrys.add(me);
+        this.mapEntries.add(me);
     }
 
     public final boolean isCollision(short X, short Y) {
-        for (MapEntry m : entrys) {
+        for (MapEntry m : mapEntries) {
             if (m.isCollision(X, Y)) {
                 return true;
             }
@@ -102,26 +102,26 @@ public class MapManager {
     }
 
     public final void collision(short X, short Y, Bullet bull) {
-        for (MapEntry m : entrys) {
+        for (MapEntry m : mapEntries) {
             m.collision(X, Y, bull);
         }
-        for (int i = 0; i < fm.allCount; i++) {
-            Player pl = fm.players[i];
+        for (int i = 0; i < fightManager.allCount; i++) {
+            Player pl = fightManager.players[i];
             if (pl != null && pl.idNV != 17) {
                 pl.collision(X, Y, bull);
             }
         }
-        for (int i = 0; i < fm.bullMNG.boms.size(); i++) {
-            BulletManager.BomHenGio bom = fm.bullMNG.boms.get(i);
-            while (!fm.mapMNG.isCollision((short) bom.X, (short) bom.Y)) {
+        for (int i = 0; i < fightManager.bullMNG.boms.size(); i++) {
+            BulletManager.BomHenGio bom = fightManager.bullMNG.boms.get(i);
+            while (!fightManager.mapMNG.isCollision((short) bom.X, (short) bom.Y)) {
                 bom.Y++;
                 for (int j = 0; j < 14; j++) {
-                    if (fm.mapMNG.isCollision((short) ((bom.X - 7) + i), (short) bom.Y)) {
+                    if (fightManager.mapMNG.isCollision((short) ((bom.X - 7) + i), (short) bom.Y)) {
                         break;
                     }
                 }
-                if (bom.Y > fm.mapMNG.Height) {
-                    fm.bullMNG.removeBom(i);
+                if (bom.Y > fightManager.mapMNG.height) {
+                    fightManager.bullMNG.removeBom(i);
                     break;
                 }
             }

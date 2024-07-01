@@ -77,7 +77,7 @@ public class Balloon extends Boss {
             }
             if (this.turns == 0) {
                 if (!fd) {
-                    short toX = (short) Utils.nextInt(100, this.fightMNG.mapMNG.Width - 100);
+                    short toX = (short) Utils.nextInt(100, this.fightMNG.mapMNG.width - 100);
                     short toY = (short) Utils.nextInt(-150, 50);
                     for (int i = 0; i < 5; i++) {
                         if (this.part[i] == -1) {

@@ -337,7 +337,7 @@ public class Bullet {
         frame++;
         this.XArray.add((short) X);
         this.YArray.add((short) Y);
-        if ((X < -200) || (X > fm.mapMNG.Width + 200) || (Y > fm.mapMNG.Height + 200)) {
+        if ((X < -200) || (X > fm.mapMNG.width + 200) || (Y > fm.mapMNG.height + 200)) {
             collect = true;
             return;
         }

@@ -207,7 +207,7 @@ public class Player {
     }
 
     public final void setXY(short X, short Y) {
-        if (X >= 0 && X < this.fightMNG.mapMNG.Width && Y < this.fightMNG.mapMNG.Height) {
+        if (X >= 0 && X < this.fightMNG.mapMNG.width && Y < this.fightMNG.mapMNG.height) {
             this.X = X;
             this.Y = Y;
         }
@@ -230,7 +230,7 @@ public class Player {
     }
 
     public void chuanHoaXY() {
-        while (this.Y < this.fightMNG.mapMNG.Height + 200) {
+        while (this.Y < this.fightMNG.mapMNG.height + 200) {
             if (this.fightMNG.mapMNG.isCollision(X, Y) || this.fly) {
                 return;
             }
@@ -241,7 +241,7 @@ public class Player {
     public boolean isDropMap() {
         short X = this.X, Y = this.Y;
         boolean isFly = this.fly;
-        short mapHeight = this.fightMNG.mapMNG.Height;
+        short mapHeight = this.fightMNG.mapMNG.height;
         while (Y < mapHeight + 200) {
             if (this.fightMNG.mapMNG.isCollision(X, Y) || isFly) {
                 return false;
@@ -374,7 +374,7 @@ public class Player {
     }
 
     private void die() {
-        if (this.isMM && this.X > 0 && this.Y < this.fightMNG.mapMNG.Height && this.X < this.fightMNG.mapMNG.Width) {
+        if (this.isMM && this.X > 0 && this.Y < this.fightMNG.mapMNG.height && this.X < this.fightMNG.mapMNG.width) {
             this.HP = 10;
         } else {
             this.isDie = true;
@@ -562,7 +562,7 @@ public class Player {
                         }
                     } else if (this.idNV == 26) {
                         for (int i = 0; i < 2; i++) {
-                            Player players = new Ghost2(fightMNG, (byte) 26, "Ghost II", (byte) (fightMNG.allCount + fightMNG.bullMNG.addboss.size()), 1800 + (fightMNG.getLevelTeam() * 10), (short) (Utils.nextInt(100, fightMNG.mapMNG.Width - 100)), (short) Utils.nextInt(150));
+                            Player players = new Ghost2(fightMNG, (byte) 26, "Ghost II", (byte) (fightMNG.allCount + fightMNG.bullMNG.addboss.size()), 1800 + (fightMNG.getLevelTeam() * 10), (short) (Utils.nextInt(100, fightMNG.mapMNG.width - 100)), (short) Utils.nextInt(150));
                             fightMNG.bullMNG.addboss.add(new AddBoss(players, fightMNG.getisLH() ? 50 : 6));
                         }
                     }
@@ -576,7 +576,7 @@ public class Player {
                         return;
                     }
                     if (this instanceof Boss) {
-                        if (fightMNG.mapMNG.Id != 35 && this.idNV != 23 && this.idNV != 24) {
+                        if (fightMNG.mapMNG.id != 35 && this.idNV != 23 && this.idNV != 24) {
                             switch (Utils.nextInt(3)) {
                                 case 0:
                                     int kichno = Utils.nextInt(10, 20);

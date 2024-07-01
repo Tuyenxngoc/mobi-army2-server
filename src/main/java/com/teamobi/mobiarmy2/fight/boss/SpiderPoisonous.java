@@ -65,7 +65,7 @@ public class SpiderPoisonous extends Boss {
                         this.fightMNG.nextTurn();
                     }
                 } else {
-                    this.X = (short) Utils.nextInt(50, fightMNG.mapMNG.Width - 50);
+                    this.X = (short) Utils.nextInt(50, fightMNG.mapMNG.width - 50);
                     this.fightMNG.flyChangeLocation(super.index);
                     this.fightMNG.newShoot(this.index, (byte) 47, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 10, (byte) 0, (byte) 1, false);
                 }
