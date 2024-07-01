@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.fight;
 
+import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.fight.BulletManager.AddBoss;
 import com.teamobi.mobiarmy2.fight.BulletManager.BomHenGio;
@@ -1002,31 +1003,33 @@ public class FightManager {
         if (!isFight) {
             return;
         }
-        int index = getPlayerIndexById(playerId);
+
+        byte index = getPlayerIndexById(playerId);
         if (index == -1) {
             return;
         }
-        Player pl = this.players[index];
+
+        Player player = players[index];
 
         try {
-            Message ms = new Message(9);
+            Message ms = new Message(Cmd.CHAT_TO_BOARD);
             DataOutputStream ds = ms.writer();
             ds.writeInt(playerId);
-            ds.writeUTF(GameString.leave1());
+            ds.writeUTF(GameString.leave2());
             ds.flush();
             sendToTeam(ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        if (!pl.isDie) {
-            pl.HP = 0;
-            pl.isUpdateHP = true;
-            pl.isDie = true;
+        if (!player.isDie) {
+            player.HP = 0;
+            player.isUpdateHP = true;
+            player.isDie = true;
         }
-        pl.us = null;
+        player.us = null;
+
         if (!this.ltap) {
-            this.wait.leaveTeam(playerId);
             new Thread(() -> {
                 try {
                     if (!checkWin()) {

@@ -2,6 +2,8 @@ package com.teamobi.mobiarmy2.fight;
 
 import com.teamobi.mobiarmy2.server.ServerManager;
 
+import java.io.IOException;
+
 public class CountDownManager implements Runnable {
 
     private final FightManager fightManager;
@@ -50,8 +52,9 @@ public class CountDownManager implements Runnable {
                     startCount = false;
                 }
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException ex) {
             ServerManager.getInstance().logger().logMessage("Stop count!");
         }
     }
