@@ -517,8 +517,8 @@ public class FightManager {
                 }
             }
 
-            if (this.countDownManager != null) {
-                this.countDownManager.stopCount();
+            if (countDownManager != null) {
+                countDownManager.stopCount();
             }
             if (this.playerTurn == -1) {
                 while (true) {
