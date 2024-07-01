@@ -40,7 +40,7 @@ public class FightManager {
     public Player[] players;
     public MapManager mapMNG;
     public BulletManager bullMNG;
-    public CountDownMNG countDownMNG;
+    public CountDownManager countDownManager;
 
     public FightManager(User us, byte map) {
         this.wait = null;
@@ -58,7 +58,7 @@ public class FightManager {
         this.nHopQua = 0;
         this.mapMNG = new MapManager(this);
         this.bullMNG = new BulletManager(this);
-        this.countDownMNG = null;
+        this.countDownManager = null;
         this.userLt = us;
         this.mapMNG.setMapId(map);
     }
@@ -82,7 +82,7 @@ public class FightManager {
         this.isFight = false;
         this.mapMNG = new MapManager(this);
         this.bullMNG = new BulletManager(this);
-        this.countDownMNG = new CountDownMNG(this, timeCountMax);
+        this.countDownManager = new CountDownManager(this, timeCountMax);
     }
 
     protected void setMap(byte map) {
@@ -516,8 +516,8 @@ public class FightManager {
                 }
             }
 
-            if (this.countDownMNG != null) {
-                this.countDownMNG.stopCount();
+            if (this.countDownManager != null) {
+                this.countDownManager.stopCount();
             }
             if (this.playerTurn == -1) {
                 while (true) {
@@ -686,7 +686,7 @@ public class FightManager {
         if (this.ltap) {
             return;
         }
-        this.countDownMNG.resetCount();
+        this.countDownManager.resetCount();
         if (this.isBossTurn) {
             new Thread(() -> ((Boss) players[bossTurn]).turnAction()).start();
         }

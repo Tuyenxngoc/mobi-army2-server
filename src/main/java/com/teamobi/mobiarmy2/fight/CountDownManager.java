@@ -2,30 +2,28 @@ package com.teamobi.mobiarmy2.fight;
 
 import com.teamobi.mobiarmy2.server.ServerManager;
 
-import java.io.IOException;
+public class CountDownManager implements Runnable {
 
-public class CountDownMNG implements Runnable {
-
-    private final FightManager fightMNG;
+    private final FightManager fightManager;
     public byte second;
     private byte countTime;
     private boolean startCount;
     private Thread countThread;
 
-    public CountDownMNG(FightManager fightMNG, byte countTime) {
-        this.fightMNG = fightMNG;
+    public CountDownManager(FightManager fightManager, byte countTime) {
+        this.fightManager = fightManager;
         this.startCount = false;
         this.second = 0;
         this.countTime = countTime;
         this.countThread = null;
     }
 
-    public final void setCountTime(byte count) {
+    public void setCountTime(byte count) {
         countTime = count;
     }
 
-    public final void resetCount() {
-        this.stopCount();
+    public void resetCount() {
+        stopCount();
         second = countTime;
         startCount = true;
 
@@ -34,28 +32,27 @@ public class CountDownMNG implements Runnable {
         countThread.start();
     }
 
-    public final void run() {
+    public void stopCount() {
+        startCount = false;
+        if (countThread != null && countThread.isAlive()) {
+            countThread.interrupt();
+        }
+    }
+
+    @Override
+    public void run() {
         try {
             while (startCount) {
                 Thread.sleep(1000L);
                 second--;
                 if (second == -10) {
-                    fightMNG.countOut();
+                    fightManager.countOut();
                     startCount = false;
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e1) {
+        } catch (Exception ex) {
+            ex.printStackTrace();
             ServerManager.getInstance().logger().logMessage("Stop count!");
         }
     }
-
-    public final void stopCount() {
-        startCount = false;
-        if (this.countThread != null && this.countThread.isAlive()) {
-            this.countThread.interrupt();
-        }
-    }
-
 }
