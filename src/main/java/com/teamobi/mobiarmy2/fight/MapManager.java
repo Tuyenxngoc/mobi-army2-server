@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.fight;
 
 import com.teamobi.mobiarmy2.model.MapData;
 import com.teamobi.mobiarmy2.model.entry.map.MapBrick;
+import com.teamobi.mobiarmy2.model.entry.map.MapEntry;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ public class MapManager {
     protected int id;
     public short width;
     public short height;
-    protected ArrayList<MapEntry> mapEntries;
+    protected ArrayList<MapEffectManager> mapEntries;
     protected short[] xPlayerInit;
     protected short[] yPlayerInit;
 
@@ -44,7 +45,7 @@ public class MapManager {
 
         byte ab[] = null;
         for (i = 0; i < MapData.MAP_ENTRIES.size(); i++) {
-            com.teamobi.mobiarmy2.model.entry.map.MapEntry mEntry = MapData.MAP_ENTRIES.get(i);
+            MapEntry mEntry = MapData.MAP_ENTRIES.get(i);
             if (mEntry.getId() == id) {
                 ab = mEntry.getData();
             }
@@ -67,12 +68,12 @@ public class MapManager {
                 MapData.loadMapBrick(brickId);
             }
 
-            MapEntry me;
+            MapEffectManager me;
             if (MapData.existsMapBrick(brickId)) {
                 MapBrick mB = MapData.getMapBrickEntry(brickId);
-                me = new MapEntry(brickId, Utils.getShort(ab, off + 1), Utils.getShort(ab, off + 3), mB.getData(), (short) mB.getWidth(), (short) mB.getHeight(), !MapData.isNotColision(brickId));
+                me = new MapEffectManager(brickId, Utils.getShort(ab, off + 1), Utils.getShort(ab, off + 3), mB.getData(), (short) mB.getWidth(), (short) mB.getHeight(), !MapData.isNotColision(brickId));
             } else {
-                me = new MapEntry(brickId, Utils.getShort(ab, off + 1), Utils.getShort(ab, off + 3), null, (short) 0, (short) 0, !MapData.isNotColision(brickId));
+                me = new MapEffectManager(brickId, Utils.getShort(ab, off + 1), Utils.getShort(ab, off + 3), null, (short) 0, (short) 0, !MapData.isNotColision(brickId));
             }
             mapEntries.add(me);
             off += 5;
@@ -88,12 +89,12 @@ public class MapManager {
         }
     }
 
-    public final void addEntry(MapEntry me) {
+    public final void addEntry(MapEffectManager me) {
         this.mapEntries.add(me);
     }
 
     public final boolean isCollision(short X, short Y) {
-        for (MapEntry m : mapEntries) {
+        for (MapEffectManager m : mapEntries) {
             if (m.isCollision(X, Y)) {
                 return true;
             }
@@ -102,8 +103,8 @@ public class MapManager {
     }
 
     public final void collision(short X, short Y, Bullet bull) {
-        for (MapEntry m : mapEntries) {
-            m.collision(X, Y, bull);
+        for (MapEffectManager m : mapEntries) {
+            m.handleCollision(X, Y, bull);
         }
         for (int i = 0; i < fightManager.allCount; i++) {
             Player pl = fightManager.players[i];

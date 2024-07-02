@@ -2,7 +2,7 @@ package com.teamobi.mobiarmy2.fight.bullet;
 
 import com.teamobi.mobiarmy2.fight.Bullet;
 import com.teamobi.mobiarmy2.fight.BulletManager;
-import com.teamobi.mobiarmy2.fight.MapEntry;
+import com.teamobi.mobiarmy2.fight.MapEffectManager;
 import com.teamobi.mobiarmy2.fight.Player;
 import com.teamobi.mobiarmy2.fight.boss.SpiderPoisonous;
 
@@ -32,7 +32,7 @@ public class SpiderDropSilk extends Bullet {
             } catch (IOException ex) {
                 Logger.getLogger(SpiderDropSilk.class.getName()).log(Level.SEVERE, null, ex);
             }
-            this.fm.mapMNG.addEntry(new MapEntry(this.bullMNG.mangNhenId++, (short) (X - 21), (short) (Y - 20), MapEntry.mangNhenData, (short) MapEntry.mangNhenW, (short) MapEntry.mangNhenH, true));
+            this.fm.mapMNG.addEntry(new MapEffectManager(this.bullMNG.mangNhenId++, (short) (X - 21), (short) (Y - 20), MapEffectManager.spiderData, (short) MapEffectManager.spiderWidth, (short) MapEffectManager.spiderHeight, true));
 
         }
     }
