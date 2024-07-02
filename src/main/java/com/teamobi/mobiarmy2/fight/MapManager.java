@@ -51,29 +51,20 @@ public class MapManager {
         for (int i = 0; i < entryCount; i++) {
             int brickId = mapData[offset];
 
-            MapEffectManager mapEffect;
             MapBrick mapBrick = MapData.loadMapBrick(brickId);
             if (mapBrick == null) {
-                mapEffect = new MapEffectManager(
-                        brickId,
-                        Utils.getShort(mapData, offset + 1),
-                        Utils.getShort(mapData, offset + 3),
-                        null,
-                        (short) 0,
-                        (short) 0,
-                        MapData.isCollision(brickId)
-                );
-            } else {
-                mapEffect = new MapEffectManager(
-                        brickId,
-                        Utils.getShort(mapData, offset + 1),
-                        Utils.getShort(mapData, offset + 3),
-                        mapBrick.getData(),
-                        (short) mapBrick.getWidth(),
-                        (short) mapBrick.getHeight(),
-                        MapData.isCollision(brickId)
-                );
+                continue;
             }
+
+            MapEffectManager mapEffect = new MapEffectManager(
+                    brickId,
+                    Utils.getShort(mapData, offset + 1),
+                    Utils.getShort(mapData, offset + 3),
+                    mapBrick.getData(),
+                    (short) mapBrick.getWidth(),
+                    (short) mapBrick.getHeight(),
+                    MapData.isCollision(brickId)
+            );
 
             mapEffects.add(mapEffect);
             offset += 5;
