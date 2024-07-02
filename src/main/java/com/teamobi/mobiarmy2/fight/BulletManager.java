@@ -25,15 +25,15 @@ public class BulletManager {
     public static class BomHenGio {
 
         public int id;
-        public int X;
-        public int Y;
+        public int x;
+        public int y;
         public int count;
         public Bullet bull;
 
         public BomHenGio(int id, Bullet bull, int count) {
             this.id = id;
-            this.X = bull.X;
-            this.Y = bull.Y;
+            this.x = bull.X;
+            this.y = bull.Y;
             this.count = count;
             this.bull = bull;
         }
@@ -112,7 +112,7 @@ public class BulletManager {
     public void exploreBom(int id) {
         BomHenGio bom = this.boms.get(id);
         try {
-            fm.exploreBom(id, bom.X, bom.Y, bom.bull);
+            fm.exploreBom(id, bom.x, bom.y, bom.bull);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -468,8 +468,8 @@ public class BulletManager {
                         if (i > 0) {
                             x = x + 105;
                         }
-                        if (x > this.fm.mapMNG.getWidth()) {
-                            x = 105 - (x - this.fm.mapMNG.getWidth());
+                        if (x > this.fm.mapManager.getWidth()) {
+                            x = 105 - (x - this.fm.mapManager.getWidth());
                         }
                         entrys.add(new Bullet(this, (byte) 43, 300, pl, x, (short) (y + 50), vx, vy, 0, 100));
                     }
@@ -653,7 +653,7 @@ public class BulletManager {
         short X = X1, Y = Y1;
         for (int i = 0; i <= k1; i++) {
             if (!isXuyenMap) {
-                if (fm.mapMNG.isCollision(X, Y)) {
+                if (fm.mapManager.isCollision(X, Y)) {
                     return new short[]{X, Y};
                 }
             }

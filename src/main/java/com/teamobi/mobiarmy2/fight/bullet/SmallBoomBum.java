@@ -21,7 +21,7 @@ public class SmallBoomBum extends Bullet {
         this.YArray.add((short) Y);
         ((SmallBoom) pl).bomAction();
         if (this.isCanCollision) {
-            fm.mapMNG.collision(X, Y, this);
+            fm.mapManager.handleCollision(X, Y, this);
         }
     }
 

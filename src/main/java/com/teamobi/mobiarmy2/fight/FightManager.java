@@ -39,8 +39,8 @@ public class FightManager {
     protected boolean isFight;
     protected final byte timeCountMax = 30;
     public Player[] players;
-    public MapManager mapMNG;
-    public BulletManager bullMNG;
+    public MapManager mapManager;
+    public BulletManager bulletManager;
     public CountDownManager countDownManager;
 
     public FightManager(User us, byte map) {
@@ -57,11 +57,11 @@ public class FightManager {
         this.WindY = 0;
         this.isFight = false;
         this.nHopQua = 0;
-        this.mapMNG = new MapManager(this);
-        this.bullMNG = new BulletManager(this);
+        this.mapManager = new MapManager(this);
+        this.bulletManager = new BulletManager(this);
         this.countDownManager = null;
         this.userLt = us;
-        this.mapMNG.setMapId(map);
+        this.mapManager.setMapId(map);
     }
 
     public FightManager(FightWait fo) {
@@ -81,13 +81,13 @@ public class FightManager {
         this.nHopQua = 0;
         this.players = new Player[100];
         this.isFight = false;
-        this.mapMNG = new MapManager(this);
-        this.bullMNG = new BulletManager(this);
+        this.mapManager = new MapManager(this);
+        this.bulletManager = new BulletManager(this);
         this.countDownManager = new CountDownManager(this, timeCountMax);
     }
 
     protected void setMap(byte map) {
-        this.mapMNG.setMapId(map);
+        this.mapManager.setMapId(map);
     }
 
     void sendToTeam(Message ms) {
@@ -225,7 +225,7 @@ public class FightManager {
         } else if (this.wait.getMapId() == 37) {
             byte numBoss = (new byte[]{2, 3, 3, 4, 4, 5, 5, 6, 6})[playerCount];
             for (byte i = 0; i < numBoss; i++) {
-                short X = (short) Utils.nextInt(20, this.mapMNG.width - 20);
+                short X = (short) Utils.nextInt(20, this.mapManager.width - 20);
                 short Y = (short) 250;
                 players[allCount] = new SpiderPoisonous(this, (byte) 22, "Spider Poisonous", (byte) allCount, 3800 + (this.getLevelTeam() * 10), X, Y);
                 allCount++;
@@ -636,43 +636,43 @@ public class FightManager {
             Player pl = this.players[this.bossTurn];
             pl.buocDi = 0;
         }
-        if (this.bullMNG.hasVoiRong) {
-            for (byte i = 0; i < this.bullMNG.voiRongs.size(); i++) {
-                VoiRong vr = this.bullMNG.voiRongs.get(i);
+        if (this.bulletManager.hasVoiRong) {
+            for (byte i = 0; i < this.bulletManager.voiRongs.size(); i++) {
+                VoiRong vr = this.bulletManager.voiRongs.get(i);
                 vr.count--;
                 if (vr.count < 0) {
-                    this.bullMNG.voiRongs.remove(i);
+                    this.bulletManager.voiRongs.remove(i);
                     i--;
                 }
             }
-            if (this.bullMNG.voiRongs.isEmpty()) {
-                this.bullMNG.hasVoiRong = false;
+            if (this.bulletManager.voiRongs.isEmpty()) {
+                this.bulletManager.hasVoiRong = false;
             }
         }
-        if (this.bullMNG.boms.size() > 0) {
-            for (byte i = 0; i < this.bullMNG.boms.size(); i++) {
-                BomHenGio bom = this.bullMNG.boms.get(i);
+        if (this.bulletManager.boms.size() > 0) {
+            for (byte i = 0; i < this.bulletManager.boms.size(); i++) {
+                BomHenGio bom = this.bulletManager.boms.get(i);
                 bom.count--;
                 if (bom.count == 1) {
-                    this.bullMNG.exploreBom(i);
+                    this.bulletManager.exploreBom(i);
                     i--;
                 }
             }
         }
-        if (this.bullMNG.addboss.size() > 0) {
-            for (byte i = 0; i < this.bullMNG.addboss.size(); i++) {
-                AddBoss bos = this.bullMNG.addboss.get(i);
+        if (this.bulletManager.addboss.size() > 0) {
+            for (byte i = 0; i < this.bulletManager.addboss.size(); i++) {
+                AddBoss bos = this.bulletManager.addboss.get(i);
                 this.addBoss(bos.players);
                 players[allCount - 1].XPExist = bos.XPE;
             }
-            this.bullMNG.addboss.clear();
+            this.bulletManager.addboss.clear();
         }
-        if (this.bullMNG.buls.size() > 0) {
-            for (byte i = 0; i < this.bullMNG.buls.size(); i++) {
-                Bullets bul = this.bullMNG.buls.get(i);
-                this.bullMNG.addBom((ItemBomHenGio) bul.bull);
+        if (this.bulletManager.buls.size() > 0) {
+            for (byte i = 0; i < this.bulletManager.buls.size(); i++) {
+                Bullets bul = this.bulletManager.buls.get(i);
+                this.bulletManager.addBom((ItemBomHenGio) bul.bull);
             }
-            this.bullMNG.buls.clear();
+            this.bulletManager.buls.clear();
         }
         if (!checkWin() && players[this.getIDTurn()].isDie) {
             nextTurn();
@@ -771,10 +771,10 @@ public class FightManager {
         this.WindX = 0;
         this.WindY = 0;
         this.nHopQua = 0;
-        this.bullMNG.hasVoiRong = false;
-        this.bullMNG.voiRongs.clear();
-        this.bullMNG.boms.clear();
-        this.bullMNG.addboss.clear();
+        this.bulletManager.hasVoiRong = false;
+        this.bulletManager.voiRongs.clear();
+        this.bulletManager.boms.clear();
+        this.bulletManager.addboss.clear();
         if (wait.getRoom().isContinuous() && wait.getNumPlayers() > 0) {
 
         }
@@ -815,7 +815,7 @@ public class FightManager {
                         break;
                 }
                 // UFO
-                switch (this.mapMNG.id) {
+                switch (this.mapManager.mapId) {
                     case 35:
                         pl.us.updateMission(2, 1);
                         break;
@@ -923,10 +923,10 @@ public class FightManager {
             return;
         }
         if (!this.ltap) {
-            this.mapMNG.mapEntries.clear();
+            this.mapManager.mapEffects.clear();
             this.setMap(this.wait.getMapId());
         } else {
-            this.mapMNG.setMapId(this.mapMNG.id);
+            this.mapManager.setMapId(this.mapManager.mapId);
         }
         this.playerTurn = -1;
         this.nTurn = 0;
@@ -963,7 +963,7 @@ public class FightManager {
                 boolean exists;
                 int locaCount = -1;
                 do {
-                    locaCount = Utils.nextInt(this.mapMNG.xPlayerInit.length);
+                    locaCount = Utils.nextInt(this.mapManager.playerInitXPositions.length);
                     exists = false;
                     for (int j = 0; j < count; j++) {
                         if (location[j] == locaCount) {
@@ -973,8 +973,8 @@ public class FightManager {
                     }
                 } while (exists);
                 location[count++] = locaCount;
-                X = this.mapMNG.xPlayerInit[locaCount];
-                Y = this.mapMNG.yPlayerInit[locaCount];
+                X = this.mapManager.playerInitXPositions[locaCount];
+                Y = this.mapManager.playerInitYPositions[locaCount];
                 item = this.wait.getItems()[i];
                 for (byte j = 0; j < 4; j++) {
                     if (item[4 + j] > 0) {
@@ -991,7 +991,7 @@ public class FightManager {
                 this.players[i] = new Player(this, i, X, Y, item, teamPoint, us);
             }
         }
-        this.bullMNG.mangNhenId = 200;
+        this.bulletManager.mangNhenId = 200;
         this.sendFightInfoMessage();
         if (this.type == 5) {
             nextBoss();
@@ -1128,7 +1128,7 @@ public class FightManager {
         ds.writeShort(pl.Y);
         ds.flush();
         sendToTeam(ms);
-        if (pl.Y > this.mapMNG.height) {
+        if (pl.Y > this.mapManager.height) {
             pl.isDie = true;
             pl.HP = 0;
             pl.isUpdateHP = true;
@@ -1176,16 +1176,16 @@ public class FightManager {
         if (!ltap) {
             this.calcMM();
         }
-        bullMNG.addShoot(pl, bullId, arg, force, force2, nshoot);
-        bullMNG.fillXY();
+        bulletManager.addShoot(pl, bullId, arg, force, force2, nshoot);
+        bulletManager.fillXY();
         if (!this.ltap) {
             this.nextMM();
         }
-        ArrayList<Bullet> bullets = bullMNG.entrys;
+        ArrayList<Bullet> bullets = bulletManager.entrys;
         if (bullets.isEmpty()) {
             return;
         }
-        bullId = bullMNG.entrys.get(0).bullId;
+        bullId = bulletManager.entrys.get(0).bullId;
         Message ms = new Message(ltap ? 84 : 22);
         DataOutputStream ds = ms.writer();
         // typeshoot
@@ -1204,7 +1204,7 @@ public class FightManager {
         ds.writeShort(arg);
         // Apa or chicky: send force 2
         if (bullId == 17 || bullId == 19) {
-            ds.writeByte(bullMNG.force2);
+            ds.writeByte(bulletManager.force2);
         }
         // dan laser
         if (bullId == 14 || bullId == 40) {
@@ -1223,7 +1223,7 @@ public class FightManager {
         ds.writeByte(bullets.size());
 
         for (Bullet bull : bullets) {
-            if (bullMNG.typeSC > 0 && pl.us != null) {
+            if (bulletManager.typeSC > 0 && pl.us != null) {
                 pl.us.updateMission(12, 1);
             }
             ArrayList<Short> X = bull.XArray;
@@ -1242,8 +1242,8 @@ public class FightManager {
                         if ((j == X.size() - 1) && bullId == 49) {
                             ds.writeShort(X.get(j));
                             ds.writeShort(Y.get(j));
-                            ds.writeByte(bullMNG.mgtAddX);
-                            ds.writeByte(bullMNG.mgtAddY);
+                            ds.writeByte(bulletManager.mgtAddX);
+                            ds.writeByte(bulletManager.mgtAddY);
                             break;
                         }
                         // Buoc nhay
@@ -1271,16 +1271,16 @@ public class FightManager {
 
         // Type Sieu cao
         if (bullId == 42) {
-            bullMNG.typeSC = 0;
+            bulletManager.typeSC = 0;
         }
-        ds.writeByte(bullMNG.typeSC);
-        if (bullMNG.typeSC == 1 || bullMNG.typeSC == 2) {
+        ds.writeByte(bulletManager.typeSC);
+        if (bulletManager.typeSC == 1 || bulletManager.typeSC == 2) {
             // X, Y super
-            ds.writeShort(bullMNG.XSC);
-            ds.writeShort(bullMNG.YSC);
+            ds.writeShort(bulletManager.XSC);
+            ds.writeShort(bulletManager.YSC);
         }
         ds.flush();
-        bullMNG.reset();
+        bulletManager.reset();
         this.sendToTeam(ms);
         pl.isUseItem = false;
         pl.itemUsed = -1;
@@ -1386,7 +1386,7 @@ public class FightManager {
     }
 
     public void exploreBom(int id, int X, int Y, Bullet bull) throws IOException {
-        this.mapMNG.collision((short) X, (short) Y, bull);
+        this.mapManager.handleCollision((short) X, (short) Y, bull);
         Message ms = new Message(109);
         DataOutputStream ds = ms.writer();
         ds.writeByte(1);
@@ -1425,7 +1425,7 @@ public class FightManager {
                 y -= 25;
             }
             while (true) {
-                if ((x < -200) || (x > bull.fm.mapMNG.width + 200) || (y > bull.fm.mapMNG.height + 200)) {
+                if ((x < -200) || (x > bull.fm.mapManager.width + 200) || (y > bull.fm.mapManager.height + 200)) {
                     break;
                 }
                 short preX = x, preY = y;
@@ -1508,7 +1508,7 @@ public class FightManager {
                 return 1;
             }
             if (!isXuyenMap) {
-                if (bull.fm.mapMNG.isCollision(X, Y)) {
+                if (bull.fm.mapManager.isCollision(X, Y)) {
                     return 2;
                 }
             }

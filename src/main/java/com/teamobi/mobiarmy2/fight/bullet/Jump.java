@@ -19,7 +19,7 @@ public class Jump extends Bullet {
         this.XArray.add((short) X);
         this.YArray.add((short) Y);
         if (this.isCanCollision) {
-            fm.mapMNG.collision(X, Y, this);
+            fm.mapManager.handleCollision(X, Y, this);
         }
     }
 

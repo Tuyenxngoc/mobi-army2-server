@@ -6,29 +6,24 @@ import com.teamobi.mobiarmy2.model.entry.map.MapEntry;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MapManager {
 
-    private final FightManager fightManager;
-    protected int id;
+    public final FightManager fightManager;
+    public int mapId;
     public short width;
     public short height;
-    protected ArrayList<MapEffectManager> mapEntries;
-    protected short[] xPlayerInit;
-    protected short[] yPlayerInit;
+    public short[] playerInitXPositions;
+    public short[] playerInitYPositions;
+    public List<MapEffectManager> mapEffects;
 
     public MapManager(FightManager fightManager) {
         this.fightManager = fightManager;
-        this.id = 0;
-        this.mapEntries = new ArrayList<>();
+        this.mapId = 0;
         this.width = 0;
         this.height = 0;
-    }
-
-    public MapManager(FightManager fightManager, int map) {
-        this.fightManager = fightManager;
-        this.mapEntries = new ArrayList<>();
-        this.id = map;
+        this.mapEffects = new ArrayList<>();
     }
 
     public int getWidth() {
@@ -39,90 +34,110 @@ public class MapManager {
         return this.height;
     }
 
-    public void setMapId(int id) {
-        this.id = id;
-        int i, off;
+    public void setMapId(int mapId) {
+        this.mapId = mapId;
+        byte[] mapData = null;
 
-        byte ab[] = null;
-        for (i = 0; i < MapData.MAP_ENTRIES.size(); i++) {
-            MapEntry mEntry = MapData.MAP_ENTRIES.get(i);
-            if (mEntry.getId() == id) {
-                ab = mEntry.getData();
+        for (MapEntry mapEntry : MapData.MAP_ENTRIES) {
+            if (mapEntry.getId() == mapId) {
+                mapData = mapEntry.getData();
+                break;
             }
         }
-        if (ab == null) {
+
+        if (mapData == null) {
             return;
         }
 
-        off = 0;
-        this.width = Utils.getShort(ab, off);
-        off += 2;
-        this.height = Utils.getShort(ab, off);
-        off += 2;
-        byte len = ab[off++];
+        int offset = 0;
+        width = Utils.getShort(mapData, offset);
+        offset += 2;
+        height = Utils.getShort(mapData, offset);
+        offset += 2;
+        byte entryCount = mapData[offset++];
 
-        for (i = 0; i < len; i++) {
-            int brickId = ab[off];
+        for (int i = 0; i < entryCount; i++) {
+            int brickId = mapData[offset];
 
             if (!MapData.existsMapBrick(brickId)) {
                 MapData.loadMapBrick(brickId);
             }
 
-            MapEffectManager me;
-            if (MapData.existsMapBrick(brickId)) {
-                MapBrick mB = MapData.getMapBrickEntry(brickId);
-                me = new MapEffectManager(brickId, Utils.getShort(ab, off + 1), Utils.getShort(ab, off + 3), mB.getData(), (short) mB.getWidth(), (short) mB.getHeight(), !MapData.isNotColision(brickId));
+            MapEffectManager mapEffect;
+            MapBrick mapBrick = MapData.getMapBrickEntry(brickId);
+            if (mapBrick == null) {
+                mapEffect = new MapEffectManager(
+                        brickId,
+                        Utils.getShort(mapData, offset + 1),
+                        Utils.getShort(mapData, offset + 3),
+                        null,
+                        (short) 0,
+                        (short) 0,
+                        !MapData.isNotCollision(brickId)
+                );
             } else {
-                me = new MapEffectManager(brickId, Utils.getShort(ab, off + 1), Utils.getShort(ab, off + 3), null, (short) 0, (short) 0, !MapData.isNotColision(brickId));
+                mapEffect = new MapEffectManager(
+                        brickId,
+                        Utils.getShort(mapData, offset + 1),
+                        Utils.getShort(mapData, offset + 3),
+                        mapBrick.getData(),
+                        (short) mapBrick.getWidth(),
+                        (short) mapBrick.getHeight(),
+                        !MapData.isNotCollision(brickId)
+                );
             }
-            mapEntries.add(me);
-            off += 5;
+
+            mapEffects.add(mapEffect);
+            offset += 5;
         }
-        int nPlayerPoint = ab[off++];
-        this.xPlayerInit = new short[nPlayerPoint];
-        this.yPlayerInit = new short[nPlayerPoint];
-        for (i = 0; i < nPlayerPoint; i++) {
-            this.xPlayerInit[i] = Utils.getShort(ab, off);
-            off += 2;
-            this.yPlayerInit[i] = Utils.getShort(ab, off);
-            off += 2;
+
+        int playerPointCount = mapData[offset++];
+        this.playerInitXPositions = new short[playerPointCount];
+        this.playerInitYPositions = new short[playerPointCount];
+        for (int i = 0; i < playerPointCount; i++) {
+            this.playerInitXPositions[i] = Utils.getShort(mapData, offset);
+            offset += 2;
+            this.playerInitYPositions[i] = Utils.getShort(mapData, offset);
+            offset += 2;
         }
     }
 
-    public final void addEntry(MapEffectManager me) {
-        this.mapEntries.add(me);
+    public final void addEntry(MapEffectManager mapEffect) {
+        this.mapEffects.add(mapEffect);
     }
 
-    public final boolean isCollision(short X, short Y) {
-        for (MapEffectManager m : mapEntries) {
-            if (m.isCollision(X, Y)) {
+    public final boolean isCollision(short x, short y) {
+        for (MapEffectManager mapEffect : mapEffects) {
+            if (mapEffect.isCollision(x, y)) {
                 return true;
             }
         }
         return false;
     }
 
-    public final void collision(short X, short Y, Bullet bull) {
-        for (MapEffectManager m : mapEntries) {
-            m.handleCollision(X, Y, bull);
+    public final void handleCollision(short x, short y, Bullet bullet) {
+        for (MapEffectManager mapEffect : mapEffects) {
+            mapEffect.handleCollision(x, y, bullet);
         }
+
         for (int i = 0; i < fightManager.allCount; i++) {
-            Player pl = fightManager.players[i];
-            if (pl != null && pl.idNV != 17) {
-                pl.collision(X, Y, bull);
+            Player player = fightManager.players[i];
+            if (player != null && player.idNV != 17) {
+                player.collision(x, y, bullet);
             }
         }
-        for (int i = 0; i < fightManager.bullMNG.boms.size(); i++) {
-            BulletManager.BomHenGio bom = fightManager.bullMNG.boms.get(i);
-            while (!fightManager.mapMNG.isCollision((short) bom.X, (short) bom.Y)) {
-                bom.Y++;
+
+        for (int i = 0; i < fightManager.bulletManager.boms.size(); i++) {
+            BulletManager.BomHenGio bomb = fightManager.bulletManager.boms.get(i);
+            while (!fightManager.mapManager.isCollision((short) bomb.x, (short) bomb.y)) {
+                bomb.y++;
                 for (int j = 0; j < 14; j++) {
-                    if (fightManager.mapMNG.isCollision((short) ((bom.X - 7) + i), (short) bom.Y)) {
+                    if (fightManager.mapManager.isCollision((short) ((bomb.x - 7) + j), (short) bomb.y)) {
                         break;
                     }
                 }
-                if (bom.Y > fightManager.mapMNG.height) {
-                    fightManager.bullMNG.removeBom(i);
+                if (bomb.y > fightManager.mapManager.height) {
+                    fightManager.bulletManager.removeBom(i);
                     break;
                 }
             }

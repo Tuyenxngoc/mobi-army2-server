@@ -25,7 +25,7 @@ public class ApaBullet extends Bullet {
             this.collect = true;
             this.isCanCollision = false;
             this.satThuong = 0;
-            fm.mapMNG.collision(this.X, this.Y, this);
+            fm.mapManager.handleCollision(this.X, this.Y, this);
             int arg = bullMNG.arg + Utils.toArg0_360(Utils.getArg(this.pl.X - this.X, this.pl.Y - this.Y));
             if (bullMNG.arg < 90) {
                 arg = 180 - arg;

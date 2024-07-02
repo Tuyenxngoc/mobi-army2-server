@@ -29,7 +29,7 @@ public class MGTBulletNew extends Bullet {
             short x = XArray.get(XArray.size() - 1);
             short y = YArray.get(YArray.size() - 1);
             while (true) {
-                if ((x < -100) || (x > fm.mapMNG.getWidth() + 100) || (y > fm.mapMNG.getHeight() + 100)) {
+                if ((x < -100) || (x > fm.mapManager.getWidth() + 100) || (y > fm.mapManager.getHeight() + 100)) {
                     break;
                 }
                 short[] XYVC = bullMNG.getCollisionPoint(x, y, (short) (x + nextX), (short) (y - nextY), false, false);
@@ -42,7 +42,7 @@ public class MGTBulletNew extends Bullet {
                 y -= nextY;
             }
 
-            fm.mapMNG.collision(x, y, this);
+            fm.mapManager.handleCollision(x, y, this);
             XArray.add((short) x);
             YArray.add((short) y);
             bullMNG.mgtAddX = (byte) nextX;

@@ -207,7 +207,7 @@ public class Player {
     }
 
     public final void setXY(short X, short Y) {
-        if (X >= 0 && X < this.fightMNG.mapMNG.width && Y < this.fightMNG.mapMNG.height) {
+        if (X >= 0 && X < this.fightMNG.mapManager.width && Y < this.fightMNG.mapManager.height) {
             this.X = X;
             this.Y = Y;
         }
@@ -230,8 +230,8 @@ public class Player {
     }
 
     public void chuanHoaXY() {
-        while (this.Y < this.fightMNG.mapMNG.height + 200) {
-            if (this.fightMNG.mapMNG.isCollision(X, Y) || this.fly) {
+        while (this.Y < this.fightMNG.mapManager.height + 200) {
+            if (this.fightMNG.mapManager.isCollision(X, Y) || this.fly) {
                 return;
             }
             Y++;
@@ -241,9 +241,9 @@ public class Player {
     public boolean isDropMap() {
         short X = this.X, Y = this.Y;
         boolean isFly = this.fly;
-        short mapHeight = this.fightMNG.mapMNG.height;
+        short mapHeight = this.fightMNG.mapManager.height;
         while (Y < mapHeight + 200) {
-            if (this.fightMNG.mapMNG.isCollision(X, Y) || isFly) {
+            if (this.fightMNG.mapManager.isCollision(X, Y) || isFly) {
                 return false;
             }
             Y++;
@@ -268,7 +268,7 @@ public class Player {
         } else {
             X -= step;
         }
-        if (fightMNG.mapMNG.isCollision(X, (short) (Y - 5))) {
+        if (fightMNG.mapManager.isCollision(X, (short) (Y - 5))) {
             buocDi--;
             if (addX) {
                 X -= step;
@@ -278,7 +278,7 @@ public class Player {
             return;
         }
         for (int i = 4; i >= 0; i--) {
-            if (this.fightMNG.mapMNG.isCollision(X, (short) (Y - i))) {
+            if (this.fightMNG.mapManager.isCollision(X, (short) (Y - i))) {
                 Y -= i;
                 return;
             }
@@ -374,7 +374,7 @@ public class Player {
     }
 
     private void die() {
-        if (this.isMM && this.X > 0 && this.Y < this.fightMNG.mapMNG.height && this.X < this.fightMNG.mapMNG.width) {
+        if (this.isMM && this.X > 0 && this.Y < this.fightMNG.mapManager.height && this.X < this.fightMNG.mapManager.width) {
             this.HP = 10;
         } else {
             this.isDie = true;
@@ -451,19 +451,19 @@ public class Player {
             if (bull.typeSC > 0) {
                 switch (bull.typeSC) {
                     case 1:
-                        fightMNG.bullMNG.typeSC = 1;
+                        fightMNG.bulletManager.typeSC = 1;
                         dame = dame * 11 / 10; // x1.1
-                        fightMNG.bullMNG.XSC = bull.XmaxY;
-                        fightMNG.bullMNG.YSC = bull.maxY;
+                        fightMNG.bulletManager.XSC = bull.XmaxY;
+                        fightMNG.bulletManager.YSC = bull.maxY;
                         break;
                     case 2:
-                        fightMNG.bullMNG.typeSC = 1;
+                        fightMNG.bulletManager.typeSC = 1;
                         dame = dame * 6 / 5; // x1.2
-                        fightMNG.bullMNG.XSC = bull.XmaxY;
-                        fightMNG.bullMNG.YSC = bull.maxY;
+                        fightMNG.bulletManager.XSC = bull.XmaxY;
+                        fightMNG.bulletManager.YSC = bull.maxY;
                         break;
                     case 4:
-                        fightMNG.bullMNG.typeSC = 2;
+                        fightMNG.bulletManager.typeSC = 2;
                         dame = dame * 13 / 10; // x1.3
                         break;
                     default:
@@ -562,8 +562,8 @@ public class Player {
                         }
                     } else if (this.idNV == 26) {
                         for (int i = 0; i < 2; i++) {
-                            Player players = new Ghost2(fightMNG, (byte) 26, "Ghost II", (byte) (fightMNG.allCount + fightMNG.bullMNG.addboss.size()), 1800 + (fightMNG.getLevelTeam() * 10), (short) (Utils.nextInt(100, fightMNG.mapMNG.width - 100)), (short) Utils.nextInt(150));
-                            fightMNG.bullMNG.addboss.add(new AddBoss(players, fightMNG.getisLH() ? 50 : 6));
+                            Player players = new Ghost2(fightMNG, (byte) 26, "Ghost II", (byte) (fightMNG.allCount + fightMNG.bulletManager.addboss.size()), 1800 + (fightMNG.getLevelTeam() * 10), (short) (Utils.nextInt(100, fightMNG.mapManager.width - 100)), (short) Utils.nextInt(150));
+                            fightMNG.bulletManager.addboss.add(new AddBoss(players, fightMNG.getisLH() ? 50 : 6));
                         }
                     }
                     // Ban dong doi -5xp -5cup
@@ -576,7 +576,7 @@ public class Player {
                         return;
                     }
                     if (this instanceof Boss) {
-                        if (fightMNG.mapMNG.id != 35 && this.idNV != 23 && this.idNV != 24) {
+                        if (fightMNG.mapManager.mapId != 35 && this.idNV != 23 && this.idNV != 24) {
                             switch (Utils.nextInt(3)) {
                                 case 0:
                                     int kichno = Utils.nextInt(10, 20);

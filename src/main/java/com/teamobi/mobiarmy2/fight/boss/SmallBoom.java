@@ -33,7 +33,7 @@ public class SmallBoom extends Boss {
                         super.move(false);
                     } else if (pl.X > this.X) {
                         super.move(true);
-                    } else if (!fightMNG.mapMNG.isCollision(this.X, this.Y)) {
+                    } else if (!fightMNG.mapManager.isCollision(this.X, this.Y)) {
                         this.Y++;
                     }
                     // if ko di chuyen dc

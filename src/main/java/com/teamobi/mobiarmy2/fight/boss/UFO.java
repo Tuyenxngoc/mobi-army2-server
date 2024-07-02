@@ -24,8 +24,8 @@ public class UFO extends Boss {
     public void turnAction() {
         try {
             short ys = this.Y, xs = this.X;
-            while (this.turnShoot && ys < this.fightMNG.mapMNG.height + 200 && !this.fightMNG.mapMNG.isCollision(xs, ys)) {
-                if (ys > this.fightMNG.mapMNG.height) {
+            while (this.turnShoot && ys < this.fightMNG.mapManager.height + 200 && !this.fightMNG.mapManager.isCollision(xs, ys)) {
+                if (ys > this.fightMNG.mapManager.height) {
                     this.turnShoot = false;
                 }
                 ys++;

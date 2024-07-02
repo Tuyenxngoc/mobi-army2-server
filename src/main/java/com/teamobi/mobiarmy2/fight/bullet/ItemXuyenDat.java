@@ -31,13 +31,13 @@ public class ItemXuyenDat extends Bullet {
             XArray.add((short) X);
             YArray.add((short) Y);
             if (this.isCanCollision) {
-                fm.mapMNG.collision(X, Y, this);
+                fm.mapManager.handleCollision(X, Y, this);
             }
             return;
         }
         XArray.add((short) X);
         YArray.add((short) Y);
-        if ((X < -100) || (X > fm.mapMNG.getWidth() + 100) || (Y > fm.mapMNG.getHeight() + 200)) {
+        if ((X < -100) || (X > fm.mapManager.getWidth() + 100) || (Y > fm.mapManager.getHeight() + 200)) {
             XArray.add((short) X);
             YArray.add((short) Y);
             collect = true;

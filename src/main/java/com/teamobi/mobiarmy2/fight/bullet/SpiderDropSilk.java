@@ -32,7 +32,7 @@ public class SpiderDropSilk extends Bullet {
             } catch (IOException ex) {
                 Logger.getLogger(SpiderDropSilk.class.getName()).log(Level.SEVERE, null, ex);
             }
-            this.fm.mapMNG.addEntry(new MapEffectManager(this.bullMNG.mangNhenId++, (short) (X - 21), (short) (Y - 20), MapEffectManager.spiderData, (short) MapEffectManager.spiderWidth, (short) MapEffectManager.spiderHeight, true));
+            this.fm.mapManager.addEntry(new MapEffectManager(this.bullMNG.mangNhenId++, (short) (X - 21), (short) (Y - 20), MapEffectManager.spiderData, (short) MapEffectManager.spiderWidth, (short) MapEffectManager.spiderHeight, true));
 
         }
     }

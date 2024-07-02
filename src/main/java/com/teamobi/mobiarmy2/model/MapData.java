@@ -41,9 +41,9 @@ public class MapData {
         return result.toString();
     }
 
-    public static boolean isNotColision(int id) {
-        for (int i = 0; i < idNotCollisions.length; i++) {
-            if (id == idNotCollisions[i]) {
+    public static boolean isNotCollision(int id) {
+        for (short idNotCollision : idNotCollisions) {
+            if (id == idNotCollision) {
                 return true;
             }
         }
@@ -51,9 +51,9 @@ public class MapData {
     }
 
     public static MapBrick getMapBrickEntry(int id) {
-        for (MapBrick me : MAP_BRICKS) {
-            if (me.getId() == id) {
-                return me;
+        for (MapBrick mapBrick : MAP_BRICKS) {
+            if (mapBrick.getId() == id) {
+                return mapBrick;
             }
         }
         return null;
@@ -74,8 +74,8 @@ public class MapData {
     }
 
     public static boolean existsMapBrick(int id) {
-        for (MapBrick me : MAP_BRICKS) {
-            if (me.getId() == id) {
+        for (MapBrick mapBrick : MAP_BRICKS) {
+            if (mapBrick.getId() == id) {
                 return true;
             }
         }

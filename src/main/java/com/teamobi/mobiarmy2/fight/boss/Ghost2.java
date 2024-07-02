@@ -34,8 +34,8 @@ public class Ghost2 extends Boss {
             this.Y = (short) (pl.Y - 15);
             this.fightMNG.flyChangeLocation(super.index);
             this.fightMNG.GhostBullet(this.index, pl.index);
-            short wmap = this.fightMNG.mapMNG.width;
-            short hmap = this.fightMNG.mapMNG.height;
+            short wmap = this.fightMNG.mapManager.width;
+            short hmap = this.fightMNG.mapManager.height;
             this.X = (short) ((this.X > pl.X && pl.X < wmap - 80) ? (pl.X + 80) : ((pl.X > 80) ? (pl.X - 80) : (pl.X + 80)));
             this.Y = (short) Utils.nextInt(0, hmap - 200);
             this.fightMNG.flyChangeLocation(super.index);

@@ -23,7 +23,7 @@ public class BalloonLazer extends Bullet {
         Y = pl2.Y;
         this.XArray.add((short) X);
         this.YArray.add((short) Y);
-        if ((X < -200) || (X > fm.mapMNG.width + 200) || (Y > fm.mapMNG.height + 200)) {
+        if ((X < -200) || (X > fm.mapManager.width + 200) || (Y > fm.mapManager.height + 200)) {
             collect = true;
             return;
         }
@@ -39,7 +39,7 @@ public class BalloonLazer extends Bullet {
             XArray.add((short) X);
             YArray.add((short) Y);
             if (this.isCanCollision) {
-                fm.mapMNG.collision(X, Y, this);
+                fm.mapManager.handleCollision(X, Y, this);
             }
         }
     }

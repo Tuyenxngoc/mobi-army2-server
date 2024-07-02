@@ -23,7 +23,7 @@ public class ChickyTrung extends Bullet {
                 XArray.add((short) X);
                 YArray.add((short) Y);
                 if (this.isCanCollision) {
-                    fm.mapMNG.collision(X, Y, this);
+                    fm.mapManager.handleCollision(X, Y, this);
                 }
                 return;
             } else {

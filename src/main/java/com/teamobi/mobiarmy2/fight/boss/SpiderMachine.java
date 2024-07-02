@@ -49,7 +49,7 @@ public class SpiderMachine extends Boss {
                 //tơ nhện
                 case 0:
                     this.itemUsed = 9;
-                    FA = fightMNG.getForceArgXY(idNV, this.fightMNG.bullMNG, false, X, Y, pl.X, (short) (pl.Y - (pl.height / 2)), (short) (pl.width / 2), pl.height, 50, 5, 70, 70);
+                    FA = fightMNG.getForceArgXY(idNV, this.fightMNG.bulletManager, false, X, Y, pl.X, (short) (pl.Y - (pl.height / 2)), (short) (pl.width / 2), pl.height, 50, 5, 70, 70);
                     if (FA == null) {
                         if (!fightMNG.checkWin())
                             fightMNG.nextTurn();
@@ -65,7 +65,7 @@ public class SpiderMachine extends Boss {
                 //lazer
                 case 1:
                     this.itemUsed = 16;
-                    FA = fightMNG.getForceArgXY(idNV, this.fightMNG.bullMNG, false, X, Y, pl.X, (short) (pl.Y - (pl.height / 2)), (short) (pl.width / 2), pl.height, 50, 5, 10, 50);
+                    FA = fightMNG.getForceArgXY(idNV, this.fightMNG.bulletManager, false, X, Y, pl.X, (short) (pl.Y - (pl.height / 2)), (short) (pl.width / 2), pl.height, 50, 5, 10, 50);
                     if (FA == null) {
                         if (!fightMNG.checkWin())
                             fightMNG.nextTurn();
@@ -75,7 +75,7 @@ public class SpiderMachine extends Boss {
                     break;
                 //rôcet
                 case 2:
-                    FA = fightMNG.getForceArgXY(idNV, this.fightMNG.bullMNG, true, X, Y, pl.X, (short) (pl.Y - (pl.height / 2)), (short) (pl.width / 2), pl.height, 50, 5, 30, 50);
+                    FA = fightMNG.getForceArgXY(idNV, this.fightMNG.bulletManager, true, X, Y, pl.X, (short) (pl.Y - (pl.height / 2)), (short) (pl.width / 2), pl.height, 50, 5, 30, 50);
                     if (FA == null) {
                         if (!fightMNG.checkWin())
                             fightMNG.nextTurn();

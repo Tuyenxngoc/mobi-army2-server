@@ -337,7 +337,7 @@ public class Bullet {
         frame++;
         this.XArray.add((short) X);
         this.YArray.add((short) Y);
-        if ((X < -200) || (X > fm.mapMNG.width + 200) || (Y > fm.mapMNG.height + 200)) {
+        if ((X < -200) || (X > fm.mapManager.width + 200) || (Y > fm.mapManager.height + 200)) {
             collect = true;
             return;
         }
@@ -366,7 +366,7 @@ public class Bullet {
                 }
             }
             if (this.isCanCollision) {
-                fm.mapMNG.collision(X, Y, this);
+                fm.mapManager.handleCollision(X, Y, this);
             }
             return;
         }

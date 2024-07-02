@@ -18,7 +18,7 @@ public class SmallBoomAdd extends Bullet {
     @Override
     public void nextXY() {
         super.nextXY();
-        if (super.collect && X > 0 && X < fm.mapMNG.width && Y < fm.mapMNG.height) {
+        if (super.collect && X > 0 && X < fm.mapManager.width && Y < fm.mapManager.height) {
             Player players;
             try {
                 players = new SmallBoom(fm, (byte) 11, "Small Boom", (byte) fm.allCount, 1000 + (fm.getLevelTeam() * 8), X, Y);
