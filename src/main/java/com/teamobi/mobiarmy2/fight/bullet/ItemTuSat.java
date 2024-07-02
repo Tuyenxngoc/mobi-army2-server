@@ -7,7 +7,7 @@ import com.teamobi.mobiarmy2.fight.Player;
 public class ItemTuSat extends Bullet {
 
     public ItemTuSat(BulletManager bullMNG, byte bullId, long satThuong, Player pl) {
-        super(bullMNG, bullId, satThuong, pl, pl.X, pl.Y - 12, 0, 0, 0, 0);
+        super(bullMNG, bullId, satThuong, pl, pl.x, pl.y - 12, 0, 0, 0, 0);
     }
 
     @Override
@@ -19,7 +19,7 @@ public class ItemTuSat extends Bullet {
         this.XArray.add((short) X);
         this.YArray.add((short) Y);
         if (this.isCanCollision) {
-            fm.mapManager.handleCollision(X, Y, this);
+            fightManager.mapManager.handleCollision(X, Y, this);
         }
     }
 

@@ -23,29 +23,29 @@ public class UFO extends Boss {
     @Override
     public void turnAction() {
         try {
-            short ys = this.Y, xs = this.X;
-            while (this.turnShoot && ys < this.fightMNG.mapManager.height + 200 && !this.fightMNG.mapManager.isCollision(xs, ys)) {
-                if (ys > this.fightMNG.mapManager.height) {
+            short ys = this.y, xs = this.x;
+            while (this.turnShoot && ys < this.fightManager.mapManager.height + 200 && !this.fightManager.mapManager.isCollision(xs, ys)) {
+                if (ys > this.fightManager.mapManager.height) {
                     this.turnShoot = false;
                 }
                 ys++;
             }
             if (!this.turnShoot) {
                 this.turnShoot = true;
-                Player pl = this.fightMNG.getPlayerClosest(this.X, this.Y);
+                Player pl = this.fightManager.getPlayerClosest(this.x, this.y);
                 if (pl != null) {
-                    this.Y = (short) (pl.Y - Utils.nextInt(150, 500));
-                    this.X = pl.X;
-                    this.fightMNG.flyChangeLocation(super.index);
-                    if (!fightMNG.checkWin()) {
-                        fightMNG.nextTurn();
+                    this.y = (short) (pl.y - Utils.nextInt(150, 500));
+                    this.x = pl.x;
+                    this.fightManager.flyChangeLocation(super.index);
+                    if (!fightManager.checkWin()) {
+                        fightManager.nextTurn();
                     }
-                } else if (!fightMNG.checkWin()) {
-                    fightMNG.nextTurn();
+                } else if (!fightManager.checkWin()) {
+                    fightManager.nextTurn();
                 }
             } else {
                 this.turnShoot = false;
-                this.fightMNG.newShoot(this.index, (byte) 42, (short) 270, (byte) 20, (byte) 0, (byte) 1, false);
+                this.fightManager.newShoot(this.index, (byte) 42, (short) 270, (byte) 20, (byte) 0, (byte) 1, false);
             }
         } catch (Exception e) {
             e.printStackTrace();

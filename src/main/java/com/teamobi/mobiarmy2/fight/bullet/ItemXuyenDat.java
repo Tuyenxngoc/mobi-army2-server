@@ -23,7 +23,7 @@ public class ItemXuyenDat extends Bullet {
         lastX = X;
         Y += vy;
         lastY = Y;
-        short[] XYVC = bullMNG.getCollisionPoint(preX, preY, X, Y, isXuyenPlayer, isXuyenMap);
+        short[] XYVC = bulletManager.getCollisionPoint(preX, preY, X, Y, isXuyenPlayer, isXuyenMap);
         if (XYVC != null) {
             collect = true;
             X = XYVC[0];
@@ -31,13 +31,13 @@ public class ItemXuyenDat extends Bullet {
             XArray.add((short) X);
             YArray.add((short) Y);
             if (this.isCanCollision) {
-                fm.mapManager.handleCollision(X, Y, this);
+                fightManager.mapManager.handleCollision(X, Y, this);
             }
             return;
         }
         XArray.add((short) X);
         YArray.add((short) Y);
-        if ((X < -100) || (X > fm.mapManager.getWidth() + 100) || (Y > fm.mapManager.getHeight() + 200)) {
+        if ((X < -100) || (X > fightManager.mapManager.getWidth() + 100) || (Y > fightManager.mapManager.getHeight() + 200)) {
             XArray.add((short) X);
             YArray.add((short) Y);
             collect = true;
@@ -54,8 +54,8 @@ public class ItemXuyenDat extends Bullet {
             vy -= vyTemp2 / 100;
             vyTemp2 %= 100;
         }
-        if (this.bullMNG.hasVoiRong) {
-            for (BulletManager.VoiRong vr : this.bullMNG.voiRongs) {
+        if (this.bulletManager.hasVoiRong) {
+            for (BulletManager.VoiRong vr : this.bulletManager.voiRongs) {
                 if (this.X >= vr.X - 5 && this.X <= vr.X + 10) {
                     this.vx -= 2;
                     this.vy -= 2;

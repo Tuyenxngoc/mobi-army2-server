@@ -17,7 +17,7 @@ public class ItemBomHenGio extends Bullet {
         super.nextXY();
         if (super.collect) {
             this.isCanCollision = true;
-            this.bullMNG.buls.add(new BulletManager.Bullets(this));
+            this.bulletManager.buls.add(new BulletManager.Bullets(this));
         }
     }
 

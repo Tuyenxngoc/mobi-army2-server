@@ -16,8 +16,8 @@ public class ItemVoiRong extends Bullet {
     public void nextXY() {
         super.nextXY();
         if (super.collect) {
-            this.bullMNG.hasVoiRong = true;
-            this.bullMNG.voiRongs.add(new VoiRong(X, Y, 3));
+            this.bulletManager.hasVoiRong = true;
+            this.bulletManager.voiRongs.add(new VoiRong(X, Y, 3));
         }
     }
 

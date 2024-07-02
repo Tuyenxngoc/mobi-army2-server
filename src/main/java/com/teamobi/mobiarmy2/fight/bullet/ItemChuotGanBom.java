@@ -21,7 +21,7 @@ public class ItemChuotGanBom extends Bullet {
     public void nextXY() {
         nYRoi++;
         for (int i = 0; i < nYRoi; i++) {
-            if (this.fm.mapManager.isCollision(X, Y)) {
+            if (this.fightManager.mapManager.isCollision(X, Y)) {
                 nYRoi = 0;
                 break;
             }
@@ -33,7 +33,7 @@ public class ItemChuotGanBom extends Bullet {
         } else {
             X -= step;
         }
-        if (this.fm.mapManager.isCollision(X, (short) (Y - 5))) {
+        if (this.fightManager.mapManager.isCollision(X, (short) (Y - 5))) {
             if (addX) {
                 X -= step;
             } else {
@@ -41,13 +41,13 @@ public class ItemChuotGanBom extends Bullet {
             }
         } else {
             for (int i = 4; i >= 0; i--) {
-                if (this.fm.mapManager.isCollision(X, (short) (Y - i))) {
+                if (this.fightManager.mapManager.isCollision(X, (short) (Y - i))) {
                     Y -= i;
                     break;
                 }
             }
         }
-        if (this.Y > this.fm.mapManager.getHeight() + 100) {
+        if (this.Y > this.fightManager.mapManager.getHeight() + 100) {
             XArray.add((short) X);
             YArray.add((short) Y);
             this.collect = true;
@@ -57,7 +57,7 @@ public class ItemChuotGanBom extends Bullet {
         YArray.add((short) Y);
         if (super.frame == nStep) {
             super.collect = true;
-            fm.mapManager.handleCollision(X, Y, this);
+            fightManager.mapManager.handleCollision(X, Y, this);
             return;
         }
         super.frame++;

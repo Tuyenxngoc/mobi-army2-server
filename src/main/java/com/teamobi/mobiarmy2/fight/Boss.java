@@ -19,7 +19,7 @@ public abstract class Boss extends Player {
         this.phongThu = 0;
         this.mayMan = 0;
         for (int i = 0; i < ServerManager.getInstance().config().getMaxPlayerFight(); i++) {
-            Player pl = this.fightMNG.players[i];
+            Player pl = this.fightManager.players[i];
             if (pl != null) {
                 list.add(pl);
             }

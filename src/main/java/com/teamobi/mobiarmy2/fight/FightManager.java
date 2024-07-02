@@ -96,18 +96,18 @@ public class FightManager {
             return;
         }
         for (Player player : players) {
-            if (player == null || player.us == null) {
+            if (player == null || player.user == null) {
                 continue;
             }
-            player.us.sendMessage(ms);
+            player.user.sendMessage(ms);
         }
     }
 
     public byte getPlayerIndexById(int playerId) {
         for (byte i = 0; i < players.length; i++) {
             if (players[i] != null &&
-                    players[i].us != null &&
-                    players[i].us.getPlayerId() == playerId) {
+                    players[i].user != null &&
+                    players[i].user.getPlayerId() == playerId) {
                 return i;
             }
         }
@@ -139,7 +139,7 @@ public class FightManager {
             if (pl == null || pl.isDie) {
                 continue;
             }
-            int kcX = Math.abs(pl.X - X);
+            int kcX = Math.abs(pl.x - X);
             if (XClosest == -1 || kcX < XClosest) {
                 XClosest = kcX;
                 plClosest = pl;
@@ -258,8 +258,8 @@ public class FightManager {
             ds.writeUTF(boss.name);
             ds.writeInt(boss.HPMax);
             ds.writeByte(boss.idNV);
-            ds.writeShort(boss.X);
-            ds.writeShort(boss.Y);
+            ds.writeShort(boss.x);
+            ds.writeShort(boss.y);
         }
         ds.flush();
         sendToTeam(ms);
@@ -400,13 +400,13 @@ public class FightManager {
     private void nextXP() {
         for (byte i = 0; i < 8; i++) {
             Player pl = this.players[i];
-            if (pl == null || pl.us == null) {
+            if (pl == null || pl.user == null) {
                 continue;
             }
             if (pl.isUpdateXP) {
-                int oldXP = pl.us.getCurrentXp();
-                pl.us.updateXp(pl.XPUp, true);
-                int newXP = pl.us.getCurrentXp();
+                int oldXP = pl.user.getCurrentXp();
+                pl.user.updateXp(pl.XPUp, true);
+                int newXP = pl.user.getCurrentXp();
                 pl.AllXPUp += newXP - oldXP;
                 pl.XPUp = 0;
                 pl.isUpdateXP = false;
@@ -417,11 +417,11 @@ public class FightManager {
     private void nextCUP() {
         for (byte i = 0; i < 8; i++) {
             Player pl = this.players[i];
-            if (pl == null || pl.us == null) {
+            if (pl == null || pl.user == null) {
                 continue;
             }
             if (pl.isUpdateCup) {
-                pl.us.updateDanhVong(pl.CupUp);
+                pl.user.updateDanhVong(pl.CupUp);
                 pl.CupUp = 0;
                 pl.isUpdateCup = false;
             }
@@ -781,8 +781,8 @@ public class FightManager {
         if (this.type == 5 && checkWin == 1) {
             for (byte i = 0; i < 8; i++) {
                 Player pl = this.players[i];
-                if (pl != null && pl.us != null) {
-                    pl.us.updateXp(10, true);
+                if (pl != null && pl.user != null) {
+                    pl.user.updateXp(10, true);
                 }
             }
         }
@@ -791,25 +791,25 @@ public class FightManager {
         // Update Win
         for (byte i = 0; i < 8; i++) {
             Player pl = this.players[i];
-            if (pl == null || pl.us == null) {
+            if (pl == null || pl.user == null) {
                 continue;
             }
             byte win = (byte) (pl.team ? checkWin : -checkWin);
             if (win == 1 && nTurn > 2) {
                 if (this.playerCount == 2) {
-                    pl.us.updateMission(0, 1);
+                    pl.user.updateMission(0, 1);
                 } else if (this.playerCount >= 5) {
-                    pl.us.updateMission(17, 1);
+                    pl.user.updateMission(17, 1);
                 }
                 switch (pl.idNV) {
                     case 0:
-                        pl.us.updateMission(13, 1);
+                        pl.user.updateMission(13, 1);
                         break;
                     case 1:
-                        pl.us.updateMission(14, 1);
+                        pl.user.updateMission(14, 1);
                         break;
                     case 2:
-                        pl.us.updateMission(15, 1);
+                        pl.user.updateMission(15, 1);
                         break;
                     default:
                         break;
@@ -817,14 +817,14 @@ public class FightManager {
                 // UFO
                 switch (this.mapManager.mapId) {
                     case 35:
-                        pl.us.updateMission(2, 1);
+                        pl.user.updateMission(2, 1);
                         break;
                     case 36:
-                        pl.us.updateMission(3, 1);
+                        pl.user.updateMission(3, 1);
                         break;
                     case 38:
                     case 39:
-                        pl.us.updateMission(4, 1);
+                        pl.user.updateMission(4, 1);
                         break;
                     default:
                         break;
@@ -839,52 +839,52 @@ public class FightManager {
             // money Bonus
             ds.writeInt(this.wait.getMoney());
             ds.flush();
-            pl.us.sendMessage(ms);
+            pl.user.sendMessage(ms);
         }
 
         // Update All XP and CUP
         for (byte i = 0; i < 8; i++) {
             Player pl = this.players[i];
-            if (pl == null || pl.us == null) {
+            if (pl == null || pl.user == null) {
                 continue;
             }
             ms = new Message(97);
             ds = ms.writer();
             ds.writeInt(pl.AllXPUp);
-            ds.writeInt(pl.us.getCurrentXp());
-            ds.writeInt(pl.us.getCurrentLevel() * (pl.us.getCurrentLevel() + 1) * 1000);
+            ds.writeInt(pl.user.getCurrentXp());
+            ds.writeInt(pl.user.getCurrentLevel() * (pl.user.getCurrentLevel() + 1) * 1000);
             ds.writeByte(0);
-            ds.writeByte(pl.us.getCurrentLevelPercent());
+            ds.writeByte(pl.user.getCurrentLevelPercent());
             ds.flush();
-            pl.us.sendMessage(ms);
+            pl.user.sendMessage(ms);
         }
         for (byte i = 0; i < 8; i++) {
             Player pl = this.players[i];
-            if (pl == null || pl.us == null) {
+            if (pl == null || pl.user == null) {
                 continue;
             }
             ms = new Message(-24);
             ds = ms.writer();
             ds.writeByte(pl.AllCupUp);
-            ds.writeInt(pl.us.getDanhVong());
+            ds.writeInt(pl.user.getDanhVong());
             ds.flush();
-            pl.us.sendMessage(ms);
+            pl.user.sendMessage(ms);
         }
         // Update Xu
         if (this.wait.getMoney() > 0) {
             for (byte i = 0; i < 8; i++) {
                 Player pl = this.players[i];
-                if (pl == null || pl.us == null) {
+                if (pl == null || pl.user == null) {
                     continue;
                 }
                 byte win = (byte) (pl.team ? checkWin : -checkWin);
                 if (win >= 0) {
-                    pl.us.updateXu(this.wait.money * (win == 1 ? 2 : 1));
+                    pl.user.updateXu(this.wait.money * (win == 1 ? 2 : 1));
                     ms = new Message(52);
                     ds = ms.writer();
-                    ds.writeInt(pl.us.getPlayerId());
+                    ds.writeInt(pl.user.getPlayerId());
                     ds.writeInt(this.wait.money * (win == 1 ? 2 : 1));
-                    ds.writeInt(pl.us.getXu());
+                    ds.writeInt(pl.user.getXu());
                     ds.flush();
                     sendToTeam(ms);
                 }
@@ -906,7 +906,7 @@ public class FightManager {
             }
             for (byte i = 0; i < 8; i++) {
                 Player pl = this.players[i];
-                if (pl == null || pl.us == null) {
+                if (pl == null || pl.user == null) {
                     continue;
                 }
                 byte win = (byte) (pl.team ? checkWin : -checkWin);
@@ -1027,7 +1027,7 @@ public class FightManager {
             player.isUpdateHP = true;
             player.isDie = true;
         }
-        player.us = null;
+        player.user = null;
 
         if (!this.ltap) {
             new Thread(() -> {
@@ -1058,21 +1058,21 @@ public class FightManager {
         if (!this.ltap && this.wait.money > 0) {
             for (byte i = 0; i < 8; i++) {
                 Player pl = this.players[i];
-                if (pl == null || pl.us == null) {
+                if (pl == null || pl.user == null) {
                     continue;
                 }
                 Message ms = new Message(52);
                 DataOutputStream ds = ms.writer();
-                ds.writeInt(pl.us.getPlayerId());
+                ds.writeInt(pl.user.getPlayerId());
                 ds.writeInt(-this.wait.money);
-                ds.writeInt(pl.us.getXu());
+                ds.writeInt(pl.user.getXu());
                 ds.flush();
                 this.sendToTeam(ms);
             }
         }
         for (byte i = 0; i < 8; i++) {
             Player pl = this.players[i];
-            if (pl == null || pl.us == null) {
+            if (pl == null || pl.user == null) {
                 continue;
             }
             Message ms = new Message(20);
@@ -1103,12 +1103,12 @@ public class FightManager {
                     ds.writeShort(-1);
                     continue;
                 }
-                ds.writeShort(pl2.X);
-                ds.writeShort(pl2.Y);
+                ds.writeShort(pl2.x);
+                ds.writeShort(pl2.y);
                 ds.writeShort(pl2.HPMax);
             }
             ds.flush();
-            pl.us.sendMessage(ms);
+            pl.user.sendMessage(ms);
         }
     }
 
@@ -1120,15 +1120,15 @@ public class FightManager {
 
     public void changeLocation(int index) throws IOException {
         Player pl = this.players[index];
-        ServerManager.getInstance().logger().logMessage("Player " + index + " change location X=" + pl.X + " Y=" + pl.Y);
+        ServerManager.getInstance().logger().logMessage("Player " + index + " change location X=" + pl.x + " Y=" + pl.y);
         Message ms = new Message(21);
         DataOutputStream ds = ms.writer();
         ds.writeByte(index);
-        ds.writeShort(pl.X);
-        ds.writeShort(pl.Y);
+        ds.writeShort(pl.x);
+        ds.writeShort(pl.y);
         ds.flush();
         sendToTeam(ms);
-        if (pl.Y > this.mapManager.height) {
+        if (pl.y > this.mapManager.height) {
             pl.isDie = true;
             pl.HP = 0;
             pl.isUpdateHP = true;
@@ -1143,8 +1143,8 @@ public class FightManager {
         Message ms = new Message(93);
         DataOutputStream ds = ms.writer();
         ds.writeByte(index);
-        ds.writeShort(pl.X);
-        ds.writeShort(pl.Y);
+        ds.writeShort(pl.x);
+        ds.writeShort(pl.y);
         ds.flush();
         sendToTeam(ms);
     }
@@ -1162,8 +1162,8 @@ public class FightManager {
         ds.writeUTF(boss.name);
         ds.writeInt(boss.HPMax);
         ds.writeByte(boss.idNV);
-        ds.writeShort(boss.X);
-        ds.writeShort(boss.Y);
+        ds.writeShort(boss.x);
+        ds.writeShort(boss.y);
         ds.flush();
         this.sendToTeam(ms);
         allCount++;
@@ -1172,7 +1172,7 @@ public class FightManager {
     public void newShoot(int index, byte bullId, short arg, byte force, byte force2, byte nshoot, boolean ltap) throws IOException {
         //ServerManager.getInstance().logger().logMessage("New shoot index=" + index + " bullId: " + bullId + " arg: " + arg + " force: " + force + " force2: " + force2 + " nshoot: " + nshoot);
         final Player pl = this.players[index];
-        short x = pl.X, y = pl.Y;
+        short x = pl.x, y = pl.y;
         if (!ltap) {
             this.calcMM();
         }
@@ -1223,8 +1223,8 @@ public class FightManager {
         ds.writeByte(bullets.size());
 
         for (Bullet bull : bullets) {
-            if (bulletManager.typeSC > 0 && pl.us != null) {
-                pl.us.updateMission(12, 1);
+            if (bulletManager.typeSC > 0 && pl.user != null) {
+                pl.user.updateMission(12, 1);
             }
             ArrayList<Short> X = bull.XArray;
             ArrayList<Short> Y = bull.YArray;
@@ -1344,7 +1344,7 @@ public class FightManager {
         }
         if (this.ltap) {
             pl.setXY(x, y);
-        } else if (x != pl.X && y != pl.Y) {
+        } else if (x != pl.x && y != pl.y) {
             pl.updateXY(x, y);
         }
         newShoot(index, bullId, (arg > 360 ? 360 : (arg < -360 ? -360 : arg)), (force > 30 ? 30 : (force < 0 ? 0 : force)), (force2 > 30 ? 30 : (force2 < 0 ? 0 : force2)), nshoot, ltap);
@@ -1557,16 +1557,16 @@ public class FightManager {
         Message ms = new Message(21);
         DataOutputStream ds = ms.writer();
         ds.writeByte(toIndex);
-        ds.writeShort(pl.X);
-        ds.writeShort(pl.Y);
+        ds.writeShort(pl.x);
+        ds.writeShort(pl.y);
         ds.flush();
-        pl.us.sendMessage(ms);
+        pl.user.sendMessage(ms);
     }
 
     private void nextGift() throws IOException {
         for (int i = 0; i < 8; i++) {
             Player pl = this.players[i];
-            if (pl == null || pl.us == null) {
+            if (pl == null || pl.user == null) {
                 continue;
             }
             for (int j = 0; j < pl.GiftBox.size(); j++) {
@@ -1583,7 +1583,7 @@ public class FightManager {
                     //xu
                     case 0:
                         ds.writeShort(nb.getNumb());
-                        pl.us.updateXu(nb.getNumb());
+                        pl.user.updateXu(nb.getNumb());
                         break;
                     //item
                     case 1:
@@ -1594,7 +1594,7 @@ public class FightManager {
                     //xp
                     case 3:
                         ds.writeByte(nb.getNumb());
-                        pl.us.updateXp(nb.getNumb(), false);
+                        pl.user.updateXp(nb.getNumb(), false);
                         //notification
                     case 4:
                         ds.writeUTF(SpecialItemData.getSpecialItemById(nb.getId()).getName());
@@ -1619,7 +1619,7 @@ public class FightManager {
                     //xu
                     case 0:
                         ds.writeShort(nb.getNumb());
-                        pl.us.updateXu(nb.getNumb());
+                        pl.user.updateXu(nb.getNumb());
                         break;
                     //item
                     case 1:
@@ -1630,7 +1630,7 @@ public class FightManager {
                     //xp
                     case 3:
                         ds.writeByte(nb.getNumb());
-                        pl.us.updateXp(nb.getNumb(), false);
+                        pl.user.updateXp(nb.getNumb(), false);
                         //notification
                     case 4:
                         ds.writeUTF(SpecialItemData.getSpecialItemById(nb.getId()).getName());

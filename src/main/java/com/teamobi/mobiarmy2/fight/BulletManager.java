@@ -124,8 +124,8 @@ public class BulletManager {
     }
 
     public void addShoot(Player pl, byte bull, short angle, byte force, byte force2, byte nshoot) {
-        this.XPL = pl.X;
-        this.YPL = pl.Y;
+        this.XPL = pl.x;
+        this.YPL = pl.y;
         this.arg = angle;
         this.force2 = force2;
         if (bull == 49 && !fm.ltap) {
@@ -133,8 +133,8 @@ public class BulletManager {
         }
         this.typeSC = 0;
         int x, y, vx, vy, idGun;
-        x = pl.X + (20 * Utils.cos(angle) >> 10);
-        y = pl.Y - 12 - (20 * Utils.sin(angle) >> 10);
+        x = pl.x + (20 * Utils.cos(angle) >> 10);
+        y = pl.y - 12 - (20 * Utils.sin(angle) >> 10);
         vx = (force * Utils.cos(angle) >> 10);
         vy = -(force * Utils.sin(angle) >> 10);
 
@@ -174,8 +174,8 @@ public class BulletManager {
                     int nBulls = pl.isUsePow ? 4 : 2;
                     for (int i = 0; i < nBulls; i++) {
                         int arg = angle + i * 5;
-                        x = pl.X + (20 * Utils.cos(arg) >> 10);
-                        y = pl.Y - 12 - (20 * Utils.sin(arg) >> 10);
+                        x = pl.x + (20 * Utils.cos(arg) >> 10);
+                        y = pl.y - 12 - (20 * Utils.sin(arg) >> 10);
                         vx = (force * Utils.cos(arg) >> 10);
                         vy = -(force * Utils.sin(arg) >> 10);
                         entrys.add(new Bullet(this, (byte) 2, nshoot == 2 ? 75 : 100, pl, x, y, vx, vy, 80, 60));
@@ -183,8 +183,8 @@ public class BulletManager {
                             continue;
                         }
                         arg = angle - i * 5;
-                        x = pl.X + (20 * Utils.cos(arg) >> 10);
-                        y = pl.Y - 12 - (20 * Utils.sin(arg) >> 10);
+                        x = pl.x + (20 * Utils.cos(arg) >> 10);
+                        y = pl.y - 12 - (20 * Utils.sin(arg) >> 10);
                         vx = (force * Utils.cos(arg) >> 10);
                         vy = -(force * Utils.sin(arg) >> 10);
                         entrys.add(new Bullet(this, (byte) 2, nshoot == 2 ? 75 : 100, pl, x, y, vx, vy, 80, 60));
@@ -196,7 +196,7 @@ public class BulletManager {
                     if (pl.itemUsed != 8) {
                         return;
                     }
-                    pl.us.updateMission(5, 1);
+                    pl.user.updateMission(5, 1);
                     entrys.add(new ItemBomB52(this, (byte) 4, 600, pl, x, y, vx, vy, 0, 80));
                     break;
 
@@ -245,8 +245,8 @@ public class BulletManager {
                     }
                     int arg2 = angle - 6;
                     for (int i = 0; i < 4; i++, arg2 += 4) {
-                        x = pl.X + (20 * Utils.cos(arg2) >> 10);
-                        y = pl.Y - 12 - (20 * Utils.sin(arg2) >> 10);
+                        x = pl.x + (20 * Utils.cos(arg2) >> 10);
+                        y = pl.y - 12 - (20 * Utils.sin(arg2) >> 10);
                         vx = (force * Utils.cos(arg2) >> 10);
                         vy = -(force * Utils.sin(arg2) >> 10);
                         entrys.add(new Bullet(this, (byte) 9, pl.isUsePow ? 210 : (nshoot == 2 ? 79 : 105), pl, x, y, vx, vy, 40, 90));
@@ -373,7 +373,7 @@ public class BulletManager {
                         return;
                     }
                     pl.isMM = false;
-                    entrys.add(new ItemKhoangDat(this, (byte) 30, pl, pl.X, pl.Y, force));
+                    entrys.add(new ItemKhoangDat(this, (byte) 30, pl, pl.x, pl.y, force));
                     break;
 
                 // Big boom bum
@@ -456,7 +456,7 @@ public class BulletManager {
                     if (idGun != 16) {
                         return;
                     }
-                    entrys.add(new Bullet(this, (byte) 42, 1000, pl, pl.X, pl.Y, vx, vy + 10, 10, 0));
+                    entrys.add(new Bullet(this, (byte) 42, 1000, pl, pl.x, pl.y, vx, vy + 10, 10, 0));
                     break;
 
                 //Balloon Gun Big
@@ -501,8 +501,8 @@ public class BulletManager {
                     }
                     for (byte i = 0; i < 5; i++) {
                         int arg = angle + i * 5;
-                        x = pl.X + (30 * Utils.cos(arg) >> 10);
-                        y = pl.Y - 12 - (30 * Utils.sin(arg) >> 10);
+                        x = pl.x + (30 * Utils.cos(arg) >> 10);
+                        y = pl.y - 12 - (30 * Utils.sin(arg) >> 10);
                         vx = (force * Utils.cos(arg) >> 10);
                         vy = -(force * Utils.sin(arg) >> 10);
                         entrys.add(new Bullet(this, (byte) 47, 400, pl, x, y, vx, vy, 0, 0));
@@ -567,8 +567,8 @@ public class BulletManager {
                     }
                     int arg3 = angle - 5;
                     for (int i = 0; i < 3; i++, arg3 += 5) {
-                        x = pl.X + (20 * Utils.cos(arg3) >> 10);
-                        y = pl.Y - 12 - (20 * Utils.sin(arg3) >> 10);
+                        x = pl.x + (20 * Utils.cos(arg3) >> 10);
+                        y = pl.y - 12 - (20 * Utils.sin(arg3) >> 10);
                         vx = (force * Utils.cos(arg3) >> 10);
                         vy = -(force * Utils.sin(arg3) >> 10);
                         entrys.add(new ItemToNhen(this, (byte) 56, 300, pl, x, y, vx, vy, 70, 70));

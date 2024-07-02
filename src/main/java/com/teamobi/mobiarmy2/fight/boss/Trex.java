@@ -19,38 +19,38 @@ public class Trex extends Boss {
     @Override
     public void turnAction() {
         try {
-            Player pl = this.fightMNG.getPlayerClosest(this.X, this.Y);
+            Player pl = this.fightManager.getPlayerClosest(this.x, this.y);
             if (pl == null) {
                 return;
             }
-            if (Math.abs(X - pl.X) <= 90 && Math.abs(Y - pl.Y) <= 250) {
-                this.fightMNG.newShoot(this.index, (byte) 35, (short) 0, (byte) 0, (byte) 0, (byte) 1, false);
+            if (Math.abs(x - pl.x) <= 90 && Math.abs(y - pl.y) <= 250) {
+                this.fightManager.newShoot(this.index, (byte) 35, (short) 0, (byte) 0, (byte) 0, (byte) 1, false);
             } else {
                 int randi = Utils.nextInt(3);
                 short[] FA = null;
                 switch (randi) {
                     case 0:
-                        this.fightMNG.newShoot(this.index, (byte) 37, (short) 110, (byte) 30, (byte) 0, (byte) 1, false);
+                        this.fightManager.newShoot(this.index, (byte) 37, (short) 110, (byte) 30, (byte) 0, (byte) 1, false);
                         break;
                     case 1:
-                        FA = fightMNG.getForceArgXY(idNV, fightMNG.bulletManager, false, X, Y, pl.X, pl.Y, (short) 70, (short) (70), 110, 5, 10, 80);
+                        FA = fightManager.getForceArgXY(idNV, fightManager.bulletManager, false, x, y, pl.x, pl.y, (short) 70, (short) (70), 110, 5, 10, 80);
                         if (FA == null) {
-                            if (!fightMNG.checkWin()) {
-                                fightMNG.nextTurn();
+                            if (!fightManager.checkWin()) {
+                                fightManager.nextTurn();
                             }
                             return;
                         }
-                        this.fightMNG.newShoot(this.index, (byte) 40, FA[0], (byte) FA[1], (byte) 0, (byte) 1, false);
+                        this.fightManager.newShoot(this.index, (byte) 40, FA[0], (byte) FA[1], (byte) 0, (byte) 1, false);
                         break;
                     case 2:
-                        FA = fightMNG.getForceArgXY(idNV, fightMNG.bulletManager, false, X, Y, pl.X, pl.Y, (short) (70), (short) (70), 110, 5, 10, 80);
+                        FA = fightManager.getForceArgXY(idNV, fightManager.bulletManager, false, x, y, pl.x, pl.y, (short) (70), (short) (70), 110, 5, 10, 80);
                         if (FA == null) {
-                            if (!fightMNG.checkWin()) {
-                                fightMNG.nextTurn();
+                            if (!fightManager.checkWin()) {
+                                fightManager.nextTurn();
                             }
                             return;
                         }
-                        this.fightMNG.newShoot(this.index, (byte) 41, FA[0], (byte) FA[1], (byte) 0, (byte) 1, false);
+                        this.fightManager.newShoot(this.index, (byte) 41, FA[0], (byte) FA[1], (byte) 0, (byte) 1, false);
                         break;
                 }
             }

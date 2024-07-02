@@ -8,7 +8,7 @@ import com.teamobi.mobiarmy2.fight.boss.BigBoom;
 public class BigBoomBum extends Bullet {
 
     public BigBoomBum(BulletManager bullMNG, byte bullId, long satThuong, Player pl) {
-        super(bullMNG, bullId, satThuong, pl, pl.X, pl.Y - 12, 0, 0, 0, 0);
+        super(bullMNG, bullId, satThuong, pl, pl.x, pl.y - 12, 0, 0, 0, 0);
     }
 
     @Override
@@ -21,7 +21,7 @@ public class BigBoomBum extends Bullet {
         this.YArray.add((short) Y);
         ((BigBoom) pl).bomAction();
         if (this.isCanCollision) {
-            fm.mapManager.handleCollision(X, Y, this);
+            fightManager.mapManager.handleCollision(X, Y, this);
         }
     }
 

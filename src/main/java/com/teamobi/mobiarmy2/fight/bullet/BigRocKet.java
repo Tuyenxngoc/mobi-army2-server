@@ -13,12 +13,12 @@ public class BigRocKet extends Bullet {
     private boolean flyshoot;
 
     public BigRocKet(BulletManager bullMNG, byte bullId, long satThuong, Player pl) {
-        super(bullMNG, bullId, satThuong, pl, pl.X, pl.Y - (pl.height + 12), 0, -50, 0, 0);
+        super(bullMNG, bullId, satThuong, pl, pl.x, pl.y - (pl.height + 12), 0, -50, 0, 0);
         super.g100 = 80;
         ArrayList<Short> ar = new ArrayList();
         for (int i = 0; i < 8; i++) {
-            if (this.fm.players[i] != null && !this.fm.players[i].isDie) {
-                ar.add(this.fm.players[i].X);
+            if (this.fightManager.players[i] != null && !this.fightManager.players[i].isDie) {
+                ar.add(this.fightManager.players[i].x);
             }
         }
         this.toX = ar.get(Utils.nextInt(ar.size()));
@@ -32,7 +32,7 @@ public class BigRocKet extends Bullet {
             if (this.Y < -1200) {
                 vy = 0;
                 for (byte i = 0; i < 21; i++) {
-                    X = (short) (X - (pl.X - toX) / 20);
+                    X = (short) (X - (pl.x - toX) / 20);
                     super.frame++;
                     this.XArray.add(X);
                     this.YArray.add(Y);

@@ -17,15 +17,15 @@ public class ItemKhoiDoc extends Bullet {
         super.nextXY();
         if (super.collect) {
             for (int i = 0; i < 8; i++) {
-                Player pl = fm.players[i];
+                Player pl = fightManager.players[i];
                 if (pl != null) {
                     int tamAH = Bullet.getTamAHByBullID(bullId);
-                    int kcX = Math.abs(pl.X - X);
-                    int kcY = Math.abs(pl.Y - pl.height / 2 - Y);
+                    int kcX = Math.abs(pl.x - X);
+                    int kcY = Math.abs(pl.y - pl.height / 2 - Y);
                     int kc = (int) Math.sqrt(kcX * kcX + kcY * kcY);
                     if (!pl.isDie && pl.voHinhCount <= 0 && kc <= tamAH + pl.width / 2) {
                         try {
-                            this.fm.updateBiDoc(pl);
+                            this.fightManager.updateBiDoc(pl);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }

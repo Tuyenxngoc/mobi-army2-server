@@ -21,27 +21,27 @@ public class Ghost extends Boss {
     @Override
     public void turnAction() {
         try {
-            Player pl = this.fightMNG.getPlayerClosest(this.X, this.Y);
+            Player pl = this.fightManager.getPlayerClosest(this.x, this.y);
             if (pl == null) {
                 return;
             }
             //mò tới nguoi chơi
-            if (this.X > pl.X) {
-                this.X = (short) (pl.X + 30);
+            if (this.x > pl.x) {
+                this.x = (short) (pl.x + 30);
             } else {
-                this.X = (short) (pl.X - 30);
+                this.x = (short) (pl.x - 30);
             }
-            this.Y = (short) (pl.Y - 15);
-            this.fightMNG.flyChangeLocation(super.index);
-            this.fightMNG.GhostBullet(this.index, pl.index);
-            short wmap = this.fightMNG.mapManager.width;
-            short hmap = this.fightMNG.mapManager.height;
-            this.X = (short) Utils.nextInt(100, wmap - 100);
-            this.Y = (short) Utils.nextInt(0, hmap - 200);
-            this.fightMNG.flyChangeLocation(super.index);
+            this.y = (short) (pl.y - 15);
+            this.fightManager.flyChangeLocation(super.index);
+            this.fightManager.GhostBullet(this.index, pl.index);
+            short wmap = this.fightManager.mapManager.width;
+            short hmap = this.fightManager.mapManager.height;
+            this.x = (short) Utils.nextInt(100, wmap - 100);
+            this.y = (short) Utils.nextInt(0, hmap - 200);
+            this.fightManager.flyChangeLocation(super.index);
             pl.updateHP(-Utils.nextInt(300, 600));
-            if (!fightMNG.checkWin()) {
-                fightMNG.nextTurn();
+            if (!fightManager.checkWin()) {
+                fightManager.nextTurn();
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -18,12 +18,12 @@ public class BalloonLazer extends Bullet {
 
     public void nextXY() {
         frame++;
-        Player pl2 = this.fm.getPlayerClosest(X, Y);
-        X = pl2.X;
-        Y = pl2.Y;
+        Player pl2 = this.fightManager.getPlayerClosest(X, Y);
+        X = pl2.x;
+        Y = pl2.y;
         this.XArray.add((short) X);
         this.YArray.add((short) Y);
-        if ((X < -200) || (X > fm.mapManager.width + 200) || (Y > fm.mapManager.height + 200)) {
+        if ((X < -200) || (X > fightManager.mapManager.width + 200) || (Y > fightManager.mapManager.height + 200)) {
             collect = true;
             return;
         }
@@ -31,7 +31,7 @@ public class BalloonLazer extends Bullet {
         lastX = X;
         Y += vy;
         lastY = Y;
-        short[] XYVC = bullMNG.getCollisionPoint(preX, preY, X, Y, isXuyenPlayer, isXuyenMap);
+        short[] XYVC = bulletManager.getCollisionPoint(preX, preY, X, Y, isXuyenPlayer, isXuyenMap);
         if (XYVC != null) {
             collect = true;
             X = XYVC[0];
@@ -39,7 +39,7 @@ public class BalloonLazer extends Bullet {
             XArray.add((short) X);
             YArray.add((short) Y);
             if (this.isCanCollision) {
-                fm.mapManager.handleCollision(X, Y, this);
+                fightManager.mapManager.handleCollision(X, Y, this);
             }
         }
     }

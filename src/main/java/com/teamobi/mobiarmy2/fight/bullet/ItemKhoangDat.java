@@ -19,8 +19,8 @@ public class ItemKhoangDat extends Bullet {
         this.frame++;
         this.XArray.add((short) X);
         this.YArray.add((short) Y);
-        if (this.fm.mapManager.isCollision(X, Y)) {
-            this.fm.mapManager.handleCollision(X, Y, this);
+        if (this.fightManager.mapManager.isCollision(X, Y)) {
+            this.fightManager.mapManager.handleCollision(X, Y, this);
         }
         if (this.frame == nFrame) {
             this.collect = true;

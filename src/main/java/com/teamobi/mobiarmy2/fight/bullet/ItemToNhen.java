@@ -15,7 +15,7 @@ public class ItemToNhen extends Bullet {
     public void nextXY() {
         super.nextXY();
         if (super.collect) {
-            this.fm.mapManager.addEntry(new MapEffectManager(this.bullMNG.mangNhenId++, (short) (X - 21), (short) (Y - 20), MapEffectManager.spiderData, (short) MapEffectManager.spiderWidth, (short) MapEffectManager.spiderHeight, true));
+            this.fightManager.mapManager.addEntry(new MapEffectManager(this.bulletManager.mangNhenId++, (short) (X - 21), (short) (Y - 20), MapEffectManager.spiderData, (short) MapEffectManager.spiderWidth, (short) MapEffectManager.spiderHeight, true));
         }
     }
 

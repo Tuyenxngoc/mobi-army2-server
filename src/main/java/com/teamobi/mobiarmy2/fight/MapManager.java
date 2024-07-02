@@ -81,11 +81,11 @@ public class MapManager {
         }
     }
 
-    public final void addEntry(MapEffectManager mapEffect) {
+    public void addEntry(MapEffectManager mapEffect) {
         this.mapEffects.add(mapEffect);
     }
 
-    public final boolean isCollision(short x, short y) {
+    public boolean isCollision(short x, short y) {
         for (MapEffectManager mapEffect : mapEffects) {
             if (mapEffect.isCollision(x, y)) {
                 return true;
@@ -94,7 +94,7 @@ public class MapManager {
         return false;
     }
 
-    public final void handleCollision(short x, short y, Bullet bullet) {
+    public void handleCollision(short x, short y, Bullet bullet) {
         for (MapEffectManager mapEffect : mapEffects) {
             mapEffect.handleCollision(x, y, bullet);
         }
@@ -122,5 +122,4 @@ public class MapManager {
             }
         }
     }
-
 }

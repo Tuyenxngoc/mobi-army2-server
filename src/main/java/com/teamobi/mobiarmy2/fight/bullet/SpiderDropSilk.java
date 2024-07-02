@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 public class SpiderDropSilk extends Bullet {
 
     public SpiderDropSilk(BulletManager bullMNG, byte bullId, long satThuong, Player pl) {
-        super(bullMNG, bullId, satThuong, pl, pl.X, pl.Y - 12, 0, 0, 0, 0);
+        super(bullMNG, bullId, satThuong, pl, pl.x, pl.y - 12, 0, 0, 0, 0);
     }
 
     @Override
@@ -27,12 +27,12 @@ public class SpiderDropSilk extends Bullet {
         if (super.collect) {
             try {
                 SpiderPoisonous boss = (SpiderPoisonous) this.pl;
-                boss.target.Y = (short) (Y - 3);
-                this.fm.cLocation(boss.target.index);
+                boss.target.y = (short) (Y - 3);
+                this.fightManager.cLocation(boss.target.index);
             } catch (IOException ex) {
                 Logger.getLogger(SpiderDropSilk.class.getName()).log(Level.SEVERE, null, ex);
             }
-            this.fm.mapManager.addEntry(new MapEffectManager(this.bullMNG.mangNhenId++, (short) (X - 21), (short) (Y - 20), MapEffectManager.spiderData, (short) MapEffectManager.spiderWidth, (short) MapEffectManager.spiderHeight, true));
+            this.fightManager.mapManager.addEntry(new MapEffectManager(this.bulletManager.mangNhenId++, (short) (X - 21), (short) (Y - 20), MapEffectManager.spiderData, (short) MapEffectManager.spiderWidth, (short) MapEffectManager.spiderHeight, true));
 
         }
     }

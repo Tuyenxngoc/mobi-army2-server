@@ -26,48 +26,48 @@ public class SpiderPoisonous extends Boss {
     @Override
     public void turnAction() {
         try {
-            short xpre = this.X;
+            short xpre = this.x;
             ArrayList<Player> player = new ArrayList<>();
             for (int i = 0; i < 8; i++) {
-                if (this.fightMNG.players[i] != null && !this.fightMNG.players[i].isDie && this.fightMNG.players[i].Y - 150 > this.Y) {
-                    player.add(this.fightMNG.players[i]);
+                if (this.fightManager.players[i] != null && !this.fightManager.players[i].isDie && this.fightManager.players[i].y - 150 > this.y) {
+                    player.add(this.fightManager.players[i]);
                 }
             }
             //kéo
             if (player.size() > 0 && nturn == 0) {
                 nturn = 3;
                 Player pl = (player.get(Utils.nextInt(0, player.size() - 1)));
-                this.X = pl.X;
-                this.fightMNG.flyChangeLocation(super.index);
-                this.fightMNG.capture(super.index, pl.index);
-                fightMNG.isNextTurn = false;
+                this.x = pl.x;
+                this.fightManager.flyChangeLocation(super.index);
+                this.fightManager.capture(super.index, pl.index);
+                fightManager.isNextTurn = false;
                 this.target = pl;
-                this.fightMNG.newShoot(this.index, (byte) 8, (short) 270, (byte) 10, (byte) 0, (byte) 1, false);
-                fightMNG.isNextTurn = true;
-                this.X = xpre;
-                this.fightMNG.flyChangeLocation(super.index);
-                if (!fightMNG.checkWin()) {
-                    this.fightMNG.nextTurn();
+                this.fightManager.newShoot(this.index, (byte) 8, (short) 270, (byte) 10, (byte) 0, (byte) 1, false);
+                fightManager.isNextTurn = true;
+                this.x = xpre;
+                this.fightManager.flyChangeLocation(super.index);
+                if (!fightManager.checkWin()) {
+                    this.fightManager.nextTurn();
                 }
             } else {
                 if (nturn > 0) {
                     nturn--;
                 }
-                Player pl = fightMNG.getPlayerClosest(X, Y);
+                Player pl = fightManager.getPlayerClosest(x, y);
                 if (!pl.isBiDoc) {
-                    this.X = pl.X;
-                    this.fightMNG.flyChangeLocation(super.index);
-                    this.fightMNG.thadocBullet(super.index, pl.index);
-                    this.fightMNG.updateBiDoc(pl);
-                    this.X = xpre;
-                    this.fightMNG.flyChangeLocation(super.index);
-                    if (!fightMNG.checkWin()) {
-                        this.fightMNG.nextTurn();
+                    this.x = pl.x;
+                    this.fightManager.flyChangeLocation(super.index);
+                    this.fightManager.thadocBullet(super.index, pl.index);
+                    this.fightManager.updateBiDoc(pl);
+                    this.x = xpre;
+                    this.fightManager.flyChangeLocation(super.index);
+                    if (!fightManager.checkWin()) {
+                        this.fightManager.nextTurn();
                     }
                 } else {
-                    this.X = (short) Utils.nextInt(50, fightMNG.mapManager.width - 50);
-                    this.fightMNG.flyChangeLocation(super.index);
-                    this.fightMNG.newShoot(this.index, (byte) 47, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 10, (byte) 0, (byte) 1, false);
+                    this.x = (short) Utils.nextInt(50, fightManager.mapManager.width - 50);
+                    this.fightManager.flyChangeLocation(super.index);
+                    this.fightManager.newShoot(this.index, (byte) 47, (short) Utils.getArgXY(x, y, pl.x, pl.y), (byte) 10, (byte) 0, (byte) 1, false);
                 }
             }
 

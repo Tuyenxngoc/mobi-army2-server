@@ -24,7 +24,7 @@ public class BigBoom extends Boss {
     @Override
     public void turnAction() {
         try {
-            Player pl = this.fightMNG.getPlayerClosest(this.X, this.Y);
+            Player pl = this.fightManager.getPlayerClosest(this.x, this.y);
             if (pl == null) {
                 return;
             }
@@ -32,44 +32,44 @@ public class BigBoom extends Boss {
             if (Utils.nextInt(100) <= 0) {
                 short Vgoc = 0;
                 short Vsuc;
-                if (pl.X > X) {
+                if (pl.x > x) {
                     Vgoc = (short) Utils.nextInt(70, 75);
                 }
-                if (pl.X <= X) {
+                if (pl.x <= x) {
                     Vgoc = (short) Utils.nextInt(110, 115);
                 }
-                Vsuc = (short) (Math.abs(X - pl.X) / 20);
+                Vsuc = (short) (Math.abs(x - pl.x) / 20);
                 if (Vsuc < 8) {
                     Vsuc = 8;
                 }
                 if (Vsuc > 30) {
                     Vsuc = 30;
                 }
-                this.fightMNG.newShoot(this.index, (byte) 34, (short) Vgoc, (byte) Vsuc, (byte) 0, (byte) 1, false);
+                this.fightManager.newShoot(this.index, (byte) 34, (short) Vgoc, (byte) Vsuc, (byte) 0, (byte) 1, false);
             } else {
-                while (X != pl.X || Y != pl.Y) {
-                    int preX = this.X;
-                    int preY = this.Y;
-                    if (pl.X < this.X) {
+                while (x != pl.x || y != pl.y) {
+                    int preX = this.x;
+                    int preY = this.y;
+                    if (pl.x < this.x) {
                         super.move(false);
-                    } else if (pl.X > this.X) {
+                    } else if (pl.x > this.x) {
                         super.move(true);
-                    } else if (!fightMNG.mapManager.isCollision(this.X, this.Y)) {
-                        this.Y++;
+                    } else if (!fightManager.mapManager.isCollision(this.x, this.y)) {
+                        this.y++;
                     }
                     // if ko di chuyen dc
-                    if (preX == this.X && preY == this.Y) {
+                    if (preX == this.x && preY == this.y) {
                         break;
                     }
                 }
-                this.fightMNG.changeLocation(super.index);
-                if (Math.abs(X - pl.X) <= 35 && Math.abs(Y - pl.Y) <= 35) {
-                    this.fightMNG.newShoot(this.index, (byte) 31, (short) 0, (byte) 0, (byte) 0, (byte) 1, false);
+                this.fightManager.changeLocation(super.index);
+                if (Math.abs(x - pl.x) <= 35 && Math.abs(y - pl.y) <= 35) {
+                    this.fightManager.newShoot(this.index, (byte) 31, (short) 0, (byte) 0, (byte) 0, (byte) 1, false);
                 } else if (this.buocDi < this.theLuc) {
                     this.itemUsed = 7;
-                    this.fightMNG.newShoot(this.index, (byte) 7, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 30, (byte) 0, (byte) 1, false);
-                } else if (!fightMNG.checkWin()) {
-                    this.fightMNG.nextTurn();
+                    this.fightManager.newShoot(this.index, (byte) 7, (short) Utils.getArgXY(x, y, pl.x, pl.y), (byte) 30, (byte) 0, (byte) 1, false);
+                } else if (!fightManager.checkWin()) {
+                    this.fightManager.nextTurn();
                 }
             }
         } catch (Exception e) {

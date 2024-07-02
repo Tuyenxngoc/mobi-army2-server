@@ -18,11 +18,11 @@ public class SmallBoomAdd extends Bullet {
     @Override
     public void nextXY() {
         super.nextXY();
-        if (super.collect && X > 0 && X < fm.mapManager.width && Y < fm.mapManager.height) {
+        if (super.collect && X > 0 && X < fightManager.mapManager.width && Y < fightManager.mapManager.height) {
             Player players;
             try {
-                players = new SmallBoom(fm, (byte) 11, "Small Boom", (byte) fm.allCount, 1000 + (fm.getLevelTeam() * 8), X, Y);
-                bullMNG.addboss.add(new BulletManager.AddBoss(players, 2));
+                players = new SmallBoom(fightManager, (byte) 11, "Small Boom", (byte) fightManager.allCount, 1000 + (fightManager.getLevelTeam() * 8), X, Y);
+                bulletManager.addboss.add(new BulletManager.AddBoss(players, 2));
             } catch (IOException ex) {
                 ex.printStackTrace();
             }

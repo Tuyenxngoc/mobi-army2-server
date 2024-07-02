@@ -13,7 +13,7 @@ public class ChickyTrung extends Bullet {
     @Override
     public void nextXY() {
         if (super.frame == 0) {
-            short[] XYVC = bullMNG.getCollisionPoint(X, Y, X, (short) (Y + 8), isXuyenPlayer, isXuyenMap);
+            short[] XYVC = bulletManager.getCollisionPoint(X, Y, X, (short) (Y + 8), isXuyenPlayer, isXuyenMap);
             if (XYVC != null) {
                 collect = true;
                 X = XYVC[0];
@@ -23,7 +23,7 @@ public class ChickyTrung extends Bullet {
                 XArray.add((short) X);
                 YArray.add((short) Y);
                 if (this.isCanCollision) {
-                    fm.mapManager.handleCollision(X, Y, this);
+                    fightManager.mapManager.handleCollision(X, Y, this);
                 }
                 return;
             } else {

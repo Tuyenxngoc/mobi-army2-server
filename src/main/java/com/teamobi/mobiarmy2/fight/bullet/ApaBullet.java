@@ -25,9 +25,9 @@ public class ApaBullet extends Bullet {
             this.collect = true;
             this.isCanCollision = false;
             this.satThuong = 0;
-            fm.mapManager.handleCollision(this.X, this.Y, this);
-            int arg = bullMNG.arg + Utils.toArg0_360(Utils.getArg(this.pl.X - this.X, this.pl.Y - this.Y));
-            if (bullMNG.arg < 90) {
+            fightManager.mapManager.handleCollision(this.X, this.Y, this);
+            int arg = bulletManager.arg + Utils.toArg0_360(Utils.getArg(this.pl.x - this.X, this.pl.y - this.Y));
+            if (bulletManager.arg < 90) {
                 arg = 180 - arg;
             }
             arg = arg - 15;
@@ -36,7 +36,7 @@ public class ApaBullet extends Bullet {
                 int y = (this.Y - 12) - (20 * Utils.sin(arg) >> 10);
                 int vxn = (this.force * Utils.cos(arg) >> 11);
                 int vyn = -(this.force * Utils.sin(arg) >> 11);
-                bullMNG.addBullet(new Bullet(bullMNG, (byte) 18, this.satThuongGoc, super.pl, x, y, vxn, vyn, 30, 100));
+                bulletManager.addBullet(new Bullet(bulletManager, (byte) 18, this.satThuongGoc, super.pl, x, y, vxn, vyn, 30, 100));
             }
         }
     }
