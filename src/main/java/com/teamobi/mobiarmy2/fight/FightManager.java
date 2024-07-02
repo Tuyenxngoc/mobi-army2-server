@@ -20,8 +20,8 @@ import java.util.ArrayList;
 
 public class FightManager {
 
-    final FightWait wait;
-    private final User userLt;
+    final FightWait fightWait;
+    private final User userPractice;
     private boolean isShoot;
     private int teamlevel;
     public boolean isNextTurn;
@@ -44,7 +44,7 @@ public class FightManager {
     public CountDownManager countDownManager;
 
     public FightManager(User us, byte map) {
-        this.wait = null;
+        this.fightWait = null;
         this.ltap = true;
         this.type = 0;
         this.playerCount = 1;
@@ -60,15 +60,15 @@ public class FightManager {
         this.mapManager = new MapManager(this);
         this.bulletManager = new BulletManager(this);
         this.countDownManager = null;
-        this.userLt = us;
+        this.userPractice = us;
         this.mapManager.setMapId(map);
     }
 
     public FightManager(FightWait fo) {
         this.isShoot = false;
         this.isNextTurn = true;
-        this.wait = fo;
-        this.userLt = null;
+        this.fightWait = fo;
+        this.userPractice = null;
         this.ltap = false;
         this.type = fo.getRoom().getType();
         this.playerCount = 0;
@@ -86,13 +86,9 @@ public class FightManager {
         this.countDownManager = new CountDownManager(this, timeCountMax);
     }
 
-    protected void setMap(byte map) {
-        this.mapManager.setMapId(map);
-    }
-
     void sendToTeam(Message ms) {
         if (ltap) {
-            userLt.sendMessage(ms);
+            userPractice.sendMessage(ms);
             return;
         }
         for (Player player : players) {
@@ -118,17 +114,17 @@ public class FightManager {
         if (ltap) {
             return 0;
         } else if (isBossTurn && type == 5) {
-            return this.bossTurn;
+            return bossTurn;
         } else {
-            return this.playerTurn;
+            return playerTurn;
         }
     }
 
     public Player getPlayerTurn() {
         if (isBossTurn) {
-            return this.players[this.bossTurn];
+            return players[bossTurn];
         }
-        return this.players[this.playerTurn];
+        return players[playerTurn];
     }
 
     public Player getPlayerClosest(short X, short Y) {
@@ -149,15 +145,15 @@ public class FightManager {
     }
 
     public int getLevelTeam() {
-        return this.teamlevel;
+        return teamlevel;
     }
 
     protected boolean getisLH() {
-        return this.wait.getRoom().isContinuous();
+        return fightWait.getRoom().isContinuous();
     }
 
     private void nextBoss() throws IOException {
-        if (this.wait.getMapId() == 30) {
+        if (this.fightWait.getMapId() == 30) {
             byte numBoss = (new byte[]{4, 4, 5, 5, 6, 8, 8, 9, 9})[playerCount];
             for (byte i = 0; i < numBoss; i++) {
                 short X = (short) ((i % 2 == 0) ? Utils.nextInt(95, 315) : Utils.nextInt(890, 1070));
@@ -165,7 +161,7 @@ public class FightManager {
                 players[allCount] = new BigBoom(this, (byte) 12, "Big Boom", (byte) allCount, 1500 + (this.getLevelTeam() * 10), X, Y);
                 allCount++;
             }
-        } else if (this.wait.getMapId() == 31) {
+        } else if (this.fightWait.getMapId() == 31) {
             byte numBoss = (new byte[]{4, 4, 5, 5, 6, 8, 8, 9, 9})[playerCount];
             for (byte i = 0; i < numBoss; i++) {
                 short X = (short) (Utils.nextInt(445, 800) + i * 50);
@@ -173,7 +169,7 @@ public class FightManager {
                 players[allCount] = new BigBoom(this, (byte) 12, "Small Boom", (byte) allCount, 1500 + (this.getLevelTeam() * 10), X, Y);
                 allCount++;
             }
-        } else if (this.wait.getMapId() == 32) {
+        } else if (this.fightWait.getMapId() == 32) {
             byte numBoss = (new byte[]{2, 2, 3, 3, 4, 4, 5, 5, 5})[playerCount];
             short[] tempX = new short[]{505, 1010, 743, 425, 1068};
             short[] tempY = new short[]{221, 221, 198, 369, 369, 369};
@@ -181,7 +177,7 @@ public class FightManager {
                 players[allCount] = new SpiderMachine(this, (byte) 13, "Spider Robot", (byte) allCount, 4785 + (getLevelTeam() * 15), (short) tempX[i], (short) tempY[i]);
                 allCount++;
             }
-        } else if (this.wait.getMapId() == 33) {
+        } else if (this.fightWait.getMapId() == 33) {
             byte numBoss = (new byte[]{2, 2, 3, 3, 4, 4, 5, 5, 6})[playerCount];
             short[] tempX = new short[]{420, 580, 720, 240, 55, 900};
             for (int i = 0; i < numBoss; i++) {
@@ -190,7 +186,7 @@ public class FightManager {
                 players[allCount] = new Robot(this, (byte) 14, "Robot", (byte) allCount, 3700 + (this.getLevelTeam() * 10), X, Y);
                 allCount++;
             }
-        } else if (this.wait.getMapId() == 34) {
+        } else if (this.fightWait.getMapId() == 34) {
             short X = 880;
             short Y = 400;
             players[allCount] = new Trex(this, (byte) 15, "T-rex", (byte) allCount, 15000 + (this.getLevelTeam() * 10), X, Y);
@@ -203,7 +199,7 @@ public class FightManager {
                 players[allCount] = new BigBoom(this, (byte) 12, "Big Boom", (byte) allCount, 1500 + (this.getLevelTeam() * 10), X, Y);
                 allCount++;
             }
-        } else if (this.wait.getMapId() == 35) {
+        } else if (this.fightWait.getMapId() == 35) {
             byte numBoss = (new byte[]{4, 4, 5, 5, 6, 8, 8, 9, 9})[playerCount];
             for (byte i = 0; i < numBoss; i++) {
                 short X = (short) (Utils.nextInt(300, 800));
@@ -211,7 +207,7 @@ public class FightManager {
                 players[allCount] = new UFO(this, (byte) 16, "UFO", (byte) allCount, 4500 + (this.getLevelTeam() * 12), X, Y);
                 allCount++;
             }
-        } else if (this.wait.getMapId() == 36) {
+        } else if (this.fightWait.getMapId() == 36) {
             short X = (short) (Utils.nextInt(300, 800));
             short Y = (short) Utils.nextInt(-350, 100);
             players[allCount] = new Balloon(this, (byte) 17, "Balloon", (byte) allCount, 1, X, Y);
@@ -222,7 +218,7 @@ public class FightManager {
             allCount++;
             players[allCount] = new BalloonFanBack(this, (byte) 20, "Fan Back", (byte) allCount, 1000 + (this.getLevelTeam() * 10), (short) (X - 67), (short) (Y - 6));
             allCount++;
-        } else if (this.wait.getMapId() == 37) {
+        } else if (this.fightWait.getMapId() == 37) {
             byte numBoss = (new byte[]{2, 3, 3, 4, 4, 5, 5, 6, 6})[playerCount];
             for (byte i = 0; i < numBoss; i++) {
                 short X = (short) Utils.nextInt(20, this.mapManager.width - 20);
@@ -230,7 +226,7 @@ public class FightManager {
                 players[allCount] = new SpiderPoisonous(this, (byte) 22, "Spider Poisonous", (byte) allCount, 3800 + (this.getLevelTeam() * 10), X, Y);
                 allCount++;
             }
-        } else if (this.wait.getMapId() == 38) {
+        } else if (this.fightWait.getMapId() == 38) {
             byte numBoss = (new byte[]{4, 4, 5, 5, 6, 8, 8, 9, 9})[playerCount];
             for (byte i = 0; i < numBoss; i++) {
                 short X = (short) ((short) 700 - i * 80);
@@ -238,7 +234,7 @@ public class FightManager {
                 players[allCount] = new Ghost(this, (byte) 25, "Ghost", (byte) allCount, 1800 + (this.getLevelTeam() * 10), X, Y);
                 allCount++;
             }
-        } else if (this.wait.getMapId() == 39) {
+        } else if (this.fightWait.getMapId() == 39) {
             byte numBoss = (new byte[]{4, 4, 5, 5, 6, 8, 8, 9, 9})[playerCount];
             for (byte i = 0; i < numBoss; i++) {
                 short X = (short) (700 - i * 80);
@@ -775,7 +771,7 @@ public class FightManager {
         this.bulletManager.voiRongs.clear();
         this.bulletManager.boms.clear();
         this.bulletManager.addboss.clear();
-        if (wait.getRoom().isContinuous() && wait.getNumPlayers() > 0) {
+        if (fightWait.getRoom().isContinuous() && fightWait.getNumPlayers() > 0) {
 
         }
         if (this.type == 5 && checkWin == 1) {
@@ -837,7 +833,7 @@ public class FightManager {
             // Null byte
             ds.writeByte(0);
             // money Bonus
-            ds.writeInt(this.wait.getMoney());
+            ds.writeInt(this.fightWait.getMoney());
             ds.flush();
             pl.user.sendMessage(ms);
         }
@@ -871,7 +867,7 @@ public class FightManager {
             pl.user.sendMessage(ms);
         }
         // Update Xu
-        if (this.wait.getMoney() > 0) {
+        if (this.fightWait.getMoney() > 0) {
             for (byte i = 0; i < 8; i++) {
                 Player pl = this.players[i];
                 if (pl == null || pl.user == null) {
@@ -879,27 +875,27 @@ public class FightManager {
                 }
                 byte win = (byte) (pl.team ? checkWin : -checkWin);
                 if (win >= 0) {
-                    pl.user.updateXu(this.wait.money * (win == 1 ? 2 : 1));
+                    pl.user.updateXu(this.fightWait.money * (win == 1 ? 2 : 1));
                     ms = new Message(52);
                     ds = ms.writer();
                     ds.writeInt(pl.user.getPlayerId());
-                    ds.writeInt(this.wait.money * (win == 1 ? 2 : 1));
+                    ds.writeInt(this.fightWait.money * (win == 1 ? 2 : 1));
                     ds.writeInt(pl.user.getXu());
                     ds.flush();
                     sendToTeam(ms);
                 }
             }
         }
-        this.wait.setStarted(false);
+        this.fightWait.setStarted(false);
         try {
             Thread.sleep(3000L);
         } catch (InterruptedException e) {
         }
-        this.wait.fightComplete();
-        if (wait.getRoom().isContinuous()) {
+        this.fightWait.fightComplete();
+        if (fightWait.getRoom().isContinuous()) {
 
         }
-        if (nTurn > 2 && wait.getRoom().getType() < 5) {
+        if (nTurn > 2 && fightWait.getRoom().getType() < 5) {
             try {
                 Thread.sleep(2000L);
             } catch (InterruptedException ignored) {
@@ -923,8 +919,8 @@ public class FightManager {
             return;
         }
         if (!this.ltap) {
-            this.mapManager.mapEffects.clear();
-            this.setMap(this.wait.getMapId());
+            mapManager.mapEffects.clear();
+            mapManager.setMapId(fightWait.getMapId());
         } else {
             this.mapManager.setMapId(this.mapManager.mapId);
         }
@@ -936,7 +932,7 @@ public class FightManager {
         if (this.ltap) {
             this.playerCount = 1;
         } else {
-            this.playerCount = this.wait.getNumPlayers();
+            this.playerCount = this.fightWait.getNumPlayers();
         }
         this.allCount = 8;
         if (this.ltap) {
@@ -948,15 +944,15 @@ public class FightManager {
             int[] location = new int[8];
             int count = 0;
             this.teamlevel = 0;
-            for (byte i = 0; i < this.wait.getMaxSetPlayers(); i++) {
-                User us = this.wait.getUsers()[i];
+            for (byte i = 0; i < this.fightWait.getMaxSetPlayers(); i++) {
+                User us = this.fightWait.getUsers()[i];
                 if (us == null) {
                     this.players[i] = null;
                     continue;
                 }
 
                 this.teamlevel += us.getCurrentLevel();
-                us.updateXu(-this.wait.money);
+                us.updateXu(-this.fightWait.money);
                 short X, Y;
                 byte item[];
                 int teamPoint;
@@ -975,7 +971,7 @@ public class FightManager {
                 location[count++] = locaCount;
                 X = this.mapManager.playerInitXPositions[locaCount];
                 Y = this.mapManager.playerInitYPositions[locaCount];
-                item = this.wait.getItems()[i];
+                item = this.fightWait.getItems()[i];
                 for (byte j = 0; j < 4; j++) {
                     if (item[4 + j] > 0) {
                         if (12 + j > 1) {
@@ -1055,7 +1051,7 @@ public class FightManager {
             return;
         }
         // Update Xu
-        if (!this.ltap && this.wait.money > 0) {
+        if (!this.ltap && this.fightWait.money > 0) {
             for (byte i = 0; i < 8; i++) {
                 Player pl = this.players[i];
                 if (pl == null || pl.user == null) {
@@ -1064,7 +1060,7 @@ public class FightManager {
                 Message ms = new Message(52);
                 DataOutputStream ds = ms.writer();
                 ds.writeInt(pl.user.getPlayerId());
-                ds.writeInt(-this.wait.money);
+                ds.writeInt(-this.fightWait.money);
                 ds.writeInt(pl.user.getXu());
                 ds.flush();
                 this.sendToTeam(ms);
@@ -1078,7 +1074,7 @@ public class FightManager {
             Message ms = new Message(20);
             DataOutputStream ds = ms.writer();
             if (ltap) {
-                short[] aw = this.userLt.getEquip();
+                short[] aw = this.userPractice.getEquip();
                 for (byte j = 0; j < 5; j++) {
                     ds.writeShort(aw[j]);
                 }
@@ -1093,7 +1089,7 @@ public class FightManager {
             }
             // Team point
             ds.writeShort(pl.dongDoi);
-            if (!this.ltap && this.wait.getRoom().getType() == 7) {
+            if (!this.ltap && this.fightWait.getRoom().getType() == 7) {
                 ds.writeByte(8);
             }
             // X, Y, HP
@@ -1331,7 +1327,7 @@ public class FightManager {
 
     public void shootMessage(User us, byte bullId, short x, short y, short arg, byte force, byte force2, byte nshoot) throws IOException {
         int index = this.getPlayerIndexById(us.getPlayerId());
-        if (index == -1 || index != this.playerTurn || this.isShoot || !wait.isStarted()) {
+        if (index == -1 || index != this.playerTurn || this.isShoot || !fightWait.isStarted()) {
             return;
         }
         this.isShoot = true;
