@@ -7,6 +7,7 @@ import com.teamobi.mobiarmy2.util.Utils;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,15 @@ public class MapData {
         return selectedId;
     }
 
+    public static byte[] getMapData(byte mapId) {
+        for (MapEntry mapEntry : MapData.MAP_ENTRIES) {
+            if (mapEntry.getId() == mapId) {
+                return mapEntry.getData();
+            }
+        }
+        return null;
+    }
+
     public static String getMapNames(byte... ids) {
         StringBuilder result = new StringBuilder();
         for (byte id : ids) {
@@ -41,45 +51,43 @@ public class MapData {
         return result.toString();
     }
 
-    public static boolean isNotCollision(int id) {
+    public static boolean isCollision(int id) {
         for (short idNotCollision : idNotCollisions) {
             if (id == idNotCollision) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
-    public static MapBrick getMapBrickEntry(int id) {
-        for (MapBrick mapBrick : MAP_BRICKS) {
-            if (mapBrick.getId() == id) {
-                return mapBrick;
-            }
+    public static MapBrick loadMapBrick(int brickId) {
+        int index = MAP_BRICKS.indexOf(new MapBrick(brickId));
+
+        if (index != -1) {
+            return MAP_BRICKS.get(index);
         }
-        return null;
-    }
 
-    public static void loadMapBrick(int id) {
         try {
-            BufferedImage img = ImageIO.read(new File("res/icon/map/" + id + ".png"));
-            int W = img.getWidth();
-            int H = img.getHeight();
-            int[] argb = new int[W * H];
-            img.getRGB(0, 0, W, H, argb, 0, W);
-            MapBrick me = new MapBrick(id, argb, W, H);
-            MAP_BRICKS.add(me);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+            File imageFile = new File("res/icon/map/" + brickId + ".png");
+            BufferedImage image = ImageIO.read(imageFile);
 
-    public static boolean existsMapBrick(int id) {
-        for (MapBrick mapBrick : MAP_BRICKS) {
-            if (mapBrick.getId() == id) {
-                return true;
+            if (image == null) {
+                throw new IOException("Failed to read image: " + imageFile.getAbsolutePath());
             }
-        }
-        return false;
-    }
 
+            int width = image.getWidth();
+            int height = image.getHeight();
+            int[] pixelData = new int[width * height];
+            image.getRGB(0, 0, width, height, pixelData, 0, width);
+
+            MapBrick mapBrick = new MapBrick(brickId, pixelData, width, height);
+            MAP_BRICKS.add(mapBrick);
+
+            return mapBrick;
+        } catch (IOException e) {
+            System.err.println("Error loading map brick with id " + brickId + ": " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

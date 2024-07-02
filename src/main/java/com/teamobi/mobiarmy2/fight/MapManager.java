@@ -2,7 +2,6 @@ package com.teamobi.mobiarmy2.fight;
 
 import com.teamobi.mobiarmy2.model.MapData;
 import com.teamobi.mobiarmy2.model.entry.map.MapBrick;
-import com.teamobi.mobiarmy2.model.entry.map.MapEntry;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.util.ArrayList;
@@ -11,7 +10,7 @@ import java.util.List;
 public class MapManager {
 
     public final FightManager fightManager;
-    public int mapId;
+    public byte mapId;
     public short width;
     public short height;
     public short[] playerInitXPositions;
@@ -34,16 +33,9 @@ public class MapManager {
         return this.height;
     }
 
-    public void setMapId(int mapId) {
+    public void setMapId(byte mapId) {
         this.mapId = mapId;
-        byte[] mapData = null;
-
-        for (MapEntry mapEntry : MapData.MAP_ENTRIES) {
-            if (mapEntry.getId() == mapId) {
-                mapData = mapEntry.getData();
-                break;
-            }
-        }
+        byte[] mapData = MapData.getMapData(mapId);
 
         if (mapData == null) {
             return;
@@ -59,12 +51,8 @@ public class MapManager {
         for (int i = 0; i < entryCount; i++) {
             int brickId = mapData[offset];
 
-            if (!MapData.existsMapBrick(brickId)) {
-                MapData.loadMapBrick(brickId);
-            }
-
             MapEffectManager mapEffect;
-            MapBrick mapBrick = MapData.getMapBrickEntry(brickId);
+            MapBrick mapBrick = MapData.loadMapBrick(brickId);
             if (mapBrick == null) {
                 mapEffect = new MapEffectManager(
                         brickId,
@@ -73,7 +61,7 @@ public class MapManager {
                         null,
                         (short) 0,
                         (short) 0,
-                        !MapData.isNotCollision(brickId)
+                        MapData.isCollision(brickId)
                 );
             } else {
                 mapEffect = new MapEffectManager(
@@ -83,7 +71,7 @@ public class MapManager {
                         mapBrick.getData(),
                         (short) mapBrick.getWidth(),
                         (short) mapBrick.getHeight(),
-                        !MapData.isNotCollision(brickId)
+                        MapData.isCollision(brickId)
                 );
             }
 
