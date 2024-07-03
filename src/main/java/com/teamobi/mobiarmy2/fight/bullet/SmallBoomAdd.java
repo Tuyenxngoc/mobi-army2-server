@@ -21,7 +21,7 @@ public class SmallBoomAdd extends Bullet {
         if (super.collect && X > 0 && X < fightManager.mapManager.width && Y < fightManager.mapManager.height) {
             Player players;
             try {
-                players = new SmallBoom(fightManager, (byte) 11, "Small Boom", (byte) fightManager.allCount, 1000 + (fightManager.getLevelTeam() * 8), X, Y);
+                players = new SmallBoom(fightManager, (byte) 11, "Small Boom", (byte) fightManager.totalPlayers, 1000 + (fightManager.getLevelTeam() * 8), X, Y);
                 bulletManager.addboss.add(new BulletManager.AddBoss(players, 2));
             } catch (IOException ex) {
                 ex.printStackTrace();

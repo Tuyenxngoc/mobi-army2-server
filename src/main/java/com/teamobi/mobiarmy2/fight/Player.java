@@ -105,7 +105,7 @@ public class Player {
     protected boolean banX2;
     protected byte buocDi;
     protected byte theLuc;
-    protected boolean isMM;
+    protected boolean isLucky;
     protected boolean fly;
     protected int XPExist;
     protected int[][] NHTItemThieuDot = new int[8][2];
@@ -148,7 +148,7 @@ public class Player {
         this.diX2 = false;
         this.banX2 = false;
         this.buocDi = 0;
-        this.isMM = false;
+        this.isLucky = false;
         this.isUpdateAngry = false;
         this.isUpdateHP = false;
         this.isUpdateXP = false;
@@ -370,7 +370,7 @@ public class Player {
     }
 
     private void die() {
-        if (this.isMM && this.x > 0 && this.y < this.fightManager.mapManager.height && this.x < this.fightManager.mapManager.width) {
+        if (this.isLucky && this.x > 0 && this.y < this.fightManager.mapManager.height && this.x < this.fightManager.mapManager.width) {
             this.HP = 10;
         } else {
             this.isDie = true;
@@ -435,7 +435,7 @@ public class Player {
             this.pixel = 0;
         }
         if (dame > 0) {
-            if (bull.pl.isMM) {
+            if (bull.pl.isLucky) {
                 dame *= 2;
             }
             if (bull.pl.itemclan[7]) {
@@ -466,14 +466,14 @@ public class Player {
                         break;
                 }
             }
-            if (this.isMM) {
+            if (this.isLucky) {
                 PhongThu = this.phongThu + this.phongThu / 10;
             }
-            if (this.isMM) {
+            if (this.isLucky) {
                 dame = Math.round((float) (dame * 1) / 2);
             }
         }
-        PhongThu *= isMM ? 2 : 1;
+        PhongThu *= isLucky ? 2 : 1;
         int maxPhongThu = 100000;
 //        PhongThu = PhongThu > 95000 ? 95000 : PhongThu;
 //        dame = Math.round(dame - (dame * (PhongThu * 100 / maxPhongThu) / 100));
@@ -558,7 +558,7 @@ public class Player {
                         }
                     } else if (this.idNV == 26) {
                         for (int i = 0; i < 2; i++) {
-                            Player players = new Ghost2(fightManager, (byte) 26, "Ghost II", (byte) (fightManager.allCount + fightManager.bulletManager.addboss.size()), 1800 + (fightManager.getLevelTeam() * 10), (short) (Utils.nextInt(100, fightManager.mapManager.width - 100)), (short) Utils.nextInt(150));
+                            Player players = new Ghost2(fightManager, (byte) 26, "Ghost II", (byte) (fightManager.totalPlayers + fightManager.bulletManager.addboss.size()), 1800 + (fightManager.getLevelTeam() * 10), (short) (Utils.nextInt(100, fightManager.mapManager.width - 100)), (short) Utils.nextInt(150));
                             fightManager.bulletManager.addboss.add(new AddBoss(players, 50));
                         }
                     }
@@ -623,7 +623,7 @@ public class Player {
         if (this.mayMan > 7500) {
             this.mayMan = 7500;
         }
-        this.isMM = Utils.nextInt(10000) <= this.mayMan;
+        this.isLucky = Utils.nextInt(10000) <= this.mayMan;
     }
 
     public void flyNotice(String text) {

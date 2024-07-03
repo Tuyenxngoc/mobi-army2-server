@@ -58,8 +58,8 @@ public class Balloon extends Boss {
                 }
             }
             if (((this.fightManager.players[this.part[1]].isDie && this.fightManager.players[this.part[2]].isDie) || this.fightManager.players[this.part[3]].isDie) && this.part[4] == -1) {
-                this.part[4] = (byte) this.fightManager.allCount;
-                this.fightManager.addBoss(new BalloonEye(this.fightManager, (byte) 21, "Balloon Eye", (byte) this.fightManager.allCount, 1500 + (this.fightManager.getLevelTeam() * 10), (short) (super.x + 55), (short) (super.y - 27)));
+                this.part[4] = (byte) this.fightManager.totalPlayers;
+                this.fightManager.addBoss(new BalloonEye(this.fightManager, (byte) 21, "Balloon Eye", (byte) this.fightManager.totalPlayers, 1500 + (this.fightManager.getLevelTeam() * 10), (short) (super.x + 55), (short) (super.y - 27)));
             } else if (fd) {
 
                 this.fightManager.players[part[0]].isDie = true;

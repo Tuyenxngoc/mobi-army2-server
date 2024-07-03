@@ -99,7 +99,7 @@ public class MapManager {
             mapEffect.handleCollision(x, y, bullet);
         }
 
-        for (int i = 0; i < fightManager.allCount; i++) {
+        for (int i = 0; i < fightManager.totalPlayers; i++) {
             Player player = fightManager.players[i];
             if (player != null && player.idNV != 17) {
                 player.collision(x, y, bullet);

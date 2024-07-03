@@ -205,7 +205,7 @@ public class BulletManager {
                     if (pl.itemUsed != 1) {
                         return;
                     }
-                    pl.isMM = false;
+                    pl.isLucky = false;
                     entrys.add(new ItemTeleport(this, (byte) 5, 0, pl, x, y, vx, vy, 0, 80));
                     break;
 
@@ -278,7 +278,7 @@ public class BulletManager {
                     if (pl.itemUsed != 17) {
                         return;
                     }
-                    pl.isMM = false;
+                    pl.isLucky = false;
                     entrys.add(new ItemVoiRong(this, (byte) 13, 0, pl, x, y, vx, vy, 50, 120));
                     break;
 
@@ -372,7 +372,7 @@ public class BulletManager {
                     if (pl.itemUsed != 23) {
                         return;
                     }
-                    pl.isMM = false;
+                    pl.isLucky = false;
                     entrys.add(new ItemKhoangDat(this, (byte) 30, pl, pl.x, pl.y, force));
                     break;
 
@@ -407,7 +407,7 @@ public class BulletManager {
                     if (idGun != 12) {
                         return;
                     }
-                    pl.isMM = false;
+                    pl.isLucky = false;
                     entrys.add(new SmallBoomAdd(this, (byte) 34, 0, pl, x, y, vx, vy, 0, 80));
                     break;
 
@@ -530,7 +530,7 @@ public class BulletManager {
                     if (pl.itemUsed != 25) {
                         return;
                     }
-                    pl.isMM = false;
+                    pl.isLucky = false;
                     entrys.add(new ItemBomMu(this, (byte) 51, 0, pl, x, y, vx, vy, 5, 60));
                     break;
 
@@ -547,7 +547,7 @@ public class BulletManager {
                     if (pl.itemUsed != 28) {
                         return;
                     }
-                    pl.isMM = false;
+                    pl.isLucky = false;
                     entrys.add(new ItemDongBang(this, (byte) 54, 0, pl, x, y, vx, vy, 0, 80));
                     break;
 
@@ -556,7 +556,7 @@ public class BulletManager {
                     if (pl.itemUsed != 29) {
                         return;
                     }
-                    pl.isMM = false;
+                    pl.isLucky = false;
                     entrys.add(new ItemKhoiDoc(this, (byte) 55, 150, pl, x, y, vx, vy, 6, 60));
                     break;
 
@@ -580,7 +580,7 @@ public class BulletManager {
                     if (pl.itemUsed != 31) {
                         return;
                     }
-                    pl.isMM = false;
+                    pl.isLucky = false;
                     entrys.add(new ItemBomHenGio(this, (byte) 57, 600, pl, x, y, vx, vy, 0, 120));
                     break;
 
@@ -658,7 +658,7 @@ public class BulletManager {
                 }
             }
             if (!isXuyenPlayer && us.idNV != 16) {
-                for (int j = 0; j < fm.allCount; j++) {
+                for (int j = 0; j < fm.totalPlayers; j++) {
                     Player pl = fm.players[j];
                     if (pl != null) {
                         if (pl.idNV > 15 && pl.isDie) {
