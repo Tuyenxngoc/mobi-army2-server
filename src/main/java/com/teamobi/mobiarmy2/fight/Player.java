@@ -202,10 +202,6 @@ public class Player {
         this.HP = this.HPMax;
     }
 
-    public static int[] getLuyenTapItem() {
-        return new int[]{0, 0, 0, 0, 0, 0, 0, 0};
-    }
-
     public final void setXY(short X, short Y) {
         if (X >= 0 && X < this.fightManager.mapManager.width && Y < this.fightManager.mapManager.height) {
             this.x = X;
@@ -405,7 +401,7 @@ public class Player {
     }
 
     public void collision(short bx, short by, Bullet bull) {
-        if (this.fightManager.ltap) {
+        if (this.fightManager.isTraining) {
             return;
         }
 
@@ -563,7 +559,7 @@ public class Player {
                     } else if (this.idNV == 26) {
                         for (int i = 0; i < 2; i++) {
                             Player players = new Ghost2(fightManager, (byte) 26, "Ghost II", (byte) (fightManager.allCount + fightManager.bulletManager.addboss.size()), 1800 + (fightManager.getLevelTeam() * 10), (short) (Utils.nextInt(100, fightManager.mapManager.width - 100)), (short) Utils.nextInt(150));
-                            fightManager.bulletManager.addboss.add(new AddBoss(players, fightManager.getisLH() ? 50 : 6));
+                            fightManager.bulletManager.addboss.add(new AddBoss(players, 50));
                         }
                     }
                     // Ban dong doi -5xp -5cup

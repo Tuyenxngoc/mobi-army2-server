@@ -25,7 +25,7 @@ public class FightManager {
     private boolean isShoot;
     private int teamlevel;
     public boolean isNextTurn;
-    protected boolean ltap;
+    protected boolean isTraining;
     protected byte type;
     protected boolean isBossTurn;
     protected byte bossTurn;
@@ -36,40 +36,18 @@ public class FightManager {
     public int allCount;
     protected int WindX;
     protected int WindY;
-    protected boolean isFight;
     protected final byte timeCountMax = 30;
     public Player[] players;
     public MapManager mapManager;
     public BulletManager bulletManager;
     public CountDownManager countDownManager;
 
-    public FightManager(User us, byte map) {
-        this.fightWait = null;
-        this.ltap = true;
-        this.type = 0;
-        this.playerCount = 1;
-        this.playerTurn = -1;
-        this.nTurn = 0;
-        this.isBossTurn = false;
-        this.bossTurn = 0;
-        this.allCount = 1;
-        this.WindX = 0;
-        this.WindY = 0;
-        this.isFight = false;
-        this.nHopQua = 0;
-        this.mapManager = new MapManager(this);
-        this.bulletManager = new BulletManager(this);
-        this.countDownManager = null;
-        this.userPractice = us;
-        this.mapManager.setMapId(map);
-    }
-
     public FightManager(FightWait fo) {
         this.isShoot = false;
         this.isNextTurn = true;
         this.fightWait = fo;
         this.userPractice = null;
-        this.ltap = false;
+        this.isTraining = false;
         this.type = fo.getRoom().getType();
         this.playerCount = 0;
         this.allCount = 0;
@@ -80,14 +58,13 @@ public class FightManager {
         this.WindY = 0;
         this.nHopQua = 0;
         this.players = new Player[100];
-        this.isFight = false;
         this.mapManager = new MapManager(this);
         this.bulletManager = new BulletManager(this);
         this.countDownManager = new CountDownManager(this, timeCountMax);
     }
 
     void sendToTeam(Message ms) {
-        if (ltap) {
+        if (isTraining) {
             userPractice.sendMessage(ms);
             return;
         }
@@ -111,7 +88,7 @@ public class FightManager {
     }
 
     public int getIDTurn() {
-        if (ltap) {
+        if (isTraining) {
             return 0;
         } else if (isBossTurn && type == 5) {
             return bossTurn;
@@ -146,10 +123,6 @@ public class FightManager {
 
     public int getLevelTeam() {
         return teamlevel;
-    }
-
-    protected boolean getisLH() {
-        return fightWait.getRoom().isContinuous();
     }
 
     private void nextBoss() throws IOException {
@@ -494,7 +467,7 @@ public class FightManager {
             }
             pl.chuanHoaXY();
         }
-        if (this.ltap) {
+        if (this.isTraining) {
             this.playerTurn = 0;
         } else {
             //kiem tra xem ai bi thieu dot tru hp va lan bi dot
@@ -680,7 +653,7 @@ public class FightManager {
         ds.flush();
         this.sendToTeam(ms);
         this.nextWind();
-        if (this.ltap) {
+        if (this.isTraining) {
             return;
         }
         this.countDownManager.resetCount();
@@ -690,10 +663,10 @@ public class FightManager {
     }
 
     public boolean checkWin() throws IOException {
-        if (this.ltap) {
+        if (isTraining) {
             return true;
         }
-        if (!isFight) {
+        if (!fightWait.isStarted()) {
             return true;
         }
         // Next HP
@@ -763,7 +736,6 @@ public class FightManager {
     }
 
     private void fightComplete(byte checkWin) throws IOException {
-        this.isFight = false;
         this.WindX = 0;
         this.WindY = 0;
         this.nHopQua = 0;
@@ -915,10 +887,10 @@ public class FightManager {
     }
 
     protected void startGame(int nTeamPointBlue, int nTeamPointRed) throws IOException {
-        if (this.isFight) {
+        if (fightWait.isStarted()) {
             return;
         }
-        if (!this.ltap) {
+        if (!this.isTraining) {
             mapManager.mapEffects.clear();
             mapManager.setMapId(fightWait.getMapId());
         } else {
@@ -928,14 +900,13 @@ public class FightManager {
         this.nTurn = 0;
         this.WindX = 0;
         this.WindY = 0;
-        this.isFight = true;
-        if (this.ltap) {
+        if (this.isTraining) {
             this.playerCount = 1;
         } else {
             this.playerCount = this.fightWait.getNumPlayers();
         }
         this.allCount = 8;
-        if (this.ltap) {
+        if (this.isTraining) {
 
         } else {
             if (this.type == 5) {
@@ -996,10 +967,6 @@ public class FightManager {
     }
 
     public void leave(int playerId) {
-        if (!isFight) {
-            return;
-        }
-
         byte index = getPlayerIndexById(playerId);
         if (index == -1) {
             return;
@@ -1025,7 +992,7 @@ public class FightManager {
         }
         player.user = null;
 
-        if (!this.ltap) {
+        if (!this.isTraining) {
             new Thread(() -> {
                 try {
                     if (!checkWin()) {
@@ -1046,70 +1013,63 @@ public class FightManager {
         }
     }
 
-    protected void sendFightInfoMessage() throws IOException {
-        if (!this.isFight) {
-            return;
-        }
-        // Update Xu
-        if (!this.ltap && this.fightWait.money > 0) {
-            for (byte i = 0; i < 8; i++) {
-                Player pl = this.players[i];
-                if (pl == null || pl.user == null) {
+    protected void sendFightInfoMessage() {
+        try {
+            if (!isTraining && fightWait.money > 0) {
+                for (Player player : players) {
+                    if (player == null || player.user == null) {
+                        continue;
+                    }
+                    Message ms = new Message(52);
+                    DataOutputStream ds = ms.writer();
+                    ds.writeInt(player.user.getPlayerId());
+                    ds.writeInt(-fightWait.money);
+                    ds.writeInt(player.user.getXu());
+                    ds.flush();
+                    sendToTeam(ms);
+                }
+            }
+
+            for (Player player : players) {
+                if (player == null || player.user == null) {
                     continue;
                 }
-                Message ms = new Message(52);
+                Message ms = new Message(20);
                 DataOutputStream ds = ms.writer();
-                ds.writeInt(pl.user.getPlayerId());
-                ds.writeInt(-this.fightWait.money);
-                ds.writeInt(pl.user.getXu());
+                if (isTraining) {
+                    for (short id : userPractice.getEquip()) {
+                        ds.writeShort(id);
+                    }
+                }
+                ds.writeByte(0);//Todo find this value
+                if (isTraining) {
+                    ds.writeByte(0);
+                } else {
+                    ds.writeByte(timeCountMax);
+                }
+                ds.writeShort(player.dongDoi);
+                if (!isTraining && fightWait.getRoom().getType() == 7) {
+                    ds.writeByte(8);
+                }
+                for (Player pl : players) {
+                    if (pl == null) {
+                        ds.writeShort(-1);
+                        continue;
+                    }
+                    ds.writeShort(pl.x);
+                    ds.writeShort(pl.y);
+                    ds.writeShort(pl.HPMax);
+                }
                 ds.flush();
-                this.sendToTeam(ms);
+                player.user.sendMessage(ms);
             }
-        }
-        for (byte i = 0; i < 8; i++) {
-            Player pl = this.players[i];
-            if (pl == null || pl.user == null) {
-                continue;
-            }
-            Message ms = new Message(20);
-            DataOutputStream ds = ms.writer();
-            if (ltap) {
-                short[] aw = this.userPractice.getEquip();
-                for (byte j = 0; j < 5; j++) {
-                    ds.writeShort(aw[j]);
-                }
-            }
-            // Null byte
-            ds.writeByte(0);
-            // Time Count
-            if (ltap) {
-                ds.writeByte(0);
-            } else {
-                ds.writeByte(this.timeCountMax);
-            }
-            // Team point
-            ds.writeShort(pl.dongDoi);
-            if (!this.ltap && this.fightWait.getRoom().getType() == 7) {
-                ds.writeByte(8);
-            }
-            // X, Y, HP
-            for (byte j = 0; j < this.players.length; j++) {
-                Player pl2 = this.players[j];
-                if (pl2 == null) {
-                    ds.writeShort(-1);
-                    continue;
-                }
-                ds.writeShort(pl2.x);
-                ds.writeShort(pl2.y);
-                ds.writeShort(pl2.HPMax);
-            }
-            ds.flush();
-            pl.user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     protected void countOut() throws IOException {
-        if (this.isFight && !this.checkWin()) {
+        if (fightWait.isStarted() && !checkWin()) {
             nextTurn();
         }
     }
@@ -1174,7 +1134,7 @@ public class FightManager {
         }
         bulletManager.addShoot(pl, bullId, arg, force, force2, nshoot);
         bulletManager.fillXY();
-        if (!this.ltap) {
+        if (!this.isTraining) {
             this.nextMM();
         }
         ArrayList<Bullet> bullets = bulletManager.entrys;
@@ -1280,7 +1240,7 @@ public class FightManager {
         this.sendToTeam(ms);
         pl.isUseItem = false;
         pl.itemUsed = -1;
-        if (this.ltap) {
+        if (this.isTraining) {
             nextTurn();
         } else if (this.isNextTurn) {
             new Thread(() -> {
@@ -1338,12 +1298,12 @@ public class FightManager {
         } else {
             nshoot = 1;
         }
-        if (this.ltap) {
+        if (this.isTraining) {
             pl.setXY(x, y);
         } else if (x != pl.x && y != pl.y) {
             pl.updateXY(x, y);
         }
-        newShoot(index, bullId, (arg > 360 ? 360 : (arg < -360 ? -360 : arg)), (force > 30 ? 30 : (force < 0 ? 0 : force)), (force2 > 30 ? 30 : (force2 < 0 ? 0 : force2)), nshoot, ltap);
+        newShoot(index, bullId, (arg > 360 ? 360 : (arg < -360 ? -360 : arg)), (force > 30 ? 30 : (force < 0 ? 0 : force)), (force2 > 30 ? 30 : (force2 < 0 ? 0 : force2)), nshoot, isTraining);
     }
 
     public void boLuotMessage(User us) throws IOException {
