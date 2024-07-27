@@ -33,7 +33,7 @@ public class User {
     public static EquipmentEntry[][] nvEquipDefault;
     private ISession session;
     private UserState state;
-    private int userId;
+    private String userId;
     private int playerId;
     private String username;
     private short clanId;

@@ -114,7 +114,7 @@ public class UserDao implements IUserDao {
                         }
                         user = new User();
                         user.setUsername(username);
-                        user.setUserId(userResultSet.getInt("user_id"));
+                        user.setUserId(userResultSet.getString("user_id"));
                         user.setLock(userResultSet.getBoolean("lock"));
                         user.setActive(userResultSet.getBoolean("active"));
                     }
@@ -129,7 +129,7 @@ public class UserDao implements IUserDao {
                 // Truy vấn để lấy thông tin từ bảng player
                 String playerQuery = "SELECT * FROM player WHERE user_id = ?";
                 try (PreparedStatement playerStatement = connection.prepareStatement(playerQuery)) {
-                    playerStatement.setInt(1, user.getUserId());
+                    playerStatement.setString(1, user.getUserId());
                     try (ResultSet playerResultSet = playerStatement.executeQuery()) {
                         //init
                         int len = NVData.CHARACTER_ENTRIES.size();
@@ -331,10 +331,10 @@ public class UserDao implements IUserDao {
     }
 
     @Override
-    public boolean existsByUserIdAndPassword(int userId, String oldPass) {
+    public boolean existsByUserIdAndPassword(String userId, String oldPass) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT password FROM user WHERE user_id = ?")) {
-            statement.setInt(1, userId);
+            statement.setString(1, userId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     String hashedPassword = resultSet.getString("password");
@@ -349,7 +349,7 @@ public class UserDao implements IUserDao {
     }
 
     @Override
-    public void changePassword(int userId, String newPass) {
+    public void changePassword(String userId, String newPass) {
         String hashedPassword = BCrypt.hashpw(newPass, BCrypt.gensalt());
         String sql = "UPDATE `user` SET `password` = ? WHERE user_id = ?";
         HikariCPManager.getInstance().update(sql, hashedPassword, userId);

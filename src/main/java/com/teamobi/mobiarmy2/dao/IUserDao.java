@@ -14,9 +14,9 @@ public interface IUserDao extends Dao<User> {
 
     List<FriendEntry> getFriendsList(int playerId, List<Integer> friends);
 
-    boolean existsByUserIdAndPassword(int userId, String oldPass);
+    boolean existsByUserIdAndPassword(String userId, String oldPass);
 
-    void changePassword(int userId, String newPass);
+    void changePassword(String userId, String newPass);
 
     Integer findPlayerIdByUsername(String username);
 
