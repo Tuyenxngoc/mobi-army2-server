@@ -373,7 +373,7 @@ public class UserDao implements IUserDao {
 
     @Override
     public void updateLastOnline(LocalDateTime now, int playerId) {
-        String sql = "UPDATE `players` SET `last_online` = ? WHERE user_id = ?";
+        String sql = "UPDATE `players` SET `last_online` = ? WHERE player_id = ?";
         HikariCPManager.getInstance().update(sql, now.toString(), playerId);
     }
 
