@@ -140,8 +140,8 @@ public class ClanDao implements IClanDao {
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT c.*, u.username " +
                              "FROM clan c " +
-                             "INNER JOIN player p ON c.master_id = p.player_id " +
-                             "INNER JOIN user u ON p.user_id = u.user_id " +
+                             "INNER JOIN players p ON c.master_id = p.player_id " +
+                             "INNER JOIN users u ON p.user_id = u.user_id " +
                              "WHERE c.clan_id = ?")
         ) {
 
@@ -208,8 +208,8 @@ public class ClanDao implements IClanDao {
         List<ClanMemEntry> entries = new ArrayList<>();
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT c.*, p.*, u.username FROM clanmem c " +
-                     "INNER JOIN player p on c.player_id = p.player_id " +
-                     "INNER JOIN user u on p.user_id = u.user_id " +
+                     "INNER JOIN players p on c.player_id = p.player_id " +
+                     "INNER JOIN users u on p.user_id = u.user_id " +
                      "WHERE p.clan_id = ? " +
                      "ORDER BY c.rights DESC " +
                      "LIMIT 10 OFFSET ?")) {
@@ -313,8 +313,8 @@ public class ClanDao implements IClanDao {
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT c.*, u.username " +
                              "FROM clan c " +
-                             "INNER JOIN player p ON c.master_id = p.player_id " +
-                             "INNER JOIN user u ON p.user_id = u.user_id " +
+                             "INNER JOIN players p ON c.master_id = p.player_id " +
+                             "INNER JOIN users u ON p.user_id = u.user_id " +
                              "ORDER BY c.xp " +
                              "LIMIT 10 OFFSET ?")
         ) {

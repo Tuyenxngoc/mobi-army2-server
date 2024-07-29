@@ -56,7 +56,7 @@ public class RankingDao implements IRankingDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery(
                     "SELECT p.*, u.username " +
-                            "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
+                            "FROM players p INNER JOIN users u ON p.user_id = u.user_id " +
                             "WHERE p.dvong > 0 " +
                             "ORDER BY p.dvong DESC LIMIT 100"
             )) {
@@ -81,7 +81,7 @@ public class RankingDao implements IRankingDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery(
                     "SELECT *, u.username " +
-                            "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
+                            "FROM players p INNER JOIN users u ON p.user_id = u.user_id " +
                             "WHERE p.xpMax > 0 " +
                             "ORDER BY p.xpMax DESC LIMIT 100"
             )) {
@@ -106,7 +106,7 @@ public class RankingDao implements IRankingDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery(
                     "SELECT *, u.username " +
-                            "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
+                            "FROM players p INNER JOIN users u ON p.user_id = u.user_id " +
                             "WHERE p.xu > 0 " +
                             "ORDER BY p.xu DESC LIMIT 100"
             )) {
@@ -131,7 +131,7 @@ public class RankingDao implements IRankingDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery(
                     "SELECT *, u.username " +
-                            "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
+                            "FROM players p INNER JOIN users u ON p.user_id = u.user_id " +
                             "WHERE p.luong > 0 " +
                             "ORDER BY p.luong DESC LIMIT 100"
             )) {
@@ -156,7 +156,7 @@ public class RankingDao implements IRankingDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery(
                     "SELECT *, u.username " +
-                            "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
+                            "FROM players p INNER JOIN users u ON p.user_id = u.user_id " +
                             "WHERE p.weekly_earnings_cup IS NOT NULL AND p.weekly_earnings_cup > 0 " +
                             "ORDER BY p.weekly_earnings_cup DESC LIMIT 100"
             )) {
@@ -181,7 +181,7 @@ public class RankingDao implements IRankingDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery(
                     "SELECT *, u.username " +
-                            "FROM player p INNER JOIN user u ON p.user_id = u.user_id " +
+                            "FROM players p INNER JOIN users u ON p.user_id = u.user_id " +
                             "WHERE p.weekly_earnings_xu IS NOT NULL AND p.weekly_earnings_xu > 0 " +
                             "ORDER BY p.weekly_earnings_xu DESC LIMIT 100"
             )) {

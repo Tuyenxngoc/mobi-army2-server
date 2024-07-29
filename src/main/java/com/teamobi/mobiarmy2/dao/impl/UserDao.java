@@ -33,7 +33,7 @@ public class UserDao implements IUserDao {
 
     @Override
     public void save(User user) {
-        HikariCPManager.getInstance().update("INSERT INTO `player`(`user_id`, `xu`, `luong`) VALUES (?,?,?)", user.getUserId(), user.getXu(), user.getLuong());
+        HikariCPManager.getInstance().update("INSERT INTO `players`(`user_id`, `xu`, `luong`) VALUES (?,?,?)", user.getUserId(), user.getXu(), user.getLuong());
     }
 
     @Override
@@ -53,7 +53,7 @@ public class UserDao implements IUserDao {
         nv1.setPointAdd(user.getPointAdd()[0]);
         nv1.setData(user.getEquipData()[0]);
 
-        String sql = "UPDATE `player` SET " +
+        String sql = "UPDATE `players` SET " +
                 "`friends` = ?, " +
                 "`xu` = ?, " +
                 "`luong` = ?, " +
@@ -102,7 +102,7 @@ public class UserDao implements IUserDao {
         User user = null;
         try (Connection connection = HikariCPManager.getInstance().getConnection()) {
             // Truy vấn để lấy thông tin từ bảng user
-            String userQuery = "SELECT `user_id`, `password`, `lock`, `active` FROM user WHERE username = ?";
+            String userQuery = "SELECT `user_id`, `password`, `enabled` FROM users WHERE username = ?";
             try (PreparedStatement userStatement = connection.prepareStatement(userQuery)) {
                 userStatement.setString(1, username);
                 try (ResultSet userResultSet = userStatement.executeQuery()) {
@@ -115,8 +115,8 @@ public class UserDao implements IUserDao {
                         user = new User();
                         user.setUsername(username);
                         user.setUserId(userResultSet.getString("user_id"));
-                        user.setLock(userResultSet.getBoolean("lock"));
-                        user.setActive(userResultSet.getBoolean("active"));
+                        user.setLock(false);//Todo
+                        user.setActive(userResultSet.getBoolean("enabled"));
                     }
                 }
             }
@@ -127,7 +127,7 @@ public class UserDao implements IUserDao {
                     return user;
                 }
                 // Truy vấn để lấy thông tin từ bảng player
-                String playerQuery = "SELECT * FROM player WHERE user_id = ?";
+                String playerQuery = "SELECT * FROM players WHERE user_id = ?";
                 try (PreparedStatement playerStatement = connection.prepareStatement(playerQuery)) {
                     playerStatement.setString(1, user.getUserId());
                     try (ResultSet playerResultSet = playerStatement.executeQuery()) {
@@ -273,7 +273,7 @@ public class UserDao implements IUserDao {
 
     @Override
     public void updateOnline(boolean flag, int playerId) {
-        String sql = "UPDATE `player` SET `online` = ? WHERE player_id = ?";
+        String sql = "UPDATE `players` SET `online` = ? WHERE player_id = ?";
         HikariCPManager.getInstance().update(sql, flag, playerId);
     }
 
@@ -333,7 +333,7 @@ public class UserDao implements IUserDao {
     @Override
     public boolean existsByUserIdAndPassword(String userId, String oldPass) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT password FROM user WHERE user_id = ?")) {
+             PreparedStatement statement = connection.prepareStatement("SELECT password FROM users WHERE user_id = ?")) {
             statement.setString(1, userId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
@@ -358,7 +358,7 @@ public class UserDao implements IUserDao {
     @Override
     public Integer findPlayerIdByUsername(String username) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT p.player_id FROM user u INNER JOIN player p ON u.user_id = p.user_id WHERE u.username = ?")) {
+             PreparedStatement statement = connection.prepareStatement("SELECT p.player_id FROM users u INNER JOIN players p ON u.user_id = p.user_id WHERE u.username = ?")) {
             statement.setString(1, username);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
@@ -373,7 +373,7 @@ public class UserDao implements IUserDao {
 
     @Override
     public void updateLastOnline(LocalDateTime now, int playerId) {
-        String sql = "UPDATE `player` SET `last_online` = ? WHERE user_id = ?";
+        String sql = "UPDATE `players` SET `last_online` = ? WHERE user_id = ?";
         HikariCPManager.getInstance().update(sql, now.toString(), playerId);
     }
 
