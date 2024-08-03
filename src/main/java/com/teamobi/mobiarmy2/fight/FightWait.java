@@ -113,7 +113,7 @@ public class FightWait {
             ds.writeShort(us.getClanId());
             ds.writeUTF(us.getUsername());
             ds.writeByte(us.getCurrentLevel());
-            ds.writeByte(us.getNvUsed());
+            ds.writeByte(us.getActiveCharacter());
             for (short id : us.getEquip()) {
                 ds.writeShort(id);
             }
@@ -144,7 +144,7 @@ public class FightWait {
                 ds.writeUTF(user.getUsername());
                 ds.writeInt(0);
                 ds.writeByte(user.getCurrentLevel());
-                ds.writeByte(user.getNvUsed());
+                ds.writeByte(user.getActiveCharacter());
                 for (short id : user.getEquip()) {
                     ds.writeShort(id);
                 }
@@ -681,7 +681,7 @@ public class FightWait {
             for (User u : userList) {
                 ds.writeUTF(u.getUsername());
                 ds.writeInt(u.getPlayerId());
-                ds.writeByte(u.getNvUsed());
+                ds.writeByte(u.getActiveCharacter());
                 ds.writeInt(u.getXu());
                 ds.writeByte(u.getCurrentLevel());
                 ds.writeByte(u.getCurrentLevelPercent());

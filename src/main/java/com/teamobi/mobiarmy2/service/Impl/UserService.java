@@ -208,7 +208,7 @@ public class UserService implements IUserService {
         target.setClanId(source.getClanId());
         target.setLevels(source.getLevels());
         target.setLevelPercents(source.getLevelPercents());
-        target.setNvUsed(source.getNvUsed());
+        target.setActiveCharacter(source.getActiveCharacter());
         target.setOwnedCharacters(source.getOwnedCharacters());
         target.setXps(source.getXps());
         target.setPoints(source.getPoints());
@@ -495,7 +495,7 @@ public class UserService implements IUserService {
             ds.writeInt(user.getPlayerId());
             ds.writeInt(user.getXu());
             ds.writeInt(user.getLuong());
-            ds.writeByte(user.getNvUsed());
+            ds.writeByte(user.getActiveCharacter());
             ds.writeShort(user.getClanId());
             ds.writeByte(0);
 
@@ -644,7 +644,7 @@ public class UserService implements IUserService {
         if (formulaMap == null) {
             return;
         }
-        List<FormulaEntry> formulas = formulaMap.get(user.getNvUsed());
+        List<FormulaEntry> formulas = formulaMap.get(user.getActiveCharacter());
         if (formulas == null) {
             return;
         }
@@ -660,7 +660,7 @@ public class UserService implements IUserService {
         }
 
         //Kiểm tra có trang bị yêu cầu không
-        EquipmentChestEntry requiredEquip = user.getEquipment(formula.getRequiredEquip().getEquipIndex(), user.getNvUsed(), formula.getLevel());
+        EquipmentChestEntry requiredEquip = user.getEquipment(formula.getRequiredEquip().getEquipIndex(), user.getActiveCharacter(), formula.getLevel());
         if (requiredEquip == null) {
             sendFormulaProcessingResult(GameString.cheDoFail());
             return;
@@ -736,7 +736,7 @@ public class UserService implements IUserService {
             if (formulaMap == null) {
                 return;
             }
-            List<FormulaEntry> formulaEntries = formulaMap.get(user.getNvUsed());
+            List<FormulaEntry> formulaEntries = formulaMap.get(user.getActiveCharacter());
             if (formulaEntries == null) {
                 return;
             }
@@ -1091,11 +1091,11 @@ public class UserService implements IUserService {
                     equip.isExpired() ||
                     !equip.getEquipEntry().isDisguise() ||
                     equip.getEquipEntry().getLevelRequirement() > user.getCurrentLevel() ||
-                    equip.getEquipEntry().getCharacterId() != user.getNvUsed()
+                    equip.getEquipEntry().getCharacterId() != user.getActiveCharacter()
             ) {
                 return;
             }
-            EquipmentChestEntry oldEquip = user.getNvEquip()[user.getNvUsed()][5];
+            EquipmentChestEntry oldEquip = user.getNvEquip()[user.getActiveCharacter()][5];
             if (oldEquip != null) {
                 oldEquip.setInUse(false);
             }
@@ -1103,12 +1103,12 @@ public class UserService implements IUserService {
             DataOutputStream ds = ms.writer();
             ds.writeByte(action);
             if (action == 0) {
-                user.getEquipData()[user.getNvUsed()][5] = -1;
-                user.getNvEquip()[user.getNvUsed()][5] = null;
+                user.getEquipData()[user.getActiveCharacter()][5] = -1;
+                user.getNvEquip()[user.getActiveCharacter()][5] = null;
             } else {
                 equip.setInUse(true);
-                user.getEquipData()[user.getNvUsed()][5] = equip.getKey();
-                user.getNvEquip()[user.getNvUsed()][5] = equip;
+                user.getEquipData()[user.getActiveCharacter()][5] = equip.getKey();
+                user.getNvEquip()[user.getActiveCharacter()][5] = equip;
                 for (short a : equip.getEquipEntry().getDisguiseEquippedIndexes()) {
                     ds.writeShort(a);
                 }
@@ -1937,7 +1937,7 @@ public class UserService implements IUserService {
             if (characterId >= NVData.CHARACTER_ENTRIES.size() || characterId < 0 || !user.getOwnedCharacters()[characterId]) {
                 return;
             }
-            user.setNvUsed(characterId);
+            user.setActiveCharacter(characterId);
             ms = new Message(Cmd.CHOOSE_GUN);
             DataOutputStream ds = ms.writer();
             ds.writeInt(user.getPlayerId());
@@ -1956,7 +1956,7 @@ public class UserService implements IUserService {
             Message ms = new Message(Cmd.CURR_EQUIP_DBKEY);
             DataOutputStream ds = ms.writer();
             for (int i = 0; i < 5; i++) {
-                ds.writeInt(user.getEquipData()[user.getNvUsed()][i]);
+                ds.writeInt(user.getEquipData()[user.getActiveCharacter()][i]);
             }
             ds.flush();
             user.sendMessage(ms);
@@ -2339,7 +2339,7 @@ public class UserService implements IUserService {
                 ds.writeByte(entry.getVipLevel());
             }
             for (int i = 0; i < 5; i++) {
-                ds.writeInt(user.getEquipData()[user.getNvUsed()][i]);
+                ds.writeInt(user.getEquipData()[user.getActiveCharacter()][i]);
             }
             ds.flush();
             user.sendMessage(ms);
@@ -2415,17 +2415,17 @@ public class UserService implements IUserService {
                         equip.isExpired() ||
                         equip.getEquipEntry().isDisguise() ||
                         equip.getEquipEntry().getLevelRequirement() > user.getCurrentLevel() ||
-                        equip.getEquipEntry().getCharacterId() != user.getNvUsed() || equip.getEquipEntry().getEquipType() != i
+                        equip.getEquipEntry().getCharacterId() != user.getActiveCharacter() || equip.getEquipEntry().getEquipType() != i
                 ) {
                     continue;
                 }
-                EquipmentChestEntry oldEquip = user.getNvEquip()[user.getNvUsed()][i];
+                EquipmentChestEntry oldEquip = user.getNvEquip()[user.getActiveCharacter()][i];
                 if (oldEquip != null) {
                     oldEquip.setInUse(false);
                 }
                 equip.setInUse(true);
-                user.getNvEquip()[user.getNvUsed()][i] = equip;
-                user.getEquipData()[user.getNvUsed()][i] = equip.getKey();
+                user.getNvEquip()[user.getActiveCharacter()][i] = equip;
+                user.getEquipData()[user.getActiveCharacter()][i] = equip.getKey();
                 changeSuccessful = true;
             }
             ms = new Message(Cmd.CHANGE_EQUIP);
