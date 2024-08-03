@@ -399,7 +399,7 @@ public class FightManager {
                 continue;
             }
             if (pl.isUpdateCup) {
-                pl.user.updateDanhVong(pl.CupUp);
+                pl.user.updateCup(pl.CupUp);
                 pl.CupUp = 0;
                 pl.isUpdateCup = false;
             }
@@ -843,7 +843,7 @@ public class FightManager {
             ms = new Message(-24);
             ds = ms.writer();
             ds.writeByte(pl.AllCupUp);
-            ds.writeInt(pl.user.getDanhVong());
+            ds.writeInt(pl.user.getCup());
             ds.flush();
             pl.user.sendMessage(ms);
         }

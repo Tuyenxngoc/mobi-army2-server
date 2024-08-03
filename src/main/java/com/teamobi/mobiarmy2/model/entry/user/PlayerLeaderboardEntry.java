@@ -12,7 +12,7 @@ public class PlayerLeaderboardEntry {
     private int playerId;
     private String username;
     private short clanId;
-    private byte nvUsed;
+    private byte activeCharacter;
     private byte level;
     private byte levelPt;
     private byte index;

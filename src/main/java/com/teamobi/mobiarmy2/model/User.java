@@ -39,7 +39,7 @@ public class User {
     private short clanId;
     private int xu;
     private int luong;
-    private int danhVong;
+    private int cup;
     private boolean isLogged;
     private boolean isLock;
     private boolean isActive;
@@ -61,8 +61,8 @@ public class User {
     private byte[] missionLevel;
     private EquipmentChestEntry[][] nvEquip;
     private List<Integer> friends;
-    private List<SpecialItemChestEntry> ruongDoItem;
-    private List<EquipmentChestEntry> ruongDoTB;
+    private List<SpecialItemChestEntry> specialItemChest;
+    private List<EquipmentChestEntry> equipmentChest;
     private FightWait fightWait;
     private final IUserService userService;
     private boolean openingGift;
@@ -149,19 +149,19 @@ public class User {
         userService.sendUpdateMoney();
     }
 
-    public synchronized void updateDanhVong(int danhVongUp) {
-        if (danhVongUp == 0) {
+    public synchronized void updateCup(int cupUp) {
+        if (cupUp == 0) {
             return;
         }
-        long sum = danhVongUp + danhVong;
+        long sum = cupUp + cup;
         if (sum > CommonConstant.MAX_DANH_VONG) {
-            danhVong = CommonConstant.MAX_DANH_VONG;
+            cup = CommonConstant.MAX_DANH_VONG;
         } else if (sum < CommonConstant.MIN_DANH_VONG) {
-            danhVong = CommonConstant.MIN_DANH_VONG;
+            cup = CommonConstant.MIN_DANH_VONG;
         } else {
-            danhVong += danhVongUp;
+            cup += cupUp;
         }
-        userService.sendUpdateDanhVong(danhVongUp);
+        userService.sendUpdateDanhVong(cupUp);
     }
 
     public synchronized void updateXp(int xpUp) {
@@ -246,7 +246,7 @@ public class User {
         addEquipment.setEmptySlot((byte) 3);
         addEquipment.setSlots(new byte[]{-1, -1, -1});
         addEquipment.setKey(equipmentPurchased | 0x10000);
-        ruongDoTB.add(addEquipment);
+        equipmentChest.add(addEquipment);
 
         //Tăng số lượng trang bị mua
         equipmentPurchased++;
@@ -309,7 +309,7 @@ public class User {
                     if (existingItem != null) {
                         existingItem.increaseQuantity(newItem.getQuantity());
                     } else {
-                        ruongDoItem.add(newItem);
+                        specialItemChest.add(newItem);
                     }
                     ds.writeByte(newItem.getQuantity() > 1 ? 3 : 1);
                     ds.writeByte(newItem.getItem().getId());
@@ -330,7 +330,7 @@ public class User {
                     if (existingItem != null) {
                         existingItem.decreaseQuantity(itemToRemove.getQuantity());
                         if (existingItem.getQuantity() <= 0) {
-                            ruongDoItem.remove(existingItem);
+                            specialItemChest.remove(existingItem);
                         }
                         updateQuantity++;
                         ds.writeByte(0);
@@ -342,7 +342,7 @@ public class User {
 
             if (removeEquip != null) {
                 updateQuantity++;
-                ruongDoTB.remove(removeEquip);
+                equipmentChest.remove(removeEquip);
                 ds.writeByte(0);
                 ds.writeInt(removeEquip.getKey());
                 ds.writeByte(1);
@@ -381,14 +381,14 @@ public class User {
     }
 
     public EquipmentChestEntry getEquipmentByKey(int key) {
-        return ruongDoTB.stream()
+        return equipmentChest.stream()
                 .filter(equip -> equip.getKey() == key)
                 .findFirst()
                 .orElse(null);
     }
 
     public SpecialItemChestEntry getSpecialItemById(byte id) {
-        return ruongDoItem.stream()
+        return specialItemChest.stream()
                 .filter(item -> item.getItem().getId() == id)
                 .findFirst()
                 .orElse(null);
@@ -408,7 +408,7 @@ public class User {
     }
 
     public short getInventorySpecialItemCount(byte itemId) {
-        SpecialItemChestEntry specialItemChestEntry = ruongDoItem.stream()
+        SpecialItemChestEntry specialItemChestEntry = specialItemChest.stream()
                 .filter(item -> item.getItem().getId() == itemId)
                 .findFirst()
                 .orElse(null);
@@ -427,7 +427,7 @@ public class User {
     }
 
     public boolean hasEquipment(short equipIndex, byte vipLevel) {
-        return ruongDoTB.stream()
+        return equipmentChest.stream()
                 .anyMatch(equip -> equip != null && equip.getEquipEntry() != null &&
                         equip.getEquipEntry().getEquipIndex() == equipIndex &&
                         equip.getVipLevel() == vipLevel &&
@@ -438,7 +438,7 @@ public class User {
     }
 
     public EquipmentChestEntry getEquipment(short equipIndex, byte characterId, byte vipLevel) {
-        return ruongDoTB.stream()
+        return equipmentChest.stream()
                 .filter(equip -> equip != null && equip.getEquipEntry() != null &&
                         equip.getEquipEntry().getEquipIndex() == equipIndex &&
                         equip.getEquipEntry().getCharacterId() == characterId &&

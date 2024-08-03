@@ -12,7 +12,7 @@ public class ClanMemEntry {
     private int playerId;
     private String username;
     private int point;
-    private byte nvUsed;
+    private byte activeCharacter;
     private byte online;
     private byte lever;
     private byte levelPt;

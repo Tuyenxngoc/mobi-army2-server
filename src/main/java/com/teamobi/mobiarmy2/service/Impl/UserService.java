@@ -204,7 +204,7 @@ public class UserService implements IUserService {
         target.setUsername(source.getUsername());
         target.setXu(source.getXu());
         target.setLuong(source.getLuong());
-        target.setDanhVong(source.getDanhVong());
+        target.setCup(source.getCup());
         target.setClanId(source.getClanId());
         target.setLevels(source.getLevels());
         target.setLevelPercents(source.getLevelPercents());
@@ -218,8 +218,8 @@ public class UserService implements IUserService {
         target.setFriends(source.getFriends());
         target.setMission(source.getMission());
         target.setMissionLevel(source.getMissionLevel());
-        target.setRuongDoItem(source.getRuongDoItem());
-        target.setRuongDoTB(source.getRuongDoTB());
+        target.setSpecialItemChest(source.getSpecialItemChest());
+        target.setEquipmentChest(source.getEquipmentChest());
         target.setNvEquip(source.getNvEquip());
         target.setItems(source.getItems());
         target.setXpX2Time(source.getXpX2Time());
@@ -451,7 +451,7 @@ public class UserService implements IUserService {
                     user.updateXp(missionEntry.getRewardXp());
                 }
                 if (missionEntry.getRewardCup() > 0) {
-                    user.updateDanhVong(missionEntry.getRewardCup());
+                    user.updateCup(missionEntry.getRewardCup());
                 }
                 sendMissionInfo();
                 message = GameString.missionComplete(missionEntry.getReward());
@@ -844,7 +844,7 @@ public class UserService implements IUserService {
                     for (PlayerLeaderboardEntry pl : bangXH) {
                         ds.writeInt(pl.getPlayerId());
                         ds.writeUTF(pl.getUsername());
-                        ds.writeByte(pl.getNvUsed());
+                        ds.writeByte(pl.getActiveCharacter());
                         ds.writeShort(pl.getClanId());
                         ds.writeByte(pl.getLevel());
                         ds.writeByte(pl.getLevelPt());
@@ -1482,7 +1482,7 @@ public class UserService implements IUserService {
                             user.updateLuong(fabricateItemEntry.getRewardLuong());
                         }
                         if (fabricateItemEntry.getRewardCup() > 0) {
-                            user.updateDanhVong(fabricateItemEntry.getRewardCup());
+                            user.updateCup(fabricateItemEntry.getRewardCup());
                         }
                         if (fabricateItemEntry.getRewardExp() > 0) {
                             user.updateXp(fabricateItemEntry.getRewardExp());
@@ -1832,7 +1832,7 @@ public class UserService implements IUserService {
                 ds.writeInt(user.getLuong());
                 ds.writeInt(user.getCurrentXp());
                 ds.writeInt(user.getCurrentXpLevel());
-                ds.writeInt(user.getDanhVong());
+                ds.writeInt(user.getCup());
                 ds.writeUTF(GameString.notRanking());
             }
             ds.flush();
@@ -2321,8 +2321,8 @@ public class UserService implements IUserService {
         try {
             Message ms = new Message(Cmd.INVENTORY);
             DataOutputStream ds = ms.writer();
-            ds.writeByte(user.getRuongDoTB().size());
-            for (EquipmentChestEntry entry : user.getRuongDoTB()) {
+            ds.writeByte(user.getEquipmentChest().size());
+            for (EquipmentChestEntry entry : user.getEquipmentChest()) {
                 ds.writeInt(entry.getKey());
                 ds.writeByte(entry.getEquipEntry().getCharacterId());
                 ds.writeByte(entry.getEquipEntry().getEquipType());
@@ -2347,8 +2347,8 @@ public class UserService implements IUserService {
             ms = new Message(Cmd.MATERIAL);
             ds = ms.writer();
             ds.writeByte(0);
-            ds.writeByte(user.getRuongDoItem().size());
-            for (SpecialItemChestEntry item : user.getRuongDoItem()) {
+            ds.writeByte(user.getSpecialItemChest().size());
+            for (SpecialItemChestEntry item : user.getSpecialItemChest()) {
                 ds.writeByte(item.getItem().getId());
                 ds.writeShort(item.getQuantity());
                 ds.writeUTF(item.getItem().getName());
@@ -2395,7 +2395,7 @@ public class UserService implements IUserService {
             }
             ds.writeInt(user.getCurrentXp());
             ds.writeInt(user.getCurrentXpLevel());
-            ds.writeInt(user.getDanhVong());
+            ds.writeInt(user.getCup());
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
@@ -2590,7 +2590,7 @@ public class UserService implements IUserService {
     }
 
     private void purchaseEquipment(short saleIndex, byte unit) {
-        if (user.getRuongDoTB().size() >= ServerManager.getInstance().config().getMaxRuongTrangBi()) {
+        if (user.getEquipmentChest().size() >= ServerManager.getInstance().config().getMaxRuongTrangBi()) {
             sendServerMessage(GameString.ruongNoSlot());
             return;
         }
@@ -2796,7 +2796,7 @@ public class UserService implements IUserService {
                 ds.writeInt(memClan.getPlayerId());
                 ds.writeUTF(memClan.getUsername());
                 ds.writeInt(memClan.getPoint());
-                ds.writeByte(memClan.getNvUsed());
+                ds.writeByte(memClan.getActiveCharacter());
                 ds.writeByte(memClan.getOnline());
                 ds.writeByte(memClan.getLever());
                 ds.writeByte(memClan.getLevelPt());
@@ -2945,7 +2945,7 @@ public class UserService implements IUserService {
             Message ms = new Message(Cmd.CUP);
             DataOutputStream ds = ms.writer();
             ds.writeByte(danhVongUp);
-            ds.writeInt(user.getDanhVong());
+            ds.writeInt(user.getCup());
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {

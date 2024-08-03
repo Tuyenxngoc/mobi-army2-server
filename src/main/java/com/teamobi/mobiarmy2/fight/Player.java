@@ -595,7 +595,7 @@ public class Player {
                         int thaoancut = this.XPExist * 4;
                         bull.pl.updateEXP(thaoancut);
                     } else {
-                        int cupCL = bull.pl.user.getDanhVong() - this.user.getDanhVong();
+                        int cupCL = bull.pl.user.getCup() - this.user.getCup();
                         int cupAdd = ((3000 - cupCL) / 100);
                         int levelPL = this.user.getCurrentLevel();
                         if (levelPL > 255) {

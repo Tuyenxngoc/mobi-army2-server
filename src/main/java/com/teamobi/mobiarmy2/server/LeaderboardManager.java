@@ -87,12 +87,12 @@ public class LeaderboardManager {
         List<PlayerLeaderboardEntry> list = leaderboardEntries.get(type);
         list.clear();
         switch (type) {
-            case 0 -> list.addAll(rankingDao.getTopDanhDu());
-            case 1 -> list.addAll(rankingDao.getTopCaoThu());
-            case 2 -> list.addAll(rankingDao.getTopDaiGiaXu());
-            case 3 -> list.addAll(rankingDao.getTopDaiGiaLuong());
-            case 4 -> list.addAll(rankingDao.getTopDanhDuTuan());
-            case 5 -> list.addAll(rankingDao.getTopDaiGiaTuan());
+            case 0 -> list.addAll(rankingDao.getTopHonor());
+            case 1 -> list.addAll(rankingDao.getTopMasters());
+            case 2 -> list.addAll(rankingDao.getTopRichestXu());
+            case 3 -> list.addAll(rankingDao.getTopRichestLuong());
+            case 4 -> list.addAll(rankingDao.getWeeklyTopHonor());
+            case 5 -> list.addAll(rankingDao.getWeeklyTopRichest());
         }
     }
 

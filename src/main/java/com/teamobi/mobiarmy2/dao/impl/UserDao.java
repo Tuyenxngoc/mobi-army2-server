@@ -44,8 +44,8 @@ public class UserDao implements IUserDao {
             pow <<= 1;
         }
 
-        String ruongdoItem = JsonConverter.convertRuongDoItemToJson(user.getRuongDoItem());
-        String ruongdoTb = JsonConverter.convertRuongDoTBToJson(user.getRuongDoTB());
+        String ruongdoItem = JsonConverter.convertRuongDoItemToJson(user.getSpecialItemChest());
+        String ruongdoTb = JsonConverter.convertRuongDoTBToJson(user.getEquipmentChest());
         CharacterJson nv1 = new CharacterJson();
         nv1.setPoint(user.getPoints()[0]);
         nv1.setLevel(user.getLevels()[0]);
@@ -57,13 +57,13 @@ public class UserDao implements IUserDao {
                 "`friends` = ?, " +
                 "`xu` = ?, " +
                 "`luong` = ?, " +
-                "`dvong` = ?, " +
+                "`cup` = ?, " +
                 "`clan_id` = ?, " +
                 "`item` = ?, " +
-                "`ruongTrangBi` = ?, " +
-                "`ruongItem` = ? ," +
+                "`equipment_chest` = ?, " +
+                "`item_chest` = ? ," +
                 "`sttnhanvat` = ?, " +
-                "`online` = ?, " +
+                "`is_online` = ?, " +
                 "`mission` = ?, " +
                 "`missionLevel` = ?, " +
                 "`top_earnings_xu` = ?, " +
@@ -78,7 +78,7 @@ public class UserDao implements IUserDao {
                 user.getFriends().toString(),
                 user.getXu(),
                 user.getLuong(),
-                user.getDanhVong(),
+                user.getCup(),
                 user.getClanId() == 0 ? null : user.getClanId(),
                 Arrays.toString(user.getItems()),
                 ruongdoTb,
@@ -141,14 +141,14 @@ public class UserDao implements IUserDao {
                         user.setPointAdd(new short[len][5]);
                         user.setEquipData(new int[len][6]);
                         user.setNvEquip(new EquipmentChestEntry[len][6]);
-                        user.setRuongDoItem(new ArrayList<>());
-                        user.setRuongDoTB(new ArrayList<>());
+                        user.setSpecialItemChest(new ArrayList<>());
+                        user.setEquipmentChest(new ArrayList<>());
                         Gson gson = GsonUtil.GSON;
                         if (playerResultSet.next()) {
                             user.setPlayerId(playerResultSet.getInt("player_id"));
                             user.setXu(playerResultSet.getInt("xu"));
                             user.setLuong(playerResultSet.getInt("luong"));
-                            user.setDanhVong(playerResultSet.getInt("dvong"));
+                            user.setCup(playerResultSet.getInt("cup"));
                             user.setNvUsed(playerResultSet.getByte("nv_used"));
                             user.setClanId(playerResultSet.getShort("clan_id"));
                             user.setPointEvent(playerResultSet.getInt("point_event"));
@@ -171,7 +171,7 @@ public class UserDao implements IUserDao {
                             }
 
                             //Đọc dữ liệu trang bị
-                            EquipmentChestJson[] equipmentChestJsons = gson.fromJson(playerResultSet.getString("ruongTrangBi"), EquipmentChestJson[].class);
+                            EquipmentChestJson[] equipmentChestJsons = gson.fromJson(playerResultSet.getString("equipment_chest"), EquipmentChestJson[].class);
                             for (EquipmentChestJson json : equipmentChestJsons) {
                                 EquipmentChestEntry equip = new EquipmentChestEntry();
                                 equip.setEquipEntry(NVData.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
@@ -192,11 +192,11 @@ public class UserDao implements IUserDao {
                                     }
                                 }
                                 equip.setEmptySlot(emptySlot);
-                                user.getRuongDoTB().add(equip);
+                                user.getEquipmentChest().add(equip);
                             }
 
                             //Đọc dữ liệu item
-                            SpecialItemChestJson[] specialItemChestJsons = gson.fromJson(playerResultSet.getString("ruongItem"), SpecialItemChestJson[].class);
+                            SpecialItemChestJson[] specialItemChestJsons = gson.fromJson(playerResultSet.getString("item_chest"), SpecialItemChestJson[].class);
                             for (SpecialItemChestJson item : specialItemChestJsons) {
                                 SpecialItemChestEntry specialItemChestEntry = new SpecialItemChestEntry();
                                 specialItemChestEntry.setItem(SpecialItemData.getSpecialItemById(item.getId()));
@@ -204,7 +204,7 @@ public class UserDao implements IUserDao {
                                     continue;
                                 }
                                 specialItemChestEntry.setQuantity(item.getQuantity());
-                                user.getRuongDoItem().add(specialItemChestEntry);
+                                user.getSpecialItemChest().add(specialItemChestEntry);
                             }
 
                             //Đọc dữ liệu nhân vật
@@ -317,8 +317,8 @@ public class UserDao implements IUserDao {
 
                     friend.setLevel((byte) level);
                     friend.setLevelPt(Utils.calculateLevelPercent(xp, xpRequired));
-                    EquipmentChestJson[] trangBi = gson.fromJson(resultSet.getString("ruongTrangBi"), EquipmentChestJson[].class);
-                    friend.setData(NVData.getEquipData(trangBi, characterJson, friend.getNvUsed()));
+                    EquipmentChestJson[] trangBi = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
+                    friend.setData(NVData.getEquipData(trangBi, characterJson.getData(), friend.getNvUsed()));
 
                     friendsList.add(friend);
                 }

@@ -6,17 +6,17 @@ import java.util.List;
 
 public interface IRankingDao {
 
-    List<PlayerLeaderboardEntry> getTopDanhDu();
+    List<PlayerLeaderboardEntry> getTopHonor();
 
-    List<PlayerLeaderboardEntry> getTopCaoThu();
+    List<PlayerLeaderboardEntry> getTopMasters();
 
-    List<PlayerLeaderboardEntry> getTopDaiGiaXu();
+    List<PlayerLeaderboardEntry> getTopRichestXu();
 
-    List<PlayerLeaderboardEntry> getTopDaiGiaLuong();
+    List<PlayerLeaderboardEntry> getTopRichestLuong();
 
-    List<PlayerLeaderboardEntry> getTopDanhDuTuan();
+    List<PlayerLeaderboardEntry> getWeeklyTopHonor();
 
-    List<PlayerLeaderboardEntry> getTopDaiGiaTuan();
+    List<PlayerLeaderboardEntry> getWeeklyTopRichest();
 
     void addBonusGift(int playerId, int quantity);
 

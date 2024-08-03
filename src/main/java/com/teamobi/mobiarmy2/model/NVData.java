@@ -1,6 +1,5 @@
 package com.teamobi.mobiarmy2.model;
 
-import com.teamobi.mobiarmy2.json.CharacterJson;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.model.entry.equip.CharacterEntry;
 import com.teamobi.mobiarmy2.model.entry.equip.EquipmentEntry;
@@ -81,12 +80,12 @@ public class NVData {
     }
 
     //Todo optimize this method
-    public static short[] getEquipData(EquipmentChestJson[] equipmentChestJsons, CharacterJson character, byte nvUsed) {
+    public static short[] getEquipData(EquipmentChestJson[] equipmentChestJsons, int[] data, byte activeCharacter) {
         short[] equipData = new short[5];
 
         //Tìm cải trang
         boolean found = false;
-        int disguiseKey = character.getData()[5];
+        int disguiseKey = data[5];
         if (disguiseKey >= 0) {
             for (EquipmentChestJson json : equipmentChestJsons) {
                 if (json != null && json.getKey() == disguiseKey) {
@@ -110,7 +109,7 @@ public class NVData {
 
                 //Kiểm tra có trang bị trong rương hay không
                 boolean exists = false;
-                int equipKey = character.getData()[i];
+                int equipKey = data[i];
                 if (equipKey >= 0) {
                     for (EquipmentChestJson json : equipmentChestJsons) {
                         if (json != null && json.getKey() == equipKey) {
@@ -130,8 +129,8 @@ public class NVData {
 
                 //Nếu không tìm thấy thì lấy dữ liệu mặc định
                 if (!exists) {
-                    if (User.nvEquipDefault[nvUsed][i] != null) {
-                        equipData[i] = User.nvEquipDefault[nvUsed][i].getEquipIndex();
+                    if (User.nvEquipDefault[activeCharacter][i] != null) {
+                        equipData[i] = User.nvEquipDefault[activeCharacter][i].getEquipIndex();
                     } else {
                         equipData[i] = -1;
                     }

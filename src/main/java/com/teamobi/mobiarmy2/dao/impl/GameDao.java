@@ -31,7 +31,7 @@ public class GameDao implements IGameDao {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
 
-            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `map`")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `maps`")) {
                 while (resultSet.next()) {
                     MapEntry map = new MapEntry();
                     map.setId(resultSet.getByte("map_id"));
@@ -61,7 +61,7 @@ public class GameDao implements IGameDao {
     public void getAllCharacterData() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `character`")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `characters`")) {
                 while (resultSet.next()) {
                     CharacterEntry characterEntry = new CharacterEntry();
                     characterEntry.setId(resultSet.getByte("character_id"));
@@ -87,7 +87,7 @@ public class GameDao implements IGameDao {
     public void getAllEquip() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `equip` ORDER BY equip_type, equip_index, character_id")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `equips` ORDER BY equip_type, equip_index, character_id")) {
 
                 //Khởi tại danh sách trang bị mặc định ban đầu
                 User.nvEquipDefault = new EquipmentEntry[NVData.CHARACTER_ENTRIES.size()][5];
@@ -134,10 +134,10 @@ public class GameDao implements IGameDao {
     public void getAllCaptionLevel() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `captionlv`")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `caption_levels`")) {
                 while (resultSet.next()) {
                     CaptionEntry capEntry = new CaptionEntry();
-                    capEntry.setLevel(resultSet.getByte("lvl"));
+                    capEntry.setLevel(resultSet.getByte("level"));
                     capEntry.setCaption(resultSet.getString("caption"));
                     CaptionData.CAPTION_ENTRIES.add(capEntry);
                 }
@@ -152,7 +152,7 @@ public class GameDao implements IGameDao {
     public void getAllItem() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet resultSet = statement.executeQuery("SELECT name, xu, luong, carried_item_count FROM `fight_item`")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT name, xu, luong, carried_item_count FROM `fight_items`")) {
                 while (resultSet.next()) {
                     FightItemEntry fightItemEntry = new FightItemEntry();
                     fightItemEntry.setName(resultSet.getString("name"));
@@ -173,10 +173,10 @@ public class GameDao implements IGameDao {
     public void getAllItemClan() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `clanshop`")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `clan_shops`")) {
                 while (resultSet.next()) {
                     ClanItemEntry item = new ClanItemEntry();
-                    item.setId(resultSet.getByte("clanshop_id"));
+                    item.setId(resultSet.getByte("clan_shop_id"));
                     item.setLevel(resultSet.getByte("level"));
                     item.setName(resultSet.getString("name"));
                     item.setTime(resultSet.getByte("time"));
@@ -197,7 +197,7 @@ public class GameDao implements IGameDao {
     public void getAllSpecialItem() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `special_item`")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `special_items`")) {
                 Gson gson = GsonUtil.GSON;
                 while (resultSet.next()) {
                     SpecialItemEntry specialItemEntry = new SpecialItemEntry();
@@ -234,7 +234,7 @@ public class GameDao implements IGameDao {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
 
-            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM formula_detail fd INNER JOIN formula f on fd.formula_id = f.formula_id ORDER BY f.material_id, fd.character_id, f.level")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM formula_details fd INNER JOIN formulas f on fd.formula_id = f.formula_id ORDER BY f.material_id, fd.character_id, f.level")) {
                 Gson gson = GsonUtil.GSON;
                 while (resultSet.next()) {
                     FormulaEntry entry = new FormulaEntry();
@@ -271,7 +271,7 @@ public class GameDao implements IGameDao {
     public void getAllPayment() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `payment`")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `payments`")) {
                 while (resultSet.next()) {
                     PaymentEntry paymentEntry = new PaymentEntry();
                     paymentEntry.setId(resultSet.getString("payment_id"));
@@ -293,7 +293,7 @@ public class GameDao implements IGameDao {
     public void getAllMissions() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `mission` ORDER BY mission_type, level")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `missions` ORDER BY mission_type, level")) {
                 while (resultSet.next()) {
                     MissionEntry missionEntry = new MissionEntry();
                     missionEntry.setId(resultSet.getByte("mission_id"));
@@ -320,7 +320,7 @@ public class GameDao implements IGameDao {
     public void getAllXpData() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet resultSet = statement.executeQuery("SELECT experience_points, level FROM `experience_level` ORDER BY level")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT experience_points, level FROM `experience_levels` ORDER BY level")) {
                 int previousXp = 0;
                 while (resultSet.next()) {
                     int currentXp = resultSet.getInt("experience_points");
@@ -344,7 +344,7 @@ public class GameDao implements IGameDao {
     public void getAllFabricateItems() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `fabricate_item`")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `fabricate_items`")) {
                 Gson gson = GsonUtil.GSON;
                 while (resultSet.next()) {
                     FabricateItemEntry entry = new FabricateItemEntry();
