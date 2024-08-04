@@ -30,7 +30,7 @@ import java.util.List;
 @Setter
 public class User {
 
-    public static EquipmentEntry[][] nvEquipDefault;
+    public static EquipmentEntry[][] equipDefault;
     private ISession session;
     private UserState state;
     private String userId;
@@ -210,8 +210,8 @@ public class User {
             for (int i = 0; i < 5; i++) {
                 if (nvEquip[activeCharacter][i] != null && !nvEquip[activeCharacter][i].getEquipEntry().isDisguise()) {
                     equip[i] = nvEquip[activeCharacter][i].getEquipEntry().getEquipIndex();
-                } else if (nvEquipDefault[activeCharacter][i] != null) {
-                    equip[i] = nvEquipDefault[activeCharacter][i].getEquipIndex();
+                } else if (equipDefault[activeCharacter][i] != null) {
+                    equip[i] = equipDefault[activeCharacter][i].getEquipIndex();
                 } else {
                     equip[i] = -1;
                 }
@@ -462,14 +462,14 @@ public class User {
         if (nvEquip[activeCharacter][0] != null) {
             return nvEquip[activeCharacter][0].getEquipEntry().getBulletId();
         }
-        return nvEquipDefault[activeCharacter][0].getBulletId();
+        return equipDefault[activeCharacter][0].getBulletId();
     }
 
     public short getGunId() {
         if (nvEquip[activeCharacter][0] != null) {
             return this.nvEquip[activeCharacter][0].getEquipEntry().getEquipIndex();
         }
-        return nvEquipDefault[activeCharacter][0].getEquipIndex();
+        return equipDefault[activeCharacter][0].getEquipIndex();
     }
 
     public int[] getAbility() {

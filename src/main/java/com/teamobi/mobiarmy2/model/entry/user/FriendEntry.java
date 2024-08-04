@@ -16,7 +16,7 @@ public class FriendEntry {
     private int id;
     private String name;
     private int xu;
-    private byte nvUsed;
+    private byte activeCharacterId;
     private short clanId;
     private byte online;
     private byte level;

@@ -3,8 +3,8 @@ package com.teamobi.mobiarmy2.service.Impl;
 import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.model.CaptionData;
+import com.teamobi.mobiarmy2.model.CharacterData;
 import com.teamobi.mobiarmy2.model.MapData;
-import com.teamobi.mobiarmy2.model.NVData;
 import com.teamobi.mobiarmy2.model.entry.CaptionEntry;
 import com.teamobi.mobiarmy2.model.entry.equip.CharacterEntry;
 import com.teamobi.mobiarmy2.model.entry.equip.EquipmentEntry;
@@ -61,9 +61,9 @@ public class GameService implements IGameService {
         try {
             ByteArrayOutputStream bas = new ByteArrayOutputStream();
             DataOutputStream ds = new DataOutputStream(bas);
-            ds.writeByte(NVData.CHARACTER_ENTRIES.size());
+            ds.writeByte(CharacterData.CHARACTER_ENTRIES.size());
 
-            for (CharacterEntry characterEntry : NVData.CHARACTER_ENTRIES) {
+            for (CharacterEntry characterEntry : CharacterData.CHARACTER_ENTRIES) {
                 ds.writeByte(characterEntry.getId());
                 ds.writeShort(characterEntry.getDamage());
                 ds.writeByte(characterEntry.getEquips().size());
@@ -104,7 +104,7 @@ public class GameService implements IGameService {
             }
             ds.writeShort(bytes.length);
             ds.write(bytes);
-            for (int i = 0; i < NVData.CHARACTER_ENTRIES.size(); i++) {
+            for (int i = 0; i < CharacterData.CHARACTER_ENTRIES.size(); i++) {
                 bytes = Utils.getFile("res/bullet/bullet" + i + ".png");
                 if (bytes == null) {
                     System.exit(1);

@@ -13,7 +13,7 @@ import java.util.Optional;
 /**
  * @author tuyen
  */
-public class NVData {
+public class CharacterData {
     public static final List<CharacterEntry> CHARACTER_ENTRIES = new ArrayList<>();
     public static final List<EquipmentEntry> EQUIPMENT_ENTRIES = new ArrayList<>();
     public static short totalSaleEquipments = 0;
@@ -129,8 +129,8 @@ public class NVData {
 
                 //Nếu không tìm thấy thì lấy dữ liệu mặc định
                 if (!exists) {
-                    if (User.nvEquipDefault[activeCharacter][i] != null) {
-                        equipData[i] = User.nvEquipDefault[activeCharacter][i].getEquipIndex();
+                    if (User.equipDefault[activeCharacter][i] != null) {
+                        equipData[i] = User.equipDefault[activeCharacter][i].getEquipIndex();
                     } else {
                         equipData[i] = -1;
                     }

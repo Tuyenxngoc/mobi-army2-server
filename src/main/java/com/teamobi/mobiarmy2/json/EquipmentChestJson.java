@@ -13,34 +13,34 @@ import java.time.LocalDateTime;
 @Setter
 public class EquipmentChestJson {
 
-    @SerializedName("key")
+    @SerializedName("k")
     private int key;
 
-    @SerializedName("equipIndex")
+    @SerializedName("ei")
     private short equipIndex;
 
-    @SerializedName("equipType")
+    @SerializedName("et")
     private byte equipType;
 
-    @SerializedName("vipLevel")
+    @SerializedName("vl")
     private byte vipLevel;
 
-    @SerializedName("purchaseDate")
+    @SerializedName("pd")
     private LocalDateTime purchaseDate;
 
-    @SerializedName("characterId")
+    @SerializedName("cid")
     private byte characterId;
 
-    @SerializedName("inUse")
+    @SerializedName("iu")
     private byte inUse;
 
-    @SerializedName("slots")
+    @SerializedName("s")
     private byte[] slots;
 
-    @SerializedName("additionalPoints")
+    @SerializedName("ap")
     private byte[] addPoints;
 
-    @SerializedName("additionalPercent")
+    @SerializedName("apc")
     private byte[] addPercents;
 
 }

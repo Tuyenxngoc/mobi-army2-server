@@ -3,9 +3,9 @@ package com.teamobi.mobiarmy2.dao.impl;
 import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
-import com.teamobi.mobiarmy2.json.CharacterJson;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
+import com.teamobi.mobiarmy2.model.CharacterData;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.entry.PlayerCharacterEntry;
 import com.teamobi.mobiarmy2.model.entry.user.EquipmentChestEntry;
@@ -13,7 +13,6 @@ import com.teamobi.mobiarmy2.model.entry.user.FriendEntry;
 import com.teamobi.mobiarmy2.model.entry.user.SpecialItemChestEntry;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.JsonConverter;
-import com.teamobi.mobiarmy2.util.Utils;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.*;
@@ -35,8 +34,8 @@ public class UserDao implements IUserDao {
 
     @Override
     public void update(User user) {
-        String specialItemChestJson = JsonConverter.convertRuongDoItemToJson(user.getSpecialItemChest());
-        String equipmentChestJson = JsonConverter.convertRuongDoTBToJson(user.getEquipmentChest());
+        String specialItemChestJson = JsonConverter.convertSpecialItemChestEntriesToJson(user.getSpecialItemChest());
+        String equipmentChestJson = JsonConverter.convertEquipmentChestEntriesToJson(user.getEquipmentChest());
 
         String sql = "UPDATE `players` SET " +
                 "`friends` = ?, " +
@@ -79,7 +78,6 @@ public class UserDao implements IUserDao {
     @Override
     public User findByUsernameAndPassword(String username, String password) {
         User user = null;
-        Gson gson = GsonUtil.GSON;
         try (Connection connection = HikariCPManager.getInstance().getConnection()) {
 
             // Truy vấn để lấy thông tin từ bảng user
@@ -110,16 +108,28 @@ public class UserDao implements IUserDao {
                 return user;
             }
 
+            Gson gson = GsonUtil.GSON;
+
             // Truy vấn để lấy thông tin từ bảng player
             String playerQuery =
-                    "SELECT p.*, pc.* " +
+                    "SELECT " +
+                            "p.player_id, p.xu, p.luong, p.cup, p.point_event, " +
+                            "p.materials_purchased, p.equipment_purchased, " +
+                            "p.item, p.equipment_chest, p.item_chest, " +
+                            "p.friends, p.mission, p.missionLevel, " +
+                            "p.x2_xp_time, p.last_online, p.top_earnings_xu, " +
+                            "pc.character_id, pc.player_character_id, pc.level, " +
+                            "pc.xp, pc.points, pc.additional_points, pc.data, " +
+                            "cm.clan_id " +
                             "FROM players p " +
                             "INNER JOIN player_characters pc ON p.active_character_id = pc.player_character_id " +
+                            "LEFT JOIN clan_members cm on p.player_id = cm.player_id " +
                             "WHERE user_id = ?";
+
             try (PreparedStatement playerStatement = connection.prepareStatement(playerQuery)) {
                 playerStatement.setString(1, user.getUserId());
                 try (ResultSet playerResultSet = playerStatement.executeQuery()) {
-                    int totalCharacter = NVData.CHARACTER_ENTRIES.size();
+                    int totalCharacter = CharacterData.CHARACTER_ENTRIES.size();
                     user.setPlayerCharacterIds(new long[totalCharacter]);
                     user.setOwnedCharacters(new boolean[totalCharacter]);
                     user.setLevels(new int[totalCharacter]);
@@ -137,7 +147,7 @@ public class UserDao implements IUserDao {
                         user.setXu(playerResultSet.getInt("xu"));
                         user.setLuong(playerResultSet.getInt("luong"));
                         user.setCup(playerResultSet.getInt("cup"));
-                        user.setActiveCharacter(playerResultSet.getByte("pc.character_id"));
+                        user.setActiveCharacter(playerResultSet.getByte("character_id"));
                         user.setClanId(playerResultSet.getShort("clan_id"));
                         user.setPointEvent(playerResultSet.getInt("point_event"));
                         user.setMaterialsPurchased(playerResultSet.getByte("materials_purchased"));
@@ -157,7 +167,7 @@ public class UserDao implements IUserDao {
                         EquipmentChestJson[] equipmentChestJsons = gson.fromJson(playerResultSet.getString("equipment_chest"), EquipmentChestJson[].class);
                         for (EquipmentChestJson json : equipmentChestJsons) {
                             EquipmentChestEntry equip = new EquipmentChestEntry();
-                            equip.setEquipEntry(NVData.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
+                            equip.setEquipEntry(CharacterData.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
                             if (equip.getEquipEntry() == null) {
                                 continue;
                             }
@@ -283,7 +293,18 @@ public class UserDao implements IUserDao {
     public List<FriendEntry> getFriendsList(int playerId, List<Integer> friendIds) {
         List<FriendEntry> friendsList = new ArrayList<>();
 
-        StringBuilder queryBuilder = new StringBuilder("SELECT user.*, player.* FROM player INNER JOIN user ON user.user_id = player.user_id WHERE player.player_id IN (");
+        StringBuilder queryBuilder = new StringBuilder(
+                "SELECT " +
+                        "u.username, u.is_locked, u.is_enabled, " +
+                        "p.player_id, p.xu, p.is_online, p.equipment_chest, " +
+                        "pc.character_id, pc.level, pc.data, " +
+                        "cm.clan_id " +
+                        "FROM players p " +
+                        "INNER JOIN users u ON p.user_id = u.user_id " +
+                        "INNER JOIN player_characters pc ON p.active_character_id = pc.player_character_id " +
+                        "LEFT JOIN clan_members cm ON p.player_id = cm.player_id " +
+                        "WHERE p.player_id IN ("
+        );
         for (int i = 0; i < friendIds.size(); i++) {
             queryBuilder.append("?");
             if (i < friendIds.size() - 1) {
@@ -301,26 +322,21 @@ public class UserDao implements IUserDao {
             try (ResultSet resultSet = statement.executeQuery()) {
                 Gson gson = GsonUtil.GSON;
                 while (resultSet.next()) {
-                    if (resultSet.getBoolean("lock") || !resultSet.getBoolean("active")) {
+                    if (resultSet.getBoolean("is_locked") || !resultSet.getBoolean("is_enabled")) {
                         continue;
                     }
                     FriendEntry friend = new FriendEntry();
                     friend.setId(resultSet.getInt("player_id"));
                     friend.setName(resultSet.getString("username"));
                     friend.setXu(resultSet.getInt("xu"));
-                    friend.setNvUsed(resultSet.getByte("nv_used"));
+                    friend.setActiveCharacterId(resultSet.getByte("character_id"));
                     friend.setClanId(resultSet.getShort("clan_id"));
-                    friend.setOnline(resultSet.getByte("online"));
-                    CharacterJson characterJson = gson.fromJson(resultSet.getString("NV" + (friend.getNvUsed() + 1)), CharacterJson.class);
-
-                    int level = characterJson.getLevel();
-                    int xp = characterJson.getXp();
-                    int xpRequired = XpData.getXpRequestLevel(level);
-
-                    friend.setLevel((byte) level);
-                    friend.setLevelPt(Utils.calculateLevelPercent(xp, xpRequired));
-                    EquipmentChestJson[] trangBi = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
-                    friend.setData(NVData.getEquipData(trangBi, characterJson.getData(), friend.getNvUsed()));
+                    friend.setOnline(resultSet.getByte("is_online"));
+                    friend.setLevel(resultSet.getByte("level"));
+                    friend.setLevelPt((byte) 0);
+                    int[] data = gson.fromJson(resultSet.getString("data"), int[].class);
+                    EquipmentChestJson[] equipmentChests = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
+                    friend.setData(CharacterData.getEquipData(equipmentChests, data, friend.getActiveCharacterId()));
 
                     friendsList.add(friend);
                 }

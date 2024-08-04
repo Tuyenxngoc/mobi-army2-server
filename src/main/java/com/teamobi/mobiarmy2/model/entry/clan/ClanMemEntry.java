@@ -19,6 +19,6 @@ public class ClanMemEntry {
     private byte index;
     private int cup;
     private short[] dataEquip;
-    private String contribute_text;
-    private String contribute_count;
+    private String contributeText;
+    private String contributeCount;
 }

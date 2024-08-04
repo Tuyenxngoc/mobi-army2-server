@@ -1,13 +1,13 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
+import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.dao.IClanDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
-import com.teamobi.mobiarmy2.json.CharacterJson;
 import com.teamobi.mobiarmy2.json.ClanItemJson;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
+import com.teamobi.mobiarmy2.model.CharacterData;
 import com.teamobi.mobiarmy2.model.ItemClanData;
-import com.teamobi.mobiarmy2.model.NVData;
 import com.teamobi.mobiarmy2.model.entry.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.entry.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.entry.clan.ClanItem;
@@ -17,6 +17,7 @@ import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -112,13 +113,13 @@ public class ClanDao implements IClanDao {
 
     @Override
     public void updateXu(int clanId, int xu) {
-        String sql = "UPDATE clan SET xu = xu + ? WHERE clan_id = ?";
+        String sql = "UPDATE clans SET xu = xu + ? WHERE clan_id = ?";
         HikariCPManager.getInstance().update(sql, xu, clanId);
     }
 
     @Override
     public void updateLuong(int clanId, int luong) {
-        String sql = "UPDATE clan SET luong = luong + ? WHERE clan_id = ?";
+        String sql = "UPDATE clans SET luong = luong + ? WHERE clan_id = ?";
         HikariCPManager.getInstance().update(sql, luong, clanId);
     }
 
@@ -138,7 +139,9 @@ public class ClanDao implements IClanDao {
     public ClanInfo getClanInfo(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(
-                     "SELECT c.*, u.username " +
+                     "SELECT " +
+                             "c.clan_id, c.name, c.mem_max, c.xu, c.luong, c.cup, c.xp, c.description, c.created_date, c.item, " +
+                             "u.username " +
                              "FROM clans c " +
                              "INNER JOIN players p ON c.master_id = p.player_id " +
                              "INNER JOIN users u ON p.user_id = u.user_id " +
@@ -152,7 +155,7 @@ public class ClanDao implements IClanDao {
                     ClanInfo clanInfo = new ClanInfo();
                     clanInfo.setId(red.getShort("clan_id"));
                     clanInfo.setName(red.getString("name"));
-                    clanInfo.setMemberCount(red.getByte("mem"));
+                    clanInfo.setMemberCount((byte) 0);
                     clanInfo.setMaxMemberCount(red.getByte("mem_max"));
                     clanInfo.setMasterName(red.getString("username"));
                     clanInfo.setXu(red.getInt("xu"));
@@ -172,7 +175,11 @@ public class ClanDao implements IClanDao {
                     clanInfo.setLevelPercentage((byte) Math.min(100, expProgress));
 
                     clanInfo.setDescription(red.getString("description"));
-                    clanInfo.setDateCreated(red.getString("date_created"));
+
+                    Timestamp createdDate = red.getTimestamp("created_date");
+                    SimpleDateFormat dateTimeFormat = new SimpleDateFormat(CommonConstant.PATTERN_DATE_TIME);
+                    String formattedDate = dateTimeFormat.format(createdDate);
+                    clanInfo.setCreatedDate(formattedDate);
 
                     ClanItemJson[] clanItemJsonArray = GsonUtil.GSON.fromJson(red.getString("item"), ClanItemJson[].class);
                     LocalDateTime currentDate = LocalDateTime.now();
@@ -207,13 +214,19 @@ public class ClanDao implements IClanDao {
     public List<ClanMemEntry> getClanMember(short clanId, byte page) {
         List<ClanMemEntry> entries = new ArrayList<>();
         try (Connection connection = HikariCPManager.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT c.*, p.*, pc.*, u.username FROM clan_members c " +
-                     "INNER JOIN players p on c.player_id = p.player_id " +
-                     "INNER JOIN users u on p.user_id = u.user_id " +
-                     "INNER JOIN player_characters pc on p.active_character_id = pc.player_character_id " +
-                     "WHERE p.clan_id = ? " +
-                     "ORDER BY c.rights DESC " +
-                     "LIMIT 10 OFFSET ?")) {
+             PreparedStatement statement = connection.prepareStatement(
+                     "SELECT " +
+                             "c.rights, c.clan_point, c.contribute_count, c.contribute_text, c.contribute_time, c.xu, c.luong, " +
+                             "p.player_id, p.is_online, p.cup, p.equipment_chest, " +
+                             "pc.character_id, pc.level, pc.data, " +
+                             "u.username " +
+                             "FROM clan_members c " +
+                             "INNER JOIN players p on c.player_id = p.player_id " +
+                             "INNER JOIN player_characters pc on p.active_character_id = pc.player_character_id " +
+                             "INNER JOIN users u on p.user_id = u.user_id " +
+                             "WHERE p.clan_id = ? " +
+                             "ORDER BY c.rights DESC " +
+                             "LIMIT 10 OFFSET ?")) {
             statement.setShort(1, clanId);
             statement.setInt(2, page * 10);
 
@@ -222,41 +235,41 @@ public class ClanDao implements IClanDao {
                 Gson gson = GsonUtil.GSON;
                 while (resultSet.next()) {
                     ClanMemEntry entry = new ClanMemEntry();
-                    entry.setPlayerId(resultSet.getInt("p.player_id"));
-                    byte rights = resultSet.getByte("c.rights");
+                    entry.setPlayerId(resultSet.getInt("player_id"));
+
+                    byte rights = resultSet.getByte("rights");
                     switch (rights) {
                         case 2 -> entry.setUsername(resultSet.getString("username") + " (Đội trưởng)");
                         case 1 -> entry.setUsername(resultSet.getString("username") + " (Đội phó %d)".formatted(index));
                         default -> entry.setUsername(resultSet.getString("username"));
                     }
-                    entry.setPoint(resultSet.getInt("c.clan_point"));
-                    entry.setActiveCharacter(resultSet.getByte("pc.character_id"));
-                    entry.setOnline(resultSet.getByte("p.is_online"));
-
-                    CharacterJson characterJson = gson.fromJson(resultSet.getString("NV" + (entry.getActiveCharacter() + 1)), CharacterJson.class);
-                    EquipmentChestJson[] trangBi = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
-
-                    entry.setLever((byte) characterJson.getLevel());
+                    entry.setPoint(resultSet.getInt("clan_point"));
+                    entry.setActiveCharacter(resultSet.getByte("character_id"));
+                    entry.setOnline(resultSet.getByte("is_online"));
+                    entry.setLever(resultSet.getByte("level"));
                     entry.setLevelPt((byte) 0);
                     entry.setIndex((byte) ((page * 10) + index));
-                    entry.setCup(resultSet.getInt("p.cup"));
-                    entry.setDataEquip(NVData.getEquipData(trangBi, characterJson.getData(), entry.getActiveCharacter()));
+                    entry.setCup(resultSet.getInt("cup"));
 
-                    short contributeCount = resultSet.getShort("c.contribute_count");
+                    int[] data = gson.fromJson(resultSet.getString("data"), int[].class);
+                    EquipmentChestJson[] equipmentChests = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
+                    entry.setDataEquip(CharacterData.getEquipData(equipmentChests, data, entry.getActiveCharacter()));
+
+                    short contributeCount = resultSet.getShort("contribute_count");
                     if (contributeCount > 0) {
                         LocalDateTime currentTime = LocalDateTime.now();
-                        LocalDateTime contributionTime = resultSet.getTimestamp("c.contribute_time").toLocalDateTime();
-                        String contributionText = resultSet.getString("c.contribute_text");
-                        int xuContribution = resultSet.getInt("c.xu");
-                        int luongContribution = resultSet.getInt("c.luong");
+                        LocalDateTime contributionTime = resultSet.getTimestamp("contribute_time").toLocalDateTime();
+                        String contributionText = resultSet.getString("contribute_text");
+                        int xuContribution = resultSet.getInt("xu");
+                        int luongContribution = resultSet.getInt("luong");
 
                         String formattedTime = Utils.getStringTimeBySecond(Duration.between(currentTime, contributionTime).getSeconds());
 
-                        entry.setContribute_text(String.format("%s %s trước", contributionText, formattedTime));
-                        entry.setContribute_count("%d lần: %s xu và %s lượng".formatted(contributeCount, Utils.getStringNumber(xuContribution), Utils.getStringNumber(luongContribution)));
+                        entry.setContributeText(String.format("%s %s trước", contributionText, formattedTime));
+                        entry.setContributeCount("%d lần: %s xu và %s lượng".formatted(contributeCount, Utils.getStringNumber(xuContribution), Utils.getStringNumber(luongContribution)));
                     } else {
-                        entry.setContribute_text("Chưa đóng góp");
-                        entry.setContribute_count("");
+                        entry.setContributeText("Chưa đóng góp");
+                        entry.setContributeCount("");
                     }
 
                     entries.add(entry);
@@ -288,7 +301,7 @@ public class ClanDao implements IClanDao {
 
     @Override
     public void updateClanItems(short clanId, ClanItemJson[] items) {
-        String sql = "UPDATE clan SET item = ? WHERE clan_id = ?";
+        String sql = "UPDATE clans SET item = ? WHERE clan_id = ?";
         HikariCPManager.getInstance().update(sql, GsonUtil.GSON.toJson(items), clanId);
     }
 
@@ -312,7 +325,9 @@ public class ClanDao implements IClanDao {
         List<ClanEntry> top = new ArrayList<>(10);
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(
-                     "SELECT c.*, u.username " +
+                     "SELECT " +
+                             "c.clan_id, c.name, c.mem_max, c.xu, c.luong, c.cup, c.xp, c.description, " +
+                             "u.username " +
                              "FROM clans c " +
                              "INNER JOIN players p ON c.master_id = p.player_id " +
                              "INNER JOIN users u ON p.user_id = u.user_id " +
@@ -326,7 +341,7 @@ public class ClanDao implements IClanDao {
                     ClanEntry clanInfo = new ClanEntry();
                     clanInfo.setId(red.getShort("clan_id"));
                     clanInfo.setName(red.getString("name"));
-                    clanInfo.setMemberCount(red.getByte("mem"));
+                    clanInfo.setMemberCount((byte) 0);
                     clanInfo.setMaxMemberCount(red.getByte("mem_max"));
                     clanInfo.setMasterName(red.getString("username"));
                     clanInfo.setXu(red.getInt("xu"));

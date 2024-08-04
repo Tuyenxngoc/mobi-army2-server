@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
  */
 public class JsonConverter {
 
-    public static String convertRuongDoItemToJson(List<SpecialItemChestEntry> ruongDoItems) {
+    public static String convertSpecialItemChestEntriesToJson(List<SpecialItemChestEntry> specialItemChestEntries) {
         // Convert the list of SpecialItemChestEntry to SpecialItemChestJson
-        List<SpecialItemChestJson> specialItemChestJsons = ruongDoItems.stream().map(entry -> {
+        List<SpecialItemChestJson> specialItemChestJsons = specialItemChestEntries.stream().map(entry -> {
             SpecialItemChestJson jsonItem = new SpecialItemChestJson();
             jsonItem.setId(entry.getItem().getId());
             jsonItem.setQuantity(entry.getQuantity());
@@ -26,9 +26,9 @@ public class JsonConverter {
         return GsonUtil.GSON.toJson(specialItemChestJsons);
     }
 
-    public static String convertRuongDoTBToJson(List<EquipmentChestEntry> ruongdoTB) {
+    public static String convertEquipmentChestEntriesToJson(List<EquipmentChestEntry> equipmentChestEntries) {
         // Convert the list of EquipmentChestEntry to EquipmentChestJson
-        List<EquipmentChestJson> equipmentChestJsons = ruongdoTB.stream().map(entry -> {
+        List<EquipmentChestJson> equipmentChestJsons = equipmentChestEntries.stream().map(entry -> {
             EquipmentChestJson jsonItem = new EquipmentChestJson();
             jsonItem.setCharacterId(entry.getEquipEntry().getCharacterId());
             jsonItem.setEquipIndex(entry.getEquipEntry().getEquipIndex());

@@ -13,6 +13,6 @@ import java.util.List;
 public class ClanInfo extends ClanEntry {
     private int exp;
     private int xpUpLevel;
-    private String dateCreated;
+    private String createdDate;
     private List<ClanItem> items;
 }

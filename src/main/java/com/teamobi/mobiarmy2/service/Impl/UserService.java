@@ -11,6 +11,7 @@ import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.GiftCodeRewardJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
+import com.teamobi.mobiarmy2.model.CharacterData;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.entry.*;
 import com.teamobi.mobiarmy2.model.entry.clan.ClanEntry;
@@ -242,7 +243,7 @@ public class UserService implements IUserService {
 
     public void sendCharacterData(IServerConfig config) {
         try {
-            List<CharacterEntry> characterEntries = NVData.CHARACTER_ENTRIES;
+            List<CharacterEntry> characterEntries = CharacterData.CHARACTER_ENTRIES;
             int characterCount = characterEntries.size();
             Message ms = new Message(Cmd.SKIP_2);
             DataOutputStream ds = ms.writer();
@@ -515,8 +516,8 @@ public class UserService implements IUserService {
                 for (int j = 0; j < 5; j++) {
                     if (user.getNvEquip()[i][j] != null) {
                         ds.writeShort(user.getNvEquip()[i][j].getEquipEntry().getEquipIndex());
-                    } else if (User.nvEquipDefault[i][j] != null) {
-                        ds.writeShort(User.nvEquipDefault[i][j].getEquipIndex());
+                    } else if (User.equipDefault[i][j] != null) {
+                        ds.writeShort(User.equipDefault[i][j].getEquipIndex());
                     } else {
                         ds.writeShort(-1);
                     }
@@ -537,7 +538,7 @@ public class UserService implements IUserService {
             for (int i = 0; i < 10; i++) {
                 if (i > 2) {
                     ds.writeByte(user.getOwnedCharacters()[i] ? 1 : 0);
-                    CharacterEntry characterEntry = NVData.CHARACTER_ENTRIES.get(i);
+                    CharacterEntry characterEntry = CharacterData.CHARACTER_ENTRIES.get(i);
                     ds.writeShort(characterEntry.getPriceXu() / 1000);
                     ds.writeShort(characterEntry.getPriceLuong());
                 }
@@ -1749,7 +1750,7 @@ public class UserService implements IUserService {
                     ds.writeInt(friend.getId());
                     ds.writeUTF(friend.getName());
                     ds.writeInt(friend.getXu());
-                    ds.writeByte(friend.getNvUsed());
+                    ds.writeByte(friend.getActiveCharacterId());
                     ds.writeShort(friend.getClanId());
                     ds.writeByte(friend.getOnline());
                     ds.writeByte(friend.getLevel());
@@ -1935,7 +1936,7 @@ public class UserService implements IUserService {
     public void handleChoseCharacter(Message ms) {
         try {
             byte characterId = ms.reader().readByte();
-            if (characterId >= NVData.CHARACTER_ENTRIES.size() || characterId < 0 || !user.getOwnedCharacters()[characterId]) {
+            if (characterId >= CharacterData.CHARACTER_ENTRIES.size() || characterId < 0 || !user.getOwnedCharacters()[characterId]) {
                 return;
             }
             user.setActiveCharacter((byte) user.getPlayerCharacterIds()[characterId]);
@@ -2031,7 +2032,7 @@ public class UserService implements IUserService {
             if (user.getOwnedCharacters()[index]) {
                 return;
             }
-            CharacterEntry characterEntry = NVData.CHARACTER_ENTRIES.get(index);
+            CharacterEntry characterEntry = CharacterData.CHARACTER_ENTRIES.get(index);
             if (unit == 0) {
                 if (characterEntry.getPriceXu() <= 0) {
                     return;
@@ -2156,7 +2157,7 @@ public class UserService implements IUserService {
         if (rewardData.getEquips() != null) {
             for (EquipmentChestJson json : rewardData.getEquips()) {
                 EquipmentChestEntry addEquip = new EquipmentChestEntry();
-                addEquip.setEquipEntry(NVData.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
+                addEquip.setEquipEntry(CharacterData.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
                 if (addEquip.getEquipEntry() == null) {
                     continue;
                 }
@@ -2458,8 +2459,8 @@ public class UserService implements IUserService {
         try {
             Message ms = new Message(Cmd.SHOP_EQUIP);
             DataOutputStream ds = ms.writer();
-            ds.writeShort(NVData.totalSaleEquipments);
-            for (EquipmentEntry equip : NVData.EQUIPMENT_ENTRIES) {
+            ds.writeShort(CharacterData.totalSaleEquipments);
+            for (EquipmentEntry equip : CharacterData.EQUIPMENT_ENTRIES) {
                 if (!equip.isOnSale()) {
                     continue;
                 }
@@ -2609,7 +2610,7 @@ public class UserService implements IUserService {
             sendServerMessage(GameString.ruongNoSlot());
             return;
         }
-        EquipmentEntry equipmentEntry = NVData.getEquipEntryBySaleIndex(saleIndex);
+        EquipmentEntry equipmentEntry = CharacterData.getEquipEntryBySaleIndex(saleIndex);
         if (equipmentEntry == null || (unit == 0 ? equipmentEntry.getPriceXu() : equipmentEntry.getPriceLuong()) < 0) {
             return;
         }
@@ -2770,7 +2771,7 @@ public class UserService implements IUserService {
             ds.writeByte(clanDetails.getLevel());
             ds.writeByte(clanDetails.getLevelPercentage());
             ds.writeUTF(clanDetails.getDescription());
-            ds.writeUTF(clanDetails.getDateCreated());
+            ds.writeUTF(clanDetails.getCreatedDate());
             ds.writeByte(clanDetails.getItems().size());
             for (ClanItem item : clanDetails.getItems()) {
                 ds.writeUTF(item.getName());
@@ -2820,8 +2821,8 @@ public class UserService implements IUserService {
                 for (int j = 0; j < 5; j++) {
                     ds.writeShort(memClan.getDataEquip()[j]);
                 }
-                ds.writeUTF(memClan.getContribute_text());
-                ds.writeUTF(memClan.getContribute_count());
+                ds.writeUTF(memClan.getContributeText());
+                ds.writeUTF(memClan.getContributeCount());
             }
             ds.flush();
             user.sendMessage(ms);

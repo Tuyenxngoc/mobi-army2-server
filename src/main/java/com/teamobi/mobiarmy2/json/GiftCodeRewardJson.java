@@ -10,19 +10,19 @@ import java.util.List;
 @Setter
 public class GiftCodeRewardJson {
 
-    @SerializedName("xu")
+    @SerializedName("x")
     private int xu;
 
-    @SerializedName("luong")
+    @SerializedName("l")
     private int luong;
 
-    @SerializedName("exp")
+    @SerializedName("xp")
     private int exp;
 
-    @SerializedName("item")
+    @SerializedName("i")
     private List<SpecialItemChestJson> items;
 
-    @SerializedName("equip")
+    @SerializedName("e")
     private List<EquipmentChestJson> equips;
 
 }

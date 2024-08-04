@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.json.serialization;
+package com.teamobi.mobiarmy2.util;
 
 import com.google.gson.*;
 

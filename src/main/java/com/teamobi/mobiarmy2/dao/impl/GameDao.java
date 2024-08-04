@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
+import com.teamobi.mobiarmy2.model.CharacterData;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.entry.*;
 import com.teamobi.mobiarmy2.model.entry.equip.CharacterEntry;
@@ -74,7 +75,7 @@ public class GameDao implements IGameDao {
                     characterEntry.setBulletDamage(resultSet.getByte("bullet_damage"));
                     characterEntry.setBulletCount(resultSet.getByte("bullet_count"));
 
-                    NVData.CHARACTER_ENTRIES.add(characterEntry);
+                    CharacterData.CHARACTER_ENTRIES.add(characterEntry);
                 }
             }
         } catch (SQLException e) {
@@ -90,7 +91,7 @@ public class GameDao implements IGameDao {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `equips` ORDER BY equip_type, equip_index, character_id")) {
 
                 //Khởi tại danh sách trang bị mặc định ban đầu
-                User.nvEquipDefault = new EquipmentEntry[NVData.CHARACTER_ENTRIES.size()][5];
+                User.equipDefault = new EquipmentEntry[CharacterData.CHARACTER_ENTRIES.size()][5];
                 Gson gson = GsonUtil.GSON;
                 while (resultSet.next()) {
                     EquipmentEntry equipEntry = new EquipmentEntry();
@@ -118,10 +119,10 @@ public class GameDao implements IGameDao {
 
                     //Đặt trang bị mặc định cho nhân vật
                     if (resultSet.getBoolean("is_default")) {
-                        User.nvEquipDefault[equipEntry.getCharacterId()][equipEntry.getEquipType()] = equipEntry;
+                        User.equipDefault[equipEntry.getCharacterId()][equipEntry.getEquipType()] = equipEntry;
                     }
 
-                    NVData.addEquip(equipEntry);
+                    CharacterData.addEquip(equipEntry);
                 }
             }
         } catch (SQLException e) {
@@ -248,8 +249,8 @@ public class GameDao implements IGameDao {
                     entry.setAddPointsMin(gson.fromJson(resultSet.getString("f.add_points_min"), byte[].class));
                     entry.setAddPercentsMax(gson.fromJson(resultSet.getString("f.add_percents_max"), byte[].class));
                     entry.setAddPercentsMin(gson.fromJson(resultSet.getString("f.add_percents_min"), byte[].class));
-                    entry.setRequiredEquip(NVData.getEquipEntry(entry.getCharacterId(), entry.getEquipType(), resultSet.getShort("fd.required_equip")));
-                    entry.setResultEquip(NVData.getEquipEntry(entry.getCharacterId(), entry.getEquipType(), resultSet.getShort("fd.result_equip")));
+                    entry.setRequiredEquip(CharacterData.getEquipEntry(entry.getCharacterId(), entry.getEquipType(), resultSet.getShort("fd.required_equip")));
+                    entry.setResultEquip(CharacterData.getEquipEntry(entry.getCharacterId(), entry.getEquipType(), resultSet.getShort("fd.result_equip")));
                     SpecialItemChestJson[] json = gson.fromJson(resultSet.getString("fd.required_items"), SpecialItemChestJson[].class);
                     for (SpecialItemChestJson itemChestJson : json) {
                         SpecialItemEntry specialItemEntry = SpecialItemData.getSpecialItemById(itemChestJson.getId());
