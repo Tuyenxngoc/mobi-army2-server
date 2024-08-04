@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.dao;
 
 import com.teamobi.mobiarmy2.model.User;
+import com.teamobi.mobiarmy2.model.entry.PlayerCharacterEntry;
 import com.teamobi.mobiarmy2.model.entry.user.FriendEntry;
 
 import java.time.LocalDateTime;
@@ -21,4 +22,9 @@ public interface IUserDao extends Dao<User> {
     Integer findPlayerIdByUsername(String username);
 
     void updateLastOnline(LocalDateTime now, int playerId);
+
+    int createPlayerCharacter(int playerId, byte characterId);
+
+    PlayerCharacterEntry getPlayerCharacter(int playerId, byte characterId);
+
 }

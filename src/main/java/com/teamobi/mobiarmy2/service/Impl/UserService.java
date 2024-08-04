@@ -209,6 +209,7 @@ public class UserService implements IUserService {
         target.setLevels(source.getLevels());
         target.setLevelPercents(source.getLevelPercents());
         target.setActiveCharacter(source.getActiveCharacter());
+        target.setPlayerCharacterIds(source.getPlayerCharacterIds());
         target.setOwnedCharacters(source.getOwnedCharacters());
         target.setXps(source.getXps());
         target.setPoints(source.getPoints());
@@ -1937,13 +1938,15 @@ public class UserService implements IUserService {
             if (characterId >= NVData.CHARACTER_ENTRIES.size() || characterId < 0 || !user.getOwnedCharacters()[characterId]) {
                 return;
             }
-            user.setActiveCharacter(characterId);
+            user.setActiveCharacter((byte) user.getPlayerCharacterIds()[characterId]);
+
             ms = new Message(Cmd.CHOOSE_GUN);
             DataOutputStream ds = ms.writer();
             ds.writeInt(user.getPlayerId());
             ds.writeByte(characterId);
             ds.flush();
             user.sendMessage(ms);
+
             sendCharacterInfo();
             sendEquipInfo();
         } catch (IOException e) {
@@ -2049,12 +2052,24 @@ public class UserService implements IUserService {
                 user.updateLuong(-characterEntry.getPriceLuong());
             }
 
-            user.getOwnedCharacters()[index] = true;
-            ms = new Message(Cmd.BUY_GUN);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(index - 3);
-            ds.flush();
-            user.sendMessage(ms);
+            if (userDao.createPlayerCharacter(user.getPlayerId(), index) != 0) {
+                PlayerCharacterEntry character = userDao.getPlayerCharacter(user.getPlayerId(), index);
+                if (character != null) {
+                    user.getLevels()[index] = character.getLevel();
+                    user.getXps()[index] = character.getXp();
+                    user.getPoints()[index] = character.getPoints();
+                    user.getPointAdd()[index] = character.getAdditionalPoints();
+                    user.getPlayerCharacterIds()[index] = character.getId();
+                    user.getOwnedCharacters()[index] = true;
+                    user.getEquipData()[index] = character.getData();
+
+                    ms = new Message(Cmd.BUY_GUN);
+                    DataOutputStream ds = ms.writer();
+                    ds.writeByte(index - 3);
+                    ds.flush();
+                    user.sendMessage(ms);
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

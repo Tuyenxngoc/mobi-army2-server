@@ -49,6 +49,7 @@ public class User {
     private short equipmentPurchased;
     private LocalDateTime xpX2Time;
     private LocalDateTime lastOnline;
+    private long[] playerCharacterIds;
     private boolean[] ownedCharacters;
     private int[] levels;
     private byte[] levelPercents;
