@@ -68,11 +68,29 @@ public class UserDao implements IUserDao {
                 Arrays.toString(user.getMission()),
                 Arrays.toString(user.getMissionLevel()),
                 user.getTopEarningsXu(),
-                user.getActiveCharacter(),
+                user.getPlayerCharacterIds()[user.getActiveCharacterId()],
                 user.getMaterialsPurchased(),
                 user.getEquipmentPurchased(),
                 //...//
                 user.getPlayerId());
+
+        for (int i = 0; i < user.getOwnedCharacters().length; i++) {
+            if (user.getOwnedCharacters()[i]) {
+                String sqlUpdateCharacter =
+                        "UPDATE player_characters SET level = ?, points = ?, xp = ?, data = ?, additional_points = ? " +
+                                "WHERE player_id = ? AND character_id = ?";
+                HikariCPManager.getInstance().update(
+                        sqlUpdateCharacter,
+                        user.getLevels()[i],
+                        user.getPoints()[i],
+                        user.getXps()[i],
+                        Arrays.toString(user.getEquipData()[i]),
+                        Arrays.toString(user.getPointAdd()[i]),
+                        user.getPlayerId(),
+                        i
+                );
+            }
+        }
     }
 
     @Override
@@ -118,6 +136,7 @@ public class UserDao implements IUserDao {
                             "p.item, p.equipment_chest, p.item_chest, " +
                             "p.friends, p.mission, p.missionLevel, " +
                             "p.x2_xp_time, p.last_online, p.top_earnings_xu, " +
+                            "p.is_chest_locked, p.is_invitation_locked, " +
                             "pc.character_id, pc.player_character_id, pc.level, " +
                             "pc.xp, pc.points, pc.additional_points, pc.data, " +
                             "cm.clan_id " +
@@ -147,11 +166,13 @@ public class UserDao implements IUserDao {
                         user.setXu(playerResultSet.getInt("xu"));
                         user.setLuong(playerResultSet.getInt("luong"));
                         user.setCup(playerResultSet.getInt("cup"));
-                        user.setActiveCharacter(playerResultSet.getByte("character_id"));
+                        user.setActiveCharacterId(playerResultSet.getByte("character_id"));
                         user.setClanId(playerResultSet.getShort("clan_id"));
                         user.setPointEvent(playerResultSet.getInt("point_event"));
                         user.setMaterialsPurchased(playerResultSet.getByte("materials_purchased"));
                         user.setEquipmentPurchased(playerResultSet.getShort("equipment_purchased"));
+                        user.setChestLocked(playerResultSet.getBoolean("is_chest_locked"));
+                        user.setInvitationLocked(playerResultSet.getBoolean("is_invitation_locked"));
 
                         //Đọc dữ liệu item chiến đấu
                         byte[] items = gson.fromJson(playerResultSet.getString("item"), byte[].class);
@@ -236,9 +257,8 @@ public class UserDao implements IUserDao {
                         user.setLastOnline(playerResultSet.getTimestamp("last_online").toLocalDateTime());
 
                         user.setTopEarningsXu(playerResultSet.getInt("top_earnings_xu"));
-                    } else {//Tạo mới một bản ghi
-                        User.setDefaultValue(user);
-                        save(user);
+                    } else {
+                        return null;
                     }
                 }
             }

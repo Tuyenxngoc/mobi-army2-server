@@ -168,7 +168,7 @@ public class Player {
         }
         this.bulletId = user.getIDBullet();
         this.gunId = user.getGunId();
-        this.idNV = user.getActiveCharacter();
+        this.idNV = user.getActiveCharacterId();
         int[] ability = user.getAbility();
         this.HPMax = ability[0] + (teamPoint * 5);
         this.satThuong = ability[1] + (teamPoint / 1);

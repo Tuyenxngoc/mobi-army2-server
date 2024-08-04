@@ -209,7 +209,7 @@ public class UserService implements IUserService {
         target.setClanId(source.getClanId());
         target.setLevels(source.getLevels());
         target.setLevelPercents(source.getLevelPercents());
-        target.setActiveCharacter(source.getActiveCharacter());
+        target.setActiveCharacterId(source.getActiveCharacterId());
         target.setPlayerCharacterIds(source.getPlayerCharacterIds());
         target.setOwnedCharacters(source.getOwnedCharacters());
         target.setXps(source.getXps());
@@ -229,6 +229,8 @@ public class UserService implements IUserService {
         target.setTopEarningsXu(source.getTopEarningsXu());
         target.setMaterialsPurchased(source.getMaterialsPurchased());
         target.setEquipmentPurchased(source.getEquipmentPurchased());
+        target.setChestLocked(source.isChestLocked());
+        target.setInvitationLocked(source.isInvitationLocked());
     }
 
     @Override
@@ -497,7 +499,7 @@ public class UserService implements IUserService {
             ds.writeInt(user.getPlayerId());
             ds.writeInt(user.getXu());
             ds.writeInt(user.getLuong());
-            ds.writeByte(user.getActiveCharacter());
+            ds.writeByte(user.getActiveCharacterId());
             ds.writeShort(user.getClanId());
             ds.writeByte(0);
 
@@ -646,7 +648,7 @@ public class UserService implements IUserService {
         if (formulaMap == null) {
             return;
         }
-        List<FormulaEntry> formulas = formulaMap.get(user.getActiveCharacter());
+        List<FormulaEntry> formulas = formulaMap.get(user.getActiveCharacterId());
         if (formulas == null) {
             return;
         }
@@ -662,7 +664,7 @@ public class UserService implements IUserService {
         }
 
         //Kiểm tra có trang bị yêu cầu không
-        EquipmentChestEntry requiredEquip = user.getEquipment(formula.getRequiredEquip().getEquipIndex(), user.getActiveCharacter(), formula.getLevel());
+        EquipmentChestEntry requiredEquip = user.getEquipment(formula.getRequiredEquip().getEquipIndex(), user.getActiveCharacterId(), formula.getLevel());
         if (requiredEquip == null) {
             sendFormulaProcessingResult(GameString.cheDoFail());
             return;
@@ -738,7 +740,7 @@ public class UserService implements IUserService {
             if (formulaMap == null) {
                 return;
             }
-            List<FormulaEntry> formulaEntries = formulaMap.get(user.getActiveCharacter());
+            List<FormulaEntry> formulaEntries = formulaMap.get(user.getActiveCharacterId());
             if (formulaEntries == null) {
                 return;
             }
@@ -1093,11 +1095,11 @@ public class UserService implements IUserService {
                     equip.isExpired() ||
                     !equip.getEquipEntry().isDisguise() ||
                     equip.getEquipEntry().getLevelRequirement() > user.getCurrentLevel() ||
-                    equip.getEquipEntry().getCharacterId() != user.getActiveCharacter()
+                    equip.getEquipEntry().getCharacterId() != user.getActiveCharacterId()
             ) {
                 return;
             }
-            EquipmentChestEntry oldEquip = user.getNvEquip()[user.getActiveCharacter()][5];
+            EquipmentChestEntry oldEquip = user.getNvEquip()[user.getActiveCharacterId()][5];
             if (oldEquip != null) {
                 oldEquip.setInUse(false);
             }
@@ -1105,12 +1107,12 @@ public class UserService implements IUserService {
             DataOutputStream ds = ms.writer();
             ds.writeByte(action);
             if (action == 0) {
-                user.getEquipData()[user.getActiveCharacter()][5] = -1;
-                user.getNvEquip()[user.getActiveCharacter()][5] = null;
+                user.getEquipData()[user.getActiveCharacterId()][5] = -1;
+                user.getNvEquip()[user.getActiveCharacterId()][5] = null;
             } else {
                 equip.setInUse(true);
-                user.getEquipData()[user.getActiveCharacter()][5] = equip.getKey();
-                user.getNvEquip()[user.getActiveCharacter()][5] = equip;
+                user.getEquipData()[user.getActiveCharacterId()][5] = equip.getKey();
+                user.getNvEquip()[user.getActiveCharacterId()][5] = equip;
                 for (short a : equip.getEquipEntry().getDisguiseEquippedIndexes()) {
                     ds.writeShort(a);
                 }
@@ -1469,6 +1471,10 @@ public class UserService implements IUserService {
                     }
 
                     case BAN_NGOC -> {
+                        if (user.isChestLocked()) {
+                            sendServerMessage(GameString.chestLocked());
+                            return;
+                        }
                         user.updateInventory(null, null, null, specialItemList);
                         user.updateXu(totalTransactionAmount);
                         sendServerMessage(GameString.buySuccess());
@@ -1939,7 +1945,7 @@ public class UserService implements IUserService {
             if (characterId >= CharacterData.CHARACTER_ENTRIES.size() || characterId < 0 || !user.getOwnedCharacters()[characterId]) {
                 return;
             }
-            user.setActiveCharacter((byte) user.getPlayerCharacterIds()[characterId]);
+            user.setActiveCharacterId(characterId);
 
             ms = new Message(Cmd.CHOOSE_GUN);
             DataOutputStream ds = ms.writer();
@@ -1960,7 +1966,7 @@ public class UserService implements IUserService {
             Message ms = new Message(Cmd.CURR_EQUIP_DBKEY);
             DataOutputStream ds = ms.writer();
             for (int i = 0; i < 5; i++) {
-                ds.writeInt(user.getEquipData()[user.getActiveCharacter()][i]);
+                ds.writeInt(user.getEquipData()[user.getActiveCharacterId()][i]);
             }
             ds.flush();
             user.sendMessage(ms);
@@ -2355,7 +2361,7 @@ public class UserService implements IUserService {
                 ds.writeByte(entry.getVipLevel());
             }
             for (int i = 0; i < 5; i++) {
-                ds.writeInt(user.getEquipData()[user.getActiveCharacter()][i]);
+                ds.writeInt(user.getEquipData()[user.getActiveCharacterId()][i]);
             }
             ds.flush();
             user.sendMessage(ms);
@@ -2431,17 +2437,17 @@ public class UserService implements IUserService {
                         equip.isExpired() ||
                         equip.getEquipEntry().isDisguise() ||
                         equip.getEquipEntry().getLevelRequirement() > user.getCurrentLevel() ||
-                        equip.getEquipEntry().getCharacterId() != user.getActiveCharacter() || equip.getEquipEntry().getEquipType() != i
+                        equip.getEquipEntry().getCharacterId() != user.getActiveCharacterId() || equip.getEquipEntry().getEquipType() != i
                 ) {
                     continue;
                 }
-                EquipmentChestEntry oldEquip = user.getNvEquip()[user.getActiveCharacter()][i];
+                EquipmentChestEntry oldEquip = user.getNvEquip()[user.getActiveCharacterId()][i];
                 if (oldEquip != null) {
                     oldEquip.setInUse(false);
                 }
                 equip.setInUse(true);
-                user.getNvEquip()[user.getActiveCharacter()][i] = equip;
-                user.getEquipData()[user.getActiveCharacter()][i] = equip.getKey();
+                user.getNvEquip()[user.getActiveCharacterId()][i] = equip;
+                user.getEquipData()[user.getActiveCharacterId()][i] = equip.getKey();
                 changeSuccessful = true;
             }
             ms = new Message(Cmd.CHANGE_EQUIP);
@@ -2494,6 +2500,11 @@ public class UserService implements IUserService {
                     purchaseEquipment(saleIndex, unit);
                 }
                 case 1 -> {//Gửi lệnh bán trang bị
+                    //Kiểm tra có khóa rương không
+                    if (user.isChestLocked()) {
+                        sendServerMessage(GameString.chestLocked());
+                        return;
+                    }
 
                     // Đặt lại giá trị
                     userAction = null;

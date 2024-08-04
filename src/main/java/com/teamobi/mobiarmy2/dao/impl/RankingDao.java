@@ -30,11 +30,15 @@ public class RankingDao implements IRankingDao {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery(
-                    "SELECT p.*, pc.*, cm.*, u.username " +
+                    "SELECT " +
+                            "p.player_id, p.equipment_chest, p.cup, " +
+                            "pc.data, pc.character_id, pc.level, " +
+                            "cm.clan_id, " +
+                            "u.username " +
                             "FROM players p " +
                             "INNER JOIN users u ON p.user_id = u.user_id " +
-                            "JOIN player_characters pc ON pc.player_character_id = p.active_character_id " +
-                            "JOIN clan_members cm ON p.player_id = cm.player_id " +
+                            "INNER JOIN player_characters pc ON pc.player_character_id = p.active_character_id " +
+                            "LEFT JOIN clan_members cm ON p.player_id = cm.player_id " +
                             "WHERE p.cup > 0 " +
                             "ORDER BY p.cup DESC " +
                             "LIMIT 100"
@@ -42,7 +46,6 @@ public class RankingDao implements IRankingDao {
                 byte index = 1;
                 while (resultSet.next()) {
                     PlayerLeaderboardEntry entry = new PlayerLeaderboardEntry();
-
                     entry.setPlayerId(resultSet.getInt("player_id"));
                     if (index <= 3) {
                         entry.setUsername(GameString.topBonus(resultSet.getString("username"), Utils.getStringNumber(CommonConstant.TOP_BONUS[index - 1])));
@@ -50,11 +53,9 @@ public class RankingDao implements IRankingDao {
                         entry.setUsername(resultSet.getString("username"));
                     }
                     entry.setClanId(resultSet.getShort("clan_id"));
-
                     EquipmentChestJson[] equipmentData = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
                     int[] data = gson.fromJson(resultSet.getString("data"), int[].class);
-
-                    entry.setActiveCharacter(resultSet.getByte("active_character_id"));
+                    entry.setActiveCharacter(resultSet.getByte("character_id"));
                     entry.setLevel((byte) resultSet.getInt("level"));
                     entry.setLevelPt((byte) 0);
                     entry.setIndex(index);
@@ -98,7 +99,7 @@ public class RankingDao implements IRankingDao {
 
     @Override
     public void addBonusGift(int playerId, int quantity) {
-        String sql = "UPDATE player SET top_earnings_xu = ? WHERE player_id = ?";
+        String sql = "UPDATE players SET top_earnings_xu = ? WHERE player_id = ?";
         HikariCPManager.getInstance().update(sql, quantity, playerId);
     }
 

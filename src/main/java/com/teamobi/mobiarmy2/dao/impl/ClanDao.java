@@ -141,7 +141,8 @@ public class ClanDao implements IClanDao {
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT " +
                              "c.clan_id, c.name, c.mem_max, c.xu, c.luong, c.cup, c.xp, c.description, c.created_date, c.item, " +
-                             "u.username " +
+                             "u.username, " +
+                             "(SELECT COUNT(*) FROM clan_members cm WHERE cm.clan_id = c.clan_id) AS member_count " +
                              "FROM clans c " +
                              "INNER JOIN players p ON c.master_id = p.player_id " +
                              "INNER JOIN users u ON p.user_id = u.user_id " +
@@ -150,19 +151,19 @@ public class ClanDao implements IClanDao {
 
             statement.setShort(1, clanId);
 
-            try (ResultSet red = statement.executeQuery()) {
-                if (red.next()) {
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
                     ClanInfo clanInfo = new ClanInfo();
-                    clanInfo.setId(red.getShort("clan_id"));
-                    clanInfo.setName(red.getString("name"));
-                    clanInfo.setMemberCount((byte) 0);
-                    clanInfo.setMaxMemberCount(red.getByte("mem_max"));
-                    clanInfo.setMasterName(red.getString("username"));
-                    clanInfo.setXu(red.getInt("xu"));
-                    clanInfo.setLuong(red.getInt("luong"));
-                    clanInfo.setCup(red.getInt("cup"));
+                    clanInfo.setId(resultSet.getShort("clan_id"));
+                    clanInfo.setName(resultSet.getString("name"));
+                    clanInfo.setMemberCount(resultSet.getByte("member_count"));
+                    clanInfo.setMaxMemberCount(resultSet.getByte("mem_max"));
+                    clanInfo.setMasterName(resultSet.getString("username"));
+                    clanInfo.setXu(resultSet.getInt("xu"));
+                    clanInfo.setLuong(resultSet.getInt("luong"));
+                    clanInfo.setCup(resultSet.getInt("cup"));
 
-                    int exp = red.getInt("xp");
+                    int exp = resultSet.getInt("xp");
                     byte level = Utils.calculateLevelClan(exp);
                     int expUpLevel = Utils.calculateXPRequired(level + 1);
                     int expCurrentLevel = Utils.calculateXPRequired(level);
@@ -174,14 +175,14 @@ public class ClanDao implements IClanDao {
                     clanInfo.setLevel(level);
                     clanInfo.setLevelPercentage((byte) Math.min(100, expProgress));
 
-                    clanInfo.setDescription(red.getString("description"));
+                    clanInfo.setDescription(resultSet.getString("description"));
 
-                    Timestamp createdDate = red.getTimestamp("created_date");
+                    Timestamp createdDate = resultSet.getTimestamp("created_date");
                     SimpleDateFormat dateTimeFormat = new SimpleDateFormat(CommonConstant.PATTERN_DATE_TIME);
                     String formattedDate = dateTimeFormat.format(createdDate);
                     clanInfo.setCreatedDate(formattedDate);
 
-                    ClanItemJson[] clanItemJsonArray = GsonUtil.GSON.fromJson(red.getString("item"), ClanItemJson[].class);
+                    ClanItemJson[] clanItemJsonArray = GsonUtil.GSON.fromJson(resultSet.getString("item"), ClanItemJson[].class);
                     LocalDateTime currentDate = LocalDateTime.now();
 
                     List<ClanItem> filteredItems = Arrays.stream(clanItemJsonArray)
@@ -327,7 +328,8 @@ public class ClanDao implements IClanDao {
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT " +
                              "c.clan_id, c.name, c.mem_max, c.xu, c.luong, c.cup, c.xp, c.description, " +
-                             "u.username " +
+                             "u.username, " +
+                             "(SELECT COUNT(*) FROM clan_members cm WHERE cm.clan_id = c.clan_id) AS member_count " +
                              "FROM clans c " +
                              "INNER JOIN players p ON c.master_id = p.player_id " +
                              "INNER JOIN users u ON p.user_id = u.user_id " +
@@ -336,19 +338,19 @@ public class ClanDao implements IClanDao {
         ) {
             statement.setByte(1, page);
 
-            try (ResultSet red = statement.executeQuery()) {
-                while (red.next()) {
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
                     ClanEntry clanInfo = new ClanEntry();
-                    clanInfo.setId(red.getShort("clan_id"));
-                    clanInfo.setName(red.getString("name"));
-                    clanInfo.setMemberCount((byte) 0);
-                    clanInfo.setMaxMemberCount(red.getByte("mem_max"));
-                    clanInfo.setMasterName(red.getString("username"));
-                    clanInfo.setXu(red.getInt("xu"));
-                    clanInfo.setLuong(red.getInt("luong"));
-                    clanInfo.setCup(red.getInt("cup"));
+                    clanInfo.setId(resultSet.getShort("clan_id"));
+                    clanInfo.setName(resultSet.getString("name"));
+                    clanInfo.setMemberCount(resultSet.getByte("member_count"));
+                    clanInfo.setMaxMemberCount(resultSet.getByte("mem_max"));
+                    clanInfo.setMasterName(resultSet.getString("username"));
+                    clanInfo.setXu(resultSet.getInt("xu"));
+                    clanInfo.setLuong(resultSet.getInt("luong"));
+                    clanInfo.setCup(resultSet.getInt("cup"));
 
-                    int exp = red.getInt("xp");
+                    int exp = resultSet.getInt("xp");
                     byte level = Utils.calculateLevelClan(exp);
                     int expUpLevel = Utils.calculateXPRequired(level + 1);
                     int expCurrentLevel = Utils.calculateXPRequired(level);
@@ -356,7 +358,7 @@ public class ClanDao implements IClanDao {
 
                     clanInfo.setLevel(level);
                     clanInfo.setLevelPercentage((byte) Math.min(100, expProgress));
-                    clanInfo.setDescription(red.getString("description"));
+                    clanInfo.setDescription(resultSet.getString("description"));
 
                     top.add(clanInfo);
                 }

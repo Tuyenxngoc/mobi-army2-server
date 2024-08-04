@@ -447,4 +447,8 @@ public class GameString {
     public static String materialLimit1(int quantity) {
         return String.format("Bạn chỉ có thể mua thêm %d nguyên liệu.", quantity);
     }
+
+    public static String chestLocked() {
+        return "Rương đồ của bạn đang khóa không thể bán vật phẩm";
+    }
 }
