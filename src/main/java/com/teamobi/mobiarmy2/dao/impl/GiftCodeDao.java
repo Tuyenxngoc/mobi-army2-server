@@ -14,7 +14,7 @@ public class GiftCodeDao implements IGiftCodeDao {
     @Override
     public GiftCodeEntry getGiftCode(String code) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM gift_code WHERE code = ?")) {
+             PreparedStatement statement = connection.prepareStatement("SELECT gc.usage_limit, gc,used_player_ids, gc.expiration_date, gc.reward FROM gift_codes gc WHERE gc.code = ?")) {
             statement.setString(1, code);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
@@ -46,7 +46,7 @@ public class GiftCodeDao implements IGiftCodeDao {
             connection = HikariCPManager.getInstance().getConnection();
             connection.setAutoCommit(false);
 
-            selectStatement = connection.prepareStatement("SELECT used_player_ids FROM gift_code WHERE code = ? FOR UPDATE");
+            selectStatement = connection.prepareStatement("SELECT used_player_ids FROM gift_codes WHERE code = ? FOR UPDATE");
             selectStatement.setString(1, code);
 
             try (ResultSet resultSet = selectStatement.executeQuery()) {
@@ -56,7 +56,7 @@ public class GiftCodeDao implements IGiftCodeDao {
                     int[] newUsedPlayerIds = Arrays.copyOf(usedPlayerIds, usedPlayerIds.length + 1);
                     newUsedPlayerIds[newUsedPlayerIds.length - 1] = playerId;
 
-                    updateStatement = connection.prepareStatement("UPDATE gift_code SET usage_limit = usage_limit - 1, used_player_ids = ? WHERE code = ?");
+                    updateStatement = connection.prepareStatement("UPDATE gift_codes SET usage_limit = usage_limit - 1, used_player_ids = ? WHERE code = ?");
                     updateStatement.setString(1, gson.toJson(newUsedPlayerIds));
                     updateStatement.setString(2, code);
                     updateStatement.executeUpdate();

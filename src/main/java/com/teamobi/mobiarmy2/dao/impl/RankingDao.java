@@ -23,48 +23,36 @@ import java.util.List;
  */
 public class RankingDao implements IRankingDao {
 
-    @Override
-    public List<PlayerLeaderboardEntry> getTopHonor() {
+    private List<PlayerLeaderboardEntry> getTopFromQuery(String query, String detailColumn, boolean applyBonus) {
         Gson gson = GsonUtil.GSON;
         List<PlayerLeaderboardEntry> top = new ArrayList<>();
         try (Connection connection = HikariCPManager.getInstance().getConnection();
-             Statement statement = connection.createStatement()) {
-            try (ResultSet resultSet = statement.executeQuery(
-                    "SELECT " +
-                            "p.player_id, p.equipment_chest, p.cup, " +
-                            "pc.data, pc.character_id, pc.level, " +
-                            "cm.clan_id, " +
-                            "u.username " +
-                            "FROM players p " +
-                            "INNER JOIN users u ON p.user_id = u.user_id " +
-                            "INNER JOIN player_characters pc ON pc.player_character_id = p.active_character_id " +
-                            "LEFT JOIN clan_members cm ON p.player_id = cm.player_id " +
-                            "WHERE p.cup > 0 " +
-                            "ORDER BY p.cup DESC " +
-                            "LIMIT 100"
-            )) {
-                byte index = 1;
-                while (resultSet.next()) {
-                    PlayerLeaderboardEntry entry = new PlayerLeaderboardEntry();
-                    entry.setPlayerId(resultSet.getInt("player_id"));
-                    if (index <= 3) {
-                        entry.setUsername(GameString.topBonus(resultSet.getString("username"), Utils.getStringNumber(CommonConstant.TOP_BONUS[index - 1])));
-                    } else {
-                        entry.setUsername(resultSet.getString("username"));
-                    }
-                    entry.setClanId(resultSet.getShort("clan_id"));
-                    EquipmentChestJson[] equipmentData = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
-                    int[] data = gson.fromJson(resultSet.getString("data"), int[].class);
-                    entry.setActiveCharacter(resultSet.getByte("character_id"));
-                    entry.setLevel((byte) resultSet.getInt("level"));
-                    entry.setLevelPt((byte) 0);
-                    entry.setIndex(index);
-                    entry.setData(CharacterData.getEquipData(equipmentData, data, entry.getActiveCharacter()));
-                    entry.setDetail(Utils.getStringNumber(resultSet.getInt("cup")));
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            byte index = 1;
+            while (resultSet.next()) {
+                PlayerLeaderboardEntry entry = new PlayerLeaderboardEntry();
 
-                    top.add(entry);
-                    index++;
+                entry.setIndex(index);
+                entry.setPlayerId(resultSet.getInt("player_id"));
+                entry.setClanId(resultSet.getShort("clan_id"));
+                entry.setActiveCharacter(resultSet.getByte("character_id"));
+                entry.setLevel((byte) resultSet.getInt("level"));
+                entry.setLevelPt((byte) 0);
+                entry.setDetail(Utils.getStringNumber(resultSet.getInt(detailColumn)));
+
+                if (applyBonus && index <= 3) {
+                    entry.setUsername(GameString.topBonus(resultSet.getString("username"), Utils.getStringNumber(CommonConstant.TOP_BONUS[index - 1])));
+                } else {
+                    entry.setUsername(resultSet.getString("username"));
                 }
+
+                EquipmentChestJson[] equipmentData = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
+                int[] data = gson.fromJson(resultSet.getString("data"), int[].class);
+                entry.setData(CharacterData.getEquipData(equipmentData, data, entry.getActiveCharacter()));
+
+                top.add(entry);
+                index++;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -73,18 +61,71 @@ public class RankingDao implements IRankingDao {
     }
 
     @Override
+    public List<PlayerLeaderboardEntry> getTopHonor() {
+        String query = "SELECT " +
+                "p.player_id, p.equipment_chest, p.cup, " +
+                "pc.data, pc.character_id, pc.level, " +
+                "cm.clan_id, " +
+                "u.username " +
+                "FROM players p " +
+                "INNER JOIN users u ON p.user_id = u.user_id " +
+                "INNER JOIN player_characters pc ON pc.player_character_id = p.active_character_id " +
+                "LEFT JOIN clan_members cm ON p.player_id = cm.player_id " +
+                "WHERE p.cup > 0 " +
+                "ORDER BY p.cup DESC " +
+                "LIMIT 100";
+        return getTopFromQuery(query, "cup", true);
+    }
+
+    @Override
     public List<PlayerLeaderboardEntry> getTopMasters() {
-        return List.of();
+        String query = "SELECT " +
+                "pc.data, pc.character_id, pc.level, pc.xp, " +
+                "p.player_id, p.equipment_chest, " +
+                "u.username, " +
+                "cm.clan_id " +
+                "FROM player_characters pc " +
+                "INNER JOIN players p on pc.player_id = p.player_id " +
+                "INNER JOIN users u on p.user_id = u.user_id " +
+                "LEFT JOIN clan_members cm on p.player_id = cm.player_id " +
+                "WHERE pc.xp > 0 " +
+                "ORDER BY pc.xp DESC " +
+                "LIMIT 100";
+        return getTopFromQuery(query, "xp", false);
     }
 
     @Override
     public List<PlayerLeaderboardEntry> getTopRichestXu() {
-        return List.of();
+        String query = "SELECT " +
+                "p.player_id, p.equipment_chest, p.xu, " +
+                "pc.data, pc.character_id, pc.level, " +
+                "cm.clan_id, " +
+                "u.username " +
+                "FROM players p " +
+                "INNER JOIN users u ON p.user_id = u.user_id " +
+                "INNER JOIN player_characters pc ON pc.player_character_id = p.active_character_id " +
+                "LEFT JOIN clan_members cm ON p.player_id = cm.player_id " +
+                "WHERE p.xu > 0 " +
+                "ORDER BY p.xu DESC " +
+                "LIMIT 100";
+        return getTopFromQuery(query, "xu", false);
     }
 
     @Override
     public List<PlayerLeaderboardEntry> getTopRichestLuong() {
-        return List.of();
+        String query = "SELECT " +
+                "p.player_id, p.equipment_chest, p.luong, " +
+                "pc.data, pc.character_id, pc.level, " +
+                "cm.clan_id, " +
+                "u.username " +
+                "FROM players p " +
+                "INNER JOIN users u ON p.user_id = u.user_id " +
+                "INNER JOIN player_characters pc ON pc.player_character_id = p.active_character_id " +
+                "LEFT JOIN clan_members cm ON p.player_id = cm.player_id " +
+                "WHERE p.luong > 0 " +
+                "ORDER BY p.luong DESC " +
+                "LIMIT 100";
+        return getTopFromQuery(query, "luong", false);
     }
 
     @Override
