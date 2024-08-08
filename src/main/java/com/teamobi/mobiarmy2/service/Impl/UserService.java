@@ -1445,6 +1445,7 @@ public class UserService implements IUserService {
                             for (int i = 0; i < specialItem.getQuantity(); i++) {
                                 equip.setNewSlot(specialItem.getItem().getId());
                                 equip.decrementEmptySlot();
+                                equip.addPoints(specialItem.getItem().getAbility());
                             }
                             user.updateInventory(equip, null, null, specialItemList);
                             sendServerMessage(GameString.hopNgocSuccess());
@@ -2500,12 +2501,6 @@ public class UserService implements IUserService {
                     purchaseEquipment(saleIndex, unit);
                 }
                 case 1 -> {//Gửi lệnh bán trang bị
-                    //Kiểm tra có khóa rương không
-                    if (user.isChestLocked()) {
-                        sendServerMessage(GameString.chestLocked());
-                        return;
-                    }
-
                     // Đặt lại giá trị
                     userAction = null;
                     totalTransactionAmount = 0;
@@ -2567,17 +2562,21 @@ public class UserService implements IUserService {
                         // Trừ phí tháo ngọc
                         user.updateXu(-totalTransactionAmount);
 
-                        // Lấy lại ngọc vào rương
                         EquipmentChestEntry selectedEquipment = equipList.get(0);
                         if (selectedEquipment == null) {
                             return;
                         }
+
+                        // Lấy lại ngọc đã ghép
                         List<SpecialItemChestEntry> recoveredGems = new ArrayList<>();
                         for (byte slotItemId : selectedEquipment.getSlots()) {
                             if (slotItemId > -1) {
                                 SpecialItemChestEntry gem = new SpecialItemChestEntry((short) 1, SpecialItemData.getSpecialItemById(slotItemId));
                                 if (gem.getItem() != null) {
                                     recoveredGems.add(gem);
+
+                                    //Trừ điểm đã cộng vào trang bị
+                                    selectedEquipment.subtractPoints(gem.getItem().getAbility());
                                 }
                             }
                         }
@@ -2592,6 +2591,12 @@ public class UserService implements IUserService {
                         // Gửi thông báo thành công
                         sendServerMessage(GameString.thaoNgocSuccess());
                     } else if (userAction == UserAction.BAN_TRANG_BI) {//Xác nhận bán trang bị
+                        //Kiểm tra có khóa rương không
+                        if (user.isChestLocked()) {
+                            sendServerMessage(GameString.chestLocked());
+                            return;
+                        }
+
                         for (EquipmentChestEntry equipment : equipList) {
                             if (equipment.isInUse()) {
                                 sendServerMessage(GameString.sellTBError1());

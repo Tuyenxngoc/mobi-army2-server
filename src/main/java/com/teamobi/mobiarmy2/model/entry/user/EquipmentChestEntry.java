@@ -62,6 +62,18 @@ public class EquipmentChestEntry {
         }
     }
 
+    public void addPoints(short[] ability) {
+        for (int i = 0; i < addPoints.length; i++) {
+            addPoints[i] += ability[i];
+        }
+    }
+
+    public void subtractPoints(short[] ability) {
+        for (int i = 0; i < addPoints.length; i++) {
+            addPoints[i] -= ability[i];
+        }
+    }
+
     public void setNewSlot(byte itemId) {
         if (emptySlot <= 0 || emptySlot > 3) {
             return;
