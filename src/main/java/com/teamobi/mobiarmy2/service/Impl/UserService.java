@@ -2972,11 +2972,11 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void sendUpdateDanhVong(int danhVongUp) {
+    public void sendUpdateCup(int cupUp) {
         try {
             Message ms = new Message(Cmd.CUP);
             DataOutputStream ds = ms.writer();
-            ds.writeByte(danhVongUp);
+            ds.writeByte(cupUp);
             ds.writeInt(user.getCup());
             ds.flush();
             user.sendMessage(ms);

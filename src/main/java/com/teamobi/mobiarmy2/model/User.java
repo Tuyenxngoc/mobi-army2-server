@@ -156,7 +156,7 @@ public class User {
         } else {
             cup += cupUp;
         }
-        userService.sendUpdateDanhVong(cupUp);
+        userService.sendUpdateCup(cupUp);
     }
 
     public synchronized void updateXp(int xpUp) {

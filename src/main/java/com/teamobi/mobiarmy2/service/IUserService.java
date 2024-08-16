@@ -150,7 +150,7 @@ public interface IUserService {
 
     void sendUpdateMoney();
 
-    void sendUpdateDanhVong(int danhVongUp);
+    void sendUpdateCup(int cupUp);
 
     void sendUpdateXp(int xpUp, boolean updateLevel);
 

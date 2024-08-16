@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
+import com.teamobi.mobiarmy2.constant.TransactionType;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
@@ -446,6 +447,11 @@ public class UserDao implements IUserDao {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public void createTransaction(TransactionType type, int amount, int playerId) {
+        HikariCPManager.getInstance().update("INSERT INTO `transactions`(`transaction_type`, `amount`, `transaction_date`, `player_id`) values (?,?,?,?)", type, amount, LocalDateTime.now(), playerId);
     }
 
 }

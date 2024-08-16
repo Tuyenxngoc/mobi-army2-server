@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.dao;
 
+import com.teamobi.mobiarmy2.constant.TransactionType;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.model.entry.PlayerCharacterEntry;
 import com.teamobi.mobiarmy2.model.entry.user.FriendEntry;
@@ -26,5 +27,7 @@ public interface IUserDao extends Dao<User> {
     int createPlayerCharacter(int playerId, byte characterId);
 
     PlayerCharacterEntry getPlayerCharacter(int playerId, byte characterId);
+
+    void createTransaction(TransactionType type, int amount, int playerId);
 
 }
