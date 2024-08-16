@@ -130,12 +130,42 @@ public class RankingDao implements IRankingDao {
 
     @Override
     public List<PlayerLeaderboardEntry> getWeeklyTopHonor() {
-        return List.of();
+        String query = "SELECT " +
+                "p.player_id, p.equipment_chest, SUM(t.amount) AS cup, " +
+                "pc.data, pc.character_id, pc.level, " +
+                "cm.clan_id, " +
+                "u.username " +
+                "FROM transactions t " +
+                "INNER JOIN players p ON t.player_id = p.player_id " +
+                "INNER JOIN users u ON p.user_id = u.user_id " +
+                "INNER JOIN player_characters pc ON pc.player_character_id = p.active_character_id " +
+                "LEFT JOIN clan_members cm ON p.player_id = cm.player_id " +
+                "WHERE t.transaction_type = 'CUP' AND t.transaction_date >= (CURDATE() - INTERVAL (WEEKDAY(CURDATE())) DAY) " +
+                "GROUP BY p.player_id " +
+                "HAVING SUM(t.amount) > 0 " +
+                "ORDER BY cup DESC " +
+                "LIMIT 100";
+        return getTopFromQuery(query, "cup", false);
     }
 
     @Override
     public List<PlayerLeaderboardEntry> getWeeklyTopRichest() {
-        return List.of();
+        String query = "SELECT " +
+                "p.player_id, p.equipment_chest, SUM(t.amount) AS xu, " +
+                "pc.data, pc.character_id, pc.level, " +
+                "cm.clan_id, " +
+                "u.username " +
+                "FROM transactions t " +
+                "INNER JOIN players p ON t.player_id = p.player_id " +
+                "INNER JOIN users u ON p.user_id = u.user_id " +
+                "INNER JOIN player_characters pc ON pc.player_character_id = p.active_character_id " +
+                "LEFT JOIN clan_members cm ON p.player_id = cm.player_id " +
+                "WHERE t.transaction_type = 'XU' AND t.transaction_date >= (CURDATE() - INTERVAL (WEEKDAY(CURDATE())) DAY) " +
+                "GROUP BY p.player_id " +
+                "HAVING SUM(t.amount) > 0 " +
+                "ORDER BY xu DESC " +
+                "LIMIT 100";
+        return getTopFromQuery(query, "xu", false);
     }
 
     @Override
