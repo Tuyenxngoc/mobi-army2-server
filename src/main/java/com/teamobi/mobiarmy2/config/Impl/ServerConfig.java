@@ -49,8 +49,8 @@ public class ServerConfig implements IServerConfig {
     private String downloadInfo;
     private String downloadUrl;
     private int maxClients;
-    private byte maxRuongTrangBi;
-    private byte maxRuongItem;
+    private byte maxEquipmentSlots;
+    private byte maxSpecialItemSlots;
     private byte maxItem;
     private byte maxFriends;
     private String messageLogin;
@@ -116,8 +116,8 @@ public class ServerConfig implements IServerConfig {
             downloadUrl = configMap.getProperty("download_url", "http://localhost");
 
             maxClients = Integer.parseInt(configMap.getProperty("max_clients", "1000"));
-            maxRuongTrangBi = Byte.parseByte(configMap.getProperty("max_ruong_trang_bi", "100"));
-            maxRuongItem = Byte.parseByte(configMap.getProperty("max_ruong_item", "100"));
+            maxEquipmentSlots = Byte.parseByte(configMap.getProperty("max_equipment_storage", "100"));
+            maxSpecialItemSlots = Byte.parseByte(configMap.getProperty("max_item_storage", "100"));
             maxItem = Byte.parseByte(configMap.getProperty("max_item", "99"));
             maxFriends = Byte.parseByte(configMap.getProperty("max_friends", "10"));
 
@@ -321,13 +321,13 @@ public class ServerConfig implements IServerConfig {
     }
 
     @Override
-    public byte getMaxRuongTrangBi() {
-        return maxRuongTrangBi;
+    public byte getMaxEquipmentSlots() {
+        return maxEquipmentSlots;
     }
 
     @Override
-    public byte getMaxRuongItem() {
-        return maxRuongItem;
+    public byte getMaxSpecialItemSlots() {
+        return maxSpecialItemSlots;
     }
 
     @Override

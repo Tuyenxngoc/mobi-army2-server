@@ -6,7 +6,6 @@ import com.teamobi.mobiarmy2.dao.IGiftCodeDao;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.dao.impl.GiftCodeDao;
 import com.teamobi.mobiarmy2.dao.impl.UserDao;
-import com.teamobi.mobiarmy2.fight.Bullet;
 import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.GiftCodeRewardJson;
@@ -994,7 +993,7 @@ public class UserService implements IUserService {
         }
 
         //Kiểm tra số lượng đang có trong rương
-        if (user.getInventorySpecialItemCount(itemId) + quantity > ServerManager.getInstance().config().getMaxRuongItem()) {
+        if (user.getInventorySpecialItemCount(itemId) + quantity > ServerManager.getInstance().config().getMaxSpecialItemSlots()) {
             sendServerMessage(GameString.ruongMaxSlot());
             return;
         }
@@ -1365,7 +1364,7 @@ public class UserService implements IUserService {
                     short quantity = (short) dis.readUnsignedByte();
 
                     //Kiểm tra dữ liệu hợp lệ
-                    if (quantity <= 0 || id < 0) {
+                    if (quantity == 0 || id < 0) {
                         continue;
                     }
 
@@ -1658,7 +1657,7 @@ public class UserService implements IUserService {
             short angle = dis.readShort();
             byte force = dis.readByte();
             byte force2 = 0;
-            if (Bullet.isDoubleBull(bullId)) {
+            if (bullId == 19) {
                 force2 = dis.readByte();
             }
             byte numShoot = dis.readByte();
@@ -1681,7 +1680,7 @@ public class UserService implements IUserService {
                 force2 = 30;
             }
 
-            user.getFightWait().getFightManager().shootMessage(user, bullId, x, y, angle, force, force2, numShoot);
+            user.getFightWait().getFightManager().newShoot(user, bullId, x, y, angle, force, force2, numShoot);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1710,7 +1709,6 @@ public class UserService implements IUserService {
         try {
             byte type = ms.reader().readByte();
             FightWait fightWait = null;
-
             if (type == 5) {// Đấu trùm
                 int start = server.config().getStartMapBoss();
                 int end = start + server.config().getRoomQuantity()[5];
@@ -1727,17 +1725,52 @@ public class UserService implements IUserService {
                         }
                     }
                 }
-            } else if (type < 5 && type > 1) {
-                //Todo
-            } else if (type == 0) {
-                //Todo
-            } else if (type == -1) {
-                //Todo
+            } else if (type <= 4 && type >= 1) {//1vs1->4vs4
+                int index = Utils.nextInt(0, rooms.length);
+                Room room = rooms[index];
+                for (FightWait fight : room.getFightWaits()) {
+                    if (!fight.isStarted() &&
+                            !fight.isPassSet() &&
+                            fight.getNumPlayers() < fight.getMaxSetPlayers() &&
+                            fight.getMoney() <= user.getXu() &&
+                            fight.getMaxSetPlayers() == type * 2
+                    ) {
+                        fightWait = fight;
+                        break;
+                    }
+                }
+            } else if (type == 0) {//Khu vực trống
+                int index = Utils.nextInt(0, rooms.length);
+                Room room = rooms[index];
+                for (FightWait fight : room.getFightWaits()) {
+                    if (!fight.isStarted() &&
+                            !fight.isPassSet() &&
+                            fight.getMoney() <= user.getXu() &&
+                            fight.getNumPlayers() == 0
+                    ) {
+                        fightWait = fight;
+                        break;
+                    }
+                }
+            } else if (type == -1) {//Ngẫu nhiên
+                int index = Utils.nextInt(0, rooms.length);
+                Room room = rooms[index];
+                for (FightWait fight : room.getFightWaits()) {
+                    if (!fight.isStarted() &&
+                            !fight.isPassSet() &&
+                            fight.getNumPlayers() < fight.getMaxSetPlayers() &&
+                            fight.getMoney() <= user.getXu()
+                    ) {
+                        fightWait = fight;
+                        break;
+                    }
+                }
             }
 
             if (fightWait == null) {
                 sendServerMessage(GameString.findKVError1());
             } else {
+                fightWait.sendInfo(user);
                 fightWait.enterFireOval(user);
             }
         } catch (IOException e) {
@@ -1855,7 +1888,7 @@ public class UserService implements IUserService {
     public void handleFindPlayer(Message ms) {
         try {
             String username = ms.reader().readUTF().trim();
-            if (username.length() == 0) {
+            if (username.isEmpty()) {
                 sendMessageLoginFail(GameString.addFrienvError2());
                 return;
             }
@@ -1879,11 +1912,7 @@ public class UserService implements IUserService {
 
     @Override
     public void skipTurn() {
-        try {
-            user.getFightWait().getFightManager().boLuotMessage(user);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        user.getFightWait().getFightManager().skipTurn(user);
     }
 
     @Override
@@ -2528,7 +2557,7 @@ public class UserService implements IUserService {
                     //Gửi thông báo
                     ms = new Message(104);
                     DataOutputStream ds = ms.writer();
-                    if (equipList.size() > 0) {//Trường hợp có trang bị hợp lệ
+                    if (!equipList.isEmpty()) {//Trường hợp có trang bị hợp lệ
                         ds.writeByte(1);
                         if (equipList.size() == 1 && equipList.get(0).getEmptySlot() < 3) {//Tháo ngọc
                             userAction = UserAction.THAO_NGOC;
@@ -2538,7 +2567,7 @@ public class UserService implements IUserService {
                             for (byte slotItemId : equipList.get(0).getSlots()) {
                                 SpecialItemEntry item = SpecialItemData.getSpecialItemById(slotItemId);
                                 if (item != null) {
-                                    totalTransactionAmount += item.getPriceXu() * 0.25;
+                                    totalTransactionAmount += (int) (item.getPriceXu() * 0.25);
                                 }
                             }
                             ds.writeUTF(GameString.thaoNgocRequest(totalTransactionAmount));
@@ -2622,7 +2651,7 @@ public class UserService implements IUserService {
     }
 
     private void purchaseEquipment(short saleIndex, byte unit) {
-        if (user.getEquipmentChest().size() >= ServerManager.getInstance().config().getMaxRuongTrangBi()) {
+        if (user.getEquipmentChest().size() >= ServerManager.getInstance().config().getMaxEquipmentSlots()) {
             sendServerMessage(GameString.ruongNoSlot());
             return;
         }

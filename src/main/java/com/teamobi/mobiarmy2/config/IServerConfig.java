@@ -66,9 +66,9 @@ public interface IServerConfig {
 
     int getMaxClients();
 
-    byte getMaxRuongTrangBi();
+    byte getMaxEquipmentSlots();
 
-    byte getMaxRuongItem();
+    byte getMaxSpecialItemSlots();
 
     byte getMaxItem();
 

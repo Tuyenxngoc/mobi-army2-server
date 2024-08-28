@@ -807,4 +807,20 @@ public class FightWait {
 
         startTime = System.currentTimeMillis();
     }
+
+    public void sendInfo(User user) {
+        try {
+            Message ms = new Message(Cmd.AUTO_BOARD);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(room.getIndex());
+            ds.writeByte(id);
+            ds.writeUTF(name);
+            ds.writeByte(room.getType());
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

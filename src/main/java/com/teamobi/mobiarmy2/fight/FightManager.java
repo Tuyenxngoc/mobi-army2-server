@@ -1,5 +1,7 @@
 package com.teamobi.mobiarmy2.fight;
 
+import com.teamobi.mobiarmy2.model.User;
+
 public class FightManager {
     private final FightWait fightWait;
 
@@ -14,6 +16,18 @@ public class FightManager {
     }
 
     public void startGame(int i, int i1) {
+
+    }
+
+    public void changeLocationMessage(User user, short x, short y) {
+
+    }
+
+    public void newShoot(User user, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
+
+    }
+
+    public void skipTurn(User user) {
 
     }
 }
