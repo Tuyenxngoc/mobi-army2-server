@@ -546,11 +546,7 @@ public class FightWait {
         }
 
         started = true;
-        try {
-            fightManager.startGame(0, 0);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        fightManager.startGame(0, 0);
     }
 
     public synchronized void setRoomName(int playerId, String name) {

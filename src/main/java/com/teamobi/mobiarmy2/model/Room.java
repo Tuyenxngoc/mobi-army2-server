@@ -63,6 +63,11 @@ public class Room {
         return (percentage < 50) ? 2 : ((percentage < 75) ? 1 : 0);
     }
 
+    /**
+     * This method calculates and returns the number of available fight wait slots in the room.
+     *
+     * @return int representing the number of available fight wait slots.
+     */
     public int getFightWaitsAvailable() {
         int startedFightsCount = 0;
         for (FightWait fight : fightWaits) {
@@ -73,6 +78,13 @@ public class Room {
         return fightWaits.length - startedFightsCount;
     }
 
+    /**
+     * This method returns the map ID based on the available map IDs for the room.
+     * If there are multiple map IDs available, it returns the first one.
+     * If there are no map IDs available, it returns the minimum map ID.
+     *
+     * @return byte representing the map ID
+     */
     public byte getMapId() {
         if (mapCanSelected != null) {
             return mapCanSelected[0];
