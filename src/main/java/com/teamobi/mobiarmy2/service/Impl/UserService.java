@@ -2174,8 +2174,8 @@ public class UserService implements IUserService {
             sendServerMessage(GameString.giftCodeError3(giftCode.getExpiryDate()));
             return;
         }
-        for (int i = 0; i < giftCode.getUsedPlayerIds().length; i++) {
-            if (giftCode.getUsedPlayerIds()[i] == user.getPlayerId()) {
+        for (int playerId : giftCode.getUsedPlayerIds()) {
+            if (playerId == user.getPlayerId()) {
                 sendServerMessage(GameString.giftCodeError4());
                 return;
             }
