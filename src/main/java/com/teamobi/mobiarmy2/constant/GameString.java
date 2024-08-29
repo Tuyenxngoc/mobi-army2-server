@@ -244,6 +244,10 @@ public class GameString {
         return "Bạn bị đuổi bởi chủ phòng!";
     }
 
+    public static String kickString2() {
+        return "Bạn bị đuổi khỏi phòng!";
+    }
+
     public static String datCuocError1(int min, int max) {
         return String.format("Chỉ có thể đặt cược từ %d xu đến %d xu!", min, max);
     }

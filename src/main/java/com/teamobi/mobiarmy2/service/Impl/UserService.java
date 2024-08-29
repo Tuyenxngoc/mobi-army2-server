@@ -1294,7 +1294,7 @@ public class UserService implements IUserService {
                 sendServerMessage(GameString.joinKVError1());
                 return;
             }
-            fightWait.enterFireOval(user);
+            fightWait.joinBattleRoom(user);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1328,7 +1328,6 @@ public class UserService implements IUserService {
         if (user.getState() == UserState.WAITING) {
             return;
         }
-        user.setState(UserState.WAITING);
         user.getFightWait().leaveTeam(user.getPlayerId());
     }
 
@@ -1771,7 +1770,7 @@ public class UserService implements IUserService {
                 sendServerMessage(GameString.findKVError1());
             } else {
                 fightWait.sendInfo(user);
-                fightWait.enterFireOval(user);
+                fightWait.joinBattleRoom(user);
             }
         } catch (IOException e) {
             e.printStackTrace();
