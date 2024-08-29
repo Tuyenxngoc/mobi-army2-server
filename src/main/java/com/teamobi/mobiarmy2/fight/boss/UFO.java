@@ -32,7 +32,7 @@ public class UFO extends Boss {
             }
             if (!this.turnShoot) {
                 this.turnShoot = true;
-                Player pl = this.fightManager.getPlayerClosest(this.x, this.y);
+                Player pl = this.fightManager.findClosestPlayerByX(this.x);
                 if (pl != null) {
                     this.y = (short) (pl.y - Utils.nextInt(150, 500));
                     this.x = pl.x;

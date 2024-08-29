@@ -21,7 +21,7 @@ public class Robot extends Boss {
     @Override
     public void turnAction() {
         try {
-            Player pl = fightManager.getPlayerClosest(x, y);
+            Player pl = fightManager.findClosestPlayerByX(x);
             if (pl == null) {
                 return;
             }

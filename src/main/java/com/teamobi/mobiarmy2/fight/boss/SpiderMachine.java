@@ -21,7 +21,7 @@ public class SpiderMachine extends Boss {
     @Override
     public void turnAction() {
         try {
-            Player pl = fightManager.getPlayerClosest(x, y);
+            Player pl = fightManager.findClosestPlayerByX(x);
             if (pl == null)
                 return;
             if (Math.abs(x - pl.x) <= 40 && Math.abs(y - pl.y) <= 30) {

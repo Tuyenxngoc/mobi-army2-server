@@ -68,12 +68,7 @@ public class FightManager {
             userPractice.sendMessage(ms);
             return;
         }
-        for (Player player : players) {
-            if (player == null || player.user == null) {
-                continue;
-            }
-            player.user.sendMessage(ms);
-        }
+        fightWait.sendToTeam(ms);
     }
 
     public byte getPlayerIndexById(int playerId) {
@@ -104,21 +99,24 @@ public class FightManager {
         return players[playerTurn];
     }
 
-    public Player getPlayerClosest(short X, short Y) {
-        int XClosest = -1;
-        Player plClosest = null;
+    public Player findClosestPlayerByX(short targetX) {
+        int minDistanceX = Integer.MAX_VALUE;
+        Player closestPlayer = null;
+
         for (byte i = 0; i < 8; i++) {
-            Player pl = this.players[i];
-            if (pl == null || pl.isDie) {
+            Player player = this.players[i];
+            if (player == null || player.isDie) {
                 continue;
             }
-            int kcX = Math.abs(pl.x - X);
-            if (XClosest == -1 || kcX < XClosest) {
-                XClosest = kcX;
-                plClosest = pl;
+
+            int distanceX = Math.abs(player.x - targetX);
+            if (distanceX < minDistanceX) {
+                minDistanceX = distanceX;
+                closestPlayer = player;
             }
         }
-        return plClosest;
+
+        return closestPlayer;
     }
 
     public int getLevelTeam() {
@@ -895,7 +893,7 @@ public class FightManager {
         this.nTurn = 0;
     }
 
-    protected void startGame(int nTeamPointBlue, int nTeamPointRed) throws IOException {
+    protected void startGame() throws IOException {
         if (fightWait.isStarted()) {
             return;
         }
@@ -934,7 +932,7 @@ public class FightManager {
                 this.teamlevel += us.getCurrentLevel();
                 us.updateXu(-this.fightWait.getMoney());
                 short X, Y;
-                byte item[];
+                byte[] item;
                 int teamPoint;
                 boolean exists;
                 int locaCount = -1;
@@ -959,12 +957,7 @@ public class FightManager {
                         }
                     }
                 }
-                if (this.type == 5 || i % 2 == 0) {
-                    teamPoint = nTeamPointBlue;
-                } else {
-                    teamPoint = nTeamPointRed;
-                }
-                this.players[i] = new Player(this, i, X, Y, item, teamPoint, us);
+                this.players[i] = new Player(this, i, X, Y, item, 0, us);
             }
         }
         this.bulletManager.mangNhenId = 200;

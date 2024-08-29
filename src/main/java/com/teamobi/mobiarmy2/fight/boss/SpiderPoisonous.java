@@ -53,7 +53,7 @@ public class SpiderPoisonous extends Boss {
                 if (nturn > 0) {
                     nturn--;
                 }
-                Player pl = fightManager.getPlayerClosest(x, y);
+                Player pl = fightManager.findClosestPlayerByX(x);
                 if (!pl.isBiDoc) {
                     this.x = pl.x;
                     this.fightManager.flyChangeLocation(super.index);

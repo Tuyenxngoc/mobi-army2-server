@@ -118,7 +118,7 @@ public class FightWait {
         numPlayers--;
     }
 
-    private void sendToTeam(Message ms) {
+    protected void sendToTeam(Message ms) {
         for (User user : users) {
             if (user != null) {
                 user.sendMessage(ms);
@@ -564,7 +564,7 @@ public class FightWait {
         }
 
         try {
-            fightManager.startGame(0, 0);
+            fightManager.startGame();
             started = true;
         } catch (IOException e) {
             e.printStackTrace();

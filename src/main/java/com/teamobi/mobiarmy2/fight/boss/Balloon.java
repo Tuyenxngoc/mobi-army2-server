@@ -25,7 +25,7 @@ public class Balloon extends Boss {
     @Override
     public void turnAction() {
         try {
-            Player pl = this.fightManager.getPlayerClosest(super.x, super.y);
+            Player pl = this.fightManager.findClosestPlayerByX(super.x);
             if (pl == null) {
                 return;
             }

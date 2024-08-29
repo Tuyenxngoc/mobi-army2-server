@@ -19,7 +19,7 @@ public class Trex extends Boss {
     @Override
     public void turnAction() {
         try {
-            Player pl = this.fightManager.getPlayerClosest(this.x, this.y);
+            Player pl = this.fightManager.findClosestPlayerByX(this.x);
             if (pl == null) {
                 return;
             }

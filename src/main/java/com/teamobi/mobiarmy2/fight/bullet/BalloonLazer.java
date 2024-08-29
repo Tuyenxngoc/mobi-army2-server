@@ -18,7 +18,7 @@ public class BalloonLazer extends Bullet {
 
     public void nextXY() {
         frame++;
-        Player pl2 = this.fightManager.getPlayerClosest(X, Y);
+        Player pl2 = this.fightManager.findClosestPlayerByX(X);
         X = pl2.x;
         Y = pl2.y;
         this.XArray.add((short) X);

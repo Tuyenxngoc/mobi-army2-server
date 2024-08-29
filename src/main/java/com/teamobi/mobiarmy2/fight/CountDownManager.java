@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.fight;
 
 import com.teamobi.mobiarmy2.server.ServerManager;
+import lombok.Setter;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
@@ -12,6 +13,7 @@ public class CountDownManager {
 
     private final FightManager fightManager;
     public byte second;
+    @Setter
     private byte countTime;
     private ScheduledExecutorService scheduler;
     private ScheduledFuture<?> countTask;
@@ -21,10 +23,6 @@ public class CountDownManager {
         this.second = 0;
         this.countTime = countTime;
         this.scheduler = Executors.newScheduledThreadPool(1);
-    }
-
-    public void setCountTime(byte count) {
-        countTime = count;
     }
 
     public void resetCount() {
