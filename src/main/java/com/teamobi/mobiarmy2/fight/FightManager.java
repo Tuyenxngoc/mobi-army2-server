@@ -856,11 +856,11 @@ public class FightManager {
                 }
                 byte win = (byte) (pl.team ? checkWin : -checkWin);
                 if (win >= 0) {
-                    pl.user.updateXu(this.fightWait.money * (win == 1 ? 2 : 1));
+                    pl.user.updateXu(this.fightWait.getMoney() * (win == 1 ? 2 : 1));
                     ms = new Message(52);
                     ds = ms.writer();
                     ds.writeInt(pl.user.getPlayerId());
-                    ds.writeInt(this.fightWait.money * (win == 1 ? 2 : 1));
+                    ds.writeInt(this.fightWait.getMoney() * (win == 1 ? 2 : 1));
                     ds.writeInt(pl.user.getXu());
                     ds.flush();
                     sendToTeam(ms);
@@ -932,7 +932,7 @@ public class FightManager {
                 }
 
                 this.teamlevel += us.getCurrentLevel();
-                us.updateXu(-this.fightWait.money);
+                us.updateXu(-this.fightWait.getMoney());
                 short X, Y;
                 byte item[];
                 int teamPoint;
@@ -1024,7 +1024,7 @@ public class FightManager {
 
     protected void sendFightInfoMessage() {
         try {
-            if (!isTraining && fightWait.money > 0) {
+            if (!isTraining && fightWait.getMoney() > 0) {
                 for (Player player : players) {
                     if (player == null || player.user == null) {
                         continue;
@@ -1032,7 +1032,7 @@ public class FightManager {
                     Message ms = new Message(52);
                     DataOutputStream ds = ms.writer();
                     ds.writeInt(player.user.getPlayerId());
-                    ds.writeInt(-fightWait.money);
+                    ds.writeInt(-fightWait.getMoney());
                     ds.writeInt(player.user.getXu());
                     ds.flush();
                     sendToTeam(ms);

@@ -1305,7 +1305,7 @@ public class UserService implements IUserService {
                 sendServerMessage(GameString.joinKVError1());
                 return;
             }
-            fightWait.enterFireOval(user);
+            fightWait.addUser(user);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1720,7 +1720,6 @@ public class UserService implements IUserService {
         try {
             byte type = ms.reader().readByte();
             FightWait fightWait = null;
-
             if (type == 5) {// Đấu trùm
                 int start = server.config().getStartMapBoss();
                 int end = start + server.config().getRoomQuantity()[5];
@@ -1737,18 +1736,53 @@ public class UserService implements IUserService {
                         }
                     }
                 }
-            } else if (type < 5 && type > 1) {
-                //Todo
-            } else if (type == 0) {
-                //Todo
-            } else if (type == -1) {
-                //Todo
+            } else if (type <= 4 && type >= 1) {//1vs1->4vs4
+                int index = Utils.nextInt(0, rooms.length);
+                Room room = rooms[index];
+                for (FightWait fight : room.getFightWaits()) {
+                    if (!fight.isStarted() &&
+                            !fight.isPassSet() &&
+                            fight.getNumPlayers() < fight.getMaxSetPlayers() &&
+                            fight.getMoney() <= user.getXu() &&
+                            fight.getMaxSetPlayers() == type * 2
+                    ) {
+                        fightWait = fight;
+                        break;
+                    }
+                }
+            } else if (type == 0) {//Khu vực trống
+                int index = Utils.nextInt(0, rooms.length);
+                Room room = rooms[index];
+                for (FightWait fight : room.getFightWaits()) {
+                    if (!fight.isStarted() &&
+                            !fight.isPassSet() &&
+                            fight.getMoney() <= user.getXu() &&
+                            fight.getNumPlayers() == 0
+                    ) {
+                        fightWait = fight;
+                        break;
+                    }
+                }
+            } else if (type == -1) {//Ngẫu nhiên
+                int index = Utils.nextInt(0, rooms.length);
+                Room room = rooms[index];
+                for (FightWait fight : room.getFightWaits()) {
+                    if (!fight.isStarted() &&
+                            !fight.isPassSet() &&
+                            fight.getNumPlayers() < fight.getMaxSetPlayers() &&
+                            fight.getMoney() <= user.getXu()
+                    ) {
+                        fightWait = fight;
+                        break;
+                    }
+                }
             }
 
             if (fightWait == null) {
                 sendServerMessage(GameString.findKVError1());
             } else {
-                fightWait.enterFireOval(user);
+                fightWait.sendInfo(user);
+                fightWait.addUser(user);
             }
         } catch (IOException e) {
             e.printStackTrace();
