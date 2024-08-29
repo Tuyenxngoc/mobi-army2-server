@@ -1,5 +1,7 @@
 package com.teamobi.mobiarmy2.model.entry;
 
+import com.teamobi.mobiarmy2.json.EquipmentChestJson;
+import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,5 +17,9 @@ public class GiftCodeEntry {
     private String code;
     private int[] usedPlayerIds;
     private LocalDateTime expiryDate;
-    private String reward;
+    private int xu;
+    private int luong;
+    private int exp;
+    private SpecialItemChestJson[] items;
+    private EquipmentChestJson[] equips;
 }

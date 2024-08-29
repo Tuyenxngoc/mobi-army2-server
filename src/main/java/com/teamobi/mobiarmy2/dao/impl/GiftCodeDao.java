@@ -3,6 +3,8 @@ package com.teamobi.mobiarmy2.dao.impl;
 import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.dao.IGiftCodeDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
+import com.teamobi.mobiarmy2.json.EquipmentChestJson;
+import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.entry.GiftCodeEntry;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 
@@ -14,20 +16,24 @@ public class GiftCodeDao implements IGiftCodeDao {
     @Override
     public GiftCodeEntry getGiftCode(String code) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT gc.usage_limit, gc,used_player_ids, gc.expiration_date, gc.reward FROM gift_codes gc WHERE gc.code = ?")) {
+             PreparedStatement statement = connection.prepareStatement("SELECT gc.usage_limit, gc.used_player_ids, gc.expiration_date, gc.xu, gc.luong, gc.exp, gc.items, gc.equips FROM gift_codes gc WHERE gc.code = ?")) {
             statement.setString(1, code);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
+                    Gson gson = GsonUtil.GSON;
                     GiftCodeEntry giftCode = new GiftCodeEntry();
                     giftCode.setLimit(resultSet.getShort("usage_limit"));
                     giftCode.setCode(code);
-                    giftCode.setUsedPlayerIds(GsonUtil.GSON.fromJson(resultSet.getString("used_player_ids"), int[].class));
+                    giftCode.setUsedPlayerIds(gson.fromJson(resultSet.getString("used_player_ids"), int[].class));
                     Timestamp expirationTimestamp = resultSet.getTimestamp("expiration_date");
                     if (expirationTimestamp != null) {
                         giftCode.setExpiryDate(expirationTimestamp.toLocalDateTime());
                     }
-                    giftCode.setReward(resultSet.getString("reward"));
-
+                    giftCode.setXu(resultSet.getInt("xu"));
+                    giftCode.setLuong(resultSet.getInt("luong"));
+                    giftCode.setExp(resultSet.getInt("exp"));
+                    giftCode.setItems(gson.fromJson(resultSet.getString("items"), SpecialItemChestJson[].class));
+                    giftCode.setEquips(gson.fromJson(resultSet.getString("equips"), EquipmentChestJson[].class));
                     return giftCode;
                 }
             }

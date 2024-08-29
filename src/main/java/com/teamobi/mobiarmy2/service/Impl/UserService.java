@@ -9,7 +9,6 @@ import com.teamobi.mobiarmy2.dao.impl.UserDao;
 import com.teamobi.mobiarmy2.fight.Bullet;
 import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
-import com.teamobi.mobiarmy2.json.GiftCodeRewardJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.CharacterData;
 import com.teamobi.mobiarmy2.model.*;
@@ -32,7 +31,6 @@ import com.teamobi.mobiarmy2.server.ClanManager;
 import com.teamobi.mobiarmy2.server.LeaderboardManager;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IUserService;
-import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.DataInputStream;
@@ -2183,22 +2181,21 @@ public class UserService implements IUserService {
             }
         }
         dao.updateGiftCode(code, user.getPlayerId());
-        GiftCodeRewardJson rewardData = GsonUtil.GSON.fromJson(giftCode.getReward(), GiftCodeRewardJson.class);
-        if (rewardData.getXu() > 0) {
-            user.updateXu(rewardData.getXu());
-            sendMessageToUser(GameString.giftCodeReward(code, Utils.getStringNumber(rewardData.getXu()) + " xu"));
+        if (giftCode.getXu() > 0) {
+            user.updateXu(giftCode.getXu());
+            sendMessageToUser(GameString.giftCodeReward(code, Utils.getStringNumber(giftCode.getXu()) + " xu"));
         }
-        if (rewardData.getLuong() > 0) {
-            user.updateLuong(rewardData.getLuong());
-            sendMessageToUser(GameString.giftCodeReward(code, Utils.getStringNumber(rewardData.getLuong()) + " lượng"));
+        if (giftCode.getLuong() > 0) {
+            user.updateLuong(giftCode.getLuong());
+            sendMessageToUser(GameString.giftCodeReward(code, Utils.getStringNumber(giftCode.getLuong()) + " lượng"));
         }
-        if (rewardData.getExp() > 0) {
-            user.updateXp(rewardData.getExp());
-            sendMessageToUser(GameString.giftCodeReward(code, Utils.getStringNumber(rewardData.getExp()) + " exp"));
+        if (giftCode.getExp() > 0) {
+            user.updateXp(giftCode.getExp());
+            sendMessageToUser(GameString.giftCodeReward(code, Utils.getStringNumber(giftCode.getExp()) + " exp"));
         }
-        if (rewardData.getItems() != null) {
+        if (giftCode.getItems() != null) {
             List<SpecialItemChestEntry> additionalItems = new ArrayList<>();
-            for (SpecialItemChestJson item : rewardData.getItems()) {
+            for (SpecialItemChestJson item : giftCode.getItems()) {
                 SpecialItemChestEntry newItem = new SpecialItemChestEntry();
                 newItem.setItem(SpecialItemData.getSpecialItemById(item.getId()));
                 if (newItem.getItem() == null) {
@@ -2210,8 +2207,8 @@ public class UserService implements IUserService {
             }
             user.updateInventory(null, null, additionalItems, null);
         }
-        if (rewardData.getEquips() != null) {
-            for (EquipmentChestJson json : rewardData.getEquips()) {
+        if (giftCode.getEquips() != null) {
+            for (EquipmentChestJson json : giftCode.getEquips()) {
                 EquipmentChestEntry addEquip = new EquipmentChestEntry();
                 addEquip.setEquipEntry(CharacterData.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
                 if (addEquip.getEquipEntry() == null) {
