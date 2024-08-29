@@ -10,7 +10,6 @@ import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -20,8 +19,9 @@ import java.util.List;
  * @author tuyen
  */
 @Getter
-@Setter
 public class FightWait {
+    private static final int BOSS_KICK_TIME_SECONDS = 100;
+
     private final FightManager fightManager;
     private final Room room;
     private final byte id;
@@ -38,9 +38,8 @@ public class FightWait {
     private String name;
     private byte mapId;
     private byte bossIndex;
-    private Thread bossKickThread;
-    private long endTime;
-    private byte continuousLevel;
+    private final long endTime;
+    private final byte continuousLevel;
 
     public FightWait(Room room, byte id) {
         this.room = room;
@@ -72,11 +71,7 @@ public class FightWait {
         return users[bossIndex];
     }
 
-    public boolean isFightWaitInvalid() {
-        return numPlayers == maxSetPlayers || started || (room.isContinuous() && continuousLevel > 0);
-    }
-
-    public void sendToTeam(Message ms) {
+    private void sendToTeam(Message ms) {
         for (User user : users) {
             if (user != null) {
                 user.sendMessage(ms);
@@ -111,6 +106,10 @@ public class FightWait {
         numReady = 0;
     }
 
+    private void changeBoss(byte index) {
+        bossIndex = index;
+    }
+
     private void findNewBoss() {
         for (byte i = 0; i < users.length; i++) {
             if (users[i] != null) {
@@ -138,6 +137,17 @@ public class FightWait {
         ServerManager.getInstance().logger().logMessage("Refresh fight wait");
     }
 
+    private void handleUserRemoval(int index) {
+        users[index].setState(UserState.WAITING);
+        users[index].setFightWait(null);
+        users[index] = null;
+        numPlayers--;
+    }
+
+    public boolean isFightWaitInvalid() {
+        return numPlayers == maxSetPlayers || started || (room.isContinuous() && continuousLevel > 0);
+    }
+
     public synchronized void joinBattleRoom(User us) throws IOException {
         //Kiểm tra có clan hay không trước khi đấu đội
         if (room.getType() == 6 && us.getClanId() == 0) {
@@ -145,7 +155,7 @@ public class FightWait {
             return;
         }
 
-        //Nếu đang đấu chiến dịch thì không cho vào
+        //Nếu đang đấu thì không cho vào
         if (started || (room.isContinuous() && continuousLevel > 0)) {
             us.getUserService().sendServerMessage(GameString.joinKVError0());
             return;
@@ -236,30 +246,6 @@ public class FightWait {
         us.sendMessage(ms);
     }
 
-    private synchronized void changeBoss(byte index) {
-        bossIndex = index;
-
-        //Khởi tạo luồng mới để kick chủ phòng
-        if (bossKickThread != null) {
-            bossKickThread.interrupt();
-        }
-        bossKickThread = new Thread(() -> {
-            try {
-                int second = 10;
-                while (!started && bossIndex != -1) {
-                    Thread.sleep(1000L);
-                    second--;
-                    if (second == 0) {
-
-                        break;
-                    }
-                }
-            } catch (Exception ignored) {
-            }
-        });
-        bossKickThread.start();
-    }
-
     public synchronized void setPassRoom(String password, int playerId) {
         if (started) {
             return;
@@ -298,7 +284,7 @@ public class FightWait {
         try {
             Message ms = new Message(Cmd.SET_MONEY);
             DataOutputStream ds = ms.writer();
-            ds.writeShort(0);
+            ds.writeShort(room.getIndex() * room.getFightWaits().length + id);
             ds.writeInt(newMoney);
             ds.flush();
             sendToTeam(ms);
@@ -366,12 +352,19 @@ public class FightWait {
             return;
         }
 
-        sendMessageKick(GameString.kickString(), index, targetPlayerId);
-        leaveTeam(targetPlayerId);
+        //Gửi thông báo tới người chơi
+        sendMessageKick(GameString.kickString(), index);
+
+        //Xóa người chơi
+        handleUserRemoval(index);
+
+        //Gửi thông tin tới phòng
+        notifyPlayerLeave(targetPlayerId);
     }
 
     public synchronized void leaveTeam(int targetPlayerId) {
         if (started) {
+            //Xóa người chơi khỏi phòng chiến đấu
             fightManager.leave(targetPlayerId);
         }
 
@@ -380,9 +373,12 @@ public class FightWait {
             return;
         }
 
-        users[index].setState(UserState.WAITING);
-        users[index] = null;
-        numPlayers--;
+        if (readies[index]) {
+            return;
+        }
+
+        //Xóa người chơi
+        handleUserRemoval(index);
 
         if (numPlayers <= 0) {
             refreshFightWait();
@@ -391,16 +387,8 @@ public class FightWait {
                 findNewBoss();
             }
 
-            try {
-                Message ms = new Message(Cmd.SOMEONE_LEAVEBOARD);
-                DataOutputStream ds = ms.writer();
-                ds.writeInt(targetPlayerId);
-                ds.writeInt(getRoomOwner().getPlayerId());
-                ds.flush();
-                sendToTeam(ms);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            //Gửi thông tin tới phòng
+            notifyPlayerLeave(targetPlayerId);
         }
     }
 
@@ -785,13 +773,27 @@ public class FightWait {
         }
     }
 
-    private void sendMessageKick(String s, int index, int playerId) {
+    private void sendMessageKick(String s, int index) {
         try {
+            User user = users[index];
             Message ms = new Message(Cmd.KICK);
             DataOutputStream ds = ms.writer();
             ds.writeShort(index);
-            ds.writeInt(playerId);
+            ds.writeInt(user.getPlayerId());
             ds.writeUTF(s);
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void notifyPlayerLeave(int playerId) {
+        try {
+            Message ms = new Message(Cmd.SOMEONE_LEAVEBOARD);
+            DataOutputStream ds = ms.writer();
+            ds.writeInt(playerId);
+            ds.writeInt(getRoomOwner().getPlayerId());
             ds.flush();
             sendToTeam(ms);
         } catch (IOException e) {

@@ -1272,7 +1272,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleJoinArea(Message ms) {
+    public void handleJoinBoard(Message ms) {
         if (user.isNotWaiting()) {
             return;
         }
