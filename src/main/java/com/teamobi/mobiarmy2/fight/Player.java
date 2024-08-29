@@ -7,11 +7,15 @@ import com.teamobi.mobiarmy2.model.ItemClanData;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.util.Utils;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+@Getter
+@Setter
 public class Player {
 
     protected static class box {
