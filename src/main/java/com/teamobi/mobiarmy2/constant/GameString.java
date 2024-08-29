@@ -44,6 +44,10 @@ public class GameString {
         return "Bạn đó đã vào bàn khác chơi rồi!";
     }
 
+    public static String inviteError3() {
+        return "Bạn đó đã tắt chức năng mời bạn!";
+    }
+
     public static String inviteMessage(String username) {
         return String.format("%s mời bạn chơi?", username);
     }
@@ -238,6 +242,10 @@ public class GameString {
 
     public static String joinKVError3() {
         return "Khu vực đã đầy!";
+    }
+
+    public static String joinKVError4(int seconds) {
+        return String.format("Còn %d giây nữa mới được vào khu vực.", seconds);
     }
 
     public static String kickString() {

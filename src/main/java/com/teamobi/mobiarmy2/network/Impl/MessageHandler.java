@@ -56,7 +56,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.BOARD_LIST -> userService.handleEnteringRoom(ms);
 
-                case Cmd.JOIN_BOARD -> userService.handleJoinArea(ms);
+                case Cmd.JOIN_BOARD -> userService.handleJoinBoard(ms);
 
                 case Cmd.CHAT_TO_BOARD -> userService.handleChatMessage(ms);
 
@@ -160,7 +160,8 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.MATERIAL_ICON -> userService.getMaterialIconMessage(ms);
 
-                default -> ServerManager.getInstance().logger().logWarning("Command " + ms.getCommand() + " is not supported");
+                default ->
+                        ServerManager.getInstance().logger().logWarning("Command " + ms.getCommand() + " is not supported");
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
  * @author tuyen
  */
 public class UserService implements IUserService {
+    private static final int minimumWaitTime = 5000;
 
     private final User user;
     private final IUserDao userDao;
@@ -59,6 +60,8 @@ public class UserService implements IUserService {
     private List<EquipmentChestEntry> selectedEquips;
     private List<SpecialItemChestEntry> selectedSpecialItems;
     private FabricateItemEntry fabricateItemEntry;
+
+    private long timeSinceLeftRoom;
 
     public UserService(User user) {
         this.user = user;
@@ -1273,10 +1276,17 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleJoinArea(Message ms) {
+    public void handleJoinBoard(Message ms) {
         if (user.isNotWaiting()) {
             return;
         }
+
+        long timeRemaining = minimumWaitTime - (System.currentTimeMillis() - timeSinceLeftRoom);
+        if (timeRemaining > 0) {
+            sendServerMessage(GameString.joinKVError4((int) (timeRemaining / 1000) + 1));
+            return;
+        }
+
         Room[] rooms = ServerManager.getInstance().getRooms();
         try {
             DataInputStream dis = ms.reader();
@@ -1329,8 +1339,8 @@ public class UserService implements IUserService {
         if (user.getState() == UserState.WAITING) {
             return;
         }
-        user.setState(UserState.WAITING);
         user.getFightWait().leaveTeam(user.getPlayerId());
+        timeSinceLeftRoom = System.currentTimeMillis();
     }
 
     @Override
@@ -1365,7 +1375,7 @@ public class UserService implements IUserService {
                     short quantity = (short) dis.readUnsignedByte();
 
                     //Kiểm tra dữ liệu hợp lệ
-                    if (quantity <= 0 || id < 0) {
+                    if (quantity == 0 || id < 0) {
                         continue;
                     }
 
@@ -1827,21 +1837,26 @@ public class UserService implements IUserService {
     public void handleGetFlayerDetail(Message ms) {
         try {
             int playerId = ms.reader().readInt();
-
+            User us = null;
+            if (playerId == user.getPlayerId()) {
+                us = user;
+            } else if (user.isNotWaiting()) {
+                us = user.getFightWait().getUserByPlayerId(playerId);
+            }
             ms = new Message(Cmd.PLAYER_DETAIL);
             DataOutputStream ds = ms.writer();
-            if (user.getPlayerId() != playerId) {
+            if (us == null) {
                 ds.writeInt(-1);
             } else {
-                ds.writeInt(user.getPlayerId());
-                ds.writeUTF(user.getUsername());
-                ds.writeInt(user.getXu());
-                ds.writeByte(user.getCurrentLevel());
-                ds.writeByte(user.getCurrentLevelPercent());
-                ds.writeInt(user.getLuong());
-                ds.writeInt(user.getCurrentXp());
-                ds.writeInt(user.getCurrentXpLevel());
-                ds.writeInt(user.getCup());
+                ds.writeInt(us.getPlayerId());
+                ds.writeUTF(us.getUsername());
+                ds.writeInt(us.getXu());
+                ds.writeByte(us.getCurrentLevel());
+                ds.writeByte(us.getCurrentLevelPercent());
+                ds.writeInt(us.getLuong());
+                ds.writeInt(us.getCurrentXp());
+                ds.writeInt(us.getCurrentXpLevel());
+                ds.writeInt(us.getCup());
                 ds.writeUTF(GameString.notRanking());
             }
             ds.flush();
@@ -1855,7 +1870,7 @@ public class UserService implements IUserService {
     public void handleFindPlayer(Message ms) {
         try {
             String username = ms.reader().readUTF().trim();
-            if (username.length() == 0) {
+            if (username.isEmpty()) {
                 sendMessageLoginFail(GameString.addFrienvError2());
                 return;
             }
@@ -2528,7 +2543,7 @@ public class UserService implements IUserService {
                     //Gửi thông báo
                     ms = new Message(104);
                     DataOutputStream ds = ms.writer();
-                    if (equipList.size() > 0) {//Trường hợp có trang bị hợp lệ
+                    if (!equipList.isEmpty()) {//Trường hợp có trang bị hợp lệ
                         ds.writeByte(1);
                         if (equipList.size() == 1 && equipList.get(0).getEmptySlot() < 3) {//Tháo ngọc
                             userAction = UserAction.THAO_NGOC;
@@ -2538,7 +2553,7 @@ public class UserService implements IUserService {
                             for (byte slotItemId : equipList.get(0).getSlots()) {
                                 SpecialItemEntry item = SpecialItemData.getSpecialItemById(slotItemId);
                                 if (item != null) {
-                                    totalTransactionAmount += item.getPriceXu() * 0.25;
+                                    totalTransactionAmount += (int) (item.getPriceXu() * 0.25);
                                 }
                             }
                             ds.writeUTF(GameString.thaoNgocRequest(totalTransactionAmount));

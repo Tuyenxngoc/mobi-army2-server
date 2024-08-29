@@ -50,7 +50,7 @@ public interface IUserService {
 
     void handleEnteringRoom(Message ms);
 
-    void handleJoinArea(Message ms);
+    void handleJoinBoard(Message ms);
 
     void handleChatMessage(Message ms);
 

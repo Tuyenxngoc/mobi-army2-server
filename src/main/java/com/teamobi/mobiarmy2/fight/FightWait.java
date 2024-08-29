@@ -14,7 +14,6 @@ import lombok.Setter;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -39,7 +38,6 @@ public class FightWait {
     private String name;
     public byte mapId;
     private byte bossIndex;
-    private Thread bossKickThread;
     private long startTime;
     public byte continuousLevel;
 
@@ -61,7 +59,7 @@ public class FightWait {
         this.numReady = 0;
         this.numPlayers = 0;
         this.startTime = 0L;
-        this.continuousLevel = (byte) (room.isContinuous() ? 0 : -1);
+        this.continuousLevel = 0;
 
         this.mapId = room.getMapId();
         this.money = room.getMinXu();
@@ -75,6 +73,14 @@ public class FightWait {
 
     public boolean isFightWaitInvalid() {
         return numPlayers == maxSetPlayers || started || (room.isContinuous() && continuousLevel > 0);
+    }
+
+    public User getUserByPlayerId(int playerId) {
+        int index = getUserIndexByPlayerId(playerId);
+        if (index == -1) {
+            return null;
+        }
+        return users[index];
     }
 
     public synchronized void enterFireOval(User us) throws IOException {
@@ -135,7 +141,7 @@ public class FightWait {
         ds.writeInt(getRoomOwner().getPlayerId());
         ds.writeInt(money);
         ds.writeByte(mapId);
-        ds.writeByte(0);//todo find value
+        ds.writeByte(0);
         for (byte i = 0; i < users.length; i++) {
             User user = users[i];
             if (user != null) {
@@ -171,26 +177,8 @@ public class FightWait {
         us.sendMessage(ms);
     }
 
-    private synchronized void changeBoss(byte index) {
+    private void changeBoss(byte index) {
         bossIndex = index;
-
-        if (bossKickThread != null) {
-            bossKickThread.interrupt();
-        }
-        bossKickThread = new Thread(() -> {
-            try {
-                int second = 300;
-                while (!started && bossIndex != -1) {
-                    Thread.sleep(1000L);
-                    second--;
-                    if (second == 0) {
-                        break;
-                    }
-                }
-            } catch (Exception ignored) {
-            }
-        });
-        bossKickThread.start();
     }
 
     public void sendToTeam(Message ms) {
@@ -271,11 +259,8 @@ public class FightWait {
     }
 
     private void resetReadies() {
-        Arrays.fill(readies, false);
+        readies = new boolean[room.getMaxPlayerFight()];
         numReady = 0;
-        if (bossIndex >= 0 && bossIndex < readies.length) {
-            readies[bossIndex] = true;
-        }
     }
 
     public synchronized void setReady(boolean ready, int playerId) {
@@ -313,6 +298,41 @@ public class FightWait {
         }
     }
 
+    private void handleUserRemoval(int index) {
+        users[index].setState(UserState.WAITING);
+        users[index].setFightWait(null);
+        users[index] = null;
+        numPlayers--;
+    }
+
+    private void sendMessageKick(String s, int index) {
+        try {
+            User user = users[index];
+            Message ms = new Message(Cmd.KICK);
+            DataOutputStream ds = ms.writer();
+            ds.writeShort(index);
+            ds.writeInt(user.getPlayerId());
+            ds.writeUTF(s);
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void notifyPlayerLeave(int playerId) {
+        try {
+            Message ms = new Message(Cmd.SOMEONE_LEAVEBOARD);
+            DataOutputStream ds = ms.writer();
+            ds.writeInt(playerId);
+            ds.writeInt(getRoomOwner().getPlayerId());
+            ds.flush();
+            sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public synchronized void kickPlayer(int playerId, int targetPlayerId) {
         if (started) {
             return;
@@ -337,19 +357,9 @@ public class FightWait {
             return;
         }
 
-        try {
-            Message ms = new Message(Cmd.KICK);
-            DataOutputStream ds = ms.writer();
-            ds.writeShort(index);
-            ds.writeInt(targetPlayerId);
-            ds.writeUTF(GameString.kickString());
-            ds.flush();
-            sendToTeam(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        leaveTeam(targetPlayerId);
+        sendMessageKick(GameString.kickString(), index);
+        handleUserRemoval(index);
+        notifyPlayerLeave(targetPlayerId);
     }
 
     public synchronized void leaveTeam(int targetPlayerId) {
@@ -362,8 +372,11 @@ public class FightWait {
             return;
         }
 
-        users[index] = null;
-        numPlayers--;
+        if (readies[index]) {
+            return;
+        }
+
+        handleUserRemoval(index);
 
         if (numPlayers <= 0) {
             refreshFightWait();
@@ -371,17 +384,7 @@ public class FightWait {
             if (bossIndex == index) {
                 findNewBoss();
             }
-
-            try {
-                Message ms = new Message(Cmd.SOMEONE_LEAVEBOARD);
-                DataOutputStream ds = ms.writer();
-                ds.writeInt(targetPlayerId);
-                ds.writeInt(getRoomOwner().getPlayerId());
-                ds.flush();
-                sendToTeam(ms);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            notifyPlayerLeave(targetPlayerId);
         }
     }
 
@@ -408,6 +411,8 @@ public class FightWait {
         users = new User[maxPlayers];
         items = new byte[maxPlayers][8];
         readies = new boolean[maxPlayers];
+
+        ServerManager.getInstance().logger().logMessage("Refresh fight wait");
     }
 
     public void chatMessage(int playerId, String message) {
@@ -697,9 +702,9 @@ public class FightWait {
     }
 
     public void inviteToRoom(int playerId) {
-        User user = ServerManager.getInstance().getUserByPlayerId(playerId);
-
         User roomOwner = getRoomOwner();
+
+        User user = ServerManager.getInstance().getUserByPlayerId(playerId);
         if (user == null) {
             roomOwner.getUserService().sendServerMessage(GameString.inviteError1());
             return;
@@ -710,11 +715,16 @@ public class FightWait {
             return;
         }
 
+        if (user.isInvitationLocked()) {
+            roomOwner.getUserService().sendServerMessage(GameString.inviteError3());
+            return;
+        }
+
         try {
             Message ms = new Message(Cmd.FIND_PLAYER);
             DataOutputStream ds = ms.writer();
             ds.writeBoolean(false);
-            ds.writeUTF(GameString.inviteMessage(user.getUsername()));
+            ds.writeUTF(GameString.inviteMessage(roomOwner.getUsername()));
             ds.writeByte(room.getIndex());
             ds.writeByte(id);
             ds.writeUTF(password);
