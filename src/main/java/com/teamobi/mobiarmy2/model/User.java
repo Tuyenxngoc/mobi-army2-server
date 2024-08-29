@@ -149,10 +149,10 @@ public class User {
             return;
         }
         long sum = cupUp + cup;
-        if (sum > CommonConstant.MAX_DANH_VONG) {
-            cup = CommonConstant.MAX_DANH_VONG;
-        } else if (sum < CommonConstant.MIN_DANH_VONG) {
-            cup = CommonConstant.MIN_DANH_VONG;
+        if (sum > CommonConstant.MAX_CUP) {
+            cup = CommonConstant.MAX_CUP;
+        } else if (sum < CommonConstant.MIN_CUP) {
+            cup = CommonConstant.MIN_CUP;
         } else {
             cup += cupUp;
         }
