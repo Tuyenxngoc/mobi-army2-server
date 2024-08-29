@@ -38,7 +38,7 @@ public class FightWait {
     private String name;
     private byte mapId;
     private byte bossIndex;
-    private long startTime;
+    private long endTime;
     private byte continuousLevel;
 
     public FightWait(Room room, byte id) {
@@ -58,7 +58,7 @@ public class FightWait {
         this.started = false;
         this.numReady = 0;
         this.numPlayers = 0;
-        this.startTime = 0L;
+        this.endTime = 0L;
         this.continuousLevel = 0;
 
         this.mapId = room.getMapId();
@@ -460,8 +460,9 @@ public class FightWait {
             return;
         }
 
-        if (System.currentTimeMillis() - startTime < 5000) {
-            roomOwner.getUserService().sendServerMessage(GameString.waitClick(startTime));
+        long remainingTime = 5000 - (System.currentTimeMillis() - endTime);
+        if (remainingTime > 0) {
+            roomOwner.getUserService().sendServerMessage(GameString.waitClick(remainingTime / 1000));
             return;
         }
 
@@ -562,9 +563,9 @@ public class FightWait {
             roomOwner.getUserService().sendServerMessage(GameString.startGameError5());
         }
 
-        started = true;
         try {
             fightManager.startGame(0, 0);
+            started = true;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -831,6 +832,6 @@ public class FightWait {
         ds.flush();
         sendToTeam(ms);
 
-        startTime = System.currentTimeMillis();
+        endTime = System.currentTimeMillis();
     }
 }
