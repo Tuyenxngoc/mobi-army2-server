@@ -101,6 +101,14 @@ public class FightWait {
         return -1;
     }
 
+    public User getUserByPlayerId(int playerId) {
+        int index = getUserIndexByPlayerId(playerId);
+        if (index == -1) {
+            return null;
+        }
+        return users[index];
+    }
+
     private void resetReadies() {
         readies = new boolean[room.getMaxPlayerFight()];
         numReady = 0;

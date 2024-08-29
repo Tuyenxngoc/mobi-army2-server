@@ -1859,21 +1859,26 @@ public class UserService implements IUserService {
     public void handleGetFlayerDetail(Message ms) {
         try {
             int playerId = ms.reader().readInt();
-
+            User us = null;
+            if (playerId == user.getPlayerId()) {
+                us = user;
+            } else if (user.isNotWaiting()) {
+                us = user.getFightWait().getUserByPlayerId(playerId);
+            }
             ms = new Message(Cmd.PLAYER_DETAIL);
             DataOutputStream ds = ms.writer();
-            if (user.getPlayerId() != playerId) {
+            if (us == null) {
                 ds.writeInt(-1);
             } else {
-                ds.writeInt(user.getPlayerId());
-                ds.writeUTF(user.getUsername());
-                ds.writeInt(user.getXu());
-                ds.writeByte(user.getCurrentLevel());
-                ds.writeByte(user.getCurrentLevelPercent());
-                ds.writeInt(user.getLuong());
-                ds.writeInt(user.getCurrentXp());
-                ds.writeInt(user.getCurrentXpLevel());
-                ds.writeInt(user.getCup());
+                ds.writeInt(us.getPlayerId());
+                ds.writeUTF(us.getUsername());
+                ds.writeInt(us.getXu());
+                ds.writeByte(us.getCurrentLevel());
+                ds.writeByte(us.getCurrentLevelPercent());
+                ds.writeInt(us.getLuong());
+                ds.writeInt(us.getCurrentXp());
+                ds.writeInt(us.getCurrentXpLevel());
+                ds.writeInt(us.getCup());
                 ds.writeUTF(GameString.notRanking());
             }
             ds.flush();
