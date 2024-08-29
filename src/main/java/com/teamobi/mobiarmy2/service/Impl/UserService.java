@@ -994,7 +994,7 @@ public class UserService implements IUserService {
         }
 
         //Kiểm tra số lượng đang có trong rương
-        if (user.getInventorySpecialItemCount(itemId) + quantity > ServerManager.getInstance().config().getMaxRuongItem()) {
+        if (user.getInventorySpecialItemCount(itemId) + quantity > ServerManager.getInstance().config().getMaxSpecialItemSlots()) {
             sendServerMessage(GameString.ruongMaxSlot());
             return;
         }
@@ -2622,7 +2622,7 @@ public class UserService implements IUserService {
     }
 
     private void purchaseEquipment(short saleIndex, byte unit) {
-        if (user.getEquipmentChest().size() >= ServerManager.getInstance().config().getMaxRuongTrangBi()) {
+        if (user.getEquipmentChest().size() >= ServerManager.getInstance().config().getMaxEquipmentSlots()) {
             sendServerMessage(GameString.ruongNoSlot());
             return;
         }
