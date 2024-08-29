@@ -117,6 +117,7 @@ public class ServerManager {
             byte maxMap = config.getRoomMaxMap()[type];
             byte numArea = config.getNumArea();
             byte maxPlayerFight = config.getMaxPlayerFight();
+            byte maxElementFight = config.getMaxElementFight();
             byte numPlayerInitRoom = config.getNumPlayerInitRoom();
             byte roomIconType = config.getRoomIconType();
 
@@ -130,7 +131,7 @@ public class ServerManager {
                     }
                 }
 
-                rooms[index] = new Room(index, type, minXu, maxXu, minMap, maxMap, mapCanSelected, isContinuous, numArea, maxPlayerFight, numPlayerInitRoom, roomIconType);
+                rooms[index] = new Room(index, type, minXu, maxXu, minMap, maxMap, mapCanSelected, isContinuous, numArea, maxPlayerFight, maxElementFight, numPlayerInitRoom, roomIconType);
                 index++;
             }
         }

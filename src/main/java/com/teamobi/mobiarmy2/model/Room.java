@@ -17,11 +17,12 @@ public class Room {
     private final byte[] mapCanSelected;
     private final boolean isContinuous;
     private final byte maxPlayerFight;
+    private final byte maxElementFight;
     private final byte numPlayerInitRoom;
     private final byte iconType;
     private final FightWait[] fightWaits;
 
-    public Room(byte index, byte type, int minXu, int maxXu, byte minMap, byte maxMap, byte[] mapCanSelected, boolean isContinuous, byte numArea, byte maxPlayerFight, byte numPlayerInitRoom, byte iconType) {
+    public Room(byte index, byte type, int minXu, int maxXu, byte minMap, byte maxMap, byte[] mapCanSelected, boolean isContinuous, byte numArea, byte maxPlayerFight, byte maxElementFight, byte numPlayerInitRoom, byte iconType) {
         this.index = index;
         this.type = type;
         this.minXu = minXu;
@@ -31,6 +32,7 @@ public class Room {
         this.mapCanSelected = mapCanSelected;
         this.isContinuous = isContinuous;
         this.maxPlayerFight = maxPlayerFight;
+        this.maxElementFight = maxElementFight;
         this.numPlayerInitRoom = numPlayerInitRoom;
         this.iconType = iconType;
         this.fightWaits = new FightWait[numArea];

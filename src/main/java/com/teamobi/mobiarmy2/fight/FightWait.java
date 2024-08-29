@@ -71,7 +71,7 @@ public class FightWait {
         return users[bossIndex];
     }
 
-    private void sendToTeam(Message ms) {
+    protected void sendToTeam(Message ms) {
         for (User user : users) {
             if (user != null) {
                 user.sendMessage(ms);
@@ -360,19 +360,13 @@ public class FightWait {
             return;
         }
 
-        //Gửi thông báo tới người chơi
         sendMessageKick(GameString.kickString(), index);
-
-        //Xóa người chơi
         handleUserRemoval(index);
-
-        //Gửi thông tin tới phòng
         notifyPlayerLeave(targetPlayerId);
     }
 
     public synchronized void leaveTeam(int targetPlayerId) {
         if (started) {
-            //Xóa người chơi khỏi phòng chiến đấu
             fightManager.leave(targetPlayerId);
         }
 
@@ -385,7 +379,6 @@ public class FightWait {
             return;
         }
 
-        //Xóa người chơi
         handleUserRemoval(index);
 
         if (numPlayers <= 0) {
@@ -394,8 +387,6 @@ public class FightWait {
             if (bossIndex == index) {
                 findNewBoss();
             }
-
-            //Gửi thông tin tới phòng
             notifyPlayerLeave(targetPlayerId);
         }
     }
@@ -435,7 +426,7 @@ public class FightWait {
 
         long elapsedTime = System.currentTimeMillis() - endTime;
         if (elapsedTime < 5000) {
-            roomOwner.getUserService().sendServerMessage(GameString.waitClick(elapsedTime / 1000));
+            roomOwner.getUserService().sendServerMessage(GameString.waitClick(5000 - (elapsedTime / 1000)));
             return;
         }
 
@@ -537,7 +528,7 @@ public class FightWait {
         }
 
         started = true;
-        fightManager.startGame(0, 0);
+        fightManager.startGame();
     }
 
     public synchronized void setRoomName(int playerId, String name) {
@@ -697,7 +688,7 @@ public class FightWait {
             return;
         }
 
-        if(user.isInvitationLocked()){
+        if (user.isInvitationLocked()) {
             roomOwner.getUserService().sendServerMessage(GameString.inviteError3());
             return;
         }
