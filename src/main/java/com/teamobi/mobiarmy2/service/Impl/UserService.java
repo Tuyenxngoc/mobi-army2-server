@@ -48,6 +48,7 @@ import java.util.stream.Collectors;
  * @author tuyen
  */
 public class UserService implements IUserService {
+    private static final int minimumWaitTime = 5000;
 
     private final User user;
     private final IUserDao userDao;
@@ -58,6 +59,8 @@ public class UserService implements IUserService {
     private List<EquipmentChestEntry> selectedEquips;
     private List<SpecialItemChestEntry> selectedSpecialItems;
     private FabricateItemEntry fabricateItemEntry;
+
+    private long timeSinceLeftRoom;
 
     public UserService(User user) {
         this.user = user;
@@ -1276,6 +1279,13 @@ public class UserService implements IUserService {
         if (user.isNotWaiting()) {
             return;
         }
+
+        long timeRemaining = minimumWaitTime - (System.currentTimeMillis() - timeSinceLeftRoom);
+        if (timeRemaining > 0) {
+            sendServerMessage(GameString.joinKVError4((int) (timeRemaining / 1000) + 1));
+            return;
+        }
+
         Room[] rooms = ServerManager.getInstance().getRooms();
         try {
             DataInputStream dis = ms.reader();
@@ -1329,6 +1339,7 @@ public class UserService implements IUserService {
             return;
         }
         user.getFightWait().leaveTeam(user.getPlayerId());
+        timeSinceLeftRoom = System.currentTimeMillis();
     }
 
     @Override

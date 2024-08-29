@@ -244,6 +244,10 @@ public class GameString {
         return "Khu vực đã đầy!";
     }
 
+    public static String joinKVError4(int seconds) {
+        return String.format("Còn %d giây nữa mới được vào khu vực.", seconds);
+    }
+
     public static String kickString() {
         return "Bạn bị đuổi bởi chủ phòng!";
     }
