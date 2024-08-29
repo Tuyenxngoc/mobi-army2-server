@@ -44,6 +44,10 @@ public class GameString {
         return "Bạn đó đã vào bàn khác chơi rồi!";
     }
 
+    public static String inviteError3() {
+        return "Bạn đó đã tắt chức năng mời bạn!";
+    }
+
     public static String inviteMessage(String username) {
         return String.format("%s mời bạn chơi?", username);
     }

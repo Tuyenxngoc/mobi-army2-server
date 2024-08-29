@@ -684,9 +684,9 @@ public class FightWait {
     }
 
     public void inviteToRoom(int playerId) {
-        User user = ServerManager.getInstance().getUserByPlayerId(playerId);
-
         User roomOwner = getRoomOwner();
+
+        User user = ServerManager.getInstance().getUserByPlayerId(playerId);
         if (user == null) {
             roomOwner.getUserService().sendServerMessage(GameString.inviteError1());
             return;
@@ -697,11 +697,16 @@ public class FightWait {
             return;
         }
 
+        if(user.isInvitationLocked()){
+            roomOwner.getUserService().sendServerMessage(GameString.inviteError3());
+            return;
+        }
+
         try {
             Message ms = new Message(Cmd.FIND_PLAYER);
             DataOutputStream ds = ms.writer();
             ds.writeBoolean(false);
-            ds.writeUTF(GameString.inviteMessage(user.getUsername()));
+            ds.writeUTF(GameString.inviteMessage(roomOwner.getUsername()));
             ds.writeByte(room.getIndex());
             ds.writeByte(id);
             ds.writeUTF(password);
