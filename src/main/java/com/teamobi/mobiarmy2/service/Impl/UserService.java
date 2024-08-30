@@ -2214,7 +2214,6 @@ public class UserService implements IUserService {
                 if (addEquip.getEquipEntry() == null) {
                     continue;
                 }
-                addEquip.setVipLevel(json.getVipLevel());
                 addEquip.setAddPoints(json.getAddPoints());
                 addEquip.setAddPercents(json.getAddPercents());
                 user.addEquipment(addEquip);
