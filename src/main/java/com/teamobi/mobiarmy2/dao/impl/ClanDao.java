@@ -1,7 +1,6 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
-import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.dao.IClanDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.ClanItemJson;
@@ -17,7 +16,6 @@ import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.sql.*;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -178,8 +176,7 @@ public class ClanDao implements IClanDao {
                     clanInfo.setDescription(resultSet.getString("description"));
 
                     Timestamp createdDate = resultSet.getTimestamp("created_date");
-                    SimpleDateFormat dateTimeFormat = new SimpleDateFormat(CommonConstant.PATTERN_DATE_TIME);
-                    String formattedDate = dateTimeFormat.format(createdDate);
+                    String formattedDate = Utils.formatLocalDateTime(createdDate.toLocalDateTime());
                     clanInfo.setCreatedDate(formattedDate);
 
                     ClanItemJson[] clanItemJsonArray = GsonUtil.GSON.fromJson(resultSet.getString("item"), ClanItemJson[].class);

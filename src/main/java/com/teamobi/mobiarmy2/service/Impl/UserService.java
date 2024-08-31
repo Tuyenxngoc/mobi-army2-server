@@ -2158,12 +2158,16 @@ public class UserService implements IUserService {
         }
     }
 
-    private void handleGiftCode(String code) {
+    private synchronized void handleGiftCode(String code) {
         IGiftCodeDao dao = getGiftCodeDao();
 
-        GiftCodeEntry giftCode = dao.getGiftCode(code);
+        GiftCodeEntry giftCode = dao.getGiftCode(code, user.getPlayerId());
         if (giftCode == null) {
             sendServerMessage(GameString.giftCodeError1());
+            return;
+        }
+        if (giftCode.isUsed()) {
+            sendServerMessage(GameString.giftCodeError4());
             return;
         }
         if (giftCode.getLimit() <= 0) {
@@ -2171,16 +2175,14 @@ public class UserService implements IUserService {
             return;
         }
         if (giftCode.getExpiryDate() != null && LocalDateTime.now().isAfter(giftCode.getExpiryDate())) {
-            sendServerMessage(GameString.giftCodeError3(giftCode.getExpiryDate()));
+            String formattedDate = Utils.formatLocalDateTime(giftCode.getExpiryDate());
+            sendServerMessage(GameString.giftCodeError3(formattedDate));
             return;
         }
-        for (int playerId : giftCode.getUsedPlayerIds()) {
-            if (playerId == user.getPlayerId()) {
-                sendServerMessage(GameString.giftCodeError4());
-                return;
-            }
-        }
-        dao.updateGiftCode(code, user.getPlayerId());
+
+        dao.decrementGiftCodeUsageLimit(giftCode.getId());
+        dao.logGiftCodeRedemption(giftCode.getId(), user.getPlayerId());
+
         if (giftCode.getXu() > 0) {
             user.updateXu(giftCode.getXu());
             sendMessageToUser(GameString.giftCodeReward(code, Utils.getStringNumber(giftCode.getXu()) + " xu"));

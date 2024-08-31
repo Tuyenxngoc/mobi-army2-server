@@ -9,31 +9,40 @@ import com.teamobi.mobiarmy2.model.entry.GiftCodeEntry;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 
 import java.sql.*;
-import java.util.Arrays;
+import java.time.LocalDateTime;
 
 public class GiftCodeDao implements IGiftCodeDao {
 
     @Override
-    public GiftCodeEntry getGiftCode(String code) {
+    public GiftCodeEntry getGiftCode(String code, int playerId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT gc.usage_limit, gc.used_player_ids, gc.expiration_date, gc.xu, gc.luong, gc.exp, gc.items, gc.equips FROM gift_codes gc WHERE gc.code = ?")) {
-            statement.setString(1, code);
+             PreparedStatement statement = connection.prepareStatement(
+                     "SELECT gc.gift_code_id, gc.usage_limit, gc.expiration_date, gc.xu, gc.luong, gc.exp, gc.items, gc.equips, " +
+                             "IF(pgc.player_id IS NOT NULL, TRUE, FALSE) AS used " +
+                             "FROM gift_codes gc " +
+                             "LEFT JOIN player_gift_codes pgc ON gc.gift_code_id = pgc.gift_code_id AND pgc.player_id = ? " +
+                             "WHERE gc.code = ?"
+             )) {
+            statement.setInt(1, playerId);
+            statement.setString(2, code);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     Gson gson = GsonUtil.GSON;
                     GiftCodeEntry giftCode = new GiftCodeEntry();
-                    giftCode.setLimit(resultSet.getShort("usage_limit"));
-                    giftCode.setCode(code);
-                    giftCode.setUsedPlayerIds(gson.fromJson(resultSet.getString("used_player_ids"), int[].class));
-                    Timestamp expirationTimestamp = resultSet.getTimestamp("expiration_date");
-                    if (expirationTimestamp != null) {
-                        giftCode.setExpiryDate(expirationTimestamp.toLocalDateTime());
+                    giftCode.setUsed(resultSet.getBoolean("used"));
+                    if (!giftCode.isUsed()) {
+                        giftCode.setId(resultSet.getLong("gift_code_id"));
+                        giftCode.setLimit(resultSet.getShort("usage_limit"));
+                        Timestamp expirationTimestamp = resultSet.getTimestamp("expiration_date");
+                        if (expirationTimestamp != null) {
+                            giftCode.setExpiryDate(expirationTimestamp.toLocalDateTime());
+                        }
+                        giftCode.setXu(resultSet.getInt("xu"));
+                        giftCode.setLuong(resultSet.getInt("luong"));
+                        giftCode.setExp(resultSet.getInt("exp"));
+                        giftCode.setItems(gson.fromJson(resultSet.getString("items"), SpecialItemChestJson[].class));
+                        giftCode.setEquips(gson.fromJson(resultSet.getString("equips"), EquipmentChestJson[].class));
                     }
-                    giftCode.setXu(resultSet.getInt("xu"));
-                    giftCode.setLuong(resultSet.getInt("luong"));
-                    giftCode.setExp(resultSet.getInt("exp"));
-                    giftCode.setItems(gson.fromJson(resultSet.getString("items"), SpecialItemChestJson[].class));
-                    giftCode.setEquips(gson.fromJson(resultSet.getString("equips"), EquipmentChestJson[].class));
                     return giftCode;
                 }
             }
@@ -44,57 +53,17 @@ public class GiftCodeDao implements IGiftCodeDao {
     }
 
     @Override
-    public void updateGiftCode(String code, int playerId) {
-        Connection connection = null;
-        PreparedStatement selectStatement = null;
-        PreparedStatement updateStatement = null;
-        try {
-            connection = HikariCPManager.getInstance().getConnection();
-            connection.setAutoCommit(false);
+    public void decrementGiftCodeUsageLimit(long giftCodeId) {
+        String sql = "UPDATE gift_codes SET usage_limit = usage_limit - 1 WHERE gift_code_id = ?";
+        HikariCPManager.getInstance().update(sql, giftCodeId);
 
-            selectStatement = connection.prepareStatement("SELECT used_player_ids FROM gift_codes WHERE code = ? FOR UPDATE");
-            selectStatement.setString(1, code);
+    }
 
-            try (ResultSet resultSet = selectStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    Gson gson = GsonUtil.GSON;
-                    int[] usedPlayerIds = gson.fromJson(resultSet.getString("used_player_ids"), int[].class);
-                    int[] newUsedPlayerIds = Arrays.copyOf(usedPlayerIds, usedPlayerIds.length + 1);
-                    newUsedPlayerIds[newUsedPlayerIds.length - 1] = playerId;
+    @Override
+    public void logGiftCodeRedemption(long giftCodeId, int playerId) {
+        String sql = "INSERT INTO player_gift_codes (redeem_time, gift_code_id, player_id) VALUES (?, ?, ?)";
+        HikariCPManager.getInstance().update(sql, LocalDateTime.now(), giftCodeId, playerId);
 
-                    updateStatement = connection.prepareStatement("UPDATE gift_codes SET usage_limit = usage_limit - 1, used_player_ids = ? WHERE code = ?");
-                    updateStatement.setString(1, gson.toJson(newUsedPlayerIds));
-                    updateStatement.setString(2, code);
-                    updateStatement.executeUpdate();
-
-                    connection.commit();  // Commit transaction
-                }
-            }
-        } catch (SQLException e) {
-            if (connection != null) {
-                try {
-                    connection.rollback();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
-            e.printStackTrace();
-        } finally {
-            try {
-                if (selectStatement != null) {
-                    selectStatement.close();
-                }
-                if (updateStatement != null) {
-                    updateStatement.close();
-                }
-                if (connection != null) {
-                    connection.setAutoCommit(true);
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
 }

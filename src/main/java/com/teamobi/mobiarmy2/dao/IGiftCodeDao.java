@@ -4,8 +4,10 @@ import com.teamobi.mobiarmy2.model.entry.GiftCodeEntry;
 
 public interface IGiftCodeDao {
 
-    GiftCodeEntry getGiftCode(String code);
+    GiftCodeEntry getGiftCode(String code, int playerId);
 
-    void updateGiftCode(String code, int playerId);
+    void decrementGiftCodeUsageLimit(long giftCodeId);
+
+    void logGiftCodeRedemption(long giftCodeId, int playerId);
 
 }

@@ -2,8 +2,6 @@ package com.teamobi.mobiarmy2.constant;
 
 import com.teamobi.mobiarmy2.util.Utils;
 
-import java.time.LocalDateTime;
-
 /**
  * @author tuyen
  */
@@ -428,8 +426,8 @@ public class GameString {
         return "Số lần sử dụng đã hết!";
     }
 
-    public static String giftCodeError3(LocalDateTime expiryDate) {
-        return "Mã quà tặng đã hết hạn lúc " + expiryDate.toString();
+    public static String giftCodeError3(String expiryDate) {
+        return "Mã quà tặng đã hết hạn lúc " + expiryDate;
     }
 
     public static String giftCodeError4() {

@@ -1,5 +1,7 @@
 package com.teamobi.mobiarmy2.util;
 
+import com.teamobi.mobiarmy2.constant.CommonConstant;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.RoundingMode;
@@ -7,8 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Random;
 
 /**
@@ -17,14 +19,14 @@ import java.util.Random;
 public class Utils {
 
     private static final Random RANDOM;
-    private static final SimpleDateFormat DATE_FORMAT;
+    private static final DateTimeFormatter DATE_TIME_FORMATTER;
     private static final short[] SIN_DATA;
     private static final short[] COS_DATA;
     private static final int[] TAN_DATA;
 
     static {
         RANDOM = new Random();
-        DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(CommonConstant.PATTERN_DATE_TIME);
         SIN_DATA = new short[]{
                 0, 18, 36, 54, 71, 89, 107, 125, 143, 160, 178, 195, 213, 230, 248, 265, 282, 299, 316, 333, 350, 367, 384, 400,
                 416, 433, 449, 465, 481, 496, 512, 527, 543, 558, 573, 587, 602, 616, 630, 644, 658, 672, 685, 698, 711, 724, 737,
@@ -181,7 +183,7 @@ public class Utils {
         return IntArg;
     }
 
-    public static final int toArg0_360(int arg) {
+    public static int toArg0_360(int arg) {
         if (arg >= 360) {
             arg -= 360;
         }
@@ -191,7 +193,7 @@ public class Utils {
         return arg;
     }
 
-    public static final int cos(int arg) {
+    public static int cos(int arg) {
         if ((arg = toArg0_360(arg)) >= 0 && arg < 90) {
             return COS_DATA[arg];
         }
@@ -205,7 +207,7 @@ public class Utils {
         }
     }
 
-    public static final int sin(int arg) {
+    public static int sin(int arg) {
         if ((arg = toArg0_360(arg)) >= 0 && arg < 90) {
             return SIN_DATA[arg];
         }
@@ -238,7 +240,7 @@ public class Utils {
         return (TongDD - 100) / 100 + (TongDD - 100) * nteam / 1000;
     }
 
-    public static final int getArg(int cos, int sin) {
+    public static int getArg(int cos, int sin) {
         if (cos == 0) {
             return sin == 0 ? 0 : (sin < 0 ? 270 : 90);
         }
@@ -269,6 +271,16 @@ public class Utils {
 
     public static short getShort(byte[] ab, int off) {
         return (short) ((ab[off] & 0xff) << 8 | ab[off + 1] & 0xff);
+    }
+
+    /**
+     * Formats the given LocalDateTime to a string using the specified pattern.
+     *
+     * @param dateTime the LocalDateTime to format
+     * @return a formatted date-time string
+     */
+    public static String formatLocalDateTime(LocalDateTime dateTime) {
+        return dateTime.format(DATE_TIME_FORMATTER);
     }
 
 }

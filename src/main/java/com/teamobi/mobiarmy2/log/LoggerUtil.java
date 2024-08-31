@@ -1,12 +1,12 @@
 package com.teamobi.mobiarmy2.log;
 
 import com.teamobi.mobiarmy2.constant.CommonConstant;
+import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
  * @author tuyen
@@ -20,7 +20,7 @@ public class LoggerUtil implements ILogManager {
     }
 
     private void log(String level, String message) {
-        String formattedDateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String formattedDateTime = Utils.formatLocalDateTime(LocalDateTime.now());
         String logMessage = String.format("%s [%s] - %s", formattedDateTime, level, message);
 
         if (isDebugEnabled) {
@@ -33,7 +33,7 @@ public class LoggerUtil implements ILogManager {
         try (FileWriter fileWriter = new FileWriter(CommonConstant.logFilePath, true);
              PrintWriter printWriter = new PrintWriter(fileWriter)) {
             LocalDateTime now = LocalDateTime.now();
-            String formattedDateTime = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            String formattedDateTime = Utils.formatLocalDateTime(now);
             printWriter.println(formattedDateTime + " - " + message);
         } catch (IOException e) {
             e.printStackTrace();

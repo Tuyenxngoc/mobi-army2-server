@@ -13,9 +13,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class GiftCodeEntry {
+    private long id;
+    private boolean isUsed;
     private short limit;
-    private String code;
-    private int[] usedPlayerIds;
     private LocalDateTime expiryDate;
     private int xu;
     private int luong;
