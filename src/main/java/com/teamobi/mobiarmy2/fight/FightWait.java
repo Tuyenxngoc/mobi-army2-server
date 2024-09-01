@@ -563,12 +563,8 @@ public class FightWait {
             roomOwner.getUserService().sendServerMessage(GameString.startGameError5());
         }
 
-        try {
-            fightManager.startGame();
-            started = true;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        fightManager.startGame();
+        started = true;
     }
 
     public synchronized void setRoomName(int playerId, String name) {
@@ -800,38 +796,5 @@ public class FightWait {
         }
 
         items[index] = newItems;
-    }
-
-    public void fightComplete() throws IOException {
-        // Chien xong, refresh fight wait
-        Message ms;
-        DataOutputStream ds;
-        for (byte i = 0; i < this.users.length; i++) {
-            this.readies[i] = false;
-            User us = this.users[i];
-            if (us == null) {
-                continue;
-            }
-            ms = new Message(112);
-            ds = ms.writer();
-            for (byte j = 0; j < 4; j++) {
-                ds.writeByte(us.getItemFightQuantity(12 + j));
-            }
-            ds.flush();
-            us.sendMessage(ms);
-            us.setFightWait(this);
-        }
-        this.numReady = 0;
-        if (this.bossIndex != -1) {
-            changeBoss(this.bossIndex);
-        }
-        // Send map
-        ms = new Message(75);
-        ds = ms.writer();
-        ds.writeByte(this.mapId);
-        ds.flush();
-        sendToTeam(ms);
-
-        endTime = System.currentTimeMillis();
     }
 }
