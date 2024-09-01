@@ -217,13 +217,12 @@ public class UserService implements IUserService {
         target.setPoints(source.getPoints());
         target.setPointAdd(source.getPointAdd());
         target.setEquipData(source.getEquipData());
-        target.setNvEquip(source.getNvEquip());
+        target.setCharacterEquips(source.getCharacterEquips());
         target.setFriends(source.getFriends());
         target.setMission(source.getMission());
         target.setMissionLevel(source.getMissionLevel());
         target.setSpecialItemChest(source.getSpecialItemChest());
         target.setEquipmentChest(source.getEquipmentChest());
-        target.setNvEquip(source.getNvEquip());
         target.setItems(source.getItems());
         target.setXpX2Time(source.getXpX2Time());
         target.setLastOnline(source.getLastOnline());
@@ -504,12 +503,11 @@ public class UserService implements IUserService {
             ds.writeShort(user.getClanId());
             ds.writeByte(0);
 
-            // Trang bị
             for (int i = 0; i < 10; i++) {
-                EquipmentChestEntry caiTrang = user.getNvEquip()[i][5];
-                if (caiTrang != null) {
+                EquipmentChestEntry equip = user.getCharacterEquips()[i][5];
+                if (equip != null) {
                     ds.writeBoolean(true);
-                    for (short s : caiTrang.getEquipEntry().getDisguiseEquippedIndexes()) {
+                    for (short s : equip.getEquipEntry().getDisguiseEquippedIndexes()) {
                         ds.writeShort(s);
                     }
                 } else {
@@ -517,8 +515,8 @@ public class UserService implements IUserService {
                 }
 
                 for (int j = 0; j < 5; j++) {
-                    if (user.getNvEquip()[i][j] != null) {
-                        ds.writeShort(user.getNvEquip()[i][j].getEquipEntry().getEquipIndex());
+                    if (user.getCharacterEquips()[i][j] != null) {
+                        ds.writeShort(user.getCharacterEquips()[i][j].getEquipEntry().getEquipIndex());
                     } else if (User.equipDefault[i][j] != null) {
                         ds.writeShort(User.equipDefault[i][j].getEquipIndex());
                     } else {
@@ -527,17 +525,13 @@ public class UserService implements IUserService {
                 }
             }
 
-            //Item
             for (int i = 0; i < FightItemData.FIGHT_ITEM_ENTRIES.size(); i++) {
                 ds.writeByte(user.getItems()[i]);
                 FightItemEntry fightItemEntry = FightItemData.FIGHT_ITEM_ENTRIES.get(i);
-                // Gia xu
                 ds.writeInt(fightItemEntry.getBuyXu());
-                // Gia luong
                 ds.writeInt(fightItemEntry.getBuyLuong());
             }
 
-            //Nhan vat
             for (int i = 0; i < 10; i++) {
                 if (i > 2) {
                     ds.writeByte(user.getOwnedCharacters()[i] ? 1 : 0);
@@ -548,11 +542,8 @@ public class UserService implements IUserService {
             }
 
             IServerConfig config = ServerManager.getInstance().config();
-            // Thong tin them
             ds.writeUTF(config.getAddInfo());
-            // Dia chi cua About me
             ds.writeUTF(config.getAddInfoUrl());
-            // Dia chi dang ki doi
             ds.writeUTF(config.getRegTeamUrl());
             ds.flush();
             user.sendMessage(ms);
@@ -1100,7 +1091,7 @@ public class UserService implements IUserService {
             ) {
                 return;
             }
-            EquipmentChestEntry oldEquip = user.getNvEquip()[user.getActiveCharacterId()][5];
+            EquipmentChestEntry oldEquip = user.getCharacterEquips()[user.getActiveCharacterId()][5];
             if (oldEquip != null) {
                 oldEquip.setInUse(false);
             }
@@ -1109,11 +1100,11 @@ public class UserService implements IUserService {
             ds.writeByte(action);
             if (action == 0) {
                 user.getEquipData()[user.getActiveCharacterId()][5] = -1;
-                user.getNvEquip()[user.getActiveCharacterId()][5] = null;
+                user.getCharacterEquips()[user.getActiveCharacterId()][5] = null;
             } else {
                 equip.setInUse(true);
                 user.getEquipData()[user.getActiveCharacterId()][5] = equip.getKey();
-                user.getNvEquip()[user.getActiveCharacterId()][5] = equip;
+                user.getCharacterEquips()[user.getActiveCharacterId()][5] = equip;
                 for (short a : equip.getEquipEntry().getDisguiseEquippedIndexes()) {
                     ds.writeShort(a);
                 }
@@ -2485,12 +2476,12 @@ public class UserService implements IUserService {
                 ) {
                     continue;
                 }
-                EquipmentChestEntry oldEquip = user.getNvEquip()[user.getActiveCharacterId()][i];
+                EquipmentChestEntry oldEquip = user.getCharacterEquips()[user.getActiveCharacterId()][i];
                 if (oldEquip != null) {
                     oldEquip.setInUse(false);
                 }
                 equip.setInUse(true);
-                user.getNvEquip()[user.getActiveCharacterId()][i] = equip;
+                user.getCharacterEquips()[user.getActiveCharacterId()][i] = equip;
                 user.getEquipData()[user.getActiveCharacterId()][i] = equip.getKey();
                 changeSuccessful = true;
             }
@@ -2723,7 +2714,7 @@ public class UserService implements IUserService {
                         itemId = FightItemData.getRandomItem();
                         quantity = SpinWheelConstants.ITEM_COUNTS[Utils.nextInt(SpinWheelConstants.ITEM_PROBABILITIES)];
                         if (i == luckyIndex) {
-                            user.updateItems(itemId, quantity);
+                            user.updateItems(itemId, (byte) quantity);
                         }
                     }
                     case 1 -> {
@@ -3005,7 +2996,7 @@ public class UserService implements IUserService {
                 }
 
                 user.setState(UserState.FIGHTING);
-                user.getFightManager().startGame();
+                user.getFightManager().startTraining();
             } else {//Out game
                 if (user.getState() != UserState.FIGHTING) {
                     return;

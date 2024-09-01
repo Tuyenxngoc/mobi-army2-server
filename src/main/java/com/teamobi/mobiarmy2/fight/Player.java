@@ -9,6 +9,14 @@ import lombok.Getter;
 @Getter
 public class Player {
 
-    private User user;
+    private final User user;
+    private short x;
+    private short y;
+    private short maxHp;
+    private short hp;
+
+    public Player(User user) {
+        this.user = user;
+    }
 
 }

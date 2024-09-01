@@ -1,7 +1,11 @@
 package com.teamobi.mobiarmy2.fight;
 
+import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.Impl.Message;
+
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 /**
  * @author tuyen
@@ -67,11 +71,74 @@ public class FightManager {
     }
 
     public void chatMessage(int playerId, String message) {
-
+        int index = getPlayerIndexByPlayerId(playerId);
+        if (index == -1) {
+            return;
+        }
+        try {
+            Message ms = new Message(Cmd.CHAT_TO_BOARD);
+            DataOutputStream ds = ms.writer();
+            ds.writeInt(playerId);
+            ds.writeUTF(message);
+            ds.flush();
+            sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void startGame() {
+        if (fightWait.isStarted()) {
+            return;
+        }
 
+        for (byte i = 0; i < fightWait.getNumPlayers(); i++) {
+            User user = fightWait.getUsers()[i];
+            if (user == null) {
+                continue;
+            }
+            players[i] = new Player(user);
+        }
+
+        sendFightInfo();
+    }
+
+    private void sendFightInfo() {
+        try {
+            Message ms = new Message(Cmd.START_ARMY);
+            DataOutputStream ds = ms.writer();
+            if (isTraining) {
+                for (short data : trainingUser.getEquip()) {
+                    ds.writeShort(data);
+                }
+            }
+
+            ds.writeByte(0);
+            //Time counter
+            if (isTraining) {
+                ds.writeByte(0);
+            } else {
+                ds.writeByte(30);
+            }
+
+            //Team point
+            ds.writeShort(0);
+
+            for (Player player : players) {
+                if (player == null) {
+                    ds.writeShort(-1);
+                    continue;
+                }
+                ds.writeShort(player.getX());
+                ds.writeShort(player.getY());
+                ds.writeShort(player.getMaxHp());
+            }
+
+            ds.flush();
+            sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void addShoot(User user, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
@@ -81,6 +148,10 @@ public class FightManager {
     }
 
     public void skipTurn(User user) {
+
+    }
+
+    public void startTraining() {
 
     }
 

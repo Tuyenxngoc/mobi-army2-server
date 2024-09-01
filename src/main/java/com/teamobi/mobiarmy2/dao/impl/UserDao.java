@@ -158,7 +158,7 @@ public class UserDao implements IUserDao {
                     user.setPoints(new int[totalCharacter]);
                     user.setPointAdd(new short[totalCharacter][5]);
                     user.setEquipData(new int[totalCharacter][6]);
-                    user.setNvEquip(new EquipmentChestEntry[totalCharacter][6]);
+                    user.setCharacterEquips(new EquipmentChestEntry[totalCharacter][6]);
                     user.setSpecialItemChest(new ArrayList<>());
                     user.setEquipmentChest(new ArrayList<>());
 
@@ -289,7 +289,7 @@ public class UserDao implements IUserDao {
                                 if (equip.isExpired()) {
                                     equip.setInUse(false);
                                 } else {
-                                    user.getNvEquip()[characterId][j] = equip;
+                                    user.getCharacterEquips()[characterId][j] = equip;
                                     user.getEquipData()[characterId][j] = equip.getKey();
                                 }
                             }

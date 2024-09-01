@@ -62,7 +62,7 @@ public class User {
     private int[][] equipData;
     private int[] mission;
     private byte[] missionLevel;
-    private EquipmentChestEntry[][] nvEquip;
+    private EquipmentChestEntry[][] characterEquips;
     private List<Integer> friends;
     private List<SpecialItemChestEntry> specialItemChest;
     private List<EquipmentChestEntry> equipmentChest;
@@ -195,28 +195,27 @@ public class User {
     }
 
     public short[] getEquip() {
-        short[] equip = new short[5];
-        if (nvEquip[activeCharacterId][5] != null && nvEquip[activeCharacterId][5].getEquipEntry().isDisguise()) {
-            equip[0] = nvEquip[activeCharacterId][5].getEquipEntry().getDisguiseEquippedIndexes()[0];
-            equip[1] = nvEquip[activeCharacterId][5].getEquipEntry().getDisguiseEquippedIndexes()[1];
-            equip[2] = nvEquip[activeCharacterId][5].getEquipEntry().getDisguiseEquippedIndexes()[2];
-            equip[3] = nvEquip[activeCharacterId][5].getEquipEntry().getDisguiseEquippedIndexes()[3];
-            equip[4] = nvEquip[activeCharacterId][5].getEquipEntry().getDisguiseEquippedIndexes()[4];
+        short[] equips = new short[5];
+        EquipmentChestEntry[] equipEntries = characterEquips[activeCharacterId];
+
+        if (equipEntries[5] != null && equipEntries[5].getEquipEntry().isDisguise()) {
+            short[] disguiseIndexes = equipEntries[5].getEquipEntry().getDisguiseEquippedIndexes();
+            System.arraycopy(disguiseIndexes, 0, equips, 0, 5);
         } else {
-            for (int i = 0; i < 5; i++) {
-                if (nvEquip[activeCharacterId][i] != null && !nvEquip[activeCharacterId][i].getEquipEntry().isDisguise()) {
-                    equip[i] = nvEquip[activeCharacterId][i].getEquipEntry().getEquipIndex();
+            for (byte i = 0; i < 5; i++) {
+                if (equipEntries[i] != null && !equipEntries[i].getEquipEntry().isDisguise()) {
+                    equips[i] = equipEntries[i].getEquipEntry().getEquipIndex();
                 } else if (equipDefault[activeCharacterId][i] != null) {
-                    equip[i] = equipDefault[activeCharacterId][i].getEquipIndex();
+                    equips[i] = equipDefault[activeCharacterId][i].getEquipIndex();
                 } else {
-                    equip[i] = -1;
+                    equips[i] = -1;
                 }
             }
         }
-        return equip;
+        return equips;
     }
 
-    public synchronized void updateItems(byte itemIndex, int quantity) {
+    public synchronized void updateItems(byte itemIndex, byte quantity) {
         items[itemIndex] += quantity;
         if (items[itemIndex] < 0) {
             items[itemIndex] = 0;
@@ -454,16 +453,16 @@ public class User {
         return 0;
     }
 
-    public short getIDBullet() {
-        if (nvEquip[activeCharacterId][0] != null) {
-            return nvEquip[activeCharacterId][0].getEquipEntry().getBulletId();
+    public short getBulletId() {
+        if (characterEquips[activeCharacterId][0] != null) {
+            return characterEquips[activeCharacterId][0].getEquipEntry().getBulletId();
         }
         return equipDefault[activeCharacterId][0].getBulletId();
     }
 
     public short getGunId() {
-        if (nvEquip[activeCharacterId][0] != null) {
-            return this.nvEquip[activeCharacterId][0].getEquipEntry().getEquipIndex();
+        if (characterEquips[activeCharacterId][0] != null) {
+            return this.characterEquips[activeCharacterId][0].getEquipEntry().getEquipIndex();
         }
         return equipDefault[activeCharacterId][0].getEquipIndex();
     }
@@ -478,11 +477,4 @@ public class User {
         return ability;
     }
 
-    public void notifyNetWait() {
-
-    }
-
-    public void netWait() {
-
-    }
 }
