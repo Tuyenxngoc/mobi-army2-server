@@ -6,7 +6,7 @@ import com.teamobi.mobiarmy2.dao.IGiftCodeDao;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.dao.impl.GiftCodeDao;
 import com.teamobi.mobiarmy2.dao.impl.UserDao;
-import com.teamobi.mobiarmy2.fight.Bullet;
+import com.teamobi.mobiarmy2.fight.FightManager;
 import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
@@ -1650,7 +1650,7 @@ public class UserService implements IUserService {
         try {
             short x = dis.readShort();
             short y = dis.readShort();
-            user.getFightWait().getFightManager().changeLocationMessage(user, x, y);
+            user.getFightWait().getFightManager().changeLocation(user, x, y);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1666,7 +1666,7 @@ public class UserService implements IUserService {
             short angle = dis.readShort();
             byte force = dis.readByte();
             byte force2 = 0;
-            if (Bullet.isDoubleBull(bullId)) {
+            if (bullId == 19) {
                 force2 = dis.readByte();
             }
             byte numShoot = dis.readByte();
@@ -1689,7 +1689,7 @@ public class UserService implements IUserService {
                 force2 = 30;
             }
 
-            user.getFightWait().getFightManager().shootMessage(user, bullId, x, y, angle, force, force2, numShoot);
+            user.getFightWait().getFightManager().addShoot(user, bullId, x, y, angle, force, force2, numShoot);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1926,11 +1926,7 @@ public class UserService implements IUserService {
 
     @Override
     public void skipTurn() {
-        try {
-            user.getFightWait().getFightManager().boLuotMessage(user);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        user.getFightWait().getFightManager().skipTurn(user);
     }
 
     @Override
@@ -2995,10 +2991,35 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void startTraining(Message ms) {
+    public synchronized void startTraining(Message ms) {
         try {
             byte type = ms.reader().readByte();
-            sendServerMessage("To be continued " + type);
+
+            if (user.getFightManager() == null) {
+                user.setFightManager(new FightManager(user));
+            }
+
+            if (type == 0) {//Start game
+                if (user.isNotWaiting()) {
+                    return;
+                }
+
+                user.setState(UserState.FIGHTING);
+                user.getFightManager().startGame();
+            } else {//Out game
+                if (user.getState() != UserState.FIGHTING) {
+                    return;
+                }
+
+                user.setState(UserState.WAITING);
+                user.getFightManager().stopTraining();
+
+                ms = new Message(Cmd.TRAINING);
+                DataOutputStream ds = ms.writer();
+                ds.writeByte(1);
+                ds.flush();
+                user.sendMessage(ms);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

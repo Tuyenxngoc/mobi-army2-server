@@ -39,7 +39,7 @@ public final class TeamImageInput {
         }
     }
 
-    public final byte[] getData(String name) {
+    public byte[] getData(String name) {
         for (int i = 0; i < names.length; i++) {
             if (names[i].compareTo(name) == 0) {
                 byte[] ab = new byte[dataLents[i]];
