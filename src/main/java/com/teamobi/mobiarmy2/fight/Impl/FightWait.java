@@ -130,6 +130,11 @@ public class FightWait implements IFightWait {
         }
     }
 
+    @Override
+    public byte getMapId() {
+        return mapId;
+    }
+
     private void refreshFightWait() {
         byte maxPlayers = room.getMaxPlayerFight();
 

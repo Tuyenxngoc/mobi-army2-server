@@ -3,6 +3,7 @@ package com.teamobi.mobiarmy2.fight.Impl;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.fight.IFightManager;
 import com.teamobi.mobiarmy2.fight.IFightWait;
+import com.teamobi.mobiarmy2.fight.IMapManager;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.Impl.Message;
@@ -15,14 +16,16 @@ import java.io.IOException;
  */
 public class FightManager implements IFightManager {
 
-    private static final byte MAX_ELEMENT_FIGHT = 100;
+    private static final int MAX_ELEMENT_FIGHT = 100;
 
     private final IFightWait fightWait;
     private Player[] players;
+    private IMapManager mapManager;
 
     public FightManager(FightWait fightWait) {
         this.fightWait = fightWait;
         this.players = new Player[MAX_ELEMENT_FIGHT];
+        this.mapManager = new MapManager();
     }
 
     private void refreshFightManager() {
@@ -77,7 +80,10 @@ public class FightManager implements IFightManager {
             return;
         }
 
-        for (byte i = 0; i < fightWait.getNumPlayers(); i++) {
+        //Tải dữ liệu bản đồ
+        mapManager.loadMapId(fightWait.getMapId());
+
+        for (int i = 0; i < fightWait.getNumPlayers(); i++) {
             User user = fightWait.getUsers()[i];
             if (user == null) {
                 continue;
@@ -93,6 +99,7 @@ public class FightManager implements IFightManager {
             IMessage ms = new Message(Cmd.START_ARMY);
             DataOutputStream ds = ms.writer();
             ds.writeByte(0);
+
             //Time counter
             ds.writeByte(30);
 

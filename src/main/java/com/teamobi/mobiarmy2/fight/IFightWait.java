@@ -27,6 +27,8 @@ public interface IFightWait {
 
     void startGame(int playerId);
 
+    byte getMapId();
+
     User getUserByPlayerId(int playerId);
 
     IFightManager getFightManager();
