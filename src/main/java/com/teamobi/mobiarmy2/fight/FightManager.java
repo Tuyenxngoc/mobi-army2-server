@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.fight;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.model.User;
+import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 
 import java.io.DataOutputStream;
@@ -37,7 +38,7 @@ public class FightManager implements IFightManager {
 
     }
 
-    private void sendToTeam(Message message) {
+    private void sendToTeam(IMessage message) {
         if (isTraining && trainingUser != null) {
             trainingUser.sendMessage(message);
             return;
@@ -78,7 +79,7 @@ public class FightManager implements IFightManager {
             return;
         }
         try {
-            Message ms = new Message(Cmd.CHAT_TO_BOARD);
+            IMessage ms = new Message(Cmd.CHAT_TO_BOARD);
             DataOutputStream ds = ms.writer();
             ds.writeInt(playerId);
             ds.writeUTF(message);
@@ -108,7 +109,7 @@ public class FightManager implements IFightManager {
 
     private void sendFightInfo() {
         try {
-            Message ms = new Message(Cmd.START_ARMY);
+            IMessage ms = new Message(Cmd.START_ARMY);
             DataOutputStream ds = ms.writer();
             if (isTraining) {
                 for (short data : trainingUser.getEquip()) {

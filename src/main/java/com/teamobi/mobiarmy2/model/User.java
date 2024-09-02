@@ -8,6 +8,7 @@ import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.model.entry.equip.EquipmentEntry;
 import com.teamobi.mobiarmy2.model.entry.user.EquipmentChestEntry;
 import com.teamobi.mobiarmy2.model.entry.user.SpecialItemChestEntry;
+import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.server.ServerManager;
@@ -86,7 +87,7 @@ public class User {
         return !state.equals(UserState.WAITING);
     }
 
-    public void sendMessage(Message ms) {
+    public void sendMessage(IMessage ms) {
         session.sendMessage(ms);
     }
 
@@ -248,7 +249,7 @@ public class User {
         equipmentPurchased++;
 
         try {
-            Message ms = new Message(Cmd.BUY_EQUIP);
+            IMessage ms = new Message(Cmd.BUY_EQUIP);
             DataOutputStream ds = ms.writer();
             ds.writeByte(0);
             ds.writeInt(addEquipment.getKey());
@@ -351,7 +352,7 @@ public class User {
                 return;
             }
 
-            Message ms = new Message(Cmd.INVENTORY_UPDATE);
+            IMessage ms = new Message(Cmd.INVENTORY_UPDATE);
             ds = ms.writer();
             ds.writeByte(updateQuantity);
             ds.write(bas.toByteArray());

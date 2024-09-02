@@ -26,6 +26,7 @@ import com.teamobi.mobiarmy2.model.entry.user.EquipmentChestEntry;
 import com.teamobi.mobiarmy2.model.entry.user.FriendEntry;
 import com.teamobi.mobiarmy2.model.entry.user.PlayerLeaderboardEntry;
 import com.teamobi.mobiarmy2.model.entry.user.SpecialItemChestEntry;
+import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.server.ClanManager;
 import com.teamobi.mobiarmy2.server.LeaderboardManager;
@@ -89,7 +90,7 @@ public class UserService implements IUserService {
 
     private void sendMessageLoginFail(String message) {
         try {
-            Message ms = new Message(4);
+            IMessage ms = new Message(4);
             DataOutputStream ds = ms.writer();
             ds.writeUTF(message);
             ds.flush();
@@ -100,7 +101,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleLogin(Message ms) {
+    public void handleLogin(IMessage ms) {
         if (user.isLogged()) {
             return;
         }
@@ -247,7 +248,7 @@ public class UserService implements IUserService {
         try {
             List<CharacterEntry> characterEntries = CharacterData.CHARACTER_ENTRIES;
             int characterCount = characterEntries.size();
-            Message ms = new Message(Cmd.SKIP_2);
+            IMessage ms = new Message(Cmd.SKIP_2);
             DataOutputStream ds = ms.writer();
             ds.writeByte(characterCount);
             for (CharacterEntry characterEntry : characterEntries) {
@@ -286,7 +287,7 @@ public class UserService implements IUserService {
         String[] names = config.getBossRoomName();
         int startMapBoss = config.getStartMapBoss();
         try {
-            Message ms = new Message(Cmd.CHANGE_ROOM_NAME);
+            IMessage ms = new Message(Cmd.CHANGE_ROOM_NAME);
             DataOutputStream ds = ms.writer();
             ds.writeByte(names.length);
             for (int i = 0; i < names.length; i++) {
@@ -304,7 +305,7 @@ public class UserService implements IUserService {
     private void sendRoomCaption(IServerConfig config) {
         String[] names = config.getRoomNameVi();
         try {
-            Message ms = new Message(Cmd.ROOM_CAPTION);
+            IMessage ms = new Message(Cmd.ROOM_CAPTION);
             DataOutputStream ds = ms.writer();
             ds.writeByte(names.length);
             for (int i = 0; i < names.length; i++) {
@@ -320,7 +321,7 @@ public class UserService implements IUserService {
 
     public void sendMapCollisionInfo() {
         try {
-            Message ms = new Message(92);
+            IMessage ms = new Message(92);
             DataOutputStream ds = ms.writer();
             ds.writeShort(MapData.idNotCollisions.length);
             for (short i : MapData.idNotCollisions) {
@@ -336,7 +337,7 @@ public class UserService implements IUserService {
     @Override
     public void sendServerMessage(String message) {
         try {
-            Message ms = new Message(Cmd.SERVER_MESSAGE);
+            IMessage ms = new Message(Cmd.SERVER_MESSAGE);
             DataOutputStream ds = ms.writer();
             ds.writeUTF(message);
             ds.flush();
@@ -349,7 +350,7 @@ public class UserService implements IUserService {
     @Override
     public void sendServerMessage2(String message) {
         try {
-            Message ms = new Message(Cmd.SET_MONEY_ERROR);
+            IMessage ms = new Message(Cmd.SET_MONEY_ERROR);
             DataOutputStream ds = ms.writer();
             ds.writeUTF(message);
             ds.flush();
@@ -365,7 +366,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void extendItemDuration(Message ms) {
+    public void extendItemDuration(IMessage ms) {
         try {
             DataInputStream dis = ms.reader();
             byte action = dis.readByte();
@@ -413,7 +414,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleGetMissions(Message ms) {
+    public void handleGetMissions(IMessage ms) {
         if (user.isNotWaiting()) {
             return;
         }
@@ -469,7 +470,7 @@ public class UserService implements IUserService {
     }
 
     private void sendMissionInfo() throws IOException {
-        Message ms = new Message(Cmd.MISSISON);
+        IMessage ms = new Message(Cmd.MISSISON);
         DataOutputStream ds = ms.writer();
         int i = 0;
         for (List<MissionEntry> missionEntryList : MissionData.MISSION_LIST.values()) {
@@ -494,7 +495,7 @@ public class UserService implements IUserService {
     @Override
     public void sendLoginSuccess() {
         try {
-            Message ms = new Message(Cmd.LOGIN_SUCESS);
+            IMessage ms = new Message(Cmd.LOGIN_SUCESS);
             DataOutputStream ds = ms.writer();
             ds.writeInt(user.getPlayerId());
             ds.writeInt(user.getXu());
@@ -553,7 +554,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void contributeToClan(Message ms) {
+    public void contributeToClan(IMessage ms) {
         if (user.isNotWaiting()) {
             return;
         }
@@ -599,7 +600,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void getVersionCode(Message ms) {
+    public void getVersionCode(IMessage ms) {
         try {
             String platform = ms.reader().readUTF();
             user.getSession().setPlatform(platform);
@@ -609,7 +610,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void getProvider(Message ms) {
+    public void getProvider(IMessage ms) {
         try {
             byte provider = ms.reader().readByte();
             user.getSession().setProvider(provider);
@@ -619,7 +620,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleMergeEquipments(Message ms) {
+    public void handleMergeEquipments(IMessage ms) {
         try {
             DataInputStream dis = ms.reader();
             byte id = dis.readByte();
@@ -715,7 +716,7 @@ public class UserService implements IUserService {
 
     private void sendFormulaProcessingResult(String message) {
         try {
-            Message ms = new Message(Cmd.FOMULA);
+            IMessage ms = new Message(Cmd.FOMULA);
             DataOutputStream ds = ms.writer();
             ds.writeByte(0);
             ds.writeUTF(message);
@@ -736,7 +737,7 @@ public class UserService implements IUserService {
             if (formulaEntries == null) {
                 return;
             }
-            Message ms = new Message(Cmd.FOMULA);
+            IMessage ms = new Message(Cmd.FOMULA);
             DataOutputStream ds = ms.writer();
             ds.writeByte(1);
             ds.writeByte(id);
@@ -782,7 +783,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void openLuckyGift(Message ms) {
+    public void openLuckyGift(IMessage ms) {
         try {
             byte index = ms.reader().readByte();
 
@@ -805,7 +806,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void viewLeaderboard(Message ms) {
+    public void viewLeaderboard(IMessage ms) {
         try {
             DataInputStream dis = ms.reader();
             byte type = dis.readByte();
@@ -860,7 +861,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handlePurchaseClanItem(Message ms) {
+    public void handlePurchaseClanItem(IMessage ms) {
         if (user.getClanId() == 0) {
             sendServerMessage(GameString.notClan());
             return;
@@ -922,7 +923,7 @@ public class UserService implements IUserService {
 
     private void sendClanShop() {
         try {
-            Message ms = new Message(Cmd.SHOP_BIETDOI);
+            IMessage ms = new Message(Cmd.SHOP_BIETDOI);
             DataOutputStream ds = ms.writer();
             ds.writeByte(ItemClanData.CLAN_ITEM_ENTRY_MAP.size());
             for (ClanItemEntry clanItemEntry : ItemClanData.CLAN_ITEM_ENTRY_MAP.values()) {
@@ -943,7 +944,7 @@ public class UserService implements IUserService {
     @Override
     public void enterTrainingMap() {
         try {
-            Message ms = new Message(Cmd.TRAINING_MAP);
+            IMessage ms = new Message(Cmd.TRAINING_MAP);
             DataOutputStream ds = ms.writer();
             ds.writeByte(ServerManager.getInstance().config().getTrainingMapId());
             ds.flush();
@@ -954,12 +955,12 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleLogout(Message ms) {
+    public void handleLogout(IMessage ms) {
         user.getSession().close();
     }
 
     @Override
-    public void handleSpecialItemShop(Message ms) {
+    public void handleSpecialItemShop(IMessage ms) {
         if (user.isNotWaiting()) {
             return;
         }
@@ -1055,7 +1056,7 @@ public class UserService implements IUserService {
 
     private void sendSpecialItem() {
         try {
-            Message ms = new Message(Cmd.SHOP_LINHTINH);
+            IMessage ms = new Message(Cmd.SHOP_LINHTINH);
             DataOutputStream ds = ms.writer();
             for (SpecialItemEntry spEntry : SpecialItemData.SPECIAL_ITEM_ENTRIES) {
                 if (!spEntry.isOnSale()) {
@@ -1077,7 +1078,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void equipVipItems(Message ms) {
+    public void equipVipItems(IMessage ms) {
         try {
             DataInputStream dis = ms.reader();
             byte action = dis.readByte();
@@ -1117,7 +1118,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleSendMessage(Message ms) {
+    public void handleSendMessage(IMessage ms) {
         try {
             DataInputStream dis = ms.reader();
             int playerId = dis.readInt();
@@ -1154,7 +1155,7 @@ public class UserService implements IUserService {
             return;
         }
         try {
-            Message ms = new Message(Cmd.SERVER_INFO);
+            IMessage ms = new Message(Cmd.SERVER_INFO);
             DataOutputStream ds = ms.writer();
             ds.writeUTF(message);
             ds.flush();
@@ -1186,7 +1187,7 @@ public class UserService implements IUserService {
             return;
         }
         try {
-            Message ms = new Message(Cmd.CHAT_TO);
+            IMessage ms = new Message(Cmd.CHAT_TO);
             DataOutputStream ds = ms.writer();
             if (userSend != null) {
                 ds.writeInt(userSend.getPlayerId());
@@ -1210,7 +1211,7 @@ public class UserService implements IUserService {
         }
         ServerManager server = ServerManager.getInstance();
         try {
-            Message ms = new Message(Cmd.ROOM_LIST);
+            IMessage ms = new Message(Cmd.ROOM_LIST);
             DataOutputStream ds = ms.writer();
             for (Room room : server.getRooms()) {
                 ds.writeByte(room.getIndex());
@@ -1226,7 +1227,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleEnteringRoom(Message ms) {
+    public void handleEnteringRoom(IMessage ms) {
         if (user.isNotWaiting()) {
             return;
         }
@@ -1265,7 +1266,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleJoinBoard(Message ms) {
+    public void handleJoinBoard(IMessage ms) {
         if (user.isNotWaiting()) {
             return;
         }
@@ -1301,7 +1302,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleChatMessage(Message ms) {
+    public void handleChatMessage(IMessage ms) {
         try {
             String message = ms.reader().readUTF().trim();
             if (message.isEmpty() || message.length() > 100) {
@@ -1314,7 +1315,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleKickPlayer(Message ms) {
+    public void handleKickPlayer(IMessage ms) {
         try {
             int playerId = ms.reader().readInt();
             user.getFightWait().kickPlayer(user.getPlayerId(), playerId);
@@ -1324,7 +1325,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleLeaveBoard(Message ms) {
+    public void handleLeaveBoard(IMessage ms) {
         if (user.getState() == UserState.WAITING) {
             return;
         }
@@ -1333,7 +1334,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void setReady(Message ms) {
+    public void setReady(IMessage ms) {
         try {
             boolean ready = ms.reader().readBoolean();
             user.getFightWait().setReady(ready, user.getPlayerId());
@@ -1343,7 +1344,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public synchronized void imbueGem(Message ms) {
+    public synchronized void imbueGem(IMessage ms) {
         List<EquipmentChestEntry> equipList = getSelectedEquips();
         List<SpecialItemChestEntry> specialItemList = getSelectedSpecialItems();
 
@@ -1590,7 +1591,7 @@ public class UserService implements IUserService {
 
     private void sendMessageConfirm(String message) {
         try {
-            Message ms = new Message(17);
+            IMessage ms = new Message(17);
             DataOutputStream ds = ms.writer();
             ds.writeByte(0);
             ds.writeUTF(message);
@@ -1602,7 +1603,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleSetPasswordFightWait(Message ms) {
+    public void handleSetPasswordFightWait(IMessage ms) {
         try {
             String password = ms.reader().readUTF().trim();
             if (password.isEmpty() || password.length() > 10) {
@@ -1615,7 +1616,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleSetMoneyFightWait(Message ms) {
+    public void handleSetMoneyFightWait(IMessage ms) {
         try {
             int xu = ms.reader().readInt();
             if (xu < 0) {
@@ -1636,7 +1637,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void movePlayer(Message ms) {
+    public void movePlayer(IMessage ms) {
         DataInputStream dis = ms.reader();
         try {
             short x = dis.readShort();
@@ -1648,7 +1649,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void shoot(Message ms) {
+    public void shoot(IMessage ms) {
         DataInputStream dis = ms.reader();
         try {
             byte bullId = dis.readByte();
@@ -1687,12 +1688,12 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void processShootingResult(Message ms) {
+    public void processShootingResult(IMessage ms) {
 
     }
 
     @Override
-    public void handleUseItem(Message ms) {
+    public void handleUseItem(IMessage ms) {
         try {
             byte itemIndex = ms.reader().readByte();
 
@@ -1703,7 +1704,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleJoinAnyBoard(Message ms) {
+    public void handleJoinAnyBoard(IMessage ms) {
         ServerManager server = ServerManager.getInstance();
         Room[] rooms = server.getRooms();
         try {
@@ -1781,7 +1782,7 @@ public class UserService implements IUserService {
     @Override
     public void handleViewFriendList() {
         try {
-            Message ms = new Message(Cmd.FRIENDLIST);
+            IMessage ms = new Message(Cmd.FRIENDLIST);
             DataOutputStream ds = ms.writer();
 
             if (!user.getFriends().isEmpty()) {
@@ -1808,7 +1809,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleAddFriend(Message ms) {
+    public void handleAddFriend(IMessage ms) {
         try {
             Integer id = ms.reader().readInt();
             if (user.getFriends().size() > ServerManager.getInstance().config().getMaxFriends()) {
@@ -1828,7 +1829,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleRemoveFriend(Message ms) {
+    public void handleRemoveFriend(IMessage ms) {
         try {
             Integer id = ms.reader().readInt();
             user.getFriends().remove(id);
@@ -1841,7 +1842,7 @@ public class UserService implements IUserService {
 
     private void sendMessageUpdateFriends(boolean isDelete, int status) {
         try {
-            Message ms;
+            IMessage ms;
             if (isDelete) {
                 ms = new Message(Cmd.DELETE_FRIEND_RESULT);
             } else {
@@ -1857,7 +1858,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleGetFlayerDetail(Message ms) {
+    public void handleGetFlayerDetail(IMessage ms) {
         try {
             int playerId = ms.reader().readInt();
             User us = null;
@@ -1890,7 +1891,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleFindPlayer(Message ms) {
+    public void handleFindPlayer(IMessage ms) {
         try {
             String username = ms.reader().readUTF().trim();
             if (username.isEmpty()) {
@@ -1921,7 +1922,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void updateCoordinates(Message ms) {
+    public void updateCoordinates(IMessage ms) {
         try {
             DataInputStream dis = ms.reader();
             short x = dis.readShort();
@@ -1934,7 +1935,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleSetFightWaitName(Message ms) {
+    public void handleSetFightWaitName(IMessage ms) {
         try {
             String name = ms.reader().readUTF().trim();
             user.getFightWait().setRoomName(user.getPlayerId(), name);
@@ -1944,7 +1945,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleSetMaxPlayerFightWait(Message ms) {
+    public void handleSetMaxPlayerFightWait(IMessage ms) {
         try {
             byte maxPlayers = ms.reader().readByte();
             user.getFightWait().setMaxPlayers(user.getPlayerId(), maxPlayers);
@@ -1954,7 +1955,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleChoseItemFight(Message ms) {
+    public void handleChoseItemFight(IMessage ms) {
         DataInputStream dis = ms.reader();
         byte[] items = new byte[8];
 
@@ -1974,7 +1975,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleChoseCharacter(Message ms) {
+    public void handleChoseCharacter(IMessage ms) {
         try {
             byte characterId = ms.reader().readByte();
             if (characterId >= CharacterData.CHARACTER_ENTRIES.size() || characterId < 0 || !user.getOwnedCharacters()[characterId]) {
@@ -1998,7 +1999,7 @@ public class UserService implements IUserService {
 
     private void sendEquipInfo() {
         try {
-            Message ms = new Message(Cmd.CURR_EQUIP_DBKEY);
+            IMessage ms = new Message(Cmd.CURR_EQUIP_DBKEY);
             DataOutputStream ds = ms.writer();
             for (int i = 0; i < 5; i++) {
                 ds.writeInt(user.getEquipData()[user.getActiveCharacterId()][i]);
@@ -2011,7 +2012,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleChangeTeam(Message ms) {
+    public void handleChangeTeam(IMessage ms) {
         if (user.getState() != UserState.WAIT_FIGHT) {
             return;
         }
@@ -2019,7 +2020,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handlePurchaseItem(Message ms) {
+    public void handlePurchaseItem(IMessage ms) {
         try {
             DataInputStream dis = ms.reader();
             byte unit = dis.readByte();
@@ -2061,7 +2062,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleBuyCharacter(Message ms) {
+    public void handleBuyCharacter(IMessage ms) {
         try {
             DataInputStream dis = ms.reader();
             byte index = dis.readByte();
@@ -2118,7 +2119,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleSelectMap(Message ms) {
+    public void handleSelectMap(IMessage ms) {
         try {
             byte mapId = ms.reader().readByte();
             user.getFightWait().setMap(user.getPlayerId(), mapId);
@@ -2128,7 +2129,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleCardRecharge(Message ms) {
+    public void handleCardRecharge(IMessage ms) {
         try {
             DataInputStream dis = ms.reader();
             String type = dis.readUTF().trim();
@@ -2214,7 +2215,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleFindPlayerWait(Message ms) {
+    public void handleFindPlayerWait(IMessage ms) {
         try {
             DataInputStream dis = ms.reader();
             boolean find = dis.readBoolean();
@@ -2230,7 +2231,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void clearBullet(Message ms) {
+    public void clearBullet(IMessage ms) {
         DataInputStream dis = ms.reader();
         try {
             int size = dis.readByte();
@@ -2247,7 +2248,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleChangePassword(Message ms) {
+    public void handleChangePassword(IMessage ms) {
         DataInputStream dis = ms.reader();
         try {
             String oldPass = dis.readUTF().trim();
@@ -2271,7 +2272,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void getFilePack(Message ms) {
+    public void getFilePack(IMessage ms) {
         try {
             DataInputStream dis = ms.reader();
             byte type = dis.readByte();
@@ -2376,7 +2377,7 @@ public class UserService implements IUserService {
 
     private void sendInventoryInfo() {
         try {
-            Message ms = new Message(Cmd.INVENTORY);
+            IMessage ms = new Message(Cmd.INVENTORY);
             DataOutputStream ds = ms.writer();
             ds.writeByte(user.getEquipmentChest().size());
             for (EquipmentChestEntry entry : user.getEquipmentChest()) {
@@ -2419,7 +2420,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleAddPoints(Message ms) {
+    public void handleAddPoints(IMessage ms) {
         try {
             short[] points = new short[5];
             int totalPoints = 0;
@@ -2442,7 +2443,7 @@ public class UserService implements IUserService {
     @Override
     public void sendCharacterInfo() {
         try {
-            Message ms = new Message(Cmd.CHARACTOR_INFO);
+            IMessage ms = new Message(Cmd.CHARACTOR_INFO);
             DataOutputStream ds = ms.writer();
             ds.writeByte(user.getCurrentLevel());
             ds.writeByte(user.getCurrentLevelPercent());
@@ -2461,7 +2462,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleChangeEquipment(Message ms) {
+    public void handleChangeEquipment(IMessage ms) {
         try {
             boolean changeSuccessful = false;
             for (int i = 0; i < 5; i++) {
@@ -2498,7 +2499,7 @@ public class UserService implements IUserService {
     @Override
     public void handleSendShopEquipments() {
         try {
-            Message ms = new Message(Cmd.SHOP_EQUIP);
+            IMessage ms = new Message(Cmd.SHOP_EQUIP);
             DataOutputStream ds = ms.writer();
             ds.writeShort(CharacterData.totalSaleEquipments);
             for (EquipmentEntry equip : CharacterData.EQUIPMENT_ENTRIES) {
@@ -2522,7 +2523,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleEquipmentTransactions(Message ms) {
+    public void handleEquipmentTransactions(IMessage ms) {
         List<EquipmentChestEntry> equipList = getSelectedEquips();
         DataInputStream dis = ms.reader();
 
@@ -2684,7 +2685,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleSpinWheel(Message ms) {
+    public void handleSpinWheel(IMessage ms) {
         try {
             byte unit = ms.reader().readByte();
             if (unit == 0) {
@@ -2743,7 +2744,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void getClanIcon(Message ms) {
+    public void getClanIcon(IMessage ms) {
         try {
             short clanId = ms.reader().readShort();
             byte[] data = ClanManager.getInstance().getClanIcon(clanId);
@@ -2763,7 +2764,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void getTopClan(Message ms) {
+    public void getTopClan(IMessage ms) {
         try {
             byte page = ms.reader().readByte();
 
@@ -2798,7 +2799,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void getInfoClan(Message ms) {
+    public void getInfoClan(IMessage ms) {
         try {
             short clanId = ms.reader().readShort();
             ClanInfo clanDetails = ClanManager.getInstance().getClanInfo(clanId);
@@ -2835,7 +2836,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void getClanMember(Message ms) {
+    public void getClanMember(IMessage ms) {
         try {
             DataInputStream dis = ms.reader();
             byte page = dis.readByte();
@@ -2882,7 +2883,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void getBigImage(Message ms) {
+    public void getBigImage(IMessage ms) {
         try {
             int idS = ms.reader().readByte();
             ms = new Message(120);
@@ -2903,12 +2904,12 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void handleRegister(Message ms) {
+    public void handleRegister(IMessage ms) {
         sendMessageLoginFail(GameString.reg_Error6());
     }
 
     @Override
-    public void rechargeMoney(Message ms) {
+    public void rechargeMoney(IMessage ms) {
         try {
             DataInputStream dis = ms.reader();
             byte type = dis.readByte();
@@ -2945,7 +2946,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void getMaterialIconMessage(Message ms) {
+    public void getMaterialIconMessage(IMessage ms) {
         try {
             DataInputStream dis = ms.reader();
             byte typeIcon = dis.readByte();
@@ -2982,7 +2983,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public synchronized void startTraining(Message ms) {
+    public synchronized void startTraining(IMessage ms) {
         try {
             byte type = ms.reader().readByte();
 
@@ -3019,7 +3020,7 @@ public class UserService implements IUserService {
     @Override
     public void sendUpdateMoney() {
         try {
-            Message ms = new Message(Cmd.UPDATE_MONEY);
+            IMessage ms = new Message(Cmd.UPDATE_MONEY);
             DataOutputStream ds = ms.writer();
             ds.writeInt(user.getXu());
             ds.writeInt(user.getLuong());
@@ -3033,7 +3034,7 @@ public class UserService implements IUserService {
     @Override
     public void sendUpdateCup(int cupUp) {
         try {
-            Message ms = new Message(Cmd.CUP);
+            IMessage ms = new Message(Cmd.CUP);
             DataOutputStream ds = ms.writer();
             ds.writeByte(cupUp);
             ds.writeInt(user.getCup());
@@ -3047,7 +3048,7 @@ public class UserService implements IUserService {
     @Override
     public void sendUpdateXp(int xpUp, boolean updateLevel) {
         try {
-            Message ms = new Message(Cmd.UPDATE_EXP);
+            IMessage ms = new Message(Cmd.UPDATE_EXP);
             DataOutputStream ds = ms.writer();
             ds.writeInt(xpUp);
             ds.writeInt(user.getCurrentLevel());
@@ -3069,14 +3070,14 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void ping(Message ms) {
+    public void ping(IMessage ms) {
     }
 
     @Override
     public void getMoreGame() {
         IServerConfig config = ServerManager.getInstance().config();
         try {
-            Message ms = new Message(Cmd.MORE_GAME);
+            IMessage ms = new Message(Cmd.MORE_GAME);
             DataOutputStream ds = ms.writer();
             ds.writeUTF(config.getDownloadTitle());
             ds.writeUTF(config.getDownloadInfo());

@@ -5,6 +5,8 @@ import java.io.DataOutputStream;
 
 public interface IMessage {
 
+    byte getCommand();
+
     byte[] getData();
 
     DataInputStream reader();

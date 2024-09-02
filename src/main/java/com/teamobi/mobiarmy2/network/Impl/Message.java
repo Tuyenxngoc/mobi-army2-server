@@ -1,7 +1,6 @@
 package com.teamobi.mobiarmy2.network.Impl;
 
 import com.teamobi.mobiarmy2.network.IMessage;
-import lombok.Getter;
 
 import java.io.*;
 
@@ -10,7 +9,6 @@ import java.io.*;
  */
 public class Message implements IMessage {
 
-    @Getter
     private final byte command;
     private ByteArrayOutputStream os;
     private DataOutputStream dos;
@@ -31,6 +29,11 @@ public class Message implements IMessage {
         this.command = command;
         is = new ByteArrayInputStream(data);
         dis = new DataInputStream(is);
+    }
+
+    @Override
+    public byte getCommand() {
+        return command;
     }
 
     @Override

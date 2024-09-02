@@ -7,6 +7,7 @@ import com.teamobi.mobiarmy2.model.FightItemData;
 import com.teamobi.mobiarmy2.model.MapData;
 import com.teamobi.mobiarmy2.model.Room;
 import com.teamobi.mobiarmy2.model.User;
+import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import lombok.Getter;
@@ -119,7 +120,7 @@ public class FightWait implements IFightWait {
     }
 
     @Override
-    public void sendToTeam(Message ms) {
+    public void sendToTeam(IMessage ms) {
         for (User user : users) {
             if (user != null) {
                 user.sendMessage(ms);
@@ -147,7 +148,7 @@ public class FightWait implements IFightWait {
 
     private void notifyPlayerLeave(int playerId) {
         try {
-            Message ms = new Message(Cmd.SOMEONE_LEAVEBOARD);
+            IMessage ms = new Message(Cmd.SOMEONE_LEAVEBOARD);
             DataOutputStream ds = ms.writer();
             ds.writeInt(playerId);
             ds.writeInt(getRoomOwner().getPlayerId());
@@ -160,7 +161,7 @@ public class FightWait implements IFightWait {
 
     public void sendInfo(User user) {
         try {
-            Message ms = new Message(Cmd.AUTO_BOARD);
+            IMessage ms = new Message(Cmd.AUTO_BOARD);
             DataOutputStream ds = ms.writer();
             ds.writeByte(room.getIndex());
             ds.writeByte(id);
@@ -212,7 +213,7 @@ public class FightWait implements IFightWait {
             return;
         }
 
-        Message ms;
+        IMessage ms;
         DataOutputStream ds;
         if (numPlayers != 0) {
             ms = new Message(Cmd.SOMEONE_JOINBOARD);
@@ -318,7 +319,7 @@ public class FightWait implements IFightWait {
         money = newMoney;
 
         try {
-            Message ms = new Message(Cmd.SET_MONEY);
+            IMessage ms = new Message(Cmd.SET_MONEY);
             DataOutputStream ds = ms.writer();
             ds.writeShort(0);
             ds.writeInt(newMoney);
@@ -354,7 +355,7 @@ public class FightWait implements IFightWait {
         }
 
         try {
-            Message ms = new Message(Cmd.READY);
+            IMessage ms = new Message(Cmd.READY);
             DataOutputStream ds = ms.writer();
             ds.writeInt(playerId);
             ds.writeBoolean(ready);
@@ -392,7 +393,7 @@ public class FightWait implements IFightWait {
         }
 
         try {
-            Message ms = new Message(Cmd.KICK);
+            IMessage ms = new Message(Cmd.KICK);
             DataOutputStream ds = ms.writer();
             ds.writeShort(index);
             ds.writeInt(user.getPlayerId());
@@ -447,7 +448,7 @@ public class FightWait implements IFightWait {
         }
 
         try {
-            Message ms = new Message(Cmd.CHAT_TO_BOARD);
+            IMessage ms = new Message(Cmd.CHAT_TO_BOARD);
             DataOutputStream ds = ms.writer();
             ds.writeInt(playerId);
             ds.writeUTF(message);
@@ -545,7 +546,7 @@ public class FightWait implements IFightWait {
                         (j >= 4 && user.getItemFightQuantity(12 + j - 4) == 0) // Item chứa đã hết
                 ) {
                     try {
-                        Message ms = new Message(Cmd.SERVER_MESSAGE);
+                        IMessage ms = new Message(Cmd.SERVER_MESSAGE);
                         DataOutputStream ds = ms.writer();
                         ds.writeUTF(GameString.startGameError4(user.getUsername(), j));
                         ds.flush();
@@ -664,7 +665,7 @@ public class FightWait implements IFightWait {
         if (mapId == 27) {
             byte mapRandom = MapData.randomMap(27);
             try {
-                Message ms = new Message(Cmd.TRAINING_MAP);
+                IMessage ms = new Message(Cmd.TRAINING_MAP);
                 DataOutputStream ds = ms.writer();
                 ds.writeByte(mapRandom);
                 ds.flush();
@@ -677,7 +678,7 @@ public class FightWait implements IFightWait {
         resetReadies();
 
         try {
-            Message ms = new Message(Cmd.MAP_SELECT);
+            IMessage ms = new Message(Cmd.MAP_SELECT);
             DataOutputStream ds = ms.writer();
             ds.writeByte(mapId);
             ds.flush();
@@ -701,7 +702,7 @@ public class FightWait implements IFightWait {
         List<User> userList = ServerManager.getInstance().findWaitPlayers(playerId);
 
         try {
-            Message ms = new Message(Cmd.FIND_PLAYER);
+            IMessage ms = new Message(Cmd.FIND_PLAYER);
             DataOutputStream ds = ms.writer();
             ds.writeBoolean(true);
             ds.writeByte(userList.size());
@@ -744,7 +745,7 @@ public class FightWait implements IFightWait {
         }
 
         try {
-            Message ms = new Message(Cmd.FIND_PLAYER);
+            IMessage ms = new Message(Cmd.FIND_PLAYER);
             DataOutputStream ds = ms.writer();
             ds.writeBoolean(false);
             ds.writeUTF(GameString.inviteMessage(roomOwner.getUsername()));
@@ -789,7 +790,7 @@ public class FightWait implements IFightWait {
         }
 
         try {
-            Message ms = new Message(Cmd.CHANGE_TEAM);
+            IMessage ms = new Message(Cmd.CHANGE_TEAM);
             DataOutputStream ds = ms.writer();
             ds.writeInt(user.getPlayerId());
             ds.writeByte(newIndex);

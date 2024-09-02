@@ -1,10 +1,10 @@
 package com.teamobi.mobiarmy2.service;
 
-import com.teamobi.mobiarmy2.network.Impl.Message;
+import com.teamobi.mobiarmy2.network.IMessage;
 
 public interface IUserService {
 
-    void handleLogin(Message ms);
+    void handleLogin(IMessage ms);
 
     void handleLogout();
 
@@ -16,137 +16,137 @@ public interface IUserService {
 
     void handleHandshakeMessage();
 
-    void extendItemDuration(Message ms);
+    void extendItemDuration(IMessage ms);
 
-    void handleGetMissions(Message ms);
+    void handleGetMissions(IMessage ms);
 
     void sendLoginSuccess();
 
-    void contributeToClan(Message ms);
+    void contributeToClan(IMessage ms);
 
-    void getVersionCode(Message ms);
+    void getVersionCode(IMessage ms);
 
-    void getProvider(Message ms);
+    void getProvider(IMessage ms);
 
-    void handleMergeEquipments(Message ms);
+    void handleMergeEquipments(IMessage ms);
 
-    void openLuckyGift(Message ms);
+    void openLuckyGift(IMessage ms);
 
-    void viewLeaderboard(Message ms);
+    void viewLeaderboard(IMessage ms);
 
-    void handlePurchaseClanItem(Message ms);
+    void handlePurchaseClanItem(IMessage ms);
 
     void enterTrainingMap();
 
-    void handleLogout(Message ms);
+    void handleLogout(IMessage ms);
 
-    void handleSpecialItemShop(Message ms);
+    void handleSpecialItemShop(IMessage ms);
 
-    void equipVipItems(Message ms);
+    void equipVipItems(IMessage ms);
 
-    void handleSendMessage(Message ms);
+    void handleSendMessage(IMessage ms);
 
     void handleSendRoomList();
 
-    void handleEnteringRoom(Message ms);
+    void handleEnteringRoom(IMessage ms);
 
-    void handleJoinBoard(Message ms);
+    void handleJoinBoard(IMessage ms);
 
-    void handleChatMessage(Message ms);
+    void handleChatMessage(IMessage ms);
 
-    void handleKickPlayer(Message ms);
+    void handleKickPlayer(IMessage ms);
 
-    void handleLeaveBoard(Message ms);
+    void handleLeaveBoard(IMessage ms);
 
-    void setReady(Message ms);
+    void setReady(IMessage ms);
 
-    void imbueGem(Message ms);
+    void imbueGem(IMessage ms);
 
-    void handleSetPasswordFightWait(Message ms);
+    void handleSetPasswordFightWait(IMessage ms);
 
-    void handleSetMoneyFightWait(Message ms);
+    void handleSetMoneyFightWait(IMessage ms);
 
     void handleStartGame();
 
-    void movePlayer(Message ms);
+    void movePlayer(IMessage ms);
 
-    void shoot(Message ms);
+    void shoot(IMessage ms);
 
-    void processShootingResult(Message ms);
+    void processShootingResult(IMessage ms);
 
-    void handleUseItem(Message ms);
+    void handleUseItem(IMessage ms);
 
-    void handleJoinAnyBoard(Message ms);
+    void handleJoinAnyBoard(IMessage ms);
 
     void handleViewFriendList();
 
-    void handleAddFriend(Message ms);
+    void handleAddFriend(IMessage ms);
 
-    void handleRemoveFriend(Message ms);
+    void handleRemoveFriend(IMessage ms);
 
-    void handleGetFlayerDetail(Message ms);
+    void handleGetFlayerDetail(IMessage ms);
 
-    void handleFindPlayer(Message ms);
+    void handleFindPlayer(IMessage ms);
 
     void skipTurn();
 
-    void updateCoordinates(Message ms);
+    void updateCoordinates(IMessage ms);
 
-    void handleSetFightWaitName(Message ms);
+    void handleSetFightWaitName(IMessage ms);
 
-    void handleSetMaxPlayerFightWait(Message ms);
+    void handleSetMaxPlayerFightWait(IMessage ms);
 
-    void handleChoseItemFight(Message ms);
+    void handleChoseItemFight(IMessage ms);
 
-    void handleChoseCharacter(Message ms);
+    void handleChoseCharacter(IMessage ms);
 
-    void handleChangeTeam(Message ms);
+    void handleChangeTeam(IMessage ms);
 
-    void handlePurchaseItem(Message ms);
+    void handlePurchaseItem(IMessage ms);
 
-    void handleBuyCharacter(Message ms);
+    void handleBuyCharacter(IMessage ms);
 
-    void handleSelectMap(Message ms);
+    void handleSelectMap(IMessage ms);
 
-    void handleCardRecharge(Message ms);
+    void handleCardRecharge(IMessage ms);
 
-    void handleFindPlayerWait(Message ms);
+    void handleFindPlayerWait(IMessage ms);
 
-    void clearBullet(Message ms);
+    void clearBullet(IMessage ms);
 
-    void handleChangePassword(Message ms);
+    void handleChangePassword(IMessage ms);
 
-    void getFilePack(Message ms);
+    void getFilePack(IMessage ms);
 
-    void handleAddPoints(Message ms);
+    void handleAddPoints(IMessage ms);
 
     void sendCharacterInfo();
 
-    void handleChangeEquipment(Message ms);
+    void handleChangeEquipment(IMessage ms);
 
     void handleSendShopEquipments();
 
-    void handleEquipmentTransactions(Message ms);
+    void handleEquipmentTransactions(IMessage ms);
 
-    void handleSpinWheel(Message ms);
+    void handleSpinWheel(IMessage ms);
 
-    void getClanIcon(Message ms);
+    void getClanIcon(IMessage ms);
 
-    void getTopClan(Message ms);
+    void getTopClan(IMessage ms);
 
-    void getInfoClan(Message ms);
+    void getInfoClan(IMessage ms);
 
-    void getClanMember(Message ms);
+    void getClanMember(IMessage ms);
 
-    void getBigImage(Message ms);
+    void getBigImage(IMessage ms);
 
-    void handleRegister(Message ms);
+    void handleRegister(IMessage ms);
 
-    void rechargeMoney(Message ms);
+    void rechargeMoney(IMessage ms);
 
-    void getMaterialIconMessage(Message ms);
+    void getMaterialIconMessage(IMessage ms);
 
-    void startTraining(Message ms);
+    void startTraining(IMessage ms);
 
     void sendUpdateMoney();
 
@@ -154,7 +154,7 @@ public interface IUserService {
 
     void sendUpdateXp(int xpUp, boolean updateLevel);
 
-    void ping(Message ms);
+    void ping(IMessage ms);
 
     void getMoreGame();
 }
