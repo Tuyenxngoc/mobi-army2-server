@@ -10,11 +10,11 @@ import java.io.IOException;
 /**
  * @author tuyen
  */
-public class FightManager {
+public class FightManager implements IFightManager {
 
     private static final byte MAX_ELEMENT_FIGHT = 100;
 
-    private final FightWait fightWait;
+    private final IFightWait fightWait;
     private final boolean isTraining;
     private final User trainingUser;
 
@@ -66,10 +66,12 @@ public class FightManager {
 
     }
 
+    @Override
     public void leave(int playerId) {
 
     }
 
+    @Override
     public void chatMessage(int playerId, String message) {
         int index = getPlayerIndexByPlayerId(playerId);
         if (index == -1) {
@@ -87,6 +89,7 @@ public class FightManager {
         }
     }
 
+    @Override
     public void startGame() {
         if (fightWait.isStarted()) {
             return;
@@ -141,20 +144,25 @@ public class FightManager {
         }
     }
 
+    @Override
     public void addShoot(User user, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
     }
 
+    @Override
     public void changeLocation(User user, short x, short y) {
     }
 
+    @Override
     public void skipTurn(User user) {
 
     }
 
+    @Override
     public void startTraining() {
 
     }
 
+    @Override
     public void stopTraining() {
 
     }

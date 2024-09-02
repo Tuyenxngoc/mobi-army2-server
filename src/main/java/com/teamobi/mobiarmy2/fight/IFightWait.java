@@ -1,0 +1,47 @@
+package com.teamobi.mobiarmy2.fight;
+
+import com.teamobi.mobiarmy2.model.User;
+import com.teamobi.mobiarmy2.network.Impl.Message;
+
+public interface IFightWait {
+
+    void sendToTeam(Message message);
+
+    boolean isStarted();
+
+    byte getNumPlayers();
+
+    User[] getUsers();
+
+    void leaveTeam(int playerId);
+
+    void chatMessage(int playerId, String message);
+
+    void kickPlayer(int playerId, int playerId1);
+
+    void setReady(boolean ready, int playerId);
+
+    void setPassRoom(String password, int playerId);
+
+    void setMoney(int xu, int playerId);
+
+    void startGame(int playerId);
+
+    User getUserByPlayerId(int playerId);
+
+    IFightManager getFightManager();
+
+    void setRoomName(int playerId, String name);
+
+    void setMaxPlayers(int playerId, byte maxPlayers);
+
+    void setItems(int playerId, byte[] items);
+
+    void changeTeam(User user);
+
+    void setMap(int playerId, byte mapId);
+
+    void findPlayer(int playerId);
+
+    void inviteToRoom(int playerId);
+}

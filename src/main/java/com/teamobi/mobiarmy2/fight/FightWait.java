@@ -21,8 +21,8 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class FightWait {
-    private final FightManager fightManager;
+public class FightWait implements IFightWait {
+    private final IFightManager fightManager;
     private final Room room;
     private final byte id;
     private User[] users;
@@ -118,7 +118,8 @@ public class FightWait {
         numPlayers--;
     }
 
-    protected void sendToTeam(Message ms) {
+    @Override
+    public void sendToTeam(Message ms) {
         for (User user : users) {
             if (user != null) {
                 user.sendMessage(ms);
@@ -176,6 +177,7 @@ public class FightWait {
         return numPlayers == maxSetPlayers || started || (room.isContinuous() && continuousLevel > 0);
     }
 
+    @Override
     public User getUserByPlayerId(int playerId) {
         int index = getUserIndexByPlayerId(playerId);
         if (index == -1) {
@@ -278,6 +280,7 @@ public class FightWait {
         us.sendMessage(ms);
     }
 
+    @Override
     public synchronized void setPassRoom(String password, int playerId) {
         if (started) {
             return;
@@ -290,6 +293,7 @@ public class FightWait {
         this.password = password;
     }
 
+    @Override
     public synchronized void setMoney(int newMoney, int playerId) {
         if (started) {
             return;
@@ -325,6 +329,7 @@ public class FightWait {
         }
     }
 
+    @Override
     public synchronized void setReady(boolean ready, int playerId) {
         if (started) {
             return;
@@ -360,6 +365,7 @@ public class FightWait {
         }
     }
 
+    @Override
     public synchronized void kickPlayer(int playerId, int targetPlayerId) {
         if (started) {
             return;
@@ -401,6 +407,7 @@ public class FightWait {
         notifyPlayerLeave(targetPlayerId);
     }
 
+    @Override
     public synchronized void leaveTeam(int targetPlayerId) {
         if (started) {
             fightManager.leave(targetPlayerId);
@@ -427,6 +434,7 @@ public class FightWait {
         }
     }
 
+    @Override
     public void chatMessage(int playerId, String message) {
         if (started) {
             fightManager.chatMessage(playerId, message);
@@ -450,6 +458,7 @@ public class FightWait {
         }
     }
 
+    @Override
     public synchronized void startGame(int playerId) {
         if (started) {
             return;
@@ -567,6 +576,7 @@ public class FightWait {
         started = true;
     }
 
+    @Override
     public synchronized void setRoomName(int playerId, String name) {
         if (started) {
             return;
@@ -579,6 +589,7 @@ public class FightWait {
         this.name = name;
     }
 
+    @Override
     public synchronized void setMaxPlayers(int playerId, byte maxPlayers) {
         if (started) {
             return;
@@ -593,6 +604,7 @@ public class FightWait {
         }
     }
 
+    @Override
     public synchronized void setMap(int playerId, byte mapIdSet) {
         if (started) {
             return;
@@ -675,6 +687,7 @@ public class FightWait {
         }
     }
 
+    @Override
     public void findPlayer(int playerId) {
         if (started) {
             return;
@@ -710,6 +723,7 @@ public class FightWait {
         }
     }
 
+    @Override
     public void inviteToRoom(int playerId) {
         User roomOwner = getRoomOwner();
 
@@ -744,6 +758,7 @@ public class FightWait {
         }
     }
 
+    @Override
     public synchronized void changeTeam(User user) {
         if (started) {
             return;
@@ -785,6 +800,7 @@ public class FightWait {
         }
     }
 
+    @Override
     public synchronized void setItems(int playerId, byte[] newItems) {
         if (started) {
             return;
