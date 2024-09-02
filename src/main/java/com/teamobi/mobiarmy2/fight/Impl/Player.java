@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.fight;
+package com.teamobi.mobiarmy2.fight.Impl;
 
 import com.teamobi.mobiarmy2.model.User;
 import lombok.Getter;

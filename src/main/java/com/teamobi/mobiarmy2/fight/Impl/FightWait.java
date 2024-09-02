@@ -1,8 +1,10 @@
-package com.teamobi.mobiarmy2.fight;
+package com.teamobi.mobiarmy2.fight.Impl;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.constant.UserState;
+import com.teamobi.mobiarmy2.fight.IFightManager;
+import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.model.FightItemData;
 import com.teamobi.mobiarmy2.model.MapData;
 import com.teamobi.mobiarmy2.model.Room;
