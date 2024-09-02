@@ -6,8 +6,8 @@ import com.teamobi.mobiarmy2.dao.IGiftCodeDao;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.dao.impl.GiftCodeDao;
 import com.teamobi.mobiarmy2.dao.impl.UserDao;
-import com.teamobi.mobiarmy2.fight.Impl.FightManager;
 import com.teamobi.mobiarmy2.fight.Impl.FightWait;
+import com.teamobi.mobiarmy2.fight.Impl.TrainingManager;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.CharacterData;
@@ -1696,8 +1696,11 @@ public class UserService implements IUserService {
     public void handleUseItem(IMessage ms) {
         try {
             byte itemIndex = ms.reader().readByte();
+            if (itemIndex < 0 || itemIndex >= FightItemData.FIGHT_ITEM_ENTRIES.size()) {
+                return;
+            }
 
-            sendServerMessage(GameString.unauthorized_Item());
+            user.getFightWait().getFightManager().useItem(itemIndex);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -2987,8 +2990,8 @@ public class UserService implements IUserService {
         try {
             byte type = ms.reader().readByte();
 
-            if (user.getFightManager() == null) {
-                user.setFightManager(new FightManager(user));
+            if (user.getTrainingManager() == null) {
+                user.setTrainingManager(new TrainingManager(user));
             }
 
             if (type == 0) {//Start game
@@ -2997,14 +3000,14 @@ public class UserService implements IUserService {
                 }
 
                 user.setState(UserState.FIGHTING);
-                user.getFightManager().startTraining();
+                user.getTrainingManager().startTraining();
             } else {//Out game
                 if (user.getState() != UserState.FIGHTING) {
                     return;
                 }
 
                 user.setState(UserState.WAITING);
-                user.getFightManager().stopTraining();
+                user.getTrainingManager().stopTraining();
 
                 ms = new Message(Cmd.TRAINING);
                 DataOutputStream ds = ms.writer();

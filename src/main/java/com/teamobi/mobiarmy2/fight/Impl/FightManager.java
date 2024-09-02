@@ -18,36 +18,15 @@ public class FightManager implements IFightManager {
     private static final byte MAX_ELEMENT_FIGHT = 100;
 
     private final IFightWait fightWait;
-    private final boolean isTraining;
-    private final User trainingUser;
-
     private Player[] players;
-
-    public FightManager(User trainingUser) {
-        this.fightWait = null;
-        this.isTraining = true;
-        this.trainingUser = trainingUser;
-    }
 
     public FightManager(FightWait fightWait) {
         this.fightWait = fightWait;
-        this.isTraining = false;
-        this.trainingUser = null;
         this.players = new Player[MAX_ELEMENT_FIGHT];
     }
 
     private void refreshFightManager() {
-
-    }
-
-    private void sendToTeam(IMessage message) {
-        if (isTraining && trainingUser != null) {
-            trainingUser.sendMessage(message);
-            return;
-        }
-        if (fightWait != null) {
-            fightWait.sendToTeam(message);
-        }
+        this.players = new Player[MAX_ELEMENT_FIGHT];
     }
 
     private int getPlayerIndexByPlayerId(int playerId) {
@@ -86,7 +65,7 @@ public class FightManager implements IFightManager {
             ds.writeInt(playerId);
             ds.writeUTF(message);
             ds.flush();
-            sendToTeam(ms);
+            fightWait.sendToTeam(ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -113,19 +92,9 @@ public class FightManager implements IFightManager {
         try {
             IMessage ms = new Message(Cmd.START_ARMY);
             DataOutputStream ds = ms.writer();
-            if (isTraining) {
-                for (short data : trainingUser.getEquip()) {
-                    ds.writeShort(data);
-                }
-            }
-
             ds.writeByte(0);
             //Time counter
-            if (isTraining) {
-                ds.writeByte(0);
-            } else {
-                ds.writeByte(30);
-            }
+            ds.writeByte(30);
 
             //Team point
             ds.writeShort(0);
@@ -141,7 +110,7 @@ public class FightManager implements IFightManager {
             }
 
             ds.flush();
-            sendToTeam(ms);
+            fightWait.sendToTeam(ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -161,12 +130,8 @@ public class FightManager implements IFightManager {
     }
 
     @Override
-    public void startTraining() {
+    public void useItem(byte itemIndex) {
 
     }
 
-    @Override
-    public void stopTraining() {
-
-    }
 }

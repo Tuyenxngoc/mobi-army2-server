@@ -3,8 +3,8 @@ package com.teamobi.mobiarmy2.model;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.constant.UserState;
-import com.teamobi.mobiarmy2.fight.IFightManager;
 import com.teamobi.mobiarmy2.fight.IFightWait;
+import com.teamobi.mobiarmy2.fight.ITrainingManager;
 import com.teamobi.mobiarmy2.model.entry.equip.EquipmentEntry;
 import com.teamobi.mobiarmy2.model.entry.user.EquipmentChestEntry;
 import com.teamobi.mobiarmy2.model.entry.user.SpecialItemChestEntry;
@@ -68,7 +68,7 @@ public class User {
     private List<SpecialItemChestEntry> specialItemChest;
     private List<EquipmentChestEntry> equipmentChest;
     private IFightWait fightWait;
-    private IFightManager fightManager;
+    private ITrainingManager trainingManager;
     private final IUserService userService;
     private boolean openingGift;
     private int topEarningsXu;

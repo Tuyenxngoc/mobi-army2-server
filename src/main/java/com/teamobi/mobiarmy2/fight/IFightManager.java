@@ -16,7 +16,6 @@ public interface IFightManager {
 
     void skipTurn(User user);
 
-    void startTraining();
+    void useItem(byte itemIndex);
 
-    void stopTraining();
 }
