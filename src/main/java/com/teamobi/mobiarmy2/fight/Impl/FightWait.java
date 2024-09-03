@@ -17,6 +17,7 @@ import lombok.Setter;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -444,11 +445,6 @@ public class FightWait implements IFightWait {
 
     @Override
     public void chatMessage(int playerId, String message) {
-        if (started) {
-            fightManager.chatMessage(playerId, message);
-            return;
-        }
-
         int index = getUserIndexByPlayerId(playerId);
         if (index == -1) {
             return;
@@ -582,6 +578,8 @@ public class FightWait implements IFightWait {
 
         fightManager.startGame();
         started = true;
+
+        Arrays.fill(readies, false);
     }
 
     @Override

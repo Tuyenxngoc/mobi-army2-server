@@ -19,4 +19,7 @@ public class Player {
         this.user = user;
     }
 
+    public void die() {
+        this.hp = 0;
+    }
 }

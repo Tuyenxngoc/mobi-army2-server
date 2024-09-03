@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.fight.Impl;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
+import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.fight.IFightManager;
 import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.fight.IMapManager;
@@ -21,6 +22,7 @@ public class FightManager implements IFightManager {
     private final IFightWait fightWait;
     private Player[] players;
     private IMapManager mapManager;
+    private int currentTurnPlayer;
 
     public FightManager(FightWait fightWait) {
         this.fightWait = fightWait;
@@ -33,7 +35,7 @@ public class FightManager implements IFightManager {
     }
 
     private int getPlayerIndexByPlayerId(int playerId) {
-        for (int i = 0; i < players.length; i++) {
+        for (int i = 0; i < fightWait.getNumPlayers(); i++) {
             if (players[i] != null
                     && players[i].getUser() != null
                     && players[i].getUser().getPlayerId() == playerId) {
@@ -52,25 +54,23 @@ public class FightManager implements IFightManager {
     }
 
     @Override
-    public void leave(int playerId) {
-
-    }
-
-    @Override
-    public void chatMessage(int playerId, String message) {
+    public void leave(int playerId) {//Todo
         int index = getPlayerIndexByPlayerId(playerId);
         if (index == -1) {
             return;
         }
-        try {
-            IMessage ms = new Message(Cmd.CHAT_TO_BOARD);
-            DataOutputStream ds = ms.writer();
-            ds.writeInt(playerId);
-            ds.writeUTF(message);
-            ds.flush();
-            fightWait.sendToTeam(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        Player player = players[index];
+        player.die();
+        player.getUser().updateCup(-5);
+
+        players[index] = null;
+
+        fightWait.chatMessage(playerId, GameString.leave2(player.getUser().getUsername()));
+
+        //đổi lượt chơi
+        if(currentTurnPlayer == index){
+            nextTurn();
         }
     }
 

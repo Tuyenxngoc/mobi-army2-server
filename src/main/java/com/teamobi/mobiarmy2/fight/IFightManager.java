@@ -6,8 +6,6 @@ public interface IFightManager {
 
     void leave(int playerId);
 
-    void chatMessage(int playerId, String message);
-
     void startGame();
 
     void changeLocation(User user, short x, short y);
