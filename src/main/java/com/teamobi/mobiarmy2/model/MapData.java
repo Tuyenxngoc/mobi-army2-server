@@ -45,7 +45,7 @@ public class MapData {
                 result.append(MAP_ENTRIES.get(index).getName()).append(", ");
             }
         }
-        if (result.length() > 0) {
+        if (!result.isEmpty()) {
             result.setLength(result.length() - 2);
         }
         return result.toString();

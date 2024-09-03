@@ -2,11 +2,13 @@ package com.teamobi.mobiarmy2.fight.Impl;
 
 import com.teamobi.mobiarmy2.model.User;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author tuyen
  */
 @Getter
+@Setter
 public class Player {
 
     private final User user;

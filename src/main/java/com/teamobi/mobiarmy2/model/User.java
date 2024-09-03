@@ -195,7 +195,7 @@ public class User {
         userService.sendUpdateXp(xpUp, levelDiff > 0);
     }
 
-    public short[] getEquip() {
+    public short[] getEquips() {
         short[] equips = new short[5];
         EquipmentChestEntry[] equipEntries = characterEquips[activeCharacterId];
 

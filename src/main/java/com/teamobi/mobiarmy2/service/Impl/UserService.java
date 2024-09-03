@@ -2999,10 +2999,10 @@ public class UserService implements IUserService {
                     return;
                 }
 
-                user.setState(UserState.FIGHTING);
+                user.setState(UserState.TRAINING);
                 user.getTrainingManager().startTraining();
             } else {//Out game
-                if (user.getState() != UserState.FIGHTING) {
+                if (user.getState() != UserState.TRAINING) {
                     return;
                 }
 
@@ -3015,6 +3015,49 @@ public class UserService implements IUserService {
                 ds.flush();
                 user.sendMessage(ms);
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void trainShooting(IMessage ms) {
+        if (user.getState() != UserState.TRAINING) {
+            return;
+        }
+
+        DataInputStream dis = ms.reader();
+        try {
+            byte bullId = dis.readByte();
+            short x = dis.readShort();
+            short y = dis.readShort();
+            short angle = dis.readShort();
+            byte force = dis.readByte();
+            byte force2 = 0;
+            if (bullId == 19) {
+                force2 = dis.readByte();
+            }
+            byte numShoot = dis.readByte();
+
+            if (angle < -360) {
+                angle = -360;
+            } else if (angle > 360) {
+                angle = 360;
+            }
+
+            if (force < 0) {
+                force = 0;
+            } else if (force > 30) {
+                force = 30;
+            }
+
+            if (force2 < 0) {
+                force2 = 0;
+            } else if (force2 > 30) {
+                force2 = 30;
+            }
+
+            user.getTrainingManager().addShoot(user, bullId, x, y, angle, force, force2, numShoot);
         } catch (IOException e) {
             e.printStackTrace();
         }

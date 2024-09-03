@@ -148,6 +148,8 @@ public interface IUserService {
 
     void startTraining(IMessage ms);
 
+    void trainShooting(IMessage ms);
+
     void sendUpdateMoney();
 
     void sendUpdateCup(int cupUp);

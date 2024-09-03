@@ -232,7 +232,8 @@ public class FightWait implements IFightWait {
             ds.writeUTF(us.getUsername());
             ds.writeByte(us.getCurrentLevel());
             ds.writeByte(us.getActiveCharacterId());
-            for (short id : us.getEquip()) {
+            short[] equips = us.getEquips();
+            for (short id : equips) {
                 ds.writeShort(id);
             }
             ds.flush();
@@ -263,7 +264,8 @@ public class FightWait implements IFightWait {
                 ds.writeInt(0);
                 ds.writeByte(user.getCurrentLevel());
                 ds.writeByte(user.getActiveCharacterId());
-                for (short id : user.getEquip()) {
+                short[] equips = us.getEquips();
+                for (short id : equips) {
                     ds.writeShort(id);
                 }
                 ds.writeBoolean(readies[i]);
@@ -718,7 +720,8 @@ public class FightWait implements IFightWait {
                 ds.writeInt(u.getXu());
                 ds.writeByte(u.getCurrentLevel());
                 ds.writeByte(u.getCurrentLevelPercent());
-                for (short id : u.getEquip()) {
+                short[] equips = u.getEquips();
+                for (short id : equips) {
                     ds.writeShort(id);
                 }
             }

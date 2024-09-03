@@ -129,6 +129,8 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.TRAINING -> userService.startTraining(ms);
 
+                case Cmd.TRAININGSHOOT -> userService.trainShooting(ms);
+
                 case Cmd.GET_FILEPACK -> userService.getFilePack(ms);
 
                 case Cmd.ADD_POINT -> userService.handleAddPoints(ms);

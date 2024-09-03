@@ -69,7 +69,7 @@ public class FightManager implements IFightManager {
         fightWait.chatMessage(playerId, GameString.leave2(player.getUser().getUsername()));
 
         //đổi lượt chơi
-        if(currentTurnPlayer == index){
+        if (currentTurnPlayer == index) {
             nextTurn();
         }
     }
