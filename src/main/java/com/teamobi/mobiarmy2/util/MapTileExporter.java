@@ -11,30 +11,16 @@ import java.util.List;
 
 public class MapTileExporter {
 
-    public static void saveMapTilesToFile(List<MapTile> mapTiles, String filePath) throws IOException {
-        // Tìm kích thước của bức ảnh
-        int imageWidth = 0;
-        int imageHeight = 0;
-        for (MapTile tile : mapTiles) {
-            imageWidth = Math.max(imageWidth, tile.getX() + tile.getWidth());
-            imageHeight = Math.max(imageHeight, tile.getY() + tile.getHeight());
-        }
-
-        // Tạo BufferedImage với kích thước phù hợp
+    public static void saveMapTilesToFile(List<MapTile> mapTiles, int imageWidth, int imageHeight, String filePath) throws IOException {
         BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = image.createGraphics();
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.setColor(Color.WHITE);
-        g2d.fillRect(0, 0, imageWidth, imageHeight);
 
-        // Vẽ các tile lên BufferedImage
         for (MapTile tile : mapTiles) {
             drawTile(g2d, tile);
         }
 
         g2d.dispose();
 
-        // Lưu BufferedImage vào file
         File file = new File(filePath);
         ImageIO.write(image, "png", file);
     }
