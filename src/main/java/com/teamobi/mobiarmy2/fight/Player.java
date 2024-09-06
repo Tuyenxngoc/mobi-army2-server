@@ -24,6 +24,7 @@ public class Player {
     private boolean isPoisoned;
     private byte eyeSmokeCount;
     private byte freezeCount;
+    private byte windStopCount;
 
     public Player(User user) {
         this.user = user;
@@ -35,6 +36,12 @@ public class Player {
 
     public void nextLuck() {
         isLucky = Math.random() < 0.5;
+    }
+
+    public void decreaseWindStopCount() {
+        if (windStopCount > 0) {
+            windStopCount--;
+        }
     }
 
 }

@@ -6,6 +6,7 @@ import com.teamobi.mobiarmy2.fight.*;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.Impl.Message;
+import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -20,6 +21,8 @@ public class FightManager implements IFightManager {
     private final IFightWait fightWait;
     private Player[] players;
     private int currentTurnPlayer;
+    private byte windX;
+    private byte windY;
     private final IMapManager mapManager;
     private final IBulletManager bulletManager;
     private final ICountdownTimer countdownTimer;
@@ -72,6 +75,7 @@ public class FightManager implements IFightManager {
         try {
             IMessage ms = new Message(Cmd.EYE_SMOKE);
             DataOutputStream ds = ms.writer();
+            ds.writeByte(0);
             ds.writeByte(index);
             ds.flush();
             fightWait.sendToTeam(ms);
@@ -84,6 +88,7 @@ public class FightManager implements IFightManager {
         try {
             IMessage ms = new Message(Cmd.FREEZE);
             DataOutputStream ds = ms.writer();
+            ds.writeByte(0);
             ds.writeByte(index);
             ds.flush();
             fightWait.sendToTeam(ms);
@@ -98,7 +103,7 @@ public class FightManager implements IFightManager {
             DataOutputStream ds = ms.writer();
             ds.writeByte(index);
             ds.writeShort(player.getHp());
-            ds.writeByte(player.getPixel());
+            ds.writeByte(player.getPixel());//todo
             ds.flush();
             fightWait.sendToTeam(ms);
         } catch (IOException e) {
@@ -179,8 +184,36 @@ public class FightManager implements IFightManager {
         return -1;
     }
 
-    private void nextBosses() {
+    private void nextWind() {
+        Player player = players[currentTurnPlayer];
+        if (player.getWindStopCount() > 0) {
+            player.decreaseWindStopCount();
 
+            windX = 0;
+            windY = 0;
+        } else {
+            if (Utils.nextInt(0, 100) > 25) {
+                windX = Utils.nextByte(-70, 70);
+                windY = Utils.nextByte(-70, 70);
+            }
+        }
+
+        try {
+            IMessage ms = new Message(Cmd.WIND);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(windX);
+            ds.writeByte(windY);
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void nextBosses() {
+        switch (fightWait.getMapId()) {
+
+        }
     }
 
     private void nextTurn() {
@@ -188,7 +221,7 @@ public class FightManager implements IFightManager {
     }
 
     @Override
-    public void leave(int playerId) {//Todo
+    public void leave(int playerId) {
         int index = getPlayerIndexByPlayerId(playerId);
         if (index == -1) {
             return;

@@ -52,6 +52,12 @@ public class Utils {
         return from + RANDOM.nextInt(to - from);
     }
 
+    public static byte nextByte(int x1, int x2) {
+        int from = Math.min(x1, x2);
+        int to = Math.max(x1, x2) + 1;
+        return (byte) (from + RANDOM.nextInt(to - from));
+    }
+
     public static int nextInt(int max) {
         return RANDOM.nextInt(max);
     }

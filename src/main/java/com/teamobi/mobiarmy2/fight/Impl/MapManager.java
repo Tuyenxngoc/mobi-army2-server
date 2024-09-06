@@ -17,7 +17,6 @@ import java.util.List;
 @Setter
 public class MapManager implements IMapManager {
 
-    private byte mapId;
     private short width;
     private short height;
     private List<MapTile> mapTiles = new ArrayList<>();
@@ -31,7 +30,6 @@ public class MapManager implements IMapManager {
 
     @Override
     public void loadMapId(byte mapId) {
-        this.mapId = mapId;
         byte[] mapData = MapData.getMapData(mapId);
 
         if (mapData == null) {
