@@ -22,14 +22,10 @@ public class TrainingManager implements ITrainingManager {
 
     @Override
     public void startTraining() {
-        players[0] = new Player(null);
-        players[0].setX((short) 230);
-        players[0].setY((short) 200);
+        players[0] = new Player(null, null, (byte) 0, (short) 230, (short) 200, null);
         players[0].setMaxHp((short) 1000);
 
-        players[1] = new Player(null);
-        players[1].setX((short) 550);
-        players[1].setY((short) 200);
+        players[1] = new Player(null, null, (byte) 1, (short) 550, (short) 200, null);
         players[1].setMaxHp((short) 1000);
 
         try {

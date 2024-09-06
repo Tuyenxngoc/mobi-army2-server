@@ -11,13 +11,16 @@ import lombok.Setter;
 @Setter
 public class Player {
 
+    private final IFightManager fightManager;
     private final User user;
+    private byte index;
     private byte pixel;
     private byte angry;
     private short x;
     private short y;
     private short maxHp;
     private short hp;
+    private byte[] items;
     private boolean isUpdateHP;
     private boolean isUpdateAngry;
     private boolean isLucky;
@@ -26,8 +29,17 @@ public class Player {
     private byte freezeCount;
     private byte windStopCount;
 
-    public Player(User user) {
+    public Player(IFightManager fightManager, User user, byte index, short x, short y, byte[] items) {
+        this.fightManager = fightManager;
         this.user = user;
+        this.index = index;
+        this.x = x;
+        this.y = y;
+        this.items = items;
+
+        short[] ability = user.getAbility();
+
+        this.maxHp = ability[0];
     }
 
     public void die() {

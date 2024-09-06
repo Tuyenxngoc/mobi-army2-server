@@ -46,4 +46,6 @@ public interface IFightWait {
     void findPlayer(int playerId);
 
     void inviteToRoom(int playerId);
+
+    byte[] getItems(byte i);
 }

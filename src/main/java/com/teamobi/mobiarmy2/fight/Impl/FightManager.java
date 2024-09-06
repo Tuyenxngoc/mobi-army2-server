@@ -10,6 +10,7 @@ import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author tuyen
@@ -250,12 +251,16 @@ public class FightManager implements IFightManager {
         //Tải dữ liệu bản đồ
         mapManager.loadMapId(fightWait.getMapId());
 
-        for (int i = 0; i < fightWait.getNumPlayers(); i++) {
+        byte totalPlayers = fightWait.getNumPlayers();
+        List<short[]> randomPositions = mapManager.getRandomPlayerPositions(totalPlayers);
+        for (byte i = 0; i < totalPlayers; i++) {
             User user = fightWait.getUsers()[i];
             if (user == null) {
                 continue;
             }
-            players[i] = new Player(user);
+            short x = randomPositions.get(i)[0];
+            short y = randomPositions.get(i)[1];
+            players[i] = new Player(this, user, i, x, y, fightWait.getItems(i));
         }
 
         sendFightInfo();

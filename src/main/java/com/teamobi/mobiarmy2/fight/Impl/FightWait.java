@@ -26,6 +26,8 @@ import java.util.List;
 @Getter
 @Setter
 public class FightWait implements IFightWait {
+    private static final byte MAX_ITEMS_SLOT = 8;
+
     private final IFightManager fightManager;
     private final Room room;
     private final byte id;
@@ -53,7 +55,7 @@ public class FightWait implements IFightWait {
 
         this.fightManager = new FightManager(this);
         this.users = new User[maxPlayers];
-        this.items = new byte[maxPlayers][8];
+        this.items = new byte[maxPlayers][MAX_ITEMS_SLOT];
         this.readies = new boolean[maxPlayers];
 
         this.name = "";
@@ -148,7 +150,7 @@ public class FightWait implements IFightWait {
         numPlayers = 0;
         numReady = 0;
         users = new User[maxPlayers];
-        items = new byte[maxPlayers][8];
+        items = new byte[maxPlayers][MAX_ITEMS_SLOT];
         readies = new boolean[maxPlayers];
 
         ServerManager.getInstance().logger().logMessage("Refresh fight wait");
@@ -546,8 +548,8 @@ public class FightWait implements IFightWait {
                 }
 
                 // Kiểm tra điều kiện số lượng item
-                if (itemUsageMap[itemIndex] > FightItemData.FIGHT_ITEM_ENTRIES.get(itemIndex).getCarriedItemCount() && // Số lượng vượt quá số lượng cho phép
-                        itemUsageMap[itemIndex] > user.getItemFightQuantity(itemIndex) && // Số lượng vượt quá số lượng đang có
+                if (itemUsageMap[itemIndex] > FightItemData.FIGHT_ITEM_ENTRIES.get(itemIndex).getCarriedItemCount() || // Số lượng vượt quá số lượng cho phép
+                        itemUsageMap[itemIndex] > user.getItemFightQuantity(itemIndex) || // Số lượng vượt quá số lượng đang có
                         (j >= 4 && user.getItemFightQuantity(12 + j - 4) == 0) // Item chứa đã hết
                 ) {
                     try {
@@ -765,6 +767,11 @@ public class FightWait implements IFightWait {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public byte[] getItems(byte i) {
+        return items[i];
     }
 
     @Override

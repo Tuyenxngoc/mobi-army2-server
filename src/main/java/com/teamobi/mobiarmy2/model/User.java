@@ -468,8 +468,8 @@ public class User {
         return equipDefault[activeCharacterId][0].getEquipIndex();
     }
 
-    public int[] getAbility() {
-        int[] ability = new int[5];
+    public short[] getAbility() {
+        short[] ability = new short[5];
         ability[0] = 1000;
         ability[1] = 10;
         ability[2] = 10;

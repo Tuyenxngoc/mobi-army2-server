@@ -11,6 +11,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -26,6 +27,43 @@ public class MapManager implements IMapManager {
 
     public MapManager(IFightManager fightManager) {
         this.fightManager = fightManager;
+    }
+
+    @Override
+    public short getHeight() {
+        return height;
+    }
+
+    @Override
+    public short getWidth() {
+        return width;
+    }
+
+    @Override
+    public List<short[]> getRandomPlayerPositions(int numPlayers) {
+        // Kiểm tra nếu số người chơi lớn hơn số vị trí khả dụng
+        if (numPlayers > playerInitXPositions.length || numPlayers > playerInitYPositions.length) {
+            throw new IllegalArgumentException("Số người chơi vượt quá số lượng vị trí khả dụng");
+        }
+
+        // Khởi tạo danh sách chỉ số vị trí
+        List<Integer> indices = new ArrayList<>();
+        for (int i = 0; i < playerInitXPositions.length; i++) {
+            indices.add(i);
+        }
+
+        // Trộn ngẫu nhiên các chỉ số
+        Collections.shuffle(indices);
+
+        // Tạo danh sách vị trí người chơi dựa trên chỉ số đã trộn
+        List<short[]> randomPositions = new ArrayList<>();
+        for (int i = 0; i < numPlayers; i++) {
+            short x = playerInitXPositions[indices.get(i)];
+            short y = playerInitYPositions[indices.get(i)];
+            randomPositions.add(new short[]{x, y});
+        }
+
+        return randomPositions;
     }
 
     @Override
