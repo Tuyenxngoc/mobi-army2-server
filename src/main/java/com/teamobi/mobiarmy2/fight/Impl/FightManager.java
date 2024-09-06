@@ -36,6 +36,138 @@ public class FightManager implements IFightManager {
         this.players = new Player[MAX_ELEMENT_FIGHT];
     }
 
+    private void handlePlayerLuck() {
+        for (int i = 0; i < fightWait.getNumPlayers(); i++) {
+            if (players[i] != null && players[i].getUser() != null) {
+                players[i].nextLuck();
+            }
+        }
+    }
+
+    private void sendLuckyUpdate(byte index) {
+        try {
+            IMessage ms = new Message(Cmd.LUCKY);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(index);
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendPoisonUpdate(byte index) {
+        try {
+            IMessage ms = new Message(Cmd.POISON);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(index);
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendEyeSmokeUpdate(byte index) {
+        try {
+            IMessage ms = new Message(Cmd.EYE_SMOKE);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(index);
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendFreezeUpdate(byte index) {
+        try {
+            IMessage ms = new Message(Cmd.FREEZE);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(index);
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendHpUpdate(byte index, Player player) {
+        try {
+            IMessage ms = new Message(Cmd.UPDATE_HP);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(index);
+            ds.writeShort(player.getHp());
+            ds.writeByte(player.getPixel());
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendAngryUpdate(byte index, Player player) {
+        try {
+            IMessage ms = new Message(Cmd.ANGRY);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(index);
+            ds.writeByte(player.getAngry());
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateLuckyPlayers() {
+        for (byte i = 0; i < fightWait.getNumPlayers(); i++) {
+            if (players[i] != null && players[i].isLucky()) {
+                sendLuckyUpdate(i);
+                players[i].setLucky(false);
+            }
+        }
+    }
+
+    private void updatePoisonedPlayers() {
+        for (byte i = 0; i < fightWait.getNumPlayers(); i++) {
+            if (players[i] != null && players[i].isPoisoned()) {
+                sendPoisonUpdate(i);
+            }
+        }
+    }
+
+    private void updateEyeSmokeStatus() {
+        for (byte i = 0; i < fightWait.getNumPlayers(); i++) {
+            if (players[i] != null && players[i].getEyeSmokeCount() > 0) {
+                sendEyeSmokeUpdate(i);
+            }
+        }
+    }
+
+    private void updateFrozenPlayers() {
+        for (byte i = 0; i < fightWait.getNumPlayers(); i++) {
+            if (players[i] != null && players[i].getFreezeCount() > 0) {
+                sendFreezeUpdate(i);
+            }
+        }
+    }
+
+    private void updateHpPlayers() {
+        for (byte i = 0; i < fightWait.getNumPlayers(); i++) {
+            if (players[i] != null && players[i].isUpdateHP()) {
+                sendHpUpdate(i, players[i]);
+            }
+        }
+    }
+
+    private void updateAngryPlayers() {
+        for (byte i = 0; i < fightWait.getNumPlayers(); i++) {
+            if (players[i] != null && players[i].isUpdateAngry()) {
+                sendAngryUpdate(i, players[i]);
+            }
+        }
+    }
+
     private int getPlayerIndexByPlayerId(int playerId) {
         for (int i = 0; i < fightWait.getNumPlayers(); i++) {
             if (players[i] != null

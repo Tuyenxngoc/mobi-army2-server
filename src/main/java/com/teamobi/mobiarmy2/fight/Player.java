@@ -12,10 +12,18 @@ import lombok.Setter;
 public class Player {
 
     private final User user;
+    private byte pixel;
+    private byte angry;
     private short x;
     private short y;
     private short maxHp;
     private short hp;
+    private boolean isUpdateHP;
+    private boolean isUpdateAngry;
+    private boolean isLucky;
+    private boolean isPoisoned;
+    private byte eyeSmokeCount;
+    private byte freezeCount;
 
     public Player(User user) {
         this.user = user;
@@ -24,4 +32,9 @@ public class Player {
     public void die() {
         this.hp = 0;
     }
+
+    public void nextLuck() {
+        isLucky = Math.random() < 0.5;
+    }
+
 }

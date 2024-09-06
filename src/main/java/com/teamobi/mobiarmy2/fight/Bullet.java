@@ -18,8 +18,8 @@ public class Bullet {
     private short frame;
     private short damage;
 
-    private List<Short> xArrays = new ArrayList<>();
-    private List<Short> yArrays = new ArrayList<>();
+    private final List<Short> xArrays = new ArrayList<>();
+    private final List<Short> yArrays = new ArrayList<>();
 
     private final IBulletManager bulletManager;
 
@@ -48,9 +48,8 @@ public class Bullet {
         lastY = y;
 
         short[] points = bulletManager.getCollisionPoint();
-        if(points != null){
+        if (points != null) {
             collect = true;
-            return;
         }
     }
 
