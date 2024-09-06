@@ -2,9 +2,7 @@ package com.teamobi.mobiarmy2.fight.Impl;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
-import com.teamobi.mobiarmy2.fight.IFightManager;
-import com.teamobi.mobiarmy2.fight.IFightWait;
-import com.teamobi.mobiarmy2.fight.IMapManager;
+import com.teamobi.mobiarmy2.fight.*;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.Impl.Message;
@@ -21,13 +19,17 @@ public class FightManager implements IFightManager {
 
     private final IFightWait fightWait;
     private Player[] players;
-    private IMapManager mapManager;
     private int currentTurnPlayer;
+    private final IMapManager mapManager;
+    private final IBulletManager bulletManager;
+    private final ICountdownTimer countdownTimer;
 
     public FightManager(FightWait fightWait) {
         this.fightWait = fightWait;
         this.players = new Player[MAX_ELEMENT_FIGHT];
         this.mapManager = new MapManager();
+        this.bulletManager = new BulletManager();
+        this.countdownTimer = new CountdownTimer();
     }
 
     private void refreshFightManager() {
@@ -139,6 +141,11 @@ public class FightManager implements IFightManager {
     @Override
     public void useItem(byte itemIndex) {
 
+    }
+
+    @Override
+    public IMapManager getMapManger() {
+        return mapManager;
     }
 
 }

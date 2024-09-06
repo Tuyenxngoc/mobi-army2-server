@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.util;
 
-import com.teamobi.mobiarmy2.fight.Impl.MapTile;
+import com.teamobi.mobiarmy2.fight.MapTile;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

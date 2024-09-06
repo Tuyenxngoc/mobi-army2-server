@@ -1,5 +1,6 @@
-package com.teamobi.mobiarmy2.fight.Impl;
+package com.teamobi.mobiarmy2.fight;
 
+import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,6 +27,15 @@ public class MapTile {
         this.width = width;
         this.height = height;
         this.collision = collision;
+    }
+
+    public boolean isCollision(short x, short y) {
+        return (Utils.inRegion(x, y, this.x, this.y, this.width, this.height)
+                && Utils.isNotAlpha(getARGB(x - this.x, y - this.x)));
+    }
+
+    public final int getARGB(int x, int y) {
+        return data[y * width + x];
     }
 
 }

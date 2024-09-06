@@ -16,4 +16,6 @@ public interface IFightManager {
 
     void useItem(byte itemIndex);
 
+    IMapManager getMapManger();
+
 }

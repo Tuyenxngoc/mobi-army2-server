@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.fight.Impl;
 
 import com.teamobi.mobiarmy2.fight.IMapManager;
+import com.teamobi.mobiarmy2.fight.MapTile;
 import com.teamobi.mobiarmy2.model.MapData;
 import com.teamobi.mobiarmy2.model.entry.map.MapBrick;
 import com.teamobi.mobiarmy2.util.Utils;
