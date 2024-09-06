@@ -55,17 +55,11 @@ public class Bullet {
     }
 
     public static boolean isFlagBull(int bulletId) {
-        if (bulletId == 4 || bulletId == 14 || bulletId == 16 || bulletId == 23 || bulletId == 28) {
-            return true;
-        }
-        return false;
+        return bulletId == 4 || bulletId == 14 || bulletId == 16 || bulletId == 23 || bulletId == 28;
     }
 
     public static boolean isDoubleBull(int bulletId) {
-        if (bulletId == 17 || bulletId == 19) {
-            return true;
-        }
-        return false;
+        return bulletId == 17 || bulletId == 19;
     }
 
 }
