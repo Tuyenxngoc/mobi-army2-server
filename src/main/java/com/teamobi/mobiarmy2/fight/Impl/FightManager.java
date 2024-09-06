@@ -27,9 +27,9 @@ public class FightManager implements IFightManager {
     public FightManager(FightWait fightWait) {
         this.fightWait = fightWait;
         this.players = new Player[MAX_ELEMENT_FIGHT];
-        this.mapManager = new MapManager();
-        this.bulletManager = new BulletManager();
-        this.countdownTimer = new CountdownTimer();
+        this.mapManager = new MapManager(this);
+        this.bulletManager = new BulletManager(this);
+        this.countdownTimer = new CountdownTimer(this);
     }
 
     private void refreshFightManager() {

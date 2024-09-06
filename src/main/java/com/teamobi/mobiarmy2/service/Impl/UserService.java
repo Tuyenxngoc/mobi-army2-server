@@ -6,6 +6,7 @@ import com.teamobi.mobiarmy2.dao.IGiftCodeDao;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.dao.impl.GiftCodeDao;
 import com.teamobi.mobiarmy2.dao.impl.UserDao;
+import com.teamobi.mobiarmy2.fight.Bullet;
 import com.teamobi.mobiarmy2.fight.Impl.FightWait;
 import com.teamobi.mobiarmy2.fight.Impl.TrainingManager;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
@@ -1658,7 +1659,7 @@ public class UserService implements IUserService {
             short angle = dis.readShort();
             byte force = dis.readByte();
             byte force2 = 0;
-            if (bullId == 19) {
+            if (Bullet.isDoubleBull(bullId)) {
                 force2 = dis.readByte();
             }
             byte numShoot = dis.readByte();
@@ -3034,7 +3035,7 @@ public class UserService implements IUserService {
             short angle = dis.readShort();
             byte force = dis.readByte();
             byte force2 = 0;
-            if (bullId == 19) {
+            if (Bullet.isDoubleBull(bullId)) {
                 force2 = dis.readByte();
             }
             byte numShoot = dis.readByte();

@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.fight.Impl;
 
+import com.teamobi.mobiarmy2.fight.IFightManager;
 import com.teamobi.mobiarmy2.fight.IMapManager;
 import com.teamobi.mobiarmy2.fight.MapTile;
 import com.teamobi.mobiarmy2.model.MapData;
@@ -19,12 +20,13 @@ public class MapManager implements IMapManager {
     private byte mapId;
     private short width;
     private short height;
-    private List<MapTile> mapTiles;
+    private List<MapTile> mapTiles = new ArrayList<>();
     private short[] playerInitXPositions;
     private short[] playerInitYPositions;
+    private final IFightManager fightManager;
 
-    public MapManager() {
-        mapTiles = new ArrayList<>();
+    public MapManager(IFightManager fightManager) {
+        this.fightManager = fightManager;
     }
 
     @Override
