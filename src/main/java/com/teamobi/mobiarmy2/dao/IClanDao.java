@@ -1,9 +1,9 @@
 package com.teamobi.mobiarmy2.dao;
 
 import com.teamobi.mobiarmy2.json.ClanItemJson;
-import com.teamobi.mobiarmy2.model.entry.clan.ClanEntry;
-import com.teamobi.mobiarmy2.model.entry.clan.ClanInfo;
-import com.teamobi.mobiarmy2.model.entry.clan.ClanMemEntry;
+import com.teamobi.mobiarmy2.model.clan.ClanEntry;
+import com.teamobi.mobiarmy2.model.clan.ClanInfo;
+import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
 
 import java.util.List;
 
