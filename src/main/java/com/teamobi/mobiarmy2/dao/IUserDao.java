@@ -8,6 +8,9 @@ import com.teamobi.mobiarmy2.model.user.FriendEntry;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * @author tuyen
+ */
 public interface IUserDao extends Dao<User> {
 
     User findByUsernameAndPassword(String username, String password);

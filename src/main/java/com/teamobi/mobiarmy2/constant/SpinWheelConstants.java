@@ -1,5 +1,8 @@
 package com.teamobi.mobiarmy2.constant;
 
+/**
+ * @author tuyen
+ */
 public class SpinWheelConstants {
     public static final int XU_COST = 1000; // Cost in Xu for spinning the wheel
     public static final int LUONG_COST = 1; // Cost in Luong for spinning the wheel

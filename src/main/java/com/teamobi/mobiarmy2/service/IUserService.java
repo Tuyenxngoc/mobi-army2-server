@@ -2,6 +2,9 @@ package com.teamobi.mobiarmy2.service;
 
 import com.teamobi.mobiarmy2.network.IMessage;
 
+/**
+ * @author tuyen
+ */
 public interface IUserService {
 
     void handleLogin(IMessage ms);

@@ -3,6 +3,9 @@ package com.teamobi.mobiarmy2.fight;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author tuyen
+ */
 public class Bullet {
 
     private boolean collect;

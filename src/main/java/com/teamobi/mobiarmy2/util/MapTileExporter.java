@@ -9,6 +9,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * @author tuyen
+ */
 public class MapTileExporter {
 
     public static void saveMapTilesToFile(List<MapTile> mapTiles, int imageWidth, int imageHeight, String filePath) throws IOException {

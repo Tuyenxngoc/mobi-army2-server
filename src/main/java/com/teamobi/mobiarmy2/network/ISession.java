@@ -2,6 +2,9 @@ package com.teamobi.mobiarmy2.network;
 
 import com.teamobi.mobiarmy2.model.User;
 
+/**
+ * @author tuyen
+ */
 public interface ISession {
 
     void sendMessage(IMessage message);

@@ -1,5 +1,8 @@
 package com.teamobi.mobiarmy2.log;
 
+/**
+ * @author tuyen
+ */
 public interface ILogManager {
 
     void logToFile(String message);

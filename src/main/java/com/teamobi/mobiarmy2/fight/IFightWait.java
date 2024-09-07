@@ -3,6 +3,9 @@ package com.teamobi.mobiarmy2.fight;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
 
+/**
+ * @author tuyen
+ */
 public interface IFightWait {
 
     void sendToTeam(IMessage message);

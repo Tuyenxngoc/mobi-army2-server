@@ -6,6 +6,9 @@ import com.teamobi.mobiarmy2.fight.IFightManager;
 
 import java.util.List;
 
+/**
+ * @author tuyen
+ */
 public class BulletManager implements IBulletManager {
 
     private final IFightManager fightManager;

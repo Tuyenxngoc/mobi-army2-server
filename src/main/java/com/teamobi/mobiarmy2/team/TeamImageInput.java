@@ -4,6 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
+/**
+ * @author tuyen
+ */
 public final class TeamImageInput {
 
     private String[] names;

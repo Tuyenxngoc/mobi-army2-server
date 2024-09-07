@@ -4,6 +4,9 @@ import com.teamobi.mobiarmy2.model.user.PlayerLeaderboardEntry;
 
 import java.util.List;
 
+/**
+ * @author tuyen
+ */
 public interface IRankingDao {
 
     List<PlayerLeaderboardEntry> getTopHonor();

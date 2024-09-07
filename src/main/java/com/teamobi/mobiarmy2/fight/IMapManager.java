@@ -2,6 +2,9 @@ package com.teamobi.mobiarmy2.fight;
 
 import java.util.List;
 
+/**
+ * @author tuyen
+ */
 public interface IMapManager {
 
     short getWidth();

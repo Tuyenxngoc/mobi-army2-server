@@ -14,6 +14,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * @author tuyen
+ */
 @Getter
 @Setter
 public class MapManager implements IMapManager {

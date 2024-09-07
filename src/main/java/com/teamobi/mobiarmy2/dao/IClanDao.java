@@ -7,6 +7,9 @@ import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
 
 import java.util.List;
 
+/**
+ * @author tuyen
+ */
 public interface IClanDao {
 
     Short getClanIcon(int clanId);

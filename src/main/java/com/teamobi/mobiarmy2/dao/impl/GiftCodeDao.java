@@ -11,6 +11,9 @@ import com.teamobi.mobiarmy2.util.GsonUtil;
 import java.sql.*;
 import java.time.LocalDateTime;
 
+/**
+ * @author tuyen
+ */
 public class GiftCodeDao implements IGiftCodeDao {
 
     @Override
