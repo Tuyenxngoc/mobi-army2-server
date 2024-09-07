@@ -23,11 +23,9 @@ public class FabricateItemData {
     public static FabricateItemEntry getFabricateItem(List<SpecialItemChestEntry> selectedSpecialItems) {
         // Convert the list to a set to eliminate duplicates and for faster comparison
         Set<SpecialItemChestEntry> entrySet = new HashSet<>(selectedSpecialItems);
-
         return FABRICATE_ITEM_ENTRIES.stream()
                 .filter(entry -> entry.getItemRequire().equals(entrySet))
                 .findFirst()
                 .orElse(null);
     }
-
 }

@@ -6,8 +6,8 @@ import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dao.IRankingDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
-import com.teamobi.mobiarmy2.repository.CharacterData;
 import com.teamobi.mobiarmy2.model.user.PlayerLeaderboardEntry;
+import com.teamobi.mobiarmy2.repository.CharacterData;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 

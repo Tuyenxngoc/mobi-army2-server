@@ -11,7 +11,6 @@ import com.teamobi.mobiarmy2.fight.Impl.FightWait;
 import com.teamobi.mobiarmy2.fight.Impl.TrainingManager;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
-import com.teamobi.mobiarmy2.repository.*;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.clan.ClanInfo;
@@ -28,6 +27,8 @@ import com.teamobi.mobiarmy2.model.user.PlayerLeaderboardEntry;
 import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.Impl.Message;
+import com.teamobi.mobiarmy2.repository.CharacterData;
+import com.teamobi.mobiarmy2.repository.*;
 import com.teamobi.mobiarmy2.server.ClanManager;
 import com.teamobi.mobiarmy2.server.LeaderboardManager;
 import com.teamobi.mobiarmy2.server.ServerManager;
@@ -944,6 +945,7 @@ public class UserService implements IUserService {
     @Override
     public void enterTrainingMap() {
         try {
+            initializeTrainingManager();
             IMessage ms = new Message(Cmd.TRAINING_MAP);
             DataOutputStream ds = ms.writer();
             ds.writeByte(user.getTrainingManager().getMapId());
@@ -2990,9 +2992,7 @@ public class UserService implements IUserService {
         try {
             byte type = ms.reader().readByte();
 
-            if (user.getTrainingManager() == null) {
-                user.setTrainingManager(new TrainingManager(user, ServerManager.getInstance().config().getTrainingMapId()));
-            }
+            initializeTrainingManager();
 
             if (type == 0) {//Start game
                 if (user.isNotWaiting()) {
@@ -3017,6 +3017,12 @@ public class UserService implements IUserService {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void initializeTrainingManager() {
+        if (user.getTrainingManager() == null) {
+            user.setTrainingManager(new TrainingManager(user, ServerManager.getInstance().config().getTrainingMapId()));
         }
     }
 

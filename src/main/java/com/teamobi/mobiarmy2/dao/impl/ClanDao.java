@@ -5,13 +5,13 @@ import com.teamobi.mobiarmy2.dao.IClanDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.ClanItemJson;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
-import com.teamobi.mobiarmy2.repository.CharacterData;
-import com.teamobi.mobiarmy2.repository.ClanItemData;
 import com.teamobi.mobiarmy2.model.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.clan.ClanItem;
 import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
 import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
+import com.teamobi.mobiarmy2.repository.CharacterData;
+import com.teamobi.mobiarmy2.repository.ClanItemData;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 

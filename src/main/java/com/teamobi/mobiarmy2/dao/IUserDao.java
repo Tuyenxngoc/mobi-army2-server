@@ -1,8 +1,8 @@
 package com.teamobi.mobiarmy2.dao;
 
 import com.teamobi.mobiarmy2.constant.TransactionType;
-import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.model.PlayerCharacterEntry;
+import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.model.user.FriendEntry;
 
 import java.time.LocalDateTime;

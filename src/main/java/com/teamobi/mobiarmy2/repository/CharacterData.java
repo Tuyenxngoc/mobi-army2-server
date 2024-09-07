@@ -7,9 +7,8 @@ import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author tuyen
@@ -28,19 +27,18 @@ public class CharacterData {
         if (characterEntry == null) {
             return;
         }
+
         //Lấy danh sách theo loại trang bị, chưa có thì tạo mới
         List<EquipmentEntry> entryList = characterEntry.getEquips().computeIfAbsent(newEquip.getEquipType(), k -> new ArrayList<>());
         if (entryList.stream().anyMatch(entry -> entry.getEquipIndex() == newEquip.getEquipIndex())) {//Nếu tồn tại trong danh sách rồi thì bỏ qua
             return;
         }
-
         if (newEquip.isOnSale()) {
             newEquip.setSaleIndex(totalSaleEquipments);
             totalSaleEquipments++;
         } else {
             newEquip.setSaleIndex(-1);
         }
-
         entryList.add(newEquip);
         EQUIPMENT_ENTRIES.add(newEquip);
     }
@@ -54,14 +52,12 @@ public class CharacterData {
         Optional<CharacterEntry> characterEntryOpt = CHARACTER_ENTRIES.stream()
                 .filter(entry -> entry.getId() == characterId)
                 .findFirst();
-
         if (characterEntryOpt.isEmpty()) {
             return null;
         }
 
         // Get the equipment list for the given type
         List<EquipmentEntry> entries = characterEntryOpt.get().getEquips().get(equipType);
-
         if (entries == null) {
             return null;
         }
@@ -80,62 +76,43 @@ public class CharacterData {
                 .orElse(null);
     }
 
-    //Todo optimize this method
     public static short[] getEquipData(EquipmentChestJson[] equipmentChestJsons, int[] data, byte activeCharacter) {
         short[] equipData = new short[5];
+        LocalDateTime now = LocalDateTime.now();
 
-        //Tìm cải trang
-        boolean found = false;
+        Map<Integer, EquipmentChestJson> equipmentMap = Arrays.stream(equipmentChestJsons)
+                .filter(json -> json != null && json.getCharacterId() == activeCharacter)
+                .collect(Collectors.toMap(EquipmentChestJson::getKey, json -> json));
+
+        // Tìm cải trang
         int disguiseKey = data[5];
-        if (disguiseKey >= 0) {
-            for (EquipmentChestJson json : equipmentChestJsons) {
-                if (json != null && json.getKey() == disguiseKey) {
-                    EquipmentEntry equip = getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex());
-                    if (equip != null) {
-
-                        //Kiểm tra cải trang còn hạn sử dụng hay không
-                        if (equip.getExpirationDays() - ChronoUnit.DAYS.between(json.getPurchaseDate(), LocalDateTime.now()) > 0) {
-                            System.arraycopy(equip.getDisguiseEquippedIndexes(), 0, equipData, 0, equipData.length);
-                            found = true;
-                            break;
-                        }
-                    }
-                }
+        if (disguiseKey != -1 && equipmentMap.containsKey(disguiseKey)) {
+            EquipmentChestJson json = equipmentMap.get(disguiseKey);
+            EquipmentEntry equip = getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex());
+            if (equip != null && equip.getExpirationDays() - ChronoUnit.DAYS.between(json.getPurchaseDate(), now) > 0) {
+                return equip.getDisguiseEquippedIndexes();
             }
         }
 
-        //Tìm trang bị
-        if (!found) {
-            for (int i = 0; i < equipData.length; i++) {
+        // Tìm trang bị
+        for (int i = 0; i < equipData.length; i++) {
+            int equipKey = data[i];
+            boolean exists = false;
 
-                //Kiểm tra có trang bị trong rương hay không
-                boolean exists = false;
-                int equipKey = data[i];
-                if (equipKey >= 0) {
-                    for (EquipmentChestJson json : equipmentChestJsons) {
-                        if (json != null && json.getKey() == equipKey) {
-                            EquipmentEntry equip = getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex());
-                            if (equip != null) {
-
-                                //Kiểm tra trang bị còn hạn sử dụng hay không
-                                if (equip.getExpirationDays() - ChronoUnit.DAYS.between(json.getPurchaseDate(), LocalDateTime.now()) > 0) {
-                                    equipData[i] = json.getEquipIndex();
-                                    exists = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
+            if (equipKey != -1 && equipmentMap.containsKey(equipKey)) {
+                EquipmentChestJson json = equipmentMap.get(equipKey);
+                EquipmentEntry equip = getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex());
+                if (equip != null && equip.getExpirationDays() - ChronoUnit.DAYS.between(json.getPurchaseDate(), now) > 0) {
+                    equipData[i] = json.getEquipIndex();
+                    exists = true;
                 }
+            }
 
-                //Nếu không tìm thấy thì lấy dữ liệu mặc định
-                if (!exists) {
-                    if (User.equipDefault[activeCharacter][i] != null) {
-                        equipData[i] = User.equipDefault[activeCharacter][i].getEquipIndex();
-                    } else {
-                        equipData[i] = -1;
-                    }
-                }
+            // Nếu không tìm thấy thì lấy dữ liệu mặc định
+            if (!exists) {
+                equipData[i] = (User.equipDefault[activeCharacter][i] != null)
+                        ? User.equipDefault[activeCharacter][i].getEquipIndex()
+                        : -1;
             }
         }
 

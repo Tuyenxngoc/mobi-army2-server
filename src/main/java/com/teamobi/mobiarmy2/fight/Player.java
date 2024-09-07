@@ -36,6 +36,16 @@ public class Player {
     private byte windStopCount;
     private boolean[] clanItems;
 
+    public Player(int index, int x, int y, int hp, int maxHp) {
+        this.fightManager = null;
+        this.user = null;
+        this.index = (byte) index;
+        this.x = (short) x;
+        this.y = (short) y;
+        this.hp = (short) hp;
+        this.maxHp = (short) maxHp;
+    }
+
     public Player(IFightManager fightManager, User user, byte index, short x, short y, byte[] items, short[] abilities, short teamPoints, boolean[] clanItems) {
         this.fightManager = fightManager;
         this.user = user;

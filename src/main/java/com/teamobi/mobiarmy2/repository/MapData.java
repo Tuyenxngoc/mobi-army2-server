@@ -62,27 +62,21 @@ public class MapData {
 
     public static MapBrick loadMapBrick(int brickId) {
         int index = MAP_BRICKS.indexOf(new MapBrick(brickId));
-
         if (index != -1) {
             return MAP_BRICKS.get(index);
         }
-
         try {
             File imageFile = new File("res/icon/map/" + brickId + ".png");
             BufferedImage image = ImageIO.read(imageFile);
-
             if (image == null) {
                 throw new IOException("Failed to read image: " + imageFile.getAbsolutePath());
             }
-
             int width = image.getWidth();
             int height = image.getHeight();
             int[] pixelData = new int[width * height];
             image.getRGB(0, 0, width, height, pixelData, 0, width);
-
             MapBrick mapBrick = new MapBrick(brickId, pixelData, width, height);
             MAP_BRICKS.add(mapBrick);
-
             return mapBrick;
         } catch (IOException e) {
             System.err.println("Error loading map brick with id " + brickId + ": " + e.getMessage());
