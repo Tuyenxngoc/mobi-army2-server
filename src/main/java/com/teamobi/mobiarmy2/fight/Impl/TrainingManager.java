@@ -14,19 +14,21 @@ public class TrainingManager implements ITrainingManager {
 
     private final User trainingUser;
     private final Player[] players;
+    private final byte mapId;
 
-    public TrainingManager(User trainingUser) {
-        this.players = new Player[2];
+    public TrainingManager(User trainingUser, byte mapId) {
         this.trainingUser = trainingUser;
+        this.mapId = mapId;
+        this.players = new Player[2];
     }
 
     @Override
     public void startTraining() {
-        players[0] = new Player(null, null, (byte) 0, (short) 230, (short) 200, null);
-        players[0].setMaxHp((short) 1000);
-
-        players[1] = new Player(null, null, (byte) 1, (short) 550, (short) 200, null);
-        players[1].setMaxHp((short) 1000);
+//        players[0] = new Player(null, null, (byte) 0, (short) 230, (short) 200, null);
+//        players[0].setMaxHp((short) 1000);
+//
+//        players[1] = new Player(null, null, (byte) 1, (short) 550, (short) 200, null);
+//        players[1].setMaxHp((short) 1000);
 
         try {
             IMessage ms = new Message(Cmd.START_ARMY);
@@ -35,7 +37,7 @@ public class TrainingManager implements ITrainingManager {
             for (short i : equips) {
                 ds.writeShort(i);
             }
-            ds.writeByte(0);
+            ds.writeByte(mapId);
             ds.writeByte(30);
             ds.writeShort(0);
             for (Player player : players) {
@@ -62,4 +64,10 @@ public class TrainingManager implements ITrainingManager {
     public void addShoot(User user, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
         trainingUser.getUserService().sendServerMessage("To be continue...: " + bullId + " " + x + " " + y + " " + angle + " " + force + " " + force2 + " " + numShoot);
     }
+
+    @Override
+    public byte getMapId() {
+        return mapId;
+    }
+
 }

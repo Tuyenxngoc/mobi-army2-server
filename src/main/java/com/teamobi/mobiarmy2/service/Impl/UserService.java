@@ -502,7 +502,7 @@ public class UserService implements IUserService {
             ds.writeInt(user.getXu());
             ds.writeInt(user.getLuong());
             ds.writeByte(user.getActiveCharacterId());
-            ds.writeShort(user.getClanId());
+            ds.writeShort(user.getClanIdAsShort());
             ds.writeByte(0);
 
             for (int i = 0; i < 10; i++) {
@@ -559,7 +559,7 @@ public class UserService implements IUserService {
         if (user.isNotWaiting()) {
             return;
         }
-        if (user.getClanId() == 0) {
+        if (user.getClanId() == null) {
             return;
         }
 
@@ -863,7 +863,7 @@ public class UserService implements IUserService {
 
     @Override
     public void handlePurchaseClanItem(IMessage ms) {
-        if (user.getClanId() == 0) {
+        if (user.getClanId() == null) {
             sendServerMessage(GameString.notClan());
             return;
         }
@@ -884,7 +884,7 @@ public class UserService implements IUserService {
 
     private void buyClanShop(byte unit, byte itemId) {
         ClanManager clanManager = ClanManager.getInstance();
-        ClanItemEntry clanItemEntry = ItemClanData.getItemClanById(itemId);
+        ClanItemEntry clanItemEntry = ClanItemData.getItemClanById(itemId);
 
         if (clanItemEntry == null || clanItemEntry.getOnSale() != 1) {
             return;
@@ -926,8 +926,8 @@ public class UserService implements IUserService {
         try {
             IMessage ms = new Message(Cmd.SHOP_BIETDOI);
             DataOutputStream ds = ms.writer();
-            ds.writeByte(ItemClanData.CLAN_ITEM_ENTRY_MAP.size());
-            for (ClanItemEntry clanItemEntry : ItemClanData.CLAN_ITEM_ENTRY_MAP.values()) {
+            ds.writeByte(ClanItemData.CLAN_ITEM_ENTRY_MAP.size());
+            for (ClanItemEntry clanItemEntry : ClanItemData.CLAN_ITEM_ENTRY_MAP.values()) {
                 ds.writeByte(clanItemEntry.getId());
                 ds.writeUTF(clanItemEntry.getName());
                 ds.writeInt(clanItemEntry.getXu());
@@ -947,7 +947,7 @@ public class UserService implements IUserService {
         try {
             IMessage ms = new Message(Cmd.TRAINING_MAP);
             DataOutputStream ds = ms.writer();
-            ds.writeByte(ServerManager.getInstance().config().getTrainingMapId());
+            ds.writeByte(user.getTrainingManager().getMapId());
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
@@ -1239,7 +1239,7 @@ public class UserService implements IUserService {
                 return;
             }
             Room room = rooms[roomNumber];
-            if (room.getType() == 6 && user.getClanId() == 0) {
+            if (room.getType() == 6 && user.getClanId() == null) {
                 sendServerMessage(GameString.notClan());
                 return;
             }
@@ -2992,7 +2992,7 @@ public class UserService implements IUserService {
             byte type = ms.reader().readByte();
 
             if (user.getTrainingManager() == null) {
-                user.setTrainingManager(new TrainingManager(user));
+                user.setTrainingManager(new TrainingManager(user, ServerManager.getInstance().config().getTrainingMapId()));
             }
 
             if (type == 0) {//Start game

@@ -10,4 +10,6 @@ public interface ITrainingManager {
 
     void addShoot(User user, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot);
 
+    byte getMapId();
+
 }

@@ -6,7 +6,7 @@ public interface IFightManager {
 
     void leave(int playerId);
 
-    void startGame();
+    void startGame(short teamPointsBlue, short teamPointsRed);
 
     void changeLocation(User user, short x, short y);
 

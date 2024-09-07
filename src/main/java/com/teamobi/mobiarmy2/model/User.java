@@ -37,7 +37,7 @@ public class User {
     private String userId;
     private int playerId;
     private String username;
-    private short clanId;
+    private Short clanId;
     private int xu;
     private int luong;
     private int cup;
@@ -95,6 +95,15 @@ public class User {
         float requiredXp = getCurrentXpLevel();
         float currentXp = getCurrentXp();
         return Utils.calculateLevelPercent(currentXp, requiredXp);
+    }
+
+    /**
+     * Lấy clanId dưới dạng short.
+     *
+     * @return giá trị clanId nếu không phải null, ngược lại trả về giá trị mặc định (0).
+     */
+    public short getClanIdAsShort() {
+        return (clanId != null) ? clanId : 0;
     }
 
     public int getCurrentXpLevel() {
@@ -468,10 +477,40 @@ public class User {
         return equipDefault[activeCharacterId][0].getEquipIndex();
     }
 
-    public short[] calculateCharacterAbilities() {
+    /**
+     * Calculates the team points for the current character based on the bonus percent.
+     *
+     * @param bonusPercent The bonus percent to be applied to the team points.
+     * @return The calculated team points, capped at a maximum of 32000.
+     */
+    public short calculateTeamPoints(byte bonusPercent) {
+        short percents = bonusPercent;
+        short points = addedPoints[activeCharacterId][4];
+
+        EquipmentChestEntry[] equippedItems = characterEquips[activeCharacterId];
+        for (EquipmentChestEntry equip : equippedItems) {
+            if (equip == null || equip.isExpired()) {
+                continue;// Bỏ qua nếu trang bị không tồn tại hoặc đã hết hạn
+            }
+
+            points += equip.getAddPoints()[4];
+            percents += equip.getAddPercents()[4];
+        }
+
+        int teamPoints = points * 10;
+        teamPoints += (teamPoints * percents / 100);
+
+        return (short) Math.min(teamPoints, 32000);
+    }
+
+    public short[] calculateCharacterAbilities(short teamPoints) {
         int[] abilities = new int[5];
-        short[] points = addedPoints[activeCharacterId];
         short[] percents = new short[5];
+
+        short[] points = addedPoints[activeCharacterId];
+        for (int i = 0; i < points.length; i++) {
+            points[i] += teamPoints;
+        }
 
         EquipmentChestEntry[] equippedItems = characterEquips[activeCharacterId];
         for (int i = 0; i < equippedItems.length; i++) {
@@ -504,5 +543,4 @@ public class User {
 
         return result;
     }
-
 }

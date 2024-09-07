@@ -61,7 +61,7 @@ public class UserDao implements IUserDao {
                 user.getXu(),
                 user.getLuong(),
                 user.getCup(),
-                user.getClanId() == 0 ? null : user.getClanId(),
+                user.getClanId(),
                 Arrays.toString(user.getItems()),
                 equipmentChestJson,
                 specialItemChestJson,
@@ -168,12 +168,18 @@ public class UserDao implements IUserDao {
                         user.setLuong(playerResultSet.getInt("luong"));
                         user.setCup(playerResultSet.getInt("cup"));
                         user.setActiveCharacterId(playerResultSet.getByte("character_id"));
-                        user.setClanId(playerResultSet.getShort("clan_id"));
                         user.setPointEvent(playerResultSet.getInt("point_event"));
                         user.setMaterialsPurchased(playerResultSet.getByte("materials_purchased"));
                         user.setEquipmentPurchased(playerResultSet.getShort("equipment_purchased"));
                         user.setChestLocked(playerResultSet.getBoolean("is_chest_locked"));
                         user.setInvitationLocked(playerResultSet.getBoolean("is_invitation_locked"));
+
+                        Object clanIdObj = playerResultSet.getObject("clan_id");
+                        if (clanIdObj != null) {
+                            user.setClanId(((Number) clanIdObj).shortValue());
+                        } else {
+                            user.setClanId(null);
+                        }
 
                         //Đọc dữ liệu item chiến đấu
                         byte[] items = gson.fromJson(playerResultSet.getString("item"), byte[].class);

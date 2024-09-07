@@ -19,6 +19,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author tuyen
@@ -198,7 +199,7 @@ public class FightWait implements IFightWait {
     }
 
     public synchronized void addUser(User us) throws IOException {
-        if (room.getType() == 6 && us.getClanId() == 0) {
+        if (room.getType() == 6 && us.getClanId() == null) {
             us.getUserService().sendServerMessage(GameString.notClan());
             return;
         }
@@ -230,7 +231,7 @@ public class FightWait implements IFightWait {
             ds = ms.writer();
             ds.writeByte(bestLocation);
             ds.writeInt(us.getPlayerId());
-            ds.writeShort(us.getClanId());
+            ds.writeShort(us.getClanIdAsShort());
             ds.writeUTF(us.getUsername());
             ds.writeByte(us.getCurrentLevel());
             ds.writeByte(us.getActiveCharacterId());
@@ -261,7 +262,7 @@ public class FightWait implements IFightWait {
             User user = users[i];
             if (user != null) {
                 ds.writeInt(user.getPlayerId());
-                ds.writeShort(user.getClanId());
+                ds.writeShort(user.getClanIdAsShort());
                 ds.writeUTF(user.getUsername());
                 ds.writeInt(0);
                 ds.writeByte(user.getCurrentLevel());
@@ -498,7 +499,7 @@ public class FightWait implements IFightWait {
                     if (j == i || users[j] == null || (j % 2 == 0 && i % 2 == 0) || (j % 2 != 0 && i % 2 != 0)) {
                         continue;
                     }
-                    if (users[j].getClanId() == users[i].getClanId()) {
+                    if (Objects.equals(users[j].getClanId(), users[i].getClanId())) {
                         roomOwner.getUserService().sendServerMessage(GameString.startGameError());
                         return;
                     }
@@ -506,8 +507,10 @@ public class FightWait implements IFightWait {
             }
         }
 
-        int numTeamRed = 0;
-        int numTeamBlue = 0;
+        byte numTeamRed = 0;
+        byte numTeamBlue = 0;
+        short teamPointsBlue = 0;
+        short teamPointsRed = 0;
 
         for (byte i = 0; i < users.length; i++) {
             User user = users[i];
@@ -565,13 +568,26 @@ public class FightWait implements IFightWait {
                 }
             }
 
+            //Lấy ra bonus item clan
+            byte bonusPercent = 0;
+
+            //Đếm số người chơi và tính điểm đồng đội (chỉ áp dụng điểm đồng đội nếu có người chơi cùng)
             if (room.getType() == 5) {
                 numTeamBlue++;
+                if (numPlayers > 1) {
+                    teamPointsBlue += user.calculateTeamPoints(bonusPercent);
+                }
             } else {
                 if (i % 2 == 0) {
                     numTeamBlue++;
+                    if (numPlayers > 3) {
+                        teamPointsBlue += user.calculateTeamPoints(bonusPercent);
+                    }
                 } else {
                     numTeamRed++;
+                    if (numPlayers > 3) {
+                        teamPointsRed += user.calculateTeamPoints(bonusPercent);
+                    }
                 }
             }
         }
@@ -580,7 +596,11 @@ public class FightWait implements IFightWait {
             roomOwner.getUserService().sendServerMessage(GameString.startGameError5());
         }
 
-        fightManager.startGame();
+        //Cập nhật lại điểm đồng đội
+        teamPointsBlue = (short) (teamPointsBlue / 20);
+        teamPointsRed = (short) (teamPointsRed / 20);
+
+        fightManager.startGame(teamPointsBlue, teamPointsRed);
         started = true;
 
         Arrays.fill(readies, false);
@@ -772,6 +792,11 @@ public class FightWait implements IFightWait {
     @Override
     public byte[] getItems(byte i) {
         return items[i];
+    }
+
+    @Override
+    public byte getRoomType() {
+        return room.getType();
     }
 
     @Override

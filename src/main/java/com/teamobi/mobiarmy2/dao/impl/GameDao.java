@@ -185,7 +185,7 @@ public class GameDao implements IGameDao {
                     item.setXu(resultSet.getInt("xu"));
                     item.setLuong(resultSet.getInt("luong"));
 
-                    ItemClanData.CLAN_ITEM_ENTRY_MAP.put(item.getId(), item);
+                    ClanItemData.CLAN_ITEM_ENTRY_MAP.put(item.getId(), item);
                 }
             }
         } catch (SQLException e) {

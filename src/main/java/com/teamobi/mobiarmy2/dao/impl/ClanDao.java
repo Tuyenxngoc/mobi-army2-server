@@ -6,7 +6,7 @@ import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.ClanItemJson;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.model.CharacterData;
-import com.teamobi.mobiarmy2.model.ItemClanData;
+import com.teamobi.mobiarmy2.model.ClanItemData;
 import com.teamobi.mobiarmy2.model.entry.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.entry.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.entry.clan.ClanItem;
@@ -185,7 +185,7 @@ public class ClanDao implements IClanDao {
                     List<ClanItem> filteredItems = Arrays.stream(clanItemJsonArray)
                             .filter(item -> !item.getTime().isBefore(currentDate))
                             .map(item -> {
-                                ClanItemEntry clanItemEntry = ItemClanData.getItemClanById(item.getId());
+                                ClanItemEntry clanItemEntry = ClanItemData.getItemClanById(item.getId());
                                 if (clanItemEntry != null) {
                                     ClanItem newClanItem = new ClanItem();
                                     newClanItem.setName(clanItemEntry.getName());

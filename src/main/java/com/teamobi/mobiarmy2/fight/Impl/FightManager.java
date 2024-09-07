@@ -3,14 +3,18 @@ package com.teamobi.mobiarmy2.fight.Impl;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.fight.*;
+import com.teamobi.mobiarmy2.model.ClanItemData;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.Impl.Message;
+import com.teamobi.mobiarmy2.server.ClanManager;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tuyen
@@ -18,6 +22,8 @@ import java.util.List;
 public class FightManager implements IFightManager {
 
     private static final int MAX_ELEMENT_FIGHT = 100;
+    private static final int MAX_USER_FIGHT = 8;
+    private static final int MAX_PLAY_TIME = 30;
 
     private final IFightWait fightWait;
     private Player[] players;
@@ -38,14 +44,6 @@ public class FightManager implements IFightManager {
 
     private void refreshFightManager() {
         this.players = new Player[MAX_ELEMENT_FIGHT];
-    }
-
-    private void handlePlayerLuck() {
-        for (int i = 0; i < fightWait.getNumPlayers(); i++) {
-            if (players[i] != null && players[i].getUser() != null) {
-                players[i].nextLuck();
-            }
-        }
     }
 
     private void sendLuckyUpdate(byte index) {
@@ -125,8 +123,16 @@ public class FightManager implements IFightManager {
         }
     }
 
+    private void handlePlayerLuck() {
+        for (int i = 0; i < MAX_USER_FIGHT; i++) {
+            if (players[i] != null && players[i].getUser() != null) {
+                players[i].nextLuck();
+            }
+        }
+    }
+
     private void updateLuckyPlayers() {
-        for (byte i = 0; i < fightWait.getNumPlayers(); i++) {
+        for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             if (players[i] != null && players[i].isLucky()) {
                 sendLuckyUpdate(i);
                 players[i].setLucky(false);
@@ -135,7 +141,7 @@ public class FightManager implements IFightManager {
     }
 
     private void updatePoisonedPlayers() {
-        for (byte i = 0; i < fightWait.getNumPlayers(); i++) {
+        for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             if (players[i] != null && players[i].isPoisoned()) {
                 sendPoisonUpdate(i);
             }
@@ -143,7 +149,7 @@ public class FightManager implements IFightManager {
     }
 
     private void updateEyeSmokeStatus() {
-        for (byte i = 0; i < fightWait.getNumPlayers(); i++) {
+        for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             if (players[i] != null && players[i].getEyeSmokeCount() > 0) {
                 sendEyeSmokeUpdate(i);
             }
@@ -151,7 +157,7 @@ public class FightManager implements IFightManager {
     }
 
     private void updateFrozenPlayers() {
-        for (byte i = 0; i < fightWait.getNumPlayers(); i++) {
+        for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             if (players[i] != null && players[i].getFreezeCount() > 0) {
                 sendFreezeUpdate(i);
             }
@@ -159,7 +165,7 @@ public class FightManager implements IFightManager {
     }
 
     private void updateHpPlayers() {
-        for (byte i = 0; i < fightWait.getNumPlayers(); i++) {
+        for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             if (players[i] != null && players[i].isUpdateHP()) {
                 sendHpUpdate(i, players[i]);
             }
@@ -167,7 +173,7 @@ public class FightManager implements IFightManager {
     }
 
     private void updateAngryPlayers() {
-        for (byte i = 0; i < fightWait.getNumPlayers(); i++) {
+        for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             if (players[i] != null && players[i].isUpdateAngry()) {
                 sendAngryUpdate(i, players[i]);
             }
@@ -175,7 +181,7 @@ public class FightManager implements IFightManager {
     }
 
     private int getPlayerIndexByPlayerId(int playerId) {
-        for (int i = 0; i < fightWait.getNumPlayers(); i++) {
+        for (int i = 0; i < MAX_USER_FIGHT; i++) {
             if (players[i] != null
                     && players[i].getUser() != null
                     && players[i].getUser().getPlayerId() == playerId) {
@@ -243,7 +249,7 @@ public class FightManager implements IFightManager {
     }
 
     @Override
-    public void startGame() {
+    public void startGame(short teamPointsBlue, short teamPointsRed) {
         if (fightWait.isStarted()) {
             return;
         }
@@ -251,47 +257,88 @@ public class FightManager implements IFightManager {
         //Tải dữ liệu bản đồ
         mapManager.loadMapId(fightWait.getMapId());
 
-        byte totalPlayers = fightWait.getNumPlayers();
-        List<short[]> randomPositions = mapManager.getRandomPlayerPositions(totalPlayers);
-        for (byte i = 0; i < totalPlayers; i++) {
+        //Tải dữ liệu vị trí
+        List<short[]> randomPositions = mapManager.getRandomPlayerPositions(MAX_USER_FIGHT);
+
+        //Sử dụng cache để lưu trữ kết quả clan items
+        Map<Short, boolean[]> clanItemsCache = new HashMap<>();
+        ClanManager clanManager = ClanManager.getInstance();
+
+        for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             User user = fightWait.getUsers()[i];
             if (user == null) {
                 continue;
             }
+
+            //Lấy ra vị trí
             short x = randomPositions.get(i)[0];
             short y = randomPositions.get(i)[1];
-            players[i] = new Player(this, user, i, x, y, fightWait.getItems(i));
+
+            //Lấy điểm đồng đội
+            short teamPoints;
+            if (fightWait.getRoomType() == 5 || i % 2 == 0) {
+                teamPoints = teamPointsBlue;
+            } else {
+                teamPoints = teamPointsRed;
+            }
+
+            //Lấy ra chỉ số
+            short[] abilities = user.calculateCharacterAbilities(teamPoints);
+
+            //Lấy danh sách items của clan
+            boolean[] clanItems = new boolean[ClanItemData.CLAN_ITEM_ENTRY_MAP.size()];
+            if (user.getClanId() != null) {
+                if (clanItemsCache.containsKey(user.getClanId())) {
+                    clanItems = clanItemsCache.get(user.getClanId());
+                } else {
+                    clanItems = clanManager.getClanItems(user.getClanId());
+                    clanItemsCache.put(user.getClanId(), clanItems);
+                }
+            }
+
+            //Xóa túi đựng item nếu sử dụng
+            byte[] items = fightWait.getItems(i);
+            for (int j = 4; j < items.length; j++) {
+                if (items[i] > 0) {
+                    user.updateItems((byte) (12 + j - 4), (byte) -1);
+                }
+            }
+
+            players[i] = new Player(this, user, i, x, y, items, abilities, teamPoints, clanItems);
         }
 
         sendFightInfo();
     }
 
     private void sendFightInfo() {
-        try {
-            IMessage ms = new Message(Cmd.START_ARMY);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(0);
-
-            //Time counter
-            ds.writeByte(30);
-
-            //Team point
-            ds.writeShort(0);
-
-            for (Player player : players) {
-                if (player == null) {
-                    ds.writeShort(-1);
-                    continue;
-                }
-                ds.writeShort(player.getX());
-                ds.writeShort(player.getY());
-                ds.writeShort(player.getMaxHp());
+        for (int i = 0; i < MAX_USER_FIGHT; i++) {
+            Player player = players[i];
+            if (player == null || player.getUser() == null) {
+                continue;
             }
 
-            ds.flush();
-            fightWait.sendToTeam(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
+            try {
+                IMessage ms = new Message(Cmd.START_ARMY);
+                DataOutputStream ds = ms.writer();
+                ds.writeByte(fightWait.getMapId());
+                ds.writeByte(MAX_PLAY_TIME);
+                ds.writeShort(player.getTeamPoints());
+                for (int j = 0; j < MAX_USER_FIGHT; j++) {
+                    Player pl = players[j];
+                    if (pl == null) {
+                        ds.writeShort(-1);
+                        continue;
+                    }
+                    ds.writeShort(pl.getX());
+                    ds.writeShort(pl.getY());
+                    ds.writeShort(pl.getMaxHp());
+                }
+
+                ds.flush();
+                fightWait.sendToTeam(ms);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
