@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.network.Impl;
 
 import com.teamobi.mobiarmy2.model.User;
+import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.IMessageHandler;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.server.ServerManager;
@@ -73,7 +74,7 @@ public class Session implements ISession {
     }
 
     @Override
-    public void sendMessage(Message message) {
+    public void sendMessage(IMessage message) {
         sender.addMessage(message);
     }
 
@@ -116,7 +117,7 @@ public class Session implements ISession {
     @Override
     public void sendKeys() {
         try {
-            Message ms = new Message(-27);
+            IMessage ms = new Message(-27);
             DataOutputStream ds = ms.writer();
             ds.writeByte(KEY.length);
             ds.writeByte(KEY[0]);
@@ -140,7 +141,7 @@ public class Session implements ISession {
         return "Client " + sessionId;
     }
 
-    protected synchronized void doSendMessage(Message m) {
+    protected synchronized void doSendMessage(IMessage m) {
         byte[] data = m.getData();
         try {
             if (sendKeyComplete) {
@@ -224,9 +225,9 @@ public class Session implements ISession {
 
     private class Sender implements Runnable {
 
-        private final ArrayList<Message> sendingMessage = new ArrayList<>();
+        private final ArrayList<IMessage> sendingMessage = new ArrayList<>();
 
-        public void addMessage(Message message) {
+        public void addMessage(IMessage message) {
             sendingMessage.add(message);
         }
 
@@ -235,7 +236,7 @@ public class Session implements ISession {
             try {
                 while (Session.this.isSendKeyComplete()) {
                     while (!sendingMessage.isEmpty() && Session.this.dis != null) {
-                        Message message = sendingMessage.remove(0);
+                        IMessage message = sendingMessage.remove(0);
                         ServerManager.getInstance().logger().logMessage("   Send mss " + message.getCommand() + " to " + Session.this);
                         Session.this.doSendMessage(message);
                     }
@@ -258,7 +259,7 @@ public class Session implements ISession {
             try {
                 while (Session.this.dis != null) {
                     Session.this.socket.setSoTimeout(TIMEOUT_DURATION);
-                    Message message = readMessage();
+                    IMessage message = readMessage();
                     if (message == null) {
                         break;
                     }
@@ -276,12 +277,12 @@ public class Session implements ISession {
             }
         }
 
-        private boolean requiresAuthentication(Message message) {
+        private boolean requiresAuthentication(IMessage message) {
             Byte cmd = message.getCommand();
             return !WHITE_LIST_CMD.contains(cmd);
         }
 
-        private Message readMessage() {
+        private IMessage readMessage() {
             try {
                 byte cmd = Session.this.dis.readByte();
                 if (Session.this.sendKeyComplete) {

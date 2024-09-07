@@ -6,12 +6,15 @@ import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
-import com.teamobi.mobiarmy2.model.CharacterData;
-import com.teamobi.mobiarmy2.model.*;
-import com.teamobi.mobiarmy2.model.entry.PlayerCharacterEntry;
-import com.teamobi.mobiarmy2.model.entry.user.EquipmentChestEntry;
-import com.teamobi.mobiarmy2.model.entry.user.FriendEntry;
-import com.teamobi.mobiarmy2.model.entry.user.SpecialItemChestEntry;
+import com.teamobi.mobiarmy2.model.PlayerCharacterEntry;
+import com.teamobi.mobiarmy2.model.User;
+import com.teamobi.mobiarmy2.model.user.EquipmentChestEntry;
+import com.teamobi.mobiarmy2.model.user.FriendEntry;
+import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
+import com.teamobi.mobiarmy2.repository.CharacterData;
+import com.teamobi.mobiarmy2.repository.FightItemData;
+import com.teamobi.mobiarmy2.repository.MissionData;
+import com.teamobi.mobiarmy2.repository.SpecialItemData;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.JsonConverter;
 import org.mindrot.jbcrypt.BCrypt;
@@ -61,7 +64,7 @@ public class UserDao implements IUserDao {
                 user.getXu(),
                 user.getLuong(),
                 user.getCup(),
-                user.getClanId() == 0 ? null : user.getClanId(),
+                user.getClanId(),
                 Arrays.toString(user.getItems()),
                 equipmentChestJson,
                 specialItemChestJson,
@@ -86,7 +89,7 @@ public class UserDao implements IUserDao {
                         user.getPoints()[i],
                         user.getXps()[i],
                         Arrays.toString(user.getEquipData()[i]),
-                        Arrays.toString(user.getPointAdd()[i]),
+                        Arrays.toString(user.getAddedPoints()[i]),
                         user.getPlayerId(),
                         i
                 );
@@ -156,9 +159,9 @@ public class UserDao implements IUserDao {
                     user.setLevelPercents(new byte[totalCharacter]);
                     user.setXps(new int[totalCharacter]);
                     user.setPoints(new int[totalCharacter]);
-                    user.setPointAdd(new short[totalCharacter][5]);
+                    user.setAddedPoints(new short[totalCharacter][5]);
                     user.setEquipData(new int[totalCharacter][6]);
-                    user.setNvEquip(new EquipmentChestEntry[totalCharacter][6]);
+                    user.setCharacterEquips(new EquipmentChestEntry[totalCharacter][6]);
                     user.setSpecialItemChest(new ArrayList<>());
                     user.setEquipmentChest(new ArrayList<>());
 
@@ -168,12 +171,18 @@ public class UserDao implements IUserDao {
                         user.setLuong(playerResultSet.getInt("luong"));
                         user.setCup(playerResultSet.getInt("cup"));
                         user.setActiveCharacterId(playerResultSet.getByte("character_id"));
-                        user.setClanId(playerResultSet.getShort("clan_id"));
                         user.setPointEvent(playerResultSet.getInt("point_event"));
                         user.setMaterialsPurchased(playerResultSet.getByte("materials_purchased"));
                         user.setEquipmentPurchased(playerResultSet.getShort("equipment_purchased"));
                         user.setChestLocked(playerResultSet.getBoolean("is_chest_locked"));
                         user.setInvitationLocked(playerResultSet.getBoolean("is_invitation_locked"));
+
+                        Object clanIdObj = playerResultSet.getObject("clan_id");
+                        if (clanIdObj != null) {
+                            user.setClanId(((Number) clanIdObj).shortValue());
+                        } else {
+                            user.setClanId(null);
+                        }
 
                         //Đọc dữ liệu item chiến đấu
                         byte[] items = gson.fromJson(playerResultSet.getString("item"), byte[].class);
@@ -278,7 +287,7 @@ public class UserDao implements IUserDao {
                         user.getXps()[characterId] = characterResultSet.getInt("xp");
                         user.getLevelPercents()[characterId] = 0;
                         user.getPoints()[characterId] = characterResultSet.getInt("points");
-                        user.getPointAdd()[characterId] = gson.fromJson(characterResultSet.getString("additional_points"), short[].class);
+                        user.getAddedPoints()[characterId] = gson.fromJson(characterResultSet.getString("additional_points"), short[].class);
                         user.getEquipData()[characterId] = new int[]{-1, -1, -1, -1, -1, -1};
 
                         int[] data = gson.fromJson(characterResultSet.getString("data"), int[].class);
@@ -289,7 +298,7 @@ public class UserDao implements IUserDao {
                                 if (equip.isExpired()) {
                                     equip.setInUse(false);
                                 } else {
-                                    user.getNvEquip()[characterId][j] = equip;
+                                    user.getCharacterEquips()[characterId][j] = equip;
                                     user.getEquipData()[characterId][j] = equip.getKey();
                                 }
                             }

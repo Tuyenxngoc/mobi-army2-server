@@ -5,7 +5,7 @@ import com.teamobi.mobiarmy2.dao.IGiftCodeDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
-import com.teamobi.mobiarmy2.model.entry.GiftCodeEntry;
+import com.teamobi.mobiarmy2.model.GiftCodeEntry;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 
 import java.sql.*;

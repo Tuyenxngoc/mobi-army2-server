@@ -10,8 +10,8 @@ import com.teamobi.mobiarmy2.log.ILogManager;
 import com.teamobi.mobiarmy2.log.LoggerUtil;
 import com.teamobi.mobiarmy2.model.Room;
 import com.teamobi.mobiarmy2.model.User;
+import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.ISession;
-import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.network.Impl.Session;
 import com.teamobi.mobiarmy2.service.IGameService;
 import com.teamobi.mobiarmy2.service.Impl.GameService;
@@ -191,7 +191,7 @@ public class ServerManager {
         countClients--;
     }
 
-    public void sendToServer(Message ms) {
+    public void sendToServer(IMessage ms) {
         synchronized (users) {
             for (ISession session : users) {
                 session.sendMessage(ms);

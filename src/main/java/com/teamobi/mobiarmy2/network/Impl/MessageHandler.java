@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.network.Impl;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
+import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.IMessageHandler;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IUserService;
@@ -17,7 +18,7 @@ public class MessageHandler implements IMessageHandler {
     }
 
     @Override
-    public void onMessage(Message ms) {
+    public void onMessage(IMessage ms) {
         try {
             switch (ms.getCommand()) {
                 case Cmd.MORE_GAME -> userService.getMoreGame();
@@ -127,6 +128,8 @@ public class MessageHandler implements IMessageHandler {
                 case Cmd.CHANGE_PASS -> userService.handleChangePassword(ms);
 
                 case Cmd.TRAINING -> userService.startTraining(ms);
+
+                case Cmd.TRAININGSHOOT -> userService.trainShooting(ms);
 
                 case Cmd.GET_FILEPACK -> userService.getFilePack(ms);
 

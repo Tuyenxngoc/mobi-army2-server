@@ -3,12 +3,16 @@ package com.teamobi.mobiarmy2.model;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.constant.UserState;
-import com.teamobi.mobiarmy2.fight.FightWait;
-import com.teamobi.mobiarmy2.model.entry.equip.EquipmentEntry;
-import com.teamobi.mobiarmy2.model.entry.user.EquipmentChestEntry;
-import com.teamobi.mobiarmy2.model.entry.user.SpecialItemChestEntry;
+import com.teamobi.mobiarmy2.fight.IFightWait;
+import com.teamobi.mobiarmy2.fight.ITrainingManager;
+import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
+import com.teamobi.mobiarmy2.model.user.EquipmentChestEntry;
+import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
+import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.Impl.Message;
+import com.teamobi.mobiarmy2.repository.CharacterData;
+import com.teamobi.mobiarmy2.repository.XpData;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.service.Impl.UserService;
@@ -35,7 +39,7 @@ public class User {
     private String userId;
     private int playerId;
     private String username;
-    private short clanId;
+    private Short clanId;
     private int xu;
     private int luong;
     private int cup;
@@ -56,16 +60,17 @@ public class User {
     private byte[] levelPercents;
     private int[] xps;
     private int[] points;
-    private short[][] pointAdd;
+    private short[][] addedPoints;
     private byte[] items;
     private int[][] equipData;
     private int[] mission;
     private byte[] missionLevel;
-    private EquipmentChestEntry[][] nvEquip;
+    private EquipmentChestEntry[][] characterEquips;
     private List<Integer> friends;
     private List<SpecialItemChestEntry> specialItemChest;
     private List<EquipmentChestEntry> equipmentChest;
-    private FightWait fightWait;
+    private IFightWait fightWait;
+    private ITrainingManager trainingManager;
     private final IUserService userService;
     private boolean openingGift;
     private int topEarningsXu;
@@ -84,7 +89,7 @@ public class User {
         return !state.equals(UserState.WAITING);
     }
 
-    public void sendMessage(Message ms) {
+    public void sendMessage(IMessage ms) {
         session.sendMessage(ms);
     }
 
@@ -92,6 +97,15 @@ public class User {
         float requiredXp = getCurrentXpLevel();
         float currentXp = getCurrentXp();
         return Utils.calculateLevelPercent(currentXp, requiredXp);
+    }
+
+    /**
+     * Lấy clanId dưới dạng short.
+     *
+     * @return giá trị clanId nếu không phải null, ngược lại trả về giá trị mặc định (0).
+     */
+    public short getClanIdAsShort() {
+        return (clanId != null) ? clanId : 0;
     }
 
     public int getCurrentXpLevel() {
@@ -110,8 +124,8 @@ public class User {
         return points[activeCharacterId];
     }
 
-    public short[] getCurrentPointAdd() {
-        return pointAdd[activeCharacterId];
+    public short[] getCurrentAddedPoints() {
+        return addedPoints[activeCharacterId];
     }
 
     public synchronized void updateXu(int xuUp) {
@@ -192,29 +206,28 @@ public class User {
         userService.sendUpdateXp(xpUp, levelDiff > 0);
     }
 
-    public short[] getEquip() {
-        short[] equip = new short[5];
-        if (nvEquip[activeCharacterId][5] != null && nvEquip[activeCharacterId][5].getEquipEntry().isDisguise()) {
-            equip[0] = nvEquip[activeCharacterId][5].getEquipEntry().getDisguiseEquippedIndexes()[0];
-            equip[1] = nvEquip[activeCharacterId][5].getEquipEntry().getDisguiseEquippedIndexes()[1];
-            equip[2] = nvEquip[activeCharacterId][5].getEquipEntry().getDisguiseEquippedIndexes()[2];
-            equip[3] = nvEquip[activeCharacterId][5].getEquipEntry().getDisguiseEquippedIndexes()[3];
-            equip[4] = nvEquip[activeCharacterId][5].getEquipEntry().getDisguiseEquippedIndexes()[4];
+    public short[] getEquips() {
+        short[] equips = new short[5];
+        EquipmentChestEntry[] equipEntries = characterEquips[activeCharacterId];
+
+        if (equipEntries[5] != null && equipEntries[5].getEquipEntry().isDisguise()) {
+            short[] disguiseIndexes = equipEntries[5].getEquipEntry().getDisguiseEquippedIndexes();
+            System.arraycopy(disguiseIndexes, 0, equips, 0, 5);
         } else {
-            for (int i = 0; i < 5; i++) {
-                if (nvEquip[activeCharacterId][i] != null && !nvEquip[activeCharacterId][i].getEquipEntry().isDisguise()) {
-                    equip[i] = nvEquip[activeCharacterId][i].getEquipEntry().getEquipIndex();
+            for (byte i = 0; i < 5; i++) {
+                if (equipEntries[i] != null && !equipEntries[i].getEquipEntry().isDisguise()) {
+                    equips[i] = equipEntries[i].getEquipEntry().getEquipIndex();
                 } else if (equipDefault[activeCharacterId][i] != null) {
-                    equip[i] = equipDefault[activeCharacterId][i].getEquipIndex();
+                    equips[i] = equipDefault[activeCharacterId][i].getEquipIndex();
                 } else {
-                    equip[i] = -1;
+                    equips[i] = -1;
                 }
             }
         }
-        return equip;
+        return equips;
     }
 
-    public synchronized void updateItems(byte itemIndex, int quantity) {
+    public synchronized void updateItems(byte itemIndex, byte quantity) {
         items[itemIndex] += quantity;
         if (items[itemIndex] < 0) {
             items[itemIndex] = 0;
@@ -247,7 +260,7 @@ public class User {
         equipmentPurchased++;
 
         try {
-            Message ms = new Message(Cmd.BUY_EQUIP);
+            IMessage ms = new Message(Cmd.BUY_EQUIP);
             DataOutputStream ds = ms.writer();
             ds.writeByte(0);
             ds.writeInt(addEquipment.getKey());
@@ -350,7 +363,7 @@ public class User {
                 return;
             }
 
-            Message ms = new Message(Cmd.INVENTORY_UPDATE);
+            IMessage ms = new Message(Cmd.INVENTORY_UPDATE);
             ds = ms.writer();
             ds.writeByte(updateQuantity);
             ds.write(bas.toByteArray());
@@ -363,7 +376,7 @@ public class User {
 
     public synchronized void updatePoints(short[] pointsToAdd, int totalPointsToSubtract) {
         for (int i = 0; i < 5; i++) {
-            pointAdd[activeCharacterId][i] += pointsToAdd[i];
+            addedPoints[activeCharacterId][i] += pointsToAdd[i];
         }
         points[activeCharacterId] -= totalPointsToSubtract;
     }
@@ -391,10 +404,10 @@ public class User {
 
     public synchronized void resetPoints() {
         int total = -30;
-        for (short point : pointAdd[activeCharacterId]) {
+        for (short point : addedPoints[activeCharacterId]) {
             total += point;
         }
-        pointAdd[activeCharacterId] = new short[]{0, 0, 10, 10, 10};
+        addedPoints[activeCharacterId] = new short[]{0, 0, 10, 10, 10};
         points[activeCharacterId] += total;
     }
 
@@ -452,35 +465,84 @@ public class User {
         return 0;
     }
 
-    public short getIDBullet() {
-        if (nvEquip[activeCharacterId][0] != null) {
-            return nvEquip[activeCharacterId][0].getEquipEntry().getBulletId();
+    public short getBulletId() {
+        if (characterEquips[activeCharacterId][0] != null) {
+            return characterEquips[activeCharacterId][0].getEquipEntry().getBulletId();
         }
         return equipDefault[activeCharacterId][0].getBulletId();
     }
 
     public short getGunId() {
-        if (nvEquip[activeCharacterId][0] != null) {
-            return this.nvEquip[activeCharacterId][0].getEquipEntry().getEquipIndex();
+        if (characterEquips[activeCharacterId][0] != null) {
+            return this.characterEquips[activeCharacterId][0].getEquipEntry().getEquipIndex();
         }
         return equipDefault[activeCharacterId][0].getEquipIndex();
     }
 
-    public int[] getAbility() {
-        int[] ability = new int[5];
-        ability[0] = 1000;
-        ability[1] = 10;
-        ability[2] = 10;
-        ability[3] = 10;
-        ability[4] = 10;
-        return ability;
+    /**
+     * Calculates the team points for the current character based on the bonus percent.
+     *
+     * @param bonusPercent The bonus percent to be applied to the team points.
+     * @return The calculated team points, capped at a maximum of 32000.
+     */
+    public short calculateTeamPoints(byte bonusPercent) {
+        short percents = bonusPercent;
+        short points = addedPoints[activeCharacterId][4];
+
+        EquipmentChestEntry[] equippedItems = characterEquips[activeCharacterId];
+        for (EquipmentChestEntry equip : equippedItems) {
+            if (equip == null || equip.isExpired()) {
+                continue;// Bỏ qua nếu trang bị không tồn tại hoặc đã hết hạn
+            }
+
+            points += equip.getAddPoints()[4];
+            percents += equip.getAddPercents()[4];
+        }
+
+        int teamPoints = points * 10;
+        teamPoints += (teamPoints * percents / 100);
+
+        return (short) Math.min(teamPoints, 32000);
     }
 
-    public void notifyNetWait() {
+    public short[] calculateCharacterAbilities(short teamPoints) {
+        int[] abilities = new int[5];
+        short[] percents = new short[5];
 
-    }
+        short[] points = addedPoints[activeCharacterId];
+        for (int i = 0; i < points.length; i++) {
+            points[i] += teamPoints;
+        }
 
-    public void netWait() {
+        EquipmentChestEntry[] equippedItems = characterEquips[activeCharacterId];
+        for (int i = 0; i < equippedItems.length; i++) {
+            EquipmentChestEntry equip = equippedItems[i];
+            if (equip == null || equip.isExpired()) {
+                continue;// Bỏ qua nếu trang bị không tồn tại hoặc đã hết hạn
+            }
 
+            for (byte j = 0; j < points.length; j++) {
+                points[i] += equip.getAddPoints()[i];
+                percents[i] += equip.getAddPercents()[i];
+            }
+        }
+
+        abilities[0] = 1000 + (points[0] * 10);
+        abilities[0] += (abilities[0] * percents[0] / 100);
+
+        short baseDamage = CharacterData.CHARACTER_ENTRIES.get(activeCharacterId).getDamage();
+        abilities[1] = (baseDamage * (100 + (points[1] / 3) + percents[1]) / 100) * 100 / baseDamage;
+
+        for (byte i = 2; i < abilities.length; i++) {
+            abilities[i] = points[i] * 10;
+            abilities[i] += (abilities[i] * percents[i] / 100);
+        }
+
+        short[] result = new short[abilities.length];
+        for (byte i = 0; i < result.length; i++) {
+            result[i] = (short) Math.min(abilities[i], 32000);
+        }
+
+        return result;
     }
 }

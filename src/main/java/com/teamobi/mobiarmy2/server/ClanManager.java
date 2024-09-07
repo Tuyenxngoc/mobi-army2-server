@@ -3,10 +3,11 @@ package com.teamobi.mobiarmy2.server;
 import com.teamobi.mobiarmy2.dao.IClanDao;
 import com.teamobi.mobiarmy2.dao.impl.ClanDao;
 import com.teamobi.mobiarmy2.json.ClanItemJson;
-import com.teamobi.mobiarmy2.model.entry.clan.ClanEntry;
-import com.teamobi.mobiarmy2.model.entry.clan.ClanInfo;
-import com.teamobi.mobiarmy2.model.entry.clan.ClanMemEntry;
-import com.teamobi.mobiarmy2.model.entry.item.ClanItemEntry;
+import com.teamobi.mobiarmy2.model.clan.ClanEntry;
+import com.teamobi.mobiarmy2.model.clan.ClanInfo;
+import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
+import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
+import com.teamobi.mobiarmy2.repository.ClanItemData;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.time.LocalDateTime;
@@ -123,4 +124,19 @@ public class ClanManager {
     public List<ClanEntry> getTopTeams(byte page) {
         return clanDao.getTopTeams(page);
     }
+
+    public boolean[] getClanItems(short clanId) {
+        boolean[] result = new boolean[ClanItemData.CLAN_ITEM_ENTRY_MAP.size()];
+        LocalDateTime now = LocalDateTime.now();
+        ClanItemJson[] items = clanDao.getClanItems(clanId);
+
+        for (ClanItemJson item : items) {
+            if (item.getTime().isAfter(now)) {
+                result[item.getId() - 1] = true;
+            }
+        }
+
+        return result;
+    }
+
 }

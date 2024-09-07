@@ -1,11 +1,10 @@
 package com.teamobi.mobiarmy2.network;
 
 import com.teamobi.mobiarmy2.model.User;
-import com.teamobi.mobiarmy2.network.Impl.Message;
 
 public interface ISession {
 
-    void sendMessage(Message message);
+    void sendMessage(IMessage message);
 
     void sendKeys();
 

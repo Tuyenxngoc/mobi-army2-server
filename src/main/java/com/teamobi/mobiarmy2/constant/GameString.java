@@ -103,7 +103,7 @@ public class GameString {
     }
 
     public static String hopNgocFail() {
-        return "Chúc bạn may mắn lần sau.";
+        return "Chúc bạn may mắn lần sau";
     }
 
     public static String hopNgocSucess() {
@@ -119,7 +119,7 @@ public class GameString {
     }
 
     public static String hopNgocError() {
-        return "Không thể kết hợp.";
+        return "Không thể kết hợp";
     }
 
     public static String hopNgocCantDo() {
@@ -131,7 +131,7 @@ public class GameString {
     }
 
     public static String hopNgocSuccess() {
-        return "Chúc mừng bạn đã kết hợp thành công.";
+        return "Chúc mừng bạn đã kết hợp thành công";
     }
 
     public static String nangNgocSuccess(int quantity, String name) {
@@ -147,7 +147,7 @@ public class GameString {
     }
 
     public static String hopNgocNoSlot() {
-        return "Trang bị đã chọn không còn đủ chỗ.";
+        return "Trang bị đã chọn không còn đủ chỗ";
     }
 
     public static String xuNotEnought() {
@@ -155,7 +155,7 @@ public class GameString {
     }
 
     public static String buySuccess() {
-        return "Giao dịch thành công. Xin cảm ơn.";
+        return "Giao dịch thành công. Xin cảm ơn";
     }
 
     public static String addFrienvError1() {
@@ -199,7 +199,7 @@ public class GameString {
     }
 
     public static String sellTBError2() {
-        return "Vui lòng tháo hết ngọc trước khi bán trang bị.";
+        return "Vui lòng tháo hết ngọc trước khi bán trang bị";
     }
 
     public static String thaoNgocError1() {
@@ -211,7 +211,7 @@ public class GameString {
     }
 
     public static String thaoNgocSuccess() {
-        return "Tháo lấy ngọc thành công.";
+        return "Tháo lấy ngọc thành công";
     }
 
     public static String giaHanRequest(int xu) {
@@ -227,7 +227,7 @@ public class GameString {
     }
 
     public static String joinKVError0() {
-        return "Không thể vào do còn đang chơi.";
+        return "Không thể vào do còn đang chơi";
     }
 
     public static String joinKVError1() {
@@ -287,11 +287,11 @@ public class GameString {
     }
 
     public static String selectMapError1_3() {
-        return "Không thể chọn map.";
+        return "Không thể chọn map";
     }
 
-    public static String waitClick(long time) {
-        return String.format("Vui lòng chờ sau: %s", time);
+    public static String waitClick(long second) {
+        return String.format("Vui lòng chờ sau %s giây", second);
     }
 
     public static String reg_Error1() {
@@ -395,7 +395,7 @@ public class GameString {
     }
 
     public static String loginLock() {
-        return "Tài khoản này đang bị khóa. Liên hệ tổng đài hỗ trợ khách hàng để biết thêm thông tin.";
+        return "Tài khoản này đang bị khóa. Liên hệ tổng đài hỗ trợ khách hàng để biết thêm thông tin";
     }
 
     public static String loginActive() {
@@ -447,7 +447,7 @@ public class GameString {
     }
 
     public static String materialLimit() {
-        return "Bạn đã mua hết số lượng cho phép.";
+        return "Bạn đã mua hết số lượng cho phép";
     }
 
     public static String materialLimit1(int quantity) {

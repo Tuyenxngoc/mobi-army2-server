@@ -4,16 +4,16 @@ import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
-import com.teamobi.mobiarmy2.model.CharacterData;
 import com.teamobi.mobiarmy2.model.*;
-import com.teamobi.mobiarmy2.model.entry.*;
-import com.teamobi.mobiarmy2.model.entry.equip.CharacterEntry;
-import com.teamobi.mobiarmy2.model.entry.equip.EquipmentEntry;
-import com.teamobi.mobiarmy2.model.entry.item.ClanItemEntry;
-import com.teamobi.mobiarmy2.model.entry.item.FightItemEntry;
-import com.teamobi.mobiarmy2.model.entry.item.SpecialItemEntry;
-import com.teamobi.mobiarmy2.model.entry.map.MapEntry;
-import com.teamobi.mobiarmy2.model.entry.user.SpecialItemChestEntry;
+import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
+import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
+import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
+import com.teamobi.mobiarmy2.model.item.FightItemEntry;
+import com.teamobi.mobiarmy2.model.item.SpecialItemEntry;
+import com.teamobi.mobiarmy2.model.map.MapEntry;
+import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
+import com.teamobi.mobiarmy2.repository.CharacterData;
+import com.teamobi.mobiarmy2.repository.*;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -117,6 +117,51 @@ public class GameDao implements IGameDao {
                     equipEntry.setAddPoints(gson.fromJson(resultSet.getString("additional_points"), byte[].class));
                     equipEntry.setAddPercents(gson.fromJson(resultSet.getString("additional_percent"), byte[].class));
 
+                    if (equipEntry.isDisguise() && equipEntry.getDisguiseEquippedIndexes().length != 5) {
+                        throw new SQLException("Invalid disguise configuration for EquipmentEntry with ID: " +
+                                equipEntry.getEquipIndex() +
+                                ". Expected 5 disguise equipped indexes, but found " +
+                                equipEntry.getDisguiseEquippedIndexes().length);
+                    }
+
+                    if (equipEntry.getBigImageCutX().length != 6 ||
+                            equipEntry.getBigImageCutY().length != 6 ||
+                            equipEntry.getBigImageSizeX().length != 6 ||
+                            equipEntry.getBigImageSizeY().length != 6 ||
+                            equipEntry.getBigImageAlignX().length != 6 ||
+                            equipEntry.getBigImageAlignY().length != 6) {
+                        StringBuilder errorMessage = new StringBuilder("Invalid image configuration for EquipmentEntry with ID: ");
+                        errorMessage.append(equipEntry.getEquipIndex());
+                        errorMessage.append(". Expected arrays of length 6 for all image properties but found:\n");
+
+                        if (equipEntry.getBigImageCutX().length != 6) {
+                            errorMessage.append("  - bigImageCutX length: ").append(equipEntry.getBigImageCutX().length).append("\n");
+                        }
+                        if (equipEntry.getBigImageCutY().length != 6) {
+                            errorMessage.append("  - bigImageCutY length: ").append(equipEntry.getBigImageCutY().length).append("\n");
+                        }
+                        if (equipEntry.getBigImageSizeX().length != 6) {
+                            errorMessage.append("  - bigImageSizeX length: ").append(equipEntry.getBigImageSizeX().length).append("\n");
+                        }
+                        if (equipEntry.getBigImageSizeY().length != 6) {
+                            errorMessage.append("  - bigImageSizeY length: ").append(equipEntry.getBigImageSizeY().length).append("\n");
+                        }
+                        if (equipEntry.getBigImageAlignX().length != 6) {
+                            errorMessage.append("  - bigImageAlignX length: ").append(equipEntry.getBigImageAlignX().length).append("\n");
+                        }
+                        if (equipEntry.getBigImageAlignY().length != 6) {
+                            errorMessage.append("  - bigImageAlignY length: ").append(equipEntry.getBigImageAlignY().length).append("\n");
+                        }
+
+                        throw new SQLException(errorMessage.toString());
+                    }
+
+                    if (equipEntry.getAddPoints().length != 5 || equipEntry.getAddPercents().length != 5) {
+                        throw new SQLException("Invalid additional points or percents configuration for EquipmentEntry with ID: " +
+                                equipEntry.getEquipIndex() +
+                                ". Expected arrays of length 5 but found:\n");
+                    }
+
                     //Đặt trang bị mặc định cho nhân vật
                     if (resultSet.getBoolean("is_default")) {
                         User.equipDefault[equipEntry.getCharacterId()][equipEntry.getEquipType()] = equipEntry;
@@ -185,7 +230,7 @@ public class GameDao implements IGameDao {
                     item.setXu(resultSet.getInt("xu"));
                     item.setLuong(resultSet.getInt("luong"));
 
-                    ItemClanData.CLAN_ITEM_ENTRY_MAP.put(item.getId(), item);
+                    ClanItemData.CLAN_ITEM_ENTRY_MAP.put(item.getId(), item);
                 }
             }
         } catch (SQLException e) {
