@@ -17,7 +17,6 @@ import lombok.Setter;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -46,6 +45,7 @@ public class FightWait implements IFightWait {
     private byte mapId;
     private byte bossIndex;
     private long endTime;
+    private long lastPlayerJoinTime;
     private byte continuousLevel;
 
     public FightWait(Room room, byte id) {
@@ -251,6 +251,9 @@ public class FightWait implements IFightWait {
         users[bestLocation] = us;
         readies[bestLocation] = false;
         numPlayers++;
+
+        //Lưu thời gian gần nhất vào phòng của người chơi
+        lastPlayerJoinTime = System.currentTimeMillis();
 
         ms = new Message(Cmd.JOIN_BOARD);
         ds = ms.writer();
@@ -478,9 +481,17 @@ public class FightWait implements IFightWait {
             return;
         }
 
+        //Kiểm tra thời gian kết thúc ván gần nhất
         long remainingTime = 5000 - (System.currentTimeMillis() - endTime);
         if (remainingTime > 0) {
             roomOwner.getUserService().sendServerMessage(GameString.waitClick(remainingTime / 1000));
+            return;
+        }
+
+        //Kiểm tra thời gian người chơi vào phòng gần nhất
+        remainingTime = 5000 - (System.currentTimeMillis() - lastPlayerJoinTime);
+        if (remainingTime > 0) {
+            roomOwner.getUserService().sendServerMessage2(GameString.waitClick(remainingTime / 1000));
             return;
         }
 
@@ -603,7 +614,7 @@ public class FightWait implements IFightWait {
         fightManager.startGame(teamPointsBlue, teamPointsRed);
         started = true;
 
-        Arrays.fill(readies, false);
+        resetReadies();
     }
 
     @Override

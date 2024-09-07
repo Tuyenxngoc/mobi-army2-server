@@ -290,8 +290,8 @@ public class GameString {
         return "Không thể chọn map.";
     }
 
-    public static String waitClick(long time) {
-        return String.format("Vui lòng chờ sau: %s", time);
+    public static String waitClick(long second) {
+        return String.format("Vui lòng chờ sau %s giây", second);
     }
 
     public static String reg_Error1() {

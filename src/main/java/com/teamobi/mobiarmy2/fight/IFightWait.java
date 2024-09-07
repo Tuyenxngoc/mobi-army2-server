@@ -51,4 +51,6 @@ public interface IFightWait {
 
     byte getRoomType();
 
+    int getMoney();
+
 }

@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.fight.Impl;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
+import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.fight.*;
 import com.teamobi.mobiarmy2.model.ClanItemData;
 import com.teamobi.mobiarmy2.model.User;
@@ -123,6 +124,21 @@ public class FightManager implements IFightManager {
         }
     }
 
+    private void sendMoneyUpdate(Player player) {
+        try {
+            User user = player.getUser();
+            IMessage ms = new Message(Cmd.BONUS_MONEY);
+            DataOutputStream ds = ms.writer();
+            ds.writeInt(user.getPlayerId());
+            ds.writeInt(-fightWait.getMoney());
+            ds.writeInt(user.getXu());
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void handlePlayerLuck() {
         for (int i = 0; i < MAX_USER_FIGHT; i++) {
             if (players[i] != null && players[i].getUser() != null) {
@@ -176,6 +192,14 @@ public class FightManager implements IFightManager {
         for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             if (players[i] != null && players[i].isUpdateAngry()) {
                 sendAngryUpdate(i, players[i]);
+            }
+        }
+    }
+
+    private void updateMoneyPlayers() {
+        for (int i = 0; i < MAX_USER_FIGHT; i++) {
+            if (players[i] != null && players[i].getUser() != null) {
+                sendMoneyUpdate(players[i]);
             }
         }
     }
@@ -304,9 +328,18 @@ public class FightManager implements IFightManager {
                 }
             }
 
+            //Trừ xu cược
+            user.updateXu(-fightWait.getMoney());
+
+            //Cập nhật trạng thái người chơi
+            user.setState(UserState.FIGHTING);
+
             players[i] = new Player(this, user, i, x, y, items, abilities, teamPoints, clanItems);
         }
 
+        if (fightWait.getMoney() > 0) {
+            updateMoneyPlayers();
+        }
         sendFightInfo();
     }
 

@@ -17,6 +17,7 @@ public class Player {
     private byte index;
     private byte pixel;
     private byte angry;
+    private byte stamina;
     private short x;
     private short y;
     private short maxHp;
@@ -42,6 +43,7 @@ public class Player {
         this.index = index;
         this.x = x;
         this.y = y;
+        this.stamina = 60;
         this.items = items;
         this.teamPoints = teamPoints;
         this.clanItems = clanItems;
