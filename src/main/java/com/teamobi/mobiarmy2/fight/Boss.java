@@ -1,14 +1,20 @@
 package com.teamobi.mobiarmy2.fight;
 
-import com.teamobi.mobiarmy2.model.User;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author tuyen
  */
+@Getter
+@Setter
 public abstract class Boss extends Player {
 
-    public Boss(IFightManager fightManager, User user, byte index, short x, short y, byte[] items, short[] abilities, short teamPoints, boolean[] clanItems) {
-        super(fightManager, user, index, x, y, items, abilities, teamPoints, clanItems);
+    private String name;
+
+    public Boss(IFightManager fightManager, byte index, byte characterId, String name, short x, short y, short maxHp) {
+        super(fightManager, index, characterId, x, y, maxHp);
+        this.name = name;
     }
 
     public abstract void turnAction();

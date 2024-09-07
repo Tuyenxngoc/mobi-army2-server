@@ -46,6 +46,17 @@ public class Player {
         this.maxHp = (short) maxHp;
     }
 
+    public Player(IFightManager fightManager, byte index, byte characterId, short x, short y, short maxHp) {
+        this.fightManager = fightManager;
+        this.user = null;
+        this.index = index;
+        this.characterId = characterId;
+        this.x = x;
+        this.y = y;
+        this.maxHp = maxHp;
+        this.hp = maxHp;
+    }
+
     public Player(IFightManager fightManager, User user, byte index, short x, short y, byte[] items, short[] abilities, short teamPoints, boolean[] clanItems) {
         this.fightManager = fightManager;
         this.user = user;
@@ -83,24 +94,24 @@ public class Player {
         if (clanItems[6]) { // 5% sức mạnh
             damage += (short) (damage * 5 / 100);
         }
-        if (clanItems[9]) { // 10% may mắn
+        if (clanItems[8]) { // 10% may mắn
             luck += (short) (luck * 10 / 100);
         }
-        if (clanItems[11]) { // 10% phòng thủ
+        if (clanItems[10]) { // 10% phòng thủ
             defense += (short) (defense * 10 / 100);
         }
-        if (clanItems[13]) { // 10% HP
+        if (clanItems[12]) { // 10% HP
             maxHp += (short) (maxHp * 10 / 100);
         }
-        if (clanItems[14]) { // 10% sức mạnh
+        if (clanItems[13]) { // 10% sức mạnh
             damage += (short) (damage * 10 / 100);
         }
-        if (clanItems[15]) { // 30% phòng thủ cho Canon và AK
+        if (clanItems[14]) { // 30% phòng thủ cho Canon và AK
             if (characterId == 1 || characterId == 5) {
                 defense += (short) (defense * 30 / 100);
             }
         }
-        if (clanItems[16]) { // 15% sức mạnh cho King Kong và Proton
+        if (clanItems[15]) { // 15% sức mạnh cho King Kong và Proton
             if (characterId == 2 || characterId == 3) {
                 damage += (short) (damage * 15 / 100);
             }
