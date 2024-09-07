@@ -217,7 +217,7 @@ public class UserService implements IUserService {
         target.setOwnedCharacters(source.getOwnedCharacters());
         target.setXps(source.getXps());
         target.setPoints(source.getPoints());
-        target.setPointAdd(source.getPointAdd());
+        target.setAddedPoints(source.getAddedPoints());
         target.setEquipData(source.getEquipData());
         target.setCharacterEquips(source.getCharacterEquips());
         target.setFriends(source.getFriends());
@@ -2105,7 +2105,7 @@ public class UserService implements IUserService {
                     user.getLevels()[index] = character.getLevel();
                     user.getXps()[index] = character.getXp();
                     user.getPoints()[index] = character.getPoints();
-                    user.getPointAdd()[index] = character.getAdditionalPoints();
+                    user.getAddedPoints()[index] = character.getAdditionalPoints();
                     user.getPlayerCharacterIds()[index] = character.getId();
                     user.getOwnedCharacters()[index] = true;
                     user.getEquipData()[index] = character.getData();
@@ -2452,7 +2452,7 @@ public class UserService implements IUserService {
             ds.writeByte(user.getCurrentLevel());
             ds.writeByte(user.getCurrentLevelPercent());
             ds.writeShort(user.getCurrentPoint());
-            for (short point : user.getCurrentPointAdd()) {
+            for (short point : user.getCurrentAddedPoints()) {
                 ds.writeShort(point);
             }
             ds.writeInt(user.getCurrentXp());

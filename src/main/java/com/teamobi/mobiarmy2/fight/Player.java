@@ -20,6 +20,9 @@ public class Player {
     private short y;
     private short maxHp;
     private short hp;
+    private short damage;
+    private short defense;
+    private short luck;
     private byte[] items;
     private boolean isUpdateHP;
     private boolean isUpdateAngry;
@@ -37,9 +40,11 @@ public class Player {
         this.y = y;
         this.items = items;
 
-        short[] ability = user.getAbility();
-
-        this.maxHp = ability[0];
+        short[] abilities = user.calculateCharacterAbilities();
+        this.maxHp = abilities[0];
+        this.damage = abilities[1];
+        this.defense = abilities[2];
+        this.luck = abilities[3];
     }
 
     public void die() {

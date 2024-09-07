@@ -58,7 +58,7 @@ public class User {
     private byte[] levelPercents;
     private int[] xps;
     private int[] points;
-    private short[][] pointAdd;
+    private short[][] addedPoints;
     private byte[] items;
     private int[][] equipData;
     private int[] mission;
@@ -113,8 +113,8 @@ public class User {
         return points[activeCharacterId];
     }
 
-    public short[] getCurrentPointAdd() {
-        return pointAdd[activeCharacterId];
+    public short[] getCurrentAddedPoints() {
+        return addedPoints[activeCharacterId];
     }
 
     public synchronized void updateXu(int xuUp) {
@@ -365,7 +365,7 @@ public class User {
 
     public synchronized void updatePoints(short[] pointsToAdd, int totalPointsToSubtract) {
         for (int i = 0; i < 5; i++) {
-            pointAdd[activeCharacterId][i] += pointsToAdd[i];
+            addedPoints[activeCharacterId][i] += pointsToAdd[i];
         }
         points[activeCharacterId] -= totalPointsToSubtract;
     }
@@ -393,10 +393,10 @@ public class User {
 
     public synchronized void resetPoints() {
         int total = -30;
-        for (short point : pointAdd[activeCharacterId]) {
+        for (short point : addedPoints[activeCharacterId]) {
             total += point;
         }
-        pointAdd[activeCharacterId] = new short[]{0, 0, 10, 10, 10};
+        addedPoints[activeCharacterId] = new short[]{0, 0, 10, 10, 10};
         points[activeCharacterId] += total;
     }
 
@@ -468,14 +468,41 @@ public class User {
         return equipDefault[activeCharacterId][0].getEquipIndex();
     }
 
-    public short[] getAbility() {
-        short[] ability = new short[5];
-        ability[0] = 1000;
-        ability[1] = 10;
-        ability[2] = 10;
-        ability[3] = 10;
-        ability[4] = 10;
-        return ability;
+    public short[] calculateCharacterAbilities() {
+        int[] abilities = new int[5];
+        short[] points = addedPoints[activeCharacterId];
+        short[] percents = new short[5];
+
+        EquipmentChestEntry[] equippedItems = characterEquips[activeCharacterId];
+        for (int i = 0; i < equippedItems.length; i++) {
+            EquipmentChestEntry equip = equippedItems[i];
+            if (equip == null || equip.isExpired()) {
+                continue;// Bỏ qua nếu trang bị không tồn tại hoặc đã hết hạn
+            }
+
+            for (byte j = 0; j < points.length; j++) {
+                points[i] += equip.getAddPoints()[i];
+                percents[i] += equip.getAddPercents()[i];
+            }
+        }
+
+        abilities[0] = 1000 + (points[0] * 10);
+        abilities[0] += (abilities[0] * percents[0] / 100);
+
+        short baseDamage = CharacterData.CHARACTER_ENTRIES.get(activeCharacterId).getDamage();
+        abilities[1] = (baseDamage * (100 + (points[1] / 3) + percents[1]) / 100) * 100 / baseDamage;
+
+        for (byte i = 2; i < abilities.length; i++) {
+            abilities[i] = points[i] * 10;
+            abilities[i] += (abilities[i] * percents[i] / 100);
+        }
+
+        short[] result = new short[abilities.length];
+        for (byte i = 0; i < result.length; i++) {
+            result[i] = (short) Math.min(abilities[i], 32000);
+        }
+
+        return result;
     }
 
 }

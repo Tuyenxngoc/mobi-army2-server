@@ -86,7 +86,7 @@ public class UserDao implements IUserDao {
                         user.getPoints()[i],
                         user.getXps()[i],
                         Arrays.toString(user.getEquipData()[i]),
-                        Arrays.toString(user.getPointAdd()[i]),
+                        Arrays.toString(user.getAddedPoints()[i]),
                         user.getPlayerId(),
                         i
                 );
@@ -156,7 +156,7 @@ public class UserDao implements IUserDao {
                     user.setLevelPercents(new byte[totalCharacter]);
                     user.setXps(new int[totalCharacter]);
                     user.setPoints(new int[totalCharacter]);
-                    user.setPointAdd(new short[totalCharacter][5]);
+                    user.setAddedPoints(new short[totalCharacter][5]);
                     user.setEquipData(new int[totalCharacter][6]);
                     user.setCharacterEquips(new EquipmentChestEntry[totalCharacter][6]);
                     user.setSpecialItemChest(new ArrayList<>());
@@ -278,7 +278,7 @@ public class UserDao implements IUserDao {
                         user.getXps()[characterId] = characterResultSet.getInt("xp");
                         user.getLevelPercents()[characterId] = 0;
                         user.getPoints()[characterId] = characterResultSet.getInt("points");
-                        user.getPointAdd()[characterId] = gson.fromJson(characterResultSet.getString("additional_points"), short[].class);
+                        user.getAddedPoints()[characterId] = gson.fromJson(characterResultSet.getString("additional_points"), short[].class);
                         user.getEquipData()[characterId] = new int[]{-1, -1, -1, -1, -1, -1};
 
                         int[] data = gson.fromJson(characterResultSet.getString("data"), int[].class);
