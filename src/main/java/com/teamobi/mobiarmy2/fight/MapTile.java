@@ -38,4 +38,7 @@ public class MapTile {
         return data[y * width + x];
     }
 
+    public void collision(int x, int y, Bullet bullet) {
+
+    }
 }

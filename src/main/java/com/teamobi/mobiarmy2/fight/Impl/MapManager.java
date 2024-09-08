@@ -117,4 +117,12 @@ public class MapManager implements IMapManager {
         }
     }
 
+    public boolean isCollision(short x, short y){
+        for (MapTile tile : mapTiles) {
+            if (tile.isCollision(x, y)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
