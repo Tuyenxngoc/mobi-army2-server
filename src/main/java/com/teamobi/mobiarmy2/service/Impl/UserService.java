@@ -1922,7 +1922,7 @@ public class UserService implements IUserService {
 
     @Override
     public void skipTurn() {
-        user.getFightWait().getFightManager().skipTurn(user);
+        user.getFightWait().getFightManager().skipTurn(user.getPlayerId());
     }
 
     @Override

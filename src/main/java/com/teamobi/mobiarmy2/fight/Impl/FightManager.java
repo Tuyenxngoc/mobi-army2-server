@@ -35,6 +35,7 @@ public class FightManager implements IFightManager {
     private Player[] players;
     private int currentTurnPlayer;
     private int totalPlayers;
+    private int turnCount;
     private byte windX;
     private byte windY;
     private long startTime;
@@ -47,7 +48,7 @@ public class FightManager implements IFightManager {
         this.players = new Player[MAX_ELEMENT_FIGHT];
         this.mapManager = new MapManager(this);
         this.bulletManager = new BulletManager(this);
-        this.countdownTimer = new CountdownTimer(this);
+        this.countdownTimer = new CountdownTimer(this, MAX_PLAY_TIME + 10);
     }
 
     private void refreshFightManager() {
@@ -286,7 +287,23 @@ public class FightManager implements IFightManager {
     }
 
     private void nextTurn() {
+        turnCount++;
 
+        countdownTimer.reset();
+
+        sendNextTurnMessage(currentTurnPlayer);
+    }
+
+    private void sendNextTurnMessage(int turn) {
+        try {
+            IMessage ms = new Message(Cmd.NEXT_TURN_2);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(turn);
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -430,8 +447,13 @@ public class FightManager implements IFightManager {
     }
 
     @Override
-    public void skipTurn(User user) {
+    public void skipTurn(int playerId) {
+        int index = getPlayerIndexByPlayerId(playerId);
+        if (index == -1 || index != currentTurnPlayer) {
+            return;
+        }
 
+        System.out.println("next turn: " + index);
     }
 
     @Override
@@ -442,6 +464,11 @@ public class FightManager implements IFightManager {
     @Override
     public IMapManager getMapManger() {
         return mapManager;
+    }
+
+    @Override
+    public void onTimeUp() {
+
     }
 
 }

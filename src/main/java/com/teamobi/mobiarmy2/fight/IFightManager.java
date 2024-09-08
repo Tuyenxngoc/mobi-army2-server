@@ -15,10 +15,12 @@ public interface IFightManager {
 
     void addShoot(User user, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot);
 
-    void skipTurn(User user);
+    void skipTurn(int playerId);
 
     void useItem(byte itemIndex);
 
     IMapManager getMapManger();
+
+    void onTimeUp();
 
 }
