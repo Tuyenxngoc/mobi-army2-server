@@ -9,4 +9,5 @@ public interface IBulletManager {
 
     short[] getCollisionPoint();
 
+    void updateBulletPositions();
 }

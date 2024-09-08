@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.fight;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,9 +9,9 @@ import java.util.List;
 /**
  * @author tuyen
  */
+@Getter
+@Setter
 public class Bullet {
-
-    @Getter
     private boolean collect;
     private short x;
     private short y;

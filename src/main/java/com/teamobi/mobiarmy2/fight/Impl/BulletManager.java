@@ -28,6 +28,7 @@ public class BulletManager implements IBulletManager {
         return new short[0];
     }
 
+    @Override
     public void updateBulletPositions() {
         boolean hasActiveBullet = false;
         do {
