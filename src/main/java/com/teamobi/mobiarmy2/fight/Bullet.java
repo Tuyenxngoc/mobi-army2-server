@@ -1,5 +1,7 @@
 package com.teamobi.mobiarmy2.fight;
 
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +10,7 @@ import java.util.List;
  */
 public class Bullet {
 
+    @Getter
     private boolean collect;
     private short x;
     private short y;
@@ -30,7 +33,7 @@ public class Bullet {
         this.bulletManager = bulletManager;
     }
 
-    protected void nextXY() {
+    public void nextXY() {
         frame++;
         xArrays.add(x);
         yArrays.add(y);

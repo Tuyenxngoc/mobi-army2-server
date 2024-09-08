@@ -13,7 +13,7 @@ public class B52Bullet extends Bullet {
     }
 
     @Override
-    protected void nextXY() {
+    public void nextXY() {
         super.nextXY();
     }
 

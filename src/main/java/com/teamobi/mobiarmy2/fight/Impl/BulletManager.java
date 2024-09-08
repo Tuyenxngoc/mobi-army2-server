@@ -28,4 +28,17 @@ public class BulletManager implements IBulletManager {
         return new short[0];
     }
 
+    public void updateBulletPositions() {
+        boolean hasActiveBullet = false;
+        do {
+            for (Bullet bullet : bullets) {
+                if (bullet == null || bullet.isCollect()) {
+                    continue;
+                }
+                hasActiveBullet = true;
+                bullet.nextXY();
+            }
+        } while (hasActiveBullet);
+    }
+
 }
