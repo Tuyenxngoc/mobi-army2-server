@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 /**
  * @author tuyen
  */
-public class CharacterData {
+public class CharacterRepository {
     public static final List<CharacterEntry> CHARACTER_ENTRIES = new ArrayList<>();
     public static final List<EquipmentEntry> EQUIPMENT_ENTRIES = new ArrayList<>();
     public static short totalSaleEquipments = 0;

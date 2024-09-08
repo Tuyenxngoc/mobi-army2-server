@@ -7,7 +7,7 @@ import com.teamobi.mobiarmy2.model.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
 import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
-import com.teamobi.mobiarmy2.repository.ClanItemData;
+import com.teamobi.mobiarmy2.repository.ClanItemRepository;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.time.LocalDateTime;
@@ -126,7 +126,7 @@ public class ClanManager {
     }
 
     public boolean[] getClanItems(short clanId) {
-        boolean[] result = new boolean[ClanItemData.CLAN_ITEM_ENTRY_MAP.size()];
+        boolean[] result = new boolean[ClanItemRepository.CLAN_ITEM_ENTRY_MAP.size()];
         LocalDateTime now = LocalDateTime.now();
         ClanItemJson[] items = clanDao.getClanItems(clanId);
 

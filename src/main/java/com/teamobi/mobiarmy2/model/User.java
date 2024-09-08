@@ -11,8 +11,8 @@ import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.Impl.Message;
-import com.teamobi.mobiarmy2.repository.CharacterData;
-import com.teamobi.mobiarmy2.repository.XpData;
+import com.teamobi.mobiarmy2.repository.CharacterRepository;
+import com.teamobi.mobiarmy2.repository.XpRepository;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.service.Impl.UserService;
@@ -109,7 +109,7 @@ public class User {
     }
 
     public int getCurrentXpLevel() {
-        return XpData.getXpRequestLevel(getCurrentLevel());
+        return XpRepository.getXpRequestLevel(getCurrentLevel());
     }
 
     public int getCurrentLevel() {
@@ -195,7 +195,7 @@ public class User {
         }
 
         int currentLevel = getCurrentLevel();
-        int newLevel = XpData.getLevelByEXP(totalXp);
+        int newLevel = XpRepository.getLevelByEXP(totalXp);
 
         int levelDiff = newLevel - currentLevel;
         if (levelDiff > 0) {
@@ -530,7 +530,7 @@ public class User {
         abilities[0] = 1000 + (points[0] * 10);
         abilities[0] += (abilities[0] * percents[0] / 100);
 
-        short baseDamage = CharacterData.CHARACTER_ENTRIES.get(activeCharacterId).getDamage();
+        short baseDamage = CharacterRepository.CHARACTER_ENTRIES.get(activeCharacterId).getDamage();
         abilities[1] = (baseDamage * (100 + (points[1] / 3) + percents[1]) / 100) * 100 / baseDamage;
 
         for (byte i = 2; i < abilities.length; i++) {

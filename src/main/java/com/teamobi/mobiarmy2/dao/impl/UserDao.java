@@ -11,10 +11,10 @@ import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.model.user.EquipmentChestEntry;
 import com.teamobi.mobiarmy2.model.user.FriendEntry;
 import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
-import com.teamobi.mobiarmy2.repository.CharacterData;
-import com.teamobi.mobiarmy2.repository.FightItemData;
-import com.teamobi.mobiarmy2.repository.MissionData;
-import com.teamobi.mobiarmy2.repository.SpecialItemData;
+import com.teamobi.mobiarmy2.repository.CharacterRepository;
+import com.teamobi.mobiarmy2.repository.FightItemRepository;
+import com.teamobi.mobiarmy2.repository.MissionRepository;
+import com.teamobi.mobiarmy2.repository.SpecialItemRepository;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.JsonConverter;
 import org.mindrot.jbcrypt.BCrypt;
@@ -152,7 +152,7 @@ public class UserDao implements IUserDao {
             try (PreparedStatement playerStatement = connection.prepareStatement(playerQuery)) {
                 playerStatement.setString(1, user.getUserId());
                 try (ResultSet playerResultSet = playerStatement.executeQuery()) {
-                    int totalCharacter = CharacterData.CHARACTER_ENTRIES.size();
+                    int totalCharacter = CharacterRepository.CHARACTER_ENTRIES.size();
                     user.setPlayerCharacterIds(new long[totalCharacter]);
                     user.setOwnedCharacters(new boolean[totalCharacter]);
                     user.setLevels(new int[totalCharacter]);
@@ -186,8 +186,8 @@ public class UserDao implements IUserDao {
 
                         //Đọc dữ liệu item chiến đấu
                         byte[] items = gson.fromJson(playerResultSet.getString("item"), byte[].class);
-                        if (items.length != FightItemData.FIGHT_ITEM_ENTRIES.size()) {
-                            byte[] adjustedItems = new byte[FightItemData.FIGHT_ITEM_ENTRIES.size()];
+                        if (items.length != FightItemRepository.FIGHT_ITEM_ENTRIES.size()) {
+                            byte[] adjustedItems = new byte[FightItemRepository.FIGHT_ITEM_ENTRIES.size()];
                             System.arraycopy(items, 0, adjustedItems, 0, Math.min(items.length, adjustedItems.length));
                             user.setItems(adjustedItems);
                         } else {
@@ -198,7 +198,7 @@ public class UserDao implements IUserDao {
                         EquipmentChestJson[] equipmentChestJsons = gson.fromJson(playerResultSet.getString("equipment_chest"), EquipmentChestJson[].class);
                         for (EquipmentChestJson json : equipmentChestJsons) {
                             EquipmentChestEntry equip = new EquipmentChestEntry();
-                            equip.setEquipEntry(CharacterData.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
+                            equip.setEquipEntry(CharacterRepository.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
                             if (equip.getEquipEntry() == null) {
                                 continue;
                             }
@@ -223,7 +223,7 @@ public class UserDao implements IUserDao {
                         SpecialItemChestJson[] specialItemChestJsons = gson.fromJson(playerResultSet.getString("item_chest"), SpecialItemChestJson[].class);
                         for (SpecialItemChestJson item : specialItemChestJsons) {
                             SpecialItemChestEntry specialItemChestEntry = new SpecialItemChestEntry();
-                            specialItemChestEntry.setItem(SpecialItemData.getSpecialItemById(item.getId()));
+                            specialItemChestEntry.setItem(SpecialItemRepository.getSpecialItemById(item.getId()));
                             if (specialItemChestEntry.getItem() == null) {
                                 continue;
                             }
@@ -241,15 +241,15 @@ public class UserDao implements IUserDao {
                         int[] missions = gson.fromJson(playerResultSet.getString("mission"), int[].class);
                         byte[] missionLevels = gson.fromJson(playerResultSet.getString("missionLevel"), byte[].class);
 
-                        if (missions.length != MissionData.MISSION_LIST.size()) {
-                            int[] adjustedMissions = new int[MissionData.MISSION_LIST.size()];
+                        if (missions.length != MissionRepository.MISSION_LIST.size()) {
+                            int[] adjustedMissions = new int[MissionRepository.MISSION_LIST.size()];
                             System.arraycopy(missions, 0, adjustedMissions, 0, Math.min(missions.length, adjustedMissions.length));
                             user.setMission(adjustedMissions);
                         } else {
                             user.setMission(missions);
                         }
-                        if (missionLevels.length != MissionData.MISSION_LIST.size()) {
-                            byte[] adjustedMissionLevels = new byte[MissionData.MISSION_LIST.size()];
+                        if (missionLevels.length != MissionRepository.MISSION_LIST.size()) {
+                            byte[] adjustedMissionLevels = new byte[MissionRepository.MISSION_LIST.size()];
                             Arrays.fill(adjustedMissionLevels, (byte) 1);
                             System.arraycopy(missionLevels, 0, adjustedMissionLevels, 0, Math.min(missionLevels.length, adjustedMissionLevels.length));
                             user.setMissionLevel(adjustedMissionLevels);
@@ -366,7 +366,7 @@ public class UserDao implements IUserDao {
                     friend.setLevelPt((byte) 0);
                     int[] data = gson.fromJson(resultSet.getString("data"), int[].class);
                     EquipmentChestJson[] equipmentChests = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
-                    friend.setData(CharacterData.getEquipData(equipmentChests, data, friend.getActiveCharacterId()));
+                    friend.setData(CharacterRepository.getEquipData(equipmentChests, data, friend.getActiveCharacterId()));
 
                     friendsList.add(friend);
                 }

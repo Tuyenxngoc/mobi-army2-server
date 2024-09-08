@@ -27,7 +27,6 @@ import com.teamobi.mobiarmy2.model.user.PlayerLeaderboardEntry;
 import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.Impl.Message;
-import com.teamobi.mobiarmy2.repository.CharacterData;
 import com.teamobi.mobiarmy2.repository.*;
 import com.teamobi.mobiarmy2.server.ClanManager;
 import com.teamobi.mobiarmy2.server.LeaderboardManager;
@@ -157,10 +156,10 @@ public class UserService implements IUserService {
             LocalDateTime now = LocalDateTime.now();
             if (Utils.hasLoggedInOnNewDay(user.getLastOnline(), now)) {
                 //Gửi item
-                byte indexItem = FightItemData.getRandomItem();
+                byte indexItem = FightItemRepository.getRandomItem();
                 byte quantity = 1;
                 user.updateItems(indexItem, quantity);
-                sendMessageToUser(GameString.dailyReward(quantity, FightItemData.FIGHT_ITEM_ENTRIES.get(indexItem).getName()));
+                sendMessageToUser(GameString.dailyReward(quantity, FightItemRepository.FIGHT_ITEM_ENTRIES.get(indexItem).getName()));
 
                 //Cập nhật quà top
                 if (user.getTopEarningsXu() > 0) {
@@ -247,7 +246,7 @@ public class UserService implements IUserService {
 
     public void sendCharacterData(IServerConfig config) {
         try {
-            List<CharacterEntry> characterEntries = CharacterData.CHARACTER_ENTRIES;
+            List<CharacterEntry> characterEntries = CharacterRepository.CHARACTER_ENTRIES;
             int characterCount = characterEntries.size();
             IMessage ms = new Message(Cmd.SKIP_2);
             DataOutputStream ds = ms.writer();
@@ -324,8 +323,8 @@ public class UserService implements IUserService {
         try {
             IMessage ms = new Message(92);
             DataOutputStream ds = ms.writer();
-            ds.writeShort(MapData.idNotCollisions.length);
-            for (short i : MapData.idNotCollisions) {
+            ds.writeShort(MapRepository.idNotCollisions.length);
+            for (short i : MapRepository.idNotCollisions) {
                 ds.writeShort(i);
             }
             ds.flush();
@@ -378,7 +377,7 @@ public class UserService implements IUserService {
             }
             int gia = 0;
             for (byte itemId : equip.getSlots()) {
-                SpecialItemEntry item = SpecialItemData.getSpecialItemById(itemId);
+                SpecialItemEntry item = SpecialItemRepository.getSpecialItemById(itemId);
                 if (item != null) {
                     gia += item.getPriceXu();
                 }
@@ -435,7 +434,7 @@ public class UserService implements IUserService {
 
     private void missionComplete(byte missionId) throws IOException {
         String message;
-        MissionEntry missionEntry = MissionData.getMissionById(missionId);
+        MissionEntry missionEntry = MissionRepository.getMissionById(missionId);
         if (missionEntry == null) {
             message = GameString.missionError1();
         } else {
@@ -474,7 +473,7 @@ public class UserService implements IUserService {
         IMessage ms = new Message(Cmd.MISSISON);
         DataOutputStream ds = ms.writer();
         int i = 0;
-        for (List<MissionEntry> missionEntryList : MissionData.MISSION_LIST.values()) {
+        for (List<MissionEntry> missionEntryList : MissionRepository.MISSION_LIST.values()) {
             int index = user.getMissionLevel()[i] - 1;// Subtracting 1 to access the correct index
             if (index >= missionEntryList.size()) {
                 index = missionEntryList.size() - 1;
@@ -527,9 +526,9 @@ public class UserService implements IUserService {
                 }
             }
 
-            for (int i = 0; i < FightItemData.FIGHT_ITEM_ENTRIES.size(); i++) {
+            for (int i = 0; i < FightItemRepository.FIGHT_ITEM_ENTRIES.size(); i++) {
                 ds.writeByte(user.getItems()[i]);
-                FightItemEntry fightItemEntry = FightItemData.FIGHT_ITEM_ENTRIES.get(i);
+                FightItemEntry fightItemEntry = FightItemRepository.FIGHT_ITEM_ENTRIES.get(i);
                 ds.writeInt(fightItemEntry.getBuyXu());
                 ds.writeInt(fightItemEntry.getBuyLuong());
             }
@@ -537,7 +536,7 @@ public class UserService implements IUserService {
             for (int i = 0; i < 10; i++) {
                 if (i > 2) {
                     ds.writeByte(user.getOwnedCharacters()[i] ? 1 : 0);
-                    CharacterEntry characterEntry = CharacterData.CHARACTER_ENTRIES.get(i);
+                    CharacterEntry characterEntry = CharacterRepository.CHARACTER_ENTRIES.get(i);
                     ds.writeShort(characterEntry.getPriceXu() / 1000);
                     ds.writeShort(characterEntry.getPriceLuong());
                 }
@@ -638,7 +637,7 @@ public class UserService implements IUserService {
     }
 
     private void processFormulaCrafting(byte id, byte level) {
-        Map<Byte, List<FormulaEntry>> formulaMap = FormulaData.FORMULA.get(id);
+        Map<Byte, List<FormulaEntry>> formulaMap = FormulaRepository.FORMULA.get(id);
         if (formulaMap == null) {
             return;
         }
@@ -730,7 +729,7 @@ public class UserService implements IUserService {
 
     private void sendFormulaInfo(byte id) {
         try {
-            Map<Byte, List<FormulaEntry>> formulaMap = FormulaData.FORMULA.get(id);
+            Map<Byte, List<FormulaEntry>> formulaMap = FormulaRepository.FORMULA.get(id);
             if (formulaMap == null) {
                 return;
             }
@@ -884,7 +883,7 @@ public class UserService implements IUserService {
 
     private void buyClanShop(byte unit, byte itemId) {
         ClanManager clanManager = ClanManager.getInstance();
-        ClanItemEntry clanItemEntry = ClanItemData.getItemClanById(itemId);
+        ClanItemEntry clanItemEntry = ClanItemRepository.getItemClanById(itemId);
 
         if (clanItemEntry == null || clanItemEntry.getOnSale() != 1) {
             return;
@@ -926,8 +925,8 @@ public class UserService implements IUserService {
         try {
             IMessage ms = new Message(Cmd.SHOP_BIETDOI);
             DataOutputStream ds = ms.writer();
-            ds.writeByte(ClanItemData.CLAN_ITEM_ENTRY_MAP.size());
-            for (ClanItemEntry clanItemEntry : ClanItemData.CLAN_ITEM_ENTRY_MAP.values()) {
+            ds.writeByte(ClanItemRepository.CLAN_ITEM_ENTRY_MAP.size());
+            for (ClanItemEntry clanItemEntry : ClanItemRepository.CLAN_ITEM_ENTRY_MAP.values()) {
                 ds.writeByte(clanItemEntry.getId());
                 ds.writeUTF(clanItemEntry.getName());
                 ds.writeInt(clanItemEntry.getXu());
@@ -994,7 +993,7 @@ public class UserService implements IUserService {
             return;
         }
 
-        SpecialItemEntry item = SpecialItemData.getSpecialItemById(itemId);
+        SpecialItemEntry item = SpecialItemRepository.getSpecialItemById(itemId);
         if (!item.isOnSale() || (unit == 0 ? item.getPriceXu() : item.getPriceLuong()) < 0) {
             return;
         }
@@ -1060,7 +1059,7 @@ public class UserService implements IUserService {
         try {
             IMessage ms = new Message(Cmd.SHOP_LINHTINH);
             DataOutputStream ds = ms.writer();
-            for (SpecialItemEntry spEntry : SpecialItemData.SPECIAL_ITEM_ENTRIES) {
+            for (SpecialItemEntry spEntry : SpecialItemRepository.SPECIAL_ITEM_ENTRIES) {
                 if (!spEntry.isOnSale()) {
                     continue;
                 }
@@ -1409,7 +1408,7 @@ public class UserService implements IUserService {
                 }
 
                 if (!specialItemList.isEmpty()) {
-                    fabricateItemEntry = FabricateItemData.getFabricateItem(specialItemList);
+                    fabricateItemEntry = FabricateItemRepository.getFabricateItem(specialItemList);
                     if (fabricateItemEntry != null) {
                         userAction = UserAction.GHEP_SPEC_ITEM;
                         sendMessageConfirm(fabricateItemEntry.getConfirmationMessage());
@@ -1462,7 +1461,7 @@ public class UserService implements IUserService {
                         if (randomNumber < successRate) {
                             SpecialItemChestEntry newItem = new SpecialItemChestEntry();
                             newItem.setQuantity((short) 1);
-                            newItem.setItem(SpecialItemData.getSpecialItemById((byte) (specialItemChestEntry.getItem().getId() + 1)));
+                            newItem.setItem(SpecialItemRepository.getSpecialItemById((byte) (specialItemChestEntry.getItem().getId() + 1)));
 
                             user.updateInventory(null, null, List.of(newItem), List.of(specialItemChestEntry));
                             sendServerMessage(GameString.nangNgocSuccess(newItem.getQuantity(), newItem.getItem().getName()));
@@ -1698,7 +1697,7 @@ public class UserService implements IUserService {
     public void handleUseItem(IMessage ms) {
         try {
             byte itemIndex = ms.reader().readByte();
-            if (itemIndex < 0 || itemIndex >= FightItemData.FIGHT_ITEM_ENTRIES.size()) {
+            if (itemIndex < 0 || itemIndex >= FightItemRepository.FIGHT_ITEM_ENTRIES.size()) {
                 return;
             }
 
@@ -1983,7 +1982,7 @@ public class UserService implements IUserService {
     public void handleChoseCharacter(IMessage ms) {
         try {
             byte characterId = ms.reader().readByte();
-            if (characterId >= CharacterData.CHARACTER_ENTRIES.size() || characterId < 0 || !user.getOwnedCharacters()[characterId]) {
+            if (characterId >= CharacterRepository.CHARACTER_ENTRIES.size() || characterId < 0 || !user.getOwnedCharacters()[characterId]) {
                 return;
             }
             user.setActiveCharacterId(characterId);
@@ -2031,20 +2030,20 @@ public class UserService implements IUserService {
             byte unit = dis.readByte();
             byte itemIndex = dis.readByte();
             byte quantity = dis.readByte();
-            if (itemIndex < 0 || itemIndex >= FightItemData.FIGHT_ITEM_ENTRIES.size()) {
+            if (itemIndex < 0 || itemIndex >= FightItemRepository.FIGHT_ITEM_ENTRIES.size()) {
                 return;
             }
             if (user.getItems()[itemIndex] + quantity > ServerManager.getInstance().config().getMaxItem()) {
                 return;
             }
             if (unit == 0) {
-                int total = FightItemData.FIGHT_ITEM_ENTRIES.get(itemIndex).getBuyXu() * quantity;
+                int total = FightItemRepository.FIGHT_ITEM_ENTRIES.get(itemIndex).getBuyXu() * quantity;
                 if (user.getXu() < total || total < 0) {
                     return;
                 }
                 user.updateXu(-total);
             } else {
-                int total = FightItemData.FIGHT_ITEM_ENTRIES.get(itemIndex).getBuyLuong() * quantity;
+                int total = FightItemRepository.FIGHT_ITEM_ENTRIES.get(itemIndex).getBuyLuong() * quantity;
                 if (user.getLuong() < total || total < 0) {
                     return;
                 }
@@ -2079,7 +2078,7 @@ public class UserService implements IUserService {
             if (user.getOwnedCharacters()[index]) {
                 return;
             }
-            CharacterEntry characterEntry = CharacterData.CHARACTER_ENTRIES.get(index);
+            CharacterEntry characterEntry = CharacterRepository.CHARACTER_ENTRIES.get(index);
             if (unit == 0) {
                 if (characterEntry.getPriceXu() <= 0) {
                     return;
@@ -2192,7 +2191,7 @@ public class UserService implements IUserService {
             List<SpecialItemChestEntry> additionalItems = new ArrayList<>();
             for (SpecialItemChestJson item : giftCode.getItems()) {
                 SpecialItemChestEntry newItem = new SpecialItemChestEntry();
-                newItem.setItem(SpecialItemData.getSpecialItemById(item.getId()));
+                newItem.setItem(SpecialItemRepository.getSpecialItemById(item.getId()));
                 if (newItem.getItem() == null) {
                     continue;
                 }
@@ -2205,7 +2204,7 @@ public class UserService implements IUserService {
         if (giftCode.getEquips() != null) {
             for (EquipmentChestJson json : giftCode.getEquips()) {
                 EquipmentChestEntry addEquip = new EquipmentChestEntry();
-                addEquip.setEquipEntry(CharacterData.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
+                addEquip.setEquipEntry(CharacterRepository.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
                 if (addEquip.getEquipEntry() == null) {
                     continue;
                 }
@@ -2506,8 +2505,8 @@ public class UserService implements IUserService {
         try {
             IMessage ms = new Message(Cmd.SHOP_EQUIP);
             DataOutputStream ds = ms.writer();
-            ds.writeShort(CharacterData.totalSaleEquipments);
-            for (EquipmentEntry equip : CharacterData.EQUIPMENT_ENTRIES) {
+            ds.writeShort(CharacterRepository.totalSaleEquipments);
+            for (EquipmentEntry equip : CharacterRepository.EQUIPMENT_ENTRIES) {
                 if (!equip.isOnSale()) {
                     continue;
                 }
@@ -2576,7 +2575,7 @@ public class UserService implements IUserService {
 
                             //Tính tiền gia hạn theo 25% giá ngọc
                             for (byte slotItemId : equipList.get(0).getSlots()) {
-                                SpecialItemEntry item = SpecialItemData.getSpecialItemById(slotItemId);
+                                SpecialItemEntry item = SpecialItemRepository.getSpecialItemById(slotItemId);
                                 if (item != null) {
                                     totalTransactionAmount += (int) (item.getPriceXu() * 0.25);
                                 }
@@ -2611,7 +2610,7 @@ public class UserService implements IUserService {
                         List<SpecialItemChestEntry> recoveredGems = new ArrayList<>();
                         for (byte slotItemId : selectedEquipment.getSlots()) {
                             if (slotItemId > -1) {
-                                SpecialItemChestEntry gem = new SpecialItemChestEntry((short) 1, SpecialItemData.getSpecialItemById(slotItemId));
+                                SpecialItemChestEntry gem = new SpecialItemChestEntry((short) 1, SpecialItemRepository.getSpecialItemById(slotItemId));
                                 if (gem.getItem() != null) {
                                     recoveredGems.add(gem);
 
@@ -2666,7 +2665,7 @@ public class UserService implements IUserService {
             sendServerMessage(GameString.ruongNoSlot());
             return;
         }
-        EquipmentEntry equipmentEntry = CharacterData.getEquipEntryBySaleIndex(saleIndex);
+        EquipmentEntry equipmentEntry = CharacterRepository.getEquipEntryBySaleIndex(saleIndex);
         if (equipmentEntry == null || (unit == 0 ? equipmentEntry.getPriceXu() : equipmentEntry.getPriceLuong()) < 0) {
             return;
         }
@@ -2717,7 +2716,7 @@ public class UserService implements IUserService {
 
                 switch (type) {
                     case 0 -> {
-                        itemId = FightItemData.getRandomItem();
+                        itemId = FightItemRepository.getRandomItem();
                         quantity = SpinWheelConstants.ITEM_COUNTS[Utils.nextInt(SpinWheelConstants.ITEM_PROBABILITIES)];
                         if (i == luckyIndex) {
                             user.updateItems(itemId, (byte) quantity);
@@ -2923,7 +2922,7 @@ public class UserService implements IUserService {
                     ms = new Message(Cmd.CHARGE_MONEY_2);
                     DataOutputStream ds = ms.writer();
                     ds.writeByte(0);
-                    for (PaymentEntry paymentEntry : PaymentData.PAYMENT_ENTRY_MAP.values()) {
+                    for (PaymentEntry paymentEntry : PaymentRepository.PAYMENT_ENTRY_MAP.values()) {
                         ds.writeUTF(paymentEntry.getId());
                         ds.writeUTF(paymentEntry.getInfo());
                         ds.writeUTF(paymentEntry.getUrl());
@@ -2933,7 +2932,7 @@ public class UserService implements IUserService {
                 }
                 case 1 -> {
                     String id = dis.readUTF();
-                    PaymentEntry paymentEntry = PaymentData.PAYMENT_ENTRY_MAP.get(id);
+                    PaymentEntry paymentEntry = PaymentRepository.PAYMENT_ENTRY_MAP.get(id);
                     if (paymentEntry != null) {
                         ms = new Message(Cmd.CHARGE_MONEY_2);
                         DataOutputStream ds = ms.writer();
@@ -3104,7 +3103,7 @@ public class UserService implements IUserService {
             DataOutputStream ds = ms.writer();
             ds.writeInt(xpUp);
             ds.writeInt(user.getCurrentLevel());
-            ds.writeInt(XpData.getXpRequestLevel(user.getCurrentLevel() + 1));
+            ds.writeInt(XpRepository.getXpRequestLevel(user.getCurrentLevel() + 1));
             if (updateLevel) {
                 ds.writeByte(1);
                 ds.writeByte(user.getCurrentLevel());

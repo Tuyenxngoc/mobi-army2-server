@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * @author tuyen
  */
-public class FormulaData {
+public class FormulaRepository {
     public static final Map<Byte, Map<Byte, List<FormulaEntry>>> FORMULA = new HashMap<>();
 
     /**

@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author tuyen
  */
-public class FightItemData {
+public class FightItemRepository {
     public static final List<FightItemEntry> FIGHT_ITEM_ENTRIES = new ArrayList<>();
 
     public static byte getRandomItem() {

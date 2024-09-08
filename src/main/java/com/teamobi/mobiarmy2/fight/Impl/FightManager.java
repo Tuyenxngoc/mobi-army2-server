@@ -8,7 +8,7 @@ import com.teamobi.mobiarmy2.fight.boss.BigBoom;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.Impl.Message;
-import com.teamobi.mobiarmy2.repository.ClanItemData;
+import com.teamobi.mobiarmy2.repository.ClanItemRepository;
 import com.teamobi.mobiarmy2.server.ClanManager;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -348,7 +348,7 @@ public class FightManager implements IFightManager {
             short[] abilities = user.calculateCharacterAbilities(teamPoints);
 
             //Lấy danh sách items của clan
-            boolean[] clanItems = new boolean[ClanItemData.CLAN_ITEM_ENTRY_MAP.size()];
+            boolean[] clanItems = new boolean[ClanItemRepository.CLAN_ITEM_ENTRY_MAP.size()];
             if (user.getClanId() != null) {
                 if (clanItemsCache.containsKey(user.getClanId())) {
                     clanItems = clanItemsCache.get(user.getClanId());

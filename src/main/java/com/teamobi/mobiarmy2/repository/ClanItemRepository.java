@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * @author tuyen
  */
-public class ClanItemData {
+public class ClanItemRepository {
     public static final Map<Byte, ClanItemEntry> CLAN_ITEM_ENTRY_MAP = new HashMap<>();
 
     public static ClanItemEntry getItemClanById(byte id) {

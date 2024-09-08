@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * @author tuyen
  */
-public class MissionData {
+public class MissionRepository {
     public static final Map<Byte, List<MissionEntry>> MISSION_LIST = new HashMap<>();
 
     public static void addMission(MissionEntry missionEntry) {

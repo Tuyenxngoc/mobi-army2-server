@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @author tuyen
  */
-public class SpecialItemData {
+public class SpecialItemRepository {
     public static final List<SpecialItemEntry> SPECIAL_ITEM_ENTRIES = new ArrayList<>();
 
     /**

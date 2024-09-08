@@ -6,9 +6,9 @@ import com.teamobi.mobiarmy2.model.CaptionEntry;
 import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
 import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
 import com.teamobi.mobiarmy2.model.map.MapEntry;
-import com.teamobi.mobiarmy2.repository.CaptionData;
-import com.teamobi.mobiarmy2.repository.CharacterData;
-import com.teamobi.mobiarmy2.repository.MapData;
+import com.teamobi.mobiarmy2.repository.CaptionRepository;
+import com.teamobi.mobiarmy2.repository.CharacterRepository;
+import com.teamobi.mobiarmy2.repository.MapRepository;
 import com.teamobi.mobiarmy2.service.IGameService;
 import com.teamobi.mobiarmy2.team.TeamImageOutput;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -34,10 +34,10 @@ public class GameService implements IGameService {
     public void setCacheMaps() {
         try (ByteArrayOutputStream bas = new ByteArrayOutputStream();
              DataOutputStream ds = new DataOutputStream(bas)) {
-            int size = MapData.MAP_ENTRIES.size();
+            int size = MapRepository.MAP_ENTRIES.size();
             ds.writeByte(size);
             for (int i = 0; i < size; i++) {
-                MapEntry mapEntry = MapData.MAP_ENTRIES.get(i);
+                MapEntry mapEntry = MapRepository.MAP_ENTRIES.get(i);
                 ds.writeByte(mapEntry.getId());
                 ds.writeShort(mapEntry.getData().length);
                 ds.write(mapEntry.getData());
@@ -61,9 +61,9 @@ public class GameService implements IGameService {
         try {
             ByteArrayOutputStream bas = new ByteArrayOutputStream();
             DataOutputStream ds = new DataOutputStream(bas);
-            ds.writeByte(CharacterData.CHARACTER_ENTRIES.size());
+            ds.writeByte(CharacterRepository.CHARACTER_ENTRIES.size());
 
-            for (CharacterEntry characterEntry : CharacterData.CHARACTER_ENTRIES) {
+            for (CharacterEntry characterEntry : CharacterRepository.CHARACTER_ENTRIES) {
                 ds.writeByte(characterEntry.getId());
                 ds.writeShort(characterEntry.getDamage());
                 ds.writeByte(characterEntry.getEquips().size());
@@ -104,7 +104,7 @@ public class GameService implements IGameService {
             }
             ds.writeShort(bytes.length);
             ds.write(bytes);
-            for (int i = 0; i < CharacterData.CHARACTER_ENTRIES.size(); i++) {
+            for (int i = 0; i < CharacterRepository.CHARACTER_ENTRIES.size(); i++) {
                 bytes = Utils.getFile("res/bullet/bullet" + i + ".png");
                 if (bytes == null) {
                     System.exit(1);
@@ -127,10 +127,10 @@ public class GameService implements IGameService {
         try {
             ByteArrayOutputStream bas = new ByteArrayOutputStream();
             DataOutputStream ds = new DataOutputStream(bas);
-            int size = CaptionData.CAPTION_ENTRIES.size();
+            int size = CaptionRepository.CAPTION_ENTRIES.size();
             ds.writeByte(size);
             for (int i = size - 1; i >= 0; i--) {
-                CaptionEntry capEntry = CaptionData.CAPTION_ENTRIES.get(i);
+                CaptionEntry capEntry = CaptionRepository.CAPTION_ENTRIES.get(i);
                 ds.writeUTF(capEntry.getCaption());
                 ds.writeByte(capEntry.getLevel());
             }

@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @author tuyen
  */
-public class XpData {
+public class XpRepository {
     public static final List<LevelXpRequiredEntry> LEVEL_XP_REQUIRED_ENTRIES = new ArrayList<>();
 
     public static int getXpRequestLevel(int currentLevel) {

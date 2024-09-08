@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * @author tuyen
  */
-public class FabricateItemData {
+public class FabricateItemRepository {
     public static final List<FabricateItemEntry> FABRICATE_ITEM_ENTRIES = new ArrayList<>();
 
     /**

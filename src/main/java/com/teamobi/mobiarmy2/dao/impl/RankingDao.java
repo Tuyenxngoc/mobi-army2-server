@@ -7,7 +7,7 @@ import com.teamobi.mobiarmy2.dao.IRankingDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.model.user.PlayerLeaderboardEntry;
-import com.teamobi.mobiarmy2.repository.CharacterData;
+import com.teamobi.mobiarmy2.repository.CharacterRepository;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -49,7 +49,7 @@ public class RankingDao implements IRankingDao {
 
                 EquipmentChestJson[] equipmentData = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
                 int[] data = gson.fromJson(resultSet.getString("data"), int[].class);
-                entry.setData(CharacterData.getEquipData(equipmentData, data, entry.getActiveCharacter()));
+                entry.setData(CharacterRepository.getEquipData(equipmentData, data, entry.getActiveCharacter()));
 
                 top.add(entry);
                 index++;

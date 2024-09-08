@@ -11,8 +11,8 @@ import lombok.Setter;
 @Setter
 public class Player {
 
-    private final IFightManager fightManager;
-    private final User user;
+    private IFightManager fightManager;
+    private User user;
     private byte characterId;
     private byte index;
     private byte pixel;
@@ -37,8 +37,6 @@ public class Player {
     private boolean[] clanItems;
 
     public Player(int index, int x, int y, int hp, int maxHp) {
-        this.fightManager = null;
-        this.user = null;
         this.index = (byte) index;
         this.x = (short) x;
         this.y = (short) y;
@@ -48,7 +46,6 @@ public class Player {
 
     public Player(IFightManager fightManager, byte index, byte characterId, short x, short y, short maxHp) {
         this.fightManager = fightManager;
-        this.user = null;
         this.index = index;
         this.characterId = characterId;
         this.x = x;

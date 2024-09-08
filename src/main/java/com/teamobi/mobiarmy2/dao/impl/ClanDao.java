@@ -10,8 +10,8 @@ import com.teamobi.mobiarmy2.model.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.clan.ClanItem;
 import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
 import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
-import com.teamobi.mobiarmy2.repository.CharacterData;
-import com.teamobi.mobiarmy2.repository.ClanItemData;
+import com.teamobi.mobiarmy2.repository.CharacterRepository;
+import com.teamobi.mobiarmy2.repository.ClanItemRepository;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -185,7 +185,7 @@ public class ClanDao implements IClanDao {
                     List<ClanItem> filteredItems = Arrays.stream(clanItemJsonArray)
                             .filter(item -> !item.getTime().isBefore(currentDate))
                             .map(item -> {
-                                ClanItemEntry clanItemEntry = ClanItemData.getItemClanById(item.getId());
+                                ClanItemEntry clanItemEntry = ClanItemRepository.getItemClanById(item.getId());
                                 if (clanItemEntry != null) {
                                     ClanItem newClanItem = new ClanItem();
                                     newClanItem.setName(clanItemEntry.getName());
@@ -251,7 +251,7 @@ public class ClanDao implements IClanDao {
 
                     int[] data = gson.fromJson(resultSet.getString("data"), int[].class);
                     EquipmentChestJson[] equipmentChests = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
-                    entry.setDataEquip(CharacterData.getEquipData(equipmentChests, data, entry.getActiveCharacter()));
+                    entry.setDataEquip(CharacterRepository.getEquipData(equipmentChests, data, entry.getActiveCharacter()));
 
                     short contributeCount = resultSet.getShort("contribute_count");
                     if (contributeCount > 0) {

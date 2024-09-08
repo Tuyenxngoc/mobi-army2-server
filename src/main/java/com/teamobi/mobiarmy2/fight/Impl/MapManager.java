@@ -4,7 +4,7 @@ import com.teamobi.mobiarmy2.fight.IFightManager;
 import com.teamobi.mobiarmy2.fight.IMapManager;
 import com.teamobi.mobiarmy2.fight.MapTile;
 import com.teamobi.mobiarmy2.model.map.MapBrick;
-import com.teamobi.mobiarmy2.repository.MapData;
+import com.teamobi.mobiarmy2.repository.MapRepository;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
@@ -71,7 +71,7 @@ public class MapManager implements IMapManager {
 
     @Override
     public void loadMapId(byte mapId) {
-        byte[] mapData = MapData.getMapData(mapId);
+        byte[] mapData = MapRepository.getMapData(mapId);
 
         if (mapData == null) {
             return;
@@ -87,7 +87,7 @@ public class MapManager implements IMapManager {
         for (int i = 0; i < entryCount; i++) {
             int brickId = mapData[offset];
 
-            MapBrick mapBrick = MapData.loadMapBrick(brickId);
+            MapBrick mapBrick = MapRepository.loadMapBrick(brickId);
             if (mapBrick == null) {
                 continue;
             }
@@ -99,7 +99,7 @@ public class MapManager implements IMapManager {
                     Arrays.copyOf(mapBrick.getData(), mapBrick.getData().length),
                     (short) mapBrick.getWidth(),
                     (short) mapBrick.getHeight(),
-                    MapData.isCollision(brickId)
+                    MapRepository.isCollision(brickId)
             );
 
             mapTiles.add(mapTile);
