@@ -31,7 +31,7 @@ public class CountdownTimer implements ICountdownTimer {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if (remainingTime > 0) {
+                if (remainingTime > -10) {
                     remainingTime--;
                     System.out.println("Thời gian còn lại: " + remainingTime + " giây");
                 } else {

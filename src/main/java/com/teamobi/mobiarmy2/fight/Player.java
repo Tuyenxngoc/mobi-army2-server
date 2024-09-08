@@ -35,6 +35,7 @@ public class Player {
     private byte freezeCount;
     private byte windStopCount;
     private boolean[] clanItems;
+    private byte skippedTurns;
 
     public Player(int index, int x, int y, int hp, int maxHp) {
         this.index = (byte) index;
@@ -127,6 +128,10 @@ public class Player {
         if (windStopCount > 0) {
             windStopCount--;
         }
+    }
+
+    public void incrementSkippedTurns() {
+        skippedTurns++;
     }
 
 }

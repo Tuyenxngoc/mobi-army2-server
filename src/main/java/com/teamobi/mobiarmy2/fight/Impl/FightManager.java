@@ -33,9 +33,11 @@ public class FightManager implements IFightManager {
 
     private final IFightWait fightWait;
     private Player[] players;
-    private int currentTurnPlayer;
     private int totalPlayers;
     private int turnCount;
+    private boolean isBossTurn;
+    private int playerTurn;
+    private int bossTurn;
     private byte windX;
     private byte windY;
     private long startTime;
@@ -48,7 +50,9 @@ public class FightManager implements IFightManager {
         this.players = new Player[MAX_ELEMENT_FIGHT];
         this.mapManager = new MapManager(this);
         this.bulletManager = new BulletManager(this);
-        this.countdownTimer = new CountdownTimer(this, MAX_PLAY_TIME + 10);
+        this.countdownTimer = new CountdownTimer(this, MAX_PLAY_TIME);
+
+        this.playerTurn = -1;
     }
 
     private void refreshFightManager() {
@@ -224,7 +228,7 @@ public class FightManager implements IFightManager {
     }
 
     private void nextWind() {
-        Player player = players[currentTurnPlayer];
+        Player player = players[playerTurn];
         if (player.getWindStopCount() > 0) {
             player.decreaseWindStopCount();
 
@@ -288,10 +292,69 @@ public class FightManager implements IFightManager {
 
     private void nextTurn() {
         turnCount++;
+        byte roomType = fightWait.getRoomType();
 
+        //Lần đầu radom lượt chơi
+        if (playerTurn == -1) {
+            while (true) {
+                int next;
+                if (roomType == 5) {
+                    next = Utils.nextInt(totalPlayers);
+                } else {
+                    next = Utils.nextInt(MAX_USER_FIGHT);
+                }
+                if (players[next] != null) {
+                    if (next < MAX_USER_FIGHT) {
+                        playerTurn = next;
+                        bossTurn = MAX_USER_FIGHT;
+                        isBossTurn = false;
+                    } else {
+                        playerTurn = 0;
+                        bossTurn = next;
+                        isBossTurn = true;
+                    }
+                    break;
+                }
+            }
+        } else {
+            if (roomType == 5) {
+                if (isBossTurn) {
+                    playerTurn = getNextValidTurn(playerTurn, MAX_USER_FIGHT);
+                } else {
+                    bossTurn = getNextValidTurn(bossTurn, totalPlayers);
+                }
+                isBossTurn = !isBossTurn;
+            } else {
+                playerTurn = getNextValidTurn(playerTurn, MAX_USER_FIGHT);
+            }
+        }
+
+        sendNextTurnMessage(isBossTurn ? bossTurn : playerTurn);
         countdownTimer.reset();
+        if (isBossTurn) {
+            new Thread(() -> ((Boss) players[bossTurn]).turnAction()).start();
+        }
+    }
 
-        sendNextTurnMessage(currentTurnPlayer);
+    /**
+     * Gets the next valid turn index for the players array.
+     *
+     * @param currentTurn The current turn index.
+     * @param limit       The limit of the players array.
+     * @return The next valid turn index. If no valid turn is found, returns the current turn index.
+     */
+    private int getNextValidTurn(int currentTurn, int limit) {
+        int turn = currentTurn + 1;
+        while (turn != currentTurn) {
+            if (turn == limit) {
+                turn = 0;
+            }
+            if (players[turn] != null) {
+                return turn;
+            }
+            turn++;
+        }
+        return currentTurn;
     }
 
     private void sendNextTurnMessage(int turn) {
@@ -322,7 +385,7 @@ public class FightManager implements IFightManager {
         fightWait.chatMessage(playerId, GameString.leave2(player.getUser().getUsername()));
 
         //đổi lượt chơi
-        if (currentTurnPlayer == index) {
+        if (playerTurn == index) {
             nextTurn();
         }
     }
@@ -449,11 +512,14 @@ public class FightManager implements IFightManager {
     @Override
     public void skipTurn(int playerId) {
         int index = getPlayerIndexByPlayerId(playerId);
-        if (index == -1 || index != currentTurnPlayer) {
+        if (index == -1 || index != playerTurn) {
             return;
         }
-
-        System.out.println("next turn: " + index);
+        Player player = players[playerTurn];
+        if (player.getSkippedTurns() < 5) {
+            nextTurn();
+            player.incrementSkippedTurns();
+        }
     }
 
     @Override
@@ -468,7 +534,7 @@ public class FightManager implements IFightManager {
 
     @Override
     public void onTimeUp() {
-
+        nextTurn();
     }
 
 }
