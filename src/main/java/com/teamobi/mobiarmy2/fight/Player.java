@@ -36,6 +36,9 @@ public class Player {
     private byte windStopCount;
     private boolean[] clanItems;
     private byte skippedTurns;
+    private boolean itemUsed;
+    private boolean isDoubleShoot;
+    private boolean isDoubleSpeed;
 
     public Player(int index, int x, int y, int hp, int maxHp) {
         this.index = (byte) index;
@@ -132,6 +135,35 @@ public class Player {
 
     public void incrementSkippedTurns() {
         skippedTurns++;
+    }
+
+    public void updateHP(short addHp) {
+        isUpdateHP = true;
+        hp += addHp;
+        if (hp <= 0) {
+            hp = 0;
+        } else if (hp < 10) {
+            hp = 10;
+        } else if (hp > maxHp) {
+            hp = maxHp;
+        }
+        int oldPixel = pixel;
+        pixel = (byte) (hp * 25 / maxHp);
+
+        if (addHp != 0) {
+            updateAngry((byte) ((oldPixel - pixel) * 4));
+        }
+    }
+
+    private void updateAngry(byte addAngry) {
+        isUpdateAngry = true;
+        angry += addAngry;
+        if (angry < 0) {
+            angry = 0;
+        }
+        if (angry > 100) {
+            angry = 100;
+        }
     }
 
 }

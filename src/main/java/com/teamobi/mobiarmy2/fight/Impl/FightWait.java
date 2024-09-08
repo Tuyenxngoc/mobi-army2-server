@@ -484,14 +484,14 @@ public class FightWait implements IFightWait {
         //Kiểm tra thời gian kết thúc ván gần nhất
         long remainingTime = 5000 - (System.currentTimeMillis() - endTime);
         if (remainingTime > 0) {
-            roomOwner.getUserService().sendServerMessage(GameString.waitClick(remainingTime / 1000));
+            roomOwner.getUserService().sendServerMessage(GameString.waitClick(remainingTime / 1000 + 1));
             return;
         }
 
         //Kiểm tra thời gian người chơi vào phòng gần nhất
         remainingTime = 5000 - (System.currentTimeMillis() - lastPlayerJoinTime);
         if (remainingTime > 0) {
-            roomOwner.getUserService().sendServerMessage2(GameString.waitClick(remainingTime / 1000));
+            roomOwner.getUserService().sendServerMessage2(GameString.waitClick(remainingTime / 1000 + 1));
             return;
         }
 

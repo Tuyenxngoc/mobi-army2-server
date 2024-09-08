@@ -350,8 +350,8 @@ public class GameString {
         return "Biệt đội bạn không có đủ lượng!";
     }
 
-    public static String unauthorized_Item() {
-        return "Bạn không thể sử dụng item này";
+    public static String unauthorizedItem() {
+        return "Bạn không thể dùng item này";
     }
 
     public static String giftFightWin() {

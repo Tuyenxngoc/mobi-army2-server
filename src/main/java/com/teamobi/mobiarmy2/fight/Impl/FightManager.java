@@ -109,22 +109,25 @@ public class FightManager implements IFightManager {
         }
     }
 
-    private void sendHpUpdate(byte index, Player player) {
+    private void sendHpUpdate(byte index) {
         try {
+            Player player = players[index];
             IMessage ms = new Message(Cmd.UPDATE_HP);
             DataOutputStream ds = ms.writer();
             ds.writeByte(index);
             ds.writeShort(player.getHp());
-            ds.writeByte(player.getPixel());//todo
+            ds.writeByte(player.getPixel());
             ds.flush();
             fightWait.sendToTeam(ms);
+            player.setUpdateHP(false);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void sendAngryUpdate(byte index, Player player) {
+    private void sendAngryUpdate(byte index) {
         try {
+            Player player = players[index];
             IMessage ms = new Message(Cmd.ANGRY);
             DataOutputStream ds = ms.writer();
             ds.writeByte(index);
@@ -195,7 +198,7 @@ public class FightManager implements IFightManager {
     private void updateHpPlayers() {
         for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             if (players[i] != null && players[i].isUpdateHP()) {
-                sendHpUpdate(i, players[i]);
+                sendHpUpdate(i);
             }
         }
     }
@@ -203,7 +206,7 @@ public class FightManager implements IFightManager {
     private void updateAngryPlayers() {
         for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             if (players[i] != null && players[i].isUpdateAngry()) {
-                sendAngryUpdate(i, players[i]);
+                sendAngryUpdate(i);
             }
         }
     }
@@ -329,6 +332,7 @@ public class FightManager implements IFightManager {
             }
         }
 
+        nextWind();
         sendNextTurnMessage(isBossTurn ? bossTurn : playerTurn);
         countdownTimer.reset();
         if (isBossTurn) {
@@ -523,8 +527,50 @@ public class FightManager implements IFightManager {
     }
 
     @Override
-    public void useItem(byte itemIndex) {
+    public synchronized void useItem(int playerId, byte itemIndex) {
+        int index = getPlayerIndexByPlayerId(playerId);
+        if (index == -1 || index != playerTurn) {
+            return;
+        }
 
+        Player player = players[index];
+        if (player.isItemUsed()) {
+            return;
+        }
+
+        if (fightWait.getRoomType() == 5 && (itemIndex == 9)) {
+            player.getUser().getUserService().sendServerMessage2(GameString.unauthorizedItem());
+            return;
+        }
+
+        try {
+            IMessage ms = new Message(Cmd.USE_ITEM);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(index);
+            ds.writeByte(itemIndex);
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        player.setItemUsed(true);
+        handleItem(player, index, itemIndex);
+    }
+
+    private void handleItem(Player player, int playerIndex, byte itemIndex) {
+        switch (itemIndex) {
+            case 0 -> {
+                player.updateHP((short) 350);
+                sendHpUpdate((byte) playerIndex);
+            }
+
+            case 2 -> player.setDoubleShoot(true);
+
+            case 3 -> player.setDoubleSpeed(true);
+
+            //todo
+        }
     }
 
     @Override

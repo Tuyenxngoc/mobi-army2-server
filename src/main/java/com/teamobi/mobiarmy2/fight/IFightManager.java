@@ -17,7 +17,7 @@ public interface IFightManager {
 
     void skipTurn(int playerId);
 
-    void useItem(byte itemIndex);
+    void useItem(int playerId, byte itemIndex);
 
     IMapManager getMapManger();
 
