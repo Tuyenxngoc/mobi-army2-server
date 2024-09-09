@@ -49,4 +49,8 @@ public class EffectManager {
         img.getRGB(0, 0, width, height, pixelData, 0, width);
         return new ImageData(width, height, pixelData);
     }
+
+    public static ImageData getHoleImageByBulletId(byte bulletId) {
+        return holeData[0];
+    }
 }

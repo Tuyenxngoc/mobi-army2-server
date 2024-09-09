@@ -583,4 +583,8 @@ public class FightManager implements IFightManager {
         nextTurn();
     }
 
+    @Override
+    public int getTotalPlayers() {
+        return totalPlayers;
+    }
 }

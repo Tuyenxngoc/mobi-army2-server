@@ -1,9 +1,9 @@
 package com.teamobi.mobiarmy2.fight.Impl;
 
+import com.teamobi.mobiarmy2.fight.Bullet;
 import com.teamobi.mobiarmy2.fight.IFightManager;
 import com.teamobi.mobiarmy2.fight.IMapManager;
 import com.teamobi.mobiarmy2.fight.MapTile;
-import com.teamobi.mobiarmy2.model.ImageData;
 import com.teamobi.mobiarmy2.model.map.MapBrick;
 import com.teamobi.mobiarmy2.repository.MapRepository;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -11,7 +11,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -93,14 +92,11 @@ public class MapManager implements IMapManager {
                 continue;
             }
 
-            ImageData imageData = mapBrick.getImageData();
             MapTile mapTile = new MapTile(
                     brickId,
                     Utils.getShort(mapData, offset + 1),
                     Utils.getShort(mapData, offset + 3),
-                    Arrays.copyOf(imageData.getPixelData(), imageData.getPixelData().length),
-                    (short) imageData.getWidth(),
-                    (short) imageData.getHeight(),
+                    mapBrick.getNewImage(),
                     MapRepository.isCollision(brickId)
             );
 
@@ -126,5 +122,11 @@ public class MapManager implements IMapManager {
             }
         }
         return false;
+    }
+
+    public void collision(Bullet bull) {
+        for (MapTile m : mapTiles) {
+            m.collision(bull);
+        }
     }
 }

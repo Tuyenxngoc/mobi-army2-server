@@ -15,7 +15,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class MapBrick {
     private int id;
-    private ImageData imageData;
+    private ImageData image;
 
     public MapBrick(int id) {
         this.id = id;
@@ -32,5 +32,14 @@ public class MapBrick {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public ImageData getNewImage() {
+        if (image != null) {
+            int[] newPixelData = new int[image.getPixelData().length];
+            System.arraycopy(image.getPixelData(), 0, newPixelData, 0, image.getPixelData().length);
+            return new ImageData(image.getWidth(), image.getHeight(), newPixelData);
+        }
+        return null;
     }
 }

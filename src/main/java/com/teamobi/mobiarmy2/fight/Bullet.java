@@ -12,6 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 public class Bullet {
+    private byte bulletId;
     private boolean collect;
     private short x;
     private short y;

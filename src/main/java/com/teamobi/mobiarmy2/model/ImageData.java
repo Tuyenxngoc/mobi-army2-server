@@ -6,9 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ImageData {
-    public int width;
-    public int height;
-    public int[] pixelData;
+    private int width;
+    private int height;
+    private int[] pixelData;
 
     public ImageData(int width, int height, int[] pixelData) {
         this.width = width;

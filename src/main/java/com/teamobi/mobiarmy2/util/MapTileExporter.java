@@ -29,9 +29,9 @@ public class MapTileExporter {
     }
 
     private static void drawTile(Graphics2D g2d, MapTile tile) {
-        int[] data = tile.getData();
-        int width = tile.getWidth();
-        int height = tile.getHeight();
+        int[] data = tile.getImage().getPixelData();
+        int width = tile.getImage().getWidth();
+        int height = tile.getImage().getHeight();
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
