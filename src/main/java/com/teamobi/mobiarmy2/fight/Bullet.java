@@ -68,11 +68,9 @@ public class Bullet {
         return bulletId == 17 || bulletId == 19;
     }
 
-
     public static byte getHoleByBulletId(int bulletId) {
         return 0;
     }
-
 
     public static int getImpactRangeByBulletId(int bulletId) {
         return 0;

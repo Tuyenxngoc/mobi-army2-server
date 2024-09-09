@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.model.map;
 
+import com.teamobi.mobiarmy2.model.ImageData;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,9 +15,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class MapBrick {
     private int id;
-    private int[] data;
-    private int width;
-    private int height;
+    private ImageData imageData;
 
     public MapBrick(int id) {
         this.id = id;

@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.repository;
 
+import com.teamobi.mobiarmy2.model.ImageData;
 import com.teamobi.mobiarmy2.model.map.MapBrick;
 import com.teamobi.mobiarmy2.model.map.MapEntry;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -75,7 +76,8 @@ public class MapRepository {
             int height = image.getHeight();
             int[] pixelData = new int[width * height];
             image.getRGB(0, 0, width, height, pixelData, 0, width);
-            MapBrick mapBrick = new MapBrick(brickId, pixelData, width, height);
+            ImageData imageData = new ImageData(width, height, pixelData);
+            MapBrick mapBrick = new MapBrick(brickId, imageData);
             MAP_BRICKS.add(mapBrick);
             return mapBrick;
         } catch (IOException e) {

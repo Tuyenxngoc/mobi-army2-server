@@ -3,6 +3,7 @@ package com.teamobi.mobiarmy2.fight.Impl;
 import com.teamobi.mobiarmy2.fight.IFightManager;
 import com.teamobi.mobiarmy2.fight.IMapManager;
 import com.teamobi.mobiarmy2.fight.MapTile;
+import com.teamobi.mobiarmy2.model.ImageData;
 import com.teamobi.mobiarmy2.model.map.MapBrick;
 import com.teamobi.mobiarmy2.repository.MapRepository;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -92,13 +93,14 @@ public class MapManager implements IMapManager {
                 continue;
             }
 
+            ImageData imageData = mapBrick.getImageData();
             MapTile mapTile = new MapTile(
                     brickId,
                     Utils.getShort(mapData, offset + 1),
                     Utils.getShort(mapData, offset + 3),
-                    Arrays.copyOf(mapBrick.getData(), mapBrick.getData().length),
-                    (short) mapBrick.getWidth(),
-                    (short) mapBrick.getHeight(),
+                    Arrays.copyOf(imageData.getPixelData(), imageData.getPixelData().length),
+                    (short) imageData.getWidth(),
+                    (short) imageData.getHeight(),
                     MapRepository.isCollision(brickId)
             );
 
@@ -117,7 +119,7 @@ public class MapManager implements IMapManager {
         }
     }
 
-    public boolean isCollision(short x, short y){
+    public boolean isCollision(short x, short y) {
         for (MapTile tile : mapTiles) {
             if (tile.isCollision(x, y)) {
                 return true;
