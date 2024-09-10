@@ -9,8 +9,6 @@ public interface IBulletManager {
 
     IFightManager getFightManager();
 
-    short[] getCollisionPoint();
-
     void updateBulletPositions();
 
     void addShoot(Player player, byte bullId, short angle, byte force, byte force2, byte numShoot);
@@ -30,4 +28,6 @@ public interface IBulletManager {
     short getYSC();
 
     short getArg();
+
+    short[] getCollisionPoint(short preY, short preX, short x, short y, boolean isXuyenPlayer, boolean isXuyenMap);
 }

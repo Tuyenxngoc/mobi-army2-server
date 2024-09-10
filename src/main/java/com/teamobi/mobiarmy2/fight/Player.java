@@ -42,6 +42,8 @@ public class Player {
     private boolean isDoubleShoot;
     private boolean isDoubleSpeed;
     private boolean isUsePow;
+    private boolean isDead;
+    private byte usedItemId;
 
     public Player(int index, int x, int y, int hp, int maxHp) {
         this.index = (byte) index;

@@ -22,4 +22,8 @@ public interface IFightManager {
     void onTimeUp();
 
     int getTotalPlayers();
+
+    byte getWindY();
+
+    byte getWindX();
 }
