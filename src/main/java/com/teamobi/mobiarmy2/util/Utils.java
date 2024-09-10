@@ -289,4 +289,12 @@ public class Utils {
         return dateTime.format(DATE_TIME_FORMATTER);
     }
 
+    public static short clamp(short value, short min, short max) {
+        return (short) Math.max(min, Math.min(value, max));
+    }
+
+    public static byte clamp(byte value, byte min, byte max) {
+        return (byte) Math.max(min, Math.min(value, max));
+    }
+
 }

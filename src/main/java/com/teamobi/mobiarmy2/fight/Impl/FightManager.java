@@ -56,7 +56,8 @@ public class FightManager implements IFightManager {
     }
 
     private void refreshFightManager() {
-        this.players = new Player[MAX_ELEMENT_FIGHT];
+        players = new Player[MAX_ELEMENT_FIGHT];
+        countdownTimer.stop();
     }
 
     private void sendLuckyUpdate(byte index) {
@@ -154,19 +155,15 @@ public class FightManager implements IFightManager {
         }
     }
 
-    private void handlePlayerLuck() {
-        for (int i = 0; i < MAX_USER_FIGHT; i++) {
+    private void handleLuckUpdates() {
+        for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             if (players[i] != null && players[i].getUser() != null) {
                 players[i].nextLuck();
-            }
-        }
-    }
 
-    private void updateLuckyPlayers() {
-        for (byte i = 0; i < MAX_USER_FIGHT; i++) {
-            if (players[i] != null && players[i].isLucky()) {
-                sendLuckyUpdate(i);
-                players[i].setLucky(false);
+                if (players[i].isLucky()) {
+                    sendLuckyUpdate(i);
+                    players[i].setLucky(false);
+                }
             }
         }
     }
@@ -231,7 +228,7 @@ public class FightManager implements IFightManager {
     }
 
     private void nextWind() {
-        Player player = players[playerTurn];
+        Player player = players[getCurrentTurn()];
         if (player.getWindStopCount() > 0) {
             player.decreaseWindStopCount();
 
@@ -254,6 +251,13 @@ public class FightManager implements IFightManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private int getCurrentTurn() {
+        if (isBossTurn) {
+            return bossTurn;
+        }
+        return playerTurn;
     }
 
     private void nextBosses() {
@@ -506,11 +510,131 @@ public class FightManager implements IFightManager {
     }
 
     @Override
-    public void addShoot(User user, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
+    public synchronized void addShoot(int playerId, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
+        int index = getPlayerIndexByPlayerId(playerId);
+        if (index == -1 || index != playerTurn || isBossTurn || !fightWait.isStarted()) {
+            return;
+        }
+        Player player = players[index];
+        player.updateXY(x, y);
+
+        newShoot(index, bullId, angle, force, force2, numShoot);
+    }
+
+    private void newShoot(int index, byte bullId, short angle, byte force, byte force2, byte numShoot) {
+        Player player = players[index];
+        if (player.isDoubleShoot()) {
+            player.setDoubleShoot(false);
+        } else {
+            numShoot = 1;
+        }
+
+        //Next lucky
+        handleLuckUpdates();
+
+        bulletManager.addShoot(player, bullId, angle, force, force2, numShoot);
+        bulletManager.updateBulletPositions();
+
+        List<Bullet> bullets = bulletManager.getBullets();
+        if (bullets.isEmpty()) {
+            return;
+        }
+
+        byte typeShoot = 0;
+        try {
+            IMessage ms = new Message(Cmd.FIRE_ARMY);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(0);
+            ds.writeByte(player.getPowerUsageStatus());
+            ds.writeByte(index);
+            ds.writeByte(bullId);
+            ds.writeShort(player.getX());
+            ds.writeShort(player.getY());
+            ds.writeShort(angle);
+            if (Bullet.isDoubleBull(bullId)) {
+                ds.writeByte(force2);
+            }
+            if (bullId == 14 || bullId == 40) {
+                ds.writeByte(0);
+                ds.writeByte(0);
+            }
+            if (bullId == 44 || bullId == 45 || bullId == 47) {
+                ds.writeByte(0);
+            }
+            ds.writeByte(numShoot);
+            ds.writeByte(bullets.size());
+            for (Bullet bullet : bullets) {
+                List<Short> xArrays = bullet.getXArrays();
+                List<Short> yArrays = bullet.getYArrays();
+                ds.writeShort(xArrays.size());
+                if (typeShoot == 0) {
+                    for (int j = 0; j < xArrays.size(); j++) {
+                        if (j == 0) {
+                            ds.writeShort(xArrays.get(0));
+                            ds.writeShort(yArrays.get(0));
+                        } else {
+                            if ((j == xArrays.size() - 1) && bullId == 49) {
+                                ds.writeShort(xArrays.get(j));
+                                ds.writeShort(yArrays.get(j));
+                                ds.writeByte(bulletManager.getMgtAddX());
+                                ds.writeByte(bulletManager.getMgtAddY());
+                                break;
+                            }
+                            ds.writeByte((byte) (xArrays.get(j) - xArrays.get(j - 1)));
+                            ds.writeByte((byte) (yArrays.get(j) - yArrays.get(j - 1)));
+                        }
+                    }
+                } else if (typeShoot == 1) {
+                    for (int j = 0; j < xArrays.size(); j++) {
+                        ds.writeShort(xArrays.get(j));
+                        ds.writeShort(yArrays.get(j));
+                    }
+                }
+                if (bullId == 48) {
+                    ds.writeByte(1);
+                    for (int j = 0; j < 1; j++) {
+                        ds.writeShort(0);
+                        ds.writeShort(0);
+                    }
+                }
+            }
+
+            byte bulletSuperState = bulletManager.getTypeSC();
+            ds.writeByte(bulletSuperState);
+            if (bulletSuperState == 1 || bulletSuperState == 2) {
+                ds.writeShort(bulletManager.getXSC());
+                ds.writeShort(bulletManager.getYSC());
+            }
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        bulletManager.clearBullets();
     }
 
     @Override
-    public void changeLocation(User user, short x, short y) {
+    public void changeLocation(int playerId, short x, short y) {
+        int index = getPlayerIndexByPlayerId(playerId);
+        if (index == -1) {
+            return;
+        }
+
+        Player player = players[index];
+        player.updateXY(x, y);
+
+        try {
+            IMessage ms = new Message(Cmd.MOVE_ARMY);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(index);
+            ds.writeShort(player.getX());
+            ds.writeShort(player.getY());
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

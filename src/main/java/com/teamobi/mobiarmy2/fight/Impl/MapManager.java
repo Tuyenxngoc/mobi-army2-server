@@ -115,6 +115,7 @@ public class MapManager implements IMapManager {
         }
     }
 
+    @Override
     public boolean isCollision(short x, short y) {
         for (MapTile tile : mapTiles) {
             if (tile.isCollision(x, y)) {
@@ -124,6 +125,7 @@ public class MapManager implements IMapManager {
         return false;
     }
 
+    @Override
     public void collision(Bullet bull) {
         for (MapTile m : mapTiles) {
             m.collision(bull);

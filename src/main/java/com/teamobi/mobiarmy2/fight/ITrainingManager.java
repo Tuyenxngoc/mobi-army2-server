@@ -15,4 +15,6 @@ public interface ITrainingManager {
 
     byte getMapId();
 
+    void changeLocation(short x, short y);
+
 }
