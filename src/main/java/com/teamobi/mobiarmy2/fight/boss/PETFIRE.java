@@ -7,39 +7,52 @@ import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.IOException;
 
-public class Ghost extends Boss {
+public class PETFIRE extends Boss {
 
-    public Ghost(FightManager fightMNG, byte idGun, String name, byte location, int HPMax, short X, short Y) throws IOException {
+    private boolean acll;
+    private Player pl;
+    private byte turnDie;
+
+    public PETFIRE(FightManager fightMNG, byte idGun, String name, byte location, int HPMax, short X, short Y, Player pl, byte tdie) throws IOException {
         super(fightMNG, idGun, name, location, HPMax, X, Y);
         super.theLuc = 0;
-        super.width = 35;
-        super.height = 31;
+        super.width = 51;
+        super.height = 46;
         this.fly = true;
-        this.XPExist = 300;
+        this.pl = pl;
+        this.turnDie = tdie;
+        this.XPExist = 4;
+        this.team = pl.index % 2 == 0;
+
     }
 
     @Override
     public void turnAction() {
+        int dame = this.HPMax;
         try {
-            Player pl = this.fightMNG.getPlayerClosest(this.X, this.Y);
-            if (pl == null) {
+            Boss bs = (Boss) this.fightMNG.getBossClosest(this.X, this.Y);
+            if (bs == null) {
                 return;
             }
-            //mò tới nguoi chơi
-            if (this.X > pl.X) {
-                this.X = (short) (pl.X + 30);
+            //mò tới boss
+            if (this.X > bs.X) {
+                this.X = (short) (bs.X + 30);
             } else {
-                this.X = (short) (pl.X - 30);
+                this.X = (short) (bs.X - 30);
             }
-            this.Y = (short) (pl.Y - 15);
+            this.Y = (short) (bs.Y - 15);
             this.fightMNG.flyChangeLocation(super.index);
-            this.fightMNG.GhostBullet(this.index, pl.index);
+            this.fightMNG.GhostBullet(this.index, bs.index);
             short wmap = this.fightMNG.mapMNG.Width;
             short hmap = this.fightMNG.mapMNG.Height;
             this.X = (short) Utils.nextInt(100, wmap - 100);
             this.Y = (short) Utils.nextInt(0, hmap - 200);
             this.fightMNG.flyChangeLocation(super.index);
-            pl.updateHP(-Utils.nextInt(300, 600));
+            bs.updateHP(-dame);
+            //  bs.updateHP(-dame);
+            if (bs.isDie) {
+                pl.updateEXP(this.XPExist * 100);
+            }
             if (!fightMNG.checkWin()) {
                 fightMNG.nextTurn();
             }

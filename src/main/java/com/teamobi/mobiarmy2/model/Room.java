@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.model;
 
-import com.teamobi.mobiarmy2.fight.Impl.FightWait;
+import com.teamobi.mobiarmy2.fight.FightWait;
+import com.teamobi.mobiarmy2.server.ServerManager;
 import lombok.Getter;
 
 /**
@@ -35,7 +36,7 @@ public class Room {
         this.iconType = iconType;
         this.fightWaits = new FightWait[numArea];
         for (byte i = 0; i < numArea; i++) {
-            fightWaits[i] = new FightWait(this, i);
+            fightWaits[i] = new FightWait(this, this.type, (byte) i, ServerManager.maxPlayers, (byte) 4, minMap, (byte) 1, isContinuous, false);
         }
     }
 

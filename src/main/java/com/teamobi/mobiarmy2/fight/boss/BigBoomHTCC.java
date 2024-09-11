@@ -5,14 +5,14 @@ import com.teamobi.mobiarmy2.fight.FightManager;
 import com.teamobi.mobiarmy2.fight.Player;
 import com.teamobi.mobiarmy2.util.Utils;
 
-public class BigBoom extends Boss {
+public class BigBoomHTCC extends Boss {
 
-    public BigBoom(FightManager fightMNG, byte idGun, String name, byte location, int HPMax, short X, short Y) {
+    public BigBoomHTCC(FightManager fightMNG, byte idGun, String name, byte location, int HPMax, short X, short Y) {
         super(fightMNG, idGun, name, location, HPMax, X, Y);
         super.theLuc = 100;
         super.width = 28;
         super.height = 28;
-        this.XPExist = 200;
+        this.XPExist = 400;
     }
 
     public void bomAction() {
@@ -64,7 +64,7 @@ public class BigBoom extends Boss {
                 }
                 this.fightMNG.changeLocation(super.index);
                 if (Math.abs(X - pl.X) <= 35 && Math.abs(Y - pl.Y) <= 35) {
-                    this.fightMNG.newShoot(this.index, (byte) 31, (short) 0, (byte) 0, (byte) 0, (byte) 1, false);
+                    this.fightMNG.newShoot(this.index, (byte) 60, (short) 0, (byte) 0, (byte) 0, (byte) 1, false);
                 } else if (this.buocDi < this.theLuc) {
                     this.itemUsed = 7;
                     this.fightMNG.newShoot(this.index, (byte) 7, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 30, (byte) 0, (byte) 1, false);

@@ -7,8 +7,8 @@ import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.dao.impl.GiftCodeDao;
 import com.teamobi.mobiarmy2.dao.impl.UserDao;
 import com.teamobi.mobiarmy2.fight.Bullet;
-import com.teamobi.mobiarmy2.fight.Impl.FightWait;
-import com.teamobi.mobiarmy2.fight.Impl.TrainingManager;
+import com.teamobi.mobiarmy2.fight.FightWait;
+import com.teamobi.mobiarmy2.fight.TrainingManager;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.*;
@@ -237,7 +237,11 @@ public class UserService implements IUserService {
     @Override
     public void handleLogout() {
         if (user.getState() == UserState.FIGHTING || user.getState() == UserState.WAIT_FIGHT) {
-            user.getFightWait().leaveTeam(user.getPlayerId());
+            try {
+                user.getFightWait().leave(user);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         user.setLogged(false);
@@ -1645,7 +1649,7 @@ public class UserService implements IUserService {
             short y = dis.readShort();
 
             if (user.getState() == UserState.FIGHTING) {
-                user.getFightWait().getFightManager().changeLocation(user.getPlayerId(), x, y);
+               /// user.getFightWait().getFightManager().changeLocation(user.getPlayerId(), x, y);
             } else if (user.getState() == UserState.TRAINING) {
                 user.getTrainingManager().changeLocation(x, y);
             }
@@ -1656,21 +1660,21 @@ public class UserService implements IUserService {
 
     @Override
     public void shoot(IMessage ms) {
-        DataInputStream dis = ms.reader();
+//        DataInputStream dis = ms.reader();
         try {
-            byte bullId = dis.readByte();
-            short x = dis.readShort();
-            short y = dis.readShort();
-            short angle = Utils.clamp(dis.readShort(), (short) -360, (short) 360);
-            byte force = Utils.clamp(dis.readByte(), (byte) 0, (byte) 30);
-            byte force2 = 0;
-            if (Bullet.isDoubleBull(bullId)) {
-                force2 = Utils.clamp(dis.readByte(), (byte) 0, (byte) 30);
-            }
-            byte numShoot = dis.readByte();
-            System.out.println("Num shoot: " + numShoot);
+//            byte bullId = dis.readByte();
+//            short x = dis.readShort();
+//            short y = dis.readShort();
+//            short angle = Utils.clamp(dis.readShort(), (short) -360, (short) 360);
+//            byte force = Utils.clamp(dis.readByte(), (byte) 0, (byte) 30);
+//            byte force2 = 0;
+//            if (Bullet.isDoubleBull(bullId)) {
+//                force2 = Utils.clamp(dis.readByte(), (byte) 0, (byte) 30);
+//            }
+//            byte numShoot = dis.readByte();
+//            System.out.println("Num shoot: " + numShoot);
 
-            user.getFightWait().getFightManager().addShoot(user.getPlayerId(), bullId, x, y, angle, force, force2, numShoot);
+            user.getFightWait().getFightManager().shootMessage(user, (Message) ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1689,7 +1693,7 @@ public class UserService implements IUserService {
                 return;
             }
 
-            user.getFightWait().getFightManager().useItem(user.getPlayerId(), itemIndex);
+            user.getFightWait().getFightManager().useItemMessage(user, (Message) ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1699,76 +1703,6 @@ public class UserService implements IUserService {
     public void handleJoinAnyBoard(IMessage ms) {
         ServerManager server = ServerManager.getInstance();
         Room[] rooms = server.getRooms();
-        try {
-            byte type = ms.reader().readByte();
-            FightWait fightWait = null;
-            if (type == 5) {// Đấu trùm
-                int start = server.config().getStartMapBoss();
-                int end = start + server.config().getRoomQuantity()[5];
-                for (int i = start; i < end; i++) {
-                    Room room = rooms[i];
-                    for (FightWait fight : room.getFightWaits()) {
-                        if (!fight.isStarted() &&
-                                !fight.isPassSet() &&
-                                fight.getNumPlayers() < fight.getMaxSetPlayers() &&
-                                fight.getMoney() <= user.getXu()
-                        ) {
-                            fightWait = fight;
-                            break;
-                        }
-                    }
-                }
-            } else if (type <= 4 && type >= 1) {//1vs1->4vs4
-                int index = Utils.nextInt(0, rooms.length);
-                Room room = rooms[index];
-                for (FightWait fight : room.getFightWaits()) {
-                    if (!fight.isStarted() &&
-                            !fight.isPassSet() &&
-                            fight.getNumPlayers() < fight.getMaxSetPlayers() &&
-                            fight.getMoney() <= user.getXu() &&
-                            fight.getMaxSetPlayers() == type * 2
-                    ) {
-                        fightWait = fight;
-                        break;
-                    }
-                }
-            } else if (type == 0) {//Khu vực trống
-                int index = Utils.nextInt(0, rooms.length);
-                Room room = rooms[index];
-                for (FightWait fight : room.getFightWaits()) {
-                    if (!fight.isStarted() &&
-                            !fight.isPassSet() &&
-                            fight.getMoney() <= user.getXu() &&
-                            fight.getNumPlayers() == 0
-                    ) {
-                        fightWait = fight;
-                        break;
-                    }
-                }
-            } else if (type == -1) {//Ngẫu nhiên
-                int index = Utils.nextInt(0, rooms.length);
-                Room room = rooms[index];
-                for (FightWait fight : room.getFightWaits()) {
-                    if (!fight.isStarted() &&
-                            !fight.isPassSet() &&
-                            fight.getNumPlayers() < fight.getMaxSetPlayers() &&
-                            fight.getMoney() <= user.getXu()
-                    ) {
-                        fightWait = fight;
-                        break;
-                    }
-                }
-            }
-
-            if (fightWait == null) {
-                sendServerMessage(GameString.findKVError1());
-            } else {
-                fightWait.sendInfo(user);
-                fightWait.addUser(user);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -1910,7 +1844,7 @@ public class UserService implements IUserService {
 
     @Override
     public void skipTurn() {
-        user.getFightWait().getFightManager().skipTurn(user.getPlayerId());
+//        user.getFightWait().getFightManager().skipTurn(user.getPlayerId());
     }
 
     @Override

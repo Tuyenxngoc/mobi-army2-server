@@ -5,15 +5,15 @@ import com.teamobi.mobiarmy2.fight.FightManager;
 
 import java.io.IOException;
 
-public class GiftBox extends Boss {
+public class Balloon_FanBack extends Boss {
 
-    public GiftBox(FightManager fightMNG, byte idGun, String name, byte location, int HPMax, short X, short Y) throws IOException {
+    public Balloon_FanBack(FightManager fightMNG, byte idGun, String name, byte location, int HPMax, short X, short Y) throws IOException {
         super(fightMNG, idGun, name, location, HPMax, X, Y);
         super.theLuc = 0;
-        super.width = 30;
-        super.height = 30;
-        this.fly = idNV == 24;
-        this.XPExist = 0;
+        super.width = 10;
+        super.height = 19;
+        this.fly = true;
+        this.XPExist = 300;
     }
 
     @Override

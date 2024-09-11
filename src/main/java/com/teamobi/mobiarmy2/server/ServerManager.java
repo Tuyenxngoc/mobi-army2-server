@@ -29,6 +29,11 @@ import java.util.List;
  */
 public class ServerManager {
 
+    //tmp variable
+    public static byte maxPlayers = 8;
+    public static int maxElementFight = 100;
+    public static boolean mgtBullNew = true;
+
     private static volatile ServerManager instance;
 
     private final IGameService gameService;
