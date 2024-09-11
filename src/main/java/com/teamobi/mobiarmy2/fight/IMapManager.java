@@ -17,5 +17,6 @@ public interface IMapManager {
 
     boolean isCollision(short x, short y);
 
-    void collision(Bullet bull);
+    void collision(short x, short y, Bullet bullet);
+
 }

@@ -126,9 +126,8 @@ public class MapManager implements IMapManager {
     }
 
     @Override
-    public void collision(Bullet bull) {
-        for (MapTile m : mapTiles) {
-            m.collision(bull);
-        }
+    public void collision(short x, short y, Bullet bullet) {
+
     }
+
 }

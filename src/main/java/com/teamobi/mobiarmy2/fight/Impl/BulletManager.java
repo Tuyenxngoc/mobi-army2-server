@@ -4,6 +4,7 @@ import com.teamobi.mobiarmy2.fight.Bullet;
 import com.teamobi.mobiarmy2.fight.IBulletManager;
 import com.teamobi.mobiarmy2.fight.IFightManager;
 import com.teamobi.mobiarmy2.fight.Player;
+import com.teamobi.mobiarmy2.fight.item.VoiRong;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.util.ArrayList;
@@ -132,6 +133,16 @@ public class BulletManager implements IBulletManager {
     @Override
     public short[] getCollisionPoint(short preY, short preX, short x, short y, boolean isXuyenPlayer, boolean isXuyenMap) {
         return null;
+    }
+
+    @Override
+    public boolean hasVoiRong() {
+        return false;
+    }
+
+    @Override
+    public List<VoiRong> getVoiRongs() {
+        return List.of();
     }
 
 }

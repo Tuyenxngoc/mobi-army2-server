@@ -13,6 +13,7 @@ public class Player {
 
     private IFightManager fightManager;
     private User user;
+    private short gunId;
     private byte characterId;
     private byte index;
     private byte pixel;
@@ -66,6 +67,7 @@ public class Player {
     public Player(IFightManager fightManager, User user, byte index, short x, short y, byte[] items, short[] abilities, short teamPoints, boolean[] clanItems) {
         this.fightManager = fightManager;
         this.user = user;
+        this.gunId = user.getGunId();
         this.characterId = user.getActiveCharacterId();
         this.index = index;
         this.x = x;

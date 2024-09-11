@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.fight;
 
+import com.teamobi.mobiarmy2.fight.item.VoiRong;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -70,28 +71,82 @@ public class Bullet {
     }
 
     public void nextXY() {
-        frame++;
-        xArrays.add(x);
-        yArrays.add(y);
-
         IFightManager fightManager = bulletManager.getFightManager();
         IMapManager mapManager = fightManager.getMapManger();
 
+        frame++;
+        xArrays.add(x);
+        yArrays.add(y);
         if ((x < -200) || (x > mapManager.getWidth() + 200) || (y > mapManager.getHeight() + 200)) {
             collect = true;
             return;
         }
-
         short preX = x;
         short preY = y;
         x += vx;
         lastX = x;
         y += vy;
         lastY = y;
-
         short[] points = bulletManager.getCollisionPoint(preY, preX, x, y, isXuyenPlayer, isXuyenMap);
         if (points != null) {
             collect = true;
+            x = points[0];
+            y = points[1];
+            xArrays.add(x);
+            yArrays.add(y);
+            if (player.getUsedItemId() == -1 && !player.isUsePow()) {
+                if (this.isMaxY) {
+                    if (this.y - this.maxY > 350 && this.y - this.maxY < 450) {
+                        this.typeSC = 1;
+                    } else if (this.y - this.maxY >= 450) {
+                        this.typeSC = 2;
+                    }
+                }
+                if ((player.getGunId() == 2 || player.getGunId() == 3) && (Math.abs(lastX - xArrays.get(0)) > 375)) {
+                    this.typeSC = 4;
+                }
+            }
+            if (this.isCanCollision) {
+                mapManager.collision(x, y, this);
+            }
+            return;
+        }
+        vxTemp += Math.abs(ax100);
+        vyTemp += Math.abs(ay100);
+        vyTemp2 += g100;
+        if (Math.abs(vxTemp) >= 100) {
+            if (ax100 > 0) {
+                vx += vxTemp / 100;
+            } else {
+                vx -= vxTemp / 100;
+            }
+            vxTemp %= 100;
+        }
+        if (Math.abs(vyTemp) >= 100) {
+            if (ay100 > 0) {
+                vy += vyTemp / 100;
+            } else {
+                vy -= vyTemp / 100;
+            }
+            vyTemp %= 100;
+        }
+        if (Math.abs(vyTemp2) >= 100) {
+            vy += vyTemp2 / 100;
+            vyTemp2 %= 100;
+        }
+        if (vy > 0 && !isMaxY) {
+            isMaxY = true;
+            XmaxY = x;
+            maxY = y;
+        }
+        if (bulletManager.hasVoiRong()) {
+            for (VoiRong vr : bulletManager.getVoiRongs()) {
+                if (this.x >= vr.X - 5 && this.x <= vr.X + 10) {
+                    this.vx -= 2;
+                    this.vy -= 2;
+                    break;
+                }
+            }
         }
     }
 
