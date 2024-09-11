@@ -590,44 +590,6 @@ public class BulletManager {
                     pl.isMM = false;
                     entrys.add(new ItemBomHenGio(this, (byte) 57, 600, pl, x, y, vx, vy, 0, 120));
                     break;
-
-                //T-rex TG Rocket
-                case 58:
-                    if (idGun != 15) {
-                        return;
-                    }
-                    entrys.add(new BigRocKet(this, (byte) 37, 600, pl));
-                    break;
-
-                //T-rex TG jump
-                case 59:
-                    if (idGun != 15 && idGun != 14) {
-                        return;
-                    }
-                    entrys.add(new Jump(this, (byte) 35, 100000, pl));
-                    break;
-
-                //BigBoomHTCCBum
-                case 60:
-                    if (idGun != 12) {
-                        return;
-                    }
-                    entrys.add(new BigBoomHTCCBum(this, (byte) 31, pl.HPMax, pl));
-                    break;
-
-                case 61:
-                    if (pl.itemUsed >= 0 || idGun != 3) {
-                        return;
-                    }
-                    int arg4 = angle - 6;
-                    for (int i = 0; i < 4; i++, arg4 += 4) {
-                        x = pl.X + (20 * Utils.cos(arg4) >> 10);
-                        y = pl.Y - 12 - (20 * Utils.sin(arg4) >> 10);
-                        vx = (force * Utils.cos(arg4) >> 10);
-                        vy = -(force * Utils.sin(arg4) >> 10);
-                        entrys.add(new Bullet(this, (byte) 9, (pl.isUsePow ? 630 : (nshoot == 2 ? 800 : 1000)), pl, x, y, vx, vy, 80, 100));
-                    }
-                    break;
             }
         }
     }

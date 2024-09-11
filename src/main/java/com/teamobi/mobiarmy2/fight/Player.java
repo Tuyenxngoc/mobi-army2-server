@@ -396,7 +396,6 @@ public class Player {
     }
 
     public void netWait() {
-        this.fightMNG.countDownMNG.second += 2;
         if (us != null) {
             us.netWait();
         }
