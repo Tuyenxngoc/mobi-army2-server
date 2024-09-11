@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.fight;
 
 import com.teamobi.mobiarmy2.model.User;
+import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -45,6 +46,8 @@ public class Player {
     private boolean isUsePow;
     private boolean isDead;
     private byte usedItemId;
+    private short width;
+    private short height;
 
     public Player(int index, int x, int y, int hp, int maxHp) {
         this.index = (byte) index;
@@ -73,6 +76,8 @@ public class Player {
         this.x = x;
         this.y = y;
         this.stamina = 60;
+        this.width = 24;
+        this.height = 24;
         this.items = items;
         this.teamPoints = teamPoints;
         this.clanItems = clanItems;
@@ -239,5 +244,16 @@ public class Player {
             }
             y++;
         }
+    }
+
+    public boolean isCollision(short x, short y) {
+        if (eyeSmokeCount > 0) {
+            return false;
+        }
+        return Utils.inRegion(x, y, this.x - this.width / 2, this.y - this.height, this.width, this.height);
+    }
+
+    public void collision(short x, short y, Bullet bull) {
+        System.out.println("123");
     }
 }

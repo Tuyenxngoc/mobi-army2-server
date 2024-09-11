@@ -1,9 +1,6 @@
 package com.teamobi.mobiarmy2.fight.Impl;
 
-import com.teamobi.mobiarmy2.fight.Bullet;
-import com.teamobi.mobiarmy2.fight.IFightManager;
-import com.teamobi.mobiarmy2.fight.IMapManager;
-import com.teamobi.mobiarmy2.fight.MapTile;
+import com.teamobi.mobiarmy2.fight.*;
 import com.teamobi.mobiarmy2.model.map.MapBrick;
 import com.teamobi.mobiarmy2.repository.MapRepository;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -126,8 +123,16 @@ public class MapManager implements IMapManager {
     }
 
     @Override
-    public void collision(short x, short y, Bullet bullet) {
-
+    public void collision(short X, short Y, Bullet bull) {
+        for (MapTile m : mapTiles) {
+            m.collision(X, Y, bull);
+        }
+        for (int i = 0; i < fightManager.getTotalPlayers(); i++) {
+            Player pl = fightManager.getPlayers()[i];
+            if (pl != null && pl.getCharacterId() != 17) {
+                pl.collision(X, Y, bull);
+            }
+        }
     }
 
 }

@@ -721,4 +721,14 @@ public class FightManager implements IFightManager {
     public byte getWindX() {
         return windX;
     }
+
+    @Override
+    public Player[] getPlayers() {
+        return players;
+    }
+
+    @Override
+    public Player getPlayerTurn() {
+        return players[getCurrentTurn()];
+    }
 }

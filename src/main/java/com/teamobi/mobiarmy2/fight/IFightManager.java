@@ -26,4 +26,8 @@ public interface IFightManager {
     byte getWindY();
 
     byte getWindX();
+
+    Player[] getPlayers();
+
+    Player getPlayerTurn();
 }

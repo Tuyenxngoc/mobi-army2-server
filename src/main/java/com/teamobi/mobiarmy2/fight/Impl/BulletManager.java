@@ -131,7 +131,76 @@ public class BulletManager implements IBulletManager {
     }
 
     @Override
-    public short[] getCollisionPoint(short preY, short preX, short x, short y, boolean isXuyenPlayer, boolean isXuyenMap) {
+    public short[] getCollisionPoint(short X1, short Y1, short X2, short Y2, boolean isXuyenPlayer, boolean isXuyenMap) {
+        int Dx = X2 - X1;
+        int Dy = Y2 - Y1;
+        byte x_unit = 0;
+        byte y_unit = 0;
+        byte x_unit2 = 0;
+        byte y_unit2 = 0;
+        Player us = this.fightManager.getPlayerTurn();
+        if (Dx < 0) {
+            x_unit = x_unit2 = -1;
+        } else if (Dx > 0) {
+            x_unit = x_unit2 = 1;
+        }
+        if (Dy < 0) {
+            y_unit = y_unit2 = -1;
+        } else if (Dy > 0) {
+            y_unit = y_unit2 = 1;
+        }
+        int k1 = Math.abs(Dx);
+        int k2 = Math.abs(Dy);
+        if (k1 > k2) {
+            y_unit2 = 0;
+        } else {
+            k1 = Math.abs(Dy);
+            k2 = Math.abs(Dx);
+            x_unit2 = 0;
+        }
+        int k = k1 >> 1;
+        short X = X1, Y = Y1;
+        for (int i = 0; i <= k1; i++) {
+            if (!isXuyenMap) {
+                if (fightManager.getMapManger().isCollision(X, Y)) {
+                    return new short[]{X, Y};
+                }
+            }
+            if (!isXuyenPlayer && us.getCharacterId() != 16) {
+                for (int j = 0; j < fightManager.getTotalPlayers(); j++) {
+                    Player pl = fightManager.getPlayers()[j];
+                    if (pl != null) {
+                        if (pl.getCharacterId() > 15 && pl.isDead()) {
+                            continue;
+                        }
+                        if (pl.isCollision(X, Y)) {
+                            return new short[]{X, Y};
+                        }
+                    }
+                }
+            }
+            if (us.getCharacterId() == 16) {
+                for (int j = 0; j < 8; j++) {
+                    Player pl = fightManager.getPlayers()[j];
+                    if (pl == null || pl.isDead()) {
+                        continue;
+                    }
+                    if (pl.isCollision(X, Y)) {
+                        return new short[]{X, Y};
+                    }
+                }
+
+            }
+            k += k2;
+            if (k >= k1) {
+                k -= k1;
+                X += x_unit;
+                Y += y_unit;
+            } else {
+                X += x_unit2;
+                Y += y_unit2;
+            }
+        }
         return null;
     }
 

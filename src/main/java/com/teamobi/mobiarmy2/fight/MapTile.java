@@ -34,37 +34,24 @@ public class MapTile {
         return image.getPixelData()[y * image.getWidth() + x];
     }
 
-    public void collision(Bullet bullet) {
+    public void collision(int bx, int by, Bullet bullet) {
         ImageData bulletHoleImage = EffectManager.getHoleImageByBulletId(bullet.getBulletId());
-        int holeWidth = bulletHoleImage.getWidth();
-        int holeHeight = bulletHoleImage.getHeight();
-        int[] bulletHolePixels = bulletHoleImage.getPixelData();
-        int adjustedBulletX = bullet.getX() - x - holeWidth / 2;
-        int adjustedBulletY = bullet.getY() - y - holeHeight / 2;
-
-        if (!collision || !Utils.intersectRegions(adjustedBulletX + x, adjustedBulletY + y, holeWidth, holeHeight, x, y, image.getWidth(), image.getHeight())) {
+        int w = bulletHoleImage.getWidth();
+        int h = bulletHoleImage.getHeight();
+        int[] argbS = bulletHoleImage.getPixelData();
+        if (!this.collision || !Utils.intersectRegions(bx - w / 2, by - h / 2, w, h, this.x, this.y, image.getWidth(), image.getHeight())) {
             return;
         }
-
-        int imageWidth = image.getWidth();
-        int[] imagePixels = image.getPixelData();
-
-        for (int holeY = 0; holeY < holeHeight; holeY++) {
-            for (int holeX = 0; holeX < holeWidth; holeX++) {
-                int imageX = adjustedBulletX + holeX;
-                int imageY = adjustedBulletY + holeY;
-
-                if (!Utils.inRegion(imageX, imageY, 0, 0, imageWidth, image.getHeight())) {
-                    continue;
-                }
-
-                int bulletHolePixelIndex = holeY * holeWidth + holeX;
-                int imagePixelIndex = imageY * imageWidth + imageX;
-
-                if (bulletHolePixels[bulletHolePixelIndex] == 0xffff0000 && Utils.isNotAlpha(getARGB(imageX, imageY))) {
-                    imagePixels[imagePixelIndex] = 0xff000000;
-                } else if (bulletHolePixels[bulletHolePixelIndex] == 0xff000000) {
-                    imagePixels[imagePixelIndex] = 0;
+        bx -= x + w / 2;
+        by -= y + h / 2;
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+                if (Utils.inRegion(bx + j, by + i, 0, 0, image.getWidth(), image.getHeight())) {
+                    if (argbS[i * w + j] == 0xffff0000 && Utils.isNotAlpha(getARGB(bx + j, by + i))) {
+                        image.getPixelData()[(by + i) * image.getWidth() + bx + j] = 0xff000000;
+                    } else if (argbS[i * w + j] == 0xff000000) {
+                        image.getPixelData()[(by + i) * image.getWidth() + bx + j] = 0;
+                    }
                 }
             }
         }
