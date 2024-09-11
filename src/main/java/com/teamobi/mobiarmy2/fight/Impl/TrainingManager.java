@@ -70,4 +70,9 @@ public class TrainingManager implements ITrainingManager {
         return mapId;
     }
 
+    @Override
+    public void changeLocation(short x, short y) {
+
+    }
+
 }

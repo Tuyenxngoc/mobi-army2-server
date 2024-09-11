@@ -231,7 +231,7 @@ public class Utils {
         return x >= x0 && x < x0 + w && y >= y0 && y < y0 + h;
     }
 
-    public static boolean intersecRegions(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2) {
+    public static boolean intersectRegions(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2) {
         return Math.abs(x1 - x2) <= w2 + w1 && Math.abs(y1 - y2) <= h2 + h1;
     }
 
@@ -287,6 +287,14 @@ public class Utils {
      */
     public static String formatLocalDateTime(LocalDateTime dateTime) {
         return dateTime.format(DATE_TIME_FORMATTER);
+    }
+
+    public static short clamp(short value, short min, short max) {
+        return (short) Math.max(min, Math.min(value, max));
+    }
+
+    public static byte clamp(byte value, byte min, byte max) {
+        return (byte) Math.max(min, Math.min(value, max));
     }
 
 }

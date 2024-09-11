@@ -15,4 +15,8 @@ public interface IMapManager {
 
     void loadMapId(byte mapId);
 
+    boolean isCollision(short x, short y);
+
+    void collision(short x, short y, Bullet bullet);
+
 }

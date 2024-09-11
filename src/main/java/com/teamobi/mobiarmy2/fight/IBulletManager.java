@@ -1,5 +1,9 @@
 package com.teamobi.mobiarmy2.fight;
 
+import com.teamobi.mobiarmy2.fight.item.VoiRong;
+
+import java.util.List;
+
 /**
  * @author tuyen
  */
@@ -7,6 +11,29 @@ public interface IBulletManager {
 
     IFightManager getFightManager();
 
-    short[] getCollisionPoint();
+    void updateBulletPositions();
 
+    void addShoot(Player player, byte bullId, short angle, byte force, byte force2, byte numShoot);
+
+    void clearBullets();
+
+    List<Bullet> getBullets();
+
+    byte getMgtAddX();
+
+    byte getMgtAddY();
+
+    byte getTypeSC();
+
+    short getXSC();
+
+    short getYSC();
+
+    short getArg();
+
+    short[] getCollisionPoint(short preY, short preX, short x, short y, boolean isXuyenPlayer, boolean isXuyenMap);
+
+    boolean hasVoiRong();
+
+    List<VoiRong> getVoiRongs();
 }

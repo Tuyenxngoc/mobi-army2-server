@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.fight;
 
 import com.teamobi.mobiarmy2.model.User;
+import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,10 +14,12 @@ public class Player {
 
     private IFightManager fightManager;
     private User user;
+    private short gunId;
     private byte characterId;
     private byte index;
     private byte pixel;
     private byte angry;
+    private short steps;
     private byte stamina;
     private short x;
     private short y;
@@ -31,6 +34,7 @@ public class Player {
     private boolean isUpdateAngry;
     private boolean isLucky;
     private boolean isPoisoned;
+    private boolean isFlying;
     private byte eyeSmokeCount;
     private byte freezeCount;
     private byte windStopCount;
@@ -39,6 +43,11 @@ public class Player {
     private boolean itemUsed;
     private boolean isDoubleShoot;
     private boolean isDoubleSpeed;
+    private boolean isUsePow;
+    private boolean isDead;
+    private byte usedItemId;
+    private short width;
+    private short height;
 
     public Player(int index, int x, int y, int hp, int maxHp) {
         this.index = (byte) index;
@@ -61,11 +70,14 @@ public class Player {
     public Player(IFightManager fightManager, User user, byte index, short x, short y, byte[] items, short[] abilities, short teamPoints, boolean[] clanItems) {
         this.fightManager = fightManager;
         this.user = user;
+        this.gunId = user.getGunId();
         this.characterId = user.getActiveCharacterId();
         this.index = index;
         this.x = x;
         this.y = y;
         this.stamina = 60;
+        this.width = 24;
+        this.height = 24;
         this.items = items;
         this.teamPoints = teamPoints;
         this.clanItems = clanItems;
@@ -120,7 +132,8 @@ public class Player {
     }
 
     public void die() {
-        this.hp = 0;
+        hp = 0;
+        isUpdateHP = true;
     }
 
     public void nextLuck() {
@@ -166,4 +179,81 @@ public class Player {
         }
     }
 
+    public byte getPowerUsageStatus() {
+        return (byte) (isUsePow ? 1 : 0);
+    }
+
+    public void updateXY(short x, short y) {
+        while (x != this.x || y != this.y) {
+            int preX = this.x;
+            int preY = this.y;
+            if (x < this.x) {
+                move(false);
+            } else if (x > this.x) {
+                move(true);
+            }
+
+            //Nếu không di chuyển được thì thoát vòng lặp
+            if (preX == this.x && preY <= this.y) {
+                return;
+            }
+        }
+    }
+
+    protected void move(boolean addX) {
+        IMapManager mapManager = fightManager.getMapManger();
+        if (this.freezeCount > 0) {
+            return;
+        }
+        byte step = 1;
+        if (this.isDoubleSpeed) {
+            step = 2;
+        }
+        if (steps > stamina) {
+            return;
+        }
+        steps++;
+        if (addX) {
+            x += step;
+        } else {
+            x -= step;
+        }
+        if (mapManager.isCollision(x, (short) (y - 5))) {
+            steps--; // Giảm số bước nếu không thể di chuyển
+            if (addX) {
+                x -= step;
+            } else {
+                x += step;
+            }
+            return;
+        }
+        for (short i = 4; i >= 0; i--) {
+            if (mapManager.isCollision(x, (short) (y - i))) {
+                y -= i;
+                return;
+            }
+        }
+        updateYPosition();
+    }
+
+    public void updateYPosition() {
+        IMapManager mapManager = fightManager.getMapManger();
+        while (y < mapManager.getHeight() + 200) {
+            if (mapManager.isCollision(x, y) || isFlying) {
+                return;
+            }
+            y++;
+        }
+    }
+
+    public boolean isCollision(short x, short y) {
+        if (eyeSmokeCount > 0) {
+            return false;
+        }
+        return Utils.inRegion(x, y, this.x - this.width / 2, this.y - this.height, this.width, this.height);
+    }
+
+    public void collision(short x, short y, Bullet bull) {
+        System.out.println("123");
+    }
 }

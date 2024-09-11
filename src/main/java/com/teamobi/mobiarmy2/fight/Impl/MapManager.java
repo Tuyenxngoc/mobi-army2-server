@@ -1,8 +1,6 @@
 package com.teamobi.mobiarmy2.fight.Impl;
 
-import com.teamobi.mobiarmy2.fight.IFightManager;
-import com.teamobi.mobiarmy2.fight.IMapManager;
-import com.teamobi.mobiarmy2.fight.MapTile;
+import com.teamobi.mobiarmy2.fight.*;
 import com.teamobi.mobiarmy2.model.map.MapBrick;
 import com.teamobi.mobiarmy2.repository.MapRepository;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -10,7 +8,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -96,9 +93,7 @@ public class MapManager implements IMapManager {
                     brickId,
                     Utils.getShort(mapData, offset + 1),
                     Utils.getShort(mapData, offset + 3),
-                    Arrays.copyOf(mapBrick.getData(), mapBrick.getData().length),
-                    (short) mapBrick.getWidth(),
-                    (short) mapBrick.getHeight(),
+                    mapBrick.getNewImage(),
                     MapRepository.isCollision(brickId)
             );
 
@@ -114,6 +109,29 @@ public class MapManager implements IMapManager {
             offset += 2;
             this.playerInitYPositions[i] = Utils.getShort(mapData, offset);
             offset += 2;
+        }
+    }
+
+    @Override
+    public boolean isCollision(short x, short y) {
+        for (MapTile tile : mapTiles) {
+            if (tile.isCollision(x, y)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void collision(short X, short Y, Bullet bull) {
+        for (MapTile m : mapTiles) {
+            m.collision(X, Y, bull);
+        }
+        for (int i = 0; i < fightManager.getTotalPlayers(); i++) {
+            Player pl = fightManager.getPlayers()[i];
+            if (pl != null && pl.getCharacterId() != 17) {
+                pl.collision(X, Y, bull);
+            }
         }
     }
 

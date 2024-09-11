@@ -1643,7 +1643,12 @@ public class UserService implements IUserService {
         try {
             short x = dis.readShort();
             short y = dis.readShort();
-            user.getFightWait().getFightManager().changeLocation(user, x, y);
+
+            if (user.getState() == UserState.FIGHTING) {
+                user.getFightWait().getFightManager().changeLocation(user.getPlayerId(), x, y);
+            } else if (user.getState() == UserState.TRAINING) {
+                user.getTrainingManager().changeLocation(x, y);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1656,33 +1661,16 @@ public class UserService implements IUserService {
             byte bullId = dis.readByte();
             short x = dis.readShort();
             short y = dis.readShort();
-            short angle = dis.readShort();
-            byte force = dis.readByte();
+            short angle = Utils.clamp(dis.readShort(), (short) -360, (short) 360);
+            byte force = Utils.clamp(dis.readByte(), (byte) 0, (byte) 30);
             byte force2 = 0;
             if (Bullet.isDoubleBull(bullId)) {
-                force2 = dis.readByte();
+                force2 = Utils.clamp(dis.readByte(), (byte) 0, (byte) 30);
             }
             byte numShoot = dis.readByte();
+            System.out.println("Num shoot: " + numShoot);
 
-            if (angle < -360) {
-                angle = -360;
-            } else if (angle > 360) {
-                angle = 360;
-            }
-
-            if (force < 0) {
-                force = 0;
-            } else if (force > 30) {
-                force = 30;
-            }
-
-            if (force2 < 0) {
-                force2 = 0;
-            } else if (force2 > 30) {
-                force2 = 30;
-            }
-
-            user.getFightWait().getFightManager().addShoot(user, bullId, x, y, angle, force, force2, numShoot);
+            user.getFightWait().getFightManager().addShoot(user.getPlayerId(), bullId, x, y, angle, force, force2, numShoot);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -3036,31 +3024,13 @@ public class UserService implements IUserService {
             byte bullId = dis.readByte();
             short x = dis.readShort();
             short y = dis.readShort();
-            short angle = dis.readShort();
-            byte force = dis.readByte();
+            short angle = Utils.clamp(dis.readShort(), (short) -360, (short) 360);
+            byte force = Utils.clamp(dis.readByte(), (byte) 0, (byte) 30);
             byte force2 = 0;
             if (Bullet.isDoubleBull(bullId)) {
-                force2 = dis.readByte();
+                force2 = Utils.clamp(dis.readByte(), (byte) 0, (byte) 30);
             }
             byte numShoot = dis.readByte();
-
-            if (angle < -360) {
-                angle = -360;
-            } else if (angle > 360) {
-                angle = 360;
-            }
-
-            if (force < 0) {
-                force = 0;
-            } else if (force > 30) {
-                force = 30;
-            }
-
-            if (force2 < 0) {
-                force2 = 0;
-            } else if (force2 > 30) {
-                force2 = 30;
-            }
 
             user.getTrainingManager().addShoot(user, bullId, x, y, angle, force, force2, numShoot);
         } catch (IOException e) {

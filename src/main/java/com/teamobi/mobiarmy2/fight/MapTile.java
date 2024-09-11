@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.fight;
 
+import com.teamobi.mobiarmy2.model.ImageData;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,32 +11,50 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MapTile {
-
     private int brickId;
     private short x;
     private short y;
-    private int[] data;
-    private short width;
-    private short height;
+    private ImageData image;
     private boolean collision;
 
-    public MapTile(int brickId, short x, short y, int[] data, short width, short height, boolean collision) {
+    public MapTile(int brickId, short x, short y, ImageData image, boolean collision) {
         this.brickId = brickId;
         this.x = x;
         this.y = y;
-        this.data = data;
-        this.width = width;
-        this.height = height;
+        this.image = image;
         this.collision = collision;
     }
 
     public boolean isCollision(short x, short y) {
-        return (Utils.inRegion(x, y, this.x, this.y, this.width, this.height)
+        return (Utils.inRegion(x, y, this.x, this.y, image.getWidth(), image.getHeight())
                 && Utils.isNotAlpha(getARGB(x - this.x, y - this.x)));
     }
 
-    public final int getARGB(int x, int y) {
-        return data[y * width + x];
+    public int getARGB(int x, int y) {
+        return image.getPixelData()[y * image.getWidth() + x];
+    }
+
+    public void collision(int bx, int by, Bullet bullet) {
+        ImageData bulletHoleImage = EffectManager.getHoleImageByBulletId(bullet.getBulletId());
+        int w = bulletHoleImage.getWidth();
+        int h = bulletHoleImage.getHeight();
+        int[] argbS = bulletHoleImage.getPixelData();
+        if (!this.collision || !Utils.intersectRegions(bx - w / 2, by - h / 2, w, h, this.x, this.y, image.getWidth(), image.getHeight())) {
+            return;
+        }
+        bx -= x + w / 2;
+        by -= y + h / 2;
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+                if (Utils.inRegion(bx + j, by + i, 0, 0, image.getWidth(), image.getHeight())) {
+                    if (argbS[i * w + j] == 0xffff0000 && Utils.isNotAlpha(getARGB(bx + j, by + i))) {
+                        image.getPixelData()[(by + i) * image.getWidth() + bx + j] = 0xff000000;
+                    } else if (argbS[i * w + j] == 0xff000000) {
+                        image.getPixelData()[(by + i) * image.getWidth() + bx + j] = 0;
+                    }
+                }
+            }
+        }
     }
 
 }
