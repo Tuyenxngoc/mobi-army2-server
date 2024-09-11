@@ -65,7 +65,7 @@ public class UFOFire extends Boss {
             } else {
                 this.acll = false;
                 this.turnDie--;
-                this.fightMNG.newShoot(this.index, (byte) 42, (short) 270, (byte) 20, (byte) 0, (byte) 1, false);
+                this.fightMNG.newShoot(this.index, (byte) 42, (short) 270, (byte) 20, (byte) 0, (byte) 1);
                 return;
             }
             if (!fightMNG.checkWin()) {

@@ -1,7 +1,6 @@
 package com.teamobi.mobiarmy2.fight;
 
 import com.teamobi.mobiarmy2.fight.BulletManager.AddBoss;
-import com.teamobi.mobiarmy2.fight.boss.BigBoomHTCC;
 import com.teamobi.mobiarmy2.fight.boss.Ghost2;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.Impl.Message;
@@ -417,10 +416,6 @@ public class Player {
     }
 
     public void collision(short bx, short by, Bullet bull) {
-        if (this.fightMNG.ltap) {
-            return;
-        }
-
         int tamAH = Bullet.getTamAHByBullID(bull.bullId);
         if (bull.bullId == 35 && bull.pl.idNV == 15) {
             tamAH = 250;
@@ -575,11 +570,6 @@ public class Player {
                         for (int i = 0; i < 2; i++) {
                             Player players = new Ghost2(fightMNG, (byte) 26, "Ghost II", (byte) (fightMNG.allCount + fightMNG.bullMNG.addboss.size()), 1800 + (fightMNG.getLevelTeam() * 10), (short) (Utils.nextInt(100, fightMNG.mapMNG.Width - 100)), (short) Utils.nextInt(150));
                             fightMNG.bullMNG.addboss.add(new AddBoss(players, fightMNG.getisLH() ? 50 : 6));
-                        }
-                    } else if (fightMNG.getisSieuBoss()) {
-                        for (int i = 0; i < 5; i++) {
-                            Player players = new BigBoomHTCC(fightMNG, (byte) 12, "BigBoomHTCC", (byte) (fightMNG.allCount + fightMNG.bullMNG.addboss.size()), 1500 + (fightMNG.getLevelTeam() * 100), (short) (Utils.nextInt(100, fightMNG.mapMNG.Width - 100)), (short) Utils.nextInt(150));
-                            fightMNG.bullMNG.addboss.add(new AddBoss(players, fightMNG.getisSieuBoss() ? 200 : 6));
                         }
                     }
                     // Ban dong doi -5xp -5cup

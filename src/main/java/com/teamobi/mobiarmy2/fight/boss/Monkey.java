@@ -34,7 +34,7 @@ public class Monkey extends Boss {
             }
             if (Math.abs(X - pl.X) <= 35 && Math.abs(Y - pl.Y) <= 35) {
                 this.itemUsed = 1;
-                this.fightMNG.newShoot(this.index, (byte) 5, (short) 84, (byte) 30, (byte) 0, (byte) 1, false);
+                this.fightMNG.newShoot(this.index, (byte) 5, (short) 84, (byte) 30, (byte) 0, (byte) 1);
                 if (!fightMNG.checkWin()) {
                     fightMNG.nextTurn();
                 }
@@ -52,7 +52,7 @@ public class Monkey extends Boss {
                         }
                         return;
                     }
-                    this.fightMNG.newShoot(this.index, (byte) 61, (short) FA[0], (byte) FA[1], (byte) 0, (byte) 1, false);
+                    this.fightMNG.newShoot(this.index, (byte) 61, (short) FA[0], (byte) FA[1], (byte) 0, (byte) 1);
                     break;
             }
         } catch (Exception e) {

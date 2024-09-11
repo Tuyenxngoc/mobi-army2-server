@@ -43,19 +43,19 @@ public class SmallBoom extends Boss {
                 }
                 this.fightMNG.changeLocation(super.index);
                 if (Math.abs(Y - pl.Y) <= 25 && Math.abs(X - pl.X) <= 25) {
-                    this.fightMNG.newShoot(this.index, (byte) 32, (short) 0, (byte) 0, (byte) 0, (byte) 1, false);
+                    this.fightMNG.newShoot(this.index, (byte) 32, (short) 0, (byte) 0, (byte) 0, (byte) 1);
                 } else if (Math.abs(X - pl.X) < 25 && (Y - (pl.Y)) > 25) {
                     this.itemUsed = 1;
-                    this.fightMNG.newShoot(this.index, (byte) 5, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 30, (byte) 0, (byte) 1, false);
+                    this.fightMNG.newShoot(this.index, (byte) 5, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 30, (byte) 0, (byte) 1);
                 } else if (((pl.Y) - Y > 25 && Math.abs(X - pl.X) < 25)) {
                     this.itemUsed = 1;
                     short VRd = (short) Utils.nextInt(60, 120);
                     byte Suc = (byte) Utils.nextInt(5, 10);
-                    this.fightMNG.newShoot(this.index, (byte) 5, (short) VRd, (byte) Suc, (byte) 0, (byte) 1, false);
+                    this.fightMNG.newShoot(this.index, (byte) 5, (short) VRd, (byte) Suc, (byte) 0, (byte) 1);
                 } else if (super.buocDi < super.theLuc) {
                     this.itemUsed = 1;
                     short Vxy = (short) (pl.X > Y ? 80 : 180 - 80);
-                    this.fightMNG.newShoot(this.index, (byte) 5, (short) Vxy, (byte) 8, (byte) 0, (byte) 1, false);
+                    this.fightMNG.newShoot(this.index, (byte) 5, (short) Vxy, (byte) 8, (byte) 0, (byte) 1);
                 } else if (!fightMNG.checkWin()) {
                     this.fightMNG.nextTurn();
                 }

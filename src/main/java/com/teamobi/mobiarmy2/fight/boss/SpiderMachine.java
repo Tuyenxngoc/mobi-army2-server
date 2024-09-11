@@ -28,11 +28,11 @@ public class SpiderMachine extends Boss {
             if (Math.abs(X - pl.X) <= 40 && Math.abs(Y - pl.Y) <= 30) {
                 this.itemUsed = 9;
                 fightMNG.isNextTurn = false;
-                this.fightMNG.newShoot(this.index, (byte) 8, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 30, (byte) 0, (byte) 1, false);
+                this.fightMNG.newShoot(this.index, (byte) 8, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 30, (byte) 0, (byte) 1);
                 fightMNG.isNextTurn = true;
                 byte force = (byte) Utils.nextInt(15, 30);
                 short arg = (short) Utils.nextInt(80, 100);
-                this.fightMNG.newShoot(this.index, (byte) 36, (short) arg, (byte) force, (byte) 0, (byte) 1, false);
+                this.fightMNG.newShoot(this.index, (byte) 36, (short) arg, (byte) force, (byte) 0, (byte) 1);
                 return;
             }
             ArrayList<Player> ar = new ArrayList();
@@ -57,11 +57,11 @@ public class SpiderMachine extends Boss {
                         return;
                     }
                     fightMNG.isNextTurn = false;
-                    this.fightMNG.newShoot(this.index, (byte) 8, FA[0], (byte) FA[1], (byte) 0, (byte) 1, false);
+                    this.fightMNG.newShoot(this.index, (byte) 8, FA[0], (byte) FA[1], (byte) 0, (byte) 1);
                     fightMNG.isNextTurn = true;
                     byte force = (byte) Utils.nextInt(15, 30);
                     short arg = (short) Utils.nextInt(80, 100);
-                    this.fightMNG.newShoot(this.index, (byte) 36, (short) arg, (byte) force, (byte) 0, (byte) 1, false);
+                    this.fightMNG.newShoot(this.index, (byte) 36, (short) arg, (byte) force, (byte) 0, (byte) 1);
                     break;
                 //lazer
                 case 1:
@@ -72,7 +72,7 @@ public class SpiderMachine extends Boss {
                             fightMNG.nextTurn();
                         return;
                     }
-                    this.fightMNG.newShoot(this.index, (byte) 14, FA[0], (byte) FA[1], (byte) 0, (byte) 1, false);
+                    this.fightMNG.newShoot(this.index, (byte) 14, FA[0], (byte) FA[1], (byte) 0, (byte) 1);
                     break;
                 //rôcet
                 case 2:
@@ -82,7 +82,7 @@ public class SpiderMachine extends Boss {
                             fightMNG.nextTurn();
                         return;
                     }
-                    this.fightMNG.newShoot(this.index, (byte) 33, FA[0], (byte) FA[1], (byte) 0, (byte) 1, false);
+                    this.fightMNG.newShoot(this.index, (byte) 33, FA[0], (byte) FA[1], (byte) 0, (byte) 1);
                     break;
             }
         } catch (Exception e) {

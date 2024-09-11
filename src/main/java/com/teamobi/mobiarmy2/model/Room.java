@@ -36,7 +36,7 @@ public class Room {
         this.iconType = iconType;
         this.fightWaits = new FightWait[numArea];
         for (byte i = 0; i < numArea; i++) {
-            fightWaits[i] = new FightWait(this, this.type, (byte) i, ServerManager.maxPlayers, (byte) 4, minMap, (byte) 1, isContinuous, false);
+            fightWaits[i] = new FightWait(this, this.type, i, ServerManager.maxPlayers, (byte) 4, minMap, (byte) 1, isContinuous);
         }
     }
 

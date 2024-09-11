@@ -45,7 +45,7 @@ public class BigBoomHTCC extends Boss {
                 if (Vsuc > 30) {
                     Vsuc = 30;
                 }
-                this.fightMNG.newShoot(this.index, (byte) 34, (short) Vgoc, (byte) Vsuc, (byte) 0, (byte) 1, false);
+                this.fightMNG.newShoot(this.index, (byte) 34, (short) Vgoc, (byte) Vsuc, (byte) 0, (byte) 1);
             } else {
                 while (X != pl.X || Y != pl.Y) {
                     int preX = this.X;
@@ -64,10 +64,10 @@ public class BigBoomHTCC extends Boss {
                 }
                 this.fightMNG.changeLocation(super.index);
                 if (Math.abs(X - pl.X) <= 35 && Math.abs(Y - pl.Y) <= 35) {
-                    this.fightMNG.newShoot(this.index, (byte) 60, (short) 0, (byte) 0, (byte) 0, (byte) 1, false);
+                    this.fightMNG.newShoot(this.index, (byte) 60, (short) 0, (byte) 0, (byte) 0, (byte) 1);
                 } else if (this.buocDi < this.theLuc) {
                     this.itemUsed = 7;
-                    this.fightMNG.newShoot(this.index, (byte) 7, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 30, (byte) 0, (byte) 1, false);
+                    this.fightMNG.newShoot(this.index, (byte) 7, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 30, (byte) 0, (byte) 1);
                 } else if (!fightMNG.checkWin()) {
                     this.fightMNG.nextTurn();
                 }

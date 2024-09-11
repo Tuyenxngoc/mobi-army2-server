@@ -28,13 +28,13 @@ public class Robot extends Boss {
             }
             if (Math.abs(X - pl.X) <= 40 && Math.abs(Y - pl.Y) <= 40) {
                 fightMNG.isNextTurn = false;
-                this.fightMNG.newShoot(this.index, (byte) 35, (short) 0, (byte) 0, (byte) 0, (byte) 1, false);
+                this.fightMNG.newShoot(this.index, (byte) 35, (short) 0, (byte) 0, (byte) 0, (byte) 1);
                 fightMNG.isNextTurn = true;
             }
             if (Math.abs(X - pl.X) <= 40) {
                 byte force = (byte) Utils.nextInt(15, 30);
                 short arg = (short) Utils.nextInt(80, 100);
-                this.fightMNG.newShoot(this.index, (byte) 36, (short) arg, (byte) force, (byte) 0, (byte) 1, false);
+                this.fightMNG.newShoot(this.index, (byte) 36, (short) arg, (byte) force, (byte) 0, (byte) 1);
                 return;
             }
             ArrayList<Player> ar = new ArrayList();
@@ -59,7 +59,7 @@ public class Robot extends Boss {
                         }
                         return;
                     }
-                    this.fightMNG.newShoot(this.index, (byte) 0, (short) FA[0], (byte) FA[1], (byte) 0, (byte) 1, false);
+                    this.fightMNG.newShoot(this.index, (byte) 0, (short) FA[0], (byte) FA[1], (byte) 0, (byte) 1);
                     break;
                 case 1:
                     FA = fightMNG.getForceArgXY(idNV, fightMNG.bullMNG, true, X, Y, pl.X, pl.Y, (short) (pl.width / 2), (short) (pl.height / 2), 50, 5, 80, 60);
@@ -69,7 +69,7 @@ public class Robot extends Boss {
                         }
                         return;
                     }
-                    this.fightMNG.newShoot(this.index, (byte) 2, (short) FA[0], (byte) FA[1], (byte) 0, (byte) 1, false);
+                    this.fightMNG.newShoot(this.index, (byte) 2, (short) FA[0], (byte) FA[1], (byte) 0, (byte) 1);
                     break;
                 case 2:
                     FA = fightMNG.getForceArgXY(idNV, fightMNG.bullMNG, true, X, Y, pl.X, pl.Y, (short) (pl.width / 2), (short) (pl.height / 2), 50, 5, 50, 80);
@@ -79,7 +79,7 @@ public class Robot extends Boss {
                         }
                         return;
                     }
-                    this.fightMNG.newShoot(this.index, (byte) 10, (short) FA[0], (byte) FA[1], (byte) 0, (byte) 1, false);
+                    this.fightMNG.newShoot(this.index, (byte) 10, (short) FA[0], (byte) FA[1], (byte) 0, (byte) 1);
                     break;
                 case 3:
                     this.itemUsed = 6;
@@ -90,7 +90,7 @@ public class Robot extends Boss {
                         }
                         return;
                     }
-                    this.fightMNG.newShoot(this.index, (byte) 6, (short) FA[0], (byte) FA[1], (byte) 0, (byte) 1, false);
+                    this.fightMNG.newShoot(this.index, (byte) 6, (short) FA[0], (byte) FA[1], (byte) 0, (byte) 1);
                     break;
                 case 4:
                     this.itemUsed = 7;
@@ -101,7 +101,7 @@ public class Robot extends Boss {
                         }
                         return;
                     }
-                    this.fightMNG.newShoot(this.index, (byte) 7, (short) FA[0], (byte) FA[1], (byte) 0, (byte) 1, false);
+                    this.fightMNG.newShoot(this.index, (byte) 7, (short) FA[0], (byte) FA[1], (byte) 0, (byte) 1);
                     break;
                 case 5:
                 case 6:
@@ -114,7 +114,7 @@ public class Robot extends Boss {
                         }
                         return;
                     }
-                    this.fightMNG.newShoot(this.index, (byte) 36, (short) FA[0], (byte) FA[1], (byte) 0, (byte) 1, false);
+                    this.fightMNG.newShoot(this.index, (byte) 36, (short) FA[0], (byte) FA[1], (byte) 0, (byte) 1);
                     break;
             }
         } catch (Exception e) {

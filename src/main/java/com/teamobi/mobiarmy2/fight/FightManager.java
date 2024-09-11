@@ -21,13 +21,11 @@ import java.util.Date;
 public class FightManager {
 
     final FightWait wait;
-    private final User userLt;
     private boolean isShoot;
     private int teamlevel;
     private int teamCS;
     public boolean isNextTurn;
     private Date matchTime;
-    protected boolean ltap;
     protected byte type;
     protected boolean isBossTurn;
     protected byte bossTurn;
@@ -45,33 +43,10 @@ public class FightManager {
     public BulletManager bullMNG;
     public CountDownMNG countDownMNG;
 
-    public FightManager(User us, byte map) {
-        this.wait = null;
-        this.ltap = true;
-        this.type = 0;
-        this.playerCount = 1;
-        this.playerTurn = -1;
-        this.nTurn = 0;
-        this.isBossTurn = false;
-        this.bossTurn = 0;
-        this.allCount = 1;
-        this.WindX = 0;
-        this.WindY = 0;
-        this.isFight = false;
-        this.nHopQua = 0;
-        this.mapMNG = new MapManager(this);
-        this.bullMNG = new BulletManager(this);
-        this.countDownMNG = null;
-        this.userLt = us;
-        this.mapMNG.setMapId(map);
-    }
-
     public FightManager(FightWait fo) {
         this.isShoot = false;
         this.isNextTurn = true;
         this.wait = fo;
-        this.userLt = null;
-        this.ltap = false;
         this.type = fo.type;
         this.playerCount = 0;
         this.allCount = 0;
@@ -93,10 +68,6 @@ public class FightManager {
     }
 
     void sendToTeam(Message ms) throws IOException {
-        if (this.ltap) {
-            this.userLt.sendMessage(ms);
-            return;
-        }
         for (byte i = 0; i < ServerManager.maxPlayers; i++) {
             Player pl = this.players[i];
             if (pl == null || pl.us == null) {
@@ -127,9 +98,7 @@ public class FightManager {
     }
 
     public int getIDTurn() {
-        if (ltap) {
-            return 0;
-        } else if (isBossTurn && type == 5) {
+        if (isBossTurn && type == 5) {
             return this.bossTurn;
         } else {
             return this.playerTurn;
@@ -198,10 +167,6 @@ public class FightManager {
         return this.wait.isLH;
     }
 
-    protected boolean getisSieuBoss() {
-        return this.wait.isSieuBoss;
-    }
-
     private void nextBoss() throws IOException {
         //Map Bom 1
         if (this.wait.mapId == 30) {
@@ -220,15 +185,6 @@ public class FightManager {
                 short X = (short) (Utils.nextInt(445, 800) + i * 50);
                 short Y = 180;
                 players[allCount] = new BigBoom(this, (byte) 12, "SmallBoom", (byte) allCount, 1500 + (this.getLevelTeam() * 10), X, Y);
-                allCount++;
-            }
-        }
-        if (this.wait.isSieuBoss) {
-            byte numBoss = (new byte[]{4, 4, 5, 5, 6, 8, 8, 9, 9})[playerCount];
-            for (byte i = 0; i < numBoss; i++) {
-                short X = (short) (Utils.nextInt(445, 800) + i * 50);
-                short Y = 180;
-                players[allCount] = new BigBoomHTCC(this, (byte) 12, "BigBoomHTCC", (byte) allCount, 1500 + (this.getLevelTeam() * 100), X, Y);
                 allCount++;
             }
         }
@@ -665,94 +621,66 @@ public class FightManager {
             }
             pl.chuanHoaXY();
         }
-        if (this.ltap) {
-            this.playerTurn = 0;
-        } else {
-            //kiem tra xem ai bi thieu dot tru hp va lan bi dot
-            for (byte i = 0; i < this.allCount; i++) {
-                Player pl = this.players[i];
-                if (pl == null || pl.isDie) {
+
+        //kiem tra xem ai bi thieu dot tru hp va lan bi dot
+        for (byte i = 0; i < this.allCount; i++) {
+            Player pl = this.players[i];
+            if (pl == null || pl.isDie) {
+                continue;
+            }
+            for (byte j = 0; j < ServerManager.maxPlayers; j++) {
+                if (pl.NHTItemThieuDot[j][0] == 0) {
                     continue;
                 }
-                for (byte j = 0; j < ServerManager.maxPlayers; j++) {
-                    if (pl.NHTItemThieuDot[j][0] == 0) {
-                        continue;
-                    }
-                    pl.NHTItemThieuDot[j][0]--;
-                    pl.updateHP(-(1 + (pl.HPMax * 1 / 100)));
-                    this.nextHP();
-                }
+                pl.NHTItemThieuDot[j][0]--;
+                pl.updateHP(-(1 + (pl.HPMax * 1 / 100)));
+                this.nextHP();
             }
+        }
 
-            if (this.countDownMNG != null) {
-                this.countDownMNG.stopCount();
-            }
-            if (this.playerTurn == -1) {
-                while (true) {
-                    int next = 0;
-                    if (this.type != 5) {
-                        next = Utils.nextInt(ServerManager.maxPlayers);
-                    } else {
-                        next = Utils.nextInt(this.allCount);
-                    }
-                    if (this.players[next] != null && this.players[next].idNV != 18 && this.players[next].idNV != 19 && this.players[next].idNV != 20 && this.players[next].idNV != 21 && this.players[next].idNV != 23 && this.players[next].idNV != 24) {
-                        if (next < ServerManager.maxPlayers) {
-                            this.playerTurn = (byte) next;
-                            this.isBossTurn = false;
-                            this.bossTurn = ServerManager.maxPlayers;
-                        } else {
-                            this.bossTurn = (byte) next;
-                            this.isBossTurn = true;
-                            this.playerTurn = 0;
-                        }
-                        break;
-                    }
-                }
-            } else {
-                this.nextAngry();
-                if (!isBossTurn) {
-                    Player plTurn = null;
-                    if (this.playerTurn >= 0 && this.playerTurn < this.players.length) {
-                        plTurn = this.players[this.playerTurn];
-                    }
-                    if (plTurn != null) {
-                        this.players[this.playerTurn].isUsePow = false;
-                        this.players[this.playerTurn].isUseItem = false;
-                        this.players[this.playerTurn].itemUsed = -1;
-                    }
-                }
-                if (this.type == 5) {
-                    if (this.isBossTurn) {
-                        this.isBossTurn = false;
-                        int turn = this.playerTurn + 1;
-                        while (turn != this.playerTurn) {
-                            if (turn == ServerManager.maxPlayers) {
-                                turn = 0;
-                            }
-                            if (this.players[turn] != null && !this.players[turn].isDie && this.players[turn].idNV != 18 && this.players[turn].idNV != 19 && this.players[turn].idNV != 20 && this.players[turn].idNV != 21 && this.players[turn].idNV != 23 && this.players[turn].idNV != 24) {
-                                this.playerTurn = (byte) turn;
-                                break;
-                            }
-                            turn++;
-                        }
-                    } else {
-                        this.isBossTurn = true;
-                        byte turn = (byte) (this.bossTurn + 1);
-                        while (turn != this.bossTurn) {
-                            if (turn >= this.allCount) {
-                                turn = ServerManager.maxPlayers;
-                            }
-                            if (this.players[turn] != null && !this.players[turn].isDie && this.players[turn].idNV != 18 && this.players[turn].idNV != 19 && this.players[turn].idNV != 20 && this.players[turn].idNV != 21 && this.players[turn].idNV != 23 && this.players[turn].idNV != 24) {
-                                this.bossTurn = turn;
-                                break;
-                            }
-                            turn++;
-                        }
-                    }
+        if (this.countDownMNG != null) {
+            this.countDownMNG.stopCount();
+        }
+        if (this.playerTurn == -1) {
+            while (true) {
+                int next = 0;
+                if (this.type != 5) {
+                    next = Utils.nextInt(ServerManager.maxPlayers);
                 } else {
-                    byte turn = (byte) (this.playerTurn + 1);
+                    next = Utils.nextInt(this.allCount);
+                }
+                if (this.players[next] != null && this.players[next].idNV != 18 && this.players[next].idNV != 19 && this.players[next].idNV != 20 && this.players[next].idNV != 21 && this.players[next].idNV != 23 && this.players[next].idNV != 24) {
+                    if (next < ServerManager.maxPlayers) {
+                        this.playerTurn = (byte) next;
+                        this.isBossTurn = false;
+                        this.bossTurn = ServerManager.maxPlayers;
+                    } else {
+                        this.bossTurn = (byte) next;
+                        this.isBossTurn = true;
+                        this.playerTurn = 0;
+                    }
+                    break;
+                }
+            }
+        } else {
+            this.nextAngry();
+            if (!isBossTurn) {
+                Player plTurn = null;
+                if (this.playerTurn >= 0 && this.playerTurn < this.players.length) {
+                    plTurn = this.players[this.playerTurn];
+                }
+                if (plTurn != null) {
+                    this.players[this.playerTurn].isUsePow = false;
+                    this.players[this.playerTurn].isUseItem = false;
+                    this.players[this.playerTurn].itemUsed = -1;
+                }
+            }
+            if (this.type == 5) {
+                if (this.isBossTurn) {
+                    this.isBossTurn = false;
+                    int turn = this.playerTurn + 1;
                     while (turn != this.playerTurn) {
-                        if (turn == this.allCount) {
+                        if (turn == ServerManager.maxPlayers) {
                             turn = 0;
                         }
                         if (this.players[turn] != null && !this.players[turn].isDie && this.players[turn].idNV != 18 && this.players[turn].idNV != 19 && this.players[turn].idNV != 20 && this.players[turn].idNV != 21 && this.players[turn].idNV != 23 && this.players[turn].idNV != 24) {
@@ -761,9 +689,35 @@ public class FightManager {
                         }
                         turn++;
                     }
+                } else {
+                    this.isBossTurn = true;
+                    byte turn = (byte) (this.bossTurn + 1);
+                    while (turn != this.bossTurn) {
+                        if (turn >= this.allCount) {
+                            turn = ServerManager.maxPlayers;
+                        }
+                        if (this.players[turn] != null && !this.players[turn].isDie && this.players[turn].idNV != 18 && this.players[turn].idNV != 19 && this.players[turn].idNV != 20 && this.players[turn].idNV != 21 && this.players[turn].idNV != 23 && this.players[turn].idNV != 24) {
+                            this.bossTurn = turn;
+                            break;
+                        }
+                        turn++;
+                    }
+                }
+            } else {
+                byte turn = (byte) (this.playerTurn + 1);
+                while (turn != this.playerTurn) {
+                    if (turn == this.allCount) {
+                        turn = 0;
+                    }
+                    if (this.players[turn] != null && !this.players[turn].isDie && this.players[turn].idNV != 18 && this.players[turn].idNV != 19 && this.players[turn].idNV != 20 && this.players[turn].idNV != 21 && this.players[turn].idNV != 23 && this.players[turn].idNV != 24) {
+                        this.playerTurn = (byte) turn;
+                        break;
+                    }
+                    turn++;
                 }
             }
         }
+
         if (!isBossTurn) {
             this.isShoot = false;
             Player pl = this.players[this.playerTurn];
@@ -851,9 +805,6 @@ public class FightManager {
         ds.flush();
         this.sendToTeam(ms);
         this.nextWind();
-        if (this.ltap) {
-            return;
-        }
         this.countDownMNG.resetCount();
         if (this.isBossTurn) {
             new Thread(new Runnable() {
@@ -866,9 +817,6 @@ public class FightManager {
     }
 
     public boolean checkWin() throws IOException {
-        if (this.ltap) {
-            return true;
-        }
         if (!isFight) {
             return true;
         }
@@ -1127,74 +1075,63 @@ public class FightManager {
         if (this.isFight) {
             return;
         }
-        if (!this.ltap) {
-            this.mapMNG.entrys.clear();
-            this.setMap(this.wait.mapId);
-        } else {
-            this.mapMNG.setMapId(this.mapMNG.Id);
-        }
+        this.mapMNG.entrys.clear();
+        this.setMap(this.wait.mapId);
         this.playerTurn = -1;
         this.nTurn = 0;
         this.WindX = 0;
         this.WindY = 0;
         this.isFight = true;
-        if (this.ltap) {
-            this.playerCount = 1;
-        } else {
-            this.playerCount = this.wait.numPlayers;
-        }
-        this.allCount = ServerManager.maxPlayers;
-        if (this.ltap) {
 
-        } else {
-            if (this.type == 5) {
-                this.nHopQua = (byte) (this.playerCount / 2);
+        this.playerCount = this.wait.numPlayers;
+        this.allCount = ServerManager.maxPlayers;
+        if (this.type == 5) {
+            this.nHopQua = (byte) (this.playerCount / 2);
+        }
+        int[] location = new int[8];
+        int count = 0;
+        this.teamCS = 0;
+        this.teamlevel = 0;
+        for (byte i = 0; i < this.wait.maxPlayer; i++) {
+            User us = this.wait.users[i];
+            if (us == null) {
+                this.players[i] = null;
+                continue;
             }
-            int[] location = new int[8];
-            int count = 0;
-            this.teamCS = 0;
-            this.teamlevel = 0;
-            for (byte i = 0; i < this.wait.maxPlayer; i++) {
-                User us = this.wait.users[i];
-                if (us == null) {
-                    this.players[i] = null;
-                    continue;
-                }
-                this.teamlevel += us.getCurrentXpLevel();
-                us.updateXu(-this.wait.money);
-                short X, Y;
-                byte[] item;
-                int teamPoint;
-                boolean exists;
-                int locaCount = -1;
-                do {
-                    locaCount = Utils.nextInt(this.mapMNG.XPlayerInit.length);
-                    exists = false;
-                    for (int j = 0; j < count; j++) {
-                        if (location[j] == locaCount) {
-                            exists = true;
-                            break;
-                        }
-                    }
-                } while (exists);
-                location[count++] = locaCount;
-                X = this.mapMNG.XPlayerInit[locaCount];
-                Y = this.mapMNG.YPlayerInit[locaCount];
-                item = this.wait.items[i];
-                for (byte j = 0; j < 4; j++) {
-                    if (item[4 + j] > 0) {
-                        if (12 + j > 1) {
-                            us.updateItems((byte) (12 + j), (byte) -1);
-                        }
+            this.teamlevel += us.getCurrentXpLevel();
+            us.updateXu(-this.wait.money);
+            short X, Y;
+            byte[] item;
+            int teamPoint;
+            boolean exists;
+            int locaCount = -1;
+            do {
+                locaCount = Utils.nextInt(this.mapMNG.XPlayerInit.length);
+                exists = false;
+                for (int j = 0; j < count; j++) {
+                    if (location[j] == locaCount) {
+                        exists = true;
+                        break;
                     }
                 }
-                if (this.type == 5 || i % 2 == 0) {
-                    teamPoint = nTeamPointBlue;
-                } else {
-                    teamPoint = nTeamPointRed;
+            } while (exists);
+            location[count++] = locaCount;
+            X = this.mapMNG.XPlayerInit[locaCount];
+            Y = this.mapMNG.YPlayerInit[locaCount];
+            item = this.wait.items[i];
+            for (byte j = 0; j < 4; j++) {
+                if (item[4 + j] > 0) {
+                    if (12 + j > 1) {
+                        us.updateItems((byte) (12 + j), (byte) -1);
+                    }
                 }
-                this.players[i] = new Player(this, i, X, Y, item, teamPoint, us);
             }
+            if (this.type == 5 || i % 2 == 0) {
+                teamPoint = nTeamPointBlue;
+            } else {
+                teamPoint = nTeamPointRed;
+            }
+            this.players[i] = new Player(this, i, X, Y, item, teamPoint, us);
         }
         this.bullMNG.mangNhenId = 200;
         this.sendFightInfoMessage();
@@ -1227,28 +1164,26 @@ public class FightManager {
             pl.isDie = true;
         }
         pl.us = null;
-        if (!this.ltap) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        if (!checkWin()) {
-                            if (index == getIDTurn()) {
-                                nextTurn();
-                            } else {
-                                Message ms = new Message(24);
-                                DataOutputStream ds = ms.writer();
-                                ds.writeByte(isBossTurn ? bossTurn : playerTurn);
-                                ds.flush();
-                                sendToTeam(ms);
-                            }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (!checkWin()) {
+                        if (index == getIDTurn()) {
+                            nextTurn();
+                        } else {
+                            Message ms = new Message(24);
+                            DataOutputStream ds = ms.writer();
+                            ds.writeByte(isBossTurn ? bossTurn : playerTurn);
+                            ds.flush();
+                            sendToTeam(ms);
                         }
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
                     }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
                 }
-            }).start();
-        }
+            }
+        }).start();
     }
 
     protected void sendFightInfoMessage() throws IOException {
@@ -1256,7 +1191,7 @@ public class FightManager {
             return;
         }
         // Update Xu
-        if (!this.ltap && this.wait.money > 0) {
+        if (this.wait.money > 0) {
             for (byte i = 0; i < ServerManager.maxPlayers; i++) {
                 Player pl = this.players[i];
                 if (pl == null || pl.us == null) {
@@ -1278,27 +1213,12 @@ public class FightManager {
             }
             Message ms = new Message(20);
             DataOutputStream ds = ms.writer();
-            if (ltap) {
-                short[] aw = this.userLt.getEquips();
-                for (byte j = 0; j < 5; j++) {
-                    ds.writeShort(aw[j]);
-                }
-            }
-            // Null byte
-            ds.writeByte(0);
-            // Time Count
-            if (ltap) {
-                ds.writeByte(0);
-            } else {
-                ds.writeByte(this.timeCountMax);
-            }
+            ds.writeByte(wait.mapId);
+            ds.writeByte(this.timeCountMax);
             // Team point
             ds.writeShort(pl.dongDoi);
-            if (!this.ltap && this.wait.type == 7) {
-                ds.writeByte(8);
-            }
             // X, Y, HP
-            for (byte j = 0; j < this.players.length; j++) {
+            for (byte j = 0; j < 8; j++) {
                 Player pl2 = this.players[j];
                 if (pl2 == null) {
                     ds.writeShort(-1);
@@ -1370,24 +1290,20 @@ public class FightManager {
         allCount++;
     }
 
-    public void newShoot(int index, byte bullId, short arg, byte force, byte force2, byte nshoot, boolean ltap) throws IOException {
+    public void newShoot(int index, byte bullId, short arg, byte force, byte force2, byte nshoot) throws IOException {
         ServerManager.getInstance().logger().logMessage("New shoot index=" + index + " bullId: " + bullId + " arg: " + arg + " force: " + force + " force2: " + force2 + " nshoot: " + nshoot);
         final Player pl = this.players[index];
         short x = pl.X, y = pl.Y;
-        if (!ltap) {
-            this.calcMM();
-        }
+        this.calcMM();
         bullMNG.addShoot(pl, bullId, arg, force, force2, nshoot);
         bullMNG.fillXY();
-        if (!this.ltap) {
-            this.nextMM();
-        }
+        this.nextMM();
         ArrayList<Bullet> bullets = bullMNG.entrys;
         if (bullets.isEmpty()) {
             return;
         }
         bullId = bullMNG.entrys.get(0).bullId;
-        Message ms = new Message(ltap ? 84 : 22);
+        Message ms = new Message(22);
         DataOutputStream ds = ms.writer();
         // typeshoot
         byte typeshoot = 0;
@@ -1485,9 +1401,7 @@ public class FightManager {
         this.sendToTeam(ms);
         pl.isUseItem = false;
         pl.itemUsed = -1;
-        if (this.ltap) {
-            nextTurn();
-        } else if (this.isNextTurn) {
+        if (this.isNextTurn) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -1560,12 +1474,10 @@ public class FightManager {
         } else {
             nshoot = 1;
         }
-        if (this.ltap) {
-            pl.setXY(x, y);
-        } else if (x != pl.X && y != pl.Y) {
+        if (x != pl.X && y != pl.Y) {
             pl.updateXY(x, y);
         }
-        newShoot(index, bullId, (arg > 360 ? 360 : (arg < -360 ? -360 : arg)), (force > 30 ? 30 : (force < 0 ? 0 : force)), (force2 > 30 ? 30 : (force2 < 0 ? 0 : force2)), nshoot, ltap);
+        newShoot(index, bullId, (arg > 360 ? 360 : (arg < -360 ? -360 : arg)), (force > 30 ? 30 : (force < 0 ? 0 : force)), (force2 > 30 ? 30 : (force2 < 0 ? 0 : force2)), nshoot);
     }
 
     public void boLuotMessage(User us) throws IOException {
@@ -1669,7 +1581,7 @@ public class FightManager {
         }
         // Tu sat
         if (idItem == 24) {
-            newShoot(index, (byte) 50, (short) 0, (byte) 0, (byte) 0, (byte) 1, this.ltap);
+            newShoot(index, (byte) 50, (short) 0, (byte) 0, (byte) 0, (byte) 1);
         }
         //item UFO new UFOFire(this, (byte) 16, "UFO", (byte) allCount, 980 + (pl.us.getLevel() * 20), (short) 100, (short) 0, pl, (byte) 3));
         if (idItem == 27) { //new Ghost(this, (byte) 25, "Ghost", (byte) allCount, 1800 + (this.getLevelTeam() * 10), X, Y);

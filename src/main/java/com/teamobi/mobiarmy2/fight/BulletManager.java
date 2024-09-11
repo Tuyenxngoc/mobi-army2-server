@@ -129,7 +129,7 @@ public class BulletManager {
         this.YPL = pl.Y;
         this.arg = angle;
         this.force2 = force2;
-        if (bull == 49 && !fm.ltap) {
+        if (bull == 49) {
             force += 5;
         }
         this.typeSC = 0;

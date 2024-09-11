@@ -113,14 +113,14 @@ public class Balloon extends Boss {
                     this.fightMNG.flyChangeLocation(super.index);
                 }
                 if (!this.fightMNG.players[this.part[1]].isDie) {
-                    this.fightMNG.newShoot(this.index, (byte) 44, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 10, (byte) 0, (byte) 1, false);
+                    this.fightMNG.newShoot(this.index, (byte) 44, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 10, (byte) 0, (byte) 1);
                     return;
                 }
             } else if (this.turns == 2 && !this.fightMNG.players[this.part[2]].isDie) {
-                this.fightMNG.newShoot(this.index, (byte) 43, (short) 270, (byte) 20, (byte) 0, (byte) 1, false);
+                this.fightMNG.newShoot(this.index, (byte) 43, (short) 270, (byte) 20, (byte) 0, (byte) 1);
                 return;
             } else if (this.turns == 4 && !this.fightMNG.players[this.part[4]].isDie) {
-                this.fightMNG.newShoot(this.index, (byte) 45, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 20, (byte) 0, (byte) 1, false);
+                this.fightMNG.newShoot(this.index, (byte) 45, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 20, (byte) 0, (byte) 1);
                 return;
             }
             if (!fightMNG.checkWin()) {

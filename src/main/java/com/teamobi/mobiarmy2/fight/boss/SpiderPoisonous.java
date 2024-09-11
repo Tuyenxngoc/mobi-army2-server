@@ -43,7 +43,7 @@ public class SpiderPoisonous extends Boss {
                 this.fightMNG.capture(super.index, pl.index);
                 fightMNG.isNextTurn = false;
                 this.target = pl;
-                this.fightMNG.newShoot(this.index, (byte) 8, (short) 270, (byte) 10, (byte) 0, (byte) 1, false);
+                this.fightMNG.newShoot(this.index, (byte) 8, (short) 270, (byte) 10, (byte) 0, (byte) 1);
                 fightMNG.isNextTurn = true;
                 this.X = xpre;
                 this.fightMNG.flyChangeLocation(super.index);
@@ -68,7 +68,7 @@ public class SpiderPoisonous extends Boss {
                 } else {
                     this.X = (short) Utils.nextInt(50, fightMNG.mapMNG.Width - 50);
                     this.fightMNG.flyChangeLocation(super.index);
-                    this.fightMNG.newShoot(this.index, (byte) 47, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 10, (byte) 0, (byte) 1, false);
+                    this.fightMNG.newShoot(this.index, (byte) 47, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 10, (byte) 0, (byte) 1);
                 }
             }
 

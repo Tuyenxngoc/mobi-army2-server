@@ -46,11 +46,10 @@ public class FightWait {
     public boolean isLH;
     public byte continuousLevel;
     public byte[] LHMap = new byte[]{30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
-    public boolean isSieuBoss;
     private long endTime;
     private long lastPlayerJoinTime;
 
-    public FightWait(Room room, byte type, byte id, byte maxPlayers, byte maxPlayerInit, byte mapId, byte teaFree, boolean isLH, boolean isSieuBoss) {
+    public FightWait(Room room, byte type, byte id, byte maxPlayers, byte maxPlayerInit, byte mapId, byte teaFree, boolean isLH) {
         this.room = room;
         this.id = id;
         this.maxPlayer = maxPlayers;
@@ -67,8 +66,7 @@ public class FightWait {
         this.name = "";
         this.password = "";
         this.isLH = isLH;
-        this.continuousLevel = (byte) (isLH ? 0 : -1);
-        this.isSieuBoss = isSieuBoss;
+        this.continuousLevel = 0;
         this.mapId = isLH ? LHMap[continuousLevel] : mapId;
         this.fightManager = new FightManager(this);
         this.started = false;
@@ -594,7 +592,6 @@ public class FightWait {
             maxSetPlayers = maxPlayers;
         }
     }
-
 
     public void doiPheMessage(User us, Message ms) throws IOException {
 

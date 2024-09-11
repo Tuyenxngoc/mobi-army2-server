@@ -45,7 +45,7 @@ public class UFO extends Boss {
                 }
             } else {
                 this.turnShoot = false;
-                this.fightMNG.newShoot(this.index, (byte) 42, (short) 270, (byte) 20, (byte) 0, (byte) 1, false);
+                this.fightMNG.newShoot(this.index, (byte) 42, (short) 270, (byte) 20, (byte) 0, (byte) 1);
             }
         } catch (Exception e) {
             e.printStackTrace();

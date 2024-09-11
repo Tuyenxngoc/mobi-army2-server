@@ -24,13 +24,13 @@ public class Trex extends Boss {
                 return;
             }
             if (Math.abs(X - pl.X) <= 90 && Math.abs(Y - pl.Y) <= 250) {
-                this.fightMNG.newShoot(this.index, (byte) 35, (short) 0, (byte) 0, (byte) 0, (byte) 1, false);
+                this.fightMNG.newShoot(this.index, (byte) 35, (short) 0, (byte) 0, (byte) 0, (byte) 1);
             } else {
                 int randi = Utils.nextInt(3);
                 short[] FA = null;
                 switch (randi) {
                     case 0:
-                        this.fightMNG.newShoot(this.index, (byte) 37, (short) 110, (byte) 30, (byte) 0, (byte) 1, false);
+                        this.fightMNG.newShoot(this.index, (byte) 37, (short) 110, (byte) 30, (byte) 0, (byte) 1);
                         break;
                     case 1:
                         FA = fightMNG.getForceArgXY(idNV, fightMNG.bullMNG, false, X, Y, pl.X, pl.Y, (short) 70, (short) (70), 110, 5, 10, 80);
@@ -40,7 +40,7 @@ public class Trex extends Boss {
                             }
                             return;
                         }
-                        this.fightMNG.newShoot(this.index, (byte) 40, FA[0], (byte) FA[1], (byte) 0, (byte) 1, false);
+                        this.fightMNG.newShoot(this.index, (byte) 40, FA[0], (byte) FA[1], (byte) 0, (byte) 1);
                         break;
                     case 2:
                         FA = fightMNG.getForceArgXY(idNV, fightMNG.bullMNG, false, X, Y, pl.X, pl.Y, (short) (70), (short) (70), 110, 5, 10, 80);
@@ -50,7 +50,7 @@ public class Trex extends Boss {
                             }
                             return;
                         }
-                        this.fightMNG.newShoot(this.index, (byte) 41, FA[0], (byte) FA[1], (byte) 0, (byte) 1, false);
+                        this.fightMNG.newShoot(this.index, (byte) 41, FA[0], (byte) FA[1], (byte) 0, (byte) 1);
                         break;
                 }
             }
