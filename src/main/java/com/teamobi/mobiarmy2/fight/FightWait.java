@@ -21,7 +21,6 @@ import java.util.Objects;
 @Getter
 @Setter
 public class FightWait {
-
     public User[] users;
     public FightManager fightManager;
     public Room room;
@@ -230,29 +229,6 @@ public class FightWait {
         leave(this.users[index]);
     }
 
-    public void kickMessage(User us, Message ms) throws IOException {
-        if (this.users[this.bossIndex].getPlayerId() != us.getPlayerId() || this.started) {
-            return;
-        }
-        int iddb = ms.reader().readInt();
-        int index = getUserIndexByPlayerId(iddb);
-        if (index == -1) {
-            return;
-        }
-        if (this.users[index].isOpeningGift()) {
-            ms = new Message(45);
-            DataOutputStream ds = ms.writer();
-            ds.writeUTF(GameString.openingGift(this.users[index].getUsername()));
-            ds.flush();
-            us.sendMessage(ms);
-            return;
-        }
-        if (this.readies[index]) {
-            return;
-        }
-        kick(index);
-    }
-
     public void leave(User us) throws IOException {
         if (this.started) {
             this.fightManager.leave(us.getPlayerId());
@@ -269,33 +245,29 @@ public class FightWait {
         this.sendToTeam(ms);
     }
 
-    public void leaveBoard(User us) throws IOException {
-        synchronized (this.users) {
-            byte max = ServerManager.maxPlayers, i;
-            for (i = 0; i < max; i++) {
-                if (this.users[i] != null && this.users[i].getPlayerId() == us.getPlayerId()) {
-//                    ServerManager.enterWait(this.players[i]);
-                    this.users[i] = null;
-                    if (this.bossIndex == i) {
-                        for (i = 0; i < max; i++) {
-                            if (this.users[i] != null) {
-                                this.changeBoss(i);
-                                break;
-                            }
+    public void leaveBoard(User us) {
+        byte max = ServerManager.maxPlayers, i;
+        for (i = 0; i < max; i++) {
+            if (this.users[i] != null && this.users[i].getPlayerId() == us.getPlayerId()) {
+                this.users[i] = null;
+                if (this.bossIndex == i) {
+                    for (i = 0; i < max; i++) {
+                        if (this.users[i] != null) {
+                            this.changeBoss(i);
+                            break;
                         }
                     }
-                    this.numPlayers--;
-                    if (this.numPlayers == 0) {
-                        refreshFightWait();
-                    }
-                    break;
                 }
+                this.numPlayers--;
+                if (this.numPlayers == 0) {
+                    refreshFightWait();
+                }
+                break;
             }
         }
     }
 
     public void fightComplete() throws IOException {
-        // Chien xong, refresh fight wait
         Message ms;
         DataOutputStream ds;
         for (byte i = 0; i < this.users.length; i++) {
@@ -324,17 +296,14 @@ public class FightWait {
         ds.flush();
         this.sendToTeam(ms);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    while (timeStart > 0L) {
-                        Thread.sleep(1000L);
-                        timeStart -= 1000L;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+        new Thread(() -> {
+            try {
+                while (timeStart > 0L) {
+                    Thread.sleep(1000L);
+                    timeStart -= 1000L;
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }).start();
     }
@@ -591,10 +560,6 @@ public class FightWait {
         if (maxPlayers > 0 && maxPlayers < 9 && maxPlayers % 2 == 0 && numPlayers < maxPlayers) {
             maxSetPlayers = maxPlayers;
         }
-    }
-
-    public void doiPheMessage(User us, Message ms) throws IOException {
-
     }
 
     public synchronized void setMap(int playerId, byte mapIdSet) {
