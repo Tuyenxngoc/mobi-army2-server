@@ -25,7 +25,7 @@ import java.util.Objects;
 @Setter
 public class FightWait implements IFightWait {
     public static final byte MAX_ITEMS_SLOT = 8;
-    public static final int KICK_BOSS_TIME = 15;
+    public static final int KICK_BOSS_TIME = 80;
     public static final byte[] continuousMaps = {30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
 
     private FightManager fightManager;
@@ -42,7 +42,6 @@ public class FightWait implements IFightWait {
     private String password;
     private int money;
     private String name;
-    private byte type;
     private byte mapId;
     private int bossIndex;
     private byte continuousLevel;
@@ -325,6 +324,11 @@ public class FightWait implements IFightWait {
         System.out.println("fightComplete");
     }
 
+    @Override
+    public byte getType() {
+        return room.getType();
+    }
+
     public void sendToTeam(IMessage ms) {
         for (User user : users) {
             if (user != null) {
@@ -558,6 +562,7 @@ public class FightWait implements IFightWait {
         started = true;
 
         resetReadies();
+        countdownTimer.stop();
     }
 
     @Override

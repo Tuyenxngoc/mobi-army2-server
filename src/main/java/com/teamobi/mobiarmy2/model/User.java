@@ -182,7 +182,7 @@ public class User {
             return;
         }
 
-        if (isXpMultiplier) {
+        if (isXpMultiplier && xpX2Time != null) {
             if (xpX2Time.isAfter(LocalDateTime.now())) {
                 xpUp *= 2;
             }
