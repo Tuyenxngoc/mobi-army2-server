@@ -24,7 +24,7 @@ public class SmallBoom extends Boss {
     @Override
     public void turnAction() {
         try {
-            Player pl = this.fightMNG.getPlayerClosest(this.X, this.Y);
+            Player pl = this.fightManager.getPlayerClosest(this.X, this.Y);
             if (pl != null) {
                 while (X != pl.X || Y != pl.Y) {
                     int preX = this.X;
@@ -33,7 +33,7 @@ public class SmallBoom extends Boss {
                         super.move(false);
                     } else if (pl.X > this.X) {
                         super.move(true);
-                    } else if (!fightMNG.mapMNG.isCollision(this.X, this.Y)) {
+                    } else if (!fightManager.mapMNG.isCollision(this.X, this.Y)) {
                         this.Y++;
                     }
                     // if ko di chuyen dc
@@ -41,23 +41,23 @@ public class SmallBoom extends Boss {
                         break;
                     }
                 }
-                this.fightMNG.changeLocation(super.index);
+                this.fightManager.changeLocation(super.index);
                 if (Math.abs(Y - pl.Y) <= 25 && Math.abs(X - pl.X) <= 25) {
-                    this.fightMNG.newShoot(this.index, (byte) 32, (short) 0, (byte) 0, (byte) 0, (byte) 1);
+                    this.fightManager.newShoot(this.index, (byte) 32, (short) 0, (byte) 0, (byte) 0, (byte) 1);
                 } else if (Math.abs(X - pl.X) < 25 && (Y - (pl.Y)) > 25) {
                     this.itemUsed = 1;
-                    this.fightMNG.newShoot(this.index, (byte) 5, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 30, (byte) 0, (byte) 1);
+                    this.fightManager.newShoot(this.index, (byte) 5, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 30, (byte) 0, (byte) 1);
                 } else if (((pl.Y) - Y > 25 && Math.abs(X - pl.X) < 25)) {
                     this.itemUsed = 1;
                     short VRd = (short) Utils.nextInt(60, 120);
                     byte Suc = (byte) Utils.nextInt(5, 10);
-                    this.fightMNG.newShoot(this.index, (byte) 5, (short) VRd, (byte) Suc, (byte) 0, (byte) 1);
+                    this.fightManager.newShoot(this.index, (byte) 5, (short) VRd, (byte) Suc, (byte) 0, (byte) 1);
                 } else if (super.buocDi < super.theLuc) {
                     this.itemUsed = 1;
                     short Vxy = (short) (pl.X > Y ? 80 : 180 - 80);
-                    this.fightMNG.newShoot(this.index, (byte) 5, (short) Vxy, (byte) 8, (byte) 0, (byte) 1);
-                } else if (!fightMNG.checkWin()) {
-                    this.fightMNG.nextTurn();
+                    this.fightManager.newShoot(this.index, (byte) 5, (short) Vxy, (byte) 8, (byte) 0, (byte) 1);
+                } else if (!fightManager.checkWin()) {
+                    this.fightManager.nextTurn();
                 }
             }
         } catch (Exception e) {

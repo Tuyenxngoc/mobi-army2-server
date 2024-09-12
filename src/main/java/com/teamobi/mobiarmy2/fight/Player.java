@@ -8,11 +8,15 @@ import com.teamobi.mobiarmy2.repository.ClanItemRepository;
 import com.teamobi.mobiarmy2.repository.FightItemRepository;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.util.Utils;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+@Getter
+@Setter
 public class Player {
 
     protected static class box {
@@ -59,8 +63,8 @@ public class Player {
         }
     }
 
-    protected FightManager fightMNG;
-    protected User us;
+    protected FightManager fightManager;
+    protected User user;
     protected boolean team;
     protected short idBullet;
     public short X;
@@ -68,7 +72,7 @@ public class Player {
     public short width;
     public short height;
     protected byte itemInit[];
-    protected int item[];
+    protected byte item[];
     protected byte itemUsed;
     protected boolean isUseItem;
     protected boolean isUsePow;
@@ -120,10 +124,10 @@ public class Player {
         this.HPMax = HpMax;
     }
 
-    public Player(FightManager fightMNG, byte location, short X, short Y, byte item[], int teamPoint, User us) {
-        this.fightMNG = fightMNG;
+    public Player(FightManager fightManager, byte location, short X, short Y, byte item[], int teamPoint, User user) {
+        this.fightManager = fightManager;
         this.index = location;
-        this.team = fightMNG.type == 5 || location % 2 == 0;
+        this.team = fightManager.type == 5 || location % 2 == 0;
         this.idBullet = -1;
         this.gunId = -1;
         this.X = X;
@@ -137,10 +141,10 @@ public class Player {
         this.GiftBox = new ArrayList<>();
         this.GiftBoxFalling = new ArrayList<>();
         if (item != null) {
-            this.item = new int[item.length];
+            this.item = new byte[item.length];
             System.arraycopy(item, 0, this.item, 0, item.length);
         }
-        this.us = us;
+        this.user = user;
         this.itemUsed = -1;
         this.isUseItem = false;
         this.isUsePow = false;
@@ -169,18 +173,18 @@ public class Player {
         this.phongThu = 0;
         this.mayMan = 0;
         this.HP = 0;
-        if (us == null) {
+        if (user == null) {
             return;
         }
-        if (this.us.getClanIdAsShort() > 0) {
+        if (this.user.getClanIdAsShort() > 0) {
             for (byte i = 1; i <= ClanItemRepository.CLAN_ITEM_ENTRY_MAP.size(); i++) {
                 this.itemclan[i] = false;
             }
         }
-        this.idBullet = us.getBulletId();
-        this.gunId = us.getGunId();
-        this.idNV = us.getActiveCharacterId();
-        short[] ability = us.calculateCharacterAbilities((short) 0);
+        this.idBullet = user.getBulletId();
+        this.gunId = user.getGunId();
+        this.idNV = user.getActiveCharacterId();
+        short[] ability = user.calculateCharacterAbilities((short) 0);
         this.HPMax = ability[0] + (teamPoint * 5);
         this.satThuong = ability[1] + (teamPoint);
         this.phongThu = ability[2] + (teamPoint * 5);
@@ -218,7 +222,7 @@ public class Player {
     }
 
     public final void setXY(short X, short Y) {
-        if (X >= 0 && X < this.fightMNG.mapMNG.Width && Y < this.fightMNG.mapMNG.Height) {
+        if (X >= 0 && X < this.fightManager.mapMNG.Width && Y < this.fightManager.mapMNG.Height) {
             this.X = X;
             this.Y = Y;
         }
@@ -241,8 +245,8 @@ public class Player {
     }
 
     public void chuanHoaXY() {
-        while (this.Y < this.fightMNG.mapMNG.Height + 200) {
-            if (this.fightMNG.mapMNG.isCollision(X, Y) || this.fly) {
+        while (this.Y < this.fightManager.mapMNG.Height + 200) {
+            if (this.fightManager.mapMNG.isCollision(X, Y) || this.fly) {
                 return;
             }
             Y++;
@@ -252,9 +256,9 @@ public class Player {
     public boolean isDropMap() {
         short X = this.X, Y = this.Y;
         boolean isFly = this.fly;
-        short mapHeight = this.fightMNG.mapMNG.Height;
+        short mapHeight = this.fightManager.mapMNG.Height;
         while (Y < mapHeight + 200) {
-            if (this.fightMNG.mapMNG.isCollision(X, Y) || isFly) {
+            if (this.fightManager.mapMNG.isCollision(X, Y) || isFly) {
                 return false;
             }
             Y++;
@@ -279,7 +283,7 @@ public class Player {
         } else {
             X -= step;
         }
-        if (fightMNG.mapMNG.isCollision(X, (short) (Y - 5))) {
+        if (fightManager.mapMNG.isCollision(X, (short) (Y - 5))) {
             buocDi--;
             if (addX) {
                 X -= step;
@@ -289,7 +293,7 @@ public class Player {
             return;
         }
         for (int i = 4; i >= 0; i--) {
-            if (this.fightMNG.mapMNG.isCollision(X, (short) (Y - i))) {
+            if (this.fightManager.mapMNG.isCollision(X, (short) (Y - i))) {
                 Y -= i;
                 return;
             }
@@ -329,11 +333,11 @@ public class Player {
     }
 
     public final void updateEXP(int addXP) throws IOException {
-        if (us == null || addXP == 0) {
+        if (user == null || addXP == 0) {
             return;
         }
         this.isUpdateXP = true;
-        if (this.us.getClanIdAsShort() > 0) {
+        if (this.user.getClanIdAsShort() > 0) {
 //            ClanManager.updateXp(this.us, addXP / 100);
         }
         if (this.itemclan[1]) {
@@ -348,9 +352,9 @@ public class Player {
             return;
         }
         int i = this.team ? 0 : 1;
-        int lent = this.fightMNG.type == 5 ? 1 : 2;
+        int lent = this.fightManager.type == 5 ? 1 : 2;
         for (; i < ServerManager.maxPlayers; i += lent) {
-            Player pl = this.fightMNG.players[i];
+            Player pl = this.fightManager.players[i];
             if (pl == null || pl == this) {
                 continue;
             }
@@ -361,7 +365,7 @@ public class Player {
     }
 
     public final void updateCUP(int addCup) throws IOException {
-        if (us == null || addCup == 0) {
+        if (user == null || addCup == 0) {
             return;
         }
         this.isUpdateCup = true;
@@ -372,9 +376,9 @@ public class Player {
             return;
         }
         int i = this.team ? 0 : 1;
-        int lent = this.fightMNG.type == 5 ? 1 : 2;
+        int lent = this.fightManager.type == 5 ? 1 : 2;
         for (; i < ServerManager.maxPlayers; i += lent) {
-            Player pl = this.fightMNG.players[i];
+            Player pl = this.fightManager.players[i];
             if (pl == null || pl == this) {
                 continue;
             }
@@ -385,25 +389,25 @@ public class Player {
     }
 
     private void die() {
-        if (this.isMM && this.X > 0 && this.Y < this.fightMNG.mapMNG.Height && this.X < this.fightMNG.mapMNG.Width) {
+        if (this.isMM && this.X > 0 && this.Y < this.fightManager.mapMNG.Height && this.X < this.fightManager.mapMNG.Width) {
             this.HP = 10;
         } else {
             this.isDie = true;
-            if (us != null) {
-                us.notifyNetWait();
+            if (user != null) {
+                user.notifyNetWait();
             }
         }
     }
 
     public void netWait() {
-        if (us != null) {
-            us.netWait();
+        if (user != null) {
+            user.netWait();
         }
     }
 
     public void notifyNetWait() {
-        if (us != null) {
-            us.notifyNetWait();
+        if (user != null) {
+            user.notifyNetWait();
         }
     }
 
@@ -457,19 +461,19 @@ public class Player {
             if (bull.typeSC > 0) {
                 switch (bull.typeSC) {
                     case 1:
-                        fightMNG.bullMNG.typeSC = 1;
+                        fightManager.bullMNG.typeSC = 1;
                         dame = dame * 11 / 10; // x1.1
-                        fightMNG.bullMNG.XSC = bull.XmaxY;
-                        fightMNG.bullMNG.YSC = bull.maxY;
+                        fightManager.bullMNG.XSC = bull.XmaxY;
+                        fightManager.bullMNG.YSC = bull.maxY;
                         break;
                     case 2:
-                        fightMNG.bullMNG.typeSC = 1;
+                        fightManager.bullMNG.typeSC = 1;
                         dame = dame * 6 / 5; // x1.2
-                        fightMNG.bullMNG.XSC = bull.XmaxY;
-                        fightMNG.bullMNG.YSC = bull.maxY;
+                        fightManager.bullMNG.XSC = bull.XmaxY;
+                        fightManager.bullMNG.YSC = bull.maxY;
                         break;
                     case 4:
-                        fightMNG.bullMNG.typeSC = 2;
+                        fightManager.bullMNG.typeSC = 2;
                         dame = dame * 13 / 10; // x1.3
                         break;
                     default:
@@ -497,7 +501,7 @@ public class Player {
             if (bull.pl instanceof Boss) {
                 return;
             }
-            bull.pl.us.updateMission(1, oldHP - this.HP);
+            bull.pl.user.updateMission(1, oldHP - this.HP);
             if (bull.pl.hutMauCount > 0 && this.HP > dame) {
                 bull.pl.updateHP((int) (dame / 2));
             }
@@ -508,13 +512,13 @@ public class Player {
             if (this.isDie) {
                 // Tarzan
                 if (this.idNV == 7) {
-                    bull.pl.us.updateMission(6, 1);
+                    bull.pl.user.updateMission(6, 1);
                 }
                 if (this.idNV == 6) {
-                    bull.pl.us.updateMission(7, 1);
+                    bull.pl.user.updateMission(7, 1);
                 }
                 if (this.idNV == 9) {
-                    bull.pl.us.updateMission(8, 1);
+                    bull.pl.user.updateMission(8, 1);
                 }
                 try {
                     if (this.idNV == 23) {
@@ -567,21 +571,21 @@ public class Player {
                         }
                     } else if (this.idNV == 26) {
                         for (int i = 0; i < 2; i++) {
-                            Player players = new Ghost2(fightMNG, (byte) 26, "Ghost II", (byte) (fightMNG.allCount + fightMNG.bullMNG.addboss.size()), 1800 + (fightMNG.getLevelTeam() * 10), (short) (Utils.nextInt(100, fightMNG.mapMNG.Width - 100)), (short) Utils.nextInt(150));
-                            fightMNG.bullMNG.addboss.add(new AddBoss(players, fightMNG.getisLH() ? 50 : 6));
+                            Player players = new Ghost2(fightManager, (byte) 26, "Ghost II", (byte) (fightManager.allCount + fightManager.bullMNG.addboss.size()), 1800 + (fightManager.getLevelTeam() * 10), (short) (Utils.nextInt(100, fightManager.mapMNG.Width - 100)), (short) Utils.nextInt(150));
+                            fightManager.bullMNG.addboss.add(new AddBoss(players, fightManager.getisLH() ? 50 : 6));
                         }
                     }
                     // Ban dong doi -5xp -5cup
-                    if (this.fightMNG.type != 5 && this.team == bull.pl.team && this.idNV != 23 && this.idNV != 24 && this.index != bull.pl.index) {
+                    if (this.fightManager.type != 5 && this.team == bull.pl.team && this.idNV != 23 && this.idNV != 24 && this.index != bull.pl.index) {
                         bull.pl.updateCUP(-5);
                         //bull.pl.updateEXP(-5);
                         return;
                     }
-                    if (index == bull.pl.index || this.fightMNG.type == 5 && !(this instanceof Boss)) {
+                    if (index == bull.pl.index || this.fightManager.type == 5 && !(this instanceof Boss)) {
                         return;
                     }
                     if (this instanceof Boss) {
-                        if (fightMNG.mapMNG.Id != 35 && this.idNV != 23 && this.idNV != 24) {
+                        if (fightManager.mapMNG.Id != 35 && this.idNV != 23 && this.idNV != 24) {
                             switch (Utils.nextInt(3)) {
                                 case 0:
                                     int kichno = Utils.nextInt(10, 20);
@@ -590,7 +594,7 @@ public class Player {
                                     break;
                                 case 1:
                                     int xuroi = Utils.nextInt(1, 100);
-                                    bull.pl.us.updateXu(xuroi);
+                                    bull.pl.user.updateXu(xuroi);
                                     bull.pl.flyNotice(xuroi + " Xu chiến đấu");
                                     break;
                                 case 2:
@@ -604,9 +608,9 @@ public class Player {
                         int thaoancut = this.XPExist * 4;
                         bull.pl.updateEXP(thaoancut);
                     } else {
-                        int cupCL = bull.pl.us.getCup() - this.us.getCup();
+                        int cupCL = bull.pl.user.getCup() - this.user.getCup();
                         int cupAdd = ((3000 - cupCL) / 100);
-                        int levelPL = this.us.getCurrentLevel();
+                        int levelPL = this.user.getCurrentLevel();
                         if (levelPL > 255) {
                             levelPL = 255;
                         }
@@ -644,7 +648,7 @@ public class Player {
             ds.writeByte(4);
             ds.writeUTF(text);
             ds.flush();
-            fightMNG.sendToTeam(ms);
+            fightManager.sendToTeam(ms);
         } catch (Exception e) {
             e.printStackTrace();
         }

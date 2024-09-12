@@ -1,20 +1,18 @@
 package com.teamobi.mobiarmy2.fight;
 
-import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class CountdownTimer {
-
-    private final FightManager fightManager;
     private Timer timer;
     private int remainingTime;
     private final int countdownTime;
+    private final Runnable onTimeUpCallback;
 
-    public CountdownTimer(FightManager fightManager, int countdownTime) {
-        this.fightManager = fightManager;
+    public CountdownTimer(int countdownTime, Runnable onTimeUpCallback) {
         this.countdownTime = countdownTime;
         this.remainingTime = countdownTime;
+        this.onTimeUpCallback = onTimeUpCallback;
     }
 
     public void start() {
@@ -49,11 +47,9 @@ public class CountdownTimer {
     }
 
     private void timeUp() {
-        try {
-            System.out.println("Hết thời gian!");
-            fightManager.onTimeUp();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        System.out.println("Hết thời gian!");
+        if (onTimeUpCallback != null) {
+            onTimeUpCallback.run();
         }
     }
 }

@@ -25,7 +25,7 @@ public class Balloon extends Boss {
     @Override
     public void turnAction() {
         try {
-            Player pl = this.fightMNG.getPlayerClosest(super.X, super.Y);
+            Player pl = this.fightManager.getPlayerClosest(super.X, super.Y);
             if (pl == null) {
                 return;
             }
@@ -38,10 +38,10 @@ public class Balloon extends Boss {
                 }
                 Player boss = null;
                 if (this.part[turn] != -1) {
-                    boss = this.fightMNG.players[this.part[turn]];
+                    boss = this.fightManager.players[this.part[turn]];
                 }
                 if (boss != null && !boss.isDie && turn != 1 && turn != 3) {
-                    if (turn != 2 || !fightMNG.players[part[3]].isDie) {
+                    if (turn != 2 || !fightManager.players[part[3]].isDie) {
                         this.turns = turn;
                         break;
                     }
@@ -52,38 +52,38 @@ public class Balloon extends Boss {
                 if (this.part[i] == -1) {
                     continue;
                 }
-                Player boss = this.fightMNG.players[this.part[i]];
+                Player boss = this.fightManager.players[this.part[i]];
                 if (boss != null && !boss.isDie && (i == 1 || i == 2 || i == 4)) {
                     fd = false;
                 }
             }
-            if (((this.fightMNG.players[this.part[1]].isDie && this.fightMNG.players[this.part[2]].isDie) || this.fightMNG.players[this.part[3]].isDie) && this.part[4] == -1) {
-                this.part[4] = (byte) this.fightMNG.allCount;
-                this.fightMNG.addBoss(new Balloon_Eye(this.fightMNG, (byte) 21, "Balloon Eye", (byte) this.fightMNG.allCount, 1500 + (this.fightMNG.getLevelTeam() * 10), (short) (super.X + 55), (short) (super.Y - 27)));
+            if (((this.fightManager.players[this.part[1]].isDie && this.fightManager.players[this.part[2]].isDie) || this.fightManager.players[this.part[3]].isDie) && this.part[4] == -1) {
+                this.part[4] = (byte) this.fightManager.allCount;
+                this.fightManager.addBoss(new Balloon_Eye(this.fightManager, (byte) 21, "Balloon Eye", (byte) this.fightManager.allCount, 1500 + (this.fightManager.getLevelTeam() * 10), (short) (super.X + 55), (short) (super.Y - 27)));
             } else if (fd) {
 
-                this.fightMNG.players[part[0]].isDie = true;
-                this.fightMNG.players[part[0]].HP = 0;
-                this.fightMNG.players[part[0]].isUpdateHP = true;
+                this.fightManager.players[part[0]].isDie = true;
+                this.fightManager.players[part[0]].HP = 0;
+                this.fightManager.players[part[0]].isUpdateHP = true;
 
-                this.fightMNG.players[part[3]].isDie = true;
-                this.fightMNG.players[part[3]].HP = 0;
-                this.fightMNG.players[part[3]].isUpdateHP = true;
+                this.fightManager.players[part[3]].isDie = true;
+                this.fightManager.players[part[3]].HP = 0;
+                this.fightManager.players[part[3]].isUpdateHP = true;
 
-                if (!this.fightMNG.checkWin()) {
-                    fightMNG.nextTurn();
+                if (!this.fightManager.checkWin()) {
+                    fightManager.nextTurn();
                     return;
                 }
             }
             if (this.turns == 0) {
                 if (!fd) {
-                    short toX = (short) Utils.nextInt(100, this.fightMNG.mapMNG.Width - 100);
+                    short toX = (short) Utils.nextInt(100, this.fightManager.mapMNG.Width - 100);
                     short toY = (short) Utils.nextInt(-150, 50);
                     for (int i = 0; i < 5; i++) {
                         if (this.part[i] == -1) {
                             continue;
                         }
-                        Player boss = (Boss) this.fightMNG.players[this.part[i]];
+                        Player boss = (Boss) this.fightManager.players[this.part[i]];
                         if (boss == null || boss.isDie) {
                             continue;
                         }
@@ -110,21 +110,21 @@ public class Balloon extends Boss {
                                 break;
                         }
                     }
-                    this.fightMNG.flyChangeLocation(super.index);
+                    this.fightManager.flyChangeLocation(super.index);
                 }
-                if (!this.fightMNG.players[this.part[1]].isDie) {
-                    this.fightMNG.newShoot(this.index, (byte) 44, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 10, (byte) 0, (byte) 1);
+                if (!this.fightManager.players[this.part[1]].isDie) {
+                    this.fightManager.newShoot(this.index, (byte) 44, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 10, (byte) 0, (byte) 1);
                     return;
                 }
-            } else if (this.turns == 2 && !this.fightMNG.players[this.part[2]].isDie) {
-                this.fightMNG.newShoot(this.index, (byte) 43, (short) 270, (byte) 20, (byte) 0, (byte) 1);
+            } else if (this.turns == 2 && !this.fightManager.players[this.part[2]].isDie) {
+                this.fightManager.newShoot(this.index, (byte) 43, (short) 270, (byte) 20, (byte) 0, (byte) 1);
                 return;
-            } else if (this.turns == 4 && !this.fightMNG.players[this.part[4]].isDie) {
-                this.fightMNG.newShoot(this.index, (byte) 45, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 20, (byte) 0, (byte) 1);
+            } else if (this.turns == 4 && !this.fightManager.players[this.part[4]].isDie) {
+                this.fightManager.newShoot(this.index, (byte) 45, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 20, (byte) 0, (byte) 1);
                 return;
             }
-            if (!fightMNG.checkWin()) {
-                this.fightMNG.nextTurn();
+            if (!fightManager.checkWin()) {
+                this.fightManager.nextTurn();
             }
         } catch (IOException e) {
             e.printStackTrace();

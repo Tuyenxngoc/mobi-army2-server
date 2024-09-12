@@ -24,7 +24,7 @@ public class Ghost2 extends Boss {
     @Override
     public void turnAction() {
         try {
-            Player pl = this.fightMNG.getPlayerClosest(this.X, this.Y);
+            Player pl = this.fightManager.getPlayerClosest(this.X, this.Y);
             if (pl == null) {
                 return;
             }
@@ -35,16 +35,16 @@ public class Ghost2 extends Boss {
                 this.X = (short) (pl.X - 30);
             }
             this.Y = (short) (pl.Y - 15);
-            this.fightMNG.flyChangeLocation(super.index);
-            this.fightMNG.GhostBullet(this.index, pl.index);
-            short wmap = this.fightMNG.mapMNG.Width;
-            short hmap = this.fightMNG.mapMNG.Height;
+            this.fightManager.flyChangeLocation(super.index);
+            this.fightManager.GhostBullet(this.index, pl.index);
+            short wmap = this.fightManager.mapMNG.Width;
+            short hmap = this.fightManager.mapMNG.Height;
             this.X = (short) ((this.X > pl.X && pl.X < wmap - 80) ? (pl.X + 80) : ((pl.X > 80) ? (pl.X - 80) : (pl.X + 80)));
             this.Y = (short) Utils.nextInt(0, hmap - 200);
-            this.fightMNG.flyChangeLocation(super.index);
+            this.fightManager.flyChangeLocation(super.index);
             pl.updateHP(-Utils.nextInt(200, 500));
-            if (!fightMNG.checkWin()) {
-                fightMNG.nextTurn();
+            if (!fightManager.checkWin()) {
+                fightManager.nextTurn();
             }
         } catch (Exception e) {
             e.printStackTrace();

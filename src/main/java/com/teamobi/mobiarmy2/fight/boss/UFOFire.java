@@ -33,14 +33,14 @@ public class UFOFire extends Boss {
                 this.HP = 0;
                 this.isUpdateHP = true;
                 this.isDie = true;
-                if (fightMNG.checkWin()) {
-                    fightMNG.nextTurn();
+                if (fightManager.checkWin()) {
+                    fightManager.nextTurn();
                 }
                 return;
             }
             short ys = this.Y, xs = this.X;
-            while (this.acll && ys < this.fightMNG.mapMNG.Height + 200 && !this.fightMNG.mapMNG.isCollision(xs, ys)) {
-                if (ys > this.fightMNG.mapMNG.Height) {
+            while (this.acll && ys < this.fightManager.mapMNG.Height + 200 && !this.fightManager.mapMNG.isCollision(xs, ys)) {
+                if (ys > this.fightManager.mapMNG.Height) {
                     this.acll = false;
                 }
                 ys++;
@@ -51,7 +51,7 @@ public class UFOFire extends Boss {
                 int i = this.team ? 1 : 0;
                 int lent = 2;
                 for (; i < ServerManager.maxPlayers; i += lent) {
-                    Player pl3 = this.fightMNG.players[i];
+                    Player pl3 = this.fightManager.players[i];
                     if (pl3 == null || pl3.isDie) {
                         continue;
                     }
@@ -60,16 +60,16 @@ public class UFOFire extends Boss {
                 if (pl2 != null) {
                     this.Y = (short) (pl2.Y - Utils.nextInt(150, 500));
                     this.X = pl2.X;
-                    this.fightMNG.flyChangeLocation(super.index);
+                    this.fightManager.flyChangeLocation(super.index);
                 }
             } else {
                 this.acll = false;
                 this.turnDie--;
-                this.fightMNG.newShoot(this.index, (byte) 42, (short) 270, (byte) 20, (byte) 0, (byte) 1);
+                this.fightManager.newShoot(this.index, (byte) 42, (short) 270, (byte) 20, (byte) 0, (byte) 1);
                 return;
             }
-            if (!fightMNG.checkWin()) {
-                fightMNG.nextTurn();
+            if (!fightManager.checkWin()) {
+                fightManager.nextTurn();
             }
         } catch (Exception e) {
             e.printStackTrace();

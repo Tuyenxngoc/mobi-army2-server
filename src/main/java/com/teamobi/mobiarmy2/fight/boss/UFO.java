@@ -24,28 +24,28 @@ public class UFO extends Boss {
     public void turnAction() {
         try {
             short ys = this.Y, xs = this.X;
-            while (this.turnShoot && ys < this.fightMNG.mapMNG.Height + 200 && !this.fightMNG.mapMNG.isCollision(xs, ys)) {
-                if (ys > this.fightMNG.mapMNG.Height) {
+            while (this.turnShoot && ys < this.fightManager.mapMNG.Height + 200 && !this.fightManager.mapMNG.isCollision(xs, ys)) {
+                if (ys > this.fightManager.mapMNG.Height) {
                     this.turnShoot = false;
                 }
                 ys++;
             }
             if (!this.turnShoot) {
                 this.turnShoot = true;
-                Player pl = this.fightMNG.getPlayerClosest(this.X, this.Y);
+                Player pl = this.fightManager.getPlayerClosest(this.X, this.Y);
                 if (pl != null) {
                     this.Y = (short) (pl.Y - Utils.nextInt(150, 500));
                     this.X = pl.X;
-                    this.fightMNG.flyChangeLocation(super.index);
-                    if (!fightMNG.checkWin()) {
-                        fightMNG.nextTurn();
+                    this.fightManager.flyChangeLocation(super.index);
+                    if (!fightManager.checkWin()) {
+                        fightManager.nextTurn();
                     }
-                } else if (!fightMNG.checkWin()) {
-                    fightMNG.nextTurn();
+                } else if (!fightManager.checkWin()) {
+                    fightManager.nextTurn();
                 }
             } else {
                 this.turnShoot = false;
-                this.fightMNG.newShoot(this.index, (byte) 42, (short) 270, (byte) 20, (byte) 0, (byte) 1);
+                this.fightManager.newShoot(this.index, (byte) 42, (short) 270, (byte) 20, (byte) 0, (byte) 1);
             }
         } catch (Exception e) {
             e.printStackTrace();

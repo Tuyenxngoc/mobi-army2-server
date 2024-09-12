@@ -151,7 +151,7 @@ public class MapEntry {
                 && Utils.isNotAlpha(this.getARGB(X - this.X, Y - this.Y)));
     }
 
-    public final void collision(short bx, short by, Bullet bull) {
+    public final void collision(int bx, int by, Bullet bull) {
         int index = Bullet.getHoleByBulletId(bull.bullId);
         int w = holeW[index];
         int h = holeH[index];

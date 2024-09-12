@@ -24,7 +24,7 @@ public class BigBoom extends Boss {
     @Override
     public void turnAction() {
         try {
-            Player pl = this.fightMNG.getPlayerClosest(this.X, this.Y);
+            Player pl = this.fightManager.getPlayerClosest(this.X, this.Y);
             if (pl == null) {
                 return;
             }
@@ -45,7 +45,7 @@ public class BigBoom extends Boss {
                 if (Vsuc > 30) {
                     Vsuc = 30;
                 }
-                this.fightMNG.newShoot(this.index, (byte) 34, (short) Vgoc, (byte) Vsuc, (byte) 0, (byte) 1);
+                this.fightManager.newShoot(this.index, (byte) 34, (short) Vgoc, (byte) Vsuc, (byte) 0, (byte) 1);
             } else {
                 while (X != pl.X || Y != pl.Y) {
                     int preX = this.X;
@@ -54,7 +54,7 @@ public class BigBoom extends Boss {
                         super.move(false);
                     } else if (pl.X > this.X) {
                         super.move(true);
-                    } else if (!fightMNG.mapMNG.isCollision(this.X, this.Y)) {
+                    } else if (!fightManager.mapMNG.isCollision(this.X, this.Y)) {
                         this.Y++;
                     }
                     // if ko di chuyen dc
@@ -62,14 +62,14 @@ public class BigBoom extends Boss {
                         break;
                     }
                 }
-                this.fightMNG.changeLocation(super.index);
+                this.fightManager.changeLocation(super.index);
                 if (Math.abs(X - pl.X) <= 35 && Math.abs(Y - pl.Y) <= 35) {
-                    this.fightMNG.newShoot(this.index, (byte) 31, (short) 0, (byte) 0, (byte) 0, (byte) 1);
+                    this.fightManager.newShoot(this.index, (byte) 31, (short) 0, (byte) 0, (byte) 0, (byte) 1);
                 } else if (this.buocDi < this.theLuc) {
                     this.itemUsed = 7;
-                    this.fightMNG.newShoot(this.index, (byte) 7, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 30, (byte) 0, (byte) 1);
-                } else if (!fightMNG.checkWin()) {
-                    this.fightMNG.nextTurn();
+                    this.fightManager.newShoot(this.index, (byte) 7, (short) Utils.getArgXY(X, Y, pl.X, pl.Y), (byte) 30, (byte) 0, (byte) 1);
+                } else if (!fightManager.checkWin()) {
+                    this.fightManager.nextTurn();
                 }
             }
         } catch (Exception e) {

@@ -30,7 +30,7 @@ public class PETFIRE extends Boss {
     public void turnAction() {
         int dame = this.HPMax;
         try {
-            Boss bs = (Boss) this.fightMNG.getBossClosest(this.X, this.Y);
+            Boss bs = (Boss) this.fightManager.getBossClosest(this.X, this.Y);
             if (bs == null) {
                 return;
             }
@@ -41,20 +41,20 @@ public class PETFIRE extends Boss {
                 this.X = (short) (bs.X - 30);
             }
             this.Y = (short) (bs.Y - 15);
-            this.fightMNG.flyChangeLocation(super.index);
-            this.fightMNG.GhostBullet(this.index, bs.index);
-            short wmap = this.fightMNG.mapMNG.Width;
-            short hmap = this.fightMNG.mapMNG.Height;
+            this.fightManager.flyChangeLocation(super.index);
+            this.fightManager.GhostBullet(this.index, bs.index);
+            short wmap = this.fightManager.mapMNG.Width;
+            short hmap = this.fightManager.mapMNG.Height;
             this.X = (short) Utils.nextInt(100, wmap - 100);
             this.Y = (short) Utils.nextInt(0, hmap - 200);
-            this.fightMNG.flyChangeLocation(super.index);
+            this.fightManager.flyChangeLocation(super.index);
             bs.updateHP(-dame);
             //  bs.updateHP(-dame);
             if (bs.isDie) {
                 pl.updateEXP(this.XPExist * 100);
             }
-            if (!fightMNG.checkWin()) {
-                fightMNG.nextTurn();
+            if (!fightManager.checkWin()) {
+                fightManager.nextTurn();
             }
         } catch (Exception e) {
             e.printStackTrace();

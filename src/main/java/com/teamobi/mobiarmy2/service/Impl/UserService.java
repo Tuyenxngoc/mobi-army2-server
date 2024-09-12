@@ -237,11 +237,7 @@ public class UserService implements IUserService {
     @Override
     public void handleLogout() {
         if (user.getState() == UserState.FIGHTING || user.getState() == UserState.WAIT_FIGHT) {
-            try {
-                user.getFightWait().leave(user);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            user.getFightWait().leaveTeam(user.getPlayerId());
         }
 
         user.setLogged(false);

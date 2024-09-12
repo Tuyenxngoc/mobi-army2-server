@@ -197,7 +197,7 @@ public class BulletManager {
                     if (pl.itemUsed != 8) {
                         return;
                     }
-                    pl.us.updateMission(5, 1);
+                    pl.user.updateMission(5, 1);
                     entrys.add(new ItemBomB52(this, (byte) 4, 600, pl, x, y, vx, vy, 0, 80));
                     break;
 

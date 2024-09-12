@@ -18,73 +18,90 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * @author tuyen
+ */
 @Getter
 @Setter
 public class FightWait {
-    public User[] users;
+    private static final byte MAX_ITEMS_SLOT = 8;
+    private static final int KICK_BOSS_TIME = 15;
+    public static final byte[] continuousMaps = {30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
+
     public FightManager fightManager;
     public Room room;
     public byte id;
+    public User[] users;
     public boolean[] readies;
     public byte[][] items;
     public boolean started;
     public int numReady;
     public int maxSetPlayers;
-    public int maxPlayerInit;
-    public int maxPlayer;
     public int numPlayers;
     public boolean isPassSet;
     public String password;
     public int money;
     public String name;
     public byte type;
-    public byte teaFree;
     public byte mapId;
     public int bossIndex;
-    public long timeStart;
-    public boolean isLH;
     public byte continuousLevel;
-    public byte[] LHMap = new byte[]{30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
     private long endTime;
     private long lastPlayerJoinTime;
+    private CountdownTimer countdownTimer;
 
-    public FightWait(Room room, byte type, byte id, byte maxPlayers, byte maxPlayerInit, byte mapId, byte teaFree, boolean isLH) {
+    public FightWait(Room room, byte id) {
         this.room = room;
         this.id = id;
-        this.maxPlayer = maxPlayers;
-        this.maxPlayerInit = maxPlayerInit;
-        this.maxSetPlayers = maxPlayerInit;
-        this.numPlayers = 0;
-        this.numReady = 0;
-        this.users = new User[maxPlayers];
-        this.readies = new boolean[maxPlayers];
-        this.items = new byte[maxPlayers][8];
-        this.type = type;
-        this.teaFree = teaFree;
-        this.money = this.room.getMinXu();
-        this.name = "";
-        this.password = "";
-        this.isLH = isLH;
-        this.continuousLevel = 0;
-        this.mapId = isLH ? LHMap[continuousLevel] : mapId;
-        this.fightManager = new FightManager(this);
-        this.started = false;
-        this.bossIndex = -1;
-        this.timeStart = 0L;
-    }
 
-    private void refreshFightWait() {
-        this.maxSetPlayers = maxPlayerInit;
-        this.numPlayers = 0;
-        this.money = this.room.getMinXu();
+        byte maxPlayers = room.getMaxPlayerFight();
+
+        this.fightManager = new FightManager(this);
+        this.users = new User[maxPlayers];
+        this.items = new byte[maxPlayers][MAX_ITEMS_SLOT];
+        this.readies = new boolean[maxPlayers];
+
         this.name = "";
         this.password = "";
         this.isPassSet = false;
+        this.started = false;
+        this.numReady = 0;
         this.bossIndex = -1;
-        if (this.isLH) {
-            this.continuousLevel = 0;
-            this.mapId = LHMap[this.continuousLevel];
+        this.numPlayers = 0;
+        this.endTime = 0L;
+        this.continuousLevel = 0;
+
+        this.mapId = room.getMapId();
+        this.money = room.getMinXu();
+
+        this.maxSetPlayers = room.getNumPlayerInitRoom();
+        this.countdownTimer = new CountdownTimer(KICK_BOSS_TIME, this::onTimeUp);
+    }
+
+    private void refreshFightWait() {
+        byte maxPlayers = room.getMaxPlayerFight();
+
+        money = room.getMinXu();
+        name = "";
+        password = "";
+        isPassSet = false;
+        started = false;
+        bossIndex = -1;
+        numPlayers = 0;
+        numReady = 0;
+        users = new User[maxPlayers];
+        items = new byte[maxPlayers][MAX_ITEMS_SLOT];
+        readies = new boolean[maxPlayers];
+        if (isContinuous()) {
+            continuousLevel = 0;
+            mapId = continuousMaps[continuousLevel];
         }
+        countdownTimer.stop();
+        ServerManager.getInstance().logger().logMessage("Refresh fight wait");
+    }
+
+    public boolean isContinuous() {
+        return room.isContinuous();
     }
 
     private User getRoomOwner() {
@@ -113,17 +130,34 @@ public class FightWait {
         return -1;
     }
 
-    private void changeBoss(final int index) {
-        this.bossIndex = index;
+    private void onTimeUp() {
+        if (bossIndex < 0 || bossIndex >= users.length) {
+            return;
+        }
+
+        User user = getRoomOwner();
+        sendMessageKick(bossIndex, "Không start ván");
+        handleUserRemoval(bossIndex);
+        if (numPlayers <= 0) {
+            refreshFightWait();
+        } else {
+            findNewBoss();
+            notifyPlayerLeave(user.getPlayerId());
+        }
     }
 
-    public void addUser(User us) throws IOException {
+    private void changeBoss(int index) {
+        bossIndex = index;
+        countdownTimer.reset();
+    }
+
+    public synchronized void addUser(User us) throws IOException {
         if (room.getType() == 6 && us.getClanId() == null) {
             us.getUserService().sendServerMessage(GameString.notClan());
             return;
         }
 
-        if (started || (room.isContinuous() && continuousLevel > 0)) {
+        if (started || (isContinuous() && continuousLevel > 0)) {
             us.getUserService().sendServerMessage(GameString.joinKVError0());
             return;
         }
@@ -189,7 +223,7 @@ public class FightWait {
                 ds.writeInt(0);
                 ds.writeByte(user.getCurrentLevel());
                 ds.writeByte(user.getActiveCharacterId());
-                short[] equips = us.getEquips();
+                short[] equips = user.getEquips();
                 for (short id : equips) {
                     ds.writeShort(id);
                 }
@@ -216,96 +250,75 @@ public class FightWait {
         us.sendMessage(ms);
     }
 
-    protected void kick(int index) throws IOException {
-        Message ms;
-        DataOutputStream ds;
-        ms = new Message(11);
-        ds = ms.writer();
-        ds.writeShort(index);
-        ds.writeInt(this.users[index].getPlayerId());
-        ds.writeUTF(GameString.kickString());
-        ds.flush();
-        sendToTeam(ms);
-        leave(this.users[index]);
-    }
-
-    public void leave(User us) throws IOException {
-        if (this.started) {
-            this.fightManager.leave(us.getPlayerId());
-        }
-        this.leaveBoard(us);
-        if (this.numPlayers == 0) {
+    public synchronized void kickPlayer(int playerId, int targetPlayerId) {
+        if (started) {
             return;
         }
-        Message ms = new Message(14);
-        DataOutputStream ds = ms.writer();
-        ds.writeInt(us.getPlayerId());
-        ds.writeInt(this.users[this.bossIndex].getPlayerId());
-        ds.flush();
-        this.sendToTeam(ms);
-    }
 
-    public void leaveBoard(User us) {
-        byte max = ServerManager.maxPlayers, i;
-        for (i = 0; i < max; i++) {
-            if (this.users[i] != null && this.users[i].getPlayerId() == us.getPlayerId()) {
-                this.users[i] = null;
-                if (this.bossIndex == i) {
-                    for (i = 0; i < max; i++) {
-                        if (this.users[i] != null) {
-                            this.changeBoss(i);
-                            break;
-                        }
-                    }
-                }
-                this.numPlayers--;
-                if (this.numPlayers == 0) {
-                    refreshFightWait();
-                }
-                break;
-            }
+        User roomOwner = getRoomOwner();
+        if (roomOwner.getPlayerId() != playerId) {
+            return;
         }
+
+        int index = getUserIndexByPlayerId(targetPlayerId);
+        if (index == -1) {
+            return;
+        }
+
+        if (readies[index]) {
+            return;
+        }
+
+        User user = users[index];
+        if (user.isOpeningGift()) {
+            roomOwner.getUserService().sendServerMessage(GameString.openingGift(users[index].getUsername()));
+            return;
+        }
+
+        sendMessageKick(index, GameString.kickString());
+        handleUserRemoval(index);
+        notifyPlayerLeave(targetPlayerId);
     }
 
-    public void fightComplete() throws IOException {
-        Message ms;
-        DataOutputStream ds;
-        for (byte i = 0; i < this.users.length; i++) {
-            this.readies[i] = false;
-            User us = this.users[i];
-            if (us == null) {
-                continue;
-            }
-            ms = new Message(112);
-            ds = ms.writer();
-            for (byte j = 0; j < 4; j++) {
-                ds.writeByte(us.getItemFightQuantity(12 + j));
-            }
+    private void sendMessageKick(int index, String s) {
+        try {
+            User user = users[index];
+            IMessage ms = new Message(Cmd.KICK);
+            DataOutputStream ds = ms.writer();
+            ds.writeShort(index);
+            ds.writeInt(user.getPlayerId());
+            ds.writeUTF(s);
             ds.flush();
-            us.sendMessage(ms);
-            us.setFightWait(this);
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        this.numReady = 0;
-        if (this.bossIndex != -1) {
-            changeBoss(this.bossIndex);
-        }
-        // Send map
-        ms = new Message(75);
-        ds = ms.writer();
-        ds.writeByte(this.mapId);
-        ds.flush();
-        this.sendToTeam(ms);
+    }
 
-        new Thread(() -> {
-            try {
-                while (timeStart > 0L) {
-                    Thread.sleep(1000L);
-                    timeStart -= 1000L;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+    public synchronized void leaveTeam(int targetPlayerId) {
+        if (started) {
+            fightManager.leave(targetPlayerId);
+        }
+
+        int index = getUserIndexByPlayerId(targetPlayerId);
+        if (index == -1) {
+            return;
+        }
+
+        handleUserRemoval(index);
+
+        if (numPlayers <= 0) {
+            refreshFightWait();
+        } else {
+            if (bossIndex == index) {
+                findNewBoss();
             }
-        }).start();
+            notifyPlayerLeave(targetPlayerId);
+        }
+    }
+
+    public void fightComplete() {
+        System.out.println("fightComplete");
     }
 
     public void sendToTeam(IMessage ms) {
@@ -371,6 +384,9 @@ public class FightWait {
             return;
         }
 
+        //Đặt lại bộ đếm thời gian kick
+        countdownTimer.reset();
+
         resetReadies();
         money = newMoney;
 
@@ -386,7 +402,7 @@ public class FightWait {
         }
     }
 
-    public void startGame(int playerId) {
+    public synchronized void startGame(int playerId) {
         if (started) {
             return;
         }
@@ -572,7 +588,7 @@ public class FightWait {
             return;
         }
 
-        if (room.isContinuous()) {
+        if (isContinuous()) {
             roomOwner.getUserService().sendServerMessage(GameString.selectMapError1_3());
             return;
         }
@@ -632,6 +648,9 @@ public class FightWait {
         }
 
         resetReadies();
+
+        //Đặt lại bộ đếm thời gian kick
+        countdownTimer.reset();
 
         try {
             IMessage ms = new Message(Cmd.MAP_SELECT);
@@ -749,77 +768,6 @@ public class FightWait {
         }
     }
 
-    public synchronized void kickPlayer(int playerId, int targetPlayerId) {
-        if (started) {
-            return;
-        }
-
-        User roomOwner = getRoomOwner();
-        if (roomOwner.getPlayerId() != playerId) {
-            return;
-        }
-
-        int index = getUserIndexByPlayerId(targetPlayerId);
-        if (index == -1) {
-            return;
-        }
-
-        if (readies[index]) {
-            return;
-        }
-
-        User user = users[index];
-        if (user.isOpeningGift()) {
-            roomOwner.getUserService().sendServerMessage(GameString.openingGift(users[index].getUsername()));
-            return;
-        }
-
-        try {
-            IMessage ms = new Message(Cmd.KICK);
-            DataOutputStream ds = ms.writer();
-            ds.writeShort(index);
-            ds.writeInt(user.getPlayerId());
-            ds.writeUTF(GameString.kickString());
-            ds.flush();
-            user.sendMessage(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        handleUserRemoval(index);
-        notifyPlayerLeave(targetPlayerId);
-    }
-
-    public synchronized void leaveTeam(int targetPlayerId) {
-        if (started) {
-            try {
-                fightManager.leave(targetPlayerId);
-            } catch (IOException e) {
-//                throw new RuntimeException(e);
-            }
-        }
-
-        int index = getUserIndexByPlayerId(targetPlayerId);
-        if (index == -1) {
-            return;
-        }
-
-        if (readies[index]) {
-            return;
-        }
-
-        handleUserRemoval(index);
-
-        if (numPlayers <= 0) {
-            refreshFightWait();
-        } else {
-            if (bossIndex == index) {
-                findNewBoss();
-            }
-            notifyPlayerLeave(targetPlayerId);
-        }
-    }
-
     private void findNewBoss() {
         for (byte i = 0; i < users.length; i++) {
             if (users[i] != null) {
@@ -830,10 +778,17 @@ public class FightWait {
     }
 
     private void handleUserRemoval(int index) {
+        //Xóa người chơi và cập nhật trạng thái người chơi
         users[index].setState(UserState.WAITING);
         users[index].setFightWait(null);
         users[index] = null;
         numPlayers--;
+
+        //Xóa trạng thái sẵn sàng
+        if (readies[index]) {
+            readies[index] = false;
+            numReady--;
+        }
     }
 
     private void notifyPlayerLeave(int playerId) {
@@ -871,7 +826,7 @@ public class FightWait {
     }
 
     public boolean isFightWaitInvalid() {
-        return numPlayers == maxSetPlayers || started || (room.isContinuous() && continuousLevel > 0);
+        return numPlayers == maxSetPlayers || started || (isContinuous() && continuousLevel > 0);
     }
 
     public synchronized void changeTeam(User user) {

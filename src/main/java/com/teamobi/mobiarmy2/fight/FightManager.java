@@ -60,7 +60,7 @@ public class FightManager {
         this.isFight = false;
         this.mapMNG = new MapManager(this);
         this.bullMNG = new BulletManager(this);
-        this.countdownTimer = new CountdownTimer(this, timeCountMax);
+        this.countdownTimer = new CountdownTimer(timeCountMax, this::onTimeUp);
     }
 
     protected void setMap(byte map) {
@@ -70,17 +70,17 @@ public class FightManager {
     void sendToTeam(Message ms) throws IOException {
         for (byte i = 0; i < ServerManager.maxPlayers; i++) {
             Player pl = this.players[i];
-            if (pl == null || pl.us == null) {
+            if (pl == null || pl.user == null) {
                 continue;
             }
-            pl.us.sendMessage(ms);
+            pl.user.sendMessage(ms);
         }
     }
 
     public void removeUser(User us) {
         synchronized (this.players) {
             for (byte i = 0; i < ServerManager.maxPlayers; i++) {
-                if (this.players[i].us.getPlayerId() == us.getPlayerId()) {
+                if (this.players[i].user.getPlayerId() == us.getPlayerId()) {
                     this.players[i] = null;
                     break;
                 }
@@ -90,7 +90,7 @@ public class FightManager {
 
     public int getIndexByIDDB(int iddb) {
         for (byte i = 0; i < ServerManager.maxPlayers; i++) {
-            if (this.players[i] != null && this.players[i].us != null && this.players[i].us.getPlayerId() == iddb) {
+            if (this.players[i] != null && this.players[i].user != null && this.players[i].user.getPlayerId() == iddb) {
                 return i;
             }
         }
@@ -164,7 +164,7 @@ public class FightManager {
     }
 
     protected boolean getisLH() {
-        return this.wait.isLH;
+        return this.wait.isContinuous();
     }
 
     private void nextBoss() throws IOException {
@@ -433,13 +433,13 @@ public class FightManager {
     private void nextXP() {
         for (byte i = 0; i < ServerManager.maxPlayers; i++) {
             Player pl = this.players[i];
-            if (pl == null || pl.us == null) {
+            if (pl == null || pl.user == null) {
                 continue;
             }
             if (pl.isUpdateXP) {
-                int oldXP = pl.us.getCurrentXp();
-                pl.us.updateXp(pl.XPUp, true);
-                int newXP = pl.us.getCurrentXp();
+                int oldXP = pl.user.getCurrentXp();
+                pl.user.updateXp(pl.XPUp, true);
+                int newXP = pl.user.getCurrentXp();
                 pl.AllXPUp += newXP - oldXP;
                 pl.XPUp = 0;
                 pl.isUpdateXP = false;
@@ -450,11 +450,11 @@ public class FightManager {
     private void nextCUP() {
         for (byte i = 0; i < ServerManager.maxPlayers; i++) {
             Player pl = this.players[i];
-            if (pl == null || pl.us == null) {
+            if (pl == null || pl.user == null) {
                 continue;
             }
             if (pl.isUpdateCup) {
-                pl.us.updateCup(pl.CupUp);
+                pl.user.updateCup(pl.CupUp);
                 pl.CupUp = 0;
                 pl.isUpdateCup = false;
             }
@@ -804,10 +804,10 @@ public class FightManager {
         this.bullMNG.addboss.clear();
         boolean LHfinish = false;
         boolean LHSuccess = false;
-        if (wait.isLH && wait.numPlayers > 0) {
+        if (wait.isContinuous() && wait.numPlayers > 0) {
             if (checkWin == 1) {
                 wait.continuousLevel++;
-                if (wait.continuousLevel == wait.LHMap.length) {
+                if (wait.continuousLevel == wait.continuousMaps.length) {
                     wait.continuousLevel = 0;
                     LHfinish = true;
                 } else {
@@ -816,13 +816,13 @@ public class FightManager {
             } else {
                 wait.continuousLevel = 0;
             }
-            wait.mapId = wait.LHMap[wait.continuousLevel];
+            wait.mapId = wait.continuousMaps[wait.continuousLevel];
         }
         if (this.type == 5 && checkWin == 1) {
             for (byte i = 0; i < ServerManager.maxPlayers; i++) {
                 Player pl = this.players[i];
-                if (pl != null && pl.us != null) {
-                    pl.us.updateXp(10, true);
+                if (pl != null && pl.user != null) {
+                    pl.user.updateXp(10, true);
                 }
             }
         }
@@ -831,25 +831,25 @@ public class FightManager {
         // Update Win
         for (byte i = 0; i < ServerManager.maxPlayers; i++) {
             Player pl = this.players[i];
-            if (pl == null || pl.us == null) {
+            if (pl == null || pl.user == null) {
                 continue;
             }
             byte win = (byte) (pl.team ? checkWin : -checkWin);
             if (win == 1 && nTurn > 2) {
                 if (this.playerCount == 2) {
-                    pl.us.updateMission(0, 1);
+                    pl.user.updateMission(0, 1);
                 } else if (this.playerCount >= 5) {
-                    pl.us.updateMission(17, 1);
+                    pl.user.updateMission(17, 1);
                 }
                 switch (pl.idNV) {
                     case 0:
-                        pl.us.updateMission(13, 1);
+                        pl.user.updateMission(13, 1);
                         break;
                     case 1:
-                        pl.us.updateMission(14, 1);
+                        pl.user.updateMission(14, 1);
                         break;
                     case 2:
-                        pl.us.updateMission(15, 1);
+                        pl.user.updateMission(15, 1);
                         break;
                     default:
                         break;
@@ -857,14 +857,14 @@ public class FightManager {
                 // UFO
                 switch (this.mapMNG.Id) {
                     case 35:
-                        pl.us.updateMission(2, 1);
+                        pl.user.updateMission(2, 1);
                         break;
                     case 36:
-                        pl.us.updateMission(3, 1);
+                        pl.user.updateMission(3, 1);
                         break;
                     case 38:
                     case 39:
-                        pl.us.updateMission(4, 1);
+                        pl.user.updateMission(4, 1);
                         break;
                     default:
                         break;
@@ -879,52 +879,52 @@ public class FightManager {
             // money Bonus
             ds.writeInt(this.wait.money);
             ds.flush();
-            pl.us.sendMessage(ms);
+            pl.user.sendMessage(ms);
         }
 
         // Update All XP and CUP
         for (byte i = 0; i < ServerManager.maxPlayers; i++) {
             Player pl = this.players[i];
-            if (pl == null || pl.us == null) {
+            if (pl == null || pl.user == null) {
                 continue;
             }
             ms = new Message(97);
             ds = ms.writer();
             ds.writeInt(pl.AllXPUp);
-            ds.writeInt(pl.us.getCurrentXp());
-            ds.writeInt(pl.us.getCurrentLevel() * (pl.us.getCurrentLevel() + 1) * 1000);
+            ds.writeInt(pl.user.getCurrentXp());
+            ds.writeInt(pl.user.getCurrentLevel() * (pl.user.getCurrentLevel() + 1) * 1000);
             ds.writeByte(0);
-            ds.writeByte(pl.us.getCurrentLevelPercent());
+            ds.writeByte(pl.user.getCurrentLevelPercent());
             ds.flush();
-            pl.us.sendMessage(ms);
+            pl.user.sendMessage(ms);
         }
         for (byte i = 0; i < ServerManager.maxPlayers; i++) {
             Player pl = this.players[i];
-            if (pl == null || pl.us == null) {
+            if (pl == null || pl.user == null) {
                 continue;
             }
             ms = new Message(-24);
             ds = ms.writer();
             ds.writeByte(pl.AllCupUp);
-            ds.writeInt(pl.us.getCup());
+            ds.writeInt(pl.user.getCup());
             ds.flush();
-            pl.us.sendMessage(ms);
+            pl.user.sendMessage(ms);
         }
         // Update Xu
         if (this.wait.money > 0) {
             for (byte i = 0; i < ServerManager.maxPlayers; i++) {
                 Player pl = this.players[i];
-                if (pl == null || pl.us == null) {
+                if (pl == null || pl.user == null) {
                     continue;
                 }
                 byte win = (byte) (pl.team ? checkWin : -checkWin);
                 if (win >= 0) {
-                    pl.us.updateXu(this.wait.money * (win == 1 ? 2 : 1));
+                    pl.user.updateXu(this.wait.money * (win == 1 ? 2 : 1));
                     ms = new Message(52);
                     ds = ms.writer();
-                    ds.writeInt(pl.us.getPlayerId());
+                    ds.writeInt(pl.user.getPlayerId());
                     ds.writeInt(this.wait.money * (win == 1 ? 2 : 1));
-                    ds.writeInt(pl.us.getXu());
+                    ds.writeInt(pl.user.getXu());
                     ds.flush();
                     sendToTeam(ms);
                 }
@@ -936,14 +936,14 @@ public class FightManager {
         } catch (InterruptedException e) {
         }
         this.wait.fightComplete();
-        if (wait.isLH) {
+        if (wait.isContinuous()) {
             for (byte i = 0; i < ServerManager.maxPlayers; i++) {
                 Player pl = this.players[i];
-                if (pl == null || pl.us == null) {
+                if (pl == null || pl.user == null) {
                     continue;
                 }
                 if (pl.isDie) {
-                    wait.kick(i);
+//                    wait.kick(i);
                     continue;
                 }
                 String strItem = "";
@@ -966,7 +966,7 @@ public class FightManager {
             }
             for (byte i = 0; i < ServerManager.maxPlayers; i++) {
                 Player pl = this.players[i];
-                if (pl == null || pl.us == null) {
+                if (pl == null || pl.user == null) {
                     continue;
                 }
                 byte win = (byte) (pl.team ? checkWin : -checkWin);
@@ -999,7 +999,7 @@ public class FightManager {
         int count = 0;
         this.teamCS = 0;
         this.teamlevel = 0;
-        for (byte i = 0; i < this.wait.maxPlayer; i++) {
+        for (byte i = 0; i < this.wait.numPlayers; i++) {
             User us = this.wait.users[i];
             if (us == null) {
                 this.players[i] = null;
@@ -1049,7 +1049,7 @@ public class FightManager {
         this.nextTurn();
     }
 
-    public void leave(int playerId) throws IOException {
+    public void leave(int playerId) {
         if (!this.isFight) {
             return;
         }
@@ -1059,18 +1059,22 @@ public class FightManager {
         }
         Player pl = this.players[index];
 
-        Message ms = new Message(9);
-        DataOutputStream ds = ms.writer();
-        ds.writeInt(playerId);
-        ds.writeUTF(GameString.leave2(pl.us.getUsername()));
-        ds.flush();
-        sendToTeam(ms);
+        try {
+            Message ms = new Message(9);
+            DataOutputStream ds = ms.writer();
+            ds.writeInt(playerId);
+            ds.writeUTF(GameString.leave2(pl.user.getUsername()));
+            ds.flush();
+            sendToTeam(ms);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         if (!pl.isDie) {
             pl.HP = 0;
             pl.isUpdateHP = true;
             pl.isDie = true;
         }
-        pl.us = null;
+        pl.user = null;
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -1101,21 +1105,21 @@ public class FightManager {
         if (this.wait.money > 0) {
             for (byte i = 0; i < ServerManager.maxPlayers; i++) {
                 Player pl = this.players[i];
-                if (pl == null || pl.us == null) {
+                if (pl == null || pl.user == null) {
                     continue;
                 }
                 Message ms = new Message(52);
                 DataOutputStream ds = ms.writer();
-                ds.writeInt(pl.us.getPlayerId());
+                ds.writeInt(pl.user.getPlayerId());
                 ds.writeInt(-this.wait.money);
-                ds.writeInt(pl.us.getXu());
+                ds.writeInt(pl.user.getXu());
                 ds.flush();
                 this.sendToTeam(ms);
             }
         }
         for (byte i = 0; i < ServerManager.maxPlayers; i++) {
             Player pl = this.players[i];
-            if (pl == null || pl.us == null) {
+            if (pl == null || pl.user == null) {
                 continue;
             }
             Message ms = new Message(20);
@@ -1136,13 +1140,17 @@ public class FightManager {
                 ds.writeShort(pl2.HPMax);
             }
             ds.flush();
-            pl.us.sendMessage(ms);
+            pl.user.sendMessage(ms);
         }
     }
 
-    protected void onTimeUp() throws IOException {
-        if (this.isFight && !this.checkWin()) {
-            nextTurn();
+    protected void onTimeUp() {
+        try {
+            if (this.isFight && !this.checkWin()) {
+                nextTurn();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -1247,8 +1255,8 @@ public class FightManager {
         ds.writeByte(bullets.size());
 
         for (Bullet bull : bullets) {
-            if (bullMNG.typeSC > 0 && pl.us != null) {
-                pl.us.updateMission(12, 1);
+            if (bullMNG.typeSC > 0 && pl.user != null) {
+                pl.user.updateMission(12, 1);
             }
             ArrayList<Short> X = bull.XArray;
             ArrayList<Short> Y = bull.YArray;
@@ -1353,7 +1361,7 @@ public class FightManager {
         changeLocation(index);
     }
 
-    public void shootMessage(User us, Message ms) throws IOException {
+    public synchronized void shootMessage(User us, Message ms) throws IOException {
         int index = this.getIndexByIDDB(us.getPlayerId());
         if (index == -1 || index != this.playerTurn || this.isShoot || !wait.started) {
             return;
@@ -1447,7 +1455,7 @@ public class FightManager {
         //fix item
         if (indexItem >= 0) {
             if (idItem > 1) {
-                pl.us.updateItems(idItem, (byte) -1);
+                pl.user.updateItems(idItem, (byte) -1);
             }
             pl.item[indexItem] = -1;
         }
@@ -1721,13 +1729,13 @@ public class FightManager {
         ds.writeShort(pl.X);
         ds.writeShort(pl.Y);
         ds.flush();
-        pl.us.sendMessage(ms);
+        pl.user.sendMessage(ms);
     }
 
     private void nextGift() throws IOException {
         for (int i = 0; i < ServerManager.maxPlayers; i++) {
             Player pl = this.players[i];
-            if (pl == null || pl.us == null) {
+            if (pl == null || pl.user == null) {
                 continue;
             }
             for (int j = 0; j < pl.GiftBox.size(); j++) {
@@ -1744,18 +1752,18 @@ public class FightManager {
                     //xu
                     case 0:
                         ds.writeShort(nb.getNumb());
-                        pl.us.updateXu(nb.getNumb());
+                        pl.user.updateXu(nb.getNumb());
                         break;
                     //item
                     case 1:
                         ds.writeByte(nb.getId());
                         ds.writeByte(nb.getNumb());
-                        pl.us.updateItems(nb.getId(), (byte) nb.getNumb());
+                        pl.user.updateItems(nb.getId(), (byte) nb.getNumb());
                         break;
                     //xp
                     case 3:
                         ds.writeByte(nb.getNumb());
-                        pl.us.updateXp(nb.getNumb(), false);
+                        pl.user.updateXp(nb.getNumb(), false);
                         //notification
 
                 }
@@ -1777,18 +1785,18 @@ public class FightManager {
                     //xu
                     case 0:
                         ds.writeShort(nb.getNumb());
-                        pl.us.updateXu(nb.getNumb());
+                        pl.user.updateXu(nb.getNumb());
                         break;
                     //item
                     case 1:
                         ds.writeByte(nb.getId());
                         ds.writeByte(nb.getNumb());
-                        pl.us.updateItems(nb.getId(), (byte) nb.getNumb());
+                        pl.user.updateItems(nb.getId(), (byte) nb.getNumb());
                         break;
                     //xp
                     case 3:
                         ds.writeByte(nb.getNumb());
-                        pl.us.updateXp(nb.getNumb(), false);
+                        pl.user.updateXp(nb.getNumb(), false);
                         //notification
 
                 }
