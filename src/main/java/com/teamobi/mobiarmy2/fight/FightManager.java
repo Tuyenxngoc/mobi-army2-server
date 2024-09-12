@@ -20,7 +20,7 @@ import java.util.Date;
 
 public class FightManager {
 
-    final FightWait wait;
+    final IFightWait fightWait;
     private boolean isShoot;
     private int teamlevel;
     private int teamCS;
@@ -46,8 +46,8 @@ public class FightManager {
     public FightManager(FightWait fo) {
         this.isShoot = false;
         this.isNextTurn = true;
-        this.wait = fo;
-        this.type = fo.type;
+        this.fightWait = fo;
+        this.type = fo.getType();
         this.playerCount = 0;
         this.allCount = 0;
         this.playerTurn = -1;
@@ -164,12 +164,12 @@ public class FightManager {
     }
 
     protected boolean getisLH() {
-        return this.wait.isContinuous();
+        return this.fightWait.isContinuous();
     }
 
     private void nextBoss() throws IOException {
         //Map Bom 1
-        if (this.wait.mapId == 30) {
+        if (this.fightWait.getMapId() == 30) {
             byte numBoss = (new byte[]{4, 4, 5, 5, 6, 8, 8, 9, 9})[playerCount];
             for (byte i = 0; i < numBoss; i++) {
                 short X = (short) ((i % 2 == 0) ? Utils.nextInt(95, 315) : Utils.nextInt(890, 1070));
@@ -179,7 +179,7 @@ public class FightManager {
             }
         }
         //Map Bom 2
-        if (this.wait.mapId == 31) {
+        if (this.fightWait.getMapId() == 31) {
             byte numBoss = (new byte[]{4, 4, 5, 5, 6, 8, 8, 9, 9})[playerCount];
             for (byte i = 0; i < numBoss; i++) {
                 short X = (short) (Utils.nextInt(445, 800) + i * 50);
@@ -189,7 +189,7 @@ public class FightManager {
             }
         }
         //map nhen may
-        if (this.wait.mapId == 32) {
+        if (this.fightWait.getMapId() == 32) {
             byte numBoss = (new byte[]{2, 2, 3, 3, 4, 4, 5, 5, 5})[playerCount];
             short[] tempX = new short[]{505, 1010, 743, 425, 1068};
             short[] tempY = new short[]{221, 221, 198, 369, 369, 369};
@@ -199,7 +199,7 @@ public class FightManager {
             }
         }
         //map thanh pho may
-        if (this.wait.mapId == 33) {
+        if (this.fightWait.getMapId() == 33) {
             byte numBoss = (new byte[]{2, 2, 3, 3, 4, 4, 5, 5, 6})[playerCount];
             short[] tempX = new short[]{420, 580, 720, 240, 55, 900};
             for (int i = 0; i < numBoss; i++) {
@@ -210,7 +210,7 @@ public class FightManager {
             }
         }
         //Map T-rex Máy
-        if (this.wait.mapId == 34) {
+        if (this.fightWait.getMapId() == 34) {
             short X = 880;
             short Y = 400;
             players[allCount] = new Trex(this, (byte) 15, "T-rex", (byte) allCount, 15000 + (this.getLevelTeam() * 10), X, Y);
@@ -225,7 +225,7 @@ public class FightManager {
             }
         }
         //Map KV cam
-        if (this.wait.mapId == 35) {
+        if (this.fightWait.getMapId() == 35) {
             byte numBoss = (new byte[]{4, 4, 5, 5, 6, 8, 8, 9, 9})[playerCount];
             for (byte i = 0; i < numBoss; i++) {
                 short X = (short) (Utils.nextInt(300, 800));
@@ -235,7 +235,7 @@ public class FightManager {
             }
         }
         //Map HMLS
-        if (this.wait.mapId == 36) {
+        if (this.fightWait.getMapId() == 36) {
             short X = (short) (Utils.nextInt(300, 800));
             short Y = (short) Utils.nextInt(-350, 100);
             players[allCount] = new Balloon(this, (byte) 17, "Balloon", (byte) allCount, 1, X, Y);
@@ -249,7 +249,7 @@ public class FightManager {
         }
 
         //map nhen doc
-        if (this.wait.mapId == 37) {
+        if (this.fightWait.getMapId() == 37) {
             byte numBoss = (new byte[]{2, 3, 3, 4, 4, 5, 5, 6, 6})[playerCount];
             for (byte i = 0; i < numBoss; i++) {
                 short X = (short) Utils.nextInt(20, this.mapMNG.Width - 20);
@@ -260,7 +260,7 @@ public class FightManager {
         }
 
         //map Nghia trang 1
-        if (this.wait.mapId == 38) {
+        if (this.fightWait.getMapId() == 38) {
             byte numBoss = (new byte[]{4, 4, 5, 5, 6, 8, 8, 9, 9})[playerCount];
             for (byte i = 0; i < numBoss; i++) {
                 short X = (short) ((short) 700 - i * 80);
@@ -271,7 +271,7 @@ public class FightManager {
         }
 
         //map Nghia trang 2
-        if (this.wait.mapId == 39) {
+        if (this.fightWait.getMapId() == 39) {
             byte numBoss = (new byte[]{4, 4, 5, 5, 6, 8, 8, 9, 9})[playerCount];
             for (byte i = 0; i < numBoss; i++) {
                 short X = (short) (700 - i * 80);
@@ -804,19 +804,19 @@ public class FightManager {
         this.bullMNG.addboss.clear();
         boolean LHfinish = false;
         boolean LHSuccess = false;
-        if (wait.isContinuous() && wait.numPlayers > 0) {
+        if (fightWait.isContinuous() && fightWait.getNumPlayers() > 0) {
             if (checkWin == 1) {
-                wait.continuousLevel++;
-                if (wait.continuousLevel == wait.continuousMaps.length) {
-                    wait.continuousLevel = 0;
+                fightWait.decreaseContinuousLevel();
+                if (fightWait.getContinuousLevel() == FightWait.continuousMaps.length) {
+                    fightWait.setContinuousLevel((byte) 0);
                     LHfinish = true;
                 } else {
                     LHSuccess = true;
                 }
             } else {
-                wait.continuousLevel = 0;
+                fightWait.setContinuousLevel((byte) 0);
             }
-            wait.mapId = wait.continuousMaps[wait.continuousLevel];
+            fightWait.setMapId(FightWait.continuousMaps[fightWait.getContinuousLevel()]);
         }
         if (this.type == 5 && checkWin == 1) {
             for (byte i = 0; i < ServerManager.maxPlayers; i++) {
@@ -877,7 +877,7 @@ public class FightManager {
             // Null byte
             ds.writeByte(0);
             // money Bonus
-            ds.writeInt(this.wait.money);
+            ds.writeInt(this.fightWait.getMoney());
             ds.flush();
             pl.user.sendMessage(ms);
         }
@@ -911,7 +911,7 @@ public class FightManager {
             pl.user.sendMessage(ms);
         }
         // Update Xu
-        if (this.wait.money > 0) {
+        if (this.fightWait.getMoney() > 0) {
             for (byte i = 0; i < ServerManager.maxPlayers; i++) {
                 Player pl = this.players[i];
                 if (pl == null || pl.user == null) {
@@ -919,24 +919,24 @@ public class FightManager {
                 }
                 byte win = (byte) (pl.team ? checkWin : -checkWin);
                 if (win >= 0) {
-                    pl.user.updateXu(this.wait.money * (win == 1 ? 2 : 1));
+                    pl.user.updateXu(this.fightWait.getMoney() * (win == 1 ? 2 : 1));
                     ms = new Message(52);
                     ds = ms.writer();
                     ds.writeInt(pl.user.getPlayerId());
-                    ds.writeInt(this.wait.money * (win == 1 ? 2 : 1));
+                    ds.writeInt(this.fightWait.getMoney() * (win == 1 ? 2 : 1));
                     ds.writeInt(pl.user.getXu());
                     ds.flush();
                     sendToTeam(ms);
                 }
             }
         }
-        this.wait.started = false;
+        this.fightWait.setStarted(false);
         try {
             Thread.sleep(3000L);
         } catch (InterruptedException e) {
         }
-        this.wait.fightComplete();
-        if (wait.isContinuous()) {
+        this.fightWait.fightComplete();
+        if (fightWait.isContinuous()) {
             for (byte i = 0; i < ServerManager.maxPlayers; i++) {
                 Player pl = this.players[i];
                 if (pl == null || pl.user == null) {
@@ -959,7 +959,7 @@ public class FightManager {
                 }
             }
         }
-        if (nTurn > 2 && wait.type < 5) {
+        if (nTurn > 2 && fightWait.getType() < 5) {
             try {
                 Thread.sleep(2000L);
             } catch (InterruptedException e) {
@@ -983,14 +983,14 @@ public class FightManager {
             return;
         }
         this.mapMNG.entrys.clear();
-        this.setMap(this.wait.mapId);
+        this.setMap(this.fightWait.getMapId());
         this.playerTurn = -1;
         this.nTurn = 0;
         this.WindX = 0;
         this.WindY = 0;
         this.isFight = true;
 
-        this.playerCount = this.wait.numPlayers;
+        this.playerCount = this.fightWait.getNumPlayers();
         this.allCount = ServerManager.maxPlayers;
         if (this.type == 5) {
             this.nHopQua = (byte) (this.playerCount / 2);
@@ -999,14 +999,14 @@ public class FightManager {
         int count = 0;
         this.teamCS = 0;
         this.teamlevel = 0;
-        for (byte i = 0; i < this.wait.numPlayers; i++) {
-            User us = this.wait.users[i];
+        for (byte i = 0; i < this.fightWait.getNumPlayers(); i++) {
+            User us = this.fightWait.getUsers()[i];
             if (us == null) {
                 this.players[i] = null;
                 continue;
             }
             this.teamlevel += us.getCurrentXpLevel();
-            us.updateXu(-this.wait.money);
+            us.updateXu(-this.fightWait.getMoney());
             short X, Y;
             byte[] item;
             int teamPoint;
@@ -1025,7 +1025,7 @@ public class FightManager {
             location[count++] = locaCount;
             X = this.mapMNG.XPlayerInit[locaCount];
             Y = this.mapMNG.YPlayerInit[locaCount];
-            item = this.wait.items[i];
+            item = this.fightWait.getItems()[i];
             for (byte j = 0; j < 4; j++) {
                 if (item[4 + j] > 0) {
                     if (12 + j > 1) {
@@ -1102,7 +1102,7 @@ public class FightManager {
             return;
         }
         // Update Xu
-        if (this.wait.money > 0) {
+        if (this.fightWait.getMoney() > 0) {
             for (byte i = 0; i < ServerManager.maxPlayers; i++) {
                 Player pl = this.players[i];
                 if (pl == null || pl.user == null) {
@@ -1111,7 +1111,7 @@ public class FightManager {
                 Message ms = new Message(52);
                 DataOutputStream ds = ms.writer();
                 ds.writeInt(pl.user.getPlayerId());
-                ds.writeInt(-this.wait.money);
+                ds.writeInt(-this.fightWait.getMoney());
                 ds.writeInt(pl.user.getXu());
                 ds.flush();
                 this.sendToTeam(ms);
@@ -1124,7 +1124,7 @@ public class FightManager {
             }
             Message ms = new Message(20);
             DataOutputStream ds = ms.writer();
-            ds.writeByte(wait.mapId);
+            ds.writeByte(fightWait.getMapId());
             ds.writeByte(this.timeCountMax);
             // Team point
             ds.writeShort(pl.dongDoi);
@@ -1363,7 +1363,7 @@ public class FightManager {
 
     public synchronized void shootMessage(User us, Message ms) throws IOException {
         int index = this.getIndexByIDDB(us.getPlayerId());
-        if (index == -1 || index != this.playerTurn || this.isShoot || !wait.started) {
+        if (index == -1 || index != this.playerTurn || this.isShoot || !fightWait.isStarted()) {
             return;
         }
         this.isShoot = true;

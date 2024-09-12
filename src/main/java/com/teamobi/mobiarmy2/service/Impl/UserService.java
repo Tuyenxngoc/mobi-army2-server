@@ -1645,7 +1645,7 @@ public class UserService implements IUserService {
             short y = dis.readShort();
 
             if (user.getState() == UserState.FIGHTING) {
-                /// user.getFightWait().getFightManager().changeLocation(user.getPlayerId(), x, y);
+              //  user.getFightWait().getFightManager().changeLocation(user.getPlayerId(), x, y);
             } else if (user.getState() == UserState.TRAINING) {
                 user.getTrainingManager().changeLocation(x, y);
             }
