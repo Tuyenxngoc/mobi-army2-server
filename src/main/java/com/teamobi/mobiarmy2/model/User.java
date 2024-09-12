@@ -515,13 +515,12 @@ public class User {
         }
 
         EquipmentChestEntry[] equippedItems = characterEquips[activeCharacterId];
-        for (int i = 0; i < equippedItems.length; i++) {
-            EquipmentChestEntry equip = equippedItems[i];
+        for (EquipmentChestEntry equip : equippedItems) {
             if (equip == null || equip.isExpired()) {
                 continue;// Bỏ qua nếu trang bị không tồn tại hoặc đã hết hạn
             }
 
-            for (byte j = 0; j < points.length; j++) {
+            for (byte i = 0; i < points.length; i++) {
                 points[i] += equip.getAddPoints()[i];
                 percents[i] += equip.getAddPercents()[i];
             }

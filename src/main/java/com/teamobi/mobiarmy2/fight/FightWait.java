@@ -100,6 +100,7 @@ public class FightWait implements IFightWait {
         ServerManager.getInstance().logger().logMessage("Refresh fight wait");
     }
 
+    @Override
     public boolean isContinuous() {
         return room.isContinuous();
     }
@@ -319,6 +320,7 @@ public class FightWait implements IFightWait {
         }
     }
 
+    @Override
     public void fightComplete() {
         System.out.println("fightComplete");
     }
