@@ -6,6 +6,8 @@ import com.teamobi.mobiarmy2.repository.MapRepository;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class MapManager {
 
@@ -78,6 +80,33 @@ public class MapManager {
             off += 2;
         }
     }
+
+    public List<short[]> getRandomPlayerPositions(int numPlayers) {
+        // Kiểm tra nếu số người chơi lớn hơn số vị trí khả dụng
+        if (numPlayers > XPlayerInit.length || numPlayers > YPlayerInit.length) {
+            throw new IllegalArgumentException("Số người chơi vượt quá số lượng vị trí khả dụng");
+        }
+
+        // Khởi tạo danh sách chỉ số vị trí
+        List<Integer> indices = new ArrayList<>();
+        for (int i = 0; i < XPlayerInit.length; i++) {
+            indices.add(i);
+        }
+
+        // Trộn ngẫu nhiên các chỉ số
+        Collections.shuffle(indices);
+
+        // Tạo danh sách vị trí người chơi dựa trên chỉ số đã trộn
+        List<short[]> randomPositions = new ArrayList<>();
+        for (int i = 0; i < numPlayers; i++) {
+            short x = XPlayerInit[indices.get(i)];
+            short y = YPlayerInit[indices.get(i)];
+            randomPositions.add(new short[]{x, y});
+        }
+
+        return randomPositions;
+    }
+
 
     public final void addEntry(MapEntry me) {
         this.entrys.add(me);

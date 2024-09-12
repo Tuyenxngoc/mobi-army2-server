@@ -3,7 +3,6 @@ package com.teamobi.mobiarmy2.fight;
 import com.teamobi.mobiarmy2.fight.BulletManager.AddBoss;
 import com.teamobi.mobiarmy2.fight.boss.Ghost2;
 import com.teamobi.mobiarmy2.model.User;
-import com.teamobi.mobiarmy2.network.Impl.Message;
 import com.teamobi.mobiarmy2.repository.ClanItemRepository;
 import com.teamobi.mobiarmy2.repository.FightItemRepository;
 import com.teamobi.mobiarmy2.server.ServerManager;
@@ -11,7 +10,6 @@ import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -586,23 +584,6 @@ public class Player {
                     }
                     if (this instanceof Boss) {
                         if (fightManager.mapMNG.Id != 35 && this.idNV != 23 && this.idNV != 24) {
-                            switch (Utils.nextInt(3)) {
-                                case 0:
-                                    int kichno = Utils.nextInt(10, 20);
-                                    bull.pl.updateAngry(kichno);
-                                    bull.pl.flyNotice(kichno + " Siêu kích Power");
-                                    break;
-                                case 1:
-                                    int xuroi = Utils.nextInt(1, 100);
-                                    bull.pl.user.updateXu(xuroi);
-                                    bull.pl.flyNotice(xuroi + " Xu chiến đấu");
-                                    break;
-                                case 2:
-                                    int cuplen = Utils.nextInt(1, 20);
-                                    bull.pl.updateCUP(cuplen);
-                                    bull.pl.flyNotice(cuplen + " Danh dự chiến đấu");
-                                    break;
-                            }
                         }
 
                         int thaoancut = this.XPExist * 4;
@@ -639,18 +620,4 @@ public class Player {
         this.isMM = Utils.nextInt(10000) <= this.mayMan;
     }
 
-    public void flyNotice(String text) {
-        try {
-            Message ms = new Message(119);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(0);
-            ds.writeByte(0);
-            ds.writeByte(4);
-            ds.writeUTF(text);
-            ds.flush();
-            fightManager.sendToTeam(ms);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

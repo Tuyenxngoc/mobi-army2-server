@@ -329,6 +329,7 @@ public class FightWait implements IFightWait {
         return room.getType();
     }
 
+    @Override
     public void sendToTeam(IMessage ms) {
         for (User user : users) {
             if (user != null) {

@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.fight;
 
 import com.teamobi.mobiarmy2.model.User;
+import com.teamobi.mobiarmy2.network.IMessage;
 
 public interface IFightWait {
     void leaveTeam(int playerId);
@@ -62,4 +63,6 @@ public interface IFightWait {
     byte[][] getItems();
 
     boolean isStarted();
+
+    void sendToTeam(IMessage message);
 }

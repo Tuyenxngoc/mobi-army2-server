@@ -16,16 +16,20 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class FightManager {
+    private static final int MAX_ELEMENT_FIGHT = 100;
+    private static final int MAX_USER_FIGHT = 8;
+    private static final int MAX_PLAY_TIME = 30;
+    private static final byte[][] BOSS_COUNTS = {
+            {4, 6, 6, 8, 8, 8, 10, 10},
+            {2, 4, 5, 6, 6, 7, 8, 8}
+    };
 
     final IFightWait fightWait;
     private boolean isShoot;
     private int teamlevel;
-    private int teamCS;
     public boolean isNextTurn;
-    private Date matchTime;
     protected byte type;
     protected boolean isBossTurn;
     protected byte bossTurn;
@@ -56,7 +60,7 @@ public class FightManager {
         this.WindX = 0;
         this.WindY = 0;
         this.nHopQua = 0;
-        this.players = new Player[ServerManager.maxElementFight];
+        this.players = new Player[MAX_ELEMENT_FIGHT];
         this.isFight = false;
         this.mapMNG = new MapManager(this);
         this.bullMNG = new BulletManager(this);
@@ -65,27 +69,6 @@ public class FightManager {
 
     protected void setMap(byte map) {
         this.mapMNG.setMapId(map);
-    }
-
-    void sendToTeam(Message ms) throws IOException {
-        for (byte i = 0; i < ServerManager.maxPlayers; i++) {
-            Player pl = this.players[i];
-            if (pl == null || pl.user == null) {
-                continue;
-            }
-            pl.user.sendMessage(ms);
-        }
-    }
-
-    public void removeUser(User us) {
-        synchronized (this.players) {
-            for (byte i = 0; i < ServerManager.maxPlayers; i++) {
-                if (this.players[i].user.getPlayerId() == us.getPlayerId()) {
-                    this.players[i] = null;
-                    break;
-                }
-            }
-        }
     }
 
     public int getIndexByIDDB(int iddb) {
@@ -107,9 +90,9 @@ public class FightManager {
 
     public Player getPlayerTurn() {
         if (isBossTurn) {
-            return this.players[this.bossTurn];
+            return players[bossTurn];
         }
-        return this.players[this.playerTurn];
+        return players[playerTurn];
     }
 
     public Player getPlayerClosest(short X, short Y) {
@@ -147,20 +130,8 @@ public class FightManager {
         return bsClosest;
     }
 
-    public int getWindX() {
-        return this.WindX;
-    }
-
-    public int getWindY() {
-        return this.WindY;
-    }
-
     public int getLevelTeam() {
         return this.teamlevel;
-    }
-
-    public int getCSTeam() {
-        return this.teamCS;
     }
 
     protected boolean getisLH() {
@@ -174,7 +145,7 @@ public class FightManager {
             for (byte i = 0; i < numBoss; i++) {
                 short X = (short) ((i % 2 == 0) ? Utils.nextInt(95, 315) : Utils.nextInt(890, 1070));
                 short Y = (short) (50 + 40 * Utils.nextInt(3));
-                players[allCount] = new BigBoom(this, (byte) 12, "SmallBoom", (byte) allCount, 1500 + (this.getLevelTeam() * 10), X, Y);
+                players[allCount] = new BigBoom(this, (byte) 12, "Big Boom", (byte) allCount, 1500 + (this.getLevelTeam() * 10), X, Y);
                 allCount++;
             }
         }
@@ -184,7 +155,7 @@ public class FightManager {
             for (byte i = 0; i < numBoss; i++) {
                 short X = (short) (Utils.nextInt(445, 800) + i * 50);
                 short Y = 180;
-                players[allCount] = new BigBoom(this, (byte) 12, "SmallBoom", (byte) allCount, 1500 + (this.getLevelTeam() * 10), X, Y);
+                players[allCount] = new BigBoom(this, (byte) 12, "Big Boom", (byte) allCount, 1500 + (this.getLevelTeam() * 10), X, Y);
                 allCount++;
             }
         }
@@ -220,7 +191,7 @@ public class FightManager {
             for (byte i = 0; i < numBoss; i++) {
                 X = (short) (Utils.nextInt(470, 755));
                 Y = 400;
-                players[allCount] = new BigBoom(this, (byte) 12, "BigBooom", (byte) allCount, 1500 + (this.getLevelTeam() * 10), X, Y);
+                players[allCount] = new BigBoom(this, (byte) 12, "Big Boom", (byte) allCount, 1500 + (this.getLevelTeam() * 10), X, Y);
                 allCount++;
             }
         }
@@ -295,7 +266,7 @@ public class FightManager {
             ds.writeShort(boss.Y);
         }
         ds.flush();
-        this.sendToTeam(ms);
+        fightWait.sendToTeam(ms);
     }
 
     private void nextAngry() throws IOException {
@@ -312,7 +283,7 @@ public class FightManager {
                 ds.writeByte(i);
                 ds.writeByte(pl.angry);
                 ds.flush();
-                this.sendToTeam(ms);
+                fightWait.sendToTeam(ms);
                 pl.isUpdateAngry = false;
             }
         }
@@ -342,7 +313,7 @@ public class FightManager {
                     ds = ms.writer();
                     ds.writeByte(i);
                     ds.flush();
-                    this.sendToTeam(ms);
+                    fightWait.sendToTeam(ms);
                 }
                 pl.isMM = false;
             }
@@ -362,7 +333,7 @@ public class FightManager {
                 ds = ms.writer();
                 ds.writeByte(pl.index);
                 ds.flush();
-                this.sendToTeam(ms);
+                fightWait.sendToTeam(ms);
             }
         }
     }
@@ -381,7 +352,7 @@ public class FightManager {
                 ds.writeByte(0);
                 ds.writeByte(pl.index);
                 ds.flush();
-                this.sendToTeam(ms);
+                fightWait.sendToTeam(ms);
             }
         }
     }
@@ -400,7 +371,7 @@ public class FightManager {
                 ds.writeByte(0);
                 ds.writeByte(pl.index);
                 ds.flush();
-                this.sendToTeam(ms);
+                fightWait.sendToTeam(ms);
             }
         }
     }
@@ -420,7 +391,7 @@ public class FightManager {
                 ds.writeShort(pl.HP);
                 ds.writeByte(pl.pixel);
                 ds.flush();
-                this.sendToTeam(ms);
+                fightWait.sendToTeam(ms);
                 pl.isUpdateHP = false;
             }
         }
@@ -478,7 +449,7 @@ public class FightManager {
         ds.writeByte(WindX);
         ds.writeByte(WindY);
         ds.flush();
-        this.sendToTeam(ms);
+        fightWait.sendToTeam(ms);
     }
 
     private void huyVoHinh(byte index) throws IOException {
@@ -486,7 +457,7 @@ public class FightManager {
         DataOutputStream ds = ms.writer();
         ds.writeByte(index);
         ds.flush();
-        this.sendToTeam(ms);
+        fightWait.sendToTeam(ms);
     }
 
     private void huyCantSee(byte index) throws IOException {
@@ -495,18 +466,18 @@ public class FightManager {
         ds.writeByte(1);
         ds.writeByte(index);
         ds.flush();
-        this.sendToTeam(ms);
+        fightWait.sendToTeam(ms);
     }
 
-    /*
     private void huyCantMove(int index) throws IOException {
-        Message ms = new Message(107); DataOutputStream ds = ms.writer();
+        Message ms = new Message(107);
+        DataOutputStream ds = ms.writer();
         ds.writeByte(1);
         ds.writeByte(index);
         ds.flush();
-        this.sendToTeam(ms);
+        fightWait.sendToTeam(ms);
     }
-     */
+
     public void nextTurn() throws IOException {
         if (!this.isNextTurn) {
             return;
@@ -710,16 +681,11 @@ public class FightManager {
         DataOutputStream ds = ms.writer();
         ds.writeByte(this.isBossTurn ? this.bossTurn : this.playerTurn);
         ds.flush();
-        this.sendToTeam(ms);
+        fightWait.sendToTeam(ms);
         this.nextWind();
         this.countdownTimer.reset();
         if (this.isBossTurn) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    ((Boss) players[bossTurn]).turnAction();
-                }
-            }).start();
+            new Thread(() -> ((Boss) players[bossTurn]).turnAction()).start();
         }
     }
 
@@ -926,7 +892,7 @@ public class FightManager {
                     ds.writeInt(this.fightWait.getMoney() * (win == 1 ? 2 : 1));
                     ds.writeInt(pl.user.getXu());
                     ds.flush();
-                    sendToTeam(ms);
+                    fightWait.sendToTeam(ms);
                 }
             }
         }
@@ -997,7 +963,6 @@ public class FightManager {
         }
         int[] location = new int[8];
         int count = 0;
-        this.teamCS = 0;
         this.teamlevel = 0;
         for (byte i = 0; i < this.fightWait.getNumPlayers(); i++) {
             User us = this.fightWait.getUsers()[i];
@@ -1045,7 +1010,6 @@ public class FightManager {
         if (this.type == 5) {
             nextBoss();
         }
-        this.matchTime = new Date();
         this.nextTurn();
     }
 
@@ -1065,7 +1029,7 @@ public class FightManager {
             ds.writeInt(playerId);
             ds.writeUTF(GameString.leave2(pl.user.getUsername()));
             ds.flush();
-            sendToTeam(ms);
+            fightWait.sendToTeam(ms);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -1087,7 +1051,7 @@ public class FightManager {
                             DataOutputStream ds = ms.writer();
                             ds.writeByte(isBossTurn ? bossTurn : playerTurn);
                             ds.flush();
-                            sendToTeam(ms);
+                            fightWait.sendToTeam(ms);
                         }
                     }
                 } catch (IOException ex) {
@@ -1114,7 +1078,7 @@ public class FightManager {
                 ds.writeInt(-this.fightWait.getMoney());
                 ds.writeInt(pl.user.getXu());
                 ds.flush();
-                this.sendToTeam(ms);
+                fightWait.sendToTeam(ms);
             }
         }
         for (byte i = 0; i < ServerManager.maxPlayers; i++) {
@@ -1163,7 +1127,7 @@ public class FightManager {
         ds.writeShort(pl.X);
         ds.writeShort(pl.Y);
         ds.flush();
-        sendToTeam(ms);
+        fightWait.sendToTeam(ms);
         if (pl.Y > this.mapMNG.Height) {
             pl.isDie = true;
             pl.HP = 0;
@@ -1182,7 +1146,7 @@ public class FightManager {
         ds.writeShort(pl.X);
         ds.writeShort(pl.Y);
         ds.flush();
-        sendToTeam(ms);
+        fightWait.sendToTeam(ms);
     }
 
     public void addBoss(Player pl) throws IOException {
@@ -1201,7 +1165,7 @@ public class FightManager {
         ds.writeShort(boss.X);
         ds.writeShort(boss.Y);
         ds.flush();
-        this.sendToTeam(ms);
+        fightWait.sendToTeam(ms);
         allCount++;
     }
 
@@ -1313,7 +1277,7 @@ public class FightManager {
         }
         ds.flush();
         bullMNG.reset();
-        this.sendToTeam(ms);
+        fightWait.sendToTeam(ms);
         pl.isUseItem = false;
         pl.itemUsed = -1;
         if (this.isNextTurn) {
@@ -1346,7 +1310,7 @@ public class FightManager {
         ds.writeInt(us.getPlayerId());
         ds.writeUTF(s);
         ds.flush();
-        this.sendToTeam(ms);
+        fightWait.sendToTeam(ms);
     }
 
     public void changeLocationMessage(User us, Message ms) throws IOException {
@@ -1449,7 +1413,7 @@ public class FightManager {
         ds.writeByte(index);
         ds.writeByte(idItem);
         ds.flush();
-        this.sendToTeam(ms);
+        fightWait.sendToTeam(ms);
         pl.isUseItem = true;
         pl.itemUsed = idItem;
         //fix item
@@ -1551,7 +1515,7 @@ public class FightManager {
         ds.writeInt(X);
         ds.writeInt(Y);
         ds.flush();
-        this.sendToTeam(ms);
+        fightWait.sendToTeam(ms);
     }
 
     public void exploreBom(int id, int X, int Y, Bullet bull) throws IOException {
@@ -1561,7 +1525,7 @@ public class FightManager {
         ds.writeByte(1);
         ds.writeByte(id);
         ds.flush();
-        this.sendToTeam(ms);
+        fightWait.sendToTeam(ms);
     }
 
     public void updateCantSee(Player pl) throws IOException {
@@ -1700,7 +1664,7 @@ public class FightManager {
         ds.writeByte(index);
         ds.writeByte(toIndex);
         ds.flush();
-        this.sendToTeam(ms);
+        fightWait.sendToTeam(ms);
     }
 
     public void capture(byte index, byte toindex) throws IOException {
@@ -1709,7 +1673,7 @@ public class FightManager {
         ds.writeByte(index);
         ds.writeByte(toindex);
         ds.flush();
-        this.sendToTeam(ms);
+        fightWait.sendToTeam(ms);
     }
 
     public void thadocBullet(byte index, byte toindex) throws IOException {
@@ -1718,7 +1682,7 @@ public class FightManager {
         ds.writeByte(index);
         ds.writeByte(toindex);
         ds.flush();
-        this.sendToTeam(ms);
+        fightWait.sendToTeam(ms);
     }
 
     public void cLocation(byte toIndex) throws IOException {
@@ -1768,7 +1732,7 @@ public class FightManager {
 
                 }
                 ds.flush();
-                this.sendToTeam(ms);
+                fightWait.sendToTeam(ms);
                 pl.GiftBox.remove(0);
             }
             for (int j = 0; j < pl.GiftBoxFalling.size(); j++) {
@@ -1801,7 +1765,7 @@ public class FightManager {
 
                 }
                 ds.flush();
-                this.sendToTeam(ms);
+                fightWait.sendToTeam(ms);
                 pl.GiftBoxFalling.remove(0);
             }
         }
