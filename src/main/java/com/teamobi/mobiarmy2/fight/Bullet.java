@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author tuyen
@@ -13,37 +14,37 @@ import java.util.ArrayList;
 @Getter
 @Setter
 public class Bullet {
-    protected FightManager fightManager;
-    protected BulletManager bulletManager;
-    protected boolean collect;
-    protected byte bullId;
-    protected int damage;
-    public short X;
-    public short Y;
-    protected short lastX;
-    protected short lastY;
-    protected short vx;
-    protected short vy;
-    protected short ax100;
-    protected short ay100;
-    protected short g100;
-    protected short vxTemp;
-    protected short vyTemp;
-    protected short vyTemp2;
-    protected boolean isMaxY;
-    protected short XmaxY;
-    protected short maxY;
-    protected short frame;
-    protected byte typeSC;
-    protected Player pl;
-    protected boolean isXuyenPlayer;
-    protected boolean isXuyenMap;
-    protected boolean isCanCollision;
-    public ArrayList<Short> XArray;
-    public ArrayList<Short> YArray;
+    private FightManager fightManager;
+    private BulletManager bulletManager;
+    private boolean collect;
+    private byte bullId;
+    private int damage;
+    private short X;
+    private short Y;
+    private short lastX;
+    private short lastY;
+    private short vx;
+    private short vy;
+    private short ax100;
+    private short ay100;
+    private short g100;
+    private short vxTemp;
+    private short vyTemp;
+    private short vyTemp2;
+    private boolean isMaxY;
+    private short XmaxY;
+    private short maxY;
+    private short frame;
+    private byte typeSC;
+    private Player pl;
+    private boolean isXuyenPlayer;
+    private boolean isXuyenMap;
+    private boolean isCanCollision;
+    private List<Short> XArray;
+    private List<Short> YArray;
 
     public Bullet(BulletManager bulletManager, byte bullId, int damage, Player pl, int X, int Y, int vx, int vy, int msg, int g100) {
-        this.fightManager = bulletManager.fightManager;
+        this.fightManager = bulletManager.getFightManager();
         this.bulletManager = bulletManager;
         this.bullId = bullId;
         this.damage = (damage * pl.getDamage()) / 100;
@@ -54,8 +55,8 @@ public class Bullet {
         this.lastY = (short) Y;
         this.vx = (short) vx;
         this.vy = (short) vy;
-        this.ax100 = (short) (bulletManager.fightManager.getWindX() * msg / 100);
-        this.ay100 = (short) (bulletManager.fightManager.getWindY() * msg / 100);
+        this.ax100 = (short) (bulletManager.getFightManager().getWindX() * msg / 100);
+        this.ay100 = (short) (bulletManager.getFightManager().getWindY() * msg / 100);
         this.g100 = (short) g100;
         this.vxTemp = 0;
         this.vyTemp = 0;
@@ -138,8 +139,8 @@ public class Bullet {
             XmaxY = X;
             maxY = Y;
         }
-        if (this.bulletManager.hasVoiRong) {
-            for (BulletManager.VoiRong vr : this.bulletManager.voiRongs) {
+        if (this.bulletManager.isHasVoiRong()) {
+            for (BulletManager.VoiRong vr : this.bulletManager.getVoiRongs()) {
                 if (this.X >= vr.X - 5 && this.X <= vr.X + 10) {
                     this.vx -= 2;
                     this.vy -= 2;

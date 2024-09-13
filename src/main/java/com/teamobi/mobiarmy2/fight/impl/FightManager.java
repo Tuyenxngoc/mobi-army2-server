@@ -557,8 +557,8 @@ public class FightManager implements IFightManager {
             ds.writeByte(numShoot);
             ds.writeByte(bullets.size());
             for (Bullet bullet : bullets) {
-                List<Short> xArrays = bullet.XArray;
-                List<Short> yArrays = bullet.YArray;
+                List<Short> xArrays = bullet.getXArray();
+                List<Short> yArrays = bullet.getYArray();
                 ds.writeShort(xArrays.size());
                 if (typeShoot == 0) {
                     for (int j = 0; j < xArrays.size(); j++) {

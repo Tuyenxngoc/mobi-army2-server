@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.fight.impl;
 
 import com.teamobi.mobiarmy2.fight.Bullet;
+import com.teamobi.mobiarmy2.fight.IBulletManager;
 import com.teamobi.mobiarmy2.fight.Player;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -8,13 +9,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author tuyen
  */
 @Getter
 @Setter
-public class BulletManager {
+public class BulletManager implements IBulletManager {
 
     public static class VoiRong {
 
@@ -40,8 +42,8 @@ public class BulletManager {
 
         public BomHenGio(int id, Bullet bull, int count) {
             this.id = id;
-            this.X = bull.X;
-            this.Y = bull.Y;
+            this.X = bull.getX();
+            this.Y = bull.getY();
             this.count = count;
             this.bull = bull;
         }
@@ -69,23 +71,23 @@ public class BulletManager {
         }
     }
 
-    public FightManager fightManager;
-    protected ArrayList<Bullet> bullets;
-    protected byte force2;
-    public int mangNhenId;
-    public boolean hasVoiRong;
-    public ArrayList<VoiRong> voiRongs;
-    public ArrayList<BomHenGio> boms;
-    public ArrayList<AddBoss> addboss;
-    public ArrayList<Bullets> buls;
-    public byte mgtAddX;
-    public byte mgtAddY;
-    public byte typeSC;
-    public short XSC;
-    public short YSC;
-    public short arg;
-    public short XPL;
-    public short YPL;
+    private FightManager fightManager;
+    private ArrayList<Bullet> bullets;
+    private byte force2;
+    private int mangNhenId;
+    private boolean hasVoiRong;
+    private List<VoiRong> voiRongs;
+    private List<BomHenGio> boms;
+    private List<AddBoss> addboss;
+    private List<Bullets> buls;
+    private byte mgtAddX;
+    private byte mgtAddY;
+    private byte typeSC;
+    private short XSC;
+    private short YSC;
+    private short arg;
+    private short XPL;
+    private short YPL;
 
     public BulletManager(FightManager fightManager) {
         this.fightManager = fightManager;
