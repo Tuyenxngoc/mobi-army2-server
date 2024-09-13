@@ -42,7 +42,7 @@ public class FightManager implements IFightManager {
     private byte windY;
     private long startTime;
     private final IMapManager mapManager;
-    private final IBulletManager bulletManager;
+    private final BulletManager bulletManager;
     private final ICountdownTimer countdownTimer;
 
     public FightManager(FightWait fightWait) {
@@ -526,9 +526,9 @@ public class FightManager implements IFightManager {
         handleLuckUpdates();
 
         bulletManager.addShoot(player, bullId, angle, force, force2, numShoot);
-        bulletManager.updateBulletPositions();
+        bulletManager.fillXY();
 
-        List<Bullet> bullets = bulletManager.getBullets();
+        List<Bullet> bullets = bulletManager.getEntrys();
         if (bullets.isEmpty()) {
             return;
         }
@@ -544,7 +544,7 @@ public class FightManager implements IFightManager {
             ds.writeShort(player.getX());
             ds.writeShort(player.getY());
             ds.writeShort(angle);
-            if (Bullet.isDoubleBull(bullId)) {
+            if (bullId == 17 || bullId == 19) {
                 ds.writeByte(force2);
             }
             if (bullId == 14 || bullId == 40) {
@@ -557,8 +557,8 @@ public class FightManager implements IFightManager {
             ds.writeByte(numShoot);
             ds.writeByte(bullets.size());
             for (Bullet bullet : bullets) {
-                List<Short> xArrays = bullet.getXArrays();
-                List<Short> yArrays = bullet.getYArrays();
+                List<Short> xArrays = bullet.XArray;
+                List<Short> yArrays = bullet.YArray;
                 ds.writeShort(xArrays.size());
                 if (typeShoot == 0) {
                     for (int j = 0; j < xArrays.size(); j++) {
@@ -604,7 +604,7 @@ public class FightManager implements IFightManager {
             e.printStackTrace();
         }
 
-        bulletManager.clearBullets();
+        bulletManager.reset();
         nextTurn();
     }
 

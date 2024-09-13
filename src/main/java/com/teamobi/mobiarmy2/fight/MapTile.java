@@ -35,7 +35,7 @@ public class MapTile {
     }
 
     public void collision(int bx, int by, Bullet bullet) {
-        ImageData bulletHoleImage = EffectManager.getHoleImageByBulletId(bullet.getBulletId());
+        ImageData bulletHoleImage = EffectManager.getHoleImageByBulletId(bullet.getBullId());
         int w = bulletHoleImage.getWidth();
         int h = bulletHoleImage.getHeight();
         int[] argbS = bulletHoleImage.getPixelData();
