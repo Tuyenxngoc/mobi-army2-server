@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 public class Player {
 
-    private IFightManager fightManager;
+    protected IFightManager fightManager;
     private User user;
     private short gunId;
     private byte characterId;
@@ -254,6 +254,6 @@ public class Player {
     }
 
     public void collision(short x, short y, Bullet bull) {
-        System.out.println("123");
+
     }
 }

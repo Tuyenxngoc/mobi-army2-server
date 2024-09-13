@@ -14,7 +14,7 @@ public class BigBoom extends Boss {
 
     @Override
     public void turnAction() {
-
+       fightManager.nextTurn();
     }
 
 }

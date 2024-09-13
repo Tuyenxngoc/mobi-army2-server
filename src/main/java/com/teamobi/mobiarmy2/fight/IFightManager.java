@@ -5,6 +5,8 @@ package com.teamobi.mobiarmy2.fight;
  */
 public interface IFightManager {
 
+    void nextTurn();
+
     void leave(int playerId);
 
     void startGame(short teamPointsBlue, short teamPointsRed);

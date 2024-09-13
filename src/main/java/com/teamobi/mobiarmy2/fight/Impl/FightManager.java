@@ -297,7 +297,8 @@ public class FightManager implements IFightManager {
         }
     }
 
-    private void nextTurn() {
+    @Override
+    public void nextTurn() {
         turnCount++;
         byte roomType = fightWait.getRoomType();
 
@@ -544,7 +545,7 @@ public class FightManager implements IFightManager {
         try {
             IMessage ms = new Message(Cmd.FIRE_ARMY);
             DataOutputStream ds = ms.writer();
-            ds.writeByte(0);
+            ds.writeByte(typeShoot);
             ds.writeByte(player.getPowerUsageStatus());
             ds.writeByte(index);
             ds.writeByte(bullId);
@@ -612,6 +613,7 @@ public class FightManager implements IFightManager {
         }
 
         bulletManager.clearBullets();
+        nextTurn();
     }
 
     @Override

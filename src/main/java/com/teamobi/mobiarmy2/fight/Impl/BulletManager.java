@@ -36,8 +36,9 @@ public class BulletManager implements IBulletManager {
 
     @Override
     public void updateBulletPositions() {
-        boolean hasActiveBullet = false;
+        boolean hasActiveBullet;
         do {
+            hasActiveBullet = false;
             for (Bullet bullet : bullets) {
                 if (bullet == null || bullet.isCollect()) {
                     continue;
