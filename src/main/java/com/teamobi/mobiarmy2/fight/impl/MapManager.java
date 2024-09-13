@@ -40,6 +40,11 @@ public class MapManager implements IMapManager {
     }
 
     @Override
+    public List<MapTile> getMapTiles() {
+        return mapTiles;
+    }
+
+    @Override
     public List<short[]> getRandomPlayerPositions(int numPlayers) {
         // Kiểm tra nếu số người chơi lớn hơn số vị trí khả dụng
         if (numPlayers > playerInitXPositions.length || numPlayers > playerInitYPositions.length) {

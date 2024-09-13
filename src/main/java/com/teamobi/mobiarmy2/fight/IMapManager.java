@@ -11,6 +11,9 @@ public interface IMapManager {
 
     short getHeight();
 
+    //Test
+    List<MapTile> getMapTiles();
+
     List<short[]> getRandomPlayerPositions(int numPlayers);
 
     void loadMapId(byte mapId);

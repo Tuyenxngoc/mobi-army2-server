@@ -10,6 +10,7 @@ import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.repository.ClanItemRepository;
 import com.teamobi.mobiarmy2.server.ClanManager;
+import com.teamobi.mobiarmy2.util.MapTileExporter;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.DataOutputStream;
@@ -336,11 +337,30 @@ public class FightManager implements IFightManager {
             }
         }
 
+        //Đặt lại giá trị của người chơi trong lượt mới như thể lưc, ..., vv
+        if (isBossTurn) {
+            players[bossTurn].resetValueInNewTurn();
+        } else {
+            players[playerTurn].resetValueInNewTurn();
+        }
+
         nextWind();
         sendNextTurnMessage(isBossTurn ? bossTurn : playerTurn);
         countdownTimer.reset();
         if (isBossTurn) {
             new Thread(() -> ((Boss) players[bossTurn]).turnAction()).start();
+        }
+
+        //Test
+        try {
+            MapTileExporter.saveMapTilesToFile(
+                    mapManager.getMapTiles(),
+                    mapManager.getWidth(),
+                    mapManager.getHeight(),
+                    players,
+                    String.format("temp/turn_%d.png", turnCount));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

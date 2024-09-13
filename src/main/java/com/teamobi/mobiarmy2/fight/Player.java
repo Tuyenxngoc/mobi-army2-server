@@ -254,6 +254,13 @@ public class Player {
     }
 
     public void collision(short x, short y, Bullet bull) {
+        int impactRadius = Bullet.getImpactRadiusByBullId(bull.getBullId());
+    }
 
+    public void resetValueInNewTurn() {
+        itemUsed = false;
+        usedItemId = -1;
+        stamina = 60;
+        steps = 0;
     }
 }
