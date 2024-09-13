@@ -32,7 +32,6 @@ import java.util.List;
 @Getter
 @Setter
 public class User {
-
     public static EquipmentEntry[][] equipDefault;
     private ISession session;
     private UserState state;
@@ -543,11 +542,5 @@ public class User {
         }
 
         return result;
-    }
-
-    public void notifyNetWait() {
-    }
-
-    public void netWait() {
     }
 }

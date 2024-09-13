@@ -1,623 +1,259 @@
 package com.teamobi.mobiarmy2.fight;
 
-import com.teamobi.mobiarmy2.fight.BulletManager.AddBoss;
-import com.teamobi.mobiarmy2.fight.boss.Ghost2;
 import com.teamobi.mobiarmy2.model.User;
-import com.teamobi.mobiarmy2.repository.ClanItemRepository;
-import com.teamobi.mobiarmy2.repository.FightItemRepository;
-import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
+/**
+ * @author tuyen
+ */
 @Getter
 @Setter
 public class Player {
 
-    protected static class box {
+    private IFightManager fightManager;
+    private User user;
+    private short gunId;
+    private byte characterId;
+    private byte index;
+    private byte pixel;
+    private byte angry;
+    private short steps;
+    private byte stamina;
+    private short x;
+    private short y;
+    private short maxHp;
+    private short hp;
+    private short damage;
+    private short defense;
+    private short luck;
+    private short teamPoints;
+    private byte[] items;
+    private boolean isUpdateHP;
+    private boolean isUpdateAngry;
+    private boolean isLucky;
+    private boolean isPoisoned;
+    private boolean isFlying;
+    private byte eyeSmokeCount;
+    private byte freezeCount;
+    private byte windStopCount;
+    private boolean[] clanItems;
+    private byte skippedTurns;
+    private boolean itemUsed;
+    private boolean isDoubleShoot;
+    private boolean isDoubleSpeed;
+    private boolean isUsePow;
+    private boolean isDead;
+    private byte usedItemId;
+    private short width;
+    private short height;
 
-        public byte type;
-        private int numb;
-        private byte id;
-
-        public void Coins(int numb) {
-            this.numb = numb;
-            this.type = 0;
-        }
-
-        public void Item(byte id, byte numb) {
-            this.id = id;
-            this.numb = numb;
-            this.type = 1;
-        }
-
-        public void XP(int numb) {
-            this.numb = numb;
-            this.type = 3;
-        }
-
-        public void SpecialItem(byte id, int numb) {
-            this.id = id;
-            this.numb = numb;
-            this.type = 4;
-        }
-
-        public byte getId() {
-            switch (this.type) {
-                case 1:
-                case 3:
-                case 4:
-                    return id;
-                default:
-                    return -1;
-            }
-        }
-
-        public int getNumb() {
-            return this.numb;
-        }
-    }
-
-    protected FightManager fightManager;
-    protected User user;
-    protected boolean team;
-    protected short idBullet;
-    public short X;
-    public short Y;
-    public short width;
-    public short height;
-    protected byte itemInit[];
-    protected byte item[];
-    protected byte itemUsed;
-    protected boolean isUseItem;
-    protected boolean isUsePow;
-    public boolean isDie;
-    public boolean isUpdateHP;
-    protected boolean isUpdateAngry;
-    protected boolean isUpdateXP;
-    protected boolean isUpdateCup;
-    protected int XPUp;
-    protected int CupUp;
-    protected int AllXPUp;
-    protected int AllCupUp;
-    protected ArrayList<box> GiftBox;
-    protected ArrayList<box> GiftBoxFalling;
-
-    protected byte idNV;
-    public byte index;
-    protected short gunId;
-    protected int angry;
-    protected byte pixel;
-    public int HP;
-    protected int HPMax;
-    protected long satThuong;
-    protected int phongThu;
-    protected int mayMan;
-    protected int dongDoi;
-    protected byte ngungGioCount;
-    protected byte hutMauCount;
-    protected byte tangHinhCount;
-    public byte voHinhCount;
-    protected byte cantSeeCount;
-    protected byte cantMoveCount;
-    public boolean isBiDoc;
-    protected boolean diX2;
-    protected boolean banX2;
-    protected byte buocDi;
-    protected byte theLuc;
-    protected boolean isMM;
-    protected boolean fly;
-    protected int XPExist;
-    protected int[][] NHTItemThieuDot = new int[ServerManager.maxPlayers][2];
-    private boolean[] itemclan = new boolean[ClanItemRepository.CLAN_ITEM_ENTRY_MAP.size() + 1];
-
-    public Player(int index, int x, int y, int HP, int HpMax) {
+    public Player(int index, int x, int y, int hp, int maxHp) {
         this.index = (byte) index;
-        this.X = (short) x;
-        this.Y = (short) y;
-        this.HP = HP;
-        this.HPMax = HpMax;
+        this.x = (short) x;
+        this.y = (short) y;
+        this.hp = (short) hp;
+        this.maxHp = (short) maxHp;
     }
 
-    public Player(FightManager fightManager, byte location, short X, short Y, byte item[], int teamPoint, User user) {
+    public Player(IFightManager fightManager, byte index, byte characterId, short x, short y, short maxHp) {
         this.fightManager = fightManager;
-        this.index = location;
-        this.team = fightManager.type == 5 || location % 2 == 0;
-        this.idBullet = -1;
-        this.gunId = -1;
-        this.X = X;
-        this.Y = Y;
-        this.theLuc = 60;
+        this.index = index;
+        this.characterId = characterId;
+        this.x = x;
+        this.y = y;
+        this.maxHp = maxHp;
+        this.hp = maxHp;
+    }
+
+    public Player(IFightManager fightManager, User user, byte index, short x, short y, byte[] items, short[] abilities, short teamPoints, boolean[] clanItems) {
+        this.fightManager = fightManager;
+        this.user = user;
+        this.gunId = user.getGunId();
+        this.characterId = user.getActiveCharacterId();
+        this.index = index;
+        this.x = x;
+        this.y = y;
+        this.stamina = 60;
         this.width = 24;
         this.height = 24;
-        this.itemInit = item;
-        this.fly = false;
-        this.XPExist = 0;
-        this.GiftBox = new ArrayList<>();
-        this.GiftBoxFalling = new ArrayList<>();
-        if (item != null) {
-            this.item = new byte[item.length];
-            System.arraycopy(item, 0, this.item, 0, item.length);
+        this.items = items;
+        this.teamPoints = teamPoints;
+        this.clanItems = clanItems;
+
+        this.maxHp = abilities[0];
+        this.damage = abilities[1];
+        this.defense = abilities[2];
+        this.luck = abilities[3];
+
+        if (user.getClanId() != null) {
+            applyClanBonuses();
         }
-        this.user = user;
-        this.itemUsed = -1;
-        this.isUseItem = false;
-        this.isUsePow = false;
-        this.isDie = false;
-        this.angry = 0;
-        this.pixel = 25;
-        this.dongDoi = teamPoint;
-        this.ngungGioCount = 0;
-        this.hutMauCount = 0;
-        this.voHinhCount = 0;
-        this.cantSeeCount = 0;
-        this.cantMoveCount = 0;
-        this.isBiDoc = false;
-        this.diX2 = false;
-        this.banX2 = false;
-        this.buocDi = 0;
-        this.isMM = false;
-        this.isUpdateAngry = false;
-        this.isUpdateHP = false;
-        this.isUpdateXP = false;
-        this.XPUp = 0;
-        this.CupUp = 0;
-        this.idNV = 0;
-        this.HPMax = 0;
-        this.satThuong = 0;
-        this.phongThu = 0;
-        this.mayMan = 0;
-        this.HP = 0;
-        if (user == null) {
-            return;
+
+        this.hp = maxHp;
+    }
+
+    private void applyClanBonuses() {
+        if (clanItems[1]) { // 5% may mắn
+            luck += (short) (luck * 5 / 100);
         }
-        if (this.user.getClanIdAsShort() > 0) {
-            for (byte i = 1; i <= ClanItemRepository.CLAN_ITEM_ENTRY_MAP.size(); i++) {
-                this.itemclan[i] = false;
+        if (clanItems[3]) { // 5% phòng thủ
+            defense += (short) (defense * 5 / 100);
+        }
+        if (clanItems[5]) { // 5% HP
+            maxHp += (short) (maxHp * 5 / 100);
+        }
+        if (clanItems[6]) { // 5% sức mạnh
+            damage += (short) (damage * 5 / 100);
+        }
+        if (clanItems[8]) { // 10% may mắn
+            luck += (short) (luck * 10 / 100);
+        }
+        if (clanItems[10]) { // 10% phòng thủ
+            defense += (short) (defense * 10 / 100);
+        }
+        if (clanItems[12]) { // 10% HP
+            maxHp += (short) (maxHp * 10 / 100);
+        }
+        if (clanItems[13]) { // 10% sức mạnh
+            damage += (short) (damage * 10 / 100);
+        }
+        if (clanItems[14]) { // 30% phòng thủ cho Canon và AK
+            if (characterId == 1 || characterId == 5) {
+                defense += (short) (defense * 30 / 100);
             }
         }
-        this.idBullet = user.getBulletId();
-        this.gunId = user.getGunId();
-        this.idNV = user.getActiveCharacterId();
-        short[] ability = user.calculateCharacterAbilities((short) 0);
-        this.HPMax = ability[0] + (teamPoint * 5);
-        this.satThuong = ability[1] + (teamPoint);
-        this.phongThu = ability[2] + (teamPoint * 5);
-        this.mayMan = ability[3] + (teamPoint * 5);
-        //5% mm
-        if (this.itemclan[2]) {
-            this.mayMan = this.mayMan * 105 / 100;
-        }
-        //5% dong doi
-        if (this.itemclan[3]) {
-            this.dongDoi = this.dongDoi * 105 / 100;
-        }
-        //5% phong thu
-        if (this.itemclan[4]) {
-            this.phongThu = this.phongThu * 105 / 100;
-        }
-        //5% HP
-        if (this.itemclan[6]) {
-            this.HPMax = this.HPMax * 105 / 100;
-        }
-        //10% mm
-        if (this.itemclan[9]) {
-            this.mayMan = this.mayMan * 110 / 100;
-        }
-        //10% dong doi
-        if (this.itemclan[10]) {
-            this.dongDoi = this.dongDoi * 110 / 100;
-        }
-
-        this.HP = this.HPMax;
-    }
-
-    public static int[] getLuyenTapItem() {
-        return new int[]{0, 0, 0, 0, 0, 0, 0, 0};
-    }
-
-    public final void setXY(short X, short Y) {
-        if (X >= 0 && X < this.fightManager.mapMNG.Width && Y < this.fightManager.mapMNG.Height) {
-            this.X = X;
-            this.Y = Y;
+        if (clanItems[15]) { // 15% sức mạnh cho King Kong và Proton
+            if (characterId == 2 || characterId == 3) {
+                damage += (short) (damage * 15 / 100);
+            }
         }
     }
 
-    public final void updateXY(short X, short Y) {
-        while (X != this.X || Y != this.Y) {
-            int preX = this.X;
-            int preY = this.Y;
-            if (X < this.X) {
+    public void die() {
+        hp = 0;
+        isUpdateHP = true;
+    }
+
+    public void nextLuck() {
+        isLucky = Math.random() < 0.5;
+    }
+
+    public void decreaseWindStopCount() {
+        if (windStopCount > 0) {
+            windStopCount--;
+        }
+    }
+
+    public void incrementSkippedTurns() {
+        skippedTurns++;
+    }
+
+    public void updateHP(short addHp) {
+        isUpdateHP = true;
+        hp += addHp;
+        if (hp <= 0) {
+            hp = 0;
+        } else if (hp < 10) {
+            hp = 10;
+        } else if (hp > maxHp) {
+            hp = maxHp;
+        }
+        int oldPixel = pixel;
+        pixel = (byte) (hp * 25 / maxHp);
+
+        if (addHp != 0) {
+            updateAngry((byte) ((oldPixel - pixel) * 4));
+        }
+    }
+
+    private void updateAngry(byte addAngry) {
+        isUpdateAngry = true;
+        angry += addAngry;
+        if (angry < 0) {
+            angry = 0;
+        }
+        if (angry > 100) {
+            angry = 100;
+        }
+    }
+
+    public byte getPowerUsageStatus() {
+        return (byte) (isUsePow ? 1 : 0);
+    }
+
+    public void updateXY(short x, short y) {
+        while (x != this.x || y != this.y) {
+            int preX = this.x;
+            int preY = this.y;
+            if (x < this.x) {
                 move(false);
-            } else if (X > this.X) {
+            } else if (x > this.x) {
                 move(true);
             }
-            // if ko di chuyen dc
-            if (preX == this.X && preY <= this.Y) {
+
+            //Nếu không di chuyển được thì thoát vòng lặp
+            if (preX == this.x && preY <= this.y) {
                 return;
             }
         }
-    }
-
-    public void chuanHoaXY() {
-        while (this.Y < this.fightManager.mapMNG.Height + 200) {
-            if (this.fightManager.mapMNG.isCollision(X, Y) || this.fly) {
-                return;
-            }
-            Y++;
-        }
-    }
-
-    public boolean isDropMap() {
-        short X = this.X, Y = this.Y;
-        boolean isFly = this.fly;
-        short mapHeight = this.fightManager.mapMNG.Height;
-        while (Y < mapHeight + 200) {
-            if (this.fightManager.mapMNG.isCollision(X, Y) || isFly) {
-                return false;
-            }
-            Y++;
-        }
-        return true;
     }
 
     protected void move(boolean addX) {
-        if (this.cantMoveCount > 0) {
+        IMapManager mapManager = fightManager.getMapManger();
+        if (this.freezeCount > 0) {
             return;
         }
         byte step = 1;
-        if (this.diX2) {
+        if (this.isDoubleSpeed) {
             step = 2;
         }
-        if (buocDi > theLuc) {
+        if (steps > stamina) {
             return;
         }
-        buocDi++;
+        steps++;
         if (addX) {
-            X += step;
+            x += step;
         } else {
-            X -= step;
+            x -= step;
         }
-        if (fightManager.mapMNG.isCollision(X, (short) (Y - 5))) {
-            buocDi--;
+        if (mapManager.isCollision(x, (short) (y - 5))) {
+            steps--; // Giảm số bước nếu không thể di chuyển
             if (addX) {
-                X -= step;
+                x -= step;
             } else {
-                X += step;
+                x += step;
             }
             return;
         }
-        for (int i = 4; i >= 0; i--) {
-            if (this.fightManager.mapMNG.isCollision(X, (short) (Y - i))) {
-                Y -= i;
+        for (short i = 4; i >= 0; i--) {
+            if (mapManager.isCollision(x, (short) (y - i))) {
+                y -= i;
                 return;
             }
         }
-        this.chuanHoaXY();
+        updateYPosition();
     }
 
-    public final void updateHP(int addHP) {
-        this.isUpdateHP = true;
-        this.HP += addHP;
-        if (this.HP <= 0) {
-            this.HP = 0;
-        } else if (this.HP < 10) {
-            this.HP = 10;
-        } else if (this.HP > this.HPMax) {
-            this.HP = this.HPMax;
-        }
-        int oldPixel = this.pixel;
-        this.pixel = (byte) (this.HP * 25 / this.HPMax);
-        if (addHP < 0) {
-            this.updateAngry((oldPixel - pixel) * 4);
-        }
-        if (this.HP <= 0) {
-            die();
-        }
-    }
-
-    public final void updateAngry(int addAngry) {
-        this.isUpdateAngry = true;
-        this.angry += addAngry;
-        if (this.angry < 0) {
-            this.angry = 0;
-        }
-        if (this.angry > 100) {
-            this.angry = 100;
-        }
-    }
-
-    public final void updateEXP(int addXP) throws IOException {
-        if (user == null || addXP == 0) {
-            return;
-        }
-        this.isUpdateXP = true;
-        if (this.user.getClanIdAsShort() > 0) {
-//            ClanManager.updateXp(this.us, addXP / 100);
-        }
-        if (this.itemclan[1]) {
-            addXP *= 2;
-        }
-        if (this.itemclan[8]) {
-            addXP *= 3;
-        }
-        this.XPUp += addXP;
-        addXP -= 2;
-        if (addXP < 1) {
-            return;
-        }
-        int i = this.team ? 0 : 1;
-        int lent = this.fightManager.type == 5 ? 1 : 2;
-        for (; i < ServerManager.maxPlayers; i += lent) {
-            Player pl = this.fightManager.players[i];
-            if (pl == null || pl == this) {
-                continue;
+    public void updateYPosition() {
+        IMapManager mapManager = fightManager.getMapManger();
+        while (y < mapManager.getHeight() + 200) {
+            if (mapManager.isCollision(x, y) || isFlying) {
+                return;
             }
-            pl.isUpdateXP = true;
-            pl.XPUp += addXP;
-            pl.AllXPUp += addXP;
+            y++;
         }
     }
 
-    public final void updateCUP(int addCup) throws IOException {
-        if (user == null || addCup == 0) {
-            return;
-        }
-        this.isUpdateCup = true;
-        this.CupUp += addCup;
-        this.AllCupUp += addCup;
-        addCup -= 2;
-        if (addCup < 1) {
-            return;
-        }
-        int i = this.team ? 0 : 1;
-        int lent = this.fightManager.type == 5 ? 1 : 2;
-        for (; i < ServerManager.maxPlayers; i += lent) {
-            Player pl = this.fightManager.players[i];
-            if (pl == null || pl == this) {
-                continue;
-            }
-            pl.isUpdateCup = true;
-            pl.CupUp += addCup;
-            pl.AllCupUp += addCup;
-        }
-    }
-
-    private void die() {
-        if (this.isMM && this.X > 0 && this.Y < this.fightManager.mapMNG.Height && this.X < this.fightManager.mapMNG.Width) {
-            this.HP = 10;
-        } else {
-            this.isDie = true;
-            if (user != null) {
-                user.notifyNetWait();
-            }
-        }
-    }
-
-    public void netWait() {
-        if (user != null) {
-            user.netWait();
-        }
-    }
-
-    public void notifyNetWait() {
-        if (user != null) {
-            user.notifyNetWait();
-        }
-    }
-
-    public boolean isCollision(short X, short Y) {
-        if (this.voHinhCount > 0 || this.isDie) {
+    public boolean isCollision(short x, short y) {
+        if (eyeSmokeCount > 0) {
             return false;
         }
-        return Utils.inRegion(X, Y, this.X - this.width / 2, this.Y - this.height, this.width, this.height);
+        return Utils.inRegion(x, y, this.x - this.width / 2, this.y - this.height, this.width, this.height);
     }
 
-    public void collision(short bx, short by, Bullet bull) {
-        int tamAH = Bullet.getTamAHByBullID(bull.bullId);
-        if (bull.bullId == 35 && bull.pl.idNV == 15) {
-            tamAH = 250;
-        }
-        // Neu la tz or apa or chicky or rocket dung pow-> no rong gap doi
-        if (bull.pl.isUsePow && (bull.pl.idNV == 3 || bull.pl.idNV == 4 || bull.pl.idNV == 6 || bull.pl.idNV == 7 || bull.pl.idNV == 8)) {
-            tamAH = tamAH * 2;
-        }
-        if (this.isDie || this.voHinhCount > 0 || !Utils.intersectRegions(X, Y, width, height, bx, by, tamAH * 2, tamAH * 2)) {
-            return;
-        }
-        if ((bull.bullId == 31 || bull.bullId == 32 || bull.bullId == 35) && this.index >= ServerManager.maxPlayers) {
-            return;
-        }
-        int kcX = Math.abs(X - bx);
-        int kcY = Math.abs(Y - this.height / 2 - by);
-        int kc = (int) Math.sqrt(kcX * kcX + kcY * kcY);
-        long dame = bull.satThuong;
-        if (kc > this.width / 2) {
-            dame = dame - ((dame * (kc - this.width / 2)) / tamAH);
-        }
-        int PhongThu = this.phongThu;
-        boolean isDropMap = isDropMap();
-        if (isDropMap) {
-            this.HP = 0;
-            this.isDie = true;
-            this.isUpdateHP = true;
-            this.pixel = 0;
-        }
-        if (dame > 0) {
-            if (bull.pl.isMM) {
-                dame *= 2;
-            }
-            if (bull.pl.itemclan[7]) {
-                dame = dame * 105 / 100;
-            }
-            if (bull.pl.isUsePow && bull.pl.itemclan[5]) {
-                dame = dame * 105 / 100;
-            }
-            if (bull.typeSC > 0) {
-                switch (bull.typeSC) {
-                    case 1:
-                        fightManager.bullMNG.typeSC = 1;
-                        dame = dame * 11 / 10; // x1.1
-                        fightManager.bullMNG.XSC = bull.XmaxY;
-                        fightManager.bullMNG.YSC = bull.maxY;
-                        break;
-                    case 2:
-                        fightManager.bullMNG.typeSC = 1;
-                        dame = dame * 6 / 5; // x1.2
-                        fightManager.bullMNG.XSC = bull.XmaxY;
-                        fightManager.bullMNG.YSC = bull.maxY;
-                        break;
-                    case 4:
-                        fightManager.bullMNG.typeSC = 2;
-                        dame = dame * 13 / 10; // x1.3
-                        break;
-                    default:
-                        break;
-                }
-            }
-            if (this.isMM) {
-                PhongThu = this.phongThu + this.phongThu / 10;
-            }
-            if (this.isMM) {
-                dame = Math.round((float) (dame * 1) / 2);
-            }
-        }
-        PhongThu *= isMM ? 2 : 1;
-        int maxPhongThu = 100000;
-//        PhongThu = PhongThu > 95000 ? 95000 : PhongThu;
-//        dame = Math.round(dame - (dame * (PhongThu * 100 / maxPhongThu) / 100));
-        PhongThu = PhongThu > 95000 ? 95000 : PhongThu;
-        dame = Math.round(dame - (dame * (PhongThu * 10 / maxPhongThu) / 100));
-        if (dame > 0) {
-            int oldHP = this.HP;
-            if (!isDropMap) {
-                this.updateHP((int) -dame);
-            }
-            if (bull.pl instanceof Boss) {
-                return;
-            }
-            bull.pl.user.updateMission(1, oldHP - this.HP);
-            if (bull.pl.hutMauCount > 0 && this.HP > dame) {
-                bull.pl.updateHP((int) (dame / 2));
-            }
-            if (bull.pl.hutMauCount > 0 && this.HP < dame) {
-                bull.pl.updateHP(this.HP / 2);
-            }
-            // Neu ban chet + xp va dvong
-            if (this.isDie) {
-                // Tarzan
-                if (this.idNV == 7) {
-                    bull.pl.user.updateMission(6, 1);
-                }
-                if (this.idNV == 6) {
-                    bull.pl.user.updateMission(7, 1);
-                }
-                if (this.idNV == 9) {
-                    bull.pl.user.updateMission(8, 1);
-                }
-                try {
-                    if (this.idNV == 23) {
-                        switch (Utils.nextInt(4)) {
-                            //xu
-                            case 0:
-                                int[] xuup = new int[]{1000, 5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000, 50000, 55000, 60000};
-                                bull.pl.GiftBoxFalling.add(new box());
-                                bull.pl.GiftBoxFalling.get(bull.pl.GiftBoxFalling.size() - 1).Coins(xuup[Utils.nextInt(xuup.length)]);
-                                break;
-                            //item
-                            case 1:
-                                bull.pl.GiftBoxFalling.add(new box());
-                                bull.pl.GiftBoxFalling.get(bull.pl.GiftBoxFalling.size() - 1).Item((byte) (Utils.nextInt(FightItemRepository.FIGHT_ITEM_ENTRIES.size() - 2) + 2), (byte) Utils.nextInt(1, 5));
-                                break;
-                            //xp
-                            case 2:
-                                bull.pl.GiftBoxFalling.add(new box());
-                                bull.pl.GiftBoxFalling.get(bull.pl.GiftBoxFalling.size() - 1).XP(Utils.nextInt(20000, 30000));
-                                break;
-                            //item dac biet
-                            case 3:
-                                bull.pl.GiftBoxFalling.add(new box());
-                                bull.pl.GiftBoxFalling.get(bull.pl.GiftBoxFalling.size() - 1).SpecialItem((byte) (Utils.nextInt(8) + Utils.nextInt(5) * 10), 1);
-                                break;
-                        }
-                    } else if (this.idNV == 24) {
-                        switch (Utils.nextInt(4)) {
-                            //xu
-                            case 0:
-                                int[] xuup = new int[]{1000, 5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000, 50000, 55000, 60000};
-                                bull.pl.GiftBox.add(new box());
-                                bull.pl.GiftBox.get(bull.pl.GiftBox.size() - 1).Coins(xuup[Utils.nextInt(xuup.length)]);
-                                break;
-                            //item
-                            case 1:
-                                bull.pl.GiftBox.add(new box());
-                                bull.pl.GiftBox.get(bull.pl.GiftBox.size() - 1).Item((byte) (Utils.nextInt(FightItemRepository.FIGHT_ITEM_ENTRIES.size() - 2) + 2), (byte) Utils.nextInt(1, 5));
-                                break;
-                            //xp
-                            case 2:
-                                bull.pl.GiftBox.add(new box());
-                                bull.pl.GiftBox.get(bull.pl.GiftBox.size() - 1).XP(Utils.nextInt(1, 127));
-                                break;
-                            //item dac biet
-                            case 3:
-                                bull.pl.GiftBox.add(new box());
-                                bull.pl.GiftBox.get(bull.pl.GiftBox.size() - 1).SpecialItem((byte) (Utils.nextInt(8) + Utils.nextInt(5) * 10), 1);
-                                break;
-                        }
-                    } else if (this.idNV == 26) {
-                        for (int i = 0; i < 2; i++) {
-                            Player players = new Ghost2(fightManager, (byte) 26, "Ghost II", (byte) (fightManager.allCount + fightManager.bullMNG.addboss.size()), 1800 + (fightManager.getLevelTeam() * 10), (short) (Utils.nextInt(100, fightManager.mapMNG.Width - 100)), (short) Utils.nextInt(150));
-                            fightManager.bullMNG.addboss.add(new AddBoss(players, fightManager.getisLH() ? 50 : 6));
-                        }
-                    }
-                    // Ban dong doi -5xp -5cup
-                    if (this.fightManager.type != 5 && this.team == bull.pl.team && this.idNV != 23 && this.idNV != 24 && this.index != bull.pl.index) {
-                        bull.pl.updateCUP(-5);
-                        //bull.pl.updateEXP(-5);
-                        return;
-                    }
-                    if (index == bull.pl.index || this.fightManager.type == 5 && !(this instanceof Boss)) {
-                        return;
-                    }
-                    if (this instanceof Boss) {
-                        if (fightManager.mapMNG.Id != 35 && this.idNV != 23 && this.idNV != 24) {
-                        }
-
-                        int thaoancut = this.XPExist * 4;
-                        bull.pl.updateEXP(thaoancut);
-                    } else {
-                        int cupCL = bull.pl.user.getCup() - this.user.getCup();
-                        int cupAdd = ((3000 - cupCL) / 100);
-                        int levelPL = this.user.getCurrentLevel();
-                        if (levelPL > 255) {
-                            levelPL = 255;
-                        }
-                        if (cupAdd > 60) {
-                            cupAdd = 60;
-                        }
-                        if (cupAdd < 0) {
-                            cupAdd = 0;
-                        }
-                        bull.pl.updateCUP(cupAdd);
-                        bull.pl.updateEXP((levelPL / 2) + 2);
-                        updateCUP(-cupAdd);
-                        //updateEXP(-((levelPL / 2) + 2));
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+    public void collision(short x, short y, Bullet bull) {
+        System.out.println("123");
     }
-
-    public void nextMM() {
-        if (this.mayMan > 7500) {
-            this.mayMan = 7500;
-        }
-        this.isMM = Utils.nextInt(10000) <= this.mayMan;
-    }
-
 }

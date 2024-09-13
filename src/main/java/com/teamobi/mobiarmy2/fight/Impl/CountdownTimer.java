@@ -1,9 +1,11 @@
-package com.teamobi.mobiarmy2.fight;
+package com.teamobi.mobiarmy2.fight.Impl;
+
+import com.teamobi.mobiarmy2.fight.ICountdownTimer;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class CountdownTimer {
+public class CountdownTimer implements ICountdownTimer {
     private Timer timer;
     private int remainingTime;
     private final int countdownTime;
@@ -15,6 +17,7 @@ public class CountdownTimer {
         this.onTimeUpCallback = onTimeUpCallback;
     }
 
+    @Override
     public void start() {
         if (timer != null) {
             timer.cancel(); // Hủy bỏ bộ đếm trước đó nếu nó đang chạy
@@ -23,7 +26,7 @@ public class CountdownTimer {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if (remainingTime > -10) {
+                if (remainingTime > 0) {
                     remainingTime--;
                     System.out.println("Thời gian còn lại: " + remainingTime + " giây");
                 } else {
@@ -34,12 +37,14 @@ public class CountdownTimer {
         }, 0, 1000); // Cập nhật mỗi giây
     }
 
+    @Override
     public void stop() {
         if (timer != null) {
             timer.cancel();
         }
     }
 
+    @Override
     public void reset() {
         stop();
         remainingTime = countdownTime;

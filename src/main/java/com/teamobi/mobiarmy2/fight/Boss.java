@@ -1,31 +1,22 @@
 package com.teamobi.mobiarmy2.fight;
 
-import com.teamobi.mobiarmy2.server.ServerManager;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.ArrayList;
-
+/**
+ * @author tuyen
+ */
+@Getter
+@Setter
 public abstract class Boss extends Player {
 
-    public String name;
-    public ArrayList<Player> list = new ArrayList<>();
+    private String name;
 
-    public Boss(FightManager fightMNG, byte idGun, String name, byte location, int HPMax, short X, short Y) {
-        super(fightMNG, location, X, Y, null, (byte) 0, null);
-        this.idNV = idGun;
-        this.HPMax = HPMax;
-        this.HP = this.HPMax;
+    public Boss(IFightManager fightManager, byte index, byte characterId, String name, short x, short y, short maxHp) {
+        super(fightManager, index, characterId, x, y, maxHp);
         this.name = name;
-        this.satThuong = 100;
-        this.phongThu = 0;
-        this.mayMan = 0;
-        for (int i = 0; i < ServerManager.maxPlayers; i++) {
-            Player pl = this.fightManager.players[i];
-            if (pl != null) {
-                list.add(pl);
-            }
-        }
     }
 
-    protected abstract void turnAction();
+    public abstract void turnAction();
 
 }

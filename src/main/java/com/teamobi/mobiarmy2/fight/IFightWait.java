@@ -3,12 +3,30 @@ package com.teamobi.mobiarmy2.fight;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
 
+/**
+ * @author tuyen
+ */
 public interface IFightWait {
+
+    void fightComplete();
+
+    void sendToTeam(IMessage message);
+
+    boolean isStarted();
+
+    byte getNumPlayers();
+
+    User[] getUsers();
+
     void leaveTeam(int playerId);
 
     void chatMessage(int playerId, String message);
 
+    boolean isContinuous();
+
     void kickPlayer(int playerId, int playerId1);
+
+    void decreaseContinuousLevel();
 
     void setReady(boolean ready, int playerId);
 
@@ -18,9 +36,11 @@ public interface IFightWait {
 
     void startGame(int playerId);
 
-    FightManager getFightManager();
+    byte getMapId();
 
     User getUserByPlayerId(int playerId);
+
+    IFightManager getFightManager();
 
     void setRoomName(int playerId, String name);
 
@@ -36,33 +56,9 @@ public interface IFightWait {
 
     void inviteToRoom(int playerId);
 
-    void decreaseContinuousLevel();
+    byte[] getItems(byte i);
 
-    boolean isContinuous();
-
-    byte getMapId();
-
-    int getNumPlayers();
-
-    byte getContinuousLevel();
-
-    void setContinuousLevel(byte b);
-
-    void setMapId(byte continuousMap);
+    byte getRoomType();
 
     int getMoney();
-
-    void setStarted(boolean b);
-
-    void fightComplete();
-
-    byte getType();
-
-    User[] getUsers();
-
-    byte[][] getItems();
-
-    boolean isStarted();
-
-    void sendToTeam(IMessage message);
 }

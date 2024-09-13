@@ -1,8 +1,10 @@
-package com.teamobi.mobiarmy2.fight;
+package com.teamobi.mobiarmy2.fight.Impl;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.constant.UserState;
+import com.teamobi.mobiarmy2.fight.IFightManager;
+import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.model.Room;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
@@ -25,10 +27,10 @@ import java.util.Objects;
 @Setter
 public class FightWait implements IFightWait {
     public static final byte MAX_ITEMS_SLOT = 8;
-    public static final int KICK_BOSS_TIME = 80;
+    public static final int KICK_BOSS_TIME = 90;
     public static final byte[] continuousMaps = {30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
 
-    private FightManager fightManager;
+    private IFightManager fightManager;
     private Room room;
     private byte id;
     private User[] users;
@@ -37,7 +39,7 @@ public class FightWait implements IFightWait {
     private boolean started;
     private int numReady;
     private int maxSetPlayers;
-    private int numPlayers;
+    private byte numPlayers;
     private boolean isPassSet;
     private String password;
     private int money;
@@ -325,11 +327,6 @@ public class FightWait implements IFightWait {
     }
 
     @Override
-    public byte getType() {
-        return room.getType();
-    }
-
-    @Override
     public void sendToTeam(IMessage ms) {
         for (User user : users) {
             if (user != null) {
@@ -555,11 +552,7 @@ public class FightWait implements IFightWait {
         teamPointsBlue = (short) (teamPointsBlue / 20);
         teamPointsRed = (short) (teamPointsRed / 20);
 
-        try {
-            fightManager.startGame(teamPointsBlue, teamPointsRed);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        fightManager.startGame(teamPointsBlue, teamPointsRed);
         started = true;
 
         resetReadies();
@@ -750,6 +743,16 @@ public class FightWait implements IFightWait {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public byte[] getItems(byte i) {
+        return items[i];
+    }
+
+    @Override
+    public byte getRoomType() {
+        return room.getType();
     }
 
     @Override

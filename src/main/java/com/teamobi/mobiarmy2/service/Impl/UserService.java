@@ -7,8 +7,8 @@ import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.dao.impl.GiftCodeDao;
 import com.teamobi.mobiarmy2.dao.impl.UserDao;
 import com.teamobi.mobiarmy2.fight.Bullet;
-import com.teamobi.mobiarmy2.fight.FightWait;
-import com.teamobi.mobiarmy2.fight.TrainingManager;
+import com.teamobi.mobiarmy2.fight.Impl.FightWait;
+import com.teamobi.mobiarmy2.fight.Impl.TrainingManager;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.*;
@@ -1645,7 +1645,7 @@ public class UserService implements IUserService {
             short y = dis.readShort();
 
             if (user.getState() == UserState.FIGHTING) {
-                //  user.getFightWait().getFightManager().changeLocation(user.getPlayerId(), x, y);
+                user.getFightWait().getFightManager().changeLocation(user.getPlayerId(), x, y);
             } else if (user.getState() == UserState.TRAINING) {
                 user.getTrainingManager().changeLocation(x, y);
             }
@@ -1656,21 +1656,20 @@ public class UserService implements IUserService {
 
     @Override
     public void shoot(IMessage ms) {
-//        DataInputStream dis = ms.reader();
+        DataInputStream dis = ms.reader();
         try {
-//            byte bullId = dis.readByte();
-//            short x = dis.readShort();
-//            short y = dis.readShort();
-//            short angle = Utils.clamp(dis.readShort(), (short) -360, (short) 360);
-//            byte force = Utils.clamp(dis.readByte(), (byte) 0, (byte) 30);
-//            byte force2 = 0;
-//            if (Bullet.isDoubleBull(bullId)) {
-//                force2 = Utils.clamp(dis.readByte(), (byte) 0, (byte) 30);
-//            }
-//            byte numShoot = dis.readByte();
-//            System.out.println("Num shoot: " + numShoot);
+            byte bullId = dis.readByte();
+            short x = dis.readShort();
+            short y = dis.readShort();
+            short angle = Utils.clamp(dis.readShort(), (short) -360, (short) 360);
+            byte force = Utils.clamp(dis.readByte(), (byte) 0, (byte) 30);
+            byte force2 = 0;
+            if (Bullet.isDoubleBull(bullId)) {
+                force2 = Utils.clamp(dis.readByte(), (byte) 0, (byte) 30);
+            }
+            byte numShoot = dis.readByte();
 
-            user.getFightWait().getFightManager().shootMessage(user, (Message) ms);
+            user.getFightWait().getFightManager().addShoot(user.getPlayerId(), bullId, x, y, angle, force, force2, numShoot);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1689,7 +1688,7 @@ public class UserService implements IUserService {
                 return;
             }
 
-            user.getFightWait().getFightManager().useItemMessage(user, (Message) ms);
+            user.getFightWait().getFightManager().useItem(user.getPlayerId(), itemIndex);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,6 +1,8 @@
-package com.teamobi.mobiarmy2.fight;
+package com.teamobi.mobiarmy2.fight.Impl;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
+import com.teamobi.mobiarmy2.fight.ITrainingManager;
+import com.teamobi.mobiarmy2.fight.Player;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.Impl.Message;
@@ -39,9 +41,9 @@ public class TrainingManager implements ITrainingManager {
             ds.writeByte(30);
             ds.writeShort(0);
             for (Player player : players) {
-                ds.writeShort(player.X);
-                ds.writeShort(player.Y);
-                ds.writeShort(player.HPMax);
+                ds.writeShort(player.getX());
+                ds.writeShort(player.getY());
+                ds.writeShort(player.getMaxHp());
             }
             for (byte i = 0; i < 6; i++) {
                 ds.writeShort(-1);
