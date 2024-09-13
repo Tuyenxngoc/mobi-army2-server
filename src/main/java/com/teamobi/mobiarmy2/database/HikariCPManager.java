@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.database;
 
-import com.teamobi.mobiarmy2.config.Impl.HikariCPConfig;
+import com.teamobi.mobiarmy2.config.impl.HikariCPConfig;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

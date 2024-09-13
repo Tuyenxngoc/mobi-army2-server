@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.config.IServerConfig;
-import com.teamobi.mobiarmy2.config.Impl.ServerConfig;
+import com.teamobi.mobiarmy2.config.impl.ServerConfig;
 import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.dao.impl.GameDao;
@@ -12,9 +12,9 @@ import com.teamobi.mobiarmy2.model.Room;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.ISession;
-import com.teamobi.mobiarmy2.network.Impl.Session;
+import com.teamobi.mobiarmy2.network.impl.Session;
 import com.teamobi.mobiarmy2.service.IGameService;
-import com.teamobi.mobiarmy2.service.Impl.GameService;
+import com.teamobi.mobiarmy2.service.impl.GameService;
 import lombok.Getter;
 
 import java.io.IOException;

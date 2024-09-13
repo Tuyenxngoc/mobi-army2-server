@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.service.Impl;
+package com.teamobi.mobiarmy2.service.impl;
 
 import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.dao.IGameDao;

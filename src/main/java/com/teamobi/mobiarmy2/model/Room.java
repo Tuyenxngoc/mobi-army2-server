@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.model;
 
-import com.teamobi.mobiarmy2.fight.Impl.FightWait;
+import com.teamobi.mobiarmy2.fight.impl.FightWait;
 import lombok.Getter;
 
 /**

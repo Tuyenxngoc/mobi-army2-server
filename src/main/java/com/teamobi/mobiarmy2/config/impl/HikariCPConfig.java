@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.config.Impl;
+package com.teamobi.mobiarmy2.config.impl;
 
 import com.teamobi.mobiarmy2.config.IDatabaseConfig;
 

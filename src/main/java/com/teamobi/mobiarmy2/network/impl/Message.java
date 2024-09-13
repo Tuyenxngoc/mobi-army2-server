@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.network.Impl;
+package com.teamobi.mobiarmy2.network.impl;
 
 import com.teamobi.mobiarmy2.network.IMessage;
 

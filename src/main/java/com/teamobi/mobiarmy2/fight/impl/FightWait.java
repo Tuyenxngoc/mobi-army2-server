@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.fight.Impl;
+package com.teamobi.mobiarmy2.fight.impl;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
@@ -8,7 +8,7 @@ import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.model.Room;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
-import com.teamobi.mobiarmy2.network.Impl.Message;
+import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.repository.FightItemRepository;
 import com.teamobi.mobiarmy2.repository.MapRepository;
 import com.teamobi.mobiarmy2.server.ServerManager;

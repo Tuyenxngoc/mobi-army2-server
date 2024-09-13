@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.fight.Impl;
+package com.teamobi.mobiarmy2.fight.impl;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
@@ -7,7 +7,7 @@ import com.teamobi.mobiarmy2.fight.*;
 import com.teamobi.mobiarmy2.fight.boss.BigBoom;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
-import com.teamobi.mobiarmy2.network.Impl.Message;
+import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.repository.ClanItemRepository;
 import com.teamobi.mobiarmy2.server.ClanManager;
 import com.teamobi.mobiarmy2.util.Utils;

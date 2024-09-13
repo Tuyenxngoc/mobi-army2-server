@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.fight.Impl;
+package com.teamobi.mobiarmy2.fight.impl;
 
 import com.teamobi.mobiarmy2.fight.*;
 import com.teamobi.mobiarmy2.model.map.MapBrick;
