@@ -273,7 +273,6 @@ public class FightManager implements IFightManager {
                     totalPlayers++;
                 }
             }
-            case 31 -> System.out.println(11);
         }
 
         try {
@@ -327,13 +326,13 @@ public class FightManager implements IFightManager {
         } else {
             if (roomType == 5) {
                 if (isBossTurn) {
-                    playerTurn = getNextValidTurn(playerTurn, MAX_USER_FIGHT);
+                    playerTurn = getNextValidTurn(playerTurn, 0, MAX_USER_FIGHT);
                 } else {
-                    bossTurn = getNextValidTurn(bossTurn, totalPlayers);
+                    bossTurn = getNextValidTurn(bossTurn, MAX_USER_FIGHT, totalPlayers);
                 }
                 isBossTurn = !isBossTurn;
             } else {
-                playerTurn = getNextValidTurn(playerTurn, MAX_USER_FIGHT);
+                playerTurn = getNextValidTurn(playerTurn, 0, MAX_USER_FIGHT);
             }
         }
 
@@ -345,18 +344,11 @@ public class FightManager implements IFightManager {
         }
     }
 
-    /**
-     * Gets the next valid turn index for the players array.
-     *
-     * @param currentTurn The current turn index.
-     * @param limit       The limit of the players array.
-     * @return The next valid turn index. If no valid turn is found, returns the current turn index.
-     */
-    private int getNextValidTurn(int currentTurn, int limit) {
+    private int getNextValidTurn(int currentTurn, int min, int limit) {
         int turn = currentTurn + 1;
         while (turn != currentTurn) {
             if (turn == limit) {
-                turn = 0;
+                turn = min;
             }
             if (players[turn] != null) {
                 return turn;

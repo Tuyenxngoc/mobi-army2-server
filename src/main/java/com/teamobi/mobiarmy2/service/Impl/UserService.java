@@ -1849,7 +1849,7 @@ public class UserService implements IUserService {
             short x = dis.readShort();
             short y = dis.readShort();
 
-            System.out.println(x + " " + y);
+            ServerManager.getInstance().logger().logMessage("Update coordinates: x=" + x + "  y=" + y);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -2162,7 +2162,8 @@ public class UserService implements IUserService {
                 x[i] = dis.readInt();
                 y[i] = dis.readInt();
             }
-            System.out.println(Arrays.toString(x) + " : " + Arrays.toString(y));
+
+            ServerManager.getInstance().logger().logMessage("Clear bullets: x=" + Arrays.toString(x) + "  y=" + Arrays.toString(y));
         } catch (IOException e) {
             e.printStackTrace();
         }
