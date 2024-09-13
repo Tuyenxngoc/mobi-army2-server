@@ -50,7 +50,26 @@ public class EffectManager {
         return new ImageData(width, height, pixelData);
     }
 
+    public static byte getHoleByBulletId(byte bullId) {
+        return switch (bullId) {
+            case 0, 32, 24, 35, 48, 52 -> 3;
+            case 1, 27 -> 1;
+            case 6, 12 -> 6;
+            case 7, 31, 37, 15, 22, 42, 43, 45, 57 -> 7;
+            case 3 -> 9;
+            case 9 -> 5;
+            case 10 -> 4;
+            case 11, 19, 17, 18, 21, 40, 41, 44 -> 2;
+            case 25, 47 -> 8;
+            default -> 0;
+        };
+    }
+
     public static ImageData getHoleImageByBulletId(byte bulletId) {
+        byte holeIndex = getHoleByBulletId(bulletId);
+        if (holeIndex >= 0 && holeIndex < HOLE_COUNT) {
+            return holeData[holeIndex];
+        }
         return holeData[0];
     }
 }

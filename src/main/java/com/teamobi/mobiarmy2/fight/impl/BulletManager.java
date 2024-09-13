@@ -69,10 +69,9 @@ public class BulletManager {
         }
     }
 
-    public FightManager fm;
-    protected ArrayList<Bullet> entrys;
+    public FightManager fightManager;
+    protected ArrayList<Bullet> bullets;
     protected byte force2;
-
     public int mangNhenId;
     public boolean hasVoiRong;
     public ArrayList<VoiRong> voiRongs;
@@ -88,9 +87,9 @@ public class BulletManager {
     public short XPL;
     public short YPL;
 
-    public BulletManager(FightManager fm) {
-        this.fm = fm;
-        this.entrys = new ArrayList<>();
+    public BulletManager(FightManager fightManager) {
+        this.fightManager = fightManager;
+        this.bullets = new ArrayList<>();
         this.voiRongs = new ArrayList<>();
         this.boms = new ArrayList<>();
         this.addboss = new ArrayList<>();
@@ -132,7 +131,7 @@ public class BulletManager {
                     if (pl.getUsedItemId() > 0 || (idGun != 0 && idGun != 14)) {
                         return;
                     }
-                    entrys.add(new Bullet(this, (byte) 0, (pl.isUsePow() ? 630 : (nshoot == 2 ? 210 : 280)), pl, x, y, vx, vy, 80, 100));
+                    bullets.add(new Bullet(this, (byte) 0, (pl.isUsePow() ? 630 : (nshoot == 2 ? 210 : 280)), pl, x, y, vx, vy, 80, 100));
                     break;
             }
         }
@@ -142,7 +141,7 @@ public class BulletManager {
         boolean hasNext;
         do {
             hasNext = false;
-            for (Bullet bull : this.entrys) {
+            for (Bullet bull : this.bullets) {
                 if (bull == null || bull.isCollect()) {
                     continue;
                 }
@@ -153,7 +152,7 @@ public class BulletManager {
     }
 
     public void reset() {
-        this.entrys.clear();
+        this.bullets.clear();
     }
 
     public short[] getCollisionPoint(short X1, short Y1, short X2, short Y2, boolean isXuyenPlayer, boolean isXuyenMap) {
@@ -163,7 +162,7 @@ public class BulletManager {
         byte y_unit = 0;
         byte x_unit2 = 0;
         byte y_unit2 = 0;
-        Player us = this.fm.getPlayerTurn();
+        Player us = this.fightManager.getPlayerTurn();
         if (Dx < 0) {
             x_unit = x_unit2 = -1;
         } else if (Dx > 0) {
@@ -187,13 +186,13 @@ public class BulletManager {
         short X = X1, Y = Y1;
         for (int i = 0; i <= k1; i++) {
             if (!isXuyenMap) {
-                if (fm.getMapManger().isCollision(X, Y)) {
+                if (fightManager.getMapManger().isCollision(X, Y)) {
                     return new short[]{X, Y};
                 }
             }
             if (!isXuyenPlayer && us.getCharacterId() != 16) {
-                for (int j = 0; j < fm.getTotalPlayers(); j++) {
-                    Player pl = fm.getPlayers()[j];
+                for (int j = 0; j < fightManager.getTotalPlayers(); j++) {
+                    Player pl = fightManager.getPlayers()[j];
                     if (pl != null) {
                         if (pl.getCharacterId() > 15 && pl.isDead()) {
                             continue;
@@ -206,7 +205,7 @@ public class BulletManager {
             }
             if (us.getCharacterId() == 16) {
                 for (int j = 0; j < ServerManager.maxPlayers; j++) {
-                    Player pl = this.fm.getPlayers()[j];
+                    Player pl = this.fightManager.getPlayers()[j];
                     if (pl == null || pl.isDead()) {
                         continue;
                     }

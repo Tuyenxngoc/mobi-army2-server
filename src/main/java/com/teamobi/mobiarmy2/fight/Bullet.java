@@ -13,11 +13,11 @@ import java.util.ArrayList;
 @Getter
 @Setter
 public class Bullet {
-    protected FightManager fm;
-    protected BulletManager bullMNG;
+    protected FightManager fightManager;
+    protected BulletManager bulletManager;
     protected boolean collect;
     protected byte bullId;
-    protected long satThuong;
+    protected int damage;
     public short X;
     public short Y;
     protected short lastX;
@@ -42,269 +42,11 @@ public class Bullet {
     public ArrayList<Short> XArray;
     public ArrayList<Short> YArray;
 
-    public static byte getHoleByBulletId(byte bullId) {
-        switch (bullId) {
-            case 0: // '\0'
-            case 32: // ' '
-                return 3;
-
-            case 1: // '\001'
-                return 1;
-
-            case 2: // '\002'
-                return 0;
-
-            case 6: // '\006'
-                return 6;
-
-            case 7: // '\007'
-            case 31: // '\037'
-            case 37: // '%'
-                return 7;
-
-            case 3: // '\003'
-                return 9;
-
-            case 9: // '\t'
-                return 5;
-
-            case 10: // '\n'
-                return 4;
-
-            case 11: // '\013'
-                return 2;
-
-            case 12: // '\f'
-                return 6;
-
-            case 15: // '\017'
-                return 7;
-
-            case 22: // '\026'
-                return 7;
-
-            case 24: // '\030'
-                return 3;
-
-            case 25: // '\031'
-                return 8;
-
-            case 19: // '\023'
-                return 2;
-
-            case 20: // '\024'
-                return 0;
-
-            case 27: // '\033'
-                return 1;
-
-            case 17: // '\021'
-            case 18: // '\022'
-                return 2;
-
-            case 21: // '\025'
-                return 2;
-
-            case 30: // '\036'
-                return 0;
-
-            case 35:// '0'
-                return 3;
-
-            case 40://1
-            case 41:
-                return 2;
-            case 42: // '*'
-            case 43: // '+'
-                return 7;
-
-            case 44: // ','
-                return 2;
-
-            case 45: // '-'
-                return 7;
-
-            case 47: // '/'
-                return 8;
-
-            case 48: // '0'
-                return 3;
-
-            case 52: // '4'
-                return 3;
-
-            case 57: // '9'
-                return 7;
-
-            default:
-                return 0;
-        }
-    }
-
-    public static int getTamAHByBullID(int bullId) {
-        switch (bullId) {
-
-            //guner
-            case 0:
-                return 21;
-
-            case 1:
-                return 13;
-
-            case 2:
-                return 18;
-
-            case 3:
-                return 100;
-
-            case 6:
-                return 22;
-
-            case 7:
-                return 30;
-
-            case 8:
-                return 22;
-
-            case 9:
-                return 18;
-
-            case 10:
-                return 19;
-
-            case 11:
-                return 13;
-
-            case 12:
-                return 20;
-
-            case 14:
-                return 30;
-
-            case 15:
-                return 28;
-
-            case 16:
-                return 19;
-
-            case 17:
-            case 18:
-                return 13;
-
-            case 19:
-                return 13;
-
-            case 20:
-                return 18;
-
-            case 21:
-                return 13;
-
-            case 22:
-                return 30;
-
-            case 23:
-                return 19;
-
-            case 24:
-                return 18;
-
-            case 25:
-                return 8;
-
-            case 26:
-                return 13;
-
-            case 27:
-                return 11;
-
-            case 28:
-                return 0;
-
-            case 29:
-                return 20;
-
-            case 30:
-                return 16;
-
-            case 31:
-                return 40;
-
-            case 32:
-                return 50;
-
-            case 33:
-                return 25;
-
-            case 35:
-                return 50;
-
-            case 37:
-                return 150;
-
-            case 40:
-                return 30;
-
-            case 41:
-                return 30;
-
-            case 42:
-            case 43:
-                return 32;
-
-            case 44:
-                return 11;
-
-            case 45:
-                return 28;
-
-            case 47:
-                return 7;
-
-            case 48:
-                return 18;
-
-            case 49:
-                return 18;
-
-            case 50:
-                return 30;
-
-            case 51:
-                return 30;
-
-            case 52:
-                return 20;
-
-            case 54:
-                return 30;
-
-            case 55:
-                return 30;
-
-            case 57:
-                return 70;
-
-            case 59:
-                return 16;
-        }
-        return 0;
-    }
-
-    public static boolean isItemk(int bullId) {
-        return bullId == 4 || bullId == 14 || bullId == 16 || bullId == 23
-                || bullId == 28;
-    }
-
-    public static boolean isChicApa(int bullId) {
-        return bullId == 17 || bullId == 19;
-    }
-
-    public Bullet(BulletManager bullMNG, byte bullId, long satThuong, Player pl, int X, int Y, int vx, int vy, int msg, int g100) {
-        this.fm = bullMNG.fm;
-        this.bullMNG = bullMNG;
+    public Bullet(BulletManager bulletManager, byte bullId, int damage, Player pl, int X, int Y, int vx, int vy, int msg, int g100) {
+        this.fightManager = bulletManager.fightManager;
+        this.bulletManager = bulletManager;
         this.bullId = bullId;
-        this.satThuong = (satThuong * pl.getDamage()) / 100;
+        this.damage = (damage * pl.getDamage()) / 100;
         this.pl = pl;
         this.X = (short) X;
         this.Y = (short) Y;
@@ -312,8 +54,8 @@ public class Bullet {
         this.lastY = (short) Y;
         this.vx = (short) vx;
         this.vy = (short) vy;
-        this.ax100 = (short) (bullMNG.fm.getWindX() * msg / 100);
-        this.ay100 = (short) (bullMNG.fm.getWindY() * msg / 100);
+        this.ax100 = (short) (bulletManager.fightManager.getWindX() * msg / 100);
+        this.ay100 = (short) (bulletManager.fightManager.getWindY() * msg / 100);
         this.g100 = (short) g100;
         this.vxTemp = 0;
         this.vyTemp = 0;
@@ -331,15 +73,11 @@ public class Bullet {
         this.isCanCollision = true;
     }
 
-    public boolean isCollect() {
-        return this.collect;
-    }
-
     public void nextXY() {
         frame++;
-        this.XArray.add((short) X);
-        this.YArray.add((short) Y);
-        if ((X < -200) || (X > fm.getMapManger().getWidth() + 200) || (Y > fm.getMapManger().getHeight() + 200)) {
+        this.XArray.add(X);
+        this.YArray.add(Y);
+        if ((X < -200) || (X > fightManager.getMapManger().getWidth() + 200) || (Y > fightManager.getMapManger().getHeight() + 200)) {
             collect = true;
             return;
         }
@@ -348,13 +86,13 @@ public class Bullet {
         lastX = X;
         Y += vy;
         lastY = Y;
-        short[] XYVC = bullMNG.getCollisionPoint(preX, preY, X, Y, isXuyenPlayer, isXuyenMap);
-        if (XYVC != null) {
+        short[] collisionPoint = bulletManager.getCollisionPoint(preX, preY, X, Y, isXuyenPlayer, isXuyenMap);
+        if (collisionPoint != null) {
             collect = true;
-            X = XYVC[0];
-            Y = XYVC[1];
-            XArray.add((short) X);
-            YArray.add((short) Y);
+            X = collisionPoint[0];
+            Y = collisionPoint[1];
+            XArray.add(X);
+            YArray.add(Y);
             if (pl.getUsedItemId() == -1 && !pl.isUsePow()) {
                 if (this.isMaxY) {
                     if (this.Y - this.maxY > 350 && this.Y - this.maxY < 450) {
@@ -368,7 +106,7 @@ public class Bullet {
                 }
             }
             if (this.isCanCollision) {
-                fm.getMapManger().collision(X, Y, this);
+                fightManager.getMapManger().collision(X, Y, this);
             }
             return;
         }
@@ -400,8 +138,8 @@ public class Bullet {
             XmaxY = X;
             maxY = Y;
         }
-        if (this.bullMNG.hasVoiRong) {
-            for (BulletManager.VoiRong vr : this.bullMNG.voiRongs) {
+        if (this.bulletManager.hasVoiRong) {
+            for (BulletManager.VoiRong vr : this.bulletManager.voiRongs) {
                 if (this.X >= vr.X - 5 && this.X <= vr.X + 10) {
                     this.vx -= 2;
                     this.vy -= 2;
@@ -410,5 +148,4 @@ public class Bullet {
             }
         }
     }
-
 }

@@ -528,7 +528,7 @@ public class FightManager implements IFightManager {
         bulletManager.addShoot(player, bullId, angle, force, force2, numShoot);
         bulletManager.fillXY();
 
-        List<Bullet> bullets = bulletManager.getEntrys();
+        List<Bullet> bullets = bulletManager.getBullets();
         if (bullets.isEmpty()) {
             return;
         }
