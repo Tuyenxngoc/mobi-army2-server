@@ -26,8 +26,8 @@ public class MapTile {
     }
 
     public boolean isCollision(short x, short y) {
-        return (Utils.inRegion(x, y, this.x, this.y, image.getWidth(), image.getHeight())
-                && Utils.isNotAlpha(getARGB(x - this.x, y - this.x)));
+        return (Utils.inRegion(x, y, this.x, this.y, image.getWidth(), image.getHeight()))
+                && Utils.isNotAlpha(this.getARGB(x - this.x, y - this.y));
     }
 
     public int getARGB(int x, int y) {

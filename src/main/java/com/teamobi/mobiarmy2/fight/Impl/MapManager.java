@@ -124,8 +124,8 @@ public class MapManager implements IMapManager {
 
     @Override
     public void collision(short X, short Y, Bullet bull) {
-        for (MapTile m : mapTiles) {
-            m.collision(X, Y, bull);
+        for (MapTile mapTile : mapTiles) {
+            mapTile.collision(X, Y, bull);
         }
         for (int i = 0; i < fightManager.getTotalPlayers(); i++) {
             Player pl = fightManager.getPlayers()[i];
@@ -133,6 +133,7 @@ public class MapManager implements IMapManager {
                 pl.collision(X, Y, bull);
             }
         }
+        //Todo: bom hen gio
     }
 
 }
