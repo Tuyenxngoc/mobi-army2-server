@@ -37,6 +37,7 @@ public class Player {
     private boolean isPoisoned;
     private boolean isFlying;
     private byte eyeSmokeCount;
+    private byte invisibleCount;
     private byte freezeCount;
     private byte windStopCount;
     private boolean[] clanItems;
@@ -163,6 +164,7 @@ public class Player {
         hp += addHp;
         if (hp <= 0) {
             hp = 0;
+            isDead = true;
         } else if (hp < 10) {
             hp = 10;
         } else if (hp > maxHp) {
@@ -275,8 +277,63 @@ public class Player {
         return Utils.inRegion(x, y, this.x - this.width / 2, this.y - this.height, this.width, this.height);
     }
 
-    public void collision(short x, short y, Bullet bull) {
+    public void collision(short bx, short by, Bullet bull) {
+        int bullId = bull.getBullId();
+        Player shooter = bull.getPl();
+        int characterId = shooter.getCharacterId();
+
+        //Logic tính toán tầm ảnh hưởng
         int impactRadius = Bullet.getImpactRadiusByBullId(bull.getBullId());
+        if (bullId == 35 && characterId == 15) {
+            impactRadius = 250;
+        }
+
+        // Nhân đôi tầm ảnh hưởng nếu sử dụng kỹ năng pow với các nhân vật cụ thể
+        if (shooter.isUsePow() && (characterId == 3 || characterId == 4 || characterId == 6 || characterId == 7 || characterId == 8)) {
+            impactRadius *= 2;
+        }
+
+        // Kiểm tra điều kiện để bỏ qua xử lý va chạm
+        if (isDead || invisibleCount > 0 || !Utils.intersectRegions(x, y, width, height, bx, by, impactRadius * 2, impactRadius * 2)) {
+            return;
+        }
+
+        // Bỏ qua nếu bullet không hợp lệ
+        if (bullId == 31 || bullId == 32 || bullId == 35) {
+            return;
+        }
+
+        // Tính toán khoảng cách từ điểm va chạm
+        int deltaX = Math.abs(x - bx);
+        int deltaY = Math.abs(y - this.height / 2 - by);
+        int distance = (int) Math.hypot(deltaX, deltaY);
+
+        // Tính sát thương
+        int damage = bull.getDamage();
+        if (distance > this.width / 2) {
+            damage -= (damage * (distance - this.width / 2)) / impactRadius;
+        }
+        if (damage > 0) {
+            //Nhân đôi sát thương nếu may mắn
+            if (shooter.isLucky) {
+                damage *= 2;
+            }
+
+            // Tăng sát thương từ item clan
+            if (shooter.isUsePow()) {
+                if (shooter.clanItems[5]) {
+                    damage += (damage * 5) / 100;  // +5% damage
+                }
+                if (shooter.clanItems[6]) {
+                    damage += (damage * 11) / 100;  // +10% damage
+                }
+            }
+
+            // Tăng sát thương khi đạn siêu cao
+            //todo...
+
+            updateHP((short) -damage);
+        }
     }
 
     public void resetValueInNewTurn() {
