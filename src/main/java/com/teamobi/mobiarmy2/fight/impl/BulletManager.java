@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.fight.impl;
 
 import com.teamobi.mobiarmy2.fight.Bullet;
 import com.teamobi.mobiarmy2.fight.IBulletManager;
+import com.teamobi.mobiarmy2.fight.IFightManager;
 import com.teamobi.mobiarmy2.fight.Player;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -71,7 +72,7 @@ public class BulletManager implements IBulletManager {
         }
     }
 
-    private FightManager fightManager;
+    private IFightManager fightManager;
     private ArrayList<Bullet> bullets;
     private byte force2;
     private int mangNhenId;
@@ -89,7 +90,7 @@ public class BulletManager implements IBulletManager {
     private short XPL;
     private short YPL;
 
-    public BulletManager(FightManager fightManager) {
+    public BulletManager(IFightManager fightManager) {
         this.fightManager = fightManager;
         this.bullets = new ArrayList<>();
         this.voiRongs = new ArrayList<>();
@@ -128,13 +129,45 @@ public class BulletManager implements IBulletManager {
         }
         for (int k = 0; k < nshoot; k++) {
             switch (bull) {
-                // Gunner
-                case 0:
+                case 0 -> {
                     if (pl.getUsedItemId() > 0 || (idGun != 0 && idGun != 14)) {
                         return;
                     }
                     bullets.add(new Bullet(this, (byte) 0, (pl.isUsePow() ? 630 : (nshoot == 2 ? 210 : 280)), pl, x, y, vx, vy, 80, 100));
-                    break;
+                }
+                case 1 -> {
+                    if (pl.getUsedItemId() > 0 || idGun != 1) {
+                        return;
+                    }
+                    int n = pl.isUsePow() ? 6 : 2;
+                    for (byte i = 0; i < n; i++) {
+                        bullets.add(new Bullet(this, (byte) 1, nshoot == 2 ? 109 : 145, pl, x, y, vx, vy, 50, 50));
+                    }
+                }
+
+                case 2 -> {
+                    if (pl.getUsedItemId() > 0 || (idGun != 2 && idGun != 14)) {
+                        return;
+                    }
+                    int n = pl.isUsePow() ? 4 : 2;
+                    for (byte i = 0; i < n; i++) {
+                        int arg = angle + i * 5;
+                        x = pl.getX() + (20 * Utils.cos(arg) >> 10);
+                        y = pl.getY() - 12 - (20 * Utils.sin(arg) >> 10);
+                        vx = (force * Utils.cos(arg) >> 10);
+                        vy = -(force * Utils.sin(arg) >> 10);
+                        bullets.add(new Bullet(this, (byte) 2, nshoot == 2 ? 75 : 100, pl, x, y, vx, vy, 80, 60));
+                        if (i == 0) {
+                            continue;
+                        }
+                        arg = angle - i * 5;
+                        x = pl.getX() + (20 * Utils.cos(arg) >> 10);
+                        y = pl.getY() - 12 - (20 * Utils.sin(arg) >> 10);
+                        vx = (force * Utils.cos(arg) >> 10);
+                        vy = -(force * Utils.sin(arg) >> 10);
+                        bullets.add(new Bullet(this, (byte) 2, nshoot == 2 ? 75 : 100, pl, x, y, vx, vy, 80, 60));
+                    }
+                }
             }
         }
     }

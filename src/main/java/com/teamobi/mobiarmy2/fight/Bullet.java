@@ -1,7 +1,6 @@
 package com.teamobi.mobiarmy2.fight;
 
 import com.teamobi.mobiarmy2.fight.impl.BulletManager;
-import com.teamobi.mobiarmy2.fight.impl.FightManager;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,7 +13,6 @@ import java.util.List;
 @Getter
 @Setter
 public class Bullet {
-    private FightManager fightManager;
     private BulletManager bulletManager;
     private boolean collect;
     private byte bullId;
@@ -44,7 +42,6 @@ public class Bullet {
     private List<Short> YArray;
 
     public Bullet(BulletManager bulletManager, byte bullId, int damage, Player pl, int X, int Y, int vx, int vy, int msg, int g100) {
-        this.fightManager = bulletManager.getFightManager();
         this.bulletManager = bulletManager;
         this.bullId = bullId;
         this.damage = (damage * pl.getDamage()) / 100;
@@ -55,8 +52,9 @@ public class Bullet {
         this.lastY = (short) Y;
         this.vx = (short) vx;
         this.vy = (short) vy;
-        this.ax100 = (short) (bulletManager.getFightManager().getWindX() * msg / 100);
-        this.ay100 = (short) (bulletManager.getFightManager().getWindY() * msg / 100);
+        IFightManager fightManager = bulletManager.getFightManager();
+        this.ax100 = (short) (fightManager.getWindX() * msg / 100);
+        this.ay100 = (short) (fightManager.getWindY() * msg / 100);
         this.g100 = (short) g100;
         this.vxTemp = 0;
         this.vyTemp = 0;
@@ -75,10 +73,13 @@ public class Bullet {
     }
 
     public void nextXY() {
+        IFightManager fightManager = bulletManager.getFightManager();
+        IMapManager mapManager = fightManager.getMapManger();
+
         frame++;
         this.XArray.add(X);
         this.YArray.add(Y);
-        if ((X < -200) || (X > fightManager.getMapManger().getWidth() + 200) || (Y > fightManager.getMapManger().getHeight() + 200)) {
+        if ((X < -200) || (X > mapManager.getWidth() + 200) || (Y > mapManager.getHeight() + 200)) {
             collect = true;
             return;
         }
@@ -107,7 +108,7 @@ public class Bullet {
                 }
             }
             if (this.isCanCollision) {
-                fightManager.getMapManger().collision(X, Y, this);
+                mapManager.collision(X, Y, this);
             }
             return;
         }
