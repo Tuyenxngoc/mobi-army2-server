@@ -302,6 +302,14 @@ public class FightManager implements IFightManager {
         turnCount++;
         byte roomType = fightWait.getRoomType();
 
+        //Cập nhật vị trí y của các player
+        for (Player player : players) {
+            if (player == null) {
+                continue;
+            }
+            player.updateYPosition();
+        }
+
         //Lần đầu radom lượt chơi
         if (playerTurn == -1) {
             while (true) {

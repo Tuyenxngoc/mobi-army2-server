@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.util;
 
+import com.teamobi.mobiarmy2.fight.Boss;
 import com.teamobi.mobiarmy2.fight.MapTile;
 import com.teamobi.mobiarmy2.fight.Player;
 
@@ -28,13 +29,18 @@ public class MapTileExporter {
                 continue;
             }
 
+            Color color = Color.RED;
+            if (player instanceof Boss) {
+                color = Color.GREEN;
+            }
+
             int playerWidth = player.getWidth();
             int playerHeight = player.getHeight();
 
             int x = player.getX() - (playerWidth / 2);
             int y = player.getY() - playerHeight;
 
-            g2d.setColor(Color.RED);
+            g2d.setColor(color);
             g2d.fillRect(x, y, playerWidth, playerHeight);
             g2d.setColor(Color.BLACK);
             g2d.fillRect(player.getX(), player.getY(), 1, 1);

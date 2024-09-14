@@ -57,12 +57,14 @@ public class Player {
         this.maxHp = (short) maxHp;
     }
 
-    public Player(IFightManager fightManager, byte index, byte characterId, short x, short y, short maxHp) {
+    public Player(IFightManager fightManager, byte index, byte characterId, short x, short y, short width, short height, short maxHp) {
         this.fightManager = fightManager;
         this.index = index;
         this.characterId = characterId;
         this.x = x;
         this.y = y;
+        this.width = width;
+        this.height = height;
         this.maxHp = maxHp;
         this.hp = maxHp;
     }
@@ -81,6 +83,7 @@ public class Player {
         this.items = items;
         this.teamPoints = teamPoints;
         this.clanItems = clanItems;
+        this.usedItemId = -1;
 
         this.maxHp = abilities[0];
         this.damage = abilities[1];
