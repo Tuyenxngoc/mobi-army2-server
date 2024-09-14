@@ -32,6 +32,7 @@ public class Player {
     private byte[] items;
     private boolean isUpdateHP;
     private boolean isUpdateAngry;
+    private boolean isUpdateXP;
     private boolean isLucky;
     private boolean isPoisoned;
     private boolean isFlying;
@@ -49,6 +50,7 @@ public class Player {
     private byte usedItemId;
     private short width;
     private short height;
+    private int xpUp;
 
     public Player(int index, int x, int y, int hp, int maxHp) {
         this.index = (byte) index;
@@ -174,7 +176,7 @@ public class Player {
         }
     }
 
-    private void updateAngry(byte addAngry) {
+    public void updateAngry(byte addAngry) {
         isUpdateAngry = true;
         angry += addAngry;
         if (angry < 0) {
@@ -183,6 +185,20 @@ public class Player {
         if (angry > 100) {
             angry = 100;
         }
+    }
+
+    public void updateXp(int addXP) {
+        if (user == null || addXP == 0) {
+            return;
+        }
+        isUpdateXP = true;
+        if (clanItems[1]) {
+            addXP *= 2;
+        }
+        if (clanItems[8]) {
+            addXP *= 3;
+        }
+        xpUp += addXP;
     }
 
     public byte getPowerUsageStatus() {

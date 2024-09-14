@@ -353,7 +353,9 @@ public class FightManager implements IFightManager {
         if (isBossTurn) {
             players[bossTurn].resetValueInNewTurn();
         } else {
-            players[playerTurn].resetValueInNewTurn();
+            Player player = players[playerTurn];
+            player.resetValueInNewTurn();
+            player.updateAngry((byte) 10);
         }
 
         nextWind();
