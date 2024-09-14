@@ -662,7 +662,7 @@ public class FightManager implements IFightManager {
     @Override
     public void skipTurn(int playerId) {
         int index = getPlayerIndexByPlayerId(playerId);
-        if (index == -1 || index != playerTurn) {
+        if (index == -1 || index != playerTurn || isBossTurn) {
             return;
         }
         Player player = players[playerTurn];

@@ -1838,7 +1838,7 @@ public class UserService implements IUserService {
 
     @Override
     public void skipTurn() {
-//        user.getFightWait().getFightManager().skipTurn(user.getPlayerId());
+        user.getFightWait().getFightManager().skipTurn(user.getPlayerId());
     }
 
     @Override
@@ -2806,14 +2806,14 @@ public class UserService implements IUserService {
     @Override
     public void getBigImage(IMessage ms) {
         try {
-            int idS = ms.reader().readByte();
-            ms = new Message(120);
+            int id = ms.reader().readByte();
+            ms = new Message(Cmd.GET_BIG_IMAGE);
             DataOutputStream ds = ms.writer();
-            ds.writeByte(idS);
-            byte[] ab1 = Utils.getFile("res/bigImage/bigImage" + idS + ".png");
-            if (ab1 != null) {
-                ds.writeShort(ab1.length);
-                ds.write(ab1);
+            ds.writeByte(id);
+            byte[] file = Utils.getFile("res/bigImage/bigImage" + id + ".png");
+            if (file != null) {
+                ds.writeShort(file.length);
+                ds.write(file);
             } else {
                 ds.writeShort(0);
             }
