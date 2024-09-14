@@ -1655,6 +1655,9 @@ public class UserService implements IUserService {
 
     @Override
     public void shoot(IMessage ms) {
+        if (user.getState() != UserState.FIGHTING) {
+            return;
+        }
         DataInputStream dis = ms.reader();
         try {
             byte bullId = dis.readByte();

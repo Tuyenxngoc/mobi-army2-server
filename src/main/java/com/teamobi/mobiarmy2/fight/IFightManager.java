@@ -15,6 +15,8 @@ public interface IFightManager {
 
     void addShoot(int playerId, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot);
 
+    void sendMessageUpdateXY(int index);
+
     void skipTurn(int playerId);
 
     void useItem(int playerId, byte itemIndex);
@@ -32,4 +34,6 @@ public interface IFightManager {
     Player[] getPlayers();
 
     Player getPlayerTurn();
+
+    Player findClosestPlayer(short targetX, short targetY);
 }

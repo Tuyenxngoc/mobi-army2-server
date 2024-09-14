@@ -30,8 +30,8 @@ public class GameString {
         return "Đã bỏ chạy -%dxp";
     }
 
-    public static String leave2(String name) {
-        return String.format("%s đã bỏ chạy", name);
+    public static String leave2() {
+        return "Đã bỏ chạy";
     }
 
     public static String inviteError1() {

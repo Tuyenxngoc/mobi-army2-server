@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.fight.impl;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
+import com.teamobi.mobiarmy2.constant.MatchResult;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.fight.*;
 import com.teamobi.mobiarmy2.fight.boss.BigBoom;
@@ -310,6 +311,9 @@ public class FightManager implements IFightManager {
             player.updateYPosition();
         }
 
+        //Cập nhật HP
+        updateHpPlayers();
+
         //Lần đầu radom lượt chơi
         if (playerTurn == -1) {
             while (true) {
@@ -345,7 +349,7 @@ public class FightManager implements IFightManager {
             }
         }
 
-        //Đặt lại giá trị của người chơi trong lượt mới như thể lưc, ..., vv
+        //Đặt lại giá trị của người chơi trong lượt mới như thể lực, ..., vv
         if (isBossTurn) {
             players[bossTurn].resetValueInNewTurn();
         } else {
@@ -378,7 +382,7 @@ public class FightManager implements IFightManager {
             if (turn == limit) {
                 turn = min;
             }
-            if (players[turn] != null) {
+            if (players[turn] != null && !players[turn].isDead()) {
                 return turn;
             }
             turn++;
@@ -405,18 +409,92 @@ public class FightManager implements IFightManager {
             return;
         }
 
+        //Cập nhật thông tin người chơi
         Player player = players[index];
         player.die();
         player.getUser().updateCup(-5);
+        player.setUser(null);
 
-        players[index] = null;
+        //Gửi thông báo đến ván chơi
+        fightWait.chatMessage(playerId, GameString.leave2());
 
-        fightWait.chatMessage(playerId, GameString.leave2(player.getUser().getUsername()));
-
-        //đổi lượt chơi
-        if (playerTurn == index) {
-            nextTurn();
+        //Kiểm tra chưa kết thúc ván thì chuyển lượt
+        if (!checkWin()) {
+            if (index == getCurrentTurn()) {
+                nextTurn();
+            } else {
+                sendNextTurnMessage(isBossTurn ? bossTurn : playerTurn);
+            }
         }
+    }
+
+    private boolean checkWin() {
+        if (!fightWait.isStarted()) {
+            return true;
+        }
+        if (fightWait.getRoomType() == 5) {
+            int playerAliveCount = 0, bossAliveCount = 0, i = 0;
+            while (i < MAX_USER_FIGHT) {
+                Player player = players[i];
+                if (player != null && !player.isDead()) {
+                    playerAliveCount++;
+                }
+                i++;
+            }
+            while (i < totalPlayers) {
+                Boss boss = (Boss) this.players[i];
+                if (boss != null && !boss.isDead()) {
+                    bossAliveCount++;
+                }
+                i++;
+            }
+            if (playerAliveCount == 0 || bossAliveCount == 0) {
+                if (playerAliveCount == bossAliveCount) {
+                    if (isBossTurn) {
+                        fightComplete(MatchResult.RED_WIN);
+                    } else {
+                        fightComplete(MatchResult.BLUE_WIN);
+                    }
+                } else if (playerAliveCount == 0) {
+                    fightComplete(MatchResult.RED_WIN);
+                } else {
+                    fightComplete(MatchResult.BLUE_WIN);
+                }
+            } else {
+                return false;
+            }
+        } else {
+            int redAliveCount = 0, blueAliveCount = 0;
+            for (byte i = 0; i < MAX_USER_FIGHT; i++) {
+                Player player = players[i];
+                if (player == null) {
+                    continue;
+                }
+                if (!player.isDead()) {
+                    if (player.isTeamBlue()) {
+                        blueAliveCount++;
+                    } else {
+                        redAliveCount++;
+                    }
+                }
+            }
+            if (redAliveCount == 0 || blueAliveCount == 0) {
+                if (redAliveCount == blueAliveCount) {
+                    fightComplete(MatchResult.DRAW);
+                } else if (redAliveCount == 0) {
+                    fightComplete(MatchResult.RED_WIN);
+                } else {
+                    fightComplete(MatchResult.BLUE_WIN);
+                }
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void fightComplete(MatchResult result) {
+
     }
 
     @Override
@@ -447,8 +525,10 @@ public class FightManager implements IFightManager {
 
             //Lấy điểm đồng đội
             short teamPoints;
+            boolean isTeamBlue = false;
             if (fightWait.getRoomType() == 5 || i % 2 == 0) {
                 teamPoints = teamPointsBlue;
+                isTeamBlue = true;
             } else {
                 teamPoints = teamPointsRed;
             }
@@ -481,7 +561,7 @@ public class FightManager implements IFightManager {
             //Cập nhật trạng thái người chơi
             user.setState(UserState.FIGHTING);
 
-            players[i] = new Player(this, user, i, x, y, items, abilities, teamPoints, clanItems);
+            players[i] = new Player(this, user, i, isTeamBlue, x, y, items, abilities, teamPoints, clanItems);
         }
 
         //Cập nhật trang thái game
@@ -644,9 +724,24 @@ public class FightManager implements IFightManager {
         }
 
         Player player = players[index];
+
+        //Lưu lại vị trí ban đầu
+        int preX = player.getX();
+        int preY = player.getY();
+
+        //Cập nhật vị trí mới
         player.updateXY(x, y);
 
+        //Gửi thông báo nếu vị trí thay đổi
+        if (preX != player.getX() || preY != player.getY()) {
+            sendMessageUpdateXY(index);
+        }
+    }
+
+    @Override
+    public void sendMessageUpdateXY(int index) {
         try {
+            Player player = players[index];
             IMessage ms = new Message(Cmd.MOVE_ARMY);
             DataOutputStream ds = ms.writer();
             ds.writeByte(index);
@@ -752,5 +847,29 @@ public class FightManager implements IFightManager {
     @Override
     public Player getPlayerTurn() {
         return players[getCurrentTurn()];
+    }
+
+    @Override
+    public Player findClosestPlayer(short targetX, short targetY) {
+        Player closestPlayer = null;
+        int closestDistanceSquared = Integer.MAX_VALUE;
+
+        for (byte index = 0; index < MAX_USER_FIGHT; index++) {
+            Player player = this.players[index];
+            if (player == null || player.isDead()) {
+                continue;
+            }
+
+            int deltaX = player.getX() - targetX;
+            int deltaY = player.getY() - targetY;
+            int distanceSquared = deltaX * deltaX + deltaY * deltaY;
+
+            if (distanceSquared < closestDistanceSquared) {
+                closestDistanceSquared = distanceSquared;
+                closestPlayer = player;
+            }
+        }
+
+        return closestPlayer;
     }
 }

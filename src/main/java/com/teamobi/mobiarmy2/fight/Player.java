@@ -16,13 +16,13 @@ public class Player {
     private User user;
     private short gunId;
     private byte characterId;
-    private byte index;
+    protected byte index;
     private byte pixel;
     private byte angry;
     private short steps;
     private byte stamina;
-    private short x;
-    private short y;
+    protected short x;
+    protected short y;
     private short maxHp;
     private short hp;
     private short damage;
@@ -45,6 +45,7 @@ public class Player {
     private boolean isDoubleSpeed;
     private boolean isUsePow;
     private boolean isDead;
+    private boolean isTeamBlue;
     private byte usedItemId;
     private short width;
     private short height;
@@ -69,12 +70,13 @@ public class Player {
         this.hp = maxHp;
     }
 
-    public Player(IFightManager fightManager, User user, byte index, short x, short y, byte[] items, short[] abilities, short teamPoints, boolean[] clanItems) {
+    public Player(IFightManager fightManager, User user, byte index, boolean isTeamBlue, short x, short y, byte[] items, short[] abilities, short teamPoints, boolean[] clanItems) {
         this.fightManager = fightManager;
         this.user = user;
         this.gunId = user.getGunId();
         this.characterId = user.getActiveCharacterId();
         this.index = index;
+        this.isTeamBlue = isTeamBlue;
         this.x = x;
         this.y = y;
         this.stamina = 60;
@@ -137,6 +139,7 @@ public class Player {
     public void die() {
         hp = 0;
         isUpdateHP = true;
+        isDead = true;
     }
 
     public void nextLuck() {

@@ -34,6 +34,10 @@ public class MapTileExporter {
                 color = Color.GREEN;
             }
 
+            if (player.isDead()) {
+                color = Color.BLUE;
+            }
+
             int playerWidth = player.getWidth();
             int playerHeight = player.getHeight();
 
