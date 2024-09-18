@@ -161,11 +161,15 @@ public class FightManager implements IFightManager {
         for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             if (players[i] != null && players[i].getUser() != null) {
                 players[i].nextLuck();
+            }
+        }
+    }
 
-                if (players[i].isLucky()) {
-                    sendLuckyUpdate(i);
-                    players[i].setLucky(false);
-                }
+    private void updateLuckyPlayers() {
+        for (byte i = 0; i < MAX_USER_FIGHT; i++) {
+            if (players[i] != null && players[i].isLucky()) {
+                sendLuckyUpdate(i);
+                players[i].setLucky(false);
             }
         }
     }
@@ -195,7 +199,7 @@ public class FightManager implements IFightManager {
     }
 
     private void updateHpPlayers() {
-        for (byte i = 0; i < MAX_USER_FIGHT; i++) {
+        for (byte i = 0; i < totalPlayers; i++) {
             if (players[i] != null && players[i].isUpdateHP()) {
                 sendHpUpdate(i);
             }
@@ -632,11 +636,14 @@ public class FightManager implements IFightManager {
             numShoot = 1;
         }
 
-        //Next lucky
+        //Tính toán người chơi nào rơi sao
         handleLuckUpdates();
 
         bulletManager.addShoot(player, bullId, angle, force, force2, numShoot);
         bulletManager.fillXY();
+
+        //Gửi ms những người chơi may mắn
+        updateLuckyPlayers();
 
         List<Bullet> bullets = bulletManager.getBullets();
         if (bullets.isEmpty()) {
