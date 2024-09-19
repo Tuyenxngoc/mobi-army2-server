@@ -33,6 +33,7 @@ public class Player {
     private boolean isUpdateHP;
     private boolean isUpdateAngry;
     private boolean isUpdateXP;
+    private boolean isUpdateCup;
     private boolean isLucky;
     private boolean isPoisoned;
     private boolean isFlying;
@@ -52,6 +53,10 @@ public class Player {
     private short width;
     private short height;
     private int xpUp;
+    private int allXpUp;
+    private int cupUp;
+    private int allCupUp;
+    private int xpExist;
 
     public Player(int index, int x, int y, int hp, int maxHp) {
         this.index = (byte) index;
@@ -61,7 +66,7 @@ public class Player {
         this.maxHp = (short) maxHp;
     }
 
-    public Player(IFightManager fightManager, byte index, byte characterId, short x, short y, short width, short height, short maxHp) {
+    public Player(IFightManager fightManager, byte index, byte characterId, short x, short y, short width, short height, short maxHp, int xpExist) {
         this.fightManager = fightManager;
         this.index = index;
         this.characterId = characterId;
@@ -71,6 +76,7 @@ public class Player {
         this.height = height;
         this.maxHp = maxHp;
         this.hp = maxHp;
+        this.xpExist = xpExist;
     }
 
     public Player(IFightManager fightManager, User user, byte index, boolean isTeamBlue, short x, short y, byte[] items, short[] abilities, short teamPoints, boolean[] clanItems) {
@@ -89,6 +95,7 @@ public class Player {
         this.teamPoints = teamPoints;
         this.clanItems = clanItems;
         this.usedItemId = -1;
+        this.xpExist = user.getCurrentLevel() / 2 + 2;
 
         this.maxHp = abilities[0];
         this.damage = abilities[1];
@@ -200,7 +207,33 @@ public class Player {
         if (clanItems[8]) {
             addXP *= 3;
         }
-        xpUp += addXP;
+        xpUp = addXP;
+        allXpUp += addXP;
+
+        addXP -= 2;
+        if (addXP < 1) {
+            return;
+        }
+
+        //Cộng xp cho đồng đội
+        //Todo...
+    }
+
+    public void updateCup(int addCup) {
+        if (user == null || addCup == 0) {
+            return;
+        }
+        isUpdateCup = true;
+        cupUp = addCup;
+        allCupUp += addCup;
+
+        addCup -= 2;
+        if (addCup < 1) {
+            return;
+        }
+
+        //Cộng cup cho đồng đội
+        //Todo...
     }
 
     public byte getPowerUsageStatus() {
@@ -363,16 +396,20 @@ public class Player {
         }
 
         if (isDead) {
-            switch (this.characterId) {
-                case 6 -> System.out.println("Update mission 1");
-                case 7 -> System.out.println("Update mission 2");
-                case 9 -> System.out.println("Update mission 3");
+            switch (characterId) {
+                case 6 -> shooter.getUser().updateMission(6, 1);
+                case 7 -> shooter.getUser().updateMission(7, 1);
+                case 9 -> shooter.getUser().updateMission(8, 1);
             }
+
+            shooter.updateXp(xpExist);
+            shooter.updateCup(60);
         }
     }
 
     public void resetValueInNewTurn() {
         itemUsed = false;
+        isUsePow = false;
         usedItemId = -1;
         stamina = 60;
         steps = 0;
