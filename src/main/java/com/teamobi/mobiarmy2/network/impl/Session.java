@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.network.impl;
 
+import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.IMessageHandler;
@@ -237,7 +238,7 @@ public class Session implements ISession {
                 while (Session.this.isSendKeyComplete()) {
                     while (!sendingMessage.isEmpty() && Session.this.dis != null) {
                         IMessage message = sendingMessage.remove(0);
-                        ServerManager.getInstance().logger().logMessage("   Send mss " + message.getCommand() + " to " + Session.this);
+                        ServerManager.getInstance().logger().logMessage("   Send mss " + Cmd.getCmdNameByValue(message.getCommand()) + " to " + Session.this);
                         Session.this.doSendMessage(message);
                     }
                     try {
@@ -263,7 +264,7 @@ public class Session implements ISession {
                     if (message == null) {
                         break;
                     }
-                    ServerManager.getInstance().logger().logMessage(Session.this + " send mss " + message.getCommand());
+                    ServerManager.getInstance().logger().logMessage(Session.this + " send mss " + Cmd.getCmdNameByValue(message.getCommand()));
                     if (!Session.this.user.isLogged() && requiresAuthentication(message)) {
                         message.cleanup();
                         break;

@@ -11,6 +11,7 @@ import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.repository.ClanItemRepository;
 import com.teamobi.mobiarmy2.server.ClanManager;
+import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.util.MapTileExporter;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -44,7 +45,7 @@ public class FightManager implements IFightManager {
     private byte windY;
     private long startTime;
     private final IMapManager mapManager;
-    private final BulletManager bulletManager;
+    private final IBulletManager bulletManager;
     private final ICountdownTimer countdownTimer;
 
     public FightManager(FightWait fightWait) {
@@ -59,7 +60,18 @@ public class FightManager implements IFightManager {
 
     private void refreshFightManager() {
         players = new Player[MAX_ELEMENT_FIGHT];
+        totalPlayers = MAX_USER_FIGHT;
+        turnCount = 0;
+        isBossTurn = false;
+        playerTurn = 0;
+        bossTurn = MAX_USER_FIGHT;
+        windX = 0;
+        windY = 0;
+        mapManager.refresh();
+        bulletManager.refresh();
         countdownTimer.stop();
+
+        ServerManager.getInstance().logger().logMessage("Refresh fight manager");
     }
 
     private void sendLuckyUpdate(byte index) {
@@ -500,7 +512,7 @@ public class FightManager implements IFightManager {
     }
 
     private void fightComplete(MatchResult result) {
-
+        refreshFightManager();
     }
 
     @Override
@@ -721,7 +733,7 @@ public class FightManager implements IFightManager {
             e.printStackTrace();
         }
 
-        bulletManager.reset();
+        bulletManager.getBullets().clear();
         nextTurn();
     }
 
