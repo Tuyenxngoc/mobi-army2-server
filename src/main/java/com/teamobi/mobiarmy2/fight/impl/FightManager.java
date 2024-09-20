@@ -561,8 +561,12 @@ public class FightManager implements IFightManager {
     }
 
     private void fightComplete(MatchResult result) {
+        updatePlayerStatuses();
+
         long duration = System.currentTimeMillis() - startTime;
+        boolean fightInValid = false;
         if (duration < 5000) {
+            fightInValid = true;
             for (byte i = 0; i < MAX_USER_FIGHT; i++) {
                 Player player = players[i];
                 if (player == null || player.getUser() == null) {
@@ -626,9 +630,8 @@ public class FightManager implements IFightManager {
 
         refreshFightManager();
 
-        //Chờ 2 giây
         try {
-            Thread.sleep(2000);
+            Thread.sleep(8000);
         } catch (InterruptedException ignored) {
         }
         fightWait.fightComplete();
@@ -740,7 +743,7 @@ public class FightManager implements IFightManager {
                 }
 
                 ds.flush();
-                fightWait.sendToTeam(ms);
+                player.getUser().sendMessage(ms);
             } catch (IOException e) {
                 e.printStackTrace();
             }

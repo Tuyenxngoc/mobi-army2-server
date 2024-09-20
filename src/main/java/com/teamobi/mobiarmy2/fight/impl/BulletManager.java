@@ -130,13 +130,13 @@ public class BulletManager implements IBulletManager {
         }
         for (int k = 0; k < nshoot; k++) {
             switch (bull) {
-                case 0 -> {
+                case 0 -> {//Gunner
                     if (pl.getUsedItemId() > 0 || (idGun != 0 && idGun != 14)) {
                         return;
                     }
                     bullets.add(new Bullet(this, (byte) 0, (pl.isUsePow() ? 630 : (nshoot == 2 ? 210 : 280)), pl, x, y, vx, vy, 80, 100));
                 }
-                case 1 -> {
+                case 1 -> {//Aka
                     if (pl.getUsedItemId() > 0 || idGun != 1) {
                         return;
                     }
@@ -146,7 +146,7 @@ public class BulletManager implements IBulletManager {
                     }
                 }
 
-                case 2 -> {
+                case 2 -> {//Electric
                     if (pl.getUsedItemId() > 0 || (idGun != 2 && idGun != 14)) {
                         return;
                     }
