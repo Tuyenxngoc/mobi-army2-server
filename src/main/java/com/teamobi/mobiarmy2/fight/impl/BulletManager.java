@@ -105,6 +105,7 @@ public class BulletManager implements IBulletManager {
         this.typeSC = 0;
     }
 
+    @Override
     public void addShoot(Player pl, byte bull, short angle, byte force, byte force2, byte nshoot) {
         this.XPL = pl.getX();
         this.YPL = pl.getY();
@@ -129,13 +130,13 @@ public class BulletManager implements IBulletManager {
         }
         for (int k = 0; k < nshoot; k++) {
             switch (bull) {
-                case 0 -> {
+                case 0 -> {//Gunner
                     if (pl.getUsedItemId() > 0 || (idGun != 0 && idGun != 14)) {
                         return;
                     }
                     bullets.add(new Bullet(this, (byte) 0, (pl.isUsePow() ? 630 : (nshoot == 2 ? 210 : 280)), pl, x, y, vx, vy, 80, 100));
                 }
-                case 1 -> {
+                case 1 -> {//Aka
                     if (pl.getUsedItemId() > 0 || idGun != 1) {
                         return;
                     }
@@ -145,7 +146,7 @@ public class BulletManager implements IBulletManager {
                     }
                 }
 
-                case 2 -> {
+                case 2 -> {//Electric
                     if (pl.getUsedItemId() > 0 || (idGun != 2 && idGun != 14)) {
                         return;
                     }
@@ -172,6 +173,7 @@ public class BulletManager implements IBulletManager {
         }
     }
 
+    @Override
     public void fillXY() {
         boolean hasNext;
         do {
@@ -184,10 +186,6 @@ public class BulletManager implements IBulletManager {
                 bull.nextXY();
             }
         } while (hasNext);
-    }
-
-    public void reset() {
-        this.bullets.clear();
     }
 
     public short[] getCollisionPoint(short X1, short Y1, short X2, short Y2, boolean isXuyenPlayer, boolean isXuyenMap) {
@@ -261,5 +259,10 @@ public class BulletManager implements IBulletManager {
             }
         }
         return null;
+    }
+
+    @Override
+    public void refresh() {
+
     }
 }

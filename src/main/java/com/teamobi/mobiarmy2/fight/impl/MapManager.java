@@ -141,4 +141,9 @@ public class MapManager implements IMapManager {
         //Todo: bom hen gio
     }
 
+    @Override
+    public void refresh() {
+
+    }
+
 }

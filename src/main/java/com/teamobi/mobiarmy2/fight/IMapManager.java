@@ -22,4 +22,5 @@ public interface IMapManager {
 
     void collision(short x, short y, Bullet bullet);
 
+    void refresh();
 }

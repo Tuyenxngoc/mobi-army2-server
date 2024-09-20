@@ -33,10 +33,12 @@ public class Player {
     private boolean isUpdateHP;
     private boolean isUpdateAngry;
     private boolean isUpdateXP;
+    private boolean isUpdateCup;
     private boolean isLucky;
     private boolean isPoisoned;
     private boolean isFlying;
     private byte eyeSmokeCount;
+    private byte invisibleCount;
     private byte freezeCount;
     private byte windStopCount;
     private boolean[] clanItems;
@@ -51,6 +53,10 @@ public class Player {
     private short width;
     private short height;
     private int xpUp;
+    private int allXpUp;
+    private int cupUp;
+    private int allCupUp;
+    private int xpExist;
 
     public Player(int index, int x, int y, int hp, int maxHp) {
         this.index = (byte) index;
@@ -60,7 +66,7 @@ public class Player {
         this.maxHp = (short) maxHp;
     }
 
-    public Player(IFightManager fightManager, byte index, byte characterId, short x, short y, short width, short height, short maxHp) {
+    public Player(IFightManager fightManager, byte index, byte characterId, short x, short y, short width, short height, short maxHp, int xpExist) {
         this.fightManager = fightManager;
         this.index = index;
         this.characterId = characterId;
@@ -70,6 +76,7 @@ public class Player {
         this.height = height;
         this.maxHp = maxHp;
         this.hp = maxHp;
+        this.xpExist = xpExist;
     }
 
     public Player(IFightManager fightManager, User user, byte index, boolean isTeamBlue, short x, short y, byte[] items, short[] abilities, short teamPoints, boolean[] clanItems) {
@@ -88,6 +95,7 @@ public class Player {
         this.teamPoints = teamPoints;
         this.clanItems = clanItems;
         this.usedItemId = -1;
+        this.xpExist = user.getCurrentLevel() / 2 + 2;
 
         this.maxHp = abilities[0];
         this.damage = abilities[1];
@@ -163,6 +171,7 @@ public class Player {
         hp += addHp;
         if (hp <= 0) {
             hp = 0;
+            isDead = true;
         } else if (hp < 10) {
             hp = 10;
         } else if (hp > maxHp) {
@@ -198,7 +207,33 @@ public class Player {
         if (clanItems[8]) {
             addXP *= 3;
         }
-        xpUp += addXP;
+        xpUp = addXP;
+        allXpUp += addXP;
+
+        addXP -= 2;
+        if (addXP < 1) {
+            return;
+        }
+
+        //Cộng xp cho đồng đội
+        //Todo...
+    }
+
+    public void updateCup(int addCup) {
+        if (user == null || addCup == 0) {
+            return;
+        }
+        isUpdateCup = true;
+        cupUp = addCup;
+        allCupUp += addCup;
+
+        addCup -= 2;
+        if (addCup < 1) {
+            return;
+        }
+
+        //Cộng cup cho đồng đội
+        //Todo...
     }
 
     public byte getPowerUsageStatus() {
@@ -266,6 +301,9 @@ public class Player {
             }
             y++;
         }
+
+        // Nếu rơi quá bản đồ thì tự sát
+        die();
     }
 
     public boolean isCollision(short x, short y) {
@@ -275,12 +313,103 @@ public class Player {
         return Utils.inRegion(x, y, this.x - this.width / 2, this.y - this.height, this.width, this.height);
     }
 
-    public void collision(short x, short y, Bullet bull) {
+    public void collision(short bx, short by, Bullet bull) {
+        //Bỏ qua nếu đã bại hoặc đang vô hình
+        if (isDead || invisibleCount > 0) {
+            return;
+        }
+
+        Player shooter = bull.getPl();
+        int bullId = bull.getBullId();
+        int shooterCharacterId = shooter.getCharacterId();
+
+        //Logic tính toán tầm ảnh hưởng
         int impactRadius = Bullet.getImpactRadiusByBullId(bull.getBullId());
+        if (bullId == 35 && shooterCharacterId == 15) {//T-rex jump
+            impactRadius = 250;
+        }
+
+        // Nhân đôi tầm ảnh hưởng nếu sử dụng kỹ năng pow với các nhân vật cụ thể
+        if (shooter.isUsePow() && (shooterCharacterId == 3 || shooterCharacterId == 4 || shooterCharacterId == 6 || shooterCharacterId == 7 || shooterCharacterId == 8)) {
+            impactRadius *= 2;
+        }
+
+        // Kiểm tra điều kiện để bỏ qua xử lý va chạm
+        if (!Utils.intersectRegions(x, y, width, height, bx, by, impactRadius * 2, impactRadius * 2)) {
+            return;
+        }
+
+        // Bỏ qua nếu bullet không hợp lệ
+        if (bullId == 31 || bullId == 32 || bullId == 35) {
+            return;
+        }
+
+        // Tính toán khoảng cách từ điểm va chạm
+        int deltaX = Math.abs(x - bx);
+        int deltaY = Math.abs(y - height / 2 - by);
+        int distance = (int) Math.hypot(deltaX, deltaY);
+
+        // Tính sát thương
+        int damage = bull.getDamage();
+        if (distance > width / 2) {
+            damage -= (damage * (distance - width / 2)) / impactRadius;
+        }
+        if (damage <= 0) {
+            return;
+        }
+
+        //Nhân đôi sát thương nếu may mắn
+        if (shooter.isLucky) {
+            damage *= 2;
+        }
+
+        // Tăng sát thương từ item clan
+        if (shooter.isUsePow()) {
+            if (shooter.clanItems[5]) {
+                damage += (damage * 5) / 100;  // +5% damage
+            }
+            if (shooter.clanItems[6]) {
+                damage += (damage * 11) / 100;  // +10% damage
+            }
+        }
+
+        // Tăng sát thương khi đạn siêu cao
+        //todo...
+
+        // Tính toán điểm phòng thủ
+        int d = defense;
+        if (isLucky) {
+            // Giảm sát thương
+            damage = Math.round((float) damage / 2);
+
+            //Cộng thêm chỉ số phòng thủ
+            d = defense + defense / 10;
+        }
+        if (d > 0) {
+            damage = damage - d / 100;
+        }
+
+        updateHP((short) -damage);
+
+        if (shooter instanceof Boss) {
+            return;
+        }
+
+        if (isDead) {
+            switch (characterId) {
+                case 6 -> shooter.getUser().updateMission(6, 1);
+                case 7 -> shooter.getUser().updateMission(7, 1);
+                case 9 -> shooter.getUser().updateMission(8, 1);
+            }
+
+            shooter.updateXp(xpExist);
+            shooter.updateCup(60);
+        }
     }
 
     public void resetValueInNewTurn() {
         itemUsed = false;
+        isUsePow = false;
         usedItemId = -1;
         stamina = 60;
         steps = 0;

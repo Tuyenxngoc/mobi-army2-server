@@ -237,19 +237,34 @@ public class FightWait implements IFightWait {
         ds.flush();
         us.sendMessage(ms);
 
-        ms = new Message(Cmd.MAP_SELECT);
-        ds = ms.writer();
-        ds.writeByte(mapId);
-        ds.flush();
-        us.sendMessage(ms);
+        sendUpdateMap(us);
+        sendUpdateItemSlot(us);
+    }
 
-        ms = new Message(Cmd.ITEM_SLOT);
-        ds = ms.writer();
-        for (byte i = 0; i < 4; i++) {
-            ds.writeByte(us.getItemFightQuantity(12 + i));
+    private void sendUpdateItemSlot(User us) {
+        try {
+            IMessage ms = new Message(Cmd.ITEM_SLOT);
+            DataOutputStream ds = ms.writer();
+            for (byte i = 0; i < 4; i++) {
+                ds.writeByte(us.getItemFightQuantity(12 + i));
+            }
+            ds.flush();
+            us.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        ds.flush();
-        us.sendMessage(ms);
+    }
+
+    private void sendUpdateMap(User us) {
+        try {
+            IMessage ms = new Message(Cmd.MAP_SELECT);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(mapId);
+            ds.flush();
+            us.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -323,7 +338,24 @@ public class FightWait implements IFightWait {
 
     @Override
     public void fightComplete() {
-        System.out.println("fightComplete");
+        if (!started) {
+            return;
+        }
+
+        started = false;
+        endTime = System.currentTimeMillis();
+        resetReadies();
+        countdownTimer.reset();
+
+        for (User user : users) {
+            if (user == null) {
+                continue;
+            }
+            user.setState(UserState.WAIT_FIGHT);
+
+            sendUpdateItemSlot(user);
+            sendUpdateMap(user);
+        }
     }
 
     @Override

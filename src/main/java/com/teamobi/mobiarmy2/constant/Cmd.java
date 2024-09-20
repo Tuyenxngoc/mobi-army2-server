@@ -1,5 +1,9 @@
 package com.teamobi.mobiarmy2.constant;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author tuyen
  */
@@ -67,7 +71,7 @@ public class Cmd {
     public static final byte KICK = 11;
     public static final byte LEAVE_BOARD = 15;
     public static final byte LOAD_CARD = 77;
-    public static final short LOGIN = 1;
+    public static final byte LOGIN = 1;
     public static final byte LOGOUT = 2;
     public static final byte MAP_SELECT = 75;
     public static final byte MOVE_ARMY = 21;
@@ -103,36 +107,36 @@ public class Cmd {
     public static final byte VERSION = 48;
     public static final byte WIND = 25;
     public static final byte ZING_CONNECT = 87;
-    public static final short ADD_FRIEND_RESULT = 32;
-    public static final short ADMIN_COMMAND_RESPONSE = 47;
+    public static final byte ADD_FRIEND_RESULT = 32;
+    public static final byte ADMIN_COMMAND_RESPONSE = 47;
     public static final byte ANGRY = 113;
-    public static final short ANTI_HACK_MESS = 64;
+    public static final byte ANTI_HACK_MESS = 64;
     public static final byte AUTO_BOARD = 76;
     public static final byte BIT = 96;
-    public static final short BOARD_LIST = 7;
-    public static final short BONUS_MONEY = 52;
-    public static final short BUY_AVATAR_SUCCESS = 43;
+    public static final byte BOARD_LIST = 7;
+    public static final byte BONUS_MONEY = 52;
+    public static final byte BUY_AVATAR_SUCCESS = 43;
     public static final byte BUY_EQUIP = 104;
     public static final byte CAPTURE = 95;
     public static final byte CHANGE_EQUIP = 102;
     public static final byte CHARACTOR_INFO = 99;
     public static final byte CHARGE_MONEY_2 = 122;
-    public static final short CHAT_FROM_BOARD = 9;
+    public static final byte CHAT_FROM_BOARD = 9;
     public static final byte CHAT_TEAM = 123;
     public static final byte CLAN_ICON = 115;
     public static final byte CLAN_INFO = 117;
     public static final byte CLAN_MEMBER = 118;
-    public static final short DELETE_FRIEND_RESULT = 33;
-    public static final short DENY_DRAW = 26;
-    public static final short DRAW = 25;
+    public static final byte DELETE_FRIEND_RESULT = 33;
+    public static final byte DENY_DRAW = 26;
+    public static final byte DRAW = 25;
     public static final byte END_INVISIBLE = 80;
     public static final byte EYE_SMOKE = 106;
-    public static final short FINISH = 51;
+    public static final byte FINISH = 51;
     public static final byte FIRE_TRAINING = 84;
     public static final byte FLY = 93;
     public static final byte FREEZE = 107;
-    public static final short FRIENDLIST = 29;
-    public static final short GAME_RESULT = 37;
+    public static final byte FRIENDLIST = 29;
+    public static final byte GAME_RESULT = 37;
     public static final byte GET_BIG_IMAGE = 120;
     public static final byte GET_BOSS = 89;
     public static final byte GET_FILEPACK = 90;
@@ -142,32 +146,32 @@ public class Cmd {
     public static final byte INVENTORY = 101;
     public static final byte INVENTORY_UPDATE = 27;
     public static final byte ITEM_SLOT = 112;
-    public static final short JOINBOARD_FAIL = 17;
-    public static final short LOGIN_FAIL = 4;
-    public static final short LOGIN_SUCESS = 3;
+    public static final byte JOINBOARD_FAIL = 17;
+    public static final byte LOGIN_FAIL = 4;
+    public static final byte LOGIN_SUCESS = 3;
     public static final byte LUCKY = 100;
     public static final byte MATERIAL = 125;
     public static final byte MATERIAL_ICON = 126;
-    public static final short NEXT_TURN_2 = 24;
-    public static final short NHAN_SMS_DIALOG = 63;
+    public static final byte NEXT_TURN_2 = 24;
+    public static final byte NHAN_SMS_DIALOG = 63;
     public static final byte OPEN_LINK = 86;
     public static final byte ORBIT = 82;
-    public static final short PLAYER_DETAIL = 34;
+    public static final byte PLAYER_DETAIL = 34;
     public static final byte POISON = 108;
-    public static final short RANDOM_ITEM = 59;
+    public static final byte RANDOM_ITEM = 59;
     public static final byte REGISTER_2 = 121;
-    public static final short RICHEST_LIST = 31;
+    public static final byte RICHEST_LIST = 31;
     public static final byte ROOM_CAPTION = 88;
-    public static final short ROOM_LIST = 6;
-    public static final short SERVER_INFO = 46;
-    public static final short SERVER_MESSAGE = 45;
-    public static final short SET_MONEY_ERROR = 10;
+    public static final byte ROOM_LIST = 6;
+    public static final byte SERVER_INFO = 46;
+    public static final byte SERVER_MESSAGE = 45;
+    public static final byte SET_MONEY_ERROR = 10;
     public static final byte SHOP_EQUIP = 103;
-    public static final short SKIP_2 = 64;
-    public static final short SOMEONE_JOINBOARD = 12;
-    public static final short SOMEONE_LEAVEBOARD = 14;
-    public static final short SOMEONE_READY = 16;
-    public static final short STOP_GAME = 50;
+    public static final byte SKIP_2 = 64;
+    public static final byte SOMEONE_JOINBOARD = 12;
+    public static final byte SOMEONE_LEAVEBOARD = 14;
+    public static final byte SOMEONE_READY = 16;
+    public static final byte STOP_GAME = 50;
     public static final byte SUB_FILEPACK_1 = 0;
     public static final byte SUB_FILEPACK_2 = 1;
     public static final byte SUB_FILEPACK_3 = 2;
@@ -179,8 +183,31 @@ public class Cmd {
     public static final byte TOP_CLAN = 116;
     public static final byte UNDESTROYTILE = 92;
     public static final byte UPDATE_EXP = 97;
-    public static final short UPDATE_HP = 51;
+    public static final byte UPDATE_HP = 51;
     public static final byte UPDATE_MONEY = 105;
     public static final byte VAMPIRE = 59;
     public static final byte VERSION_CODE = 114;
+
+    private static final Map<Byte, String> cmdMap = new HashMap<>();
+
+    static {
+        Field[] fields = Cmd.class.getDeclaredFields();
+
+        for (Field field : fields) {
+            try {
+                if (field.getType() == byte.class) {
+                    byte value = field.getByte(null);
+                    String name = String.format("%s (%d)", field.getName(), value);
+                    cmdMap.put(value, name);
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static String getCmdNameByValue(byte value) {
+        return cmdMap.getOrDefault(value, String.valueOf(value));
+    }
+
 }

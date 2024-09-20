@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 public class Bullet {
     private BulletManager bulletManager;
-    private boolean collect;
+    protected boolean collect;
     private byte bullId;
     private int damage;
     private short X;
