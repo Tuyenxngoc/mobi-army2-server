@@ -30,7 +30,7 @@ public class FightManager implements IFightManager {
     private static final int MAX_USER_FIGHT = 8;
     private static final int MAX_PLAY_TIME = 30;
     private static final byte[][] BOSS_COUNTS = {
-            {4, 6, 6, 8, 8, 8, 10, 10},
+            {1, 6, 6, 8, 8, 8, 10, 10},
             {4, 6, 6, 6, 8, 8, 10, 10}
     };
 
@@ -78,11 +78,13 @@ public class FightManager implements IFightManager {
 
     private void sendLuckyUpdate(byte index) {
         try {
+            Player player = players[index];
             IMessage ms = new Message(Cmd.LUCKY);
             DataOutputStream ds = ms.writer();
             ds.writeByte(index);
             ds.flush();
             fightWait.sendToTeam(ms);
+            player.setLucky(false);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -151,6 +153,7 @@ public class FightManager implements IFightManager {
             ds.writeByte(player.getAngry());
             ds.flush();
             fightWait.sendToTeam(ms);
+            player.setUpdateAngry(false);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -173,66 +176,55 @@ public class FightManager implements IFightManager {
 
     private void handleLuckUpdates() {
         for (byte i = 0; i < MAX_USER_FIGHT; i++) {
-            if (players[i] != null && players[i].getUser() != null) {
-                players[i].nextLuck();
+            Player player = players[i];
+            if (player == null || player.getUser() == null) {
+                continue;
             }
+            player.nextLuck();
         }
     }
 
     private void updateLuckyPlayers() {
         for (byte i = 0; i < MAX_USER_FIGHT; i++) {
-            if (players[i] != null && players[i].isLucky()) {
-                sendLuckyUpdate(i);
-                players[i].setLucky(false);
+            Player player = players[i];
+            if (player == null || player.getUser() == null || !player.isLucky()) {
+                continue;
             }
+            sendLuckyUpdate(i);
         }
     }
 
-    private void updatePoisonedPlayers() {
-        for (byte i = 0; i < MAX_USER_FIGHT; i++) {
-            if (players[i] != null && players[i].isPoisoned()) {
+    private void updatePlayerStatuses() {
+        for (byte i = 0; i < totalPlayers; i++) {
+            Player player = players[i];
+            if (player == null) {
+                continue;
+            }
+            if (player.isUpdateHP()) {
+                sendHpUpdate(i);
+            }
+            if (player.isUpdateAngry()) {
+                sendAngryUpdate(i);
+            }
+            if (player.getFreezeCount() > 0) {
+                sendFreezeUpdate(i);
+            }
+            if (player.getEyeSmokeCount() > 0) {
+                sendEyeSmokeUpdate(i);
+            }
+            if (player.isPoisoned()) {
                 sendPoisonUpdate(i);
             }
         }
     }
 
-    private void updateEyeSmokeStatus() {
-        for (byte i = 0; i < MAX_USER_FIGHT; i++) {
-            if (players[i] != null && players[i].getEyeSmokeCount() > 0) {
-                sendEyeSmokeUpdate(i);
-            }
-        }
-    }
-
-    private void updateFrozenPlayers() {
-        for (byte i = 0; i < MAX_USER_FIGHT; i++) {
-            if (players[i] != null && players[i].getFreezeCount() > 0) {
-                sendFreezeUpdate(i);
-            }
-        }
-    }
-
-    private void updateHpPlayers() {
-        for (byte i = 0; i < totalPlayers; i++) {
-            if (players[i] != null && players[i].isUpdateHP()) {
-                sendHpUpdate(i);
-            }
-        }
-    }
-
-    private void updateAngryPlayers() {
-        for (byte i = 0; i < MAX_USER_FIGHT; i++) {
-            if (players[i] != null && players[i].isUpdateAngry()) {
-                sendAngryUpdate(i);
-            }
-        }
-    }
-
-    private void updateMoneyPlayers() {
+    private void updateMoneyPlayers(int money) {
         for (int i = 0; i < MAX_USER_FIGHT; i++) {
-            if (players[i] != null && players[i].getUser() != null) {
-                sendMoneyUpdate(players[i], -fightWait.getMoney());
+            Player player = players[i];
+            if (player == null || player.getUser() == null) {
+                continue;
             }
+            sendMoneyUpdate(player, money);
         }
     }
 
@@ -371,8 +363,8 @@ public class FightManager implements IFightManager {
             player.updateYPosition();
         }
 
-        //Cập nhật HP
-        updateHpPlayers();
+        //Cập nhật trạng thái người chơi
+        updatePlayerStatuses();
 
         //Cập nhật số xp nhận được
         updateXpPlayers();
@@ -424,6 +416,13 @@ public class FightManager implements IFightManager {
             player.updateAngry((byte) 10);
         }
 
+        if (turnCount > 0) {
+            //Chờ 2 giây
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException ignored) {
+            }
+        }
         nextWind();
         sendNextTurnMessage(isBossTurn ? bossTurn : playerTurn);
         countdownTimer.reset();
@@ -626,6 +625,12 @@ public class FightManager implements IFightManager {
         }
 
         refreshFightManager();
+
+        //Chờ 2 giây
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException ignored) {
+        }
         fightWait.fightComplete();
     }
 
@@ -701,7 +706,7 @@ public class FightManager implements IFightManager {
         totalPlayers = MAX_USER_FIGHT;
 
         if (fightWait.getMoney() > 0) {
-            updateMoneyPlayers();
+            updateMoneyPlayers(-fightWait.getMoney());
         }
         sendFightInfo();
         if (fightWait.getRoomType() == 5) {
