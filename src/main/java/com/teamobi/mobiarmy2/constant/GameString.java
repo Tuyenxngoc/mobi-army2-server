@@ -243,7 +243,7 @@ public class GameString {
     }
 
     public static String joinKVError4(int seconds) {
-        return String.format("Còn %d giây nữa mới được vào khu vực.", seconds);
+        return String.format("Còn %d giây nữa mới được vào khu vực", seconds);
     }
 
     public static String kickString() {
@@ -451,7 +451,7 @@ public class GameString {
     }
 
     public static String materialLimit1(int quantity) {
-        return String.format("Bạn chỉ có thể mua thêm %d nguyên liệu.", quantity);
+        return String.format("Bạn chỉ có thể mua thêm %d nguyên liệu", quantity);
     }
 
     public static String chestLocked() {

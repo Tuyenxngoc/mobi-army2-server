@@ -923,28 +923,37 @@ public class FightManager implements IFightManager {
         }
 
         Player player = players[index];
-        if (player.isItemUsed()) {
+        if (player.isItemUsed() || player.isUsePow()) {
             return;
         }
 
-        if (fightWait.getRoomType() == 5 && (itemIndex == 9)) {
+        //Khi đấu boss thì cấm dùng 1 số item
+        if (fightWait.getRoomType() == 5 && (itemIndex == 9 || itemIndex == 23 || itemIndex == 26 || itemIndex == 28 || itemIndex == 30 || itemIndex == 31)) {
             player.getUser().getUserService().sendServerMessage2(GameString.unauthorizedItem());
             return;
         }
 
-        //Kiểm tra người chơi có mang theo item hay không
-        if (itemIndex != 100) {//pow thì bỏ qua
-            boolean foundItem = false;
+        if (itemIndex == 100) {//Nếu là pow thì kiểm tra angry
+            if (player.getAngry() < 100) {
+                return;
+            } else {
+                player.setAngry((byte) 0);
+                player.setUsePow(true);
+            }
+        } else { //Kiểm tra người chơi có mang theo item hay không
+            int slot = -1;
             byte[] items = player.getItems();
-            for (byte item : items) {
-                if (item == itemIndex) {
-                    foundItem = true;
-                    break;
+            for (byte i = 0; i < items.length; i++) {
+                if (items[i] == itemIndex) {
+                    slot = i;
                 }
             }
-            if (!foundItem) {
+            if (slot == -1) {
                 return;
             }
+
+            player.usedItem(slot);
+            player.getUser().updateItems(itemIndex, (byte) -1);
         }
 
         try {
@@ -958,24 +967,74 @@ public class FightManager implements IFightManager {
             e.printStackTrace();
         }
 
-        player.setItemUsed(true);
-        player.setUsedItemId(itemIndex);
-        player.getUser().updateItems(itemIndex, (byte) -1);
+        //Xử lý khi dùng item
         handleItem(player, index, itemIndex);
     }
 
     private void handleItem(Player player, int playerIndex, byte itemIndex) {
         switch (itemIndex) {
+            //Hồi máu
             case 0 -> {
                 player.updateHP((short) 350);
                 sendHpUpdate((byte) playerIndex);
             }
 
+            //Bắn x2
             case 2 -> player.setDoubleShoot(true);
 
+            //Đi x2
             case 3 -> player.setDoubleSpeed(true);
 
-            //todo
+            //Tàng hình
+            case 4 -> player.setVanishCount((byte) 5);
+
+            //Ngưng gió
+            case 5 -> {
+                player.setWindStopCount((byte) 5);
+                nextWind();
+            }
+
+            //Hồi máu đồng đội
+            case 10 -> {
+                byte n = (byte) (fightWait.getRoomType() == 5 ? 1 : 2);
+                byte i = (byte) (player.isTeamBlue() ? 0 : 1);
+                for (; i < MAX_USER_FIGHT; i += n) {
+                    Player pl = players[i];
+                    if (pl == null || pl.isDead()) {
+                        continue;
+                    }
+                    short hpUp = (short) (pl.getMaxHp() * 0.3);
+                    pl.updateHP(hpUp);
+                    sendHpUpdate(i);
+                }
+            }
+
+            //Tự sát
+            case 24 -> newShoot(playerIndex, (byte) 50, (short) 0, (byte) 0, (byte) 0, (byte) 1);
+
+            //Ufo Todo
+            case 27 -> {
+                System.out.println("tobe continue...");
+            }
+
+            //Hồi máu 50%
+            case 32 -> {
+                short hpUp = (short) (player.getMaxHp() / 2);
+                player.updateHP(hpUp);
+                sendHpUpdate((byte) playerIndex);
+            }
+
+            //Hồi máu 100%
+            case 33 -> {
+                player.updateHP(player.getMaxHp());
+                sendHpUpdate((byte) playerIndex);
+            }
+
+            //Vô hình
+            case 34 -> player.setInvisibleCount((byte) 10);
+
+            //Hút máu
+            case 35 -> player.setVampireCount((byte) 2);
         }
     }
 

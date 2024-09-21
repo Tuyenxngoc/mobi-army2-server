@@ -11,7 +11,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Player {
-
     protected IFightManager fightManager;
     private User user;
     private short gunId;
@@ -38,7 +37,9 @@ public class Player {
     private boolean isPoisoned;
     private boolean isFlying;
     private byte eyeSmokeCount;
-    private byte invisibleCount;
+    private byte invisibleCount; // Số lần vô hình
+    private byte vanishCount; // Số lần tàn hình
+    private byte vampireCount;  // Số lần hút máu
     private byte freezeCount;
     private byte windStopCount;
     private boolean[] clanItems;
@@ -421,4 +422,14 @@ public class Player {
             this.y = y;
         }
     }
+
+    public final void usedItem(int slot) {
+        usedItemId = items[slot];
+        if (usedItemId == 0 || usedItemId == 2 || usedItemId == 3 || usedItemId == 4 || usedItemId == 5 || usedItemId == 10 || usedItemId == 32 || usedItemId == 33 || usedItemId == 34 || usedItemId == 35 || usedItemId == 100) {
+            usedItemId = -1;
+        }
+        itemUsed = true;
+        items[slot] = -1;
+    }
+
 }

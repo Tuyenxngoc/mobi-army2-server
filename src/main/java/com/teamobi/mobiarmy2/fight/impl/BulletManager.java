@@ -147,6 +147,7 @@ public class BulletManager implements IBulletManager {
                     }
                     bullets.add(new Bullet(this, (byte) 0, (pl.isUsePow() ? 630 : (nshoot == 2 ? 210 : 280)), pl, x, y, vx, vy, 80, 100));
                 }
+
                 case 1 -> {//Aka
                     if (pl.getUsedItemId() > 0 || idGun != 1) {
                         return;
@@ -278,12 +279,14 @@ public class BulletManager implements IBulletManager {
                     bullets.add(new ItemTraiPha(this, (byte) 16, 200, pl, x, y, vx, vy, 0, 100));
 
                 }
+
                 case 17 -> {//Apache
                     if (pl.getUsedItemId() >= 0 || idGun != 8) {
                         return;
                     }
                     bullets.add(new ApaBullet(this, (byte) 17, pl.isUsePow() ? 216 : (nshoot == 2 ? 81 : 108), pl, x, y, vx, vy, 30, 100, force, force2));
                 }
+
                 case 19 -> {
                     if (pl.getUsedItemId() >= 0 || idGun != 6) {
                         return;
@@ -291,6 +294,7 @@ public class BulletManager implements IBulletManager {
                     bullets.add(new ChickyBullet(this, (byte) 19, pl.isUsePow() ? 500 : (nshoot == 2 ? 169 : 225), pl, x, y, vx, vy, 20, 50, force2));
 
                 }
+
                 case 21 -> {
                     if (pl.getUsedItemId() >= 0 || idGun != 7) {
                         return;
@@ -298,12 +302,14 @@ public class BulletManager implements IBulletManager {
                     bullets.add(new TazranBullet(this, (byte) 21, pl.isUsePow() ? 800 : (nshoot == 2 ? 225 : 340), pl, x, y, vx, vy, 10, 50));
 
                 }
+
                 case 22 -> {
                     if (pl.getUsedItemId() != 18) {
                         return;
                     }
                     bullets.add(new ItemChuotGanBom(this, (byte) 22, 500, pl, x, y, force, angle < 89));
                 }
+
                 case 23 -> {
                     if (pl.getUsedItemId() != 21) {
                         return;
@@ -311,6 +317,7 @@ public class BulletManager implements IBulletManager {
                     bullets.add(new ItemSaoBang(this, (byte) 23, 200, pl, x, y, vx, vy, 20, 100));
 
                 }
+
                 case 25 -> {
                     if (pl.getUsedItemId() != 20) {
                         return;
@@ -319,6 +326,7 @@ public class BulletManager implements IBulletManager {
                     bullets.add(new ItemXuyenDat(this, (byte) 25, 500, pl, x, y, vx, vy, 0, -50, force));
 
                 }
+
                 // Item ten lua
                 case 26 -> {
                     if (pl.getUsedItemId() != 19) {
@@ -413,7 +421,7 @@ public class BulletManager implements IBulletManager {
                     bullets.add(new Bullet(this, (byte) 40, 220, pl, x - 20, y - 20, vx, vy, 10, 80));
                 }
 
-                // T-rex white
+                // T. rex white
                 case 41 -> {
                     if (idGun != 15) {
                         return;
@@ -464,6 +472,7 @@ public class BulletManager implements IBulletManager {
                     }
                     bullets.add(new BalloonLazer(this, (byte) 45, 500, pl, x + 65, y - 27));
                 }
+
                 case 47 -> {
                     if (idGun != 22) {
                         return;
@@ -477,6 +486,7 @@ public class BulletManager implements IBulletManager {
                         bullets.add(new Bullet(this, (byte) 47, 400, pl, x, y, vx, vy, 0, 0));
                     }
                 }
+
                 // Magenta
                 case 49 -> {
                     if (pl.getUsedItemId() >= 0 || idGun != 9) {
@@ -491,7 +501,6 @@ public class BulletManager implements IBulletManager {
                     }
                 }
 
-                // TODO
                 // Item tu sat
                 case 50 -> {
                     if (pl.getUsedItemId() != 24) {
