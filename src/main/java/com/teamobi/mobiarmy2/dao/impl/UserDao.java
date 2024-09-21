@@ -102,13 +102,13 @@ public class UserDao implements IUserDao {
         User user = null;
         try (Connection connection = HikariCPManager.getInstance().getConnection()) {
 
-            // Truy vấn để lấy thông tin từ bảng user
+            //Truy vấn để lấy thông tin từ bảng user
             String userQuery = "SELECT `user_id`, `password`, `is_enabled`, `is_locked` FROM users WHERE username = ?";
             try (PreparedStatement userStatement = connection.prepareStatement(userQuery)) {
                 userStatement.setString(1, username);
                 try (ResultSet userResultSet = userStatement.executeQuery()) {
                     if (userResultSet.next()) {
-                        // Kiểm tra mật khẩu đã được mã hóa bằng jBCrypt
+                        //Kiểm tra mật khẩu đã được mã hóa bằng jBCrypt
                         String hashedPassword = userResultSet.getString("password");
                         if (!BCrypt.checkpw(password, hashedPassword)) {
                             return null;
@@ -132,7 +132,7 @@ public class UserDao implements IUserDao {
 
             Gson gson = GsonUtil.GSON;
 
-            // Truy vấn để lấy thông tin từ bảng player
+            //Truy vấn để lấy thông tin từ bảng player
             String playerQuery =
                     "SELECT " +
                             "p.player_id, p.xu, p.luong, p.cup, p.point_event, " +
@@ -273,7 +273,7 @@ public class UserDao implements IUserDao {
                 }
             }
 
-            // Truy vấn để lấy thông tin nhân vật
+            //Truy vấn để lấy thông tin nhân vật
             String playerCharacterQuery = "SELECT * FROM player_characters pc WHERE pc.player_id = ? ORDER BY pc.character_id";
             try (PreparedStatement characterStatement = connection.prepareStatement(playerCharacterQuery)) {
                 characterStatement.setInt(1, user.getPlayerId());
@@ -386,7 +386,7 @@ public class UserDao implements IUserDao {
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     String hashedPassword = resultSet.getString("password");
-                    // Check if the provided password matches the hashed password from the database
+                    //Check if the provided password matches the hashed password from the database
                     return BCrypt.checkpw(oldPass, hashedPassword);
                 }
             }

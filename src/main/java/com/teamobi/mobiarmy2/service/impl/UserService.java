@@ -473,7 +473,7 @@ public class UserService implements IUserService {
         DataOutputStream ds = ms.writer();
         int i = 0;
         for (List<MissionEntry> missionEntryList : MissionRepository.MISSION_LIST.values()) {
-            int index = user.getMissionLevel()[i] - 1;// Subtracting 1 to access the correct index
+            int index = user.getMissionLevel()[i] - 1;//Subtracting 1 to access the correct index
             if (index >= missionEntryList.size()) {
                 index = missionEntryList.size() - 1;
             }
@@ -1008,14 +1008,14 @@ public class UserService implements IUserService {
             }
         }
 
-        if (unit == 0) {// Mua bằng xu
+        if (unit == 0) {//Mua bằng xu
             int totalPrice = quantity * item.getPriceXu();
             if (user.getXu() < totalPrice) {
                 sendServerMessage(GameString.xuNotEnought());
                 return;
             }
             user.updateXu(-totalPrice);
-        } else {// Mua bằng lượng
+        } else {//Mua bằng lượng
             int totalPrice = quantity * item.getPriceLuong();
             if (user.getLuong() < totalPrice) {
                 sendServerMessage(GameString.xuNotEnought());
@@ -1126,13 +1126,13 @@ public class UserService implements IUserService {
             if (content.isEmpty() || content.length() > 100) {
                 return;
             }
-            // Neu la admin -> bo qua
+            //Neu la admin -> bo qua
             if (playerId == 1) {
                 return;
             }
-            // Neu la nguoi dua tin -> send Mss 46-> chat The gioi
+            //Neu la nguoi dua tin -> send Mss 46-> chat The gioi
             if (playerId == 2) {
-                // 10000xu/lan
+                //10000xu/lan
                 if (user.getXu() < CommonConstant.PRICE_CHAT) {
                     return;
                 }
@@ -1690,6 +1690,9 @@ public class UserService implements IUserService {
                 return;
             }
 
+            if (user.getItemFightQuantity(itemIndex) < 1) {
+                return;
+            }
             user.getFightWait().getFightManager().useItem(user.getPlayerId(), itemIndex);
         } catch (IOException e) {
             e.printStackTrace();
@@ -2460,7 +2463,7 @@ public class UserService implements IUserService {
                     purchaseEquipment(saleIndex, unit);
                 }
                 case 1 -> {//Gửi lệnh bán trang bị
-                    // Đặt lại giá trị
+                    //Đặt lại giá trị
                     userAction = null;
                     totalTransactionAmount = 0;
                     equipList.clear();
@@ -2518,7 +2521,7 @@ public class UserService implements IUserService {
                             return;
                         }
 
-                        // Trừ phí tháo ngọc
+                        //Trừ phí tháo ngọc
                         user.updateXu(-totalTransactionAmount);
 
                         EquipmentChestEntry selectedEquipment = equipList.get(0);
@@ -2526,7 +2529,7 @@ public class UserService implements IUserService {
                             return;
                         }
 
-                        // Lấy lại ngọc đã ghép
+                        //Lấy lại ngọc đã ghép
                         List<SpecialItemChestEntry> recoveredGems = new ArrayList<>();
                         for (byte slotItemId : selectedEquipment.getSlots()) {
                             if (slotItemId > -1) {
@@ -2540,14 +2543,14 @@ public class UserService implements IUserService {
                             }
                         }
 
-                        // Đặt các slot ngọc thành trống
+                        //Đặt các slot ngọc thành trống
                         selectedEquipment.setSlots(new byte[]{-1, -1, -1});
                         selectedEquipment.setEmptySlot((byte) 3);
 
-                        // Cập nhật rương
+                        //Cập nhật rương
                         user.updateInventory(selectedEquipment, null, recoveredGems, null);
 
-                        // Gửi thông báo thành công
+                        //Gửi thông báo thành công
                         sendServerMessage(GameString.thaoNgocSuccess());
                     } else if (userAction == UserAction.BAN_TRANG_BI) {//Xác nhận bán trang bị
                         //Kiểm tra có khóa rương không

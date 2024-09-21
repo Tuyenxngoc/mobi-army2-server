@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class JsonConverter {
 
     public static String convertSpecialItemChestEntriesToJson(List<SpecialItemChestEntry> specialItemChestEntries) {
-        // Convert the list of SpecialItemChestEntry to SpecialItemChestJson
+        //Convert the list of SpecialItemChestEntry to SpecialItemChestJson
         List<SpecialItemChestJson> specialItemChestJsons = specialItemChestEntries.stream().map(entry -> {
             SpecialItemChestJson jsonItem = new SpecialItemChestJson();
             jsonItem.setId(entry.getItem().getId());
@@ -22,12 +22,12 @@ public class JsonConverter {
             return jsonItem;
         }).collect(Collectors.toList());
 
-        // Convert the list of SpecialItemChestJson to JSON string
+        //Convert the list of SpecialItemChestJson to JSON string
         return GsonUtil.GSON.toJson(specialItemChestJsons);
     }
 
     public static String convertEquipmentChestEntriesToJson(List<EquipmentChestEntry> equipmentChestEntries) {
-        // Convert the list of EquipmentChestEntry to EquipmentChestJson
+        //Convert the list of EquipmentChestEntry to EquipmentChestJson
         List<EquipmentChestJson> equipmentChestJsons = equipmentChestEntries.stream().map(entry -> {
             EquipmentChestJson jsonItem = new EquipmentChestJson();
             jsonItem.setCharacterId(entry.getEquipEntry().getCharacterId());
@@ -44,7 +44,7 @@ public class JsonConverter {
             return jsonItem;
         }).collect(Collectors.toList());
 
-        // Convert the list of EquipmentChestJson to JSON string
+        //Convert the list of EquipmentChestJson to JSON string
         return GsonUtil.GSON.toJson(equipmentChestJsons);
     }
 

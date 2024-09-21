@@ -33,13 +33,4 @@ public class MapBrick {
     public int hashCode() {
         return Objects.hash(id);
     }
-
-    public ImageData getNewImage() {
-        if (image != null) {
-            int[] newPixelData = new int[image.getPixelData().length];
-            System.arraycopy(image.getPixelData(), 0, newPixelData, 0, image.getPixelData().length);
-            return new ImageData(image.getWidth(), image.getHeight(), newPixelData);
-        }
-        return null;
-    }
 }

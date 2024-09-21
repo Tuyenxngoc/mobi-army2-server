@@ -520,7 +520,7 @@ public class FightWait implements IFightWait {
             byte[] userItems = items[i];
             byte[] itemUsageMap = new byte[FightItemRepository.FIGHT_ITEM_ENTRIES.size()];
 
-            // Đếm số lượng item mà người dùng đang có
+            //Đếm số lượng item mà người dùng đang có
             for (byte itemIndex : userItems) {
                 if (itemIndex < 0 || itemIndex >= itemUsageMap.length) {
                     continue;
@@ -534,10 +534,10 @@ public class FightWait implements IFightWait {
                     continue;
                 }
 
-                // Kiểm tra điều kiện số lượng item
-                if (itemUsageMap[itemIndex] > FightItemRepository.FIGHT_ITEM_ENTRIES.get(itemIndex).getCarriedItemCount() || // Số lượng vượt quá số lượng cho phép
-                        itemUsageMap[itemIndex] > user.getItemFightQuantity(itemIndex) || // Số lượng vượt quá số lượng đang có
-                        (j >= 4 && user.getItemFightQuantity(12 + j - 4) == 0) // Item chứa đã hết
+                //Kiểm tra điều kiện số lượng item
+                if (itemUsageMap[itemIndex] > FightItemRepository.FIGHT_ITEM_ENTRIES.get(itemIndex).getCarriedItemCount() || //Số lượng vượt quá số lượng cho phép
+                        itemUsageMap[itemIndex] > user.getItemFightQuantity(itemIndex) || //Số lượng vượt quá số lượng đang có
+                        (j >= 4 && user.getItemFightQuantity(12 + j - 4) == 0) //Item chứa đã hết
                 ) {
                     try {
                         IMessage ms = new Message(Cmd.SERVER_MESSAGE);

@@ -267,7 +267,7 @@ public class FightManager implements IFightManager {
 
     private void nextWind() {
         Player player = players[getCurrentTurn()];
-        if (player.getWindStopCount() > 0) {
+        if (player != null && player.getWindStopCount() > 0) {
             player.decreaseWindStopCount();
 
             windX = 0;
@@ -416,7 +416,7 @@ public class FightManager implements IFightManager {
             player.updateAngry((byte) 10);
         }
 
-        if (turnCount > 0) {
+        if (turnCount > 1) {
             //Chờ 2 giây
             try {
                 Thread.sleep(2000);
@@ -608,16 +608,16 @@ public class FightManager implements IFightManager {
                 //Cập nhật xu cuối trận
                 int xuUp = fightWait.getMoney();
                 switch (winStatus) {
-                    // Người chơi thắng
+                    //Người chơi thắng
                     case 1 -> {
                         user.updateXu(xuUp *= 2);
                         sendMoneyUpdate(player, xuUp);
                     }
 
-                    // Người chơi thua
+                    //Người chơi thua
                     case -1 -> sendMoneyUpdate(player, -xuUp);
 
-                    // Hòa
+                    //Hòa
                     case 0 -> {
                         user.updateXu(xuUp);
                         sendMoneyUpdate(player, xuUp);
@@ -932,6 +932,21 @@ public class FightManager implements IFightManager {
             return;
         }
 
+        //Kiểm tra người chơi có mang theo item hay không
+        if (itemIndex != 100) {//pow thì bỏ qua
+            boolean foundItem = false;
+            byte[] items = player.getItems();
+            for (byte item : items) {
+                if (item == itemIndex) {
+                    foundItem = true;
+                    break;
+                }
+            }
+            if (!foundItem) {
+                return;
+            }
+        }
+
         try {
             IMessage ms = new Message(Cmd.USE_ITEM);
             DataOutputStream ds = ms.writer();
@@ -944,6 +959,8 @@ public class FightManager implements IFightManager {
         }
 
         player.setItemUsed(true);
+        player.setUsedItemId(itemIndex);
+        player.getUser().updateItems(itemIndex, (byte) -1);
         handleItem(player, index, itemIndex);
     }
 
@@ -1019,5 +1036,20 @@ public class FightManager implements IFightManager {
         }
 
         return closestPlayer;
+    }
+
+    @Override
+    public void updateCantMove(Player pl) {
+        pl.setFreezeCount((byte) 5);
+    }
+
+    @Override
+    public void updateBiDoc(Player pl) {
+        //Todo
+    }
+
+    @Override
+    public void updateCantSee(Player pl) {
+
     }
 }

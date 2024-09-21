@@ -21,7 +21,7 @@ public class CountdownTimer implements ICountdownTimer {
     @Override
     public void start() {
         if (timer != null) {
-            timer.cancel(); // Hủy bỏ bộ đếm trước đó nếu nó đang chạy
+            timer.cancel(); //Hủy bỏ bộ đếm trước đó nếu nó đang chạy
         }
         timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -31,11 +31,11 @@ public class CountdownTimer implements ICountdownTimer {
                     remainingTime--;
                     ServerManager.getInstance().logger().logMessage("Thời gian còn lại: " + remainingTime + " giây");
                 } else {
-                    timer.cancel(); // Dừng bộ đếm khi thời gian hết
+                    timer.cancel(); //Dừng bộ đếm khi thời gian hết
                     timeUp();
                 }
             }
-        }, 0, 1000); // Cập nhật mỗi giây
+        }, 0, 1000); //Cập nhật mỗi giây
     }
 
     @Override

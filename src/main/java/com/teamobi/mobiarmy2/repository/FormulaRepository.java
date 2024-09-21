@@ -22,7 +22,7 @@ public class FormulaRepository {
         Map<Byte, List<FormulaEntry>> innerMap = FORMULA.computeIfAbsent(entry.getMaterial().getId(), k -> new HashMap<>());
         List<FormulaEntry> formulaList = innerMap.computeIfAbsent(entry.getCharacterId(), k -> new ArrayList<>());
 
-        // Add the entry to the list
+        //Add the entry to the list
         formulaList.add(entry);
     }
 }

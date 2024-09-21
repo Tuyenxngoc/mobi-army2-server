@@ -46,21 +46,21 @@ public class MapManager implements IMapManager {
 
     @Override
     public List<short[]> getRandomPlayerPositions(int numPlayers) {
-        // Kiểm tra nếu số người chơi lớn hơn số vị trí khả dụng
+        //Kiểm tra nếu số người chơi lớn hơn số vị trí khả dụng
         if (numPlayers > playerInitXPositions.length || numPlayers > playerInitYPositions.length) {
             throw new IllegalArgumentException("Số người chơi vượt quá số lượng vị trí khả dụng");
         }
 
-        // Khởi tạo danh sách chỉ số vị trí
+        //Khởi tạo danh sách chỉ số vị trí
         List<Integer> indices = new ArrayList<>();
         for (int i = 0; i < playerInitXPositions.length; i++) {
             indices.add(i);
         }
 
-        // Trộn ngẫu nhiên các chỉ số
+        //Trộn ngẫu nhiên các chỉ số
         Collections.shuffle(indices);
 
-        // Tạo danh sách vị trí người chơi dựa trên chỉ số đã trộn
+        //Tạo danh sách vị trí người chơi dựa trên chỉ số đã trộn
         List<short[]> randomPositions = new ArrayList<>();
         for (int i = 0; i < numPlayers; i++) {
             short x = playerInitXPositions[indices.get(i)];
@@ -98,7 +98,7 @@ public class MapManager implements IMapManager {
                     brickId,
                     Utils.getShort(mapData, offset + 1),
                     Utils.getShort(mapData, offset + 3),
-                    mapBrick.getNewImage(),
+                    mapBrick.getImage(),
                     MapRepository.isCollision(brickId)
             );
 
@@ -144,6 +144,11 @@ public class MapManager implements IMapManager {
     @Override
     public void refresh() {
 
+    }
+
+    @Override
+    public void addNewTiles(MapTile mapTile) {
+        mapTiles.add(mapTile);
     }
 
 }

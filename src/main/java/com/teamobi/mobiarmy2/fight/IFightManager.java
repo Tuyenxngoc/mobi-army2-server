@@ -36,4 +36,11 @@ public interface IFightManager {
     Player getPlayerTurn();
 
     Player findClosestPlayer(short targetX, short targetY);
+
+    void updateCantMove(Player pl);
+
+    void updateBiDoc(Player pl);
+
+    void updateCantSee(Player pl);
+
 }

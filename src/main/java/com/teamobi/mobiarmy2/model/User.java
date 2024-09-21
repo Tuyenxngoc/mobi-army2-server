@@ -227,6 +227,10 @@ public class User {
     }
 
     public synchronized void updateItems(byte itemIndex, byte quantity) {
+        if (itemIndex < 0 || itemIndex >= items.length) {
+            return;
+        }
+
         items[itemIndex] += quantity;
         if (items[itemIndex] < 0) {
             items[itemIndex] = 0;
@@ -491,7 +495,7 @@ public class User {
         EquipmentChestEntry[] equippedItems = characterEquips[activeCharacterId];
         for (EquipmentChestEntry equip : equippedItems) {
             if (equip == null || equip.isExpired()) {
-                continue;// Bỏ qua nếu trang bị không tồn tại hoặc đã hết hạn
+                continue;//Bỏ qua nếu trang bị không tồn tại hoặc đã hết hạn
             }
 
             points += equip.getAddPoints()[4];
@@ -516,7 +520,7 @@ public class User {
         EquipmentChestEntry[] equippedItems = characterEquips[activeCharacterId];
         for (EquipmentChestEntry equip : equippedItems) {
             if (equip == null || equip.isExpired()) {
-                continue;// Bỏ qua nếu trang bị không tồn tại hoặc đã hết hạn
+                continue;//Bỏ qua nếu trang bị không tồn tại hoặc đã hết hạn
             }
 
             for (byte i = 0; i < points.length; i++) {

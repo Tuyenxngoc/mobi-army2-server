@@ -48,7 +48,7 @@ public class CharacterRepository {
             return null;
         }
 
-        // Find the character entry by ID
+        //Find the character entry by ID
         Optional<CharacterEntry> characterEntryOpt = CHARACTER_ENTRIES.stream()
                 .filter(entry -> entry.getId() == characterId)
                 .findFirst();
@@ -56,13 +56,13 @@ public class CharacterRepository {
             return null;
         }
 
-        // Get the equipment list for the given type
+        //Get the equipment list for the given type
         List<EquipmentEntry> entries = characterEntryOpt.get().getEquips().get(equipType);
         if (entries == null) {
             return null;
         }
 
-        // Find the equipment entry by index
+        //Find the equipment entry by index
         return entries.stream()
                 .filter(equipmentEntry -> equipmentEntry.getEquipIndex() == equipIndex)
                 .findFirst()
@@ -84,7 +84,7 @@ public class CharacterRepository {
                 .filter(json -> json != null && json.getCharacterId() == activeCharacter)
                 .collect(Collectors.toMap(EquipmentChestJson::getKey, json -> json));
 
-        // Tìm cải trang
+        //Tìm cải trang
         int disguiseKey = data[5];
         if (disguiseKey != -1 && equipmentMap.containsKey(disguiseKey)) {
             EquipmentChestJson json = equipmentMap.get(disguiseKey);
@@ -94,7 +94,7 @@ public class CharacterRepository {
             }
         }
 
-        // Tìm trang bị
+        //Tìm trang bị
         for (int i = 0; i < equipData.length; i++) {
             int equipKey = data[i];
             boolean exists = false;
@@ -108,7 +108,7 @@ public class CharacterRepository {
                 }
             }
 
-            // Nếu không tìm thấy thì lấy dữ liệu mặc định
+            //Nếu không tìm thấy thì lấy dữ liệu mặc định
             if (!exists) {
                 equipData[i] = (User.equipDefault[activeCharacter][i] != null)
                         ? User.equipDefault[activeCharacter][i].getEquipIndex()

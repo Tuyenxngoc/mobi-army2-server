@@ -21,8 +21,17 @@ public class MapTile {
         this.brickId = brickId;
         this.x = x;
         this.y = y;
-        this.image = image;
         this.collision = collision;
+        copyImageData(image);
+    }
+
+    private void copyImageData(ImageData image) {
+        if (image != null) {
+            int[] newPixelData = new int[image.getPixelData().length];
+            System.arraycopy(image.getPixelData(), 0, newPixelData, 0, image.getPixelData().length);
+
+            this.image = new ImageData(image.getWidth(), image.getHeight(), newPixelData);
+        }
     }
 
     public boolean isCollision(short x, short y) {

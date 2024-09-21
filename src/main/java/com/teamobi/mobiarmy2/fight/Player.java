@@ -110,36 +110,36 @@ public class Player {
     }
 
     private void applyClanBonuses() {
-        if (clanItems[1]) { // 5% may mắn
+        if (clanItems[1]) { //5% may mắn
             luck += (short) (luck * 5 / 100);
         }
-        if (clanItems[3]) { // 5% phòng thủ
+        if (clanItems[3]) { //5% phòng thủ
             defense += (short) (defense * 5 / 100);
         }
-        if (clanItems[5]) { // 5% HP
+        if (clanItems[5]) { //5% HP
             maxHp += (short) (maxHp * 5 / 100);
         }
-        if (clanItems[6]) { // 5% sức mạnh
+        if (clanItems[6]) { //5% sức mạnh
             damage += (short) (damage * 5 / 100);
         }
-        if (clanItems[8]) { // 10% may mắn
+        if (clanItems[8]) { //10% may mắn
             luck += (short) (luck * 10 / 100);
         }
-        if (clanItems[10]) { // 10% phòng thủ
+        if (clanItems[10]) { //10% phòng thủ
             defense += (short) (defense * 10 / 100);
         }
-        if (clanItems[12]) { // 10% HP
+        if (clanItems[12]) { //10% HP
             maxHp += (short) (maxHp * 10 / 100);
         }
-        if (clanItems[13]) { // 10% sức mạnh
+        if (clanItems[13]) { //10% sức mạnh
             damage += (short) (damage * 10 / 100);
         }
-        if (clanItems[14]) { // 30% phòng thủ cho Canon và AK
+        if (clanItems[14]) { //30% phòng thủ cho Canon và AK
             if (characterId == 1 || characterId == 5) {
                 defense += (short) (defense * 30 / 100);
             }
         }
-        if (clanItems[15]) { // 15% sức mạnh cho King Kong và Proton
+        if (clanItems[15]) { //15% sức mạnh cho King Kong và Proton
             if (characterId == 2 || characterId == 3) {
                 damage += (short) (damage * 15 / 100);
             }
@@ -276,7 +276,7 @@ public class Player {
             x -= step;
         }
         if (mapManager.isCollision(x, (short) (y - 5))) {
-            steps--; // Giảm số bước nếu không thể di chuyển
+            steps--; //Giảm số bước nếu không thể di chuyển
             if (addX) {
                 x -= step;
             } else {
@@ -302,7 +302,7 @@ public class Player {
             y++;
         }
 
-        // Nếu rơi quá bản đồ thì tự sát
+        //Nếu rơi quá bản đồ thì tự sát
         die();
     }
 
@@ -329,27 +329,27 @@ public class Player {
             impactRadius = 250;
         }
 
-        // Nhân đôi tầm ảnh hưởng nếu sử dụng kỹ năng pow với các nhân vật cụ thể
+        //Nhân đôi tầm ảnh hưởng nếu sử dụng kỹ năng pow với các nhân vật cụ thể
         if (shooter.isUsePow() && (shooterCharacterId == 3 || shooterCharacterId == 4 || shooterCharacterId == 6 || shooterCharacterId == 7 || shooterCharacterId == 8)) {
             impactRadius *= 2;
         }
 
-        // Kiểm tra điều kiện để bỏ qua xử lý va chạm
+        //Kiểm tra điều kiện để bỏ qua xử lý va chạm
         if (!Utils.intersectRegions(x, y, width, height, bx, by, impactRadius * 2, impactRadius * 2)) {
             return;
         }
 
-        // Bỏ qua nếu bullet không hợp lệ
+        //Bỏ qua nếu bullet không hợp lệ
         if (bullId == 31 || bullId == 32 || bullId == 35) {
             return;
         }
 
-        // Tính toán khoảng cách từ điểm va chạm
+        //Tính toán khoảng cách từ điểm va chạm
         int deltaX = Math.abs(x - bx);
         int deltaY = Math.abs(y - height / 2 - by);
         int distance = (int) Math.hypot(deltaX, deltaY);
 
-        // Tính sát thương
+        //Tính sát thương
         int damage = bull.getDamage();
         if (distance > width / 2) {
             damage -= (damage * (distance - width / 2)) / impactRadius;
@@ -363,23 +363,23 @@ public class Player {
             damage *= 2;
         }
 
-        // Tăng sát thương từ item clan
+        //Tăng sát thương từ item clan
         if (shooter.isUsePow()) {
             if (shooter.clanItems[5]) {
-                damage += (damage * 5) / 100;  // +5% damage
+                damage += (damage * 5) / 100;  //+5% damage
             }
             if (shooter.clanItems[6]) {
-                damage += (damage * 11) / 100;  // +10% damage
+                damage += (damage * 11) / 100;  //+10% damage
             }
         }
 
-        // Tăng sát thương khi đạn siêu cao
+        //Tăng sát thương khi đạn siêu cao
         //todo...
 
-        // Tính toán điểm phòng thủ
+        //Tính toán điểm phòng thủ
         int d = defense;
         if (isLucky) {
-            // Giảm sát thương
+            //Giảm sát thương
             damage = Math.round((float) damage / 2);
 
             //Cộng thêm chỉ số phòng thủ
@@ -413,5 +413,12 @@ public class Player {
         usedItemId = -1;
         stamina = 60;
         steps = 0;
+    }
+
+    public final void setXY(short x, short y) {
+        if (x >= 0 && x < fightManager.getMapManger().getWidth() && y < fightManager.getMapManger().getHeight()) {
+            this.x = x;
+            this.y = y;
+        }
     }
 }

@@ -36,4 +36,7 @@ public class BigBoom extends Boss {
         fightManager.nextTurn();
     }
 
+    public void bomAction() {
+        System.out.println("boom action");
+    }
 }
