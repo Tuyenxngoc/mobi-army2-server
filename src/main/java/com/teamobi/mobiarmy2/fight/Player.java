@@ -432,4 +432,9 @@ public class Player {
         items[slot] = -1;
     }
 
+    protected int calculateDistance(short x, short y) {
+        int deltaX = Math.abs(this.x - x);
+        int deltaY = Math.abs(this.y - y);
+        return (int) Math.abs(Math.hypot(deltaX, deltaY));
+    }
 }

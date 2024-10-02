@@ -11,6 +11,8 @@ public interface IFightManager {
 
     void startGame(short teamPointsBlue, short teamPointsRed);
 
+    void newShoot(int index, byte bullId, short angle, byte force, byte force2, byte numShoot);
+
     void changeLocation(int playerId, short x, short y);
 
     void addShoot(int playerId, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot);

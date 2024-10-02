@@ -762,7 +762,8 @@ public class FightManager implements IFightManager {
         newShoot(index, bullId, angle, force, force2, numShoot);
     }
 
-    private void newShoot(int index, byte bullId, short angle, byte force, byte force2, byte numShoot) {
+    @Override
+    public void newShoot(int index, byte bullId, short angle, byte force, byte force2, byte numShoot) {
         Player player = players[index];
         if (player.isDoubleShoot()) {
             player.setDoubleShoot(false);
