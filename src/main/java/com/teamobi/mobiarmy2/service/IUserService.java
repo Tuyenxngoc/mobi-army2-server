@@ -162,4 +162,6 @@ public interface IUserService {
     void ping(IMessage ms);
 
     void getMoreGame();
+
+    void handleSendAgentAndProviders();
 }

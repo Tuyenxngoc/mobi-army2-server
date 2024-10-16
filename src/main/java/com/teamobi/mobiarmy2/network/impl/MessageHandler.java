@@ -25,6 +25,8 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.GET_KEY -> userService.handleHandshakeMessage();
 
+                case Cmd.GET_AGENT_PROVIDER -> userService.handleSendAgentAndProviders();
+
                 case Cmd.GET_MORE_DAY -> userService.extendItemDuration(ms);
 
                 case Cmd.MISSISON -> userService.handleGetMissions(ms);

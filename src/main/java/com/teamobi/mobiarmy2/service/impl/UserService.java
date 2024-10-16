@@ -3044,4 +3044,18 @@ public class UserService implements IUserService {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void handleSendAgentAndProviders() {
+        try {
+            IMessage ms = new Message(Cmd.GET_AGENT_PROVIDER);
+            DataOutputStream ds = ms.writer();
+            ds.writeUTF("none");
+            ds.writeByte(0);
+            ds.flush();
+            user.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
