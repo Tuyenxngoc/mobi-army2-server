@@ -5,7 +5,7 @@ import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.constant.MatchResult;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.fight.*;
-import com.teamobi.mobiarmy2.fight.boss.BigBoom;
+import com.teamobi.mobiarmy2.fight.boss.*;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.impl.Message;
@@ -31,7 +31,15 @@ public class FightManager implements IFightManager {
     private static final int MAX_PLAY_TIME = 30;
     private static final byte[][] BOSS_COUNTS = {
             {1, 6, 6, 8, 8, 8, 10, 10},
-            {4, 6, 6, 6, 8, 8, 10, 10}
+            {4, 6, 6, 6, 8, 8, 10, 10},
+            {1, 6, 6, 8, 8, 8, 10, 10},
+            {2, 2, 3, 3, 4, 4, 5, 5},
+            {4, 5, 5, 6, 6, 7, 7, 8},
+            {4, 5, 5, 6, 8, 8, 9, 9},
+            {3, 3, 4, 4, 5, 5, 6, 6},//
+            {4, 5, 5, 6, 8, 8, 9, 9},
+            {4, 5, 5, 6, 8, 8, 9, 9},
+            {4, 5, 5, 6, 8, 8, 9, 9},
     };
 
     private final IFightWait fightWait;
@@ -299,9 +307,10 @@ public class FightManager implements IFightManager {
     }
 
     private void nextBosses() {
+        byte playerCount = fightWait.getNumPlayers();
+
         switch (fightWait.getMapId()) {
-            case 30 -> {
-                byte playerCount = fightWait.getNumPlayers();
+            case 30 -> {//Bom 1
                 byte bossCount = BOSS_COUNTS[0][playerCount - 1];
                 for (byte i = 0; i < bossCount; i++) {
                     short bossX = (short) ((i % 2 == 0) ? Utils.nextInt(95, 315) : Utils.nextInt(890, 1070));
@@ -312,14 +321,102 @@ public class FightManager implements IFightManager {
                 }
             }
 
-            case 31 -> {
-                byte playerCount = fightWait.getNumPlayers();
+            case 31 -> {//Bom 2
                 byte bossCount = BOSS_COUNTS[1][playerCount - 1];
                 for (byte i = 0; i < bossCount; i++) {
                     short bossX = (short) (Utils.nextInt(445, 800) + i * 50);
                     short bossY = 180;
                     short bossHealth = 1500;
                     players[totalPlayers] = new BigBoom(this, (byte) totalPlayers, bossX, bossY, bossHealth);
+                    totalPlayers++;
+                }
+            }
+
+            case 32 -> {//Nhện máy
+                short[] tempX = new short[]{505, 1010, 743, 425, 1068};
+                short[] tempY = new short[]{221, 221, 198, 369, 369, 369};
+                byte bossCount = BOSS_COUNTS[2][playerCount - 1];
+                for (byte i = 0; i < bossCount; i++) {
+                    players[totalPlayers] = new RobotSpider(this, (byte) totalPlayers, tempX[i], tempY[i], (short) 1500);
+                    totalPlayers++;
+                }
+            }
+
+            case 33 -> {//Thành phố máy
+                short[] tempX = new short[]{420, 580, 720, 240, 55, 900};
+                byte bossCount = BOSS_COUNTS[3][playerCount - 1];
+                for (int i = 0; i < bossCount; i++) {
+                    short X = tempX[i];
+                    short Y = 200;
+                    players[totalPlayers] = new Robot(this, (byte) totalPlayers, X, Y, (short) 3700);
+                    totalPlayers++;
+                }
+            }
+
+            case 34 -> {// T-rex máy
+                short X = 880;
+                short Y = 400;
+                players[totalPlayers] = new TRex(this, (byte) totalPlayers, X, Y, (short) 15000);
+                totalPlayers++;
+
+                byte bossCount = BOSS_COUNTS[4][playerCount - 1];
+                for (byte i = 0; i < bossCount; i++) {
+                    X = (short) (Utils.nextInt(470, 755));
+                    Y = 400;
+                    players[totalPlayers] = new BigBoom(this, (byte) totalPlayers, X, Y, (short) 1500);
+                    totalPlayers++;
+                }
+            }
+
+            case 35 -> {//Khu vực cấm
+                byte bossCount = BOSS_COUNTS[5][playerCount - 1];
+                for (byte i = 0; i < bossCount; i++) {
+                    short X = (short) (Utils.nextInt(300, 800));
+                    short Y = (short) Utils.nextInt(-350, 100);
+                    players[totalPlayers] = new UFO(this, (byte) totalPlayers, X, Y, (short) 4500);
+                    totalPlayers++;
+                }
+            }
+
+            case 36 -> {//Đỉnh hi mã lạp sơn
+                short X = (short) (Utils.nextInt(300, 800));
+                short Y = (short) Utils.nextInt(-350, 100);
+                players[totalPlayers] = new Balloon(this, (byte) totalPlayers, X, Y);
+                totalPlayers++;
+                players[totalPlayers] = new BalloonGun(this, (byte) totalPlayers, (short) (X + 51), (short) (Y + 19), (short) 2000);
+                totalPlayers++;
+                players[totalPlayers] = new BalloonGunBig(this, (byte) totalPlayers, (short) (X - 5), (short) (Y + 30), (short) 2500);
+                totalPlayers++;
+                players[totalPlayers] = new BalloonFanBack(this, (byte) totalPlayers, (short) (X - 67), (short) (Y - 6), (short) 1000);
+                totalPlayers++;
+            }
+
+            case 37 -> {//Nhện độc
+                byte bossCount = BOSS_COUNTS[7][playerCount - 1];
+                for (byte i = 0; i < bossCount; i++) {
+                    short X = (short) Utils.nextInt(20, mapManager.getWidth() - 20);
+                    short Y = (short) 250;
+                    players[totalPlayers] = new VenomousSpider(this, (byte) totalPlayers, X, Y, (short) 3800);
+                    totalPlayers++;
+                }
+            }
+
+            case 38 -> {//Nghĩa trang 1
+                byte bossCount = BOSS_COUNTS[8][playerCount - 1];
+                for (byte i = 0; i < bossCount; i++) {
+                    short X = (short) ((short) 700 - i * 80);
+                    short Y = (short) (Utils.nextInt(30));
+                    players[totalPlayers] = new Ghost(this, (byte) totalPlayers, X, Y, (short) 1800);
+                    totalPlayers++;
+                }
+            }
+
+            case 39 -> {//Nghĩa trang 2
+                byte bossCount = BOSS_COUNTS[9][playerCount - 1];
+                for (byte i = 0; i < bossCount; i++) {
+                    short X = (short) (700 - i * 80);
+                    short Y = (short) Utils.nextInt(30);
+                    players[totalPlayers] = new Ghost2(this, (byte) totalPlayers, X, Y, (short) 1800);
                     totalPlayers++;
                 }
             }

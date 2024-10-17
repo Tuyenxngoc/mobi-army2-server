@@ -8,8 +8,8 @@ import com.teamobi.mobiarmy2.fight.IFightManager;
  */
 public class SmallBoom extends Boss {
 
-    public SmallBoom(IFightManager fightManager, byte index, byte characterId, String name, short x, short y, short width, short height, short maxHp, int xpExist) {
-        super(fightManager, index, characterId, name, x, y, width, height, maxHp, xpExist);
+    public SmallBoom(IFightManager fightManager, byte index, short x, short y, short maxHp) {
+        super(fightManager, index, (byte) 11, "Small Boom", x, y, (short) 18, (short) 18, maxHp, 10);
     }
 
     @Override

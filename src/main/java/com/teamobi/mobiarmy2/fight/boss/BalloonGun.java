@@ -6,10 +6,9 @@ import com.teamobi.mobiarmy2.fight.IFightManager;
 /**
  * @author tuyen
  */
-public class Ghost extends Boss {
-
-    public Ghost(IFightManager fightManager, byte index, short x, short y, short maxHp) {
-        super(fightManager, index, (byte) 25, "Ghost", x, y, (short) 35, (short) 31, maxHp, 8);
+public class BalloonGun extends Boss {
+    public BalloonGun(IFightManager fightManager, byte index, short x, short y, short maxHp) {
+        super(fightManager, index, (byte) 18, "Balloon Gun", x, y, (short) 21, (short) 20, maxHp, 1);
         super.isFlying = true;
     }
 

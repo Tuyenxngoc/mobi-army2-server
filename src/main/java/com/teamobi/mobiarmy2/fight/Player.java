@@ -35,7 +35,7 @@ public class Player {
     private boolean isUpdateCup;
     private boolean isLucky;
     private boolean isPoisoned;
-    private boolean isFlying;
+    protected boolean isFlying;
     private byte eyeSmokeCount;
     private byte invisibleCount; // Số lần vô hình
     private byte vanishCount; // Số lần tàn hình
