@@ -13,14 +13,14 @@ public class SmallBoomBum extends Bullet {
 
     @Override
     public void nextXY() {
-        this.collect = true;
-        this.XArray.add((short) X);
-        this.YArray.add((short) Y);
-        this.Y += 2;
-        this.XArray.add((short) X);
-        this.YArray.add((short) Y);
+        collect = true;
+        XArray.add(X);
+        YArray.add(Y);
+        Y += 2;
+        XArray.add(X);
+        YArray.add(Y);
         ((SmallBoom) pl).bomAction();
-        if (this.isCanCollision) {
+        if (isCanCollision) {
             bulletManager.getFightManager().getMapManger().collision(X, Y, this);
         }
     }

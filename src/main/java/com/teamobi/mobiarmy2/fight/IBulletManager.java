@@ -9,6 +9,8 @@ public interface IBulletManager {
 
     void refresh();
 
+    List<Boss> getAddboss();
+
     void decreaseSpiderWebCount();
 
     void addShoot(Player player, byte bullId, short angle, byte force, byte force2, byte numShoot);

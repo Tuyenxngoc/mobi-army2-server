@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.fight.boss;
 
 import com.teamobi.mobiarmy2.fight.Boss;
 import com.teamobi.mobiarmy2.fight.IFightManager;
+import com.teamobi.mobiarmy2.fight.Player;
 
 /**
  * @author tuyen
@@ -14,10 +15,22 @@ public class SmallBoom extends Boss {
 
     @Override
     public void turnAction() {
+        Player player = fightManager.findClosestPlayer(x, y);
+        if (player == null) {
+            fightManager.nextTurn();
+            return;
+        }
 
+        moveToTarget(player);
+        int distance = calculateDistance(player.getX(), player.getY());
+        if (distance < 25) {
+            fightManager.newShoot(index, (byte) 32, (short) 0, (byte) 0, (byte) 0, (byte) 1);
+            return;
+        }
+        fightManager.nextTurn();
     }
 
     public void bomAction() {
-        System.out.println("Bom Action");
+        isDead = true;
     }
 }

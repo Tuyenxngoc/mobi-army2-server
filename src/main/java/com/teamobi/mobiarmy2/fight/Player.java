@@ -48,7 +48,7 @@ public class Player {
     private boolean isDoubleShoot;
     private boolean isDoubleSpeed;
     private boolean isUsePow;
-    private boolean isDead;
+    protected boolean isDead;
     private boolean isTeamBlue;
     private byte usedItemId;
     private short width;
@@ -432,9 +432,4 @@ public class Player {
         items[slot] = -1;
     }
 
-    protected int calculateDistance(short x, short y) {
-        int deltaX = Math.abs(this.x - x);
-        int deltaY = Math.abs(this.y - y);
-        return (int) Math.abs(Math.hypot(deltaX, deltaY));
-    }
 }

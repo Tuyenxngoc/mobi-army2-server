@@ -8,7 +8,7 @@ import com.teamobi.mobiarmy2.fight.IFightManager;
  */
 public class GiftBox extends Boss {
     public GiftBox(IFightManager fightManager, byte index, short x, short y) {
-        super(fightManager, index, (byte) 20, "Gift Box", x, y, (short) 30, (short) 30, (short) 1, 0);
+        super(fightManager, index, (byte) 24, "Gift Box", x, y, (short) 30, (short) 30, (short) 1, 0);
     }
 
     @Override

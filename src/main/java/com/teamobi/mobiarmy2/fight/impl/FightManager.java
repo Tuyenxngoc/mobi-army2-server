@@ -422,25 +422,12 @@ public class FightManager implements IFightManager {
             }
         }
 
-        try {
-            int bossCount = totalPlayers - MAX_USER_FIGHT;
-            IMessage ms = new Message(Cmd.GET_BOSS);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(bossCount);
-            for (byte i = 0; i < bossCount; i++) {
-                Boss boss = (Boss) players[i + MAX_USER_FIGHT];
-                ds.writeInt(-1);
-                ds.writeUTF(boss.getName());
-                ds.writeInt(boss.getMaxHp());
-                ds.writeByte(boss.getCharacterId());
-                ds.writeShort(boss.getX());
-                ds.writeShort(boss.getY());
-            }
-            ds.flush();
-            fightWait.sendToTeam(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
+        //Gửi thông tin thêm các boss đã tạo đến các team
+        Boss[] bosses = new Boss[totalPlayers - MAX_USER_FIGHT];
+        for (int i = 0; i < bosses.length; i++) {
+            bosses[i] = (Boss) players[i + MAX_USER_FIGHT];
         }
+        sendMssAddBosses(bosses);
     }
 
     @Override
@@ -513,6 +500,14 @@ public class FightManager implements IFightManager {
             player.updateAngry((byte) 10);
         }
 
+        List<Boss> addboss = bulletManager.getAddboss();
+        if (!addboss.isEmpty()) {
+            for (Boss bos : addboss) {
+                addBoss(bos);
+            }
+            addboss.clear();
+        }
+
         if (turnCount > 1) {
             //Chờ 2 giây
             try {
@@ -535,6 +530,37 @@ public class FightManager implements IFightManager {
                     mapManager.getHeight(),
                     players,
                     String.format("temp/turn_%d.png", turnCount));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addBoss(Player player) {
+        if (totalPlayers >= ServerManager.maxElementFight) {
+            return;
+        }
+        players[totalPlayers] = player;
+        totalPlayers++;
+        Boss boss = (Boss) player;
+
+        sendMssAddBosses(new Boss[]{boss});
+    }
+
+    private void sendMssAddBosses(Boss[] bosses) {
+        try {
+            IMessage ms = new Message(Cmd.GET_BOSS);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(bosses.length);
+            for (Boss boss : bosses) {
+                ds.writeInt(-1);
+                ds.writeUTF(boss.getName());
+                ds.writeInt(boss.getMaxHp());
+                ds.writeByte(boss.getCharacterId());
+                ds.writeShort(boss.getX());
+                ds.writeShort(boss.getY());
+            }
+            ds.flush();
+            fightWait.sendToTeam(ms);
         } catch (IOException e) {
             e.printStackTrace();
         }

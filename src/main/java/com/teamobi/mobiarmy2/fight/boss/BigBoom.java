@@ -38,18 +38,7 @@ public class BigBoom extends Boss {
             }
             fightManager.newShoot(index, (byte) 34, angle, force, (byte) 0, (byte) 1);
         } else {
-            //Lưu lại vị trí ban đầu
-            int preX = x;
-            int preY = y;
-
-            //Di chuyển đến vị trí của người chơi
-            updateXY(player.getX(), player.getY());
-
-            //Nếu vị trí thay đổi thì gửi message cập nhật
-            if (preX != x || preY != y) {
-                fightManager.sendMessageUpdateXY(index);
-            }
-
+            moveToTarget(player);
             int distance = calculateDistance(player.getX(), player.getY());
             if (distance < 35) {
                 fightManager.newShoot(index, (byte) 31, (short) 0, (byte) 0, (byte) 0, (byte) 1);

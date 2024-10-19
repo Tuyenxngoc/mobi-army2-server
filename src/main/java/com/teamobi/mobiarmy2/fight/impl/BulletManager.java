@@ -1,9 +1,6 @@
 package com.teamobi.mobiarmy2.fight.impl;
 
-import com.teamobi.mobiarmy2.fight.Bullet;
-import com.teamobi.mobiarmy2.fight.IBulletManager;
-import com.teamobi.mobiarmy2.fight.IFightManager;
-import com.teamobi.mobiarmy2.fight.Player;
+import com.teamobi.mobiarmy2.fight.*;
 import com.teamobi.mobiarmy2.fight.bullet.*;
 import com.teamobi.mobiarmy2.fight.item.ItemBomB52;
 import com.teamobi.mobiarmy2.server.ServerManager;
@@ -53,18 +50,6 @@ public class BulletManager implements IBulletManager {
 
     }
 
-    public static class AddBoss {
-
-        public Player players;
-        public int XPE;
-
-        public AddBoss(Player players, int XPE) {
-            this.players = players;
-            this.XPE = XPE;
-        }
-
-    }
-
     public static class Bullets {
 
         public Bullet bull;
@@ -81,7 +66,7 @@ public class BulletManager implements IBulletManager {
     private boolean hasVoiRong;
     private List<VoiRong> voiRongs;
     private List<BomHenGio> boms;
-    private List<AddBoss> addboss;
+    private List<Boss> addboss;
     private List<Bullets> buls;
     private byte mgtAddX;
     private byte mgtAddY;
@@ -109,6 +94,11 @@ public class BulletManager implements IBulletManager {
 
     public void addBullet(Bullet bullet) {
         bullets.add(bullet);
+    }
+
+    @Override
+    public List<Boss> getAddboss() {
+        return addboss;
     }
 
     @Override
