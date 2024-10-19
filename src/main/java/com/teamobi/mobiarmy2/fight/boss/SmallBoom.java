@@ -30,7 +30,4 @@ public class SmallBoom extends Boss {
         fightManager.nextTurn();
     }
 
-    public void bomAction() {
-        isDead = true;
-    }
 }

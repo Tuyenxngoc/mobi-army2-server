@@ -1,8 +1,6 @@
 package com.teamobi.mobiarmy2.fight.bullet;
 
-import com.teamobi.mobiarmy2.fight.Boss;
-import com.teamobi.mobiarmy2.fight.Bullet;
-import com.teamobi.mobiarmy2.fight.Player;
+import com.teamobi.mobiarmy2.fight.*;
 import com.teamobi.mobiarmy2.fight.boss.SmallBoom;
 import com.teamobi.mobiarmy2.fight.impl.BulletManager;
 
@@ -17,9 +15,11 @@ public class SmallBoomAdd extends Bullet {
     @Override
     public void nextXY() {
         super.nextXY();
-        if (super.collect && X > 0 && X < bulletManager.getFightManager().getMapManger().getWidth() && Y < bulletManager.getFightManager().getMapManger().getHeight()) {
-            Boss smallBoom = new SmallBoom(bulletManager.getFightManager(), (byte) bulletManager.getFightManager().getTotalPlayers(), X, Y, (short) 1000);
-            bulletManager.getAddboss().add(smallBoom);
+        IFightManager fightManager = bulletManager.getFightManager();
+        IMapManager mapManager = fightManager.getMapManger();
+        if (super.collect && X > 0 && X < mapManager.getWidth() && Y < mapManager.getHeight()) {
+            Boss smallBoom = new SmallBoom(fightManager, (byte) fightManager.getTotalPlayers(), X, Y, (short) 1000);
+            bulletManager.getAddBosses().add(smallBoom);
         }
     }
 }

@@ -9,7 +9,7 @@ public interface IBulletManager {
 
     void refresh();
 
-    List<Boss> getAddboss();
+    List<Boss> getAddBosses();
 
     void decreaseSpiderWebCount();
 

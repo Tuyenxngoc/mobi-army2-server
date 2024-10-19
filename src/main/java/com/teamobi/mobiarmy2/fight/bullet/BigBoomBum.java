@@ -20,6 +20,8 @@ public class BigBoomBum extends Bullet {
         YArray.add(Y);
         bulletManager.getFightManager().getMapManger().collision(X, Y, this);
         pl.setDead(true);
+        pl.setWidth((short) 0);
+        pl.setHeight((short) 0);
     }
 
 }

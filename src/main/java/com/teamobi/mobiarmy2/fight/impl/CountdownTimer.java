@@ -1,7 +1,6 @@
 package com.teamobi.mobiarmy2.fight.impl;
 
 import com.teamobi.mobiarmy2.fight.ICountdownTimer;
-import com.teamobi.mobiarmy2.server.ServerManager;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -29,7 +28,6 @@ public class CountdownTimer implements ICountdownTimer {
             public void run() {
                 if (remainingTime > 0) {
                     remainingTime--;
-                    ServerManager.getInstance().logger().logMessage("Thời gian còn lại: " + remainingTime + " giây");
                 } else {
                     timer.cancel(); //Dừng bộ đếm khi thời gian hết
                     timeUp();
@@ -53,7 +51,6 @@ public class CountdownTimer implements ICountdownTimer {
     }
 
     private void timeUp() {
-        ServerManager.getInstance().logger().logMessage("Hết thời gian");
         if (onTimeUpCallback != null) {
             onTimeUpCallback.run();
         }

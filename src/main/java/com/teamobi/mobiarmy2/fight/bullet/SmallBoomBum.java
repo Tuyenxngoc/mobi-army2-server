@@ -2,7 +2,6 @@ package com.teamobi.mobiarmy2.fight.bullet;
 
 import com.teamobi.mobiarmy2.fight.Bullet;
 import com.teamobi.mobiarmy2.fight.Player;
-import com.teamobi.mobiarmy2.fight.boss.SmallBoom;
 import com.teamobi.mobiarmy2.fight.impl.BulletManager;
 
 public class SmallBoomBum extends Bullet {
@@ -19,10 +18,10 @@ public class SmallBoomBum extends Bullet {
         Y += 2;
         XArray.add(X);
         YArray.add(Y);
-        ((SmallBoom) pl).bomAction();
-        if (isCanCollision) {
-            bulletManager.getFightManager().getMapManger().collision(X, Y, this);
-        }
+        bulletManager.getFightManager().getMapManger().collision(X, Y, this);
+        pl.setDead(true);
+        pl.setWidth((short) 0);
+        pl.setHeight((short) 0);
     }
 
 }

@@ -30,9 +30,9 @@ public class FightManager implements IFightManager {
     private static final int MAX_USER_FIGHT = 8;
     private static final int MAX_PLAY_TIME = 30;
     private static final byte[][] BOSS_COUNTS = {
-            {1, 6, 6, 8, 8, 8, 10, 10},
+            {4, 6, 6, 8, 8, 8, 10, 10},
             {4, 6, 6, 6, 8, 8, 10, 10},
-            {1, 6, 6, 8, 8, 8, 10, 10},
+            {4, 6, 6, 8, 8, 8, 10, 10},
             {2, 2, 3, 3, 4, 4, 5, 5},
             {4, 5, 5, 6, 6, 7, 7, 8},
             {4, 5, 5, 6, 8, 8, 9, 9},
@@ -500,21 +500,14 @@ public class FightManager implements IFightManager {
             player.updateAngry((byte) 10);
         }
 
-        List<Boss> addboss = bulletManager.getAddboss();
-        if (!addboss.isEmpty()) {
-            for (Boss bos : addboss) {
+        List<Boss> addBosses = bulletManager.getAddBosses();
+        if (!addBosses.isEmpty()) {
+            for (Boss bos : addBosses) {
                 addBoss(bos);
             }
-            addboss.clear();
+            addBosses.clear();
         }
 
-        if (turnCount > 1) {
-            //Chờ 2 giây
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException ignored) {
-            }
-        }
         nextWind();
         sendNextTurnMessage(isBossTurn ? bossTurn : playerTurn);
         countdownTimer.reset();
@@ -535,13 +528,12 @@ public class FightManager implements IFightManager {
         }
     }
 
-    private void addBoss(Player player) {
+    private void addBoss(Boss boss) {
         if (totalPlayers >= ServerManager.maxElementFight) {
             return;
         }
-        players[totalPlayers] = player;
+        players[totalPlayers] = boss;
         totalPlayers++;
-        Boss boss = (Boss) player;
 
         sendMssAddBosses(new Boss[]{boss});
     }
@@ -753,19 +745,11 @@ public class FightManager implements IFightManager {
 
         refreshFightManager();
 
-        try {
-            Thread.sleep(8000);
-        } catch (InterruptedException ignored) {
-        }
         fightWait.fightComplete();
     }
 
     @Override
     public void startGame(short teamPointsBlue, short teamPointsRed) {
-        if (fightWait.isStarted()) {
-            return;
-        }
-
         //Tải dữ liệu bản đồ
         mapManager.loadMapId(fightWait.getMapId());
 

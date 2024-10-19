@@ -15,6 +15,8 @@ public abstract class Boss extends Player {
     public Boss(IFightManager fightManager, byte index, byte characterId, String name, short x, short y, short width, short height, short maxHp, int xpExist) {
         super(fightManager, index, characterId, x, y, width, height, maxHp, xpExist);
         this.name = name;
+        this.stamina = 100;
+        this.damage = 100;
     }
 
     public abstract void turnAction();

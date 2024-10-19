@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.fight;
 
 import com.teamobi.mobiarmy2.model.User;
+import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,12 +20,12 @@ public class Player {
     private byte pixel;
     private byte angry;
     private short steps;
-    private byte stamina;
+    protected byte stamina;
     protected short x;
     protected short y;
     private short maxHp;
     private short hp;
-    private short damage;
+    protected short damage;
     private short defense;
     private short luck;
     private short teamPoints;
@@ -170,6 +171,12 @@ public class Player {
     public void updateHP(short addHp) {
         isUpdateHP = true;
         hp += addHp;
+
+        //Nếu may mắn và máu thấp hơn 10 thì máu bằng 10
+        if (isLucky && hp < 10) {
+            hp = 10;
+        }
+
         if (hp <= 0) {
             hp = 0;
             isDead = true;
@@ -320,6 +327,11 @@ public class Player {
             return;
         }
 
+        //Bỏ qua va chạm cho boom bum
+        if ((bull.bullId == 31 || bull.bullId == 32 || bull.bullId == 35) && this.index >= ServerManager.maxPlayers) {
+            return;
+        }
+
         Player shooter = bull.getPl();
         int bullId = bull.getBullId();
         int shooterCharacterId = shooter.getCharacterId();
@@ -337,11 +349,6 @@ public class Player {
 
         //Kiểm tra điều kiện để bỏ qua xử lý va chạm
         if (!Utils.intersectRegions(x, y, width, height, bx, by, impactRadius * 2, impactRadius * 2)) {
-            return;
-        }
-
-        //Bỏ qua nếu bullet không hợp lệ
-        if (bullId == 31 || bullId == 32 || bullId == 35) {
             return;
         }
 

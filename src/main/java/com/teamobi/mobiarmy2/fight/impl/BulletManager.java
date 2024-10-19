@@ -66,7 +66,7 @@ public class BulletManager implements IBulletManager {
     private boolean hasVoiRong;
     private List<VoiRong> voiRongs;
     private List<BomHenGio> boms;
-    private List<Boss> addboss;
+    private List<Boss> addBosses;
     private List<Bullets> buls;
     private byte mgtAddX;
     private byte mgtAddY;
@@ -82,7 +82,7 @@ public class BulletManager implements IBulletManager {
         this.bullets = new ArrayList<>();
         this.voiRongs = new ArrayList<>();
         this.boms = new ArrayList<>();
-        this.addboss = new ArrayList<>();
+        this.addBosses = new ArrayList<>();
         this.buls = new ArrayList<>();
         this.hasVoiRong = false;
         this.force2 = -1;
@@ -97,8 +97,8 @@ public class BulletManager implements IBulletManager {
     }
 
     @Override
-    public List<Boss> getAddboss() {
-        return addboss;
+    public List<Boss> getAddBosses() {
+        return addBosses;
     }
 
     @Override
@@ -349,7 +349,7 @@ public class BulletManager implements IBulletManager {
                     if (idGun != 12) {
                         return;
                     }
-                    bullets.add(new BigBoomBum(this, (byte) 31, pl.getHp(), pl));
+                    bullets.add(new BigBoomBum(this, (byte) 31, 2500, pl));
                 }
 
                 // Small boom bum
@@ -357,7 +357,7 @@ public class BulletManager implements IBulletManager {
                     if (idGun != 11) {
                         return;
                     }
-                    bullets.add(new SmallBoomBum(this, (byte) 32, pl.getHp(), pl));
+                    bullets.add(new SmallBoomBum(this, (byte) 32, 600, pl));
                 }
 
                 //dan nhen

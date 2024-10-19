@@ -584,8 +584,8 @@ public class FightWait implements IFightWait {
         teamPointsBlue = (short) (teamPointsBlue / 20);
         teamPointsRed = (short) (teamPointsRed / 20);
 
-        fightManager.startGame(teamPointsBlue, teamPointsRed);
         started = true;
+        fightManager.startGame(teamPointsBlue, teamPointsRed);
 
         resetReadies();
         countdownTimer.stop();
