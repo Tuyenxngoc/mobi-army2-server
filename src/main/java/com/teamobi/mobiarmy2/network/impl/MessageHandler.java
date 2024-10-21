@@ -165,6 +165,8 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.MATERIAL_ICON -> userService.getMaterialIconMessage(ms);
 
+                case Cmd.GETSTRING -> userService.getStringMessage(ms);
+
                 default ->
                         ServerManager.getInstance().logger().logWarning("Command " + ms.getCommand() + " is not supported");
             }

@@ -20,7 +20,8 @@ public class MapTileExporter {
         BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = image.createGraphics();
 
-        for (MapTile tile : mapTiles) {
+        for (int i = 0; i < mapTiles.size(); i++) {
+            MapTile tile = mapTiles.get(i);
             drawTile(g2d, tile);
         }
 

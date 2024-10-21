@@ -15,7 +15,7 @@ public class Player {
     protected IFightManager fightManager;
     private User user;
     private short gunId;
-    private byte characterId;
+    protected byte characterId;
     protected byte index;
     private byte pixel;
     private byte angry;
@@ -51,7 +51,7 @@ public class Player {
     private boolean isUsePow;
     protected boolean isDead;
     private boolean isTeamBlue;
-    private byte usedItemId;
+    protected byte usedItemId;
     private short width;
     private short height;
     private int xpUp;

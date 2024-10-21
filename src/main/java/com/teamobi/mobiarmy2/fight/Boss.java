@@ -21,6 +21,12 @@ public abstract class Boss extends Player {
 
     public abstract void turnAction();
 
+    @Override
+    public void resetValueInNewTurn() {
+        super.resetValueInNewTurn();
+        stamina = 100;
+    }
+
     protected void moveToTarget(Player player) {
         //Lưu lại vị trí ban đầu
         int preX = x;

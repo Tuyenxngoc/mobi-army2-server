@@ -342,8 +342,6 @@ public class FightWait implements IFightWait {
             return;
         }
 
-        started = false;
-        endTime = System.currentTimeMillis();
         resetReadies();
         countdownTimer.reset();
 
@@ -356,6 +354,9 @@ public class FightWait implements IFightWait {
             sendUpdateItemSlot(user);
             sendUpdateMap(user);
         }
+
+        endTime = System.currentTimeMillis();
+        started = false;
     }
 
     @Override

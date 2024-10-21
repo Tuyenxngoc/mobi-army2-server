@@ -2,6 +2,8 @@ package com.teamobi.mobiarmy2.fight.boss;
 
 import com.teamobi.mobiarmy2.fight.Boss;
 import com.teamobi.mobiarmy2.fight.IFightManager;
+import com.teamobi.mobiarmy2.fight.Player;
+import com.teamobi.mobiarmy2.util.Utils;
 
 /**
  * @author tuyen
@@ -14,6 +16,73 @@ public class RobotSpider extends Boss {
 
     @Override
     public void turnAction() {
+        Player player = fightManager.findClosestPlayer(x, y);
+        if (player == null) {
+            fightManager.nextTurn();
+            return;
+        }
 
+        int distance = calculateDistance(player.getX(), player.getY());
+        if (distance < 30) {
+            this.usedItemId = 9;
+            fightManager.setNextTurn(false);
+            fightManager.newShoot(index, (byte) 8, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 30, (byte) 0, (byte) 1);
+            fightManager.setNextTurn(true);
+
+            byte force = (byte) Utils.nextInt(15, 30);
+            short arg = (short) Utils.nextInt(80, 100);
+            fightManager.newShoot(index, (byte) 36, arg, force, (byte) 0, (byte) 1);
+            return;
+        }
+
+        switch (Utils.nextInt(3)) {
+            case 0 -> {
+                usedItemId = 9;
+                short[] forceArgXY = fightManager.getForceArgXY(
+                        characterId, false, x, y, player.getX(),
+                        (short) (player.getY() - (player.getHeight() / 2)),
+                        (short) (player.getWidth() / 2), player.getHeight(),
+                        50, 5, 70, 70
+                );
+                if (forceArgXY == null) {
+                    fightManager.nextTurn();
+                    return;
+                }
+                fightManager.setNextTurn(false);
+                fightManager.newShoot(index, (byte) 8, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1);
+                fightManager.setNextTurn(true);
+
+                byte force = (byte) Utils.nextInt(15, 30);
+                short arg = (short) Utils.nextInt(80, 100);
+                fightManager.newShoot(index, (byte) 36, arg, force, (byte) 0, (byte) 1);
+            }
+            case 1 -> {
+                usedItemId = 16;
+                short[] forceArgXY = fightManager.getForceArgXY(
+                        characterId, false, x, y, player.getX(),
+                        (short) (player.getY() - (player.getHeight() / 2)),
+                        (short) (player.getWidth() / 2), player.getHeight(),
+                        50, 5, 10, 50
+                );
+                if (forceArgXY == null) {
+                    fightManager.nextTurn();
+                    return;
+                }
+                fightManager.newShoot(index, (byte) 14, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1);
+            }
+            case 2 -> {
+                short[] forceArgXY = fightManager.getForceArgXY(
+                        characterId, true, x, y, player.getX(),
+                        (short) (player.getY() - (player.getHeight() / 2)),
+                        (short) (player.getWidth() / 2), player.getHeight(),
+                        50, 5, 30, 50
+                );
+                if (forceArgXY == null) {
+                    fightManager.nextTurn();
+                    return;
+                }
+                fightManager.newShoot(index, (byte) 33, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1);
+            }
+        }
     }
 }

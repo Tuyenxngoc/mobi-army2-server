@@ -5,6 +5,10 @@ package com.teamobi.mobiarmy2.fight;
  */
 public interface IFightManager {
 
+    short[] getForceArgXY(int idGun, boolean isXuyenMap, short X, short Y, short toX, short toY, short Mx, short My, int arg, int force, int msg, int g100);
+
+    void setNextTurn(boolean nextTurn);
+
     void nextTurn();
 
     void leave(int playerId);

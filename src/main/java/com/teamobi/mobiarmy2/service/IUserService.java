@@ -164,4 +164,6 @@ public interface IUserService {
     void getMoreGame();
 
     void handleSendAgentAndProviders();
+
+    void getStringMessage(IMessage ms);
 }

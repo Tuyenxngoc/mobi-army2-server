@@ -362,7 +362,6 @@ public class FightManager implements IFightManager {
                 byte bossCount = BOSS_COUNTS[4][playerCount - 1];
                 for (byte i = 0; i < bossCount; i++) {
                     X = (short) (Utils.nextInt(470, 755));
-                    Y = 400;
                     players[totalPlayers] = new BigBoom(this, (byte) totalPlayers, X, Y, (short) 1500);
                     totalPlayers++;
                 }
@@ -431,6 +430,130 @@ public class FightManager implements IFightManager {
     }
 
     @Override
+    public short[] getForceArgXY(int idGun, boolean isXuyenMap, short X, short Y, short toX, short toY, short Mx, short My, int arg, int force, int msg, int g100) {
+        byte i = (byte) (Utils.nextInt(2) == 0 ? -1 : 1);
+        short argS = (short) (i == 1 ? arg : 180 - arg);
+        byte forceS = (byte) force;
+        do {
+            short x, y, vx, vy;
+            x = (short) (X + (20 * Utils.cos(argS) >> 10));
+            y = (short) (Y - 12 - (20 * Utils.sin(argS) >> 10));
+            vx = (short) (forceS * Utils.cos(argS) >> 10);
+            vy = (short) -(forceS * Utils.sin(argS) >> 10);
+            short ax100 = (short) (windX * msg / 100);
+            short ay100 = (short) (windY * msg / 100);
+            short vxTemp = 0, vyTemp = 0, vyTemp2 = 0;
+
+            if (idGun == 13) {
+                y -= 25;
+            }
+            while (true) {
+                if ((x < -200) || (x > mapManager.getWidth() + 200) || (y > mapManager.getHeight() + 200)) {
+                    break;
+                }
+                short preX = x, preY = y;
+                x += vx;
+                y += vy;
+                byte collision = getCollisionPoint(preX, preY, x, y, toX, toY, Mx, My, isXuyenMap);
+                if (collision == 1) {
+                    return new short[]{argS, forceS};
+                } else if (collision == 2) {
+                    break;
+                }
+                vxTemp += Math.abs(ax100);
+                vyTemp += Math.abs(ay100);
+                vyTemp2 += g100;
+                if (Math.abs(vxTemp) >= 100) {
+                    if (ax100 > 0) {
+                        vx += vxTemp / 100;
+                    } else {
+                        vx -= vxTemp / 100;
+                    }
+                    vxTemp %= 100;
+                }
+                if (Math.abs(vyTemp) >= 100) {
+                    if (ay100 > 0) {
+                        vy += vyTemp / 100;
+                    } else {
+                        vy -= vyTemp / 100;
+                    }
+                    vyTemp %= 100;
+                }
+                if (Math.abs(vyTemp2) >= 100) {
+                    vy += vyTemp2 / 100;
+                    vyTemp2 %= 100;
+                }
+            }
+            forceS++;
+            if (forceS > 30) {
+                argS += i;
+                forceS = (byte) force;
+                argS = (short) Utils.toArg0_360(argS);
+                if (argS == arg) {
+                    break;
+                }
+            }
+        } while (true);
+
+        return null;
+    }
+
+    private byte getCollisionPoint(short X1, short Y1, short X2, short Y2, short toX, short toY, short Mx, short My, boolean isXuyenMap) {
+        int Dx = X2 - X1;
+        int Dy = Y2 - Y1;
+        byte x_unit = 0;
+        byte y_unit = 0;
+        byte x_unit2 = 0;
+        byte y_unit2 = 0;
+        if (Dx < 0) {
+            x_unit = x_unit2 = -1;
+        } else if (Dx > 0) {
+            x_unit = x_unit2 = 1;
+        }
+        if (Dy < 0) {
+            y_unit = y_unit2 = -1;
+        } else if (Dy > 0) {
+            y_unit = y_unit2 = 1;
+        }
+        int k1 = Math.abs(Dx);
+        int k2 = Math.abs(Dy);
+        if (k1 > k2) {
+            y_unit2 = 0;
+        } else {
+            k1 = Math.abs(Dy);
+            k2 = Math.abs(Dx);
+            x_unit2 = 0;
+        }
+        int k = k1 >> 1;
+        short X = X1, Y = Y1;
+        for (int i = 0; i <= k1; i++) {
+            if (Math.abs(X - toX) <= Mx && Math.abs(Y - toY) <= My) {
+                return 1;
+            }
+            if (!isXuyenMap) {
+                if (mapManager.isCollision(X, Y)) {
+                    return 2;
+                }
+            }
+            k += k2;
+            if (k >= k1) {
+                k -= k1;
+                X += x_unit;
+                Y += y_unit;
+            } else {
+                X += x_unit2;
+                Y += y_unit2;
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public void setNextTurn(boolean nextTurn) {
+        isNextTurn = nextTurn;
+    }
+
+    @Override
     public void nextTurn() {
         if (!isNextTurn) {//Trường hợp đặc biệt cho một số boss thực hiện 2 lượt liên tiếp
             return;
@@ -493,7 +616,8 @@ public class FightManager implements IFightManager {
 
         //Đặt lại giá trị của người chơi trong lượt mới như thể lực, ..., vv
         if (isBossTurn) {
-            players[bossTurn].resetValueInNewTurn();
+            Boss boss = (Boss) players[bossTurn];
+            boss.resetValueInNewTurn();
         } else {
             Player player = players[playerTurn];
             player.resetValueInNewTurn();
@@ -1188,7 +1312,7 @@ public class FightManager implements IFightManager {
 
         for (byte index = 0; index < MAX_USER_FIGHT; index++) {
             Player player = this.players[index];
-            if (player == null || player.isDead()) {
+            if (player == null || player.getUser() == null || player.isDead()) {
                 continue;
             }
 

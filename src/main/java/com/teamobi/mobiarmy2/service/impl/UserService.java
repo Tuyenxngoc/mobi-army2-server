@@ -3058,4 +3058,14 @@ public class UserService implements IUserService {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void getStringMessage(IMessage ms) {
+        DataInputStream dis = ms.reader();
+        try {
+            String str = dis.readUTF();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
