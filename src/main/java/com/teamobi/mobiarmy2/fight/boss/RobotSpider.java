@@ -36,7 +36,7 @@ public class RobotSpider extends Boss {
         }
 
         switch (Utils.nextInt(3)) {
-            case 0 -> {
+            case 0 -> {// Tơ nhện
                 usedItemId = 9;
                 short[] forceArgXY = fightManager.getForceArgXY(
                         characterId, false, x, y, player.getX(),
@@ -56,7 +56,7 @@ public class RobotSpider extends Boss {
                 short arg = (short) Utils.nextInt(80, 100);
                 fightManager.newShoot(index, (byte) 36, arg, force, (byte) 0, (byte) 1);
             }
-            case 1 -> {
+            case 1 -> {// Laser
                 usedItemId = 16;
                 short[] forceArgXY = fightManager.getForceArgXY(
                         characterId, false, x, y, player.getX(),
@@ -70,12 +70,12 @@ public class RobotSpider extends Boss {
                 }
                 fightManager.newShoot(index, (byte) 14, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1);
             }
-            case 2 -> {
+            case 2 -> {// Rocket
                 short[] forceArgXY = fightManager.getForceArgXY(
                         characterId, true, x, y, player.getX(),
                         (short) (player.getY() - (player.getHeight() / 2)),
                         (short) (player.getWidth() / 2), player.getHeight(),
-                        50, 5, 30, 50
+                        50, 5, 50, 80
                 );
                 if (forceArgXY == null) {
                     fightManager.nextTurn();

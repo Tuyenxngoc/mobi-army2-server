@@ -17,6 +17,7 @@ import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1303,6 +1304,24 @@ public class FightManager implements IFightManager {
     @Override
     public Player getPlayerTurn() {
         return players[getCurrentTurn()];
+    }
+
+    @Override
+    public Player getRandomPlayer() {
+        List<Player> validPlayers = new ArrayList<>(MAX_USER_FIGHT);
+
+        for (byte i = 0; i < MAX_USER_FIGHT; i++) {
+            Player player = players[i];
+            if (player != null && player.getUser() != null && !player.isDead()) {
+                validPlayers.add(player);
+            }
+        }
+
+        if (validPlayers.isEmpty()) {
+            return null;
+        }
+
+        return validPlayers.get(Utils.nextInt(validPlayers.size()));
     }
 
     @Override

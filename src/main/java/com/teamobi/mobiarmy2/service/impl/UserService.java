@@ -1686,12 +1686,14 @@ public class UserService implements IUserService {
     public void handleUseItem(IMessage ms) {
         try {
             byte itemIndex = ms.reader().readByte();
-            if (itemIndex < 0 || itemIndex >= FightItemRepository.FIGHT_ITEM_ENTRIES.size()) {
-                return;
-            }
+            if (itemIndex != 100) {
+                if (itemIndex < 0 || itemIndex >= FightItemRepository.FIGHT_ITEM_ENTRIES.size()) {
+                    return;
+                }
 
-            if (user.getItemFightQuantity(itemIndex) < 1) {
-                return;
+                if (user.getItemFightQuantity(itemIndex) < 1) {
+                    return;
+                }
             }
             user.getFightWait().getFightManager().useItem(user.getPlayerId(), itemIndex);
         } catch (IOException e) {

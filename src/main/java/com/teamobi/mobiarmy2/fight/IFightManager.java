@@ -41,6 +41,8 @@ public interface IFightManager {
 
     Player getPlayerTurn();
 
+    Player getRandomPlayer();
+
     Player findClosestPlayer(short targetX, short targetY);
 
     void updateCantMove(Player pl);

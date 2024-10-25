@@ -403,7 +403,7 @@ public class BulletManager implements IBulletManager {
                     bullets.add(new BigRocKet(this, (byte) 37, 570, pl));
                 }
 
-                // T-rex lazer
+                // T-rex laser
                 case 40 -> {
                     if (idGun != 15) {
                         return;
@@ -411,7 +411,7 @@ public class BulletManager implements IBulletManager {
                     bullets.add(new Bullet(this, (byte) 40, 220, pl, x - 20, y - 20, vx, vy, 10, 80));
                 }
 
-                // T. rex white
+                // T-rex white
                 case 41 -> {
                     if (idGun != 15) {
                         return;
@@ -419,7 +419,7 @@ public class BulletManager implements IBulletManager {
                     bullets.add(new Bullet(this, (byte) 41, 200, pl, x - 20, y - 20, vx, vy, 10, 80));
                 }
 
-                //UFO Lazer
+                // UFO Laser
                 case 42 -> {
                     if (idGun != 16) {
                         return;

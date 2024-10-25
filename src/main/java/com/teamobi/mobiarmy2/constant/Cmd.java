@@ -127,7 +127,6 @@ public class Cmd {
     public static final byte CLAN_INFO = 117;
     public static final byte CLAN_MEMBER = 118;
     public static final byte DELETE_FRIEND_RESULT = 33;
-    public static final byte DENY_DRAW = 26;
     public static final byte DRAW = 25;
     public static final byte END_INVISIBLE = 80;
     public static final byte EYE_SMOKE = 106;
