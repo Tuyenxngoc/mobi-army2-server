@@ -17,10 +17,7 @@ import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author tuyen
@@ -37,11 +34,14 @@ public class FightManager implements IFightManager {
             {2, 2, 3, 3, 4, 4, 5, 5},
             {4, 5, 5, 6, 6, 7, 7, 8},
             {4, 5, 5, 6, 8, 8, 9, 9},
-            {3, 3, 4, 4, 5, 5, 6, 6},//
+            null,
             {4, 5, 5, 6, 8, 8, 9, 9},
             {4, 5, 5, 6, 8, 8, 9, 9},
             {4, 5, 5, 6, 8, 8, 9, 9},
     };
+
+    //Danh sách id boss không có lượt chơi
+    private static final Set<Byte> invalidCharacterIds = new HashSet<>(Set.of((byte) 18, (byte) 19, (byte) 20, (byte) 21, (byte) 23, (byte) 24));
 
     private final IFightWait fightWait;
     private Player[] players;
@@ -689,7 +689,8 @@ public class FightManager implements IFightManager {
             if (turn == limit) {
                 turn = min;
             }
-            if (players[turn] != null && !players[turn].isDead()) {
+            Player player = players[turn];
+            if (player != null && !player.isDead() && !invalidCharacterIds.contains(player.getCharacterId())) {
                 return turn;
             }
             turn++;
@@ -735,7 +736,8 @@ public class FightManager implements IFightManager {
         }
     }
 
-    private boolean checkWin() {
+    @Override
+    public boolean checkWin() {
         if (!fightWait.isStarted()) {
             return true;
         }
@@ -1361,5 +1363,63 @@ public class FightManager implements IFightManager {
     @Override
     public void updateCantSee(Player pl) {
 
+    }
+
+    @Override
+    public void sendPlayerFlyPosition(byte index) {
+        Player player = players[index];
+        try {
+            Message ms = new Message(Cmd.FLY);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(index);
+            ds.writeShort(player.getX());
+            ds.writeShort(player.getY());
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void sendGhostAttackInfo(byte index, byte toIndex) {
+        try {
+            Message ms = new Message(Cmd.GHOST_BIT);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(index);
+            ds.writeByte(toIndex);
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void capture(byte index, byte toIndex) {
+        try {
+            Message ms = new Message(Cmd.CAPTURE);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(index);
+            ds.writeByte(toIndex);
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void sendBulletHit(byte index, byte toIndex) {
+        try {
+            Message ms = new Message(Cmd.BIT);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(index);
+            ds.writeByte(toIndex);
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

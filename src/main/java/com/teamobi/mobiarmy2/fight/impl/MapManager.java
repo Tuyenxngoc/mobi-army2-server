@@ -151,4 +151,11 @@ public class MapManager implements IMapManager {
         mapTiles.add(mapTile);
     }
 
+    @Override
+    public short[] getRandomPosition(short leftMargin, short rightMargin, short topMargin, short bottomMargin) {
+        short x = (short) Utils.nextInt(leftMargin, (short) (width - rightMargin));
+        short y = (short) Utils.nextInt(topMargin, (short) (height - bottomMargin));
+        return new short[]{x, y};
+    }
+
 }

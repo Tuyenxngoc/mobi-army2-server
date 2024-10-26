@@ -2,6 +2,8 @@ package com.teamobi.mobiarmy2.fight.boss;
 
 import com.teamobi.mobiarmy2.fight.Boss;
 import com.teamobi.mobiarmy2.fight.IFightManager;
+import com.teamobi.mobiarmy2.fight.Player;
+import com.teamobi.mobiarmy2.util.Utils;
 
 /**
  * @author tuyen
@@ -15,6 +17,40 @@ public class Ghost2 extends Boss {
 
     @Override
     public void turnAction() {
+        Player player = fightManager.getRandomPlayer();
+        if (player == null) {
+            fightManager.nextTurn();
+            return;
+        }
 
+        // Di chuyển lại người chơi
+        if (x > player.getX()) {
+            x = (short) (player.getX() + 30);
+        } else {
+            x = (short) (player.getX() - 30);
+        }
+        y = (short) (player.getY() - 15);
+
+        // Gửi cập nhật vị trí
+        fightManager.sendPlayerFlyPosition(index);
+
+        // Tấn công
+        fightManager.sendGhostAttackInfo(index, player.getIndex());
+
+        // Cập nhật vị trí ngẫu nhiên
+        short[] position = fightManager.getMapManger().getRandomPosition((short) 100, (short) 100, (short) 50, (short) 200);
+        x = position[0];
+        y = position[1];
+
+        // Gửi cập nhật vị trí
+        fightManager.sendPlayerFlyPosition(index);
+
+        // Trừ máu người chơi
+        player.updateHP((short) -Utils.nextInt(300, 600));
+
+        // Tiếp tục chơi
+        if (!fightManager.checkWin()) {
+            fightManager.nextTurn();
+        }
     }
 }

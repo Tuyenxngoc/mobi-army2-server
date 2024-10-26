@@ -26,4 +26,5 @@ public interface IMapManager {
 
     void addNewTiles(MapTile mapTile);
 
+    short[] getRandomPosition(short leftMargin, short rightMargin, short topMargin, short bottomMargin);
 }

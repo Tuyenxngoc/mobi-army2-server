@@ -13,6 +13,8 @@ public interface IFightManager {
 
     void leave(int playerId);
 
+    boolean checkWin();
+
     void startGame(short teamPointsBlue, short teamPointsRed);
 
     void newShoot(int index, byte bullId, short angle, byte force, byte force2, byte numShoot);
@@ -51,4 +53,11 @@ public interface IFightManager {
 
     void updateCantSee(Player pl);
 
+    void sendPlayerFlyPosition(byte index);
+
+    void sendGhostAttackInfo(byte index, byte toIndex);
+
+    void capture(byte index, byte toIndex);
+
+    void sendBulletHit(byte index, byte toIndex);
 }

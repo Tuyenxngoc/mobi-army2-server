@@ -14,6 +14,6 @@ public class BalloonGunBig extends Boss {
 
     @Override
     public void turnAction() {
-
+        throw new UnsupportedOperationException("Cannot call nextTurn from BalloonGunBig!");
     }
 }

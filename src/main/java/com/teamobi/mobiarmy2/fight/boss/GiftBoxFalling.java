@@ -13,6 +13,6 @@ public class GiftBoxFalling extends Boss {
 
     @Override
     public void turnAction() {
-
+        throw new UnsupportedOperationException("Cannot call nextTurn from GiftBoxFalling!");
     }
 }
