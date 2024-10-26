@@ -338,7 +338,7 @@ public class Player {
 
         //Logic tính toán tầm ảnh hưởng
         int impactRadius = Bullet.getImpactRadiusByBullId(bull.getBullId());
-        if (bullId == 35 && shooterCharacterId == 15) {//T-rex jump
+        if (bullId == 35 && shooterCharacterId == 15) {//T. rex jump
             impactRadius = 250;
         }
 

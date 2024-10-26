@@ -23,7 +23,7 @@ public class ItemKhoiDoc extends Bullet {
                     int kcY = Math.abs(pl.getY() - pl.getHeight() / 2 - Y);
                     int kc = (int) Math.sqrt(kcX * kcX + kcY * kcY);
                     if (!pl.isDead() && pl.getInvisibleCount() <= 0 && kc <= tamAH + pl.getWidth() / 2) {
-                        bulletManager.getFightManager().updateBiDoc(pl);
+                        pl.setPoisoned(true);
                     }
                 }
             }

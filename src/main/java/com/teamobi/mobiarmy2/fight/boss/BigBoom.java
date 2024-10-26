@@ -36,12 +36,12 @@ public class BigBoom extends Boss {
             if (force > 30) {
                 force = 30;
             }
-            fightManager.newShoot(index, (byte) 34, angle, force, (byte) 0, (byte) 1);
+            fightManager.newShoot(index, (byte) 34, angle, force, (byte) 0, (byte) 1, true);
         } else {
             moveToTarget(player);
             int distance = calculateDistance(player.getX(), player.getY());
             if (distance < 35) {
-                fightManager.newShoot(index, (byte) 31, (short) 0, (byte) 0, (byte) 0, (byte) 1);
+                fightManager.newShoot(index, (byte) 31, (short) 0, (byte) 0, (byte) 0, (byte) 1, true);
                 return;
             }
             fightManager.nextTurn();

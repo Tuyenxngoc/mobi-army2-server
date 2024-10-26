@@ -17,7 +17,7 @@ public class Ghost extends Boss {
 
     @Override
     public void turnAction() {
-        Player player = fightManager.getRandomPlayer();
+        Player player = fightManager.getRandomPlayer(null);
         if (player == null) {
             fightManager.nextTurn();
             return;

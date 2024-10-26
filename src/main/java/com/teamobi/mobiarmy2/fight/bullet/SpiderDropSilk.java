@@ -4,6 +4,7 @@ import com.teamobi.mobiarmy2.fight.Bullet;
 import com.teamobi.mobiarmy2.fight.EffectManager;
 import com.teamobi.mobiarmy2.fight.MapTile;
 import com.teamobi.mobiarmy2.fight.Player;
+import com.teamobi.mobiarmy2.fight.boss.VenomousSpider;
 import com.teamobi.mobiarmy2.fight.impl.BulletManager;
 
 public class SpiderDropSilk extends Bullet {
@@ -20,8 +21,14 @@ public class SpiderDropSilk extends Bullet {
         Y += 38;
         XArray.add(X);
         YArray.add(Y);
-        //Todo
 
+        //Cập nhật vị tri người chơi
+        VenomousSpider spider = (VenomousSpider) pl;
+        Player targetPlayer = spider.getTargetPlayer();
+        targetPlayer.setY((short) (Y - 3));
+        bulletManager.getFightManager().sendMessageUpdateXY(targetPlayer.getIndex());
+
+        //Thêm mạng nhện
         bulletManager.getFightManager().getMapManger().addNewTiles(new MapTile(bulletManager.getMangNhenId(), (short) (X - 21), (short) (Y - 20), EffectManager.spiderWebData, true));
         bulletManager.decreaseSpiderWebCount();
     }

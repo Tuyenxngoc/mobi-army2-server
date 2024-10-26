@@ -1,13 +1,13 @@
 package com.teamobi.mobiarmy2.fight;
 
+import java.util.function.Predicate;
+
 /**
  * @author tuyen
  */
 public interface IFightManager {
 
     short[] getForceArgXY(int idGun, boolean isXuyenMap, short X, short Y, short toX, short toY, short Mx, short My, int arg, int force, int msg, int g100);
-
-    void setNextTurn(boolean nextTurn);
 
     void nextTurn();
 
@@ -17,7 +17,7 @@ public interface IFightManager {
 
     void startGame(short teamPointsBlue, short teamPointsRed);
 
-    void newShoot(int index, byte bullId, short angle, byte force, byte force2, byte numShoot);
+    void newShoot(int index, byte bullId, short angle, byte force, byte force2, byte numShoot, boolean isNextTurn);
 
     void changeLocation(int playerId, short x, short y);
 
@@ -43,13 +43,11 @@ public interface IFightManager {
 
     Player getPlayerTurn();
 
-    Player getRandomPlayer();
+    Player getRandomPlayer(Predicate<Player> condition);
 
     Player findClosestPlayer(short targetX, short targetY);
 
     void updateCantMove(Player pl);
-
-    void updateBiDoc(Player pl);
 
     void updateCantSee(Player pl);
 

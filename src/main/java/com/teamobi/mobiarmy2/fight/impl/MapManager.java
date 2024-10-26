@@ -152,9 +152,9 @@ public class MapManager implements IMapManager {
     }
 
     @Override
-    public short[] getRandomPosition(short leftMargin, short rightMargin, short topMargin, short bottomMargin) {
-        short x = (short) Utils.nextInt(leftMargin, (short) (width - rightMargin));
-        short y = (short) Utils.nextInt(topMargin, (short) (height - bottomMargin));
+    public short[] getRandomPosition(int leftMargin, int rightMargin, int topMargin, int bottomMargin) {
+        short x = (short) Utils.nextInt(leftMargin, (width - rightMargin));
+        short y = (short) Utils.nextInt(topMargin, (height - bottomMargin));
         return new short[]{x, y};
     }
 

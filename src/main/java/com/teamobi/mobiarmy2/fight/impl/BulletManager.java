@@ -379,7 +379,7 @@ public class BulletManager implements IBulletManager {
                     bullets.add(new SmallBoomAdd(this, (byte) 34, 0, pl, x, y, vx, vy, 0, 80));
                 }
 
-                //T-rex or Robot jump
+                //T. rex or Robot jump
                 case 35 -> {
                     if (idGun != 15 && idGun != 14) {
                         return;
@@ -395,7 +395,7 @@ public class BulletManager implements IBulletManager {
                     bullets.add(new JumpOrFly(this, (byte) 36, 0, pl, x, y, vx, vy, 0, 80));
                 }
 
-                //T-rex Rocket
+                //T. rex Rocket
                 case 37 -> {
                     if (idGun != 15) {
                         return;
@@ -403,7 +403,7 @@ public class BulletManager implements IBulletManager {
                     bullets.add(new BigRocKet(this, (byte) 37, 570, pl));
                 }
 
-                // T-rex laser
+                // T. rex laser
                 case 40 -> {
                     if (idGun != 15) {
                         return;
@@ -411,7 +411,7 @@ public class BulletManager implements IBulletManager {
                     bullets.add(new Bullet(this, (byte) 40, 220, pl, x - 20, y - 20, vx, vy, 10, 80));
                 }
 
-                // T-rex white
+                // T. rex white
                 case 41 -> {
                     if (idGun != 15) {
                         return;

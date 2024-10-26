@@ -18,6 +18,7 @@ import com.teamobi.mobiarmy2.util.Utils;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * @author tuyen
@@ -47,7 +48,6 @@ public class FightManager implements IFightManager {
     private Player[] players;
     private int totalPlayers;
     private int turnCount;
-    private boolean isNextTurn;
     private boolean isBossTurn;
     private int playerTurn;
     private int bossTurn;
@@ -66,7 +66,6 @@ public class FightManager implements IFightManager {
         this.countdownTimer = new CountdownTimer(MAX_PLAY_TIME + 10, this::onTimeUp);
 
         this.playerTurn = -1;
-        this.isNextTurn = true;
     }
 
     private void refreshFightManager() {
@@ -354,7 +353,7 @@ public class FightManager implements IFightManager {
                 }
             }
 
-            case 34 -> {// T-rex máy
+            case 34 -> {// T. rex máy
                 short X = 880;
                 short Y = 400;
                 players[totalPlayers] = new TRex(this, (byte) totalPlayers, X, Y, (short) 15000);
@@ -550,16 +549,7 @@ public class FightManager implements IFightManager {
     }
 
     @Override
-    public void setNextTurn(boolean nextTurn) {
-        isNextTurn = nextTurn;
-    }
-
-    @Override
     public void nextTurn() {
-        if (!isNextTurn) {//Trường hợp đặc biệt cho một số boss thực hiện 2 lượt liên tiếp
-            return;
-        }
-
         turnCount++;
         byte roomType = fightWait.getRoomType();
 
@@ -993,11 +983,11 @@ public class FightManager implements IFightManager {
         Player player = players[index];
         player.updateXY(x, y);
 
-        newShoot(index, bullId, angle, force, force2, numShoot);
+        newShoot(index, bullId, angle, force, force2, numShoot, true);
     }
 
     @Override
-    public void newShoot(int index, byte bullId, short angle, byte force, byte force2, byte numShoot) {
+    public void newShoot(int index, byte bullId, short angle, byte force, byte force2, byte numShoot, boolean isNextTurn) {
         Player player = players[index];
         if (player.isDoubleShoot()) {
             player.setDoubleShoot(false);
@@ -1245,7 +1235,7 @@ public class FightManager implements IFightManager {
             }
 
             //Tự sát
-            case 24 -> newShoot(playerIndex, (byte) 50, (short) 0, (byte) 0, (byte) 0, (byte) 1);
+            case 24 -> newShoot(playerIndex, (byte) 50, (short) 0, (byte) 0, (byte) 0, (byte) 1, true);
 
             //Ufo Todo
             case 27 -> {
@@ -1309,12 +1299,15 @@ public class FightManager implements IFightManager {
     }
 
     @Override
-    public Player getRandomPlayer() {
+    public Player getRandomPlayer(Predicate<Player> condition) {
         List<Player> validPlayers = new ArrayList<>(MAX_USER_FIGHT);
 
         for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             Player player = players[i];
-            if (player != null && player.getUser() != null && !player.isDead()) {
+
+            boolean isValid = player != null && player.getUser() != null && !player.isDead();
+
+            if (isValid && (condition == null || condition.test(player))) {
                 validPlayers.add(player);
             }
         }
@@ -1353,11 +1346,6 @@ public class FightManager implements IFightManager {
     @Override
     public void updateCantMove(Player pl) {
         pl.setFreezeCount((byte) 5);
-    }
-
-    @Override
-    public void updateBiDoc(Player pl) {
-        //Todo
     }
 
     @Override

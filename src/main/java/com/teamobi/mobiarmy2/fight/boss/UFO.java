@@ -32,11 +32,11 @@ public class UFO extends Boss {
 
         if (turnShoot) {
             turnShoot = false;
-            fightManager.newShoot(index, (byte) 42, (short) 270, (byte) 20, (byte) 0, (byte) 1);
+            fightManager.newShoot(index, (byte) 42, (short) 270, (byte) 20, (byte) 0, (byte) 1, true);
         } else {
             turnShoot = true;
 
-            Player player = fightManager.getRandomPlayer();
+            Player player = fightManager.getRandomPlayer(null);
             if (player != null) {
                 x = player.getX();
                 y = (short) (player.getY() - Utils.nextInt(150, 500));
