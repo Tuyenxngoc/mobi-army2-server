@@ -18,7 +18,9 @@ public class TRex extends Boss {
     public void turnAction() {
         Player closestPlayer = fightManager.findClosestPlayer(x, y);
         if (closestPlayer == null) {
-            fightManager.nextTurn();
+            if (!fightManager.checkWin()) {
+                fightManager.nextTurn();
+            }
             return;
         }
 
@@ -43,7 +45,9 @@ public class TRex extends Boss {
                         characterId, false, x, y, randomPlayer.getX(), randomPlayer.getY(),
                         (short) 70, (short) 70, 110, 5, 10, 80);
                 if (forceArgXY == null) {
-                    fightManager.nextTurn();
+                    if (!fightManager.checkWin()) {
+                        fightManager.nextTurn();
+                    }
                     return;
                 }
                 fightManager.newShoot(index, (byte) 40, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1, true);
@@ -54,7 +58,9 @@ public class TRex extends Boss {
                         characterId, false, x, y, randomPlayer.getX(), randomPlayer.getY(),
                         (short) 70, (short) 70, 110, 5, 10, 80);
                 if (forceArgXY == null) {
-                    fightManager.nextTurn();
+                    if (!fightManager.checkWin()) {
+                        fightManager.nextTurn();
+                    }
                     return;
                 }
                 fightManager.newShoot(index, (byte) 41, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1, true);

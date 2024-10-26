@@ -8,7 +8,7 @@ import com.teamobi.mobiarmy2.fight.IFightManager;
  */
 public class BalloonFanBack extends Boss {
     public BalloonFanBack(IFightManager fightManager, byte index, short x, short y, short maxHp) {
-        super(fightManager, index, (byte) 20, "Balloon Fan Back", x, y, (short) 10, (short) 19, maxHp, 1);
+        super(fightManager, index, (byte) 20, "Balloon Fan Back", x, y, (short) 10, (short) 19, maxHp, 4);
         super.isFlying = true;
     }
 
