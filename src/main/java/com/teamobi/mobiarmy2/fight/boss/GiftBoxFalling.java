@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.fight.boss;
 
 import com.teamobi.mobiarmy2.fight.Boss;
 import com.teamobi.mobiarmy2.fight.IFightManager;
+import com.teamobi.mobiarmy2.fight.Reward;
 
 /**
  * @author tuyen
@@ -14,5 +15,9 @@ public class GiftBoxFalling extends Boss {
     @Override
     public void turnAction() {
         throw new UnsupportedOperationException("Cannot call nextTurn from GiftBoxFalling!");
+    }
+
+    public Reward getRandomReward() {
+        return null;
     }
 }

@@ -22,11 +22,6 @@ public class Balloon extends Boss {
 
     @Override
     public void turnAction() {
-        if (fightManager.getTurnCount() == 1) {
-            fightManager.nextTurn();
-            return;
-        }
-
         // Thêm Balloon Eye nếu bodyParts[4] là null, Gun và Gun Big bị tiêu diệt
         if (bodyParts[4] == null && bodyParts[1].isDead() && bodyParts[2].isDead()) {
             BalloonEye newBoss = new BalloonEye(fightManager, (byte) fightManager.getTotalPlayers(), (short) (x + 55), (short) (y - 27), (short) 1000);

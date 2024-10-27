@@ -7,6 +7,8 @@ import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.fight.*;
 import com.teamobi.mobiarmy2.fight.boss.*;
 import com.teamobi.mobiarmy2.model.User;
+import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
+import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.repository.ClanItemRepository;
@@ -1422,6 +1424,47 @@ public class FightManager implements IFightManager {
             DataOutputStream ds = ms.writer();
             ds.writeByte(index);
             ds.writeByte(toIndex);
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendRewardMessage(Player player, Reward reward) {
+        try {
+            Message ms = new Message(Cmd.GIFT);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(0);//null byte
+            ds.writeByte(player.getIndex());//player index
+            ds.writeByte(reward.getType());//gift type
+            switch (reward.getType()) {
+                //xu
+                case 0 -> ds.writeShort(reward.getXu());
+
+                //item fight
+                case 1 -> {
+                    ds.writeByte(reward.getItemIndex());
+                    ds.writeByte(reward.getQuantity());
+                }
+
+                //equip
+                case 2 -> {
+                    EquipmentEntry equip = reward.getEquip().getEquipEntry();
+                    ds.writeByte(equip.getCharacterId());
+                    ds.writeByte(equip.getEquipType());
+                    ds.writeShort(equip.getEquipIndex());
+                }
+
+                //xp
+                case 3 -> ds.writeByte(reward.getXp());
+
+                //notification
+                case 4 -> {
+                    SpecialItemChestEntry specialItem = reward.getSpecialItem();
+                    ds.writeUTF(specialItem.getItem().getName());
+                }
+            }
             ds.flush();
             fightWait.sendToTeam(ms);
         } catch (IOException e) {

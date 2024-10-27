@@ -4,10 +4,12 @@ import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
 import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
+import com.teamobi.mobiarmy2.util.Utils;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -41,6 +43,24 @@ public class CharacterRepository {
         }
         entryList.add(newEquip);
         EQUIPMENT_ENTRIES.add(newEquip);
+    }
+
+    public static EquipmentEntry getRandomEquip(Predicate<EquipmentEntry> filter) {
+        if (filter == null) {
+            return null;
+        }
+
+        // Áp dụng bộ lọc để lấy danh sách trang bị phù hợp
+        List<EquipmentEntry> filteredEquipments = EQUIPMENT_ENTRIES.stream()
+                .filter(filter)
+                .toList();
+
+        if (filteredEquipments.isEmpty()) {
+            return null;
+        }
+
+        // Lấy ngẫu nhiên một trang bị từ danh sách đã lọc
+        return filteredEquipments.get(Utils.nextInt(filteredEquipments.size()));
     }
 
     public static EquipmentEntry getEquipEntry(byte characterId, byte equipType, short equipIndex) {

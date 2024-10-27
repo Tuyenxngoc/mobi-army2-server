@@ -1,10 +1,15 @@
 package com.teamobi.mobiarmy2.fight;
 
+import com.teamobi.mobiarmy2.fight.boss.GiftBox;
+import com.teamobi.mobiarmy2.fight.boss.GiftBoxFalling;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author tuyen
@@ -59,6 +64,7 @@ public class Player {
     private int cupUp;
     private int allCupUp;
     private int xpExist;
+    private List<Reward> rewards;
 
     public Player(int index, int x, int y, int hp, int maxHp) {
         this.index = (byte) index;
@@ -408,11 +414,27 @@ public class Player {
                 case 6 -> shooter.getUser().updateMission(6, 1);
                 case 7 -> shooter.getUser().updateMission(7, 1);
                 case 9 -> shooter.getUser().updateMission(8, 1);
+                case 23 -> {
+                    GiftBoxFalling giftBoxFalling = (GiftBoxFalling) this;
+                    shooter.addReward(giftBoxFalling.getRandomReward());
+                }
+                case 24 -> {
+                    GiftBox giftBox = (GiftBox) this;
+                    shooter.addReward(giftBox.getRandomReward());
+                }
             }
 
             shooter.updateXp(xpExist);
             shooter.updateCup(60);
         }
+    }
+
+    public void addReward(Reward reward) {
+        if (rewards == null) {
+            rewards = new ArrayList<>();
+        }
+
+        rewards.add(reward);
     }
 
     public void resetValueInNewTurn() {
