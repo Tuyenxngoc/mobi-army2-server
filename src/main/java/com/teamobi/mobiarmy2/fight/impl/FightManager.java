@@ -380,13 +380,25 @@ public class FightManager implements IFightManager {
             case 36 -> {//Đỉnh hi mã lạp sơn
                 short X = (short) (Utils.nextInt(300, 800));
                 short Y = (short) Utils.nextInt(-350, 100);
-                players[totalPlayers] = new Balloon(this, (byte) totalPlayers, X, Y);
+
+                Balloon balloon = new Balloon(this, (byte) totalPlayers, X, Y);
+                balloon.getBodyParts()[0] = balloon;
+                players[totalPlayers] = balloon;
                 totalPlayers++;
-                players[totalPlayers] = new BalloonGun(this, (byte) totalPlayers, (short) (X + 51), (short) (Y + 19), (short) 2000);
+
+                BalloonGun balloonGun = new BalloonGun(this, (byte) totalPlayers, (short) (X + 51), (short) (Y + 19), (short) 2000);
+                balloon.getBodyParts()[1] = balloonGun;
+                players[totalPlayers] = balloonGun;
                 totalPlayers++;
-                players[totalPlayers] = new BalloonGunBig(this, (byte) totalPlayers, (short) (X - 5), (short) (Y + 30), (short) 2500);
+
+                BalloonGunBig balloonGunBig = new BalloonGunBig(this, (byte) totalPlayers, (short) (X - 5), (short) (Y + 30), (short) 2500);
+                balloon.getBodyParts()[2] = balloonGunBig;
+                players[totalPlayers] = balloonGunBig;
                 totalPlayers++;
-                players[totalPlayers] = new BalloonFanBack(this, (byte) totalPlayers, (short) (X - 67), (short) (Y - 6), (short) 1000);
+
+                BalloonFanBack balloonFanBack = new BalloonFanBack(this, (byte) totalPlayers, (short) (X - 67), (short) (Y - 6), (short) 1000);
+                balloon.getBodyParts()[3] = balloonFanBack;
+                players[totalPlayers] = balloonFanBack;
                 totalPlayers++;
             }
 
@@ -575,11 +587,11 @@ public class FightManager implements IFightManager {
             while (true) {
                 int next;
                 if (roomType == 5) {
-                    next = Utils.nextInt(totalPlayers);
+                    next = Utils.nextInt(MAX_USER_FIGHT, totalPlayers);
                 } else {
                     next = Utils.nextInt(MAX_USER_FIGHT);
                 }
-                if (players[next] != null) {
+                if (players[next] != null && !invalidCharacterIds.contains(players[next].getCharacterId())) {
                     if (next < MAX_USER_FIGHT) {
                         playerTurn = next;
                         bossTurn = MAX_USER_FIGHT;
@@ -643,7 +655,8 @@ public class FightManager implements IFightManager {
         }
     }
 
-    private void addBoss(Boss boss) {
+    @Override
+    public void addBoss(Boss boss) {
         if (totalPlayers >= ServerManager.maxElementFight) {
             return;
         }
@@ -1276,6 +1289,11 @@ public class FightManager implements IFightManager {
     @Override
     public int getTotalPlayers() {
         return totalPlayers;
+    }
+
+    @Override
+    public int getTurnCount() {
+        return turnCount;
     }
 
     @Override

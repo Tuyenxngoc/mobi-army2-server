@@ -11,6 +11,8 @@ public interface IFightManager {
 
     void nextTurn();
 
+    void addBoss(Boss boss);
+
     void leave(int playerId);
 
     boolean checkWin();
@@ -34,6 +36,8 @@ public interface IFightManager {
     void onTimeUp();
 
     int getTotalPlayers();
+
+    int getTurnCount();
 
     byte getWindY();
 

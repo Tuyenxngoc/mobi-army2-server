@@ -46,6 +46,14 @@ public class Utils {
         }
     }
 
+    /**
+     * Generates a random integer within the specified range (inclusive).
+     *
+     * @param x1 the lower bound of the range (inclusive)
+     * @param x2 the upper bound of the range (inclusive)
+     * @return a random integer between {@code x1} and {@code x2} (inclusive)
+     * @throws IllegalArgumentException if {@code x1} is greater than {@code x2}
+     */
     public static int nextInt(int x1, int x2) {
         int from = Math.min(x1, x2);
         int to = Math.max(x1, x2) + 1;
