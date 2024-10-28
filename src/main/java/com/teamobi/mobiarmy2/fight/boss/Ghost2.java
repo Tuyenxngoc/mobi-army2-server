@@ -11,7 +11,7 @@ import com.teamobi.mobiarmy2.util.Utils;
 public class Ghost2 extends Boss {
 
     public Ghost2(IFightManager fightManager, byte index, short x, short y, short maxHp) {
-        super(fightManager, index, (byte) 26, "Ghost II", x, y, (short) 35, (short) 31, maxHp, 8);
+        super(fightManager, index, (byte) 26, "Ghost II", x, y, (short) 35, (short) 31, maxHp, 5);
         super.isFlying = true;
     }
 

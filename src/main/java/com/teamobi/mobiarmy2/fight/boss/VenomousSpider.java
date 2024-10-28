@@ -16,7 +16,7 @@ public class VenomousSpider extends Boss {
     private byte actionCountdown;
 
     public VenomousSpider(IFightManager fightManager, byte index, short x, short y, short maxHp) {
-        super(fightManager, index, (byte) 22, "Venomous Spider", x, y, (short) 45, (short) 48, maxHp, 8);
+        super(fightManager, index, (byte) 22, "Venomous Spider", x, y, (short) 45, (short) 48, maxHp, 4);
         super.isFlying = true;
     }
 

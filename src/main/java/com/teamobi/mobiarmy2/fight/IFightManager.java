@@ -62,4 +62,6 @@ public interface IFightManager {
     void capture(byte index, byte toIndex);
 
     void sendBulletHit(byte index, byte toIndex);
+
+    void giveXpToTeammates(boolean isTeamBlue, int addXP);
 }

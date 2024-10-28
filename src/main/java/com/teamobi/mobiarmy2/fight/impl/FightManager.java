@@ -275,7 +275,7 @@ public class FightManager implements IFightManager {
         return -1;
     }
 
-    private void nextWind() {
+    private synchronized void nextWind() {
         Player player = players[getCurrentTurn()];
         if (player != null && player.getWindStopCount() > 0) {
             player.decreaseWindStopCount();
@@ -640,11 +640,7 @@ public class FightManager implements IFightManager {
         nextWind();
         sendNextTurnMessage(isBossTurn ? bossTurn : playerTurn);
         countdownTimer.reset();
-        if (isBossTurn) {
-            new Thread(() -> ((Boss) players[bossTurn]).turnAction()).start();
-        }
 
-        //Test
         try {
             MapTileExporter.saveMapTilesToFile(
                     mapManager.getMapTiles(),
@@ -654,6 +650,10 @@ public class FightManager implements IFightManager {
                     String.format("temp/turn_%d.png", turnCount));
         } catch (IOException e) {
             e.printStackTrace();
+        }
+
+        if (isBossTurn) {
+            ((Boss) players[bossTurn]).turnAction();
         }
     }
 
@@ -796,9 +796,9 @@ public class FightManager implements IFightManager {
                 if (redAliveCount == blueAliveCount) {
                     fightComplete(MatchResult.DRAW);
                 } else if (redAliveCount == 0) {
-                    fightComplete(MatchResult.RED_WIN);
-                } else {
                     fightComplete(MatchResult.BLUE_WIN);
+                } else {
+                    fightComplete(MatchResult.RED_WIN);
                 }
             } else {
                 return false;
@@ -844,7 +844,11 @@ public class FightManager implements IFightManager {
                 DataOutputStream ds = ms.writer();
                 ds.writeByte(winStatus);
                 ds.writeByte(0);
-                ds.writeInt(fightWait.getMoney());
+                if (winStatus == 1 || winStatus == 0) {
+                    ds.writeInt(fightWait.getMoney());
+                } else {
+                    ds.writeInt(-fightWait.getMoney());
+                }
                 ds.flush();
                 user.sendMessage(ms);
 
@@ -1143,7 +1147,7 @@ public class FightManager implements IFightManager {
     }
 
     @Override
-    public void skipTurn(int playerId) {
+    public synchronized void skipTurn(int playerId) {
         int index = getPlayerIndexByPlayerId(playerId);
         if (index == -1 || index != playerTurn || isBossTurn) {
             return;
@@ -1428,6 +1432,19 @@ public class FightManager implements IFightManager {
             fightWait.sendToTeam(ms);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void giveXpToTeammates(boolean isTeamBlue, int addXP) {
+        int i = isTeamBlue ? 0 : 1;
+        int step = fightWait.getRoomType() == 5 ? 1 : 2;
+
+        for (; i < MAX_USER_FIGHT; i += step) {
+            Player player = players[i];
+            if (player != null && player.getUser() != null && !player.isDead()) {
+                player.updateXp(addXP, false);
+            }
         }
     }
 

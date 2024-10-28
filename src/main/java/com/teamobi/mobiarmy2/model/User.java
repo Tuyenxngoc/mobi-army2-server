@@ -98,21 +98,12 @@ public class User {
         return Utils.calculateLevelPercent(currentXp, requiredXp);
     }
 
-    /**
-     * Lấy clanId dưới dạng short.
-     *
-     * @return giá trị clanId nếu không phải null, ngược lại trả về giá trị mặc định (0).
-     */
-    public short getClanIdAsShort() {
-        return (clanId != null) ? clanId : 0;
-    }
-
     public int getCurrentXpLevel() {
         return XpRepository.getXpRequestLevel(getCurrentLevel());
     }
 
     public int getCurrentLevel() {
-        return Math.min(levels[activeCharacterId], 127);
+        return levels[activeCharacterId];
     }
 
     public int getCurrentXp() {
@@ -201,6 +192,7 @@ public class User {
             levels[activeCharacterId] = newLevel;
             points[activeCharacterId] += levelDiff * CommonConstant.POINT_ON_LEVEL;
         }
+        xps[activeCharacterId] = (int) totalXp;
 
         userService.sendUpdateXp(xpUp, levelDiff > 0);
     }

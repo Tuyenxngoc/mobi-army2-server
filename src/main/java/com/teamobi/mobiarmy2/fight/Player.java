@@ -161,7 +161,7 @@ public class Player {
     }
 
     public void nextLuck() {
-        isLucky = Math.random() < 0.5;
+        isLucky = Math.random() < 0.5;//todo
     }
 
     public void decreaseWindStopCount() {
@@ -174,7 +174,7 @@ public class Player {
         skippedTurns++;
     }
 
-    public void updateHP(short addHp) {
+    public synchronized void updateHP(short addHp) {
         isUpdateHP = true;
         hp += addHp;
 
@@ -210,44 +210,35 @@ public class Player {
         }
     }
 
-    public void updateXp(int addXP) {
+    public synchronized void updateXp(int addXP, boolean shareXp) {
         if (user == null || addXP == 0) {
             return;
         }
-        isUpdateXP = true;
+
+        // Cộng XP cho đồng đội
+        int teamXp = addXP / 4;
+        if (shareXp && teamXp > 1) {
+            fightManager.giveXpToTeammates(isTeamBlue, teamXp);
+        }
+
         if (clanItems[1]) {
             addXP *= 2;
         }
         if (clanItems[8]) {
             addXP *= 3;
         }
+        isUpdateXP = true;
         xpUp = addXP;
         allXpUp += addXP;
-
-        addXP -= 2;
-        if (addXP < 1) {
-            return;
-        }
-
-        //Cộng xp cho đồng đội
-        //Todo...
     }
 
-    public void updateCup(int addCup) {
+    public synchronized void updateCup(int addCup) {
         if (user == null || addCup == 0) {
             return;
         }
         isUpdateCup = true;
         cupUp = addCup;
         allCupUp += addCup;
-
-        addCup -= 2;
-        if (addCup < 1) {
-            return;
-        }
-
-        //Cộng cup cho đồng đội
-        //Todo...
     }
 
     public byte getPowerUsageStatus() {
@@ -424,8 +415,16 @@ public class Player {
                 }
             }
 
-            shooter.updateXp(xpExist);
-            shooter.updateCup(60);
+            //Cộng xp
+            shooter.updateXp(xpExist, true);
+
+            //Logic cộng cup
+            if (shooter.getUser() != null && this.getUser() != null) {
+                int cupDifference = shooter.getUser().getCup() - this.getUser().getCup();
+                if (cupDifference > 0) {
+                    shooter.updateCup(cupDifference);
+                }
+            }
         }
     }
 

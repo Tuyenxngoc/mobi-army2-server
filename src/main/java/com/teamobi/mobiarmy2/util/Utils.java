@@ -239,13 +239,6 @@ public class Utils {
         return (rgb >> 24) != 0;
     }
 
-    public static int getTeamPoint(int TongDD, int nteam) {
-        if (nteam == 1) {
-            return 0;
-        }
-        return (TongDD - 100) / 100 + (TongDD - 100) * nteam / 1000;
-    }
-
     public static int getArg(int cos, int sin) {
         if (cos == 0) {
             return sin == 0 ? 0 : (sin < 0 ? 270 : 90);
@@ -289,12 +282,20 @@ public class Utils {
         return dateTime.format(DATE_TIME_FORMATTER);
     }
 
-    public static short clamp(short value, short min, short max) {
-        return (short) Math.max(min, Math.min(value, max));
-    }
 
-    public static byte clamp(byte value, byte min, byte max) {
-        return (byte) Math.max(min, Math.min(value, max));
+    /**
+     * Clamps the given value to the specified range [min, max].
+     * If the value is less than the minimum, it returns the minimum.
+     * If the value is greater than the maximum, it returns the maximum.
+     * Otherwise, it returns the value itself.
+     *
+     * @param value the value to clamp
+     * @param min   the minimum value of the range
+     * @param max   the maximum value of the range
+     * @return the clamped value
+     */
+    public static int clamp(int value, int min, int max) {
+        return Math.max(min, Math.min(value, max));
     }
 
 }

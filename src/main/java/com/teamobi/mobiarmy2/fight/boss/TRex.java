@@ -11,7 +11,7 @@ import com.teamobi.mobiarmy2.util.Utils;
 public class TRex extends Boss {
 
     public TRex(IFightManager fightManager, byte index, short x, short y, short maxHp) {
-        super(fightManager, index, (byte) 15, "T. rex", x, y, (short) 45, (short) 50, maxHp, 8);
+        super(fightManager, index, (byte) 15, "T. rex", x, y, (short) 45, (short) 50, maxHp, 4);
     }
 
     @Override

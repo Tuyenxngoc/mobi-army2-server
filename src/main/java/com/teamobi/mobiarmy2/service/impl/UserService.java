@@ -500,7 +500,7 @@ public class UserService implements IUserService {
             ds.writeInt(user.getXu());
             ds.writeInt(user.getLuong());
             ds.writeByte(user.getActiveCharacterId());
-            ds.writeShort(user.getClanIdAsShort());
+            ds.writeShort(user.getClanId() != null ? user.getClanId() : 0);
             ds.writeByte(0);
 
             for (int i = 0; i < 10; i++) {
@@ -1344,7 +1344,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public synchronized void imbueGem(IMessage ms) {
+    public void imbueGem(IMessage ms) {
         List<EquipmentChestEntry> equipList = getSelectedEquips();
         List<SpecialItemChestEntry> specialItemList = getSelectedSpecialItems();
 
@@ -1663,11 +1663,11 @@ public class UserService implements IUserService {
             byte bullId = dis.readByte();
             short x = dis.readShort();
             short y = dis.readShort();
-            short angle = Utils.clamp(dis.readShort(), (short) -360, (short) 360);
-            byte force = Utils.clamp(dis.readByte(), (byte) 0, (byte) 30);
+            short angle = (short) Utils.clamp(dis.readShort(), -360, 360);
+            byte force = (byte) Utils.clamp(dis.readByte(), 0, 30);
             byte force2 = 0;
             if (bullId == 17 || bullId == 19) {
-                force2 = Utils.clamp(dis.readByte(), (byte) 0, (byte) 30);
+                force2 = (byte) Utils.clamp(dis.readByte(), 0, 30);
             }
             byte numShoot = dis.readByte();
 
@@ -2074,7 +2074,7 @@ public class UserService implements IUserService {
         }
     }
 
-    private synchronized void handleGiftCode(String code) {
+    private void handleGiftCode(String code) {
         IGiftCodeDao dao = getGiftCodeDao();
 
         GiftCodeEntry giftCode = dao.getGiftCode(code, user.getPlayerId());
@@ -2912,7 +2912,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public synchronized void startTraining(IMessage ms) {
+    public void startTraining(IMessage ms) {
         try {
             byte type = ms.reader().readByte();
 
@@ -2961,11 +2961,11 @@ public class UserService implements IUserService {
             byte bullId = dis.readByte();
             short x = dis.readShort();
             short y = dis.readShort();
-            short angle = Utils.clamp(dis.readShort(), (short) -360, (short) 360);
-            byte force = Utils.clamp(dis.readByte(), (byte) 0, (byte) 30);
+            short angle = (short) Utils.clamp(dis.readShort(), -360, 360);
+            byte force = (byte) Utils.clamp(dis.readByte(), 0, 30);
             byte force2 = 0;
             if (bullId == 17 || bullId == 19) {
-                force2 = Utils.clamp(dis.readByte(), (byte) 0, (byte) 30);
+                force2 = (byte) Utils.clamp(dis.readByte(), 0, 30);
             }
             byte numShoot = dis.readByte();
 

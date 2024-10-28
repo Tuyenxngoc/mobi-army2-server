@@ -14,7 +14,7 @@ public class UFO extends Boss {
     private boolean turnShoot;
 
     public UFO(IFightManager fightManager, byte index, short x, short y, short maxHp) {
-        super(fightManager, index, (byte) 16, "UFO", x, y, (short) 51, (short) 46, maxHp, 8);
+        super(fightManager, index, (byte) 16, "UFO", x, y, (short) 51, (short) 46, maxHp, 4);
         super.isFlying = true;
         turnShoot = false;
     }

@@ -186,7 +186,7 @@ public class FightWait implements IFightWait {
             ds = ms.writer();
             ds.writeByte(bestLocation);
             ds.writeInt(us.getPlayerId());
-            ds.writeShort(us.getClanIdAsShort());
+            ds.writeShort(us.getClanId() != null ? us.getClanId() : 0);
             ds.writeUTF(us.getUsername());
             ds.writeByte(us.getCurrentLevel());
             ds.writeByte(us.getActiveCharacterId());
@@ -220,9 +220,9 @@ public class FightWait implements IFightWait {
             User user = users[i];
             if (user != null) {
                 ds.writeInt(user.getPlayerId());
-                ds.writeShort(user.getClanIdAsShort());
+                ds.writeShort(user.getClanId() != null ? user.getClanId() : 0);
                 ds.writeUTF(user.getUsername());
-                ds.writeInt(0);
+                ds.writeInt(user.getXu());
                 ds.writeByte(user.getCurrentLevel());
                 ds.writeByte(user.getActiveCharacterId());
                 short[] equips = user.getEquips();
