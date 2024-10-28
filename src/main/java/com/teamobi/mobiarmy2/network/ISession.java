@@ -13,6 +13,14 @@ public interface ISession {
 
     void close();
 
+    String getIPAddress();
+
+    String getPlatform();
+
+    String getVersion();
+
+    byte getProvider();
+
     void setVersion(String version);
 
     void setPlatform(String platform);

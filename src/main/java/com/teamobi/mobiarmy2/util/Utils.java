@@ -55,15 +55,7 @@ public class Utils {
      * @throws IllegalArgumentException if {@code x1} is greater than {@code x2}
      */
     public static int nextInt(int x1, int x2) {
-        int from = Math.min(x1, x2);
-        int to = Math.max(x1, x2) + 1;
-        return from + RANDOM.nextInt(to - from);
-    }
-
-    public static byte nextByte(int x1, int x2) {
-        int from = Math.min(x1, x2);
-        int to = Math.max(x1, x2) + 1;
-        return (byte) (from + RANDOM.nextInt(to - from));
+        return x1 + RANDOM.nextInt(x2 - x1 + 1);
     }
 
     public static int nextInt(int max) {

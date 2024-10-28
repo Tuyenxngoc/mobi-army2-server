@@ -11,6 +11,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,6 @@ import java.util.List;
  */
 public class Session implements ISession {
 
-    private static final byte[] KEY = "bth.army2.ml".getBytes();
     private static final int TIMEOUT_DURATION = 180_000;
     private static final List<Byte> WHITE_LIST_CMD = List.of(
             (byte) -27,
@@ -30,6 +30,7 @@ public class Session implements ISession {
             (byte) 127
     );
 
+    private final byte[] sessionKey;
     private Socket socket;
     private DataInputStream dis;
     private DataOutputStream dos;
@@ -61,6 +62,7 @@ public class Session implements ISession {
         this.user = new User(this);
         this.messageHandler = new MessageHandler(user.getUserService());
 
+        this.sessionKey = generateSessionKey();
         initializeThreads();
     }
 
@@ -68,6 +70,13 @@ public class Session implements ISession {
         this.sendThread = new Thread(sender);
         this.collectorThread = new Thread(new MessageCollector());
         this.collectorThread.start();
+    }
+
+    private byte[] generateSessionKey() {
+        byte[] key = new byte[16];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(key);
+        return key;
     }
 
     private boolean isSendKeyComplete() {
@@ -96,6 +105,26 @@ public class Session implements ISession {
     }
 
     @Override
+    public String getIPAddress() {
+        return IPAddress;
+    }
+
+    @Override
+    public String getPlatform() {
+        return platform;
+    }
+
+    @Override
+    public String getVersion() {
+        return version;
+    }
+
+    @Override
+    public byte getProvider() {
+        return provider;
+    }
+
+    @Override
     public void setVersion(String version) {
         this.version = version;
     }
@@ -120,10 +149,10 @@ public class Session implements ISession {
         try {
             IMessage ms = new Message(-27);
             DataOutputStream ds = ms.writer();
-            ds.writeByte(KEY.length);
-            ds.writeByte(KEY[0]);
-            for (int i = 1; i < KEY.length; i++) {
-                ds.writeByte(KEY[i] ^ KEY[i - 1]);
+            ds.writeByte(sessionKey.length);
+            ds.writeByte(sessionKey[0]);
+            for (int i = 1; i < sessionKey.length; i++) {
+                ds.writeByte(sessionKey[i] ^ sessionKey[i - 1]);
             }
             ds.flush();
             doSendMessage(ms);
@@ -179,17 +208,17 @@ public class Session implements ISession {
     }
 
     private byte readKey(byte b) {
-        byte i = (byte) ((KEY[curR++] & 0xff) ^ (b & 0xff));
-        if (curR >= KEY.length) {
-            curR %= KEY.length;
+        byte i = (byte) ((sessionKey[curR++] & 0xff) ^ (b & 0xff));
+        if (curR >= sessionKey.length) {
+            curR %= (byte) sessionKey.length;
         }
         return i;
     }
 
     private byte writeKey(byte b) {
-        byte i = (byte) ((KEY[curW++] & 0xff) ^ (b & 0xff));
-        if (curW >= KEY.length) {
-            curW %= KEY.length;
+        byte i = (byte) ((sessionKey[curW++] & 0xff) ^ (b & 0xff));
+        if (curW >= sessionKey.length) {
+            curW %= (byte) sessionKey.length;
         }
         return i;
     }

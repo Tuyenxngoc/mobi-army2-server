@@ -46,10 +46,6 @@ public class CharacterRepository {
     }
 
     public static EquipmentEntry getRandomEquip(Predicate<EquipmentEntry> filter) {
-        if (filter == null) {
-            return null;
-        }
-
         // Áp dụng bộ lọc để lấy danh sách trang bị phù hợp
         List<EquipmentEntry> filteredEquipments = EQUIPMENT_ENTRIES.stream()
                 .filter(filter)

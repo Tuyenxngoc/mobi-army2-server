@@ -28,6 +28,12 @@ public class Reward {
         this.xu = xu;
     }
 
+    public void items(byte itemIndex, byte quantity) {
+        this.type = 1;
+        this.itemIndex = itemIndex;
+        this.quantity = quantity;
+    }
+
     public void equip() {
         this.type = 2;
         EquipmentEntry entry = CharacterRepository.getRandomEquip(
@@ -42,12 +48,6 @@ public class Reward {
         }
         equip = new EquipmentChestEntry();
         equip.setEquipEntry(entry);
-    }
-
-    public void items(byte itemIndex, byte quantity) {
-        this.type = 1;
-        this.itemIndex = itemIndex;
-        this.quantity = quantity;
     }
 
     public void xp(short xp) {

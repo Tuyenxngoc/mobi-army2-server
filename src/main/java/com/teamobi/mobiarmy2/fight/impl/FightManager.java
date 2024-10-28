@@ -284,8 +284,8 @@ public class FightManager implements IFightManager {
             windY = 0;
         } else {
             if (Utils.nextInt(0, 100) > 25) {
-                windX = Utils.nextByte(-70, 70);
-                windY = Utils.nextByte(-70, 70);
+                windX = (byte) Utils.nextInt(-70, 70);
+                windY = (byte) Utils.nextInt(-70, 70);
             }
         }
 
