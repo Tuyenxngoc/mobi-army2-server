@@ -31,8 +31,6 @@ public class ServerManager {
 
     //tmp variable
     public static byte maxPlayers = 8;
-    public static int maxElementFight = 100;
-    public static boolean mgtBullNew = true;
 
     private static volatile ServerManager instance;
 
@@ -165,7 +163,7 @@ public class ServerManager {
                         log.warning("Maximum number of players reached. Waiting for a slot to be free.");
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
-                       log.logException(ServerManager.class, e);
+                        log.logException(ServerManager.class, e);
                     }
                 }
             }
@@ -178,7 +176,7 @@ public class ServerManager {
         log.log("Stop server!");
         isStart = false;
         try {
-            while (users.size() > 0) {
+            while (!users.isEmpty()) {
                 ISession session = users.get(0);
                 session.close();
             }
@@ -191,27 +189,22 @@ public class ServerManager {
         }
     }
 
-    public void disconnect(Session session) {
+    public synchronized void disconnect(Session session) {
         users.remove(session);
-        countClients--;
     }
 
     public void sendToServer(IMessage ms) {
-        synchronized (users) {
-            for (ISession session : users) {
-                session.sendMessage(ms);
-            }
+        for (ISession session : users) {
+            session.sendMessage(ms);
         }
     }
 
     public User getUserByPlayerId(int playerId) {
-        synchronized (users) {
-            return users.stream()
-                    .filter(session -> session != null && session.getUser() != null && session.getUser().getPlayerId() == playerId)
-                    .map(ISession::getUser)
-                    .findFirst()
-                    .orElse(null);
-        }
+        return users.stream()
+                .filter(session -> session != null && session.getUser() != null && session.getUser().getPlayerId() == playerId)
+                .map(ISession::getUser)
+                .findFirst()
+                .orElse(null);
     }
 
     public List<User> findWaitPlayers(int excludedPlayerId) {

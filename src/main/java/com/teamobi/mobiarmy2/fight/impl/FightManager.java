@@ -13,7 +13,6 @@ import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.repository.ClanItemRepository;
 import com.teamobi.mobiarmy2.server.ClanManager;
-import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.util.MapTileExporter;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -657,7 +656,7 @@ public class FightManager implements IFightManager {
 
     @Override
     public void addBoss(Boss boss) {
-        if (totalPlayers >= ServerManager.maxElementFight) {
+        if (totalPlayers >= FightManager.MAX_ELEMENT_FIGHT) {
             return;
         }
         players[totalPlayers] = boss;

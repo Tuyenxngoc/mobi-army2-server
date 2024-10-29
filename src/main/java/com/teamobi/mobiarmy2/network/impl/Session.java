@@ -67,8 +67,8 @@ public class Session implements ISession {
     }
 
     private void initializeThreads() {
-        this.sendThread = new Thread(sender);
-        this.collectorThread = new Thread(new MessageCollector());
+        this.sendThread = new Thread(sender, sessionId + "_send");
+        this.collectorThread = new Thread(new MessageCollector(), sessionId + "_collector");
         this.collectorThread.start();
     }
 

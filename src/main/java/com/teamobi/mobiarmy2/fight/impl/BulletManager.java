@@ -16,6 +16,8 @@ import java.util.List;
 @Getter
 @Setter
 public class BulletManager implements IBulletManager {
+    public static final boolean MGT_BULL_NEW = true;
+
 
     public static class VoiRong {
 
@@ -481,7 +483,7 @@ public class BulletManager implements IBulletManager {
                     if (pl.getUsedItemId() >= 0 || idGun != 9) {
                         return;
                     }
-                    if (ServerManager.mgtBullNew) {
+                    if (MGT_BULL_NEW) {
                         bullets.add(new MGTBulletNew(this, (byte) 49, pl.isUsePow() ? 1000 : (nshoot == 2 ? 308 : 400), pl, x, y, vx, vy, 40, 70, force));
                     } else {
                         vx = (1600 * Utils.cos(angle) >> 10);
