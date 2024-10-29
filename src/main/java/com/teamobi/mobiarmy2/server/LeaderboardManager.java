@@ -60,7 +60,7 @@ public class LeaderboardManager {
                 }
                 addBonusGiftsForPlayers();
                 isComplete = true;
-                ServerManager.getInstance().logger().logMessage("Refresh BXH");
+                ServerManager.getInstance().logger().success("Refresh BXH");
             }
         }, calendar.getTime(), 86_400_000L);
     }

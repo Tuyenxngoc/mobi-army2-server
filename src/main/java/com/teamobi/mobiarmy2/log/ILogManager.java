@@ -5,12 +5,13 @@ package com.teamobi.mobiarmy2.log;
  */
 public interface ILogManager {
 
-    void logToFile(String message);
+    void log(String message);
 
-    void logMessage(String message);
+    void success(String message);
 
-    void logWarning(String message);
+    void warning(String message);
 
-    void logError(String message);
+    void error(String message);
 
+    void logException(Class<?> exceptionClass, Exception exception, String... additionalMessages);
 }

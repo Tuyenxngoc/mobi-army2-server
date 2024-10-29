@@ -82,8 +82,6 @@ public class FightManager implements IFightManager {
         mapManager.refresh();
         bulletManager.refresh();
         countdownTimer.stop();
-
-        ServerManager.getInstance().logger().logMessage("Refresh fight manager");
     }
 
     private void sendLuckyUpdate(byte index) {

@@ -98,7 +98,6 @@ public class FightWait implements IFightWait {
             mapId = continuousMaps[continuousLevel];
         }
         countdownTimer.stop();
-        ServerManager.getInstance().logger().logMessage("Refresh fight wait");
     }
 
     @Override

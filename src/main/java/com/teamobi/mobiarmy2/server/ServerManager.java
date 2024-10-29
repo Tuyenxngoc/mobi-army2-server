@@ -146,26 +146,26 @@ public class ServerManager {
     }
 
     public void start() {
-        log.logMessage("Start server!");
+        log.log("Start server!");
         isStart = true;
         try {
             server = new ServerSocket(config.getPort());
-            log.logMessage("Server start at port: " + config.getPort());
+            log.success("Server start at port: " + config.getPort());
             while (isStart) {
                 if (users.size() < config.getMaxClients()) {
                     try {
                         Socket socket = server.accept();
                         ISession session = new Session(++countClients, socket);
                         users.add(session);
-                        log.logMessage("Accept socket client " + countClients + " done!");
+                        log.log("Accept socket client " + countClients + " done!");
                     } catch (Exception ignored) {
                     }
                 } else {
                     try {
-                        log.logMessage("Maximum number of players reached. Waiting for a slot to be free.");
+                        log.warning("Maximum number of players reached. Waiting for a slot to be free.");
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                       log.logException(ServerManager.class, e);
                     }
                 }
             }
@@ -175,7 +175,7 @@ public class ServerManager {
     }
 
     public void stop() {
-        log.logMessage("Stop server!");
+        log.log("Stop server!");
         isStart = false;
         try {
             while (users.size() > 0) {

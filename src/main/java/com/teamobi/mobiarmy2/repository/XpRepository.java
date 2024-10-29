@@ -21,6 +21,6 @@ public class XpRepository {
                 return levelXpRequiredEntry.getLevel() - 1;
             }
         }
-        return -1;
+        return LEVEL_XP_REQUIRED_ENTRIES.get(LEVEL_XP_REQUIRED_ENTRIES.size() - 1).getLevel();
     }
 }
