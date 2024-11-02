@@ -396,7 +396,7 @@ public class Player {
 
         updateHP((short) -damage);
 
-        if (shooter instanceof Boss) {
+        if (shooter instanceof Boss || shooter == this) {
             return;
         }
 
@@ -412,6 +412,9 @@ public class Player {
                 case 24 -> {
                     GiftBox giftBox = (GiftBox) this;
                     shooter.addReward(giftBox.getRandomReward());
+                }
+                case 26 -> {
+//                    Player players = new Ghost2(fightManager, (byte) (fightMNG.allCount + fightMNG.bullMNG.addboss.size()), 1800 + (fightMNG.getLevelTeam() * 10), (short) (Until.nextInt(100, fightMNG.mapMNG.Width - 100)), (short) Until.nextInt(150));
                 }
             }
 

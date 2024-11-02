@@ -282,7 +282,6 @@ public class Utils {
         return dateTime.format(DATE_TIME_FORMATTER);
     }
 
-
     /**
      * Clamps the given value to the specified range [min, max].
      * If the value is less than the minimum, it returns the minimum.

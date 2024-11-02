@@ -11,13 +11,16 @@ import java.util.List;
 public class XpRepository {
     public static final List<LevelXpRequiredEntry> LEVEL_XP_REQUIRED_ENTRIES = new ArrayList<>();
 
-    public static int getXpRequestLevel(int currentLevel) {
-        return LEVEL_XP_REQUIRED_ENTRIES.get(currentLevel).getXp();
+    public static int getRequiredXpLevel(int level) {
+        if (level < 0 || level >= LEVEL_XP_REQUIRED_ENTRIES.size()) {
+            throw new IndexOutOfBoundsException("Level " + level + " is out of bounds. Valid levels are from 0 to " + (LEVEL_XP_REQUIRED_ENTRIES.size() - 1) + ".");
+        }
+        return LEVEL_XP_REQUIRED_ENTRIES.get(level).getXp();
     }
 
-    public static int getLevelByEXP(long exp) {
+    public static int getLevelByXP(long xp) {
         for (LevelXpRequiredEntry levelXpRequiredEntry : LEVEL_XP_REQUIRED_ENTRIES) {
-            if (exp < levelXpRequiredEntry.getXp()) {
+            if (xp < levelXpRequiredEntry.getXp()) {
                 return levelXpRequiredEntry.getLevel() - 1;
             }
         }

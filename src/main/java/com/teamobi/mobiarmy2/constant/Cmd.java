@@ -80,7 +80,6 @@ public class Cmd {
     public static final byte READY = 16;
     public static final byte REQUEST_AVATAR = 38;
     public static final byte REQUEST_AVATARLIST = 39;
-    public static final byte REQUEST_BOARDLIST = 7;
     public static final byte REQUEST_DETAIL = 34;
     public static final byte REQUEST_FRIENDLIST = 29;
     public static final byte REQUEST_REGISTER = 35;
@@ -145,7 +144,6 @@ public class Cmd {
     public static final byte INVENTORY = 101;
     public static final byte INVENTORY_UPDATE = 27;
     public static final byte ITEM_SLOT = 112;
-    public static final byte JOINBOARD_FAIL = 17;
     public static final byte LOGIN_FAIL = 4;
     public static final byte LOGIN_SUCESS = 3;
     public static final byte LUCKY = 100;
@@ -176,7 +174,6 @@ public class Cmd {
     public static final byte SUB_FILEPACK_3 = 2;
     public static final byte SUB_FILEPACK_4 = 3;
     public static final byte SUB_FILEPACK_5 = 4;
-    public static final byte SUB_FILEPACK_6 = 5;
     public static final byte TEST = 111;
     public static final byte TIME_BOMB = 109;
     public static final byte TOP_CLAN = 116;

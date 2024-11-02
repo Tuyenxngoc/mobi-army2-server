@@ -3,6 +3,7 @@ package com.teamobi.mobiarmy2.server;
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.config.impl.ServerConfig;
 import com.teamobi.mobiarmy2.constant.CommonConstant;
+import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.dao.impl.GameDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
@@ -15,13 +16,11 @@ import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.impl.Session;
 import com.teamobi.mobiarmy2.service.IGameService;
 import com.teamobi.mobiarmy2.service.impl.GameService;
-import lombok.Getter;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -41,7 +40,6 @@ public class ServerManager {
     private ServerSocket server;
     private long countClients;
     private boolean isStart;
-    @Getter
     private Room[] rooms;
     private final ArrayList<ISession> users = new ArrayList<>();
 
@@ -70,6 +68,10 @@ public class ServerManager {
 
     public IServerConfig config() {
         return config;
+    }
+
+    public Room[] getRooms() {
+        return rooms;
     }
 
     public void init() {
@@ -161,7 +163,7 @@ public class ServerManager {
                 } else {
                     try {
                         log.warning("Maximum number of players reached. Waiting for a slot to be free.");
-                        Thread.sleep(1000);
+                        Thread.sleep(1000L);
                     } catch (InterruptedException e) {
                         log.logException(ServerManager.class, e);
                     }
@@ -208,6 +210,12 @@ public class ServerManager {
     }
 
     public List<User> findWaitPlayers(int excludedPlayerId) {
-        return Collections.emptyList();
+        return users.stream()
+                .filter(session -> session != null && session.getUser() != null &&
+                        session.getUser().getPlayerId() != excludedPlayerId &&
+                        session.getUser().getState() == UserState.WAITING)
+                .map(ISession::getUser)
+                .limit(10)
+                .toList();
     }
 }

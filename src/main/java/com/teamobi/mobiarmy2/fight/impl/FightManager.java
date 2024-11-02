@@ -560,7 +560,7 @@ public class FightManager implements IFightManager {
     }
 
     @Override
-    public void nextTurn() {
+    public synchronized void nextTurn() {
         turnCount++;
         byte roomType = fightWait.getRoomType();
 
@@ -807,6 +807,8 @@ public class FightManager implements IFightManager {
     private void fightComplete(MatchResult result) {
         updatePlayerStatuses();
 
+        //todo bug update xp
+
         long duration = System.currentTimeMillis() - startTime;
         boolean fightInValid = false;
         if (duration < 5000) {
@@ -837,21 +839,26 @@ public class FightManager implements IFightManager {
             }
 
             try {
-                IMessage ms = new Message(Cmd.STOP_GAME);
-                DataOutputStream ds = ms.writer();
-                ds.writeByte(winStatus);
-                ds.writeByte(0);
-                if (winStatus == 1 || winStatus == 0) {
-                    ds.writeInt(fightWait.getMoney());
-                } else {
-                    ds.writeInt(-fightWait.getMoney());
-                }
-                ds.flush();
-                user.sendMessage(ms);
-
                 //Gửi ms thông báo số xp và cup nhận được
                 user.getUserService().sendUpdateXp(player.getAllXpUp(), false);
                 user.getUserService().sendUpdateCup(Math.min(player.getAllCupUp(), Byte.MAX_VALUE));
+
+                if (winStatus == 1 && fightWait.getRoomType() == 5) {
+                    user.updateXp(10, true);
+                }
+
+                //Gửi ms kết thúc ván chơi
+                IMessage ms = new Message(Cmd.STOP_GAME);
+                DataOutputStream ds = ms.writer();
+                ds.writeByte(winStatus);
+                ds.writeByte(10);//xp bonus
+                if (winStatus == 1 || winStatus == 0) {
+                    ds.writeInt(fightWait.getMoney());
+                } else {
+                    ds.writeInt(fightWait.getMoney() * -1);
+                }
+                ds.flush();
+                user.sendMessage(ms);
 
                 //Cập nhật xu cuối trận
                 int xuUp = fightWait.getMoney();
@@ -877,7 +884,6 @@ public class FightManager implements IFightManager {
         }
 
         refreshFightManager();
-
         fightWait.fightComplete();
     }
 

@@ -1254,7 +1254,7 @@ public class UserService implements IUserService {
                 ds.writeByte(fightWait.getMaxSetPlayers());
                 ds.writeBoolean(fightWait.isPassSet());
                 ds.writeInt(fightWait.getMoney());
-                ds.writeBoolean(false);
+                ds.writeBoolean(fightWait.isStarted());
                 ds.writeUTF(fightWait.getName());
                 ds.writeByte(fightWait.getRoom().getIconType());
             }
@@ -1807,7 +1807,7 @@ public class UserService implements IUserService {
                 ds.writeByte(us.getCurrentLevelPercent());
                 ds.writeInt(us.getLuong());
                 ds.writeInt(us.getCurrentXp());
-                ds.writeInt(us.getCurrentXpLevel());
+                ds.writeInt(us.getCurrentRequiredXp());
                 ds.writeInt(us.getCup());
                 ds.writeUTF(GameString.notRanking());
             }
@@ -2381,7 +2381,7 @@ public class UserService implements IUserService {
                 ds.writeShort(point);
             }
             ds.writeInt(user.getCurrentXp());
-            ds.writeInt(user.getCurrentXpLevel());
+            ds.writeInt(user.getCurrentRequiredXp());
             ds.writeInt(user.getCup());
             ds.flush();
             user.sendMessage(ms);
@@ -3009,8 +3009,8 @@ public class UserService implements IUserService {
             IMessage ms = new Message(Cmd.UPDATE_EXP);
             DataOutputStream ds = ms.writer();
             ds.writeInt(xpUp);
-            ds.writeInt(user.getCurrentLevel());
-            ds.writeInt(XpRepository.getXpRequestLevel(user.getCurrentLevel() + 1));
+            ds.writeInt(user.getCurrentXp());
+            ds.writeInt(user.getCurrentRequiredXp());
             if (updateLevel) {
                 ds.writeByte(1);
                 ds.writeByte(user.getCurrentLevel());

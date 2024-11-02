@@ -214,7 +214,7 @@ public class FightWait implements IFightWait {
         ds.writeInt(getRoomOwner().getPlayerId());
         ds.writeInt(money);
         ds.writeByte(mapId);
-        ds.writeByte(0);
+        ds.writeByte(0);//GameMode
         for (byte i = 0; i < users.length; i++) {
             User user = users[i];
             if (user != null) {

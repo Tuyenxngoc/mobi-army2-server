@@ -23,19 +23,19 @@ class XpRepositoryTest {
     }
 
     @Test
-    void testGetXpRequestLevel() {
-        assertEquals(100, XpRepository.getXpRequestLevel(0), "Xp for level 1 should be 100");
-        assertEquals(300, XpRepository.getXpRequestLevel(1), "Xp for level 2 should be 300");
-        assertEquals(600, XpRepository.getXpRequestLevel(2), "Xp for level 3 should be 600");
-        assertEquals(1000, XpRepository.getXpRequestLevel(3), "Xp for level 4 should be 1000");
+    void testGetRequiredXpLevel() {
+        assertEquals(100, XpRepository.getRequiredXpLevel(0), "Xp for level 1 should be 100");
+        assertEquals(300, XpRepository.getRequiredXpLevel(1), "Xp for level 2 should be 300");
+        assertEquals(600, XpRepository.getRequiredXpLevel(2), "Xp for level 3 should be 600");
+        assertEquals(1000, XpRepository.getRequiredXpLevel(3), "Xp for level 4 should be 1000");
     }
 
     @Test
-    void testGetLevelByEXP() {
-        assertEquals(0, XpRepository.getLevelByEXP(50), "Exp 50 should correspond to level 0");
-        assertEquals(1, XpRepository.getLevelByEXP(150), "Exp 150 should correspond to level 1");
-        assertEquals(2, XpRepository.getLevelByEXP(350), "Exp 350 should correspond to level 2");
-        assertEquals(3, XpRepository.getLevelByEXP(700), "Exp 700 should correspond to level 3");
-        assertEquals(-1, XpRepository.getLevelByEXP(1200), "Exp 1200 should correspond to an undefined level");
+    void testGetLevelByXP() {
+        assertEquals(0, XpRepository.getLevelByXP(50), "Exp 50 should correspond to level 0");
+        assertEquals(1, XpRepository.getLevelByXP(150), "Exp 150 should correspond to level 1");
+        assertEquals(2, XpRepository.getLevelByXP(350), "Exp 350 should correspond to level 2");
+        assertEquals(3, XpRepository.getLevelByXP(700), "Exp 700 should correspond to level 3");
+        assertEquals(-1, XpRepository.getLevelByXP(1200), "Exp 1200 should correspond to an undefined level");
     }
 }

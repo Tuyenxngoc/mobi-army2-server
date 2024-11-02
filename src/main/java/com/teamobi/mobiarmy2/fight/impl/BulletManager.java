@@ -18,7 +18,6 @@ import java.util.List;
 public class BulletManager implements IBulletManager {
     public static final boolean MGT_BULL_NEW = true;
 
-
     public static class VoiRong {
 
         public int X;

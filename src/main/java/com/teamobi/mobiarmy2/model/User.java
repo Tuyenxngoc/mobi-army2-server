@@ -93,13 +93,13 @@ public class User {
     }
 
     public int getCurrentLevelPercent() {
-        float requiredXp = getCurrentXpLevel();
+        float requiredXp = getCurrentRequiredXp();
         float currentXp = getCurrentXp();
         return Utils.calculateLevelPercent(currentXp, requiredXp);
     }
 
-    public int getCurrentXpLevel() {
-        return XpRepository.getXpRequestLevel(getCurrentLevel());
+    public int getCurrentRequiredXp() {
+        return XpRepository.getRequiredXpLevel(getCurrentLevel());
     }
 
     public int getCurrentLevel() {
@@ -185,7 +185,7 @@ public class User {
         }
 
         int currentLevel = getCurrentLevel();
-        int newLevel = XpRepository.getLevelByEXP(totalXp);
+        int newLevel = XpRepository.getLevelByXP(totalXp);
 
         int levelDiff = newLevel - currentLevel;
         if (levelDiff > 0) {
