@@ -839,43 +839,44 @@ public class FightManager implements IFightManager {
             }
 
             try {
-                //Gửi ms thông báo số xp và cup nhận được
-                user.getUserService().sendUpdateXp(player.getAllXpUp(), false);
-                user.getUserService().sendUpdateCup(Math.min(player.getAllCupUp(), Byte.MAX_VALUE));
-
-                if (winStatus == 1 && fightWait.getRoomType() == 5) {
-                    user.updateXp(10, true);
-                }
-
-                //Gửi ms kết thúc ván chơi
+                //Gửi thông báo kết thúc ván chơi
                 IMessage ms = new Message(Cmd.STOP_GAME);
                 DataOutputStream ds = ms.writer();
                 ds.writeByte(winStatus);
-                ds.writeByte(10);//xp bonus
+                ds.writeByte(0);
                 if (winStatus == 1 || winStatus == 0) {
                     ds.writeInt(fightWait.getMoney());
                 } else {
-                    ds.writeInt(fightWait.getMoney() * -1);
+                    ds.writeInt(-fightWait.getMoney());
                 }
                 ds.flush();
                 user.sendMessage(ms);
 
+                //Gửi thông báo số xp và cup nhận được
+                user.getUserService().sendUpdateXp(player.getAllXpUp(), false);
+                user.getUserService().sendUpdateCup(Math.min(player.getAllCupUp(), Byte.MAX_VALUE));
+
+                //Nếu chiến thắng trong đấu boss thì cộng thêm 10xp
+                if (winStatus == 1 && fightWait.getRoomType() == 5 && !fightInValid) {
+                    user.updateXp(10, true);
+                }
+
                 //Cập nhật xu cuối trận
                 int xuUp = fightWait.getMoney();
-                switch (winStatus) {
-                    //Người chơi thắng
-                    case 1 -> {
-                        user.updateXu(xuUp *= 2);
-                        sendMoneyUpdate(player, xuUp);
-                    }
+                if (xuUp > 0) {
+                    switch (winStatus) {
+                        //Thắng
+                        case 1 -> {
+                            xuUp = xuUp * 2;
+                            user.updateXu(xuUp);
+                            sendMoneyUpdate(player, xuUp);
+                        }
 
-                    //Người chơi thua
-                    case -1 -> sendMoneyUpdate(player, -xuUp);
-
-                    //Hòa
-                    case 0 -> {
-                        user.updateXu(xuUp);
-                        sendMoneyUpdate(player, xuUp);
+                        //Hòa
+                        case 0 -> {
+                            user.updateXu(xuUp);
+                            sendMoneyUpdate(player, xuUp);
+                        }
                     }
                 }
             } catch (IOException e) {
@@ -1439,13 +1440,17 @@ public class FightManager implements IFightManager {
     }
 
     @Override
-    public void giveXpToTeammates(boolean isTeamBlue, int addXP) {
+    public void giveXpToTeammates(boolean isTeamBlue, int addXP, Player sharer) {
         int i = isTeamBlue ? 0 : 1;
         int step = fightWait.getRoomType() == 5 ? 1 : 2;
 
         for (; i < MAX_USER_FIGHT; i += step) {
             Player player = players[i];
-            if (player != null && player.getUser() != null && !player.isDead()) {
+            if (player != sharer
+                    && player != null
+                    && player.getUser() != null
+                    && !player.isDead()
+            ) {
                 player.updateXp(addXP, false);
             }
         }

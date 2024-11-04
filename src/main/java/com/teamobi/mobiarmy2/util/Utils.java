@@ -134,7 +134,7 @@ public class Utils {
         if (requiredXp == 0) {
             return 0;
         }
-        int percentage = Math.round((currentXp / requiredXp) * 100);
+        int percentage = (int) Math.floor((currentXp / requiredXp) * 100);
         return (byte) Math.min(percentage, 100);
     }
 

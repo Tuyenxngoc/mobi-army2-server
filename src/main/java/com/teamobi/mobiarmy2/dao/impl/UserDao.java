@@ -56,7 +56,9 @@ public class UserDao implements IUserDao {
                 "`top_earnings_xu` = ?, " +
                 "`active_character_id` = ?, " +
                 "`materials_purchased` = ?, " +
-                "`equipment_purchased` = ? " +
+                "`equipment_purchased` = ?, " +
+                "`x2_xp_time` = ?, " +
+                "`point_event` = ? " +
                 //...//
                 " WHERE player_id = ?";
         HikariCPManager.getInstance().update(sql,
@@ -75,6 +77,8 @@ public class UserDao implements IUserDao {
                 user.getPlayerCharacterIds()[user.getActiveCharacterId()],
                 user.getMaterialsPurchased(),
                 user.getEquipmentPurchased(),
+                user.getXpX2Time(),
+                user.getPointEvent(),
                 //...//
                 user.getPlayerId());
 

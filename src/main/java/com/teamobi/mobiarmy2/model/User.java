@@ -423,7 +423,7 @@ public class User {
 
     public synchronized void addDaysToXpX2Time(int days) {
         LocalDateTime now = LocalDateTime.now();
-        if (xpX2Time.isBefore(now)) {
+        if (xpX2Time == null || xpX2Time.isBefore(now)) {
             xpX2Time = now;
         }
         xpX2Time = xpX2Time.plusDays(days);

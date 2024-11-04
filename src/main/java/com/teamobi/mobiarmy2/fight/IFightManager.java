@@ -63,5 +63,5 @@ public interface IFightManager {
 
     void sendBulletHit(byte index, byte toIndex);
 
-    void giveXpToTeammates(boolean isTeamBlue, int addXP);
+    void giveXpToTeammates(boolean isTeamBlue, int addXP, Player sharer);
 }

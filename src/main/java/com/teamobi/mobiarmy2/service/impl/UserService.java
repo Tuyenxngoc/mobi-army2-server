@@ -207,6 +207,7 @@ public class UserService implements IUserService {
         target.setXu(source.getXu());
         target.setLuong(source.getLuong());
         target.setCup(source.getCup());
+        target.setPointEvent(source.getPointEvent());
         target.setClanId(source.getClanId());
         target.setLevels(source.getLevels());
         target.setLevelPercents(source.getLevelPercents());

@@ -73,6 +73,7 @@ public class MapManager implements IMapManager {
 
     @Override
     public void loadMapId(byte mapId) {
+        mapTiles.clear();
         byte[] mapData = MapRepository.getMapData(mapId);
 
         if (mapData == null) {

@@ -218,13 +218,13 @@ public class Player {
         // Cộng XP cho đồng đội
         int teamXp = addXP / 4;
         if (shareXp && teamXp > 1) {
-            fightManager.giveXpToTeammates(isTeamBlue, teamXp);
+            fightManager.giveXpToTeammates(isTeamBlue, teamXp, this);
         }
 
-        if (clanItems[1]) {
+        if (clanItems[0]) {
             addXP *= 2;
         }
-        if (clanItems[8]) {
+        if (clanItems[7]) {
             addXP *= 3;
         }
         isUpdateXP = true;

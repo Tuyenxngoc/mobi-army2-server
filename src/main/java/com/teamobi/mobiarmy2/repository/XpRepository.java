@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.repository;
 
+import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.model.LevelXpRequiredEntry;
 
 import java.util.ArrayList;
@@ -12,9 +13,10 @@ public class XpRepository {
     public static final List<LevelXpRequiredEntry> LEVEL_XP_REQUIRED_ENTRIES = new ArrayList<>();
 
     public static int getRequiredXpLevel(int level) {
-        if (level < 0 || level >= LEVEL_XP_REQUIRED_ENTRIES.size()) {
-            throw new IndexOutOfBoundsException("Level " + level + " is out of bounds. Valid levels are from 0 to " + (LEVEL_XP_REQUIRED_ENTRIES.size() - 1) + ".");
+        if (level >= LEVEL_XP_REQUIRED_ENTRIES.size()) {
+            return CommonConstant.MAX_XP;
         }
+
         return LEVEL_XP_REQUIRED_ENTRIES.get(level).getXp();
     }
 
