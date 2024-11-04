@@ -1,13 +1,13 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
-import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dao.IRankingDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.model.user.PlayerLeaderboardEntry;
 import com.teamobi.mobiarmy2.repository.CharacterRepository;
+import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -25,6 +25,7 @@ public class RankingDao implements IRankingDao {
 
     private List<PlayerLeaderboardEntry> getTopFromQuery(String query, String detailColumn, boolean applyBonus) {
         Gson gson = GsonUtil.GSON;
+        int[] topBonus = ServerManager.getInstance().config().getTopBonus();
         List<PlayerLeaderboardEntry> top = new ArrayList<>();
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement();
@@ -42,7 +43,7 @@ public class RankingDao implements IRankingDao {
                 entry.setDetail(Utils.getStringNumber(resultSet.getInt(detailColumn)));
 
                 if (applyBonus && index <= 3) {
-                    entry.setUsername(GameString.topBonus(resultSet.getString("username"), Utils.getStringNumber(CommonConstant.TOP_BONUS[index - 1])));
+                    entry.setUsername(GameString.topBonus(resultSet.getString("username"), Utils.getStringNumber(topBonus[index - 1])));
                 } else {
                     entry.setUsername(resultSet.getString("username"));
                 }

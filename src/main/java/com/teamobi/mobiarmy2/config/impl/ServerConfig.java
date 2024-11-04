@@ -3,6 +3,7 @@ package com.teamobi.mobiarmy2.config.impl;
 import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.constant.CommonConstant;
+import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 
 import java.io.FileInputStream;
@@ -55,6 +56,15 @@ public class ServerConfig implements IServerConfig {
     private byte maxFriends;
     private String messageLogin;
     private String[] message;
+    private int priceChatServer;
+    private int minXuContributeClan;
+    private int[] topBonus;
+    private int spinXuCost;
+    private int spinLuongCost;
+    private int[][] spinItemCounts;
+    private int[][] spinXuCounts;
+    private int[][] spinXpCounts;
+    private int[] spinTypeProbabilities;
 
     public ServerConfig(String resourceName) {
         configMap = new Properties();
@@ -123,6 +133,17 @@ public class ServerConfig implements IServerConfig {
 
             messageLogin = configMap.getProperty("message_login", "");
             message = gson.fromJson(configMap.getProperty("message", "[]"), String[].class);
+
+            priceChatServer = Integer.parseInt(configMap.getProperty("price_chat", "10000"));
+            minXuContributeClan = Integer.parseInt(configMap.getProperty("min_xu_contribute_clan", "1000"));
+            topBonus = gson.fromJson(configMap.getProperty("top_bonus", "[]"), int[].class);
+
+            spinXuCost = Integer.parseInt(configMap.getProperty("spin_xu_cost", "1000"));
+            spinLuongCost = Integer.parseInt(configMap.getProperty("spin_luong_cost", "1"));
+            spinItemCounts = gson.fromJson(configMap.getProperty("spin_item_counts", "[]"), int[][].class);
+            spinXuCounts = gson.fromJson(configMap.getProperty("spin_xu_counts", "[]"), int[][].class);
+            spinXpCounts = gson.fromJson(configMap.getProperty("spin_xp_counts", "[]"), int[][].class);
+            spinTypeProbabilities = gson.fromJson(configMap.getProperty("spin_type_probabilities", "[]"), int[].class);
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
@@ -151,6 +172,69 @@ public class ServerConfig implements IServerConfig {
 
         if (bossRoomMapId.length != bossRoomBossId.length) {
             System.out.println("room_boss_id, map_boss_id must have the same length");
+            System.exit(1);
+        }
+
+        if (priceChatServer < 0 || priceChatServer > GameConstants.MAX_XU) {
+            System.out.println("Invalid value for price_chat");
+            System.exit(1);
+        }
+
+        if (minXuContributeClan < 0 || minXuContributeClan > GameConstants.MAX_XU) {
+            System.out.println("Invalid value for min_xu_contribute_clan");
+            System.exit(1);
+        }
+
+        if (topBonus.length == 0) {
+            System.out.println("Invalid value for top_bonus");
+            System.exit(1);
+        }
+        for (int i = 0; i < topBonus.length; i++) {
+            if (topBonus[i] < 0 || topBonus[i] > GameConstants.MAX_XU) {
+                System.out.println("Invalid value for top_bonus at index " + i);
+                System.exit(1);
+            }
+        }
+
+        if (spinXuCost < 0 || spinXuCost > GameConstants.MAX_XU) {
+            System.out.println("Invalid value for spin_xu_cost");
+            System.exit(1);
+        }
+
+        if (spinLuongCost < 0 || spinLuongCost > GameConstants.MAX_LUONG) {
+            System.out.println("Invalid value for spin_luong_cost");
+            System.exit(1);
+        }
+
+        if (spinItemCounts.length != 2) {
+            System.out.println("Invalid value for spin_item_counts");
+            System.exit(1);
+        }
+        if (spinItemCounts[0].length != spinItemCounts[1].length) {
+            System.out.println("Invalid value for spin_item_counts arrays must have the same length");
+            System.exit(1);
+        }
+
+        if (spinXuCounts.length != 2) {
+            System.out.println("Invalid value for spin_xu_counts");
+            System.exit(1);
+        }
+        if (spinXuCounts[0].length != spinXuCounts[1].length) {
+            System.out.println("Invalid value for spin_xu_counts arrays must have the same length");
+            System.exit(1);
+        }
+
+        if (spinXpCounts.length != 2) {
+            System.out.println("Invalid value for spin_xp_counts");
+            System.exit(1);
+        }
+        if (spinXpCounts[0].length != spinXpCounts[1].length) {
+            System.out.println("Invalid value for spin_xp_counts arrays must have the same length");
+            System.exit(1);
+        }
+
+        if (spinTypeProbabilities.length != 4) {
+            System.out.println("Invalid value for spin_type_probabilities");
             System.exit(1);
         }
     }
@@ -350,4 +434,48 @@ public class ServerConfig implements IServerConfig {
         return message;
     }
 
+    @Override
+    public int getPriceChatServer() {
+        return priceChatServer;
+    }
+
+    @Override
+    public int getMinXuContributeClan() {
+        return minXuContributeClan;
+    }
+
+    @Override
+    public int[] getTopBonus() {
+        return topBonus;
+    }
+
+    @Override
+    public int getSpinXuCost() {
+        return spinXuCost;
+    }
+
+    @Override
+    public int getSpinLuongCost() {
+        return spinLuongCost;
+    }
+
+    @Override
+    public int[][] getSpinItemCounts() {
+        return spinItemCounts;
+    }
+
+    @Override
+    public int[][] getSpinXuCounts() {
+        return spinXuCounts;
+    }
+
+    @Override
+    public int[][] getSpinXpCounts() {
+        return spinXpCounts;
+    }
+
+    @Override
+    public int[] getSpinTypeProbabilities() {
+        return spinTypeProbabilities;
+    }
 }

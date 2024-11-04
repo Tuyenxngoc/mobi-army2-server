@@ -575,8 +575,10 @@ public class UserService implements IUserService {
                 if (quantity > user.getXu()) {
                     return;
                 }
-                if (quantity < CommonConstant.MIN_XU_CONTRIBUTE_CLAN) {
-                    sendServerMessage(GameString.gopClanMinXu(CommonConstant.MIN_XU_CONTRIBUTE_CLAN));
+
+                int minXuContributeClan = ServerManager.getInstance().config().getMinXuContributeClan();
+                if (quantity < minXuContributeClan) {
+                    sendServerMessage(GameString.gopClanMinXu(minXuContributeClan));
                     return;
                 }
                 //Update xu user
@@ -1133,11 +1135,12 @@ public class UserService implements IUserService {
             }
             //Neu la nguoi dua tin -> send Mss 46-> chat The gioi
             if (playerId == 2) {
-                //10000xu/lan
-                if (user.getXu() < CommonConstant.PRICE_CHAT) {
+                int priceChatServer = ServerManager.getInstance().config().getPriceChatServer();
+
+                if (user.getXu() < priceChatServer) {
                     return;
                 }
-                user.updateXu(-CommonConstant.PRICE_CHAT);
+                user.updateXu(-priceChatServer);
                 sendServerInfoToServer(GameString.mssTGString(user.getUsername(), content));
                 return;
             }
@@ -2216,7 +2219,7 @@ public class UserService implements IUserService {
                     ds.writeByte(type);
                     ds.writeByte(config.getIconVersion2());
                     if (version != config.getIconVersion2()) {
-                        byte[] ab = Utils.getFile(CommonConstant.iconCacheName);
+                        byte[] ab = Utils.getFile(CommonConstant.ICON_CACHE_NAME);
                         if (ab == null) {
                             return;
                         }
@@ -2234,7 +2237,7 @@ public class UserService implements IUserService {
                     ds.writeByte(type);
                     ds.writeByte(config.getValuesVersion2());
                     if (version != config.getValuesVersion2()) {
-                        byte[] ab = Utils.getFile(CommonConstant.mapCacheName);
+                        byte[] ab = Utils.getFile(CommonConstant.MAP_CACHE_NAME);
                         if (ab == null) {
                             return;
                         }
@@ -2251,7 +2254,7 @@ public class UserService implements IUserService {
                     ds.writeByte(type);
                     ds.writeByte(config.getPlayerVersion2());
                     if (version != config.getPlayerVersion2()) {
-                        byte[] ab = Utils.getFile(CommonConstant.playerCacheName);
+                        byte[] ab = Utils.getFile(CommonConstant.PLAYER_CACHE_NAME);
                         if (ab == null) {
                             return;
                         }
@@ -2268,7 +2271,7 @@ public class UserService implements IUserService {
                     ds.writeByte(type);
                     ds.writeByte(config.getEquipVersion2());
                     if (version != config.getEquipVersion2()) {
-                        byte[] ab = Utils.getFile(CommonConstant.equipCacheName);
+                        byte[] ab = Utils.getFile(CommonConstant.EQUIP_CACHE_NAME);
                         if (ab == null) {
                             return;
                         }
@@ -2285,7 +2288,7 @@ public class UserService implements IUserService {
                     ds.writeByte(type);
                     ds.writeByte(config.getLevelCVersion2());
                     if (version != config.getLevelCVersion2()) {
-                        byte[] ab = Utils.getFile(CommonConstant.levelCacheName);
+                        byte[] ab = Utils.getFile(CommonConstant.LEVEL_CACHE_NAME);
                         if (ab == null) {
                             return;
                         }
@@ -2616,46 +2619,46 @@ public class UserService implements IUserService {
 
     @Override
     public void handleSpinWheel(IMessage ms) {
+        IServerConfig config = ServerManager.getInstance().config();
         try {
             byte unit = ms.reader().readByte();
             if (unit == 0) {
-                if (user.getXu() < SpinWheelConstants.XU_COST) {
+                if (user.getXu() < config.getSpinXuCost()) {
                     sendServerMessage(GameString.xuNotEnought());
                     return;
                 }
-                user.updateXu(-SpinWheelConstants.XU_COST);
+                user.updateXu(-config.getSpinXuCost());
             } else {
-                if (user.getLuong() < SpinWheelConstants.LUONG_COST) {
+                if (user.getLuong() < config.getSpinLuongCost()) {
                     sendServerMessage(GameString.xuNotEnought());
                     return;
                 }
-                user.updateLuong(-SpinWheelConstants.LUONG_COST);
+                user.updateLuong(-config.getSpinLuongCost());
             }
             ms = new Message(Cmd.RULET);
             DataOutputStream ds = ms.writer();
-
             int luckyIndex = Utils.nextInt(10);
             for (byte i = 0; i < 10; i++) {
-                byte type = Utils.nextByte(SpinWheelConstants.TYPE_PROBABILITIES);
+                byte type = (byte) Utils.nextInt(config.getSpinTypeProbabilities());
                 byte itemId = 0;
                 int quantity = 0;
 
                 switch (type) {
                     case 0 -> {
                         itemId = FightItemRepository.getRandomItem();
-                        quantity = SpinWheelConstants.ITEM_COUNTS[Utils.nextInt(SpinWheelConstants.ITEM_PROBABILITIES)];
+                        quantity = config.getSpinItemCounts()[0][Utils.nextInt(config.getSpinItemCounts()[1])];
                         if (i == luckyIndex) {
                             user.updateItems(itemId, (byte) quantity);
                         }
                     }
                     case 1 -> {
-                        quantity = SpinWheelConstants.XU_COUNTS[Utils.nextInt(SpinWheelConstants.XU_PROBABILITIES)];
+                        quantity = config.getSpinXuCounts()[0][Utils.nextInt(config.getSpinXuCounts()[1])];
                         if (i == luckyIndex) {
                             user.updateXu(quantity);
                         }
                     }
                     case 2 -> {
-                        quantity = SpinWheelConstants.XP_COUNTS[Utils.nextInt(SpinWheelConstants.XP_PROBABILITIES)];
+                        quantity = config.getSpinXpCounts()[0][Utils.nextInt(config.getSpinXpCounts()[1])];
                         if (i == luckyIndex) {
                             user.updateXp(quantity);
                         }

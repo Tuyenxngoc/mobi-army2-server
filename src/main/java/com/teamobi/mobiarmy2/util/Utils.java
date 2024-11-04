@@ -62,15 +62,22 @@ public class Utils {
         return RANDOM.nextInt(max);
     }
 
-    public static int nextInt(int[] percent) {
-        int next = nextInt(1000), i;
-        for (i = 0; i < percent.length; i++) {
-            if (next < percent[i]) {
+    public static int nextInt(int[] probabilities) {
+        int sum = 0;
+        for (int prob : probabilities) {
+            sum += prob;
+        }
+
+        int randomNumber = RANDOM.nextInt(sum);
+
+        int cumulativeSum = 0;
+        for (int i = 0; i < probabilities.length; i++) {
+            cumulativeSum += probabilities[i];
+            if (randomNumber < cumulativeSum) {
                 return i;
             }
-            next -= percent[i];
         }
-        return i;
+        return -1;
     }
 
     public static String getStringNumber(float num) {
@@ -145,24 +152,6 @@ public class Utils {
 
     public static int calculateXPRequired(int level) {
         return 25_000 * level * (level - 1);
-    }
-
-    public static byte nextByte(int[] probabilities) {
-        int sum = 0;
-        for (int prob : probabilities) {
-            sum += prob;
-        }
-
-        int randomNumber = RANDOM.nextInt(sum);
-
-        int cumulativeSum = 0;
-        for (byte i = 0; i < probabilities.length; i++) {
-            cumulativeSum += probabilities[i];
-            if (randomNumber < cumulativeSum) {
-                return i;
-            }
-        }
-        return -1;
     }
 
     public static boolean hasLoggedInOnNewDay(LocalDateTime lastOnline, LocalDateTime now) {

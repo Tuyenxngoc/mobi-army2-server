@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.repository;
 
-import com.teamobi.mobiarmy2.constant.CommonConstant;
+import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.model.LevelXpRequiredEntry;
 
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ public class XpRepository {
 
     public static int getRequiredXpLevel(int level) {
         if (level >= LEVEL_XP_REQUIRED_ENTRIES.size()) {
-            return CommonConstant.MAX_XP;
+            return GameConstants.MAX_XP;
         }
 
         return LEVEL_XP_REQUIRED_ENTRIES.get(level).getXp();

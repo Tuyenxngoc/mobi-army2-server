@@ -83,4 +83,21 @@ public interface IServerConfig {
 
     byte[] getBossRoomMapId();
 
+    int getPriceChatServer();
+
+    int getMinXuContributeClan();
+
+    int[] getTopBonus();
+
+    int getSpinXuCost();
+
+    int getSpinLuongCost();
+
+    int[][] getSpinItemCounts();
+
+    int[][] getSpinXuCounts();
+
+    int[][] getSpinXpCounts();
+
+    int[] getSpinTypeProbabilities();
 }

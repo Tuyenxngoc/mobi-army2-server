@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.model;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
-import com.teamobi.mobiarmy2.constant.CommonConstant;
+import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.fight.ITrainingManager;
@@ -123,10 +123,10 @@ public class User {
             return;
         }
         long sum = xuUp + xu;
-        if (sum > CommonConstant.MAX_XU) {
-            xu = CommonConstant.MAX_XU;
-        } else if (sum < CommonConstant.MIN_XU) {
-            xu = CommonConstant.MIN_XU;
+        if (sum > GameConstants.MAX_XU) {
+            xu = GameConstants.MAX_XU;
+        } else if (sum < GameConstants.MIN_XU) {
+            xu = GameConstants.MIN_XU;
         } else {
             xu += xuUp;
         }
@@ -138,10 +138,10 @@ public class User {
             return;
         }
         long sum = luongUp + luong;
-        if (sum > CommonConstant.MAX_LUONG) {
-            luong = CommonConstant.MAX_LUONG;
-        } else if (sum < CommonConstant.MIN_LUONG) {
-            luong = CommonConstant.MIN_LUONG;
+        if (sum > GameConstants.MAX_LUONG) {
+            luong = GameConstants.MAX_LUONG;
+        } else if (sum < GameConstants.MIN_LUONG) {
+            luong = GameConstants.MIN_LUONG;
         } else {
             luong += luongUp;
         }
@@ -153,10 +153,10 @@ public class User {
             return;
         }
         long sum = cupUp + cup;
-        if (sum > CommonConstant.MAX_CUP) {
-            cup = CommonConstant.MAX_CUP;
-        } else if (sum < CommonConstant.MIN_CUP) {
-            cup = CommonConstant.MIN_CUP;
+        if (sum > GameConstants.MAX_CUP) {
+            cup = GameConstants.MAX_CUP;
+        } else if (sum < GameConstants.MIN_CUP) {
+            cup = GameConstants.MIN_CUP;
         } else {
             cup += cupUp;
         }
@@ -180,8 +180,8 @@ public class User {
 
         int oldXp = getCurrentXp();
         long totalXp = xpUp + oldXp;
-        if (totalXp > CommonConstant.MAX_XP) {
-            totalXp = CommonConstant.MAX_XP;
+        if (totalXp > GameConstants.MAX_XP) {
+            totalXp = GameConstants.MAX_XP;
         }
 
         int currentLevel = getCurrentLevel();
@@ -190,7 +190,7 @@ public class User {
         int levelDiff = newLevel - currentLevel;
         if (levelDiff > 0) {
             levels[activeCharacterId] = newLevel;
-            points[activeCharacterId] += levelDiff * CommonConstant.POINT_ON_LEVEL;
+            points[activeCharacterId] += levelDiff * GameConstants.POINT_ON_LEVEL;
         }
         xps[activeCharacterId] = (int) totalXp;
 
