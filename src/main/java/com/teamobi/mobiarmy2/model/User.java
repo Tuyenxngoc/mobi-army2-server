@@ -12,7 +12,7 @@ import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.repository.CharacterRepository;
-import com.teamobi.mobiarmy2.repository.XpRepository;
+import com.teamobi.mobiarmy2.repository.PlayerXpRepository;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.service.impl.UserService;
@@ -93,13 +93,20 @@ public class User {
     }
 
     public int getCurrentLevelPercent() {
-        float requiredXp = getCurrentRequiredXp();
-        float currentXp = getCurrentXp();
-        return Utils.calculateLevelPercent(currentXp, requiredXp);
+        int currentXp = getCurrentXp();
+        int currentLevel = getCurrentLevel();
+
+        int requiredXpCurrentLevel = PlayerXpRepository.getRequiredXpLevel(currentLevel - 1);
+        int requiredXpNextLevel = PlayerXpRepository.getRequiredXpLevel(currentLevel);
+
+        int currentXpInLevel = currentXp - requiredXpCurrentLevel;
+        int xpNeededForNextLevel = requiredXpNextLevel - requiredXpCurrentLevel;
+
+        return Utils.calculateLevelPercent(currentXpInLevel, xpNeededForNextLevel);
     }
 
     public int getCurrentRequiredXp() {
-        return XpRepository.getRequiredXpLevel(getCurrentLevel());
+        return PlayerXpRepository.getRequiredXpLevel(getCurrentLevel());
     }
 
     public int getCurrentLevel() {
@@ -185,7 +192,7 @@ public class User {
         }
 
         int currentLevel = getCurrentLevel();
-        int newLevel = XpRepository.getLevelByXP(totalXp);
+        int newLevel = PlayerXpRepository.getLevelByXP(totalXp);
 
         int levelDiff = newLevel - currentLevel;
         if (levelDiff > 0) {

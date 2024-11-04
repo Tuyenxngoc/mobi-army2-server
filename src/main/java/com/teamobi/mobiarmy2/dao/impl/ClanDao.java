@@ -12,6 +12,7 @@ import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
 import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
 import com.teamobi.mobiarmy2.repository.CharacterRepository;
 import com.teamobi.mobiarmy2.repository.ClanItemRepository;
+import com.teamobi.mobiarmy2.repository.ClanXpRepository;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -161,17 +162,18 @@ public class ClanDao implements IClanDao {
                     clanInfo.setLuong(resultSet.getInt("luong"));
                     clanInfo.setCup(resultSet.getInt("cup"));
 
-                    int exp = resultSet.getInt("xp");
-                    byte level = Utils.calculateLevelClan(exp);
-                    int expUpLevel = Utils.calculateXPRequired(level + 1);
-                    int expCurrentLevel = Utils.calculateXPRequired(level);
+                    int xp = resultSet.getInt("xp");
+                    int level = ClanXpRepository.getLevelByXP(xp);
+                    int xpForCurrentLevel = ClanXpRepository.getRequiredXpLevel(level - 1);
+                    int xpForNextLevel = ClanXpRepository.getRequiredXpLevel(level);
+                    int currentXpInLevel = xp - xpForCurrentLevel;
+                    int xpNeededForNextLevel = xpForNextLevel - xpForCurrentLevel;
+                    byte levelPercent = Utils.calculateLevelPercent(currentXpInLevel, xpNeededForNextLevel);
 
-                    double expProgress = (exp - expCurrentLevel) * 100 / (double) expUpLevel;
-
-                    clanInfo.setExp(exp);
-                    clanInfo.setXpUpLevel(expUpLevel);
-                    clanInfo.setLevel(level);
-                    clanInfo.setLevelPercentage((byte) Math.min(100, expProgress));
+                    clanInfo.setExp(xp);
+                    clanInfo.setLevel((byte) level);
+                    clanInfo.setXpUpLevel(xpForNextLevel);
+                    clanInfo.setLevelPercentage(levelPercent);
 
                     clanInfo.setDescription(resultSet.getString("description"));
 
@@ -347,14 +349,16 @@ public class ClanDao implements IClanDao {
                     clanInfo.setLuong(resultSet.getInt("luong"));
                     clanInfo.setCup(resultSet.getInt("cup"));
 
-                    int exp = resultSet.getInt("xp");
-                    byte level = Utils.calculateLevelClan(exp);
-                    int expUpLevel = Utils.calculateXPRequired(level + 1);
-                    int expCurrentLevel = Utils.calculateXPRequired(level);
-                    double expProgress = (exp - expCurrentLevel) * 100 / (double) expUpLevel;
+                    int xp = resultSet.getInt("xp");
+                    int level = ClanXpRepository.getLevelByXP(xp);
+                    int xpForCurrentLevel = ClanXpRepository.getRequiredXpLevel(level - 1);
+                    int xpForNextLevel = ClanXpRepository.getRequiredXpLevel(level);
+                    int currentXpInLevel = xp - xpForCurrentLevel;
+                    int xpNeededForNextLevel = xpForNextLevel - xpForCurrentLevel;
+                    byte levelPercent = Utils.calculateLevelPercent(currentXpInLevel, xpNeededForNextLevel);
 
-                    clanInfo.setLevel(level);
-                    clanInfo.setLevelPercentage((byte) Math.min(100, expProgress));
+                    clanInfo.setLevel((byte) level);
+                    clanInfo.setLevelPercentage(levelPercent);
                     clanInfo.setDescription(resultSet.getString("description"));
 
                     top.add(clanInfo);

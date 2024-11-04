@@ -8,6 +8,7 @@ import com.teamobi.mobiarmy2.model.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
 import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
 import com.teamobi.mobiarmy2.repository.ClanItemRepository;
+import com.teamobi.mobiarmy2.repository.ClanXpRepository;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.time.LocalDateTime;
@@ -38,9 +39,9 @@ public class ClanManager {
         return instance;
     }
 
-    public byte getClanLevel(short clanId) {
+    public int getClanLevel(short clanId) {
         int exp = clanDao.getExp(clanId);
-        return Utils.calculateLevelClan(exp);
+        return ClanXpRepository.getLevelByXP(exp);
     }
 
     public int getClanXu(short clanId) {

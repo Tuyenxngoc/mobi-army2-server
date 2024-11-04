@@ -142,16 +142,13 @@ public class Utils {
             return 0;
         }
         int percentage = (int) Math.floor((currentXp / requiredXp) * 100);
-        return (byte) Math.min(percentage, 100);
-    }
-
-    public static byte calculateLevelClan(float xp) {
-        int level = ((int) Math.sqrt(1 + xp / 6250) + 1) >> 1;
-        return (byte) Math.min(level, 127);
-    }
-
-    public static int calculateXPRequired(int level) {
-        return 25_000 * level * (level - 1);
+        if (percentage < 0) {
+            return 0;
+        }
+        if (percentage > 100) {
+            return 100;
+        }
+        return (byte) percentage;
     }
 
     public static boolean hasLoggedInOnNewDay(LocalDateTime lastOnline, LocalDateTime now) {

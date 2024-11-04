@@ -891,7 +891,7 @@ public class UserService implements IUserService {
             return;
         }
 
-        byte currentLevel = clanManager.getClanLevel(user.getClanId());
+        int currentLevel = clanManager.getClanLevel(user.getClanId());
         if (currentLevel < clanItemEntry.getLevel()) {
             sendServerMessage(GameString.clanLevelNotEnought());
             return;

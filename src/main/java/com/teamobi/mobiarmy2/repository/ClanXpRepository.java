@@ -6,10 +6,7 @@ import com.teamobi.mobiarmy2.model.LevelXpRequiredEntry;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author tuyen
- */
-public class XpRepository {
+public class ClanXpRepository {
     public static final List<LevelXpRequiredEntry> LEVEL_XP_REQUIRED_ENTRIES = new ArrayList<>();
 
     public static int getRequiredXpLevel(int level) {

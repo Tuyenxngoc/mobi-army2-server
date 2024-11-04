@@ -7,6 +7,7 @@ import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.model.user.PlayerLeaderboardEntry;
 import com.teamobi.mobiarmy2.repository.CharacterRepository;
+import com.teamobi.mobiarmy2.repository.PlayerXpRepository;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -38,8 +39,17 @@ public class RankingDao implements IRankingDao {
                 entry.setPlayerId(resultSet.getInt("player_id"));
                 entry.setClanId(resultSet.getShort("clan_id"));
                 entry.setActiveCharacter(resultSet.getByte("character_id"));
-                entry.setLevel((byte) resultSet.getInt("level"));
-                entry.setLevelPt((byte) 0);
+
+                int currentLevel = resultSet.getInt("level");
+                int currentXp = resultSet.getInt("xp");
+                int requiredXpCurrentLevel = PlayerXpRepository.getRequiredXpLevel(currentLevel - 1);
+                int requiredXpNextLevel = PlayerXpRepository.getRequiredXpLevel(currentLevel);
+                int currentXpInLevel = currentXp - requiredXpCurrentLevel;
+                int xpNeededForNextLevel = requiredXpNextLevel - requiredXpCurrentLevel;
+                byte levelPercent = Utils.calculateLevelPercent(currentXpInLevel, xpNeededForNextLevel);
+
+                entry.setLevel((byte) currentLevel);
+                entry.setLevelPt(levelPercent);
                 entry.setDetail(Utils.getStringNumber(resultSet.getInt(detailColumn)));
 
                 if (applyBonus && index <= 3) {
@@ -65,7 +75,7 @@ public class RankingDao implements IRankingDao {
     public List<PlayerLeaderboardEntry> getTopHonor() {
         String query = "SELECT " +
                 "p.player_id, p.equipment_chest, p.cup, " +
-                "pc.data, pc.character_id, pc.level, " +
+                "pc.data, pc.character_id, pc.level, pc.xp, " +
                 "cm.clan_id, " +
                 "u.username " +
                 "FROM players p " +
@@ -99,7 +109,7 @@ public class RankingDao implements IRankingDao {
     public List<PlayerLeaderboardEntry> getTopRichestXu() {
         String query = "SELECT " +
                 "p.player_id, p.equipment_chest, p.xu, " +
-                "pc.data, pc.character_id, pc.level, " +
+                "pc.data, pc.character_id, pc.level, pc.xp, " +
                 "cm.clan_id, " +
                 "u.username " +
                 "FROM players p " +
@@ -116,7 +126,7 @@ public class RankingDao implements IRankingDao {
     public List<PlayerLeaderboardEntry> getTopRichestLuong() {
         String query = "SELECT " +
                 "p.player_id, p.equipment_chest, p.luong, " +
-                "pc.data, pc.character_id, pc.level, " +
+                "pc.data, pc.character_id, pc.level, pc.xp, " +
                 "cm.clan_id, " +
                 "u.username " +
                 "FROM players p " +
@@ -133,7 +143,7 @@ public class RankingDao implements IRankingDao {
     public List<PlayerLeaderboardEntry> getWeeklyTopHonor() {
         String query = "SELECT " +
                 "p.player_id, p.equipment_chest, SUM(t.amount) AS cup, " +
-                "pc.data, pc.character_id, pc.level, " +
+                "pc.data, pc.character_id, pc.level, pc.xp, " +
                 "cm.clan_id, " +
                 "u.username " +
                 "FROM transactions t " +
@@ -153,7 +163,7 @@ public class RankingDao implements IRankingDao {
     public List<PlayerLeaderboardEntry> getWeeklyTopRichest() {
         String query = "SELECT " +
                 "p.player_id, p.equipment_chest, SUM(t.amount) AS xu, " +
-                "pc.data, pc.character_id, pc.level, " +
+                "pc.data, pc.character_id, pc.level, pc.xp, " +
                 "cm.clan_id, " +
                 "u.username " +
                 "FROM transactions t " +

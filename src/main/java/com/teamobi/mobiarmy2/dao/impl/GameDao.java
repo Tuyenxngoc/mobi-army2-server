@@ -61,6 +61,7 @@ public class GameDao implements IGameDao {
     public void getAllCharacterData() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
+
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `characters`")) {
                 while (resultSet.next()) {
                     CharacterEntry characterEntry = new CharacterEntry();
@@ -87,6 +88,7 @@ public class GameDao implements IGameDao {
     public void getAllEquip() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
+
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `equips` ORDER BY equip_type, equip_index, character_id")) {
 
                 //Khởi tại danh sách trang bị mặc định ban đầu
@@ -179,6 +181,7 @@ public class GameDao implements IGameDao {
     public void getAllCaptionLevel() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
+
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `caption_levels`")) {
                 while (resultSet.next()) {
                     CaptionEntry capEntry = new CaptionEntry();
@@ -197,6 +200,7 @@ public class GameDao implements IGameDao {
     public void getAllItem() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
+
             try (ResultSet resultSet = statement.executeQuery("SELECT name, xu, luong, carried_item_count FROM `fight_items`")) {
                 while (resultSet.next()) {
                     FightItemEntry fightItemEntry = new FightItemEntry();
@@ -218,6 +222,7 @@ public class GameDao implements IGameDao {
     public void getAllItemClan() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
+
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `clan_shops`")) {
                 while (resultSet.next()) {
                     ClanItemEntry item = new ClanItemEntry();
@@ -365,18 +370,54 @@ public class GameDao implements IGameDao {
     public void getAllXpData() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet resultSet = statement.executeQuery("SELECT experience_points, level FROM `experience_levels` ORDER BY level")) {
-                int previousXp = 0;
+            try (ResultSet resultSet = statement.executeQuery("SELECT exp_player, exp_clan, level FROM `experience_levels` ORDER BY level")) {
+                int previousPlayerXp = 0;
+                int previousClanXp = 0;
+                boolean reachedMaxPlayerLevel = false;
+                boolean reachedMaxClanLevel = false;
+
                 while (resultSet.next()) {
-                    int currentXp = resultSet.getInt("experience_points");
-                    if (currentXp < previousXp) {
-                        throw new SQLException(String.format("XP of the next level (%d) is lower than the XP of the previous level (%d)!", currentXp, previousXp));
+                    Integer playerXp = resultSet.getObject("exp_player", Integer.class);
+                    Integer clanXp = resultSet.getObject("exp_clan", Integer.class);
+                    short level = resultSet.getShort("level");
+
+                    if (!reachedMaxPlayerLevel) {
+                        if (playerXp == null) {
+                            reachedMaxPlayerLevel = true;
+                        } else {
+                            // Kiểm tra tính hợp lệ của XP cho player
+                            if (playerXp < previousPlayerXp) {
+                                throw new SQLException(String.format("XP của cấp độ tiếp theo cho player (%d) nhỏ hơn XP của cấp độ trước đó (%d)!", playerXp, previousPlayerXp));
+                            }
+
+                            // Tạo bản ghi cho player
+                            LevelXpRequiredEntry playerXpRequired = new LevelXpRequiredEntry(level, playerXp);
+                            PlayerXpRepository.LEVEL_XP_REQUIRED_ENTRIES.add(playerXpRequired);
+
+                            previousPlayerXp = playerXp;
+                        }
                     }
-                    LevelXpRequiredEntry xpRequired = new LevelXpRequiredEntry();
-                    xpRequired.setLevel(resultSet.getShort("level"));
-                    xpRequired.setXp(currentXp);
-                    XpRepository.LEVEL_XP_REQUIRED_ENTRIES.add(xpRequired);
-                    previousXp = currentXp;
+
+                    if (!reachedMaxClanLevel) {
+                        if (clanXp == null) {
+                            reachedMaxClanLevel = true;
+                        } else {
+                            // Kiểm tra tính hợp lệ của XP cho clan
+                            if (clanXp < previousClanXp) {
+                                throw new SQLException(String.format("XP của cấp độ tiếp theo cho clan (%d) nhỏ hơn XP của cấp độ trước đó (%d)!", clanXp, previousClanXp));
+                            }
+
+                            // Tạo bản ghi cho clan
+                            LevelXpRequiredEntry clanXpRequired = new LevelXpRequiredEntry(level, clanXp);
+                            ClanXpRepository.LEVEL_XP_REQUIRED_ENTRIES.add(clanXpRequired);
+
+                            previousClanXp = clanXp;
+                        }
+                    }
+
+                    if (reachedMaxPlayerLevel && reachedMaxClanLevel) {
+                        break;
+                    }
                 }
             }
         } catch (SQLException e) {
