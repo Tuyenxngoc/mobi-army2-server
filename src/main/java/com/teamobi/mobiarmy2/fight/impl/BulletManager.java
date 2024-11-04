@@ -650,9 +650,4 @@ public class BulletManager implements IBulletManager {
         }
         return null;
     }
-
-    @Override
-    public void refresh() {
-
-    }
 }

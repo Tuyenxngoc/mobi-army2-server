@@ -78,8 +78,6 @@ public class FightManager implements IFightManager {
         bossTurn = MAX_USER_FIGHT;
         windX = 0;
         windY = 0;
-        mapManager.refresh();
-        bulletManager.refresh();
         countdownTimer.stop();
     }
 
@@ -1037,7 +1035,7 @@ public class FightManager implements IFightManager {
             IMessage ms = new Message(Cmd.FIRE_ARMY);
             DataOutputStream ds = ms.writer();
             ds.writeByte(typeShoot);
-            ds.writeByte(player.getPowerUsageStatus());
+            ds.writeByte(player.isUsePow() ? 1 : 0);
             ds.writeByte(index);
             ds.writeByte(bullId);
             ds.writeShort(player.getX());

@@ -11,7 +11,6 @@ public interface IMapManager {
 
     short getHeight();
 
-    //Test
     List<MapTile> getMapTiles();
 
     List<short[]> getRandomPlayerPositions(int numPlayers);
@@ -21,8 +20,6 @@ public interface IMapManager {
     boolean isCollision(short x, short y);
 
     void collision(short x, short y, Bullet bullet);
-
-    void refresh();
 
     void addNewTiles(MapTile mapTile);
 

@@ -143,11 +143,6 @@ public class MapManager implements IMapManager {
     }
 
     @Override
-    public void refresh() {
-
-    }
-
-    @Override
     public void addNewTiles(MapTile mapTile) {
         mapTiles.add(mapTile);
     }

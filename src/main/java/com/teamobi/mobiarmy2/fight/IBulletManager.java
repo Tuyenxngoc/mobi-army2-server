@@ -7,8 +7,6 @@ import java.util.List;
  */
 public interface IBulletManager {
 
-    void refresh();
-
     List<Boss> getAddBosses();
 
     void decreaseSpiderWebCount();

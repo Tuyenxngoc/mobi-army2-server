@@ -154,7 +154,7 @@ public class Player {
         }
     }
 
-    public void die() {
+    public synchronized void die() {
         hp = 0;
         isUpdateHP = true;
         isDead = true;
@@ -228,7 +228,7 @@ public class Player {
             addXP *= 3;
         }
         isUpdateXP = true;
-        xpUp = addXP;
+        xpUp += addXP;
         allXpUp += addXP;
     }
 
@@ -237,15 +237,11 @@ public class Player {
             return;
         }
         isUpdateCup = true;
-        cupUp = addCup;
+        cupUp += addCup;
         allCupUp += addCup;
     }
 
-    public byte getPowerUsageStatus() {
-        return (byte) (isUsePow ? 1 : 0);
-    }
-
-    public void updateXY(short x, short y) {
+    public synchronized void updateXY(short x, short y) {
         while (x != this.x || y != this.y) {
             int preX = this.x;
             int preY = this.y;
@@ -262,7 +258,7 @@ public class Player {
         }
     }
 
-    protected void move(boolean addX) {
+    private void move(boolean addX) {
         IMapManager mapManager = fightManager.getMapManger();
         if (this.freezeCount > 0) {
             return;
@@ -298,7 +294,7 @@ public class Player {
         updateYPosition();
     }
 
-    public void updateYPosition() {
+    public synchronized void updateYPosition() {
         IMapManager mapManager = fightManager.getMapManger();
         while (y < mapManager.getHeight() + 200) {
             if (mapManager.isCollision(x, y) || isFlying) {
@@ -318,7 +314,7 @@ public class Player {
         return Utils.inRegion(x, y, this.x - this.width / 2, this.y - this.height, this.width, this.height);
     }
 
-    public void collision(short bx, short by, Bullet bull) {
+    public synchronized void collision(short bx, short by, Bullet bull) {
         //Bỏ qua nếu đã bại hoặc đang vô hình
         if (isDead || invisibleCount > 0) {
             return;
@@ -422,8 +418,8 @@ public class Player {
             shooter.updateXp(xpExist, true);
 
             //Logic cộng cup
-            if (shooter.getUser() != null && this.getUser() != null) {
-                int cupDifference = shooter.getUser().getCup() - this.getUser().getCup();
+            if (shooter.getUser() != null && user != null) {
+                int cupDifference = shooter.getUser().getCup() - user.getCup();
                 if (cupDifference > 0) {
                     shooter.updateCup(cupDifference);
                 }
@@ -431,7 +427,7 @@ public class Player {
         }
     }
 
-    public void addReward(Reward reward) {
+    private void addReward(Reward reward) {
         if (rewards == null) {
             rewards = new ArrayList<>();
         }
@@ -439,7 +435,7 @@ public class Player {
         rewards.add(reward);
     }
 
-    public void resetValueInNewTurn() {
+    public synchronized void resetValueInNewTurn() {
         itemUsed = false;
         isUsePow = false;
         usedItemId = -1;
@@ -447,14 +443,14 @@ public class Player {
         steps = 0;
     }
 
-    public final void setXY(short x, short y) {
+    public synchronized void setXY(short x, short y) {
         if (x >= 0 && x < fightManager.getMapManger().getWidth() && y < fightManager.getMapManger().getHeight()) {
             this.x = x;
             this.y = y;
         }
     }
 
-    public final void usedItem(int slot) {
+    public synchronized void usedItem(int slot) {
         usedItemId = items[slot];
         if (usedItemId == 0 || usedItemId == 2 || usedItemId == 3 || usedItemId == 4 || usedItemId == 5 || usedItemId == 10 || usedItemId == 32 || usedItemId == 33 || usedItemId == 34 || usedItemId == 35 || usedItemId == 100) {
             usedItemId = -1;
