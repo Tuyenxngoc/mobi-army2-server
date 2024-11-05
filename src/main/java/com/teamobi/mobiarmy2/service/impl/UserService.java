@@ -6,7 +6,7 @@ import com.teamobi.mobiarmy2.dao.IGiftCodeDao;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.dao.impl.GiftCodeDao;
 import com.teamobi.mobiarmy2.dao.impl.UserDao;
-import com.teamobi.mobiarmy2.fight.impl.FightWait;
+import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.fight.impl.TrainingManager;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
@@ -698,8 +698,8 @@ public class UserService implements IUserService {
         byte[] addPoints = new byte[5];
         byte[] addPercents = new byte[5];
         for (int i = 0; i < 5; i++) {
-            addPoints[i] = (byte) Utils.nextInt(formula.getAddPointsMax()[i], formula.getAddPointsMin()[i]);
-            addPercents[i] = (byte) Utils.nextInt(formula.getAddPercentsMax()[i], formula.getAddPercentsMin()[i]);
+            addPoints[i] = (byte) Utils.nextInt(formula.getAddPointsMin()[i], formula.getAddPointsMax()[i]);
+            addPercents[i] = (byte) Utils.nextInt(formula.getAddPercentsMin()[i], formula.getAddPercentsMax()[i]);
         }
 
         //Tạo trang bị mới
@@ -1249,7 +1249,7 @@ public class UserService implements IUserService {
             ms = new Message(Cmd.BOARD_LIST);
             DataOutputStream ds = ms.writer();
             ds.writeByte(roomNumber);
-            for (FightWait fightWait : room.getFightWaits()) {
+            for (IFightWait fightWait : room.getFightWaits()) {
                 if (fightWait.isFightWaitInvalid()) {
                     continue;
                 }
@@ -1290,11 +1290,11 @@ public class UserService implements IUserService {
             if (roomNumber < 0 || roomNumber >= rooms.length) {
                 return;
             }
-            FightWait[] fightWaits = rooms[roomNumber].getFightWaits();
+            IFightWait[] fightWaits = rooms[roomNumber].getFightWaits();
             if (areaNumber < 0 || areaNumber >= fightWaits.length) {
                 return;
             }
-            FightWait fightWait = fightWaits[areaNumber];
+            IFightWait fightWait = fightWaits[areaNumber];
             if (fightWait.isPassSet() && !fightWait.getPassword().equals(password)) {
                 sendServerMessage(GameString.joinKVError1());
                 return;
@@ -1709,6 +1709,94 @@ public class UserService implements IUserService {
     public void handleJoinAnyBoard(IMessage ms) {
         ServerManager server = ServerManager.getInstance();
         Room[] rooms = server.getRooms();
+        IFightWait fightWait = null;
+        try {
+            int type = ms.reader().readByte();
+            switch (type) {
+                // Đấu trùm
+                case 5 -> {
+                    int start = server.config().getStartMapBoss();
+                    int end = start + server.config().getRoomQuantity()[5];
+
+                    outerLoop:
+                    for (int i = start; i < end; i++) {
+                        Room room = rooms[i];
+                        for (IFightWait fight : room.getFightWaits()) {
+                            if (!fight.isStarted() &&
+                                    !fight.isPassSet() &&
+                                    !fight.isContinuous() &&
+                                    fight.getNumPlayers() < fight.getMaxSetPlayers() &&
+                                    fight.getMoney() <= user.getXu()
+                            ) {
+                                fightWait = fight;
+                                break outerLoop;
+                            }
+                        }
+                    }
+                }
+
+                //4vs4->1vs1
+                case 4, 3, 2, 1 -> {
+                    int end = server.config().getStartMapBoss();
+                    int index = Utils.nextInt(0, end - 1);
+                    Room room = rooms[index];
+                    for (IFightWait fight : room.getFightWaits()) {
+                        if (!fight.isStarted() &&
+                                !fight.isPassSet() &&
+                                fight.getNumPlayers() < fight.getMaxSetPlayers() &&
+                                fight.getMoney() <= user.getXu() &&
+                                fight.getMaxSetPlayers() == type * 2
+                        ) {
+                            fightWait = fight;
+                            break;
+                        }
+                    }
+                }
+
+                //Khu vực trống
+                case 0 -> {
+                    int end = server.config().getStartMapBoss();
+                    int index = Utils.nextInt(0, end - 1);
+                    Room room = rooms[index];
+                    for (IFightWait fight : room.getFightWaits()) {
+                        if (!fight.isStarted() &&
+                                !fight.isPassSet() &&
+                                fight.getMoney() <= user.getXu() &&
+                                fight.getNumPlayers() == 0
+                        ) {
+                            fightWait = fight;
+                            break;
+                        }
+                    }
+                }
+
+                //Ngẫu nhiên
+                case -1 -> {
+                    int end = server.config().getStartMapBoss();
+                    int index = Utils.nextInt(0, end - 1);
+                    Room room = rooms[index];
+                    for (IFightWait fight : room.getFightWaits()) {
+                        if (!fight.isStarted() &&
+                                !fight.isPassSet() &&
+                                fight.getNumPlayers() < fight.getMaxSetPlayers() &&
+                                fight.getMoney() <= user.getXu()
+                        ) {
+                            fightWait = fight;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (fightWait == null) {
+                sendServerMessage2(GameString.findKVError1());
+            } else {
+                fightWait.sendInfo(user);
+                fightWait.addUser(user);
+            }
+        } catch (IOException e) {
+            ServerManager.getInstance().logger().logException(UserService.class, e);
+        }
     }
 
     @Override

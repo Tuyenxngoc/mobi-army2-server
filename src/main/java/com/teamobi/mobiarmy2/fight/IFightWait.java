@@ -1,28 +1,59 @@
 package com.teamobi.mobiarmy2.fight;
 
+import com.teamobi.mobiarmy2.model.Room;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
+
+import java.io.IOException;
 
 /**
  * @author tuyen
  */
 public interface IFightWait {
 
-    void fightComplete();
-
-    void sendToTeam(IMessage message);
+    int getMaxSetPlayers();
 
     boolean isStarted();
 
+    boolean isContinuous();
+
+    boolean isPassSet();
+
+    boolean isFightWaitInvalid();
+
     byte getNumPlayers();
 
+    byte getId();
+
+    byte getMapId();
+
+    byte getRoomType();
+
+    String getName();
+
+    String getPassword();
+
+    int getMoney();
+
+    Room getRoom();
+
+    User getUserByPlayerId(int playerId);
+
+    byte[] getItems(byte i);
+
     User[] getUsers();
+
+    IFightManager getFightManager();
+
+    void fightComplete();
+
+    void startGame(int playerId);
+
+    void sendToTeam(IMessage message);
 
     void leaveTeam(int playerId);
 
     void chatMessage(int playerId, String message);
-
-    boolean isContinuous();
 
     void kickPlayer(int playerId, int playerId1);
 
@@ -33,14 +64,6 @@ public interface IFightWait {
     void setPassRoom(String password, int playerId);
 
     void setMoney(int xu, int playerId);
-
-    void startGame(int playerId);
-
-    byte getMapId();
-
-    User getUserByPlayerId(int playerId);
-
-    IFightManager getFightManager();
 
     void setRoomName(int playerId, String name);
 
@@ -56,9 +79,7 @@ public interface IFightWait {
 
     void inviteToRoom(int playerId);
 
-    byte[] getItems(byte i);
+    void sendInfo(User user);
 
-    byte getRoomType();
-
-    int getMoney();
+    void addUser(User user) throws IOException;
 }

@@ -4,8 +4,6 @@ import com.teamobi.mobiarmy2.fight.*;
 import com.teamobi.mobiarmy2.model.map.MapBrick;
 import com.teamobi.mobiarmy2.repository.MapRepository;
 import com.teamobi.mobiarmy2.util.Utils;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,15 +12,13 @@ import java.util.List;
 /**
  * @author tuyen
  */
-@Getter
-@Setter
 public class MapManager implements IMapManager {
 
     private short width;
     private short height;
-    private List<MapTile> mapTiles = new ArrayList<>();
     private short[] playerInitXPositions;
     private short[] playerInitYPositions;
+    private final List<MapTile> mapTiles = new ArrayList<>();
     private final IFightManager fightManager;
 
     public MapManager(IFightManager fightManager) {

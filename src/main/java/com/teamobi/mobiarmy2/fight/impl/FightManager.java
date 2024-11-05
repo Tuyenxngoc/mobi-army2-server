@@ -59,7 +59,7 @@ public class FightManager implements IFightManager {
     private final IBulletManager bulletManager;
     private final ICountdownTimer countdownTimer;
 
-    public FightManager(FightWait fightWait) {
+    public FightManager(IFightWait fightWait) {
         this.fightWait = fightWait;
         this.players = new Player[MAX_ELEMENT_FIGHT];
         this.mapManager = new MapManager(this);
