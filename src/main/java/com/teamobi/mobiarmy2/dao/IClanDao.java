@@ -20,7 +20,11 @@ public interface IClanDao {
 
     int getLuong(short clanId);
 
-    int getExp(short clanId);
+    int getXp(short clanId);
+
+    int getLevel(short clanId);
+
+    int getCup(short clanId);
 
     void updateXu(int clanId, int xu);
 
@@ -39,4 +43,10 @@ public interface IClanDao {
     short getCountClan();
 
     List<ClanEntry> getTopTeams(byte page);
+
+    void updateXp(short clanId, int playerId, int xp, int level);
+
+    void updateCup(short clanId, int playerId, int cup);
+
+    void updateClanMemberPoints(int playerId, int point);
 }

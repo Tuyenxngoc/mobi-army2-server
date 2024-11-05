@@ -13,6 +13,7 @@ import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
 import com.teamobi.mobiarmy2.repository.CharacterRepository;
 import com.teamobi.mobiarmy2.repository.ClanItemRepository;
 import com.teamobi.mobiarmy2.repository.ClanXpRepository;
+import com.teamobi.mobiarmy2.repository.PlayerXpRepository;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -95,13 +96,45 @@ public class ClanDao implements IClanDao {
     }
 
     @Override
-    public int getExp(short clanId) {
+    public int getXp(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT xp FROM clans WHERE clan_id = ?")) {
             statement.setInt(1, clanId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     return resultSet.getInt("xp");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public int getLevel(short clanId) {
+        try (Connection connection = HikariCPManager.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT level FROM clans WHERE clan_id = ?")) {
+            statement.setInt(1, clanId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt("level");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 1;
+    }
+
+    @Override
+    public int getCup(short clanId) {
+        try (Connection connection = HikariCPManager.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT cup FROM clans WHERE clan_id = ?")) {
+            statement.setInt(1, clanId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt("cup");
                 }
             }
         } catch (SQLException e) {
@@ -139,7 +172,7 @@ public class ClanDao implements IClanDao {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT " +
-                             "c.clan_id, c.name, c.mem_max, c.xu, c.luong, c.cup, c.xp, c.description, c.created_date, c.item, " +
+                             "c.clan_id, c.name, c.mem_max, c.xu, c.luong, c.cup, c.xp, c.level, c.description, c.created_date, c.item, " +
                              "u.username, " +
                              "(SELECT COUNT(*) FROM clan_members cm WHERE cm.clan_id = c.clan_id) AS member_count " +
                              "FROM clans c " +
@@ -163,7 +196,7 @@ public class ClanDao implements IClanDao {
                     clanInfo.setCup(resultSet.getInt("cup"));
 
                     int xp = resultSet.getInt("xp");
-                    int level = ClanXpRepository.getLevelByXP(xp);
+                    int level = resultSet.getInt("level");
                     int xpForCurrentLevel = ClanXpRepository.getRequiredXpLevel(level - 1);
                     int xpForNextLevel = ClanXpRepository.getRequiredXpLevel(level);
                     int currentXpInLevel = xp - xpForCurrentLevel;
@@ -218,7 +251,7 @@ public class ClanDao implements IClanDao {
                      "SELECT " +
                              "c.rights, c.clan_point, c.contribute_count, c.contribute_text, c.contribute_time, c.xu, c.luong, " +
                              "p.player_id, p.is_online, p.cup, p.equipment_chest, " +
-                             "pc.character_id, pc.level, pc.data, " +
+                             "pc.character_id, pc.level, pc.xp, pc.data, " +
                              "u.username " +
                              "FROM clan_members c " +
                              "INNER JOIN players p on c.player_id = p.player_id " +
@@ -246,8 +279,18 @@ public class ClanDao implements IClanDao {
                     entry.setPoint(resultSet.getInt("clan_point"));
                     entry.setActiveCharacter(resultSet.getByte("character_id"));
                     entry.setOnline(resultSet.getByte("is_online"));
-                    entry.setLever(resultSet.getByte("level"));
-                    entry.setLevelPt((byte) 0);
+
+                    int currentLevel = resultSet.getInt("level");
+                    int currentXp = resultSet.getInt("xp");
+                    int requiredXpCurrentLevel = PlayerXpRepository.getRequiredXpLevel(currentLevel - 1);
+                    int requiredXpNextLevel = PlayerXpRepository.getRequiredXpLevel(currentLevel);
+                    int currentXpInLevel = currentXp - requiredXpCurrentLevel;
+                    int xpNeededForNextLevel = requiredXpNextLevel - requiredXpCurrentLevel;
+                    byte levelPercent = Utils.calculateLevelPercent(currentXpInLevel, xpNeededForNextLevel);
+
+                    entry.setLevel((byte) currentLevel);
+                    entry.setLevelPt(levelPercent);
+
                     entry.setIndex((byte) ((page * 10) + index));
                     entry.setCup(resultSet.getInt("cup"));
 
@@ -326,7 +369,7 @@ public class ClanDao implements IClanDao {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT " +
-                             "c.clan_id, c.name, c.mem_max, c.xu, c.luong, c.cup, c.xp, c.description, " +
+                             "c.clan_id, c.name, c.mem_max, c.xu, c.luong, c.cup, c.xp, c.level, c.description, " +
                              "u.username, " +
                              "(SELECT COUNT(*) FROM clan_members cm WHERE cm.clan_id = c.clan_id) AS member_count " +
                              "FROM clans c " +
@@ -350,7 +393,7 @@ public class ClanDao implements IClanDao {
                     clanInfo.setCup(resultSet.getInt("cup"));
 
                     int xp = resultSet.getInt("xp");
-                    int level = ClanXpRepository.getLevelByXP(xp);
+                    int level = resultSet.getInt("level");
                     int xpForCurrentLevel = ClanXpRepository.getRequiredXpLevel(level - 1);
                     int xpForNextLevel = ClanXpRepository.getRequiredXpLevel(level);
                     int currentXpInLevel = xp - xpForCurrentLevel;
@@ -370,4 +413,27 @@ public class ClanDao implements IClanDao {
         return top;
     }
 
+    @Override
+    public void updateXp(short clanId, int playerId, int xp, int level) {
+        String sql = "UPDATE clans c " +
+                "JOIN clan_members cm ON c.clan_id = cm.clan_id " +
+                "SET c.xp = ?, c.level = ? " +
+                "WHERE c.clan_id = ? AND cm.player_id = ?";
+        HikariCPManager.getInstance().update(sql, xp, level, clanId, playerId);
+    }
+
+    @Override
+    public void updateCup(short clanId, int playerId, int cup) {
+        String sql = "UPDATE clans c " +
+                "JOIN clan_members cm ON c.clan_id = cm.clan_id " +
+                "SET c.cup = ? " +
+                "WHERE c.clan_id = ? AND cm.player_id = ?";
+        HikariCPManager.getInstance().update(sql, cup, clanId, playerId);
+    }
+
+    @Override
+    public void updateClanMemberPoints(int playerId, int point) {
+        String sql = "UPDATE clan_members SET clan_point = clan_point + ? WHERE player_id = ?";
+        HikariCPManager.getInstance().update(sql, point, playerId);
+    }
 }

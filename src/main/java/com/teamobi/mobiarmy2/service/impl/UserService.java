@@ -2798,7 +2798,7 @@ public class UserService implements IUserService {
                 ds.writeInt(memClan.getPoint());
                 ds.writeByte(memClan.getActiveCharacter());
                 ds.writeByte(memClan.getOnline());
-                ds.writeByte(memClan.getLever());
+                ds.writeByte(memClan.getLevel());
                 ds.writeByte(memClan.getLevelPt());
                 ds.writeByte(memClan.getIndex());
                 ds.writeInt(memClan.getCup());

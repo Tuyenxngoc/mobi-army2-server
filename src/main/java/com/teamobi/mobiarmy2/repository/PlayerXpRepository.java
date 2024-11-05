@@ -13,7 +13,7 @@ public class PlayerXpRepository {
     public static final List<LevelXpRequiredEntry> LEVEL_XP_REQUIRED_ENTRIES = new ArrayList<>();
 
     public static int getRequiredXpLevel(int level) {
-        if (level >= LEVEL_XP_REQUIRED_ENTRIES.size()) {
+        if (level < 0 || level >= LEVEL_XP_REQUIRED_ENTRIES.size()) {
             return GameConstants.MAX_XP;
         }
 
@@ -21,11 +21,20 @@ public class PlayerXpRepository {
     }
 
     public static int getLevelByXP(long xp) {
-        for (LevelXpRequiredEntry levelXpRequiredEntry : LEVEL_XP_REQUIRED_ENTRIES) {
-            if (xp < levelXpRequiredEntry.getXp()) {
-                return levelXpRequiredEntry.getLevel() - 1;
+        int left = 0;
+        int right = LEVEL_XP_REQUIRED_ENTRIES.size() - 1;
+
+        while (left <= right) {
+            int mid = (left + right) / 2;
+            LevelXpRequiredEntry midEntry = LEVEL_XP_REQUIRED_ENTRIES.get(mid);
+
+            if (xp < midEntry.getXp()) {
+                right = mid - 1;
+            } else {
+                left = mid + 1;
             }
         }
-        return LEVEL_XP_REQUIRED_ENTRIES.get(LEVEL_XP_REQUIRED_ENTRIES.size() - 1).getLevel();
+
+        return right >= 0 ? LEVEL_XP_REQUIRED_ENTRIES.get(right).getLevel() : 1;
     }
 }

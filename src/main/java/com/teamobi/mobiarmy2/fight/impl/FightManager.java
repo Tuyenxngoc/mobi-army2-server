@@ -820,6 +820,7 @@ public class FightManager implements IFightManager {
             }
         }
 
+        ClanManager clanManager = ClanManager.getInstance();
         for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             Player player = players[i];
             if (player == null || player.getUser() == null) {
@@ -854,9 +855,18 @@ public class FightManager implements IFightManager {
                 user.getUserService().sendUpdateXp(player.getAllXpUp(), false);
                 user.getUserService().sendUpdateCup(Math.min(player.getAllCupUp(), Byte.MAX_VALUE));
 
-                //Nếu chiến thắng trong đấu boss thì cộng thêm 10xp
-                if (winStatus == 1 && fightWait.getRoomType() == 5 && !fightInValid) {
-                    user.updateXp(10, true);
+                //Cộng thêm quà nếu trận đấu là hợp lệ
+                if (!fightInValid) {
+                    //Nếu chiến thắng trong đấu boss thì cộng thêm 10xp
+                    if (winStatus == 1 && fightWait.getRoomType() == 5) {
+                        user.updateXp(10, true);
+                    }
+
+                    //Cộng xp và cup cho clan
+                    if (user.getClanId() != null) {
+                        clanManager.updateXp(user.getClanId(), user.getPlayerId(), player.getAllXpUp() / 100);
+                        clanManager.updateCup(user.getClanId(), user.getPlayerId(), player.getAllCupUp());
+                    }
                 }
 
                 //Cập nhật xu cuối trận

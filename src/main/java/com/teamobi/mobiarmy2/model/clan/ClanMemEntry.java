@@ -14,7 +14,7 @@ public class ClanMemEntry {
     private int point;
     private byte activeCharacter;
     private byte online;
-    private byte lever;
+    private byte level;
     private byte levelPt;
     private byte index;
     private int cup;

@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.server;
 
+import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.dao.IClanDao;
 import com.teamobi.mobiarmy2.dao.impl.ClanDao;
 import com.teamobi.mobiarmy2.json.ClanItemJson;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author tuyen
@@ -23,6 +25,7 @@ public class ClanManager {
 
     private static volatile ClanManager instance;
     private final IClanDao clanDao;
+    private final ConcurrentHashMap<Short, Object> clanLocks = new ConcurrentHashMap<>();
 
     public ClanManager() {
         clanDao = new ClanDao();
@@ -39,9 +42,12 @@ public class ClanManager {
         return instance;
     }
 
+    private Object getClanLock(short clanId) {
+        return clanLocks.computeIfAbsent(clanId, k -> new Object());
+    }
+
     public int getClanLevel(short clanId) {
-        int exp = clanDao.getExp(clanId);
-        return ClanXpRepository.getLevelByXP(exp);
+        return clanDao.getLevel(clanId);
     }
 
     public int getClanXu(short clanId) {
@@ -50,41 +56,6 @@ public class ClanManager {
 
     public int getClanLuong(short clanId) {
         return clanDao.getLuong(clanId);
-    }
-
-    public void updateItemClan(short clanId, int playerId, ClanItemEntry clanItemEntry, boolean isBuyXu) {
-        if (isBuyXu) {
-            clanDao.updateXu(clanId, -clanItemEntry.getXu());
-            clanDao.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItemEntry.getXu()) + " xu", playerId, -clanItemEntry.getXu(), 0);
-        } else {
-            clanDao.updateLuong(clanId, -clanItemEntry.getLuong());
-            clanDao.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItemEntry.getLuong()) + " lượng", playerId, 0, -clanItemEntry.getLuong());
-        }
-
-        ClanItemJson[] items = clanDao.getClanItems(clanId);
-        boolean found = false;
-        LocalDateTime now = LocalDateTime.now();
-
-        for (ClanItemJson item : items) {
-            if (item.getId() == clanItemEntry.getId()) {
-                if (item.getTime().isBefore(now)) {
-                    item.setTime(now);
-                }
-                item.setTime(item.getTime().plusHours(clanItemEntry.getTime()));
-                found = true;
-                break;
-            }
-        }
-
-        if (!found) {
-            List<ClanItemJson> updatedItems = new ArrayList<>(Arrays.asList(items));
-            ClanItemJson newItem = new ClanItemJson();
-            newItem.setId(clanItemEntry.getId());
-            newItem.setTime(now.plusHours(clanItemEntry.getTime()));
-            updatedItems.add(newItem);
-            items = updatedItems.toArray(new ClanItemJson[0]);
-        }
-        clanDao.updateClanItems(clanId, items);
     }
 
     public byte[] getClanIcon(short clanId) {
@@ -99,27 +70,17 @@ public class ClanManager {
         return (byte) Math.ceil((double) mem / 10);
     }
 
-    public void contributeClan(short clanId, int playerId, int quantity, boolean isXu) {
-        if (isXu) {
-            clanDao.updateXu(clanId, quantity);
-            clanDao.gopClanContribute("Góp " + Utils.getStringNumber(quantity) + " xu", playerId, quantity, 0);
-        } else {
-            clanDao.updateLuong(clanId, quantity);
-            clanDao.gopClanContribute("Góp " + Utils.getStringNumber(quantity) + " lượng", playerId, 0, quantity);
-        }
-    }
-
-    public List<ClanMemEntry> getMemberClan(short clanId, byte page) {
-        return clanDao.getClanMember(clanId, page);
+    public byte getTotalPagesClan() {
+        double count = clanDao.getCountClan();
+        return (byte) Math.ceil(count / 10);
     }
 
     public ClanInfo getClanInfo(short clanId) {
         return clanDao.getClanInfo(clanId);
     }
 
-    public byte getTotalPagesClan() {
-        double count = clanDao.getCountClan();
-        return (byte) Math.ceil(count / 10);
+    public List<ClanMemEntry> getMemberClan(short clanId, byte page) {
+        return clanDao.getClanMember(clanId, page);
     }
 
     public List<ClanEntry> getTopTeams(byte page) {
@@ -138,6 +99,92 @@ public class ClanManager {
         }
 
         return result;
+    }
+
+    public void updateItemClan(short clanId, int playerId, ClanItemEntry clanItemEntry, boolean isBuyXu) {
+        synchronized (getClanLock(clanId)) {
+            if (isBuyXu) {
+                clanDao.updateXu(clanId, -clanItemEntry.getXu());
+                clanDao.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItemEntry.getXu()) + " xu", playerId, -clanItemEntry.getXu(), 0);
+            } else {
+                clanDao.updateLuong(clanId, -clanItemEntry.getLuong());
+                clanDao.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItemEntry.getLuong()) + " lượng", playerId, 0, -clanItemEntry.getLuong());
+            }
+
+            ClanItemJson[] items = clanDao.getClanItems(clanId);
+            boolean found = false;
+            LocalDateTime now = LocalDateTime.now();
+
+            for (ClanItemJson item : items) {
+                if (item.getId() == clanItemEntry.getId()) {
+                    if (item.getTime().isBefore(now)) {
+                        item.setTime(now);
+                    }
+                    item.setTime(item.getTime().plusHours(clanItemEntry.getTime()));
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                List<ClanItemJson> updatedItems = new ArrayList<>(Arrays.asList(items));
+                ClanItemJson newItem = new ClanItemJson();
+                newItem.setId(clanItemEntry.getId());
+                newItem.setTime(now.plusHours(clanItemEntry.getTime()));
+                updatedItems.add(newItem);
+                items = updatedItems.toArray(new ClanItemJson[0]);
+            }
+            clanDao.updateClanItems(clanId, items);
+        }
+    }
+
+    public void contributeClan(short clanId, int playerId, int quantity, boolean isXu) {
+        synchronized (getClanLock(clanId)) {
+            if (isXu) {
+                clanDao.updateXu(clanId, quantity);
+                clanDao.gopClanContribute("Góp " + Utils.getStringNumber(quantity) + " xu", playerId, quantity, 0);
+            } else {
+                clanDao.updateLuong(clanId, quantity);
+                clanDao.gopClanContribute("Góp " + Utils.getStringNumber(quantity) + " lượng", playerId, 0, quantity);
+            }
+        }
+    }
+
+    public void updateXp(short clanId, int playerId, int xpUp) {
+        if (xpUp == 0) {
+            return;
+        }
+        synchronized (getClanLock(clanId)) {
+            int currentXp = clanDao.getXp(clanId);
+            long newXp = currentXp + xpUp;
+            if (newXp > GameConstants.MAX_XP) {
+                newXp = GameConstants.MAX_XP;
+            } else if (newXp < GameConstants.MIN_XP) {
+                newXp = GameConstants.MIN_XP;
+            }
+
+            int level = ClanXpRepository.getLevelByXP((int) newXp);
+            clanDao.updateXp(clanId, playerId, (int) newXp, level);
+            clanDao.updateClanMemberPoints(playerId, xpUp);
+        }
+    }
+
+    public void updateCup(short clanId, int playerId, int cupUp) {
+        if (cupUp == 0) {
+            return;
+        }
+        synchronized (getClanLock(clanId)) {
+            int currentCup = clanDao.getCup(clanId);
+            long newCup = currentCup + cupUp;
+            if (newCup > GameConstants.MAX_CUP) {
+                newCup = GameConstants.MAX_CUP;
+            } else if (newCup < GameConstants.MIN_CUP) {
+                newCup = GameConstants.MIN_CUP;
+            }
+
+            clanDao.updateCup(clanId, playerId, (int) newCup);
+            clanDao.updateClanMemberPoints(playerId, cupUp * 2);
+        }
     }
 
 }
