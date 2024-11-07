@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.service.impl;
 
 import com.teamobi.mobiarmy2.constant.CommonConstant;
+import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.model.CaptionEntry;
 import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
@@ -99,14 +100,14 @@ public class GameService implements IGameService {
                 }
             }
 
-            byte[] bytes = Utils.getFile("res/itemSpecial.png");
+            byte[] bytes = Utils.getFile(GameConstants.RESOURCE_BASE_URL + "/itemSpecial.png");
             if (bytes == null) {
                 System.exit(1);
             }
             ds.writeShort(bytes.length);
             ds.write(bytes);
             for (int i = 0; i < CharacterRepository.CHARACTER_ENTRIES.size(); i++) {
-                bytes = Utils.getFile("res/bullet/bullet" + i + ".png");
+                bytes = Utils.getFile(String.format(GameConstants.BULLET_IMAGE_PATH, i));
                 if (bytes == null) {
                     System.exit(1);
                 }
@@ -152,7 +153,7 @@ public class GameService implements IGameService {
     public void setCachePlayerImages() {
         try {
             TeamImageOutput tio = new TeamImageOutput();
-            File playerDir = new File("res/player");
+            File playerDir = new File(GameConstants.PLAYER_PATH);
             if (!playerDir.exists()) {
                 throw new IOException("Folder player not found!");
             }
@@ -176,7 +177,7 @@ public class GameService implements IGameService {
     public void setCacheMapIcons() {
         try {
             TeamImageOutput tio = new TeamImageOutput();
-            File mapDir = new File("res/map/icon");
+            File mapDir = new File(GameConstants.MAP_LOGO_PATH);
             if (!mapDir.exists()) {
                 throw new IOException("Folder map icon not found!");
             }

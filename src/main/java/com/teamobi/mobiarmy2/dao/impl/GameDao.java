@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
+import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
@@ -37,7 +38,7 @@ public class GameDao implements IGameDao {
                     map.setId(resultSet.getByte("map_id"));
                     map.setName(resultSet.getString("name"));
                     map.setFileName(resultSet.getString("file"));
-                    byte[] dataMap = Utils.getFile("res/map/" + map.getFileName());
+                    byte[] dataMap = Utils.getFile(GameConstants.MAP_PATH + "/" + map.getFileName());
                     if (dataMap == null) {
                         System.exit(1);
                     }

@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.fight;
 
+import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.model.ImageData;
 
 import javax.imageio.ImageIO;
@@ -17,18 +18,18 @@ public class EffectManager {
 
     static {
         try {
-            holeData[0] = loadImageData("res/effect/hole/h32x26.png");
-            holeData[1] = loadImageData("res/effect/hole/smallhole.png");
-            holeData[2] = loadImageData("res/effect/hole/smallhole.png");
-            holeData[3] = loadImageData("res/effect/hole/h36x30.png");
-            holeData[4] = loadImageData("res/effect/hole/rocket.png");
-            holeData[5] = loadImageData("res/effect/hole/rangehole.png");
-            holeData[6] = loadImageData("res/effect/hole/hrangcua.png");
-            holeData[7] = loadImageData("res/effect/hole/hgrenade.png");
-            holeData[8] = loadImageData("res/effect/hole/h14x12.png");
-            holeData[9] = loadImageData("res/effect/hole/h55x50.png");
+            holeData[0] = loadImageData(GameConstants.EFFECT_PATH + "/h32x26.png");
+            holeData[1] = loadImageData(GameConstants.EFFECT_PATH + "/smallhole.png");
+            holeData[2] = loadImageData(GameConstants.EFFECT_PATH + "/smallhole.png");
+            holeData[3] = loadImageData(GameConstants.EFFECT_PATH + "/h36x30.png");
+            holeData[4] = loadImageData(GameConstants.EFFECT_PATH + "/rocket.png");
+            holeData[5] = loadImageData(GameConstants.EFFECT_PATH + "/rangehole.png");
+            holeData[6] = loadImageData(GameConstants.EFFECT_PATH + "/hrangcua.png");
+            holeData[7] = loadImageData(GameConstants.EFFECT_PATH + "/hgrenade.png");
+            holeData[8] = loadImageData(GameConstants.EFFECT_PATH + "/h14x12.png");
+            holeData[9] = loadImageData(GameConstants.EFFECT_PATH + "/h55x50.png");
 
-            spiderWebData = loadImageData("res/effect/hole/mangnhen.png");
+            spiderWebData = loadImageData(GameConstants.EFFECT_PATH + "/mangnhen.png");
         } catch (IOException e) {
             throw new RuntimeException("Error loading hole or spider web data: " + e.getMessage(), e);
         }

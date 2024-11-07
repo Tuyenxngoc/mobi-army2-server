@@ -2910,7 +2910,7 @@ public class UserService implements IUserService {
             ms = new Message(Cmd.GET_BIG_IMAGE);
             DataOutputStream ds = ms.writer();
             ds.writeByte(id);
-            byte[] file = Utils.getFile("res/bigImage/bigImage" + id + ".png");
+            byte[] file = Utils.getFile(String.format(GameConstants.BIG_IMAGE_PATH, id));
             if (file != null) {
                 ds.writeShort(file.length);
                 ds.write(file);
@@ -2976,11 +2976,11 @@ public class UserService implements IUserService {
             byte indexIcon = 0;
             byte[] data = null;
             switch (typeIcon) {
-                case 0, 1 -> data = Utils.getFile("res/icon/item/" + iconId + ".png");
-                case 2 -> data = Utils.getFile("res/icon/map/" + iconId + ".png");
+                case 0, 1 -> data = Utils.getFile(String.format(GameConstants.ITEM_ICON_PATH, iconId));
+                case 2 -> data = Utils.getFile(String.format(GameConstants.MAP_ICON_PATH, iconId));
                 case 3, 4 -> {
                     indexIcon = dis.readByte();
-                    data = Utils.getFile("res/icon/item/" + iconId + ".png");
+                    data = Utils.getFile(String.format(GameConstants.ITEM_ICON_PATH, iconId));
                 }
             }
             if (data == null) {

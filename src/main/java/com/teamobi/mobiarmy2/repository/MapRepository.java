@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.repository;
 
+import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.model.ImageData;
 import com.teamobi.mobiarmy2.model.map.MapBrick;
 import com.teamobi.mobiarmy2.model.map.MapEntry;
@@ -67,7 +68,7 @@ public class MapRepository {
             return MAP_BRICKS.get(index);
         }
         try {
-            File imageFile = new File("res/icon/map/" + brickId + ".png");
+            File imageFile = new File(String.format(GameConstants.MAP_ICON_PATH, brickId));
             BufferedImage image = ImageIO.read(imageFile);
             if (image == null) {
                 throw new IOException("Failed to read image: " + imageFile.getAbsolutePath());

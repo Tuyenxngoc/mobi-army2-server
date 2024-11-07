@@ -59,7 +59,7 @@ public class ClanManager {
     }
 
     public byte[] getClanIcon(short clanId) {
-        return Utils.getFile("res/icon/clan/" + clanDao.getClanIcon(clanId) + ".png");
+        return Utils.getFile(String.format(GameConstants.CLAN_ICON_PATH, clanDao.getClanIcon(clanId)));
     }
 
     public byte getTotalPage(short clanId) {
