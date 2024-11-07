@@ -1,1 +1,1 @@
-<img src="res/icon.png" alt="icon"/>
+<img src="src/main/resources/icon.png" alt="icon"/>
