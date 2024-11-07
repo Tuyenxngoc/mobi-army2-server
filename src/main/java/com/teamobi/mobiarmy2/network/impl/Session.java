@@ -147,7 +147,7 @@ public class Session implements ISession {
     @Override
     public void sendKeys() {
         try {
-            IMessage ms = new Message(-27);
+            IMessage ms = new Message(Cmd.GET_KEY);
             DataOutputStream ds = ms.writer();
             ds.writeByte(sessionKey.length);
             ds.writeByte(sessionKey[0]);

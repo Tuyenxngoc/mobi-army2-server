@@ -51,7 +51,7 @@ public class UserService implements IUserService {
 
     private final User user;
     private final IUserDao userDao;
-    private IGiftCodeDao giftCodeDao;
+    private final IGiftCodeDao giftCodeDao;
 
     private UserAction userAction;
     private int totalTransactionAmount;
@@ -64,13 +64,7 @@ public class UserService implements IUserService {
     public UserService(User user) {
         this.user = user;
         this.userDao = new UserDao();
-    }
-
-    private IGiftCodeDao getGiftCodeDao() {
-        if (giftCodeDao == null) {
-            giftCodeDao = new GiftCodeDao();
-        }
-        return giftCodeDao;
+        this.giftCodeDao = new GiftCodeDao();
     }
 
     private List<EquipmentChestEntry> getSelectedEquips() {
@@ -89,7 +83,7 @@ public class UserService implements IUserService {
 
     private void sendMessageLoginFail(String message) {
         try {
-            IMessage ms = new Message(4);
+            IMessage ms = new Message(Cmd.LOGIN_FAIL);
             DataOutputStream ds = ms.writer();
             ds.writeUTF(message);
             ds.flush();
@@ -147,7 +141,7 @@ public class UserService implements IUserService {
                 return;
             }
 
-            copyUserData(user, userFound);
+            copyUserData(user, userFound);//todo
             user.getSession().setVersion(version);
             user.setLogged(true);
 
@@ -321,7 +315,7 @@ public class UserService implements IUserService {
 
     public void sendMapCollisionInfo() {
         try {
-            IMessage ms = new Message(92);
+            IMessage ms = new Message(Cmd.UNDESTROYTILE);
             DataOutputStream ds = ms.writer();
             ds.writeShort(MapRepository.idNotCollisions.length);
             for (short i : MapRepository.idNotCollisions) {
@@ -1595,7 +1589,7 @@ public class UserService implements IUserService {
 
     private void sendMessageConfirm(String message) {
         try {
-            IMessage ms = new Message(17);
+            IMessage ms = new Message(Cmd.IMBUE);
             DataOutputStream ds = ms.writer();
             ds.writeByte(0);
             ds.writeUTF(message);
@@ -2066,7 +2060,7 @@ public class UserService implements IUserService {
                 user.updateLuong(-total);
             }
             user.updateItems(itemIndex, quantity);
-            ms = new Message(72);
+            ms = new Message(Cmd.BUY_ITEM);
             DataOutputStream ds = ms.writer();
             ds.writeByte(1);
             ds.writeByte(itemIndex);
@@ -2167,9 +2161,7 @@ public class UserService implements IUserService {
     }
 
     private void handleGiftCode(String code) {
-        IGiftCodeDao dao = getGiftCodeDao();
-
-        GiftCodeEntry giftCode = dao.getGiftCode(code, user.getPlayerId());
+        GiftCodeEntry giftCode = giftCodeDao.getGiftCode(code, user.getPlayerId());
         if (giftCode == null) {
             sendServerMessage(GameString.giftCodeError1());
             return;
@@ -2188,8 +2180,8 @@ public class UserService implements IUserService {
             return;
         }
 
-        dao.decrementGiftCodeUsageLimit(giftCode.getId());
-        dao.logGiftCodeRedemption(giftCode.getId(), user.getPlayerId());
+        giftCodeDao.decrementGiftCodeUsageLimit(giftCode.getId());
+        giftCodeDao.logGiftCodeRedemption(giftCode.getId(), user.getPlayerId());
 
         if (giftCode.getXu() > 0) {
             user.updateXu(giftCode.getXu());
@@ -2582,7 +2574,7 @@ public class UserService implements IUserService {
                     }
 
                     //Gửi thông báo
-                    ms = new Message(104);
+                    ms = new Message(Cmd.BUY_EQUIP);
                     DataOutputStream ds = ms.writer();
                     if (!equipList.isEmpty()) {//Trường hợp có trang bị hợp lệ
                         ds.writeByte(1);

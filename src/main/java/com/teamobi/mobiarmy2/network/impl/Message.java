@@ -12,12 +12,7 @@ public class Message implements IMessage {
     private final byte command;
     private ByteArrayOutputStream os;
     private DataOutputStream dos;
-    private ByteArrayInputStream is;
     private DataInputStream dis;
-
-    public Message(int command) {
-        this((byte) command);
-    }
 
     public Message(byte command) {
         this.command = command;
@@ -27,8 +22,7 @@ public class Message implements IMessage {
 
     public Message(byte command, byte[] data) {
         this.command = command;
-        is = new ByteArrayInputStream(data);
-        dis = new DataInputStream(is);
+        dis = new DataInputStream(new ByteArrayInputStream(data));
     }
 
     @Override
