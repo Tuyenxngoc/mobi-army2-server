@@ -1,6 +1,4 @@
-package com.teamobi.mobiarmy2.team;
-
-import com.teamobi.mobiarmy2.util.Utils;
+package com.teamobi.mobiarmy2.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;

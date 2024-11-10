@@ -253,7 +253,7 @@ public class Session implements ISession {
         }
     }
 
-    private class Sender implements Runnable {
+    class Sender implements Runnable {
 
         private final ArrayList<IMessage> sendingMessage = new ArrayList<>();
 

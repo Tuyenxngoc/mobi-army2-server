@@ -10,7 +10,7 @@ import com.teamobi.mobiarmy2.model.map.MapEntry;
 import com.teamobi.mobiarmy2.repository.*;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IGameService;
-import com.teamobi.mobiarmy2.team.TeamImageOutput;
+import com.teamobi.mobiarmy2.util.TeamImageOutput;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.ByteArrayOutputStream;

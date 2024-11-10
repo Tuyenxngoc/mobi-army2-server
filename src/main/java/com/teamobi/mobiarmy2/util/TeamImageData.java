@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.team;
+package com.teamobi.mobiarmy2.util;
 
 /**
  * @author tuyen
