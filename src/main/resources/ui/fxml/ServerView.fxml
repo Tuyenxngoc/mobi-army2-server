@@ -11,6 +11,8 @@
             <Separator orientation="VERTICAL"/>
             <Label text="Status: "/>
             <Label fx:id="serverStatus" text="Stopped" styleClass="status-label"/>
+            <Separator orientation="VERTICAL"/>
+            <Button text="Maintenance" fx:id="maintainButton" onAction="#maintainServer"/>
         </ToolBar>
     </top>
 
@@ -36,8 +38,20 @@
                     <Button text="Save Configuration" onAction="#saveConfig"/>
                 </VBox>
             </Tab>
+            <Tab text="Server Info" fx:id="serverInfoTab" closable="false">
+                <VBox spacing="10">
+                    <Label text="CPU Usage:"/>
+                    <Label fx:id="cpuUsage" text="N/A"/>
+                    <Label text="Memory Usage:"/>
+                    <Label fx:id="memoryUsage" text="N/A"/>
+                    <Label text="Disk Space:"/>
+                    <Label fx:id="diskSpace" text="N/A"/>
+                    <Label text="Uptime:"/>
+                    <Label fx:id="uptime" text="N/A"/>
+                </VBox>
+            </Tab>
             <Tab text="Logs" closable="false">
-                <VBox>
+                <VBox spacing="10">
                     <TextArea fx:id="logArea" prefRowCount="15" wrapText="true" editable="false"/>
                     <Button text="Clear Logs" onAction="#clearLogs"/>
                 </VBox>
