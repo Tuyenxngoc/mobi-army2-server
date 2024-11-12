@@ -1394,7 +1394,7 @@ public class UserService implements IUserService {
                 if (!equipList.isEmpty() && !specialItemList.isEmpty()) {
                     if (equipList.size() == 1 &&
                             specialItemList.size() == 1 &&
-                            specialItemList.get(0).getItem().isGem()
+                            specialItemList.getFirst().getItem().isGem()
                     ) {
                         userAction = UserAction.GHEP_NGOC_VAO_TRANG_BI;
                         sendMessageConfirm(GameString.hopNgocRequest());
@@ -1413,7 +1413,7 @@ public class UserService implements IUserService {
                     }
 
                     if (specialItemList.size() == 1) {
-                        SpecialItemChestEntry itemChestEntry = specialItemList.get(0);
+                        SpecialItemChestEntry itemChestEntry = specialItemList.getFirst();
                         if (itemChestEntry.getItem().isGem()) {
                             if (itemChestEntry.getQuantity() == 5 && ((itemChestEntry.getItem().getId() + 1) % 10 != 0)) {
                                 userAction = UserAction.NANG_CAP_NGOC;
@@ -1437,8 +1437,8 @@ public class UserService implements IUserService {
             } else if (action == 1) {
                 switch (userAction) {
                     case GHEP_NGOC_VAO_TRANG_BI -> {
-                        EquipmentChestEntry equip = equipList.get(0);
-                        SpecialItemChestEntry specialItem = specialItemList.get(0);
+                        EquipmentChestEntry equip = equipList.getFirst();
+                        SpecialItemChestEntry specialItem = specialItemList.getFirst();
                         if (equip.getEmptySlot() >= specialItem.getQuantity()) {
                             for (int i = 0; i < specialItem.getQuantity(); i++) {
                                 equip.setNewSlot(specialItem.getItem().getId());
@@ -1452,7 +1452,7 @@ public class UserService implements IUserService {
                         }
                     }
                     case NANG_CAP_NGOC -> {
-                        SpecialItemChestEntry specialItemChestEntry = specialItemList.get(0);
+                        SpecialItemChestEntry specialItemChestEntry = specialItemList.getFirst();
                         int successRate = (90 - (specialItemChestEntry.getItem().getId() % 10) * 10);
                         int randomNumber = Utils.nextInt(100);
                         if (randomNumber < successRate) {
@@ -1479,7 +1479,7 @@ public class UserService implements IUserService {
                         sendServerMessage(GameString.buySuccess());
                     }
 
-                    case DUNG_SPEC_ITEM -> handleUseSpecialItem(specialItemList.get(0));
+                    case DUNG_SPEC_ITEM -> handleUseSpecialItem(specialItemList.getFirst());
 
                     case GHEP_SPEC_ITEM -> {
                         if (fabricateItemEntry.getRewardXu() > 0) {
@@ -2299,7 +2299,7 @@ public class UserService implements IUserService {
                     ds.writeByte(type);
                     ds.writeByte(config.getIconVersion2());
                     if (version != config.getIconVersion2()) {
-                        byte[] ab = Utils.getFile(CommonConstant.ICON_CACHE_NAME);
+                        byte[] ab = Utils.getFile(GameConstants.ICON_CACHE_NAME);
                         if (ab == null) {
                             return;
                         }
@@ -2317,7 +2317,7 @@ public class UserService implements IUserService {
                     ds.writeByte(type);
                     ds.writeByte(config.getValuesVersion2());
                     if (version != config.getValuesVersion2()) {
-                        byte[] ab = Utils.getFile(CommonConstant.MAP_CACHE_NAME);
+                        byte[] ab = Utils.getFile(GameConstants.MAP_CACHE_NAME);
                         if (ab == null) {
                             return;
                         }
@@ -2334,7 +2334,7 @@ public class UserService implements IUserService {
                     ds.writeByte(type);
                     ds.writeByte(config.getPlayerVersion2());
                     if (version != config.getPlayerVersion2()) {
-                        byte[] ab = Utils.getFile(CommonConstant.PLAYER_CACHE_NAME);
+                        byte[] ab = Utils.getFile(GameConstants.PLAYER_CACHE_NAME);
                         if (ab == null) {
                             return;
                         }
@@ -2351,7 +2351,7 @@ public class UserService implements IUserService {
                     ds.writeByte(type);
                     ds.writeByte(config.getEquipVersion2());
                     if (version != config.getEquipVersion2()) {
-                        byte[] ab = Utils.getFile(CommonConstant.EQUIP_CACHE_NAME);
+                        byte[] ab = Utils.getFile(GameConstants.EQUIP_CACHE_NAME);
                         if (ab == null) {
                             return;
                         }
@@ -2368,7 +2368,7 @@ public class UserService implements IUserService {
                     ds.writeByte(type);
                     ds.writeByte(config.getLevelCVersion2());
                     if (version != config.getLevelCVersion2()) {
-                        byte[] ab = Utils.getFile(CommonConstant.LEVEL_CACHE_NAME);
+                        byte[] ab = Utils.getFile(GameConstants.LEVEL_CACHE_NAME);
                         if (ab == null) {
                             return;
                         }
@@ -2578,12 +2578,12 @@ public class UserService implements IUserService {
                     DataOutputStream ds = ms.writer();
                     if (!equipList.isEmpty()) {//Trường hợp có trang bị hợp lệ
                         ds.writeByte(1);
-                        if (equipList.size() == 1 && equipList.get(0).getEmptySlot() < 3) {//Tháo ngọc
+                        if (equipList.size() == 1 && equipList.getFirst().getEmptySlot() < 3) {//Tháo ngọc
                             userAction = UserAction.THAO_NGOC;
                             totalTransactionAmount = 0;
 
                             //Tính tiền gia hạn theo 25% giá ngọc
-                            for (byte slotItemId : equipList.get(0).getSlots()) {
+                            for (byte slotItemId : equipList.getFirst().getSlots()) {
                                 SpecialItemEntry item = SpecialItemRepository.getSpecialItemById(slotItemId);
                                 if (item != null) {
                                     totalTransactionAmount += (int) (item.getPriceXu() * 0.25);
@@ -2610,7 +2610,7 @@ public class UserService implements IUserService {
                         //Trừ phí tháo ngọc
                         user.updateXu(-totalTransactionAmount);
 
-                        EquipmentChestEntry selectedEquipment = equipList.get(0);
+                        EquipmentChestEntry selectedEquipment = equipList.getFirst();
                         if (selectedEquipment == null) {
                             return;
                         }

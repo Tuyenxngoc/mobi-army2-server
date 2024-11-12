@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.teamobi.mobiarmy2.ui.controllers.ServerViewController">
+    <top>
+        <ToolBar>
+            <Button text="Start Server" onAction="#startServer"/>
+            <Button text="Stop Server" onAction="#stopServer"/>
+            <Button text="Restart Server" onAction="#restartServer"/>
+            <Separator orientation="VERTICAL"/>
+            <Label text="Status: "/>
+            <Label fx:id="serverStatus" text="Stopped" styleClass="status-label"/>
+        </ToolBar>
+    </top>
+
+    <center>
+        <TabPane>
+            <Tab text="Players">
+                <VBox spacing="10">
+                    <TableView fx:id="playerTable">
+                        <columns>
+                            <TableColumn text="Player ID" fx:id="playerIdColumn"/>
+                            <TableColumn text="Username" fx:id="usernameColumn"/>
+                            <TableColumn text="Level" fx:id="levelColumn"/>
+                            <TableColumn text="Status" fx:id="statusColumn"/>
+                        </columns>
+                    </TableView>
+                    <Button text="Kick Selected Player" onAction="#kickPlayer"/>
+                </VBox>
+            </Tab>
+            <Tab text="Configuration">
+                <VBox spacing="10">
+                    <Label text="Game Configuration"/>
+                    <GridPane hgap="10" vgap="10">
+                        <Label text="Max Players:"/>
+                        <TextField fx:id="maxPlayersField"/>
+                        <Label text="Server Port:"/>
+                        <TextField fx:id="serverPortField"/>
+                    </GridPane>
+                    <Button text="Save Configuration" onAction="#saveConfig"/>
+                </VBox>
+            </Tab>
+            <Tab text="Logs">
+                <VBox>
+                    <TextArea fx:id="logArea" prefRowCount="15" wrapText="true" editable="false"/>
+                    <Button text="Clear Logs" onAction="#clearLogs"/>
+                </VBox>
+            </Tab>
+        </TabPane>
+    </center>
+</BorderPane>

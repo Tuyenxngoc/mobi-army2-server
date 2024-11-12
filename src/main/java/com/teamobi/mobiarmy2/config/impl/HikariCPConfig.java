@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.config.impl;
 
 import com.teamobi.mobiarmy2.config.IDatabaseConfig;
+import com.teamobi.mobiarmy2.constant.GameConstants;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -15,7 +16,7 @@ public class HikariCPConfig implements IDatabaseConfig {
 
     public HikariCPConfig() {
         properties = new Properties();
-        try (FileInputStream fis = new FileInputStream("src/main/resources/database.properties")) {
+        try (FileInputStream fis = new FileInputStream(GameConstants.CONFIG_BASE_URL + "/database.properties")) {
             properties.load(fis);
         } catch (IOException e) {
             e.printStackTrace();

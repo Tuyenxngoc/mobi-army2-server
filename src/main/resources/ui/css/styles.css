@@ -1,0 +1,8 @@
+.status-label {
+    -fx-font-weight: bold;
+}
+
+.text-area {
+    -fx-background-color: #f4f4f4;
+    -fx-border-color: #d4d4d4;
+}

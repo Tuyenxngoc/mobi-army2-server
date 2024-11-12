@@ -803,9 +803,14 @@ public class FightManager implements IFightManager {
     }
 
     private void fightComplete(MatchResult result) {
+        //Cập nhật trạng thái người chơi
         updatePlayerStatuses();
 
-        //todo bug update xp
+        //Cập nhật số xp nhận được
+        updateXpPlayers();
+
+        //Cập nhật số cup nhận được
+        updateCupPlayers();
 
         long duration = System.currentTimeMillis() - startTime;
         boolean fightInValid = false;

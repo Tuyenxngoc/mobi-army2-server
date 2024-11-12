@@ -1,6 +1,5 @@
 package com.teamobi.mobiarmy2.service.impl;
 
-import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.model.CaptionEntry;
@@ -50,9 +49,9 @@ public class GameService implements IGameService {
                 ds.writeUTF(mapEntry.getFileName());
             }
             byte[] ab = bas.toByteArray();
-            Utils.saveFile(CommonConstant.MAP_CACHE_NAME, ab);
+            Utils.saveFile(GameConstants.MAP_CACHE_NAME, ab);
 
-            ServerManager.getInstance().logger().success("Cache file created successfully: " + CommonConstant.MAP_CACHE_NAME);
+            ServerManager.getInstance().logger().success("Cache file created successfully: " + GameConstants.MAP_CACHE_NAME);
         } catch (IOException e) {
             ServerManager.getInstance().logger().logException(GameService.class, e);
         }
@@ -100,7 +99,7 @@ public class GameService implements IGameService {
                 }
             }
 
-            byte[] bytes = Utils.getFile(GameConstants.RESOURCE_BASE_URL + "/itemSpecial.png");
+            byte[] bytes = Utils.getFile(GameConstants.IMAGE_BASE_URL + "/itemSpecial.png");
             if (bytes == null) {
                 System.exit(1);
             }
@@ -116,11 +115,11 @@ public class GameService implements IGameService {
             }
 
             byte[] data = bas.toByteArray();
-            Utils.saveFile(CommonConstant.EQUIP_CACHE_NAME, data);
+            Utils.saveFile(GameConstants.EQUIP_CACHE_NAME, data);
             bas.close();
             ds.close();
 
-            ServerManager.getInstance().logger().success("Cache file created successfully: " + CommonConstant.EQUIP_CACHE_NAME);
+            ServerManager.getInstance().logger().success("Cache file created successfully: " + GameConstants.EQUIP_CACHE_NAME);
         } catch (IOException e) {
             ServerManager.getInstance().logger().logException(GameService.class, e);
         }
@@ -139,11 +138,11 @@ public class GameService implements IGameService {
                 ds.writeByte(capEntry.getLevel());
             }
             byte[] data = bas.toByteArray();
-            Utils.saveFile(CommonConstant.LEVEL_CACHE_NAME, data);
+            Utils.saveFile(GameConstants.LEVEL_CACHE_NAME, data);
             bas.close();
             ds.close();
 
-            ServerManager.getInstance().logger().success("Cache file created successfully: " + CommonConstant.LEVEL_CACHE_NAME);
+            ServerManager.getInstance().logger().success("Cache file created successfully: " + GameConstants.LEVEL_CACHE_NAME);
         } catch (IOException e) {
             ServerManager.getInstance().logger().logException(GameService.class, e);
         }
@@ -165,9 +164,9 @@ public class GameService implements IGameService {
                 tio.addFile(f.getName(), f.getPath());
             }
             byte[] data = tio.output();
-            Utils.saveFile(CommonConstant.PLAYER_CACHE_NAME, data);
+            Utils.saveFile(GameConstants.PLAYER_CACHE_NAME, data);
 
-            ServerManager.getInstance().logger().success("Cache file created successfully: " + CommonConstant.PLAYER_CACHE_NAME);
+            ServerManager.getInstance().logger().success("Cache file created successfully: " + GameConstants.PLAYER_CACHE_NAME);
         } catch (IOException e) {
             ServerManager.getInstance().logger().logException(GameService.class, e);
         }
@@ -189,9 +188,9 @@ public class GameService implements IGameService {
                 tio.addFile(f.getName(), f.getPath());
             }
             byte[] data = tio.output();
-            Utils.saveFile(CommonConstant.ICON_CACHE_NAME, data);
+            Utils.saveFile(GameConstants.ICON_CACHE_NAME, data);
 
-            ServerManager.getInstance().logger().success("Cache file created successfully: " + CommonConstant.ICON_CACHE_NAME);
+            ServerManager.getInstance().logger().success("Cache file created successfully: " + GameConstants.ICON_CACHE_NAME);
         } catch (IOException e) {
             ServerManager.getInstance().logger().logException(GameService.class, e);
         }

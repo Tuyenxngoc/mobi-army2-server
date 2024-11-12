@@ -2,7 +2,6 @@ package com.teamobi.mobiarmy2.config.impl;
 
 import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.config.IServerConfig;
-import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 
@@ -66,9 +65,9 @@ public class ServerConfig implements IServerConfig {
     private int[][] spinXpCounts;
     private int[] spinTypeProbabilities;
 
-    public ServerConfig(String resourceName) {
+    public ServerConfig() {
         configMap = new Properties();
-        try (FileInputStream fis = new FileInputStream(CommonConstant.RESOURCES_PATH + resourceName);
+        try (FileInputStream fis = new FileInputStream(GameConstants.CONFIG_BASE_URL + "/army2.properties");
              InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8)
         ) {
             configMap.load(isr);

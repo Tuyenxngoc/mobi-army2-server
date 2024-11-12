@@ -2,7 +2,6 @@ package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.config.impl.ServerConfig;
-import com.teamobi.mobiarmy2.constant.CommonConstant;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.dao.impl.GameDao;
@@ -22,6 +21,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author tuyen
@@ -47,7 +47,7 @@ public class ServerManager {
         IGameDao gameDao = new GameDao();
         this.gameService = new GameService(gameDao);
 
-        this.config = new ServerConfig(CommonConstant.ARMY_2_PROPERTIES);
+        this.config = new ServerConfig();
         this.log = new LoggerUtil(config.isDebug());
     }
 
@@ -70,8 +70,16 @@ public class ServerManager {
         return config;
     }
 
+    public boolean isStart() {
+        return isStart;
+    }
+
     public Room[] getRooms() {
         return rooms;
+    }
+
+    public List<User> getUsers() {
+        return users.stream().map(ISession::getUser).toList();
     }
 
     public void init() {
