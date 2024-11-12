@@ -21,7 +21,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author tuyen
@@ -42,6 +41,7 @@ public class ServerManager {
     private boolean isStart;
     private Room[] rooms;
     private final ArrayList<ISession> users = new ArrayList<>();
+    private final List<ServerListener> listeners = new ArrayList<>();
 
     public ServerManager() {
         IGameDao gameDao = new GameDao();
@@ -76,10 +76,6 @@ public class ServerManager {
 
     public Room[] getRooms() {
         return rooms;
-    }
-
-    public List<User> getUsers() {
-        return users.stream().map(ISession::getUser).toList();
     }
 
     public void init() {
@@ -187,7 +183,7 @@ public class ServerManager {
         isStart = false;
         try {
             while (!users.isEmpty()) {
-                ISession session = users.get(0);
+                ISession session = users.getFirst();
                 session.close();
             }
             if (server != null) {
@@ -201,6 +197,7 @@ public class ServerManager {
 
     public synchronized void disconnect(Session session) {
         users.remove(session);
+        notifyListeners();
     }
 
     public void sendToServer(IMessage ms) {
@@ -225,5 +222,15 @@ public class ServerManager {
                 .map(ISession::getUser)
                 .limit(10)
                 .toList();
+    }
+
+    public void addServerListener(ServerListener listener) {
+        listeners.add(listener);
+    }
+
+    public void notifyListeners() {
+        for (ServerListener listener : listeners) {
+            listener.onUsersUpdated(users);
+        }
     }
 }

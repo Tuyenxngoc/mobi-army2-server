@@ -9,15 +9,19 @@ import javafx.stage.Stage;
 
 import java.util.Objects;
 
+/**
+ * @author tuyen
+ */
 public class ServerUI extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/fxml/ServerView.fxml"));
         Parent root = loader.load();
-        primaryStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icon.png"))));
+
         Scene scene = new Scene(root, 600, 400);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/ui/css/styles.css")).toExternalForm());
+        primaryStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icon.png"))));
         primaryStage.setTitle("Server Manager UI");
         primaryStage.setScene(scene);
         primaryStage.show();

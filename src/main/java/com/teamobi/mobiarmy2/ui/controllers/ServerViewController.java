@@ -1,77 +1,98 @@
 package com.teamobi.mobiarmy2.ui.controllers;
 
 import com.teamobi.mobiarmy2.model.User;
+import com.teamobi.mobiarmy2.network.ISession;
+import com.teamobi.mobiarmy2.server.ServerListener;
 import com.teamobi.mobiarmy2.server.ServerManager;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 
-public class ServerViewController {
+import java.util.List;
 
-    @FXML
-    private TableColumn playerIdColumn;
-    @FXML
-    private TableColumn usernameColumn;
-    @FXML
-    private TableColumn levelColumn;
-    @FXML
-    private TableColumn statusColumn;
+/**
+ * @author tuyen
+ */
+public class ServerViewController implements ServerListener {
+
     @FXML
     private Label serverStatus;
     @FXML
     private TableView<User> playerTable;
     @FXML
-    private TextField maxPlayersField;
+    public TableColumn<User, Integer> playerIdColumn;
     @FXML
-    private TextField serverPortField;
+    public TableColumn<User, String> usernameColumn;
+    @FXML
+    public TableColumn<User, Integer> levelColumn;
+    @FXML
+    public TableColumn<User, String> statusColumn;
+    @FXML
+    public TableColumn<User, String> ipAddressColumn;
     @FXML
     private TextArea logArea;
 
-    private ServerManager serverManager = ServerManager.getInstance();
+    private ObservableList<User> userList;
 
     @FXML
     public void initialize() {
-        updateServerStatus();
-        updatePlayerTable();
+        // Initialize the ObservableList to bind to the TableView
+        userList = FXCollections.observableArrayList();
+
+        // Set up the columns to show data from the User class
+        playerIdColumn.setCellValueFactory(cellData ->
+                new SimpleIntegerProperty(cellData.getValue().getPlayerId()).asObject());
+        usernameColumn.setCellValueFactory(cellData ->
+                new SimpleStringProperty(cellData.getValue().getUsername()));
+        levelColumn.setCellValueFactory(cellData ->
+                new SimpleIntegerProperty(cellData.getValue().getCurrentLevel()).asObject());
+        statusColumn.setCellValueFactory(cellData ->
+                new SimpleStringProperty(cellData.getValue().getState().name()));
+        ipAddressColumn.setCellValueFactory(cellData ->
+                new SimpleStringProperty(cellData.getValue().getSession().getIPAddress()));
+
+        // Set the ObservableList into the TableView
+        playerTable.setItems(userList);
+
+        ServerManager.getInstance().addServerListener(this);
     }
 
-    private void updateServerStatus() {
-        if (serverManager != null) {
-            String status = serverManager.isStart() ? "Running" : "Stopped";
-            serverStatus.setText(status);
-        }
+    @Override
+    public void onUsersUpdated(List<ISession> sessions) {
+        List<User> updatedUsers = sessions.stream()
+                .map(ISession::getUser)
+                .filter(User::isLogged)
+                .toList();
+        userList.setAll(updatedUsers);
     }
 
-    private void updatePlayerTable() {
-        playerTable.getItems().setAll(serverManager.getUsers());
-    }
-
+    @FXML
     public void startServer() {
-        serverStatus.setText("Running");
-        logArea.appendText("Server started...\n");
     }
 
+    @FXML
     public void stopServer() {
-        serverStatus.setText("Stopped");
-        logArea.appendText("Server stopped...\n");
     }
 
+    @FXML
     public void restartServer() {
-        stopServer();
-        startServer();
-        logArea.appendText("Server restarted...\n");
     }
 
+    @FXML
     public void kickPlayer() {
-        // Logic kick player here
-        logArea.appendText("Player kicked from server.\n");
     }
 
+    @FXML
     public void saveConfig() {
-        String maxPlayers = maxPlayersField.getText();
-        String serverPort = serverPortField.getText();
-        logArea.appendText("Configuration saved: Max Players = " + maxPlayers + ", Port = " + serverPort + "\n");
     }
 
+    @FXML
     public void clearLogs() {
         logArea.clear();
     }

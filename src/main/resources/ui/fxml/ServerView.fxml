@@ -16,7 +16,7 @@
 
     <center>
         <TabPane>
-            <Tab text="Players">
+            <Tab text="Players" closable="false">
                 <VBox spacing="10">
                     <TableView fx:id="playerTable">
                         <columns>
@@ -24,24 +24,19 @@
                             <TableColumn text="Username" fx:id="usernameColumn"/>
                             <TableColumn text="Level" fx:id="levelColumn"/>
                             <TableColumn text="Status" fx:id="statusColumn"/>
+                            <TableColumn text="IP Address" fx:id="ipAddressColumn"/>
                         </columns>
                     </TableView>
                     <Button text="Kick Selected Player" onAction="#kickPlayer"/>
                 </VBox>
             </Tab>
-            <Tab text="Configuration">
+            <Tab text="Configuration" closable="false">
                 <VBox spacing="10">
                     <Label text="Game Configuration"/>
-                    <GridPane hgap="10" vgap="10">
-                        <Label text="Max Players:"/>
-                        <TextField fx:id="maxPlayersField"/>
-                        <Label text="Server Port:"/>
-                        <TextField fx:id="serverPortField"/>
-                    </GridPane>
                     <Button text="Save Configuration" onAction="#saveConfig"/>
                 </VBox>
             </Tab>
-            <Tab text="Logs">
+            <Tab text="Logs" closable="false">
                 <VBox>
                     <TextArea fx:id="logArea" prefRowCount="15" wrapText="true" editable="false"/>
                     <Button text="Clear Logs" onAction="#clearLogs"/>

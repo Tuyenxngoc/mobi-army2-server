@@ -183,8 +183,9 @@ public class UserService implements IUserService {
             sendCharacterData(config);
             sendRoomCaption(config);
             sendMapCollisionInfo();
-
             sendServerInfoToUser(config.getMessageLogin());
+
+            serverManager.notifyListeners();
         } catch (IOException e) {
             ServerManager.getInstance().logger().logException(UserService.class, e);
         }
