@@ -58,7 +58,7 @@ public class HikariCPManager {
             }
             logMessage.delete(logMessage.length() - 2, logMessage.length()); //Remove the trailing comma and space
             logMessage.append("]");
-            ServerManager.getInstance().logger().log(logMessage.toString());
+            ServerManager.getInstance().getLog().log(logMessage.toString());
         }
 
         int rowsUpdated = 0;

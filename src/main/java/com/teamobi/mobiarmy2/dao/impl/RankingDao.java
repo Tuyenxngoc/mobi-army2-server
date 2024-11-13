@@ -26,7 +26,7 @@ public class RankingDao implements IRankingDao {
 
     private List<PlayerLeaderboardEntry> getTopFromQuery(String query, String detailColumn, boolean applyBonus) {
         Gson gson = GsonUtil.GSON;
-        int[] topBonus = ServerManager.getInstance().config().getTopBonus();
+        int[] topBonus = ServerManager.getInstance().getConfig().getTopBonus();
         List<PlayerLeaderboardEntry> top = new ArrayList<>();
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement();

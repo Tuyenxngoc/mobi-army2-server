@@ -1075,8 +1075,8 @@ public class FightManager implements IFightManager {
                 if (typeShoot == 0) {
                     for (int j = 0; j < xArrays.size(); j++) {
                         if (j == 0) {
-                            ds.writeShort(xArrays.get(0));
-                            ds.writeShort(yArrays.get(0));
+                            ds.writeShort(xArrays.getFirst());
+                            ds.writeShort(yArrays.getFirst());
                         } else {
                             if ((j == xArrays.size() - 1) && bullId == 49) {
                                 ds.writeShort(xArrays.get(j));

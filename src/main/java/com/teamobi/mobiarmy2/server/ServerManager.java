@@ -15,6 +15,7 @@ import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.impl.Session;
 import com.teamobi.mobiarmy2.service.IGameService;
 import com.teamobi.mobiarmy2.service.impl.GameService;
+import lombok.Getter;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -33,12 +34,15 @@ public class ServerManager {
     private static volatile ServerManager instance;
 
     private final IGameService gameService;
+    @Getter
     private final IServerConfig config;
+    @Getter
     private final ILogManager log;
 
     private ServerSocket server;
     private long countClients;
     private boolean isStart;
+    @Getter
     private Room[] rooms;
     private final ArrayList<ISession> users = new ArrayList<>();
     private final List<ServerListener> listeners = new ArrayList<>();
@@ -60,22 +64,6 @@ public class ServerManager {
             }
         }
         return instance;
-    }
-
-    public ILogManager logger() {
-        return log;
-    }
-
-    public IServerConfig config() {
-        return config;
-    }
-
-    public boolean isStart() {
-        return isStart;
-    }
-
-    public Room[] getRooms() {
-        return rooms;
     }
 
     public void init() {

@@ -10,13 +10,13 @@ public class MobiArmy2 {
 
     public static void main(String[] args) {
         ServerManager serverManager = ServerManager.getInstance();
-        Runtime.getRuntime().addShutdownHook(new Thread(serverManager::stop, "serverShutdownHook"));
+        Runtime.getRuntime().addShutdownHook(new Thread(serverManager::stop, "ServerShutdownHook"));
 
         new Thread(() -> {
             serverManager.init();
             serverManager.start();
         }, "Main").start();
 
-        new Thread(() -> ServerUI.launchUI(args), "Server UI").start();
+        new Thread(() -> ServerUI.launchUI(args), "ServerUI").start();
     }
 }

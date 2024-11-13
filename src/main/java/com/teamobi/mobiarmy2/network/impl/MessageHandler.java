@@ -168,7 +168,7 @@ public class MessageHandler implements IMessageHandler {
                 case Cmd.GETSTRING -> userService.getStringMessage(ms);
 
                 default ->
-                        ServerManager.getInstance().logger().warning("Command " + ms.getCommand() + " is not supported");
+                        ServerManager.getInstance().getLog().warning("Command " + ms.getCommand() + " is not supported");
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -51,9 +51,9 @@ public class GameService implements IGameService {
             byte[] ab = bas.toByteArray();
             Utils.saveFile(GameConstants.MAP_CACHE_NAME, ab);
 
-            ServerManager.getInstance().logger().success("Cache file created successfully: " + GameConstants.MAP_CACHE_NAME);
+            ServerManager.getInstance().getLog().success("Cache file created successfully: " + GameConstants.MAP_CACHE_NAME);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(GameService.class, e);
+            ServerManager.getInstance().getLog().logException(GameService.class, e);
         }
     }
 
@@ -119,9 +119,9 @@ public class GameService implements IGameService {
             bas.close();
             ds.close();
 
-            ServerManager.getInstance().logger().success("Cache file created successfully: " + GameConstants.EQUIP_CACHE_NAME);
+            ServerManager.getInstance().getLog().success("Cache file created successfully: " + GameConstants.EQUIP_CACHE_NAME);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(GameService.class, e);
+            ServerManager.getInstance().getLog().logException(GameService.class, e);
         }
     }
 
@@ -142,9 +142,9 @@ public class GameService implements IGameService {
             bas.close();
             ds.close();
 
-            ServerManager.getInstance().logger().success("Cache file created successfully: " + GameConstants.LEVEL_CACHE_NAME);
+            ServerManager.getInstance().getLog().success("Cache file created successfully: " + GameConstants.LEVEL_CACHE_NAME);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(GameService.class, e);
+            ServerManager.getInstance().getLog().logException(GameService.class, e);
         }
     }
 
@@ -166,9 +166,9 @@ public class GameService implements IGameService {
             byte[] data = tio.output();
             Utils.saveFile(GameConstants.PLAYER_CACHE_NAME, data);
 
-            ServerManager.getInstance().logger().success("Cache file created successfully: " + GameConstants.PLAYER_CACHE_NAME);
+            ServerManager.getInstance().getLog().success("Cache file created successfully: " + GameConstants.PLAYER_CACHE_NAME);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(GameService.class, e);
+            ServerManager.getInstance().getLog().logException(GameService.class, e);
         }
     }
 
@@ -190,82 +190,82 @@ public class GameService implements IGameService {
             byte[] data = tio.output();
             Utils.saveFile(GameConstants.ICON_CACHE_NAME, data);
 
-            ServerManager.getInstance().logger().success("Cache file created successfully: " + GameConstants.ICON_CACHE_NAME);
+            ServerManager.getInstance().getLog().success("Cache file created successfully: " + GameConstants.ICON_CACHE_NAME);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(GameService.class, e);
+            ServerManager.getInstance().getLog().logException(GameService.class, e);
         }
     }
 
     @Override
     public void getFormulaData() {
         gameDao.getAllFormula();
-        ServerManager.getInstance().logger().success("Loaded " + FormulaRepository.FORMULA.size() + " formula entries successfully.");
+        ServerManager.getInstance().getLog().success("Loaded " + FormulaRepository.FORMULA.size() + " formula entries successfully.");
     }
 
     @Override
     public void getPaymentData() {
         gameDao.getAllPayment();
-        ServerManager.getInstance().logger().success("Loaded " + PaymentRepository.PAYMENT_ENTRY_MAP.size() + " payment entries successfully.");
+        ServerManager.getInstance().getLog().success("Loaded " + PaymentRepository.PAYMENT_ENTRY_MAP.size() + " payment entries successfully.");
     }
 
     @Override
     public void getMissionData() {
         gameDao.getAllMissions();
-        ServerManager.getInstance().logger().success("Loaded " + MissionRepository.MISSION_LIST.size() + " mission entries successfully.");
+        ServerManager.getInstance().getLog().success("Loaded " + MissionRepository.MISSION_LIST.size() + " mission entries successfully.");
     }
 
     @Override
     public void getMapData() {
         gameDao.getAllMapData();
-        ServerManager.getInstance().logger().success("Loaded " + MapRepository.MAP_ENTRIES.size() + " map entries successfully.");
+        ServerManager.getInstance().getLog().success("Loaded " + MapRepository.MAP_ENTRIES.size() + " map entries successfully.");
     }
 
     @Override
     public void getCharacterData() {
         gameDao.getAllCharacterData();
-        ServerManager.getInstance().logger().success("Loaded " + CharacterRepository.CHARACTER_ENTRIES.size() + " character entries successfully.");
+        ServerManager.getInstance().getLog().success("Loaded " + CharacterRepository.CHARACTER_ENTRIES.size() + " character entries successfully.");
     }
 
     @Override
     public void getEquipData() {
         gameDao.getAllEquip();
-        ServerManager.getInstance().logger().success("Loaded " + CharacterRepository.EQUIPMENT_ENTRIES.size() + " equipment entries successfully.");
+        ServerManager.getInstance().getLog().success("Loaded " + CharacterRepository.EQUIPMENT_ENTRIES.size() + " equipment entries successfully.");
     }
 
     @Override
     public void getLvXpData() {
         gameDao.getAllXpData();
-        ServerManager.getInstance().logger().success("Loaded " + PlayerXpRepository.LEVEL_XP_REQUIRED_ENTRIES.size() + " player XP entries successfully.");
-        ServerManager.getInstance().logger().success("Loaded " + ClanXpRepository.LEVEL_XP_REQUIRED_ENTRIES.size() + " clan XP entries successfully.");
+        ServerManager.getInstance().getLog().success("Loaded " + PlayerXpRepository.LEVEL_XP_REQUIRED_ENTRIES.size() + " player XP entries successfully.");
+        ServerManager.getInstance().getLog().success("Loaded " + ClanXpRepository.LEVEL_XP_REQUIRED_ENTRIES.size() + " clan XP entries successfully.");
     }
 
     @Override
     public void getFabricateItemData() {
         gameDao.getAllFabricateItems();
-        ServerManager.getInstance().logger().success("Loaded " + FabricateItemRepository.FABRICATE_ITEM_ENTRIES.size() + " fabricate items successfully.");
+        ServerManager.getInstance().getLog().success("Loaded " + FabricateItemRepository.FABRICATE_ITEM_ENTRIES.size() + " fabricate items successfully.");
     }
 
     @Override
     public void setCaptionLevelData() {
         gameDao.getAllCaptionLevel();
-        ServerManager.getInstance().logger().success("Loaded " + CaptionRepository.CAPTION_ENTRIES.size() + " caption level entries successfully.");
+        ServerManager.getInstance().getLog().success("Loaded " + CaptionRepository.CAPTION_ENTRIES.size() + " caption level entries successfully.");
     }
 
     @Override
     public void getItemData() {
         gameDao.getAllItem();
-        ServerManager.getInstance().logger().success("Loaded " + FightItemRepository.FIGHT_ITEM_ENTRIES.size() + " fight item entries successfully.");
+        ServerManager.getInstance().getLog().success("Loaded " + FightItemRepository.FIGHT_ITEM_ENTRIES.size() + " fight item entries successfully.");
     }
 
     @Override
     public void getClanShopData() {
         gameDao.getAllItemClan();
-        ServerManager.getInstance().logger().success("Loaded " + ClanItemRepository.CLAN_ITEM_ENTRY_MAP.size() + " clan shop items successfully.");
+        ServerManager.getInstance().getLog().success("Loaded " + ClanItemRepository.CLAN_ITEM_ENTRY_MAP.size() + " clan shop items successfully.");
     }
 
     @Override
     public void getSpecialItemData() {
         gameDao.getAllSpecialItem();
-        ServerManager.getInstance().logger().success("Loaded " + SpecialItemRepository.SPECIAL_ITEM_ENTRIES.size() + " special items successfully.");
+        ServerManager.getInstance().getLog().success("Loaded " + SpecialItemRepository.SPECIAL_ITEM_ENTRIES.size() + " special items successfully.");
     }
 }

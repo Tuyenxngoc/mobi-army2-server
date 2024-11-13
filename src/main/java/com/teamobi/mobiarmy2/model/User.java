@@ -234,8 +234,8 @@ public class User {
         if (items[itemIndex] < 0) {
             items[itemIndex] = 0;
         }
-        if (items[itemIndex] > ServerManager.getInstance().config().getMaxItem()) {
-            items[itemIndex] = ServerManager.getInstance().config().getMaxItem();
+        if (items[itemIndex] > ServerManager.getInstance().getConfig().getMaxItem()) {
+            items[itemIndex] = ServerManager.getInstance().getConfig().getMaxItem();
         }
         items[0] = items[1] = 99;
     }

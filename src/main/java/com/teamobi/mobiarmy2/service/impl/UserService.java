@@ -89,7 +89,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -165,7 +165,7 @@ public class UserService implements IUserService {
                 user.setMaterialsPurchased((byte) 0);
 
                 //Gửi messeage khi login
-                for (String msg : serverManager.config().getMessage()) {
+                for (String msg : serverManager.getConfig().getMessage()) {
                     sendMessageToUser(msg);
                 }
 
@@ -179,7 +179,7 @@ public class UserService implements IUserService {
             userDao.updateOnline(true, userFound.getPlayerId());
 
             sendLoginSuccess();
-            IServerConfig config = serverManager.config();
+            IServerConfig config = serverManager.getConfig();
             sendCharacterData(config);
             sendRoomCaption(config);
             sendMapCollisionInfo();
@@ -187,7 +187,7 @@ public class UserService implements IUserService {
 
             serverManager.notifyListeners();
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -273,12 +273,12 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
     public void sendRoomName() {
-        IServerConfig config = ServerManager.getInstance().config();
+        IServerConfig config = ServerManager.getInstance().getConfig();
         String[] names = config.getBossRoomName();
         int startMapBoss = config.getStartMapBoss();
         try {
@@ -293,7 +293,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -310,7 +310,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -325,7 +325,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -338,7 +338,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -351,7 +351,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -404,7 +404,7 @@ public class UserService implements IUserService {
                 sendServerMessage(GameString.giaHanSucess());
             }
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -423,7 +423,7 @@ public class UserService implements IUserService {
                 missionComplete(missionId);
             }
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -537,14 +537,14 @@ public class UserService implements IUserService {
                 }
             }
 
-            IServerConfig config = ServerManager.getInstance().config();
+            IServerConfig config = ServerManager.getInstance().getConfig();
             ds.writeUTF(config.getAddInfo());
             ds.writeUTF(config.getAddInfoUrl());
             ds.writeUTF(config.getRegTeamUrl());
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -571,7 +571,7 @@ public class UserService implements IUserService {
                     return;
                 }
 
-                int minXuContributeClan = ServerManager.getInstance().config().getMinXuContributeClan();
+                int minXuContributeClan = ServerManager.getInstance().getConfig().getMinXuContributeClan();
                 if (quantity < minXuContributeClan) {
                     sendServerMessage(GameString.gopClanMinXu(minXuContributeClan));
                     return;
@@ -592,7 +592,7 @@ public class UserService implements IUserService {
                 sendServerMessage(GameString.gopClanThanhCong());
             }
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -602,7 +602,7 @@ public class UserService implements IUserService {
             String platform = ms.reader().readUTF();
             user.getSession().setPlatform(platform);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -612,7 +612,7 @@ public class UserService implements IUserService {
             byte provider = ms.reader().readByte();
             user.getSession().setProvider(provider);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -629,7 +629,7 @@ public class UserService implements IUserService {
                 processFormulaCrafting(id, level);
             }
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -720,7 +720,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -775,7 +775,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -798,7 +798,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -853,7 +853,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -874,7 +874,7 @@ public class UserService implements IUserService {
                 buyClanShop(unit, itemId);
             }
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -934,7 +934,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -948,7 +948,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -974,7 +974,7 @@ public class UserService implements IUserService {
                 purchaseSpecialItem(unit, itemId, quantity);
             }
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -985,7 +985,7 @@ public class UserService implements IUserService {
         }
 
         //Kiểm tra số lượng đang có trong rương
-        if (user.getInventorySpecialItemCount(itemId) + quantity > ServerManager.getInstance().config().getMaxSpecialItemSlots()) {
+        if (user.getInventorySpecialItemCount(itemId) + quantity > ServerManager.getInstance().getConfig().getMaxSpecialItemSlots()) {
             sendServerMessage(GameString.ruongMaxSlot());
             return;
         }
@@ -1071,7 +1071,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1111,7 +1111,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1130,7 +1130,7 @@ public class UserService implements IUserService {
             }
             //Neu la nguoi dua tin -> send Mss 46-> chat The gioi
             if (playerId == 2) {
-                int priceChatServer = ServerManager.getInstance().config().getPriceChatServer();
+                int priceChatServer = ServerManager.getInstance().getConfig().getPriceChatServer();
 
                 if (user.getXu() < priceChatServer) {
                     return;
@@ -1145,7 +1145,7 @@ public class UserService implements IUserService {
             }
             sendMessageToUser(receiver, content);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1165,7 +1165,7 @@ public class UserService implements IUserService {
                 user.sendMessage(ms);
             }
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1199,7 +1199,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1221,7 +1221,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1260,7 +1260,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1296,7 +1296,7 @@ public class UserService implements IUserService {
             }
             fightWait.addUser(user);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1309,7 +1309,7 @@ public class UserService implements IUserService {
             }
             user.getFightWait().chatMessage(user.getPlayerId(), message);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1319,7 +1319,7 @@ public class UserService implements IUserService {
             int playerId = ms.reader().readInt();
             user.getFightWait().kickPlayer(user.getPlayerId(), playerId);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1338,7 +1338,7 @@ public class UserService implements IUserService {
             boolean ready = ms.reader().readBoolean();
             user.getFightWait().setReady(ready, user.getPlayerId());
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1513,7 +1513,7 @@ public class UserService implements IUserService {
                 userAction = null;
             }
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1597,7 +1597,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1610,7 +1610,7 @@ public class UserService implements IUserService {
             }
             user.getFightWait().setPassRoom(password, user.getPlayerId());
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1623,7 +1623,7 @@ public class UserService implements IUserService {
             }
             user.getFightWait().setMoney(xu, user.getPlayerId());
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1648,7 +1648,7 @@ public class UserService implements IUserService {
                 user.getTrainingManager().changeLocation(x, y);
             }
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1672,7 +1672,7 @@ public class UserService implements IUserService {
 
             user.getFightWait().getFightManager().addShoot(user.getPlayerId(), bullId, x, y, angle, force, force2, numShoot);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1696,7 +1696,7 @@ public class UserService implements IUserService {
             }
             user.getFightWait().getFightManager().useItem(user.getPlayerId(), itemIndex);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1710,8 +1710,8 @@ public class UserService implements IUserService {
             switch (type) {
                 // Đấu trùm
                 case 5 -> {
-                    int start = server.config().getStartMapBoss();
-                    int end = start + server.config().getRoomQuantity()[5];
+                    int start = server.getConfig().getStartMapBoss();
+                    int end = start + server.getConfig().getRoomQuantity()[5];
 
                     outerLoop:
                     for (int i = start; i < end; i++) {
@@ -1732,7 +1732,7 @@ public class UserService implements IUserService {
 
                 //4vs4->1vs1
                 case 4, 3, 2, 1 -> {
-                    int end = server.config().getStartMapBoss();
+                    int end = server.getConfig().getStartMapBoss();
                     int index = Utils.nextInt(0, end - 1);
                     Room room = rooms[index];
                     for (IFightWait fight : room.getFightWaits()) {
@@ -1750,7 +1750,7 @@ public class UserService implements IUserService {
 
                 //Khu vực trống
                 case 0 -> {
-                    int end = server.config().getStartMapBoss();
+                    int end = server.getConfig().getStartMapBoss();
                     int index = Utils.nextInt(0, end - 1);
                     Room room = rooms[index];
                     for (IFightWait fight : room.getFightWaits()) {
@@ -1767,7 +1767,7 @@ public class UserService implements IUserService {
 
                 //Ngẫu nhiên
                 case -1 -> {
-                    int end = server.config().getStartMapBoss();
+                    int end = server.getConfig().getStartMapBoss();
                     int index = Utils.nextInt(0, end - 1);
                     Room room = rooms[index];
                     for (IFightWait fight : room.getFightWaits()) {
@@ -1790,7 +1790,7 @@ public class UserService implements IUserService {
                 fightWait.addUser(user);
             }
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1819,7 +1819,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1827,7 +1827,7 @@ public class UserService implements IUserService {
     public void handleAddFriend(IMessage ms) {
         try {
             Integer id = ms.reader().readInt();
-            if (user.getFriends().size() > ServerManager.getInstance().config().getMaxFriends()) {
+            if (user.getFriends().size() > ServerManager.getInstance().getConfig().getMaxFriends()) {
                 sendMessageUpdateFriends(Boolean.FALSE, 2);
                 return;
             }
@@ -1838,7 +1838,7 @@ public class UserService implements IUserService {
                 sendMessageUpdateFriends(Boolean.FALSE, 0);
             }
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
             sendMessageUpdateFriends(Boolean.FALSE, 1);
         }
     }
@@ -1850,7 +1850,7 @@ public class UserService implements IUserService {
             user.getFriends().remove(id);
             sendMessageUpdateFriends(Boolean.TRUE, 0);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
             sendMessageUpdateFriends(Boolean.TRUE, 1);
         }
     }
@@ -1868,7 +1868,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1901,7 +1901,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1927,7 +1927,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1943,9 +1943,9 @@ public class UserService implements IUserService {
             short x = dis.readShort();
             short y = dis.readShort();
 
-            ServerManager.getInstance().logger().log("Update coordinates: x=" + x + "  y=" + y);
+            ServerManager.getInstance().getLog().log("Update coordinates: x=" + x + "  y=" + y);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1955,7 +1955,7 @@ public class UserService implements IUserService {
             String name = ms.reader().readUTF().trim();
             user.getFightWait().setRoomName(user.getPlayerId(), name);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1965,7 +1965,7 @@ public class UserService implements IUserService {
             byte maxPlayers = ms.reader().readByte();
             user.getFightWait().setMaxPlayers(user.getPlayerId(), maxPlayers);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -1985,7 +1985,7 @@ public class UserService implements IUserService {
             }
             user.getFightWait().setItems(user.getPlayerId(), items);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -2008,7 +2008,7 @@ public class UserService implements IUserService {
             sendCharacterInfo();
             sendEquipInfo();
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -2022,7 +2022,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -2044,7 +2044,7 @@ public class UserService implements IUserService {
             if (itemIndex < 0 || itemIndex >= FightItemRepository.FIGHT_ITEM_ENTRIES.size()) {
                 return;
             }
-            if (user.getItems()[itemIndex] + quantity > ServerManager.getInstance().config().getMaxItem()) {
+            if (user.getItems()[itemIndex] + quantity > ServerManager.getInstance().getConfig().getMaxItem()) {
                 return;
             }
             if (unit == 0) {
@@ -2072,7 +2072,7 @@ public class UserService implements IUserService {
             user.sendMessage(ms);
             sendServerMessage(GameString.buySuccess());
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -2129,7 +2129,7 @@ public class UserService implements IUserService {
                 }
             }
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -2139,7 +2139,7 @@ public class UserService implements IUserService {
             byte mapId = ms.reader().readByte();
             user.getFightWait().setMap(user.getPlayerId(), mapId);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -2157,7 +2157,7 @@ public class UserService implements IUserService {
             }
             sendServerMessage(serial + " " + pin);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -2239,7 +2239,7 @@ public class UserService implements IUserService {
                 user.getFightWait().inviteToRoom(playerId);
             }
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -2255,9 +2255,9 @@ public class UserService implements IUserService {
                 y[i] = dis.readInt();
             }
 
-            ServerManager.getInstance().logger().log("Clear bullets: x=" + Arrays.toString(x) + "  y=" + Arrays.toString(y));
+            ServerManager.getInstance().getLog().log("Clear bullets: x=" + Arrays.toString(x) + "  y=" + Arrays.toString(y));
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -2281,7 +2281,7 @@ public class UserService implements IUserService {
             userDao.changePassword(user.getUserId(), newPass);
             sendServerMessage(GameString.changPassSuccess());
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -2294,7 +2294,7 @@ public class UserService implements IUserService {
 
             switch (type) {
                 case 1 -> {
-                    IServerConfig config = ServerManager.getInstance().config();
+                    IServerConfig config = ServerManager.getInstance().getConfig();
                     ms = new Message(Cmd.GET_FILEPACK);
                     DataOutputStream ds = ms.writer();
                     ds.writeByte(type);
@@ -2312,7 +2312,7 @@ public class UserService implements IUserService {
                 }
 
                 case 2 -> {
-                    IServerConfig config = ServerManager.getInstance().config();
+                    IServerConfig config = ServerManager.getInstance().getConfig();
                     ms = new Message(Cmd.GET_FILEPACK);
                     DataOutputStream ds = ms.writer();
                     ds.writeByte(type);
@@ -2329,7 +2329,7 @@ public class UserService implements IUserService {
                     user.sendMessage(ms);
                 }
                 case 3 -> {
-                    IServerConfig config = ServerManager.getInstance().config();
+                    IServerConfig config = ServerManager.getInstance().getConfig();
                     ms = new Message(Cmd.GET_FILEPACK);
                     DataOutputStream ds = ms.writer();
                     ds.writeByte(type);
@@ -2346,7 +2346,7 @@ public class UserService implements IUserService {
                     user.sendMessage(ms);
                 }
                 case 4 -> {
-                    IServerConfig config = ServerManager.getInstance().config();
+                    IServerConfig config = ServerManager.getInstance().getConfig();
                     ms = new Message(Cmd.GET_FILEPACK);
                     DataOutputStream ds = ms.writer();
                     ds.writeByte(type);
@@ -2363,7 +2363,7 @@ public class UserService implements IUserService {
                     user.sendMessage(ms);
                 }
                 case 5 -> {
-                    IServerConfig config = ServerManager.getInstance().config();
+                    IServerConfig config = ServerManager.getInstance().getConfig();
                     ms = new Message(Cmd.GET_FILEPACK);
                     DataOutputStream ds = ms.writer();
                     ds.writeByte(type);
@@ -2385,7 +2385,7 @@ public class UserService implements IUserService {
                 }
             }
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -2429,7 +2429,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -2449,7 +2449,7 @@ public class UserService implements IUserService {
                 user.updatePoints(points, totalPoints);
             }
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
         sendCharacterInfo();
     }
@@ -2471,7 +2471,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -2506,7 +2506,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -2532,7 +2532,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -2666,12 +2666,12 @@ public class UserService implements IUserService {
                 }
             }
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
     private void purchaseEquipment(short saleIndex, byte unit) {
-        if (user.getEquipmentChest().size() >= ServerManager.getInstance().config().getMaxEquipmentSlots()) {
+        if (user.getEquipmentChest().size() >= ServerManager.getInstance().getConfig().getMaxEquipmentSlots()) {
             sendServerMessage(GameString.ruongNoSlot());
             return;
         }
@@ -2700,7 +2700,7 @@ public class UserService implements IUserService {
 
     @Override
     public void handleSpinWheel(IMessage ms) {
-        IServerConfig config = ServerManager.getInstance().config();
+        IServerConfig config = ServerManager.getInstance().getConfig();
         try {
             byte unit = ms.reader().readByte();
             if (unit == 0) {
@@ -2753,7 +2753,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -2773,7 +2773,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -2808,7 +2808,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -2845,7 +2845,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -2892,7 +2892,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -2913,7 +2913,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -2955,7 +2955,7 @@ public class UserService implements IUserService {
                 }
             }
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -2992,7 +2992,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -3025,13 +3025,13 @@ public class UserService implements IUserService {
                 user.sendMessage(ms);
             }
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
     private void initializeTrainingManager() {
         if (user.getTrainingManager() == null) {
-            user.setTrainingManager(new TrainingManager(user, ServerManager.getInstance().config().getTrainingMapId()));
+            user.setTrainingManager(new TrainingManager(user, ServerManager.getInstance().getConfig().getTrainingMapId()));
         }
     }
 
@@ -3056,7 +3056,7 @@ public class UserService implements IUserService {
 
             user.getTrainingManager().addShoot(user, bullId, x, y, angle, force, force2, numShoot);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -3070,7 +3070,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -3084,7 +3084,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -3108,7 +3108,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -3118,7 +3118,7 @@ public class UserService implements IUserService {
 
     @Override
     public void getMoreGame() {
-        IServerConfig config = ServerManager.getInstance().config();
+        IServerConfig config = ServerManager.getInstance().getConfig();
         try {
             IMessage ms = new Message(Cmd.MORE_GAME);
             DataOutputStream ds = ms.writer();
@@ -3128,7 +3128,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -3142,7 +3142,7 @@ public class UserService implements IUserService {
             ds.flush();
             user.sendMessage(ms);
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 
@@ -3152,7 +3152,7 @@ public class UserService implements IUserService {
         try {
             String str = dis.readUTF();
         } catch (IOException e) {
-            ServerManager.getInstance().logger().logException(UserService.class, e);
+            ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
     }
 }

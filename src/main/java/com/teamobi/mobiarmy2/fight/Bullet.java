@@ -103,7 +103,7 @@ public class Bullet {
                         this.typeSC = 2;
                     }
                 }
-                if ((pl.getGunId() == 2 || pl.getGunId() == 3) && (Math.abs(lastX - XArray.get(0)) > 375)) {
+                if ((pl.getGunId() == 2 || pl.getGunId() == 3) && (Math.abs(lastX - XArray.getFirst()) > 375)) {
                     this.typeSC = 4;
                 }
             }

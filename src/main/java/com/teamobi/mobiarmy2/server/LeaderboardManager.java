@@ -59,16 +59,16 @@ public class LeaderboardManager {
                 }
                 addBonusGiftsForPlayers();
                 isComplete = true;
-                ServerManager.getInstance().logger().success("Refresh BXH");
+                ServerManager.getInstance().getLog().success("Refresh BXH");
             }
         }, calendar.getTime(), 86_400_000L);
     }
 
     private void addBonusGiftsForPlayers() {
-        int[] topBonus = ServerManager.getInstance().config().getTopBonus();
+        int[] topBonus = ServerManager.getInstance().getConfig().getTopBonus();
 
         int i = 0;
-        for (PlayerLeaderboardEntry entry : leaderboardEntries.get(0)) {
+        for (PlayerLeaderboardEntry entry : leaderboardEntries.getFirst()) {
             if (i >= 3) {
                 break;
             }
