@@ -13,12 +13,13 @@ import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.repository.ClanItemRepository;
 import com.teamobi.mobiarmy2.server.ClanManager;
-import com.teamobi.mobiarmy2.util.MapTileExporter;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Predicate;
 
 /**
@@ -58,6 +59,7 @@ public class FightManager implements IFightManager {
     private final IMapManager mapManager;
     private final IBulletManager bulletManager;
     private final ICountdownTimer countdownTimer;
+    private final ExecutorService executorNextTurn;
 
     public FightManager(IFightWait fightWait) {
         this.fightWait = fightWait;
@@ -65,7 +67,7 @@ public class FightManager implements IFightManager {
         this.mapManager = new MapManager(this);
         this.bulletManager = new BulletManager(this);
         this.countdownTimer = new CountdownTimer(MAX_PLAY_TIME + 10, this::onTimeUp);
-
+        this.executorNextTurn = Executors.newSingleThreadExecutor();
         this.playerTurn = -1;
     }
 
@@ -632,24 +634,23 @@ public class FightManager implements IFightManager {
             addBosses.clear();
         }
 
-        nextWind();
-        sendNextTurnMessage(isBossTurn ? bossTurn : playerTurn);
-        countdownTimer.reset();
 
-        try {
-            MapTileExporter.saveMapTilesToFile(
-                    mapManager.getMapTiles(),
-                    mapManager.getWidth(),
-                    mapManager.getHeight(),
-                    players,
-                    String.format("temp/turn_%d.png", turnCount));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        executorNextTurn.submit(() -> {
+            if (turnCount > 1) {
+                try {
+                    Thread.sleep(2000L);
+                } catch (InterruptedException ignored) {
 
-        if (isBossTurn) {
-            ((Boss) players[bossTurn]).turnAction();
-        }
+                }
+            }
+            nextWind();
+            sendNextTurnMessage(isBossTurn ? bossTurn : playerTurn);
+            countdownTimer.reset();
+
+            if (isBossTurn) {
+                ((Boss) players[bossTurn]).turnAction();
+            }
+        });
     }
 
     @Override

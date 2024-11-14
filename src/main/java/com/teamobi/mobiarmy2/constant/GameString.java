@@ -21,6 +21,7 @@ public class GameString {
     public static final String specialItemId87Request2 = "Dùng bánh tét thành công";
     public static final String specialItemId87Request3 = "Dùng bánh tét thành công";
     public static final String specialItemId87Success = "Dùng bánh trưng thành công";
+    public static final String MAINTENANCE_MODE = "Server đang bảo trì. Vui lòng quay lại sau khi hoàn tất.";
 
     public static String getNotFinishedLoadingRanking() {
         return "Chưa tải xong bảng xếp hạng";

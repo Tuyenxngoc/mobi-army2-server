@@ -104,6 +104,12 @@ public class UserService implements IUserService {
             return;
         }
 
+        ServerManager serverManager = ServerManager.getInstance();
+        if (serverManager.isMaintenanceMode()) {
+            sendMessageLoginFail(GameString.MAINTENANCE_MODE);
+            return;
+        }
+
         try {
             DataInputStream dis = ms.reader();
             String username = dis.readUTF();
@@ -128,8 +134,6 @@ public class UserService implements IUserService {
                 sendMessageLoginFail(GameString.loginActive());
                 return;
             }
-
-            ServerManager serverManager = ServerManager.getInstance();
 
             //Kiểm tra có đang đăng nhập hay không
             User userLogin = serverManager.getUserByPlayerId(userFound.getPlayerId());

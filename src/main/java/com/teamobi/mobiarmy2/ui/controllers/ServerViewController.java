@@ -122,6 +122,8 @@ public class ServerViewController implements ServerListener {
     private void enterMaintenanceMode() {
         maintainButton.setDisable(false);
         serverStatus.setText("Maintenance Mode");
+
+        ServerManager.getInstance().setMaintenanceMode(true);
     }
 
     @Override
