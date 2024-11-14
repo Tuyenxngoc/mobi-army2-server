@@ -27,7 +27,7 @@ public interface IUserDao extends Dao<User> {
 
     void updateLastOnline(LocalDateTime now, int playerId);
 
-    int createPlayerCharacter(int playerId, byte characterId);
+    boolean createPlayerCharacter(int playerId, byte characterId);
 
     PlayerCharacterEntry getPlayerCharacter(int playerId, byte characterId);
 

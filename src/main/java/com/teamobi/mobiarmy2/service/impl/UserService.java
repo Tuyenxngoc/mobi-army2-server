@@ -2110,7 +2110,7 @@ public class UserService implements IUserService {
                 user.updateLuong(-characterEntry.getPriceLuong());
             }
 
-            if (userDao.createPlayerCharacter(user.getPlayerId(), index) != 0) {
+            if (userDao.createPlayerCharacter(user.getPlayerId(), index)) {
                 PlayerCharacterEntry character = userDao.getPlayerCharacter(user.getPlayerId(), index);
                 if (character != null) {
                     user.getLevels()[index] = character.getLevel();

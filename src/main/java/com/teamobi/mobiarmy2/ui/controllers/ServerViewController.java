@@ -64,37 +64,6 @@ public class ServerViewController implements ServerListener {
         alert.showAndWait();
     }
 
-    @FXML
-    public void initialize() {
-        maintainButton.setDisable(false);
-
-        // Initialize the ObservableList to bind to the TableView
-        userList = FXCollections.observableArrayList();
-
-        // Set up the columns to show data from the User class
-        playerIdColumn.setCellValueFactory(cellData ->
-                new SimpleIntegerProperty(cellData.getValue().getPlayerId()).asObject());
-        usernameColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getUsername()));
-        levelColumn.setCellValueFactory(cellData ->
-                new SimpleIntegerProperty(cellData.getValue().getCurrentLevel()).asObject());
-        statusColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getState().name()));
-        ipAddressColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getSession().getIPAddress()));
-
-        // Set the ObservableList into the TableView
-        playerTable.setItems(userList);
-
-        ServerManager.getInstance().addServerListener(this);
-
-        serverInfoTab.setOnSelectionChanged(event -> {
-            if (serverInfoTab.isSelected()) {
-                updateServerInfo();
-            }
-        });
-    }
-
     private void updateServerInfo() {
         OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
 
@@ -129,50 +98,6 @@ public class ServerViewController implements ServerListener {
         return String.format("%d days, %d hours, %d minutes, %d seconds", days, hours, minutes, seconds);
     }
 
-    @Override
-    public void onUsersUpdated(List<ISession> sessions) {
-        List<User> updatedUsers = sessions.stream()
-                .map(ISession::getUser)
-                .filter(User::isLogged)
-                .toList();
-        userList.setAll(updatedUsers);
-    }
-
-    @FXML
-    public void startServer() {
-    }
-
-    @FXML
-    public void stopServer() {
-    }
-
-    @FXML
-    public void restartServer() {
-    }
-
-    @FXML
-    public void maintainServer() {
-        TextInputDialog dialog = new TextInputDialog("180");
-        dialog.setTitle("Maintenance Countdown");
-        dialog.setHeaderText("Enter countdown time in seconds before maintenance:");
-        dialog.setContentText("Countdown (seconds):");
-
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(countdownStr -> {
-            try {
-                int countdownTime = Integer.parseInt(countdownStr);
-
-                if (countdownTime > 0) {
-                    startCountdown(countdownTime);
-                } else {
-                    showError("Invalid time", "Please enter a positive integer for the countdown.");
-                }
-            } catch (NumberFormatException e) {
-                showError("Invalid input", "Please enter a valid number for the countdown.");
-            }
-        });
-    }
-
     private void startCountdown(int countdownTime) {
         maintainButton.setDisable(true);
         final int[] timeRemaining = {countdownTime};
@@ -197,6 +122,64 @@ public class ServerViewController implements ServerListener {
     private void enterMaintenanceMode() {
         maintainButton.setDisable(false);
         serverStatus.setText("Maintenance Mode");
+    }
+
+    @Override
+    public void onUsersUpdated(List<ISession> sessions) {
+        List<User> updatedUsers = sessions.stream()
+                .map(ISession::getUser)
+                .filter(User::isLogged)
+                .toList();
+        userList.setAll(updatedUsers);
+    }
+
+    @FXML
+    public void initialize() {
+        userList = FXCollections.observableArrayList();
+
+        playerIdColumn.setCellValueFactory(cellData ->
+                new SimpleIntegerProperty(cellData.getValue().getPlayerId()).asObject());
+        usernameColumn.setCellValueFactory(cellData ->
+                new SimpleStringProperty(cellData.getValue().getUsername()));
+        levelColumn.setCellValueFactory(cellData ->
+                new SimpleIntegerProperty(cellData.getValue().getCurrentLevel()).asObject());
+        statusColumn.setCellValueFactory(cellData ->
+                new SimpleStringProperty(cellData.getValue().getState().name()));
+        ipAddressColumn.setCellValueFactory(cellData ->
+                new SimpleStringProperty(cellData.getValue().getSession().getIPAddress()));
+
+        playerTable.setItems(userList);
+
+        ServerManager.getInstance().addServerListener(this);
+
+        serverInfoTab.setOnSelectionChanged(event -> {
+            if (serverInfoTab.isSelected()) {
+                updateServerInfo();
+            }
+        });
+    }
+
+    @FXML
+    public void maintainServer() {
+        TextInputDialog dialog = new TextInputDialog("180");
+        dialog.setTitle("Maintenance Countdown");
+        dialog.setHeaderText("Enter countdown time in seconds before maintenance:");
+        dialog.setContentText("Countdown (seconds):");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(countdownStr -> {
+            try {
+                int countdownTime = Integer.parseInt(countdownStr);
+
+                if (countdownTime > 0) {
+                    startCountdown(countdownTime);
+                } else {
+                    showError("Invalid time", "Please enter a positive integer for the countdown.");
+                }
+            } catch (NumberFormatException e) {
+                showError("Invalid input", "Please enter a valid number for the countdown.");
+            }
+        });
     }
 
     @FXML

@@ -31,8 +31,6 @@ public class ServerManager {
     //tmp variable
     public static byte maxPlayers = 8;
 
-    private static volatile ServerManager instance;
-
     private final IGameService gameService;
     @Getter
     private final IServerConfig config;
@@ -55,15 +53,12 @@ public class ServerManager {
         this.log = new LoggerUtil(config.isDebug());
     }
 
+    private static class SingletonHelper {
+        private static final ServerManager INSTANCE = new ServerManager();
+    }
+
     public static ServerManager getInstance() {
-        if (instance == null) {
-            synchronized (ServerManager.class) {
-                if (instance == null) {
-                    instance = new ServerManager();
-                }
-            }
-        }
-        return instance;
+        return SingletonHelper.INSTANCE;
     }
 
     public void init() {

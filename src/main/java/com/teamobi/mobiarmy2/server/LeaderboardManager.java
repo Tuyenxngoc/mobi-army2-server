@@ -11,23 +11,18 @@ import java.util.*;
  * @author tuyen
  */
 public class LeaderboardManager {
-
-    private static volatile LeaderboardManager instance;
     private final IRankingDao rankingDao;
 
     public LeaderboardManager() {
         this.rankingDao = new RankingDao();
     }
 
+    private static class SingletonHelper {
+        private static final LeaderboardManager INSTANCE = new LeaderboardManager();
+    }
+
     public static LeaderboardManager getInstance() {
-        if (instance == null) {
-            synchronized (LeaderboardManager.class) {
-                if (instance == null) {
-                    instance = new LeaderboardManager();
-                }
-            }
-        }
-        return instance;
+        return SingletonHelper.INSTANCE;
     }
 
     @Getter

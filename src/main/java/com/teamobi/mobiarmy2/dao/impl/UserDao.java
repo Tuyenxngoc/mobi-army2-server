@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -430,8 +431,9 @@ public class UserDao implements IUserDao {
     }
 
     @Override
-    public int createPlayerCharacter(int playerId, byte characterId) {
-        return HikariCPManager.getInstance().update("INSERT INTO `player_characters`(`player_id`, `character_id`) VALUES (?,?)", playerId, characterId);
+    public boolean createPlayerCharacter(int playerId, byte characterId) {
+        Optional<Integer> result = HikariCPManager.getInstance().update("INSERT INTO `player_characters`(`player_id`, `character_id`) VALUES (?,?)", playerId, characterId);
+        return result.isPresent();
     }
 
     @Override

@@ -22,24 +22,19 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author tuyen
  */
 public class ClanManager {
-
-    private static volatile ClanManager instance;
-    private final IClanDao clanDao;
     private final ConcurrentHashMap<Short, Object> clanLocks = new ConcurrentHashMap<>();
+    private final IClanDao clanDao;
 
     public ClanManager() {
         clanDao = new ClanDao();
     }
 
+    private static class SingletonHelper {
+        private static final ClanManager INSTANCE = new ClanManager();
+    }
+
     public static ClanManager getInstance() {
-        if (instance == null) {
-            synchronized (ClanManager.class) {
-                if (instance == null) {
-                    instance = new ClanManager();
-                }
-            }
-        }
-        return instance;
+        return SingletonHelper.INSTANCE;
     }
 
     private Object getClanLock(short clanId) {

@@ -5,14 +5,10 @@
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.teamobi.mobiarmy2.ui.controllers.ServerViewController">
     <top>
         <ToolBar>
-            <Button text="Start Server" onAction="#startServer"/>
-            <Button text="Stop Server" onAction="#stopServer"/>
-            <Button text="Restart Server" onAction="#restartServer"/>
+            <Button fx:id="maintainButton" text="Maintenance" onAction="#maintainServer"/>
             <Separator orientation="VERTICAL"/>
             <Label text="Status: "/>
-            <Label fx:id="serverStatus" text="Stopped" styleClass="status-label"/>
-            <Separator orientation="VERTICAL"/>
-            <Button text="Maintenance" fx:id="maintainButton" onAction="#maintainServer"/>
+            <Label fx:id="serverStatus" text="Running" styleClass="status-label"/>
         </ToolBar>
     </top>
 

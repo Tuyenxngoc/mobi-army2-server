@@ -1,25 +1,38 @@
 package com.teamobi.mobiarmy2.database;
 
+import com.teamobi.mobiarmy2.config.IDatabaseConfig;
 import com.teamobi.mobiarmy2.config.impl.HikariCPConfig;
-import com.teamobi.mobiarmy2.server.ServerManager;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Optional;
+import java.util.logging.Logger;
 
 /**
  * @author tuyen
  */
 public class HikariCPManager {
-
-    private static volatile HikariCPManager instance;
-    private final HikariDataSource dataSource;
-    private final boolean isShowSql;
+    private static final Logger logger = Logger.getLogger(HikariCPManager.class.getName());
+    private final IDatabaseConfig config;
+    private HikariDataSource dataSource;
 
     private HikariCPManager() {
-        HikariCPConfig config = new HikariCPConfig();
+        this.config = new HikariCPConfig();
+        initDataSource();
+    }
+
+    private static class SingletonHelper {
+        private static final HikariCPManager INSTANCE = new HikariCPManager();
+    }
+
+    public static HikariCPManager getInstance() {
+        return SingletonHelper.INSTANCE;
+    }
+
+    private void initDataSource() {
         HikariConfig hikariConfig = new HikariConfig();
 
         hikariConfig.setJdbcUrl(config.getJdbcUrl());
@@ -31,52 +44,35 @@ public class HikariCPManager {
         hikariConfig.setConnectionTimeout(config.getConnectionTimeout());
 
         dataSource = new HikariDataSource(hikariConfig);
-        this.isShowSql = config.isShowSql();
-    }
-
-    public static HikariCPManager getInstance() {
-        if (instance == null) {
-            synchronized (HikariCPManager.class) {
-                if (instance == null) {
-                    instance = new HikariCPManager();
-                }
-            }
-        }
-        return instance;
+        logger.info("HikariCP DataSource initialized.");
     }
 
     public Connection getConnection() throws SQLException {
+        if (dataSource == null || dataSource.isClosed()) {
+            logger.warning("DataSource is closed or uninitialized; reinitializing DataSource.");
+            initDataSource();
+        }
         return dataSource.getConnection();
     }
 
-    public int update(String sql, Object... params) {
-        if (isShowSql) {
-            StringBuilder logMessage = new StringBuilder();
-            logMessage.append(sql).append(" [Parameters: ");
-            for (Object param : params) {
-                logMessage.append(param).append(", ");
-            }
-            logMessage.delete(logMessage.length() - 2, logMessage.length()); //Remove the trailing comma and space
-            logMessage.append("]");
-            ServerManager.getInstance().getLog().log(logMessage.toString());
-        }
-
-        int rowsUpdated = 0;
+    public Optional<Integer> update(String sql, Object... params) {
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {
                 statement.setObject(i + 1, params[i]);
             }
-            rowsUpdated = statement.executeUpdate();
+            int rowsUpdated = statement.executeUpdate();
+            return Optional.of(rowsUpdated);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.severe("SQL Update failed: " + e.getMessage());
+            return Optional.empty();
         }
-        return rowsUpdated;
     }
 
     public void closeDataSource() {
-        if (dataSource != null) {
+        if (dataSource != null && !dataSource.isClosed()) {
             dataSource.close();
+            logger.info("HikariCP DataSource closed.");
         }
     }
 }
