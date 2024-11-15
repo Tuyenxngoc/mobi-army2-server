@@ -6,456 +6,192 @@ import com.teamobi.mobiarmy2.util.Utils;
  * @author tuyen
  */
 public class GameString {
-
-    public static final String specialItemId54Request = "Bạn có muốn sử dụng item này không? Hiệu lực 1 ngày!";
-    public static final String specialItemId54Success = "Sử dụng thành công. Bạn có 1 ngày x2 kinh nghiệm!";
-
-    public static final String specialItemId86Request = "Dùng bánh trưng thành công";
-    public static final String specialItemId86Request1 = "Dùng bánh trưng thành công";
-    public static final String specialItemId86Request2 = "Dùng bánh trưng thành công";
-    public static final String specialItemId86Request3 = "Dùng bánh trưng thành công";
-    public static final String specialItemId86Success = "Dùng bánh trưng thành công";
-
-    public static final String specialItemId87Request = "Dùng bánh tét thành công";
-    public static final String specialItemId87Request1 = "Dùng bánh tét thành công";
-    public static final String specialItemId87Request2 = "Dùng bánh tét thành công";
-    public static final String specialItemId87Request3 = "Dùng bánh tét thành công";
-    public static final String specialItemId87Success = "Dùng bánh trưng thành công";
     public static final String MAINTENANCE_MODE = "Server đang bảo trì. Vui lòng quay lại sau khi hoàn tất.";
+    public static final String RANKING_NOT_LOADED = "Chưa tải xong bảng xếp hạng";
+    public static final String notRanking = "Chưa có hạng";
 
-    public static String getNotFinishedLoadingRanking() {
-        return "Chưa tải xong bảng xếp hạng";
-    }
+    public static final String ESCAPED_GAME = "Đã bỏ chạy";
+    public static final String unauthorizedItem = "Bạn không thể dùng item này";
 
-    public static String leave1() {
-        return "Đã bỏ chạy -%dxp";
-    }
+    public static final String INVITE_OFFLINE = "Bạn đó đã offline rồi!";
+    public static final String INVITE_ALREADY_IN_GAME = "Bạn đó đã vào bàn khác chơi rồi!";
+    public static final String INVITE_DISABLED = "Bạn đó đã tắt chức năng mời bạn!";
 
-    public static String leave2() {
-        return "Đã bỏ chạy";
-    }
+    public static final String MISSION_NOT_FOUND = "Không tồn tại nhiệm vụ này!";
+    public static final String MISSION_NOT_COMPLETED = "Nhiệm vụ chưa hoàn thành!";
+    public static final String MISSION_COMPLETED = "Nhiệm vụ đã hoàn thành!";
 
-    public static String inviteError1() {
-        return "Bạn đó đã offline rồi!";
-    }
+    public static final String FRIEND_ADD_INVALID_NAME = "Tên bạn bè cần thêm có chứa kí tự đặc biệt!";
+    public static final String FRIEND_ADD_MISSING_NAME = "Vui lòng nhập tên bạn bè cần thêm!";
+    public static final String INVALID_ACCOUNT_PASSWORD = "Tài khoản hoặc mật khẩu không cho phép kí tự đặc biệt!";
+    public static final String REGISTRATION_REQUIRED = "Vui lòng truy cập trang chủ để đăng ký";
+    public static final String PASSWORD_INVALID_CHARACTER = "Mật khẩu không được chứa kí tự đặc biệt!";
+    public static final String PASSWORD_INCORRECT_OLD = "Mật khẩu cũ không chính xác!";
+    public static final String PASSWORD_CHANGE_SUCCESS = "Đổi mật khẩu thành công!";
+    public static final String ACCOUNT_INACTIVE = "Tài khoản của bạn chưa được kích hoạt";
+    public static final String LOGIN_FAILED = "Thông tin tài khoản hoặc mật khẩu không chính xác";
+    public static final String ACCOUNT_OTHER_LOGIN = "Có người khác đăng nhập vào tài khoản của bạn!";
+    public static final String LOGIN_ANOTHER_DEVICE = "Bạn đang đăng nhập ở máy khác. Hãy thử đăng nhập lại";
+    public static final String ACCOUNT_LOCKED = "Tài khoản này đang bị khóa. Liên hệ tổng đài hỗ trợ khách hàng để biết thêm thông tin";
 
-    public static String inviteError2() {
-        return "Bạn đó đã vào bàn khác chơi rồi!";
-    }
+    public static final String MATERIAL_PURCHASE_LIMIT = "Bạn đã mua hết số lượng cho phép";
+    public static final String CHEST_LOCKED_NO_SELL = "Rương đồ của bạn đang khóa không thể bán vật phẩm";
+    public static final String ITEM_CRAFT_FAILURE = "Chế đồ thất bại";
+    public static final String ITEM_CRAFT_SUCCESS = "Chế đồ thành công";
+    public static final String COMBINE_ERROR = "Không thể kết hợp";
+    public static final String COMBINE_FAILURE = "Chúc bạn may mắn lần sau";
+    public static final String GEM_COMBINE_REQUEST = "Bạn có muốn gắn ngọc vào trang bị?";
+    public static final String GEM_COMBINE_SUCCESS = "Chúc mừng bạn đã kết hợp thành công";
+    public static final String GEM_COMBINE_NO_SLOT = "Trang bị đã chọn không còn đủ chỗ";
+    public static final String INSUFFICIENT_FUNDS = "Bạn không có đủ tiền!";
+    public static final String PURCHASE_SUCCESS = "Giao dịch thành công. Xin cảm ơn";
+    public static final String CHEST_NO_SPACE = "Không đủ chỗ trong rương!";
+    public static final String CHEST_MAXIMUM_REACHED = "Số lượng đã quá mức tối đa!";
+    public static final String EQUIP_SELL_ERROR_IN_USE = "Không thể bán trang bị đang sử dụng!";
+    public static final String EQUIP_SELL_ERROR_REMOVE_GEMS = "Vui lòng tháo hết ngọc trước khi bán trang bị";
+    public static final String GEM_REMOVAL_SUCCESS = "Tháo lấy ngọc thành công";
+    public static final String EXTEND_SUCCESS = "Gia hạn thành công!";
 
-    public static String inviteError3() {
-        return "Bạn đó đã tắt chức năng mời bạn!";
-    }
+    public static final String ITEM_X2_XP_USAGE_REQUEST = "Bạn có muốn sử dụng item này không? Hiệu lực 1 ngày!";
+    public static final String ITEM_X2_XP_USAGE_SUCCESS = "Sử dụng thành công. Bạn có 1 ngày x2 kinh nghiệm!";
 
-    public static String inviteMessage(String username) {
+    public static final String USE_BANH_TRUNG_REQUEST = "Bạn có muốn dùng bánh trưng không?";
+    public static final String USE_BANH_TRUNG_SUCCESS = "Dùng bánh trưng thành công";
+    public static final String USE_BANH_TET_REQUEST = "Bạn có muốn dùng bánh tét không?";
+    public static final String USE_BANH_TET_SUCCESS = "Dùng bánh tét thành công";
+    public static final String EXCHANGE_BANH_TET_TO_SILVER_EQUIP_1 = "Bạn có muốn đổi 50 bánh tét để lấy một bộ trang bị bạc cấp 1 không?";
+    public static final String EXCHANGE_BANH_TET_TO_SILVER_EQUIP_2 = "Bạn có muốn đổi 100 bánh tét để lấy một bộ trang bị bạc cấp 2 không?";
+    public static final String EXCHANGE_BANH_TET_TO_SILVER_EQUIP_3 = "Bạn có muốn đổi 150 bánh tét để lấy một bộ trang bị bạc cấp 3 không?";
+    public static final String EXCHANGE_BANH_TRUNG_TO_GOLD_EQUIP_1 = "Bạn có muốn đổi 50 bánh trưng để lấy một bộ trang bị vàng cấp 1 không?";
+    public static final String EXCHANGE_BANH_TRUNG_TO_GOLD_EQUIP_2 = "Bạn có muốn đổi 100 bánh trưng để lấy một bộ trang bị vàng cấp 2 không?";
+    public static final String EXCHANGE_BANH_TRUNG_TO_GOLD_EQUIP_3 = "Bạn có muốn đổi 150 bánh trưng để lấy một bộ trang bị vàng cấp 3 không?";
+
+    public static final String AREA_NOT_FOUND = "Không tìm thấy khu vực yêu cầu!";
+    public static final String AREA_JOIN_IN_PROGRESS = "Không thể vào do còn đang chơi";
+    public static final String AREA_INCORRECT_PASSWORD = "Mật khẩu không chính xác!";
+    public static final String AREA_INSUFFICIENT_FUNDS = "Không đủ tiền cược!";
+    public static final String AREA_FULL = "Khu vực đã đầy!";
+    public static final String KICKED_BY_HOST = "Bạn bị đuổi bởi chủ phòng!";
+    public static final String TEAM_MUST_BE_SAME_FACTION = "Đội phải cùng phe!";
+    public static final String TEAM_NOT_READY = "Mọi người chưa sẵn sàng!";
+    public static final String MAP_SELECTION_ERROR = "Không thể chọn map";
+    public static final String MATCH_NOT_COUNTED = "Ván chơi không tính vì thời gian quá ngắn hoặc bạn có hành vi tiêu cực!";
+    public static final String TEAM_SIZE_MISMATCH = "Số lượng 2 bên chưa ngang nhau";
+
+    public static final String NO_CLAN_MEMBERSHIP = "Bạn chưa gia nhập biệt đội nào!";
+    public static final String CLAN_NOT_FOUND = "Biệt đội không tồn tại!";
+    public static final String CLAN_LEVEL_INSUFFICIENT = "Biệt đội bạn chưa đủ cấp độ!";
+    public static final String CLAN_NOT_AUTHORIZED = "Chỉ đội trưởng mới có thể mua!";
+    public static final String CLAN_NOT_ENOUGH_XU = "Biệt đội bạn không có đủ xu!";
+    public static final String CLAN_NOT_ENOUGH_LUONG = "Biệt đội bạn không có đủ lượng!";
+    public static final String CONTRIBUTION_SUCCESS = "Góp thành công";
+
+    public static final String GIFT_CODE_INVALID = "Mã quà tặng không tồn tại hoặc đã sử dụng!";
+    public static final String GIFT_CODE_LIMIT_REACHED = "Số lần sử dụng đã hết!";
+    public static final String GIFT_CODE_ALREADY_USED = "Tài khoản đã sử dụng mã quà tặng này";
+    public static final String GIFT_CODE_SUCCESS = "Sử dụng thành công";
+
+    public static String createInviteMessage(String username) {
         return String.format("%s mời bạn chơi?", username);
     }
 
-    public static String missionError1() {
-        return "Không tồn tại nhiệm vụ này!";
-    }
-
-    public static String missionError2() {
-        return "Nhiệm vụ chưa hoàn thành!";
-    }
-
-    public static String missionError3() {
-        return "Nhiệm vụ đã hoàn thành!";
-    }
-
-    public static String missionComplete(String reward) {
+    public static String createMissionCompleteMessage(String reward) {
         return String.format("Chúc mừng bạn nhận được phần thưởng %s!", reward);
     }
 
-    public static String phucHoiSuccess() {
-        return "Phục hồi điểm nâng cấp thành công!";
-    }
-
-    public static String exchangeGift() {
-        return "Bạn muốn sử dụng vật phẩm sự kiện!";
-    }
-
-    public static String phucHoiDiemString() {
-        return "Bạn có muốn sử dụng item này không? Sẽ xóa hết điểm đã nâng!";
-    }
-
-    public static String mssTGString(String sender, String content) {
+    public static String createMessageFromSender(String sender, String content) {
         return String.format("Tin nhắn từ %s: %s.", sender, content);
     }
 
-    public static String dailyReward(byte quantity, String name) {
+    public static String createDailyRewardMessage(byte quantity, String name) {
         return String.format("Hôm nay bạn được tặng %dx item %s. Chúc bạn chơi game vui vẻ", quantity, name);
     }
 
-    public static String dailyTopReward(int quantity) {
+    public static String createDailyTopRewardMessage(int quantity) {
         return String.format("Chúc mừng bạn nhận được phần thưởng top là %s xu", Utils.getStringNumber(quantity));
     }
 
-    public static String loginErr1() {
-        return "Bạn đang đăng nhập ở máy khác. Hãy thử đăng nhập lại";
-    }
-
-    public static String userLoginMany() {
-        return "Có người khác đăng nhập vào tài khoản của bạn!";
-    }
-
-    public static String loginPassFail() {
-        return "Thông tin tài khoản hoặc mật khẩu không chính xác";
-    }
-
-    public static String hopNgocFail() {
-        return "Chúc bạn may mắn lần sau";
-    }
-
-    public static String hopNgocSucess() {
-        return "Chế ngọc thành công hao phí %d %s thu được %d %s!";
-    }
-
-    public static String cheDoSuccess() {
-        return "Chế đồ thành công";
-    }
-
-    public static String cheDoFail() {
-        return "Chế đồ thất bại";
-    }
-
-    public static String hopNgocError() {
-        return "Không thể kết hợp";
-    }
-
-    public static String hopNgocCantDo() {
-        return "Không thể kết hợp";
-    }
-
-    public static String hopNgocRequest() {
-        return "Bạn có muốn gắn ngọc vào trang bị?";
-    }
-
-    public static String hopNgocSuccess() {
-        return "Chúc mừng bạn đã kết hợp thành công";
-    }
-
-    public static String nangNgocSuccess(int quantity, String name) {
+    public static String createGemUpgradeSuccessMessage(int quantity, String name) {
         return String.format("Chúc mừng, bạn đã kết hợp thành công %d viên %s", quantity, name);
     }
 
-    public static String hopNgocNC(int pt) {
+    public static String createGemFusionRequestMessage(int pt) {
         return String.format("Bạn có muốn kết hợp 5 viên ngọc này thành 1 viên ngọc cấp cao hơn? Tỉ lệ thành công là %d%%", pt);
     }
 
-    public static String hopNgocSell(int quantity, int total) {
+    public static String createGemSellRequestMessage(int quantity, int total) {
         return String.format("Bạn có muốn bán %d vật phẩm này với giá %d xu không?", quantity, total);
     }
 
-    public static String hopNgocNoSlot() {
-        return "Trang bị đã chọn không còn đủ chỗ";
-    }
-
-    public static String xuNotEnought() {
-        return "Bạn không có đủ tiền!";
-    }
-
-    public static String buySuccess() {
-        return "Giao dịch thành công. Xin cảm ơn";
-    }
-
-    public static String addFrienvError1() {
-        return "Tên bạn bè cần thêm có chứa kí tự đặc biệt!";
-    }
-
-    public static String addFrienvError2() {
-        return "Vui lòng nhập tên bạn bè cần thêm!";
-    }
-
-    public static String changPassError1() {
-        return "Mật khẩu không được chứa kí tự đặc biệt!";
-    }
-
-    public static String changPassError2() {
-        return "Mật khẩu cũ không chính xác!";
-    }
-
-    public static String changPassSuccess() {
-        return "Đổi mật khẩu thành công!";
-    }
-
-    public static String ruongNoSlot() {
-        return "Không đủ chỗ trong rương!";
-    }
-
-    public static String ruongMaxSlot() {
-        return "Số lượng đã quá mức tối đa!";
-    }
-
-    public static String thaoNgocRequest(int xu) {
+    public static String createGemRemovalRequestMessage(int xu) {
         return String.format("Bạn có muốn tháo hết ngọc trong trang bị này ra? Chi phí là %d xu", xu);
     }
 
-    public static String sellTBRequest(int quantity, int xu) {
+    public static String createEquipmentSellRequestMessage(int quantity, int xu) {
         return String.format("Bạn có muốn bán %d trang bị này với giá %d xu không?", quantity, xu);
     }
 
-    public static String sellTBError1() {
-        return "Không thể bán trang bị đang sử dụng!";
-    }
-
-    public static String sellTBError2() {
-        return "Vui lòng tháo hết ngọc trước khi bán trang bị";
-    }
-
-    public static String thaoNgocError1() {
-        return "Không thể tháo ngọc trang bị đang sử dụng!";
-    }
-
-    public static String thaoNgocError2() {
-        return "Bạn không có đủ tiền. Bạn cần %d xu để thực hiện thao tác này!";
-    }
-
-    public static String thaoNgocSuccess() {
-        return "Tháo lấy ngọc thành công";
-    }
-
-    public static String giaHanRequest(int xu) {
+    public static String createEquipmentRenewalRequestMessage(int xu) {
         return String.format("Bạn có muốn gia hạn trang bị này với giá %d xu?", xu);
     }
 
-    public static String giaHanSucess() {
-        return "Gia hạn thành công!";
-    }
-
-    public static String findKVError1() {
-        return "Không tìm thấy khu vực yêu cầu!";
-    }
-
-    public static String joinKVError0() {
-        return "Không thể vào do còn đang chơi";
-    }
-
-    public static String joinKVError1() {
-        return "Mật khẩu không chính xác!";
-    }
-
-    public static String joinKVError2() {
-        return "Không đủ tiền cược!";
-    }
-
-    public static String joinKVError3() {
-        return "Khu vực đã đầy!";
-    }
-
-    public static String joinKVError4(int seconds) {
+    public static String createJoinAreaErrorMessage(int seconds) {
         return String.format("Còn %d giây nữa mới được vào khu vực", seconds);
     }
 
-    public static String kickString() {
-        return "Bạn bị đuổi bởi chủ phòng!";
-    }
-
-    public static String datCuocError1(int min, int max) {
+    public static String createBettingRangeErrorMessage(int min, int max) {
         return String.format("Chỉ có thể đặt cược từ %d xu đến %d xu!", min, max);
     }
 
-    public static String startGameError() {
-        return "Đội phải cùng phe!";
-    }
-
-    public static String startGameError1() {
-        return "Mọi người chưa sẵn sàng!";
-    }
-
-    public static String startGameError2(String username) {
+    public static String createGameStartErrorMessageUserNotReady(String username) {
         return String.format("Còn %s chưa sẵn sàng!", username);
     }
 
-    public static String startGameError3(String username) {
+    public static String createGameStartErrorMessageInsufficientFunds(String username) {
         return String.format("%s không đủ tiền đặt cược!", username);
     }
 
-    public static String startGameError4(String username, int slot) {
+    public static String createGameStartErrorMessageInvalidSlot(String username, int slot) {
         return String.format("%s lỗi item slot %d xin chọn lại!", username, slot);
     }
 
-    public static String startGameError5() {
-        return "Số lượng 2 bên chưa ngang nhau";
-    }
-
-    public static String selectMapError1_1(String srt) {
+    public static String createMapSelectionErrorMessage(String srt) {
         return String.format("Chỉ có thể chọn map %s", srt);
     }
 
-    public static String selectMapError1_2() {
+    public static String createMapSelectionErrorMessageMultipleChoices() {
         return "Chỉ có thể chọn map %s hoặc map %s!";
     }
 
-    public static String selectMapError1_3() {
-        return "Không thể chọn map";
-    }
-
-    public static String waitClick(long second) {
+    public static String createWaitClickMessage(long second) {
         return String.format("Vui lòng chờ sau %s giây", second);
     }
 
-    public static String reg_Error1() {
-        return "Tài khoản hoặc mật khẩu không cho phép kí tự đặc biệt!";
-    }
-
-    public static String reg_Error2() {
-        return "Tài khoản phải có độ dài từ 5 - 16 kí tự!";
-    }
-
-    public static String reg_Error3() {
-        return "Mật khẩu phải có độ dài từ 1 - 40 kí tự!";
-    }
-
-    public static String reg_Error4() {
-        return "Tài khoản đã tồn tại. Vui lòng chọn một tài khoản khác!";
-    }
-
-    public static String reg_Error5() {
-        return "Đăng kí tài khoản thành công!";
-    }
-
-    public static String reg_Error6() {
-        return "Vui lòng truy cập trang chủ để đăng ký";
-    }
-
-    public static String notCompletedMatch() {
-        return "Ván chơi không tính vì thời gian quá ngắn hoặc bạn có hành vi tiêu cực!";
-    }
-
-    public static String openingGift(String name) {
+    public static String createOpeningGiftMessage(String name) {
         return String.format("%s vẫn còn đang mở quà", name);
     }
 
-    public static String notClan() {
-        return "Bạn không có biệt đội!";
-    }
-
-    public static String clanNull() {
-        return "Biệt đội không tồn tại!";
-    }
-
-    public static String clanLevelNotEnought() {
-        return "Biệt đội bạn chưa đủ cấp độ!";
-    }
-
-    public static String clanrightNotEnought() {
-        return "Chỉ đội trưởng mới có thể mua!";
-    }
-
-    public static String clanXuNotEnought() {
-        return "Biệt đội bạn không có đủ xu!";
-    }
-
-    public static String clanLuongNotEnought() {
-        return "Biệt đội bạn không có đủ lượng!";
-    }
-
-    public static String unauthorizedItem() {
-        return "Bạn không thể dùng item này";
-    }
-
-    public static String giftFightWin() {
-        return "Chúc mừng bạn đành chiến thắng phần quà của bạn là %s";
-    }
-
-    public static String LHFinish() {
-        return "Hoàn thành trận đấu phần quà của bạn là %s";
-    }
-
-    public static String LHSuccess() {
-        return "Vượt thành công trận đấu %d phần quà của bạn là %s";
-    }
-
-    public static String LHfailde() {
-        return "Trận đấu thất bại hãy tiếp tục cố gắng";
-    }
-
-    public static String dapDoRequest_1() {
-        return "Bạn có muốn nâng cấp trang bị lên +%d (%d";
-    }
-
-    public static String dapDoRequest_2() {
-        return "Bạn đang không dùng bảo hiểm, có muốn nâng cấp trang bị lên +%d (%d";
-    }
-
-    public static String dapDoSuccess() {
-        return "Chúc mừng bạn đã đập đồ lên cấp %s (+ %s %s)!";
-    }
-
-    public static String dapDoMax() {
-        return "Chúc mừng bạn đã đập lên cấp tối đa %d, +%d%s và %d%s tất cả chỉ số!";
-    }
-
-    public static String dapDoDatMuc() {
-        return "Chúc mừng bạn đã đập đồ lên cấp %d, %d%s và +%d tất cả chỉ số!";
-    }
-
-    public static String dapDoFail() {
-        return "Đập đồ thất bại!";
-    }
-
-    public static String loginLock() {
-        return "Tài khoản này đang bị khóa. Liên hệ tổng đài hỗ trợ khách hàng để biết thêm thông tin";
-    }
-
-    public static String loginActive() {
-        return "Tài khoản của bạn chưa được kích hoạt";
-    }
-
-    public static String gopClanMinXu(int xu) {
+    public static String createClanContributionMinXuMessage(int xu) {
         return String.format("Mức góp ít nhất là %s xu", Utils.getStringNumber(xu));
     }
 
-    public static String gopClanThanhCong() {
-        return "Góp thành công";
-    }
-
-    public static String notRanking() {
-        return "Chưa có hạng";
-    }
-
-    public static String topBonus(String username, String bonus) {
+    public static String createTopBonusMessage(String username, String bonus) {
         return String.format("%s +%s xu mỗi ngày", username, bonus);
     }
 
-    public static String giftCodeError1() {
-        return "Mã quà tặng không tồn tại hoặc đã sử dụng!";
-    }
-
-    public static String giftCodeError2() {
-        return "Số lần sử dụng đã hết!";
-    }
-
-    public static String giftCodeError3(String expiryDate) {
+    public static String createGiftCodeExpiryMessage(String expiryDate) {
         return "Mã quà tặng đã hết hạn lúc " + expiryDate;
     }
 
-    public static String giftCodeError4() {
-        return "Tài khoản đã sử dụng mã quà tặng này";
-    }
-
-    public static String giftCodeSuccess() {
-        return "Sử dụng thành công";
-    }
-
-    public static String giftCodeReward(String code, String reward) {
+    public static String createGiftCodeRewardMessage(String code, String reward) {
         return String.format("Sử dụng mã quà tặng %s thành công, nhận được %s", code, reward);
     }
 
-    public static String giftCodeReward(String code, int quantity, String reward) {
+    public static String createGiftCodeRewardMessageWithQuantity(String code, int quantity, String reward) {
         return String.format("Sử dụng mã quà tặng %s thành công, nhận được %s %s", code, Utils.getStringNumber(quantity), reward);
     }
 
-    public static String materialLimit() {
-        return "Bạn đã mua hết số lượng cho phép";
-    }
-
-    public static String materialLimit1(int quantity) {
+    public static String createMaterialPurchaseLimitMessage(int quantity) {
         return String.format("Bạn chỉ có thể mua thêm %d nguyên liệu", quantity);
-    }
-
-    public static String chestLocked() {
-        return "Rương đồ của bạn đang khóa không thể bán vật phẩm";
     }
 }

@@ -53,7 +53,7 @@ public class RankingDao implements IRankingDao {
                 entry.setDetail(Utils.getStringNumber(resultSet.getInt(detailColumn)));
 
                 if (applyBonus && index <= 3) {
-                    entry.setUsername(GameString.topBonus(resultSet.getString("username"), Utils.getStringNumber(topBonus[index - 1])));
+                    entry.setUsername(GameString.createTopBonusMessage(resultSet.getString("username"), Utils.getStringNumber(topBonus[index - 1])));
                 } else {
                     entry.setUsername(resultSet.getString("username"));
                 }

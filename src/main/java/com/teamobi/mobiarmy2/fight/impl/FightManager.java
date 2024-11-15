@@ -634,7 +634,6 @@ public class FightManager implements IFightManager {
             addBosses.clear();
         }
 
-
         executorNextTurn.submit(() -> {
             if (turnCount > 1) {
                 try {
@@ -725,7 +724,7 @@ public class FightManager implements IFightManager {
         player.setUser(null);
 
         //Gửi thông báo đến ván chơi
-        fightWait.chatMessage(playerId, GameString.leave2());
+        fightWait.chatMessage(playerId, GameString.ESCAPED_GAME);
 
         //Kiểm tra chưa kết thúc ván thì chuyển lượt
         if (!checkWin()) {
@@ -822,7 +821,7 @@ public class FightManager implements IFightManager {
                 if (player == null || player.getUser() == null) {
                     continue;
                 }
-                player.getUser().getUserService().sendServerMessage2("Ván chơi không được công nhận vì thời gian quá ngắn");
+                player.getUser().getUserService().sendServerMessage2(GameString.MATCH_NOT_COUNTED);
             }
         }
 
@@ -1191,7 +1190,7 @@ public class FightManager implements IFightManager {
 
         //Khi đấu boss thì cấm dùng 1 số item
         if (fightWait.getRoomType() == 5 && (itemIndex == 9 || itemIndex == 23 || itemIndex == 26 || itemIndex == 28 || itemIndex == 30 || itemIndex == 31)) {
-            player.getUser().getUserService().sendServerMessage2(GameString.unauthorizedItem());
+            player.getUser().getUserService().sendServerMessage2(GameString.unauthorizedItem);
             return;
         }
 

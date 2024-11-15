@@ -100,7 +100,7 @@ public class UserService implements IUserService {
         }
 
         if (!LeaderboardManager.getInstance().isComplete()) {
-            sendMessageLoginFail(GameString.getNotFinishedLoadingRanking());
+            sendMessageLoginFail(GameString.RANKING_NOT_LOADED);
             return;
         }
 
@@ -117,31 +117,31 @@ public class UserService implements IUserService {
             String version = dis.readUTF();
 
             if (isInvalidInput(username) || isInvalidInput(password)) {
-                sendMessageLoginFail(GameString.reg_Error1());
+                sendMessageLoginFail(GameString.INVALID_ACCOUNT_PASSWORD);
                 return;
             }
 
             User userFound = userDao.findByUsernameAndPassword(username, password);
             if (userFound == null) {
-                sendMessageLoginFail(GameString.loginPassFail());
+                sendMessageLoginFail(GameString.LOGIN_FAILED);
                 return;
             }
             if (userFound.isLock()) {
-                sendMessageLoginFail(GameString.loginLock());
+                sendMessageLoginFail(GameString.ACCOUNT_LOCKED);
                 return;
             }
             if (!userFound.isActive()) {
-                sendMessageLoginFail(GameString.loginActive());
+                sendMessageLoginFail(GameString.ACCOUNT_INACTIVE);
                 return;
             }
 
             //Kiểm tra có đang đăng nhập hay không
             User userLogin = serverManager.getUserByPlayerId(userFound.getPlayerId());
             if (userLogin != null) {
-                userLogin.getUserService().sendServerMessage2(GameString.userLoginMany());
+                userLogin.getUserService().sendServerMessage2(GameString.ACCOUNT_OTHER_LOGIN);
                 userLogin.getSession().close();
 
-                sendMessageLoginFail(GameString.loginErr1());
+                sendMessageLoginFail(GameString.LOGIN_ANOTHER_DEVICE);
                 return;
             }
 
@@ -156,12 +156,12 @@ public class UserService implements IUserService {
                 byte indexItem = FightItemRepository.getRandomItem();
                 byte quantity = 1;
                 user.updateItems(indexItem, quantity);
-                sendMessageToUser(GameString.dailyReward(quantity, FightItemRepository.FIGHT_ITEM_ENTRIES.get(indexItem).getName()));
+                sendMessageToUser(GameString.createDailyRewardMessage(quantity, FightItemRepository.FIGHT_ITEM_ENTRIES.get(indexItem).getName()));
 
                 //Cập nhật quà top
                 if (user.getTopEarningsXu() > 0) {
                     user.updateXu(user.getTopEarningsXu());
-                    sendMessageToUser(GameString.dailyTopReward(user.getTopEarningsXu()));
+                    sendMessageToUser(GameString.createDailyTopRewardMessage(user.getTopEarningsXu()));
                     user.setTopEarningsXu(0);
                 }
 
@@ -394,18 +394,18 @@ public class UserService implements IUserService {
                 ms = new Message(Cmd.GET_MORE_DAY);
                 DataOutputStream ds = ms.writer();
                 ds.writeInt(equip.getKey());
-                ds.writeUTF(GameString.giaHanRequest(gia));
+                ds.writeUTF(GameString.createEquipmentRenewalRequestMessage(gia));
                 ds.flush();
                 user.sendMessage(ms);
             } else {
                 if (user.getXu() < gia) {
-                    sendServerMessage(GameString.xuNotEnought());
+                    sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                     return;
                 }
                 user.updateXu(-gia);
                 equip.setPurchaseDate(LocalDateTime.now());
                 user.updateInventory(equip, null, null, null);
-                sendServerMessage(GameString.giaHanSucess());
+                sendServerMessage(GameString.EXTEND_SUCCESS);
             }
         } catch (IOException e) {
             ServerManager.getInstance().getLog().logException(UserService.class, e);
@@ -435,14 +435,14 @@ public class UserService implements IUserService {
         String message;
         MissionEntry missionEntry = MissionRepository.getMissionById(missionId);
         if (missionEntry == null) {
-            message = GameString.missionError1();
+            message = GameString.MISSION_NOT_FOUND;
         } else {
             byte missionType = missionEntry.getType();
             byte missionLevel = user.getMissionLevel()[missionType];
             byte requiredLevel = missionEntry.getLevel();
 
             if (user.getMission()[missionType] < missionEntry.getRequirement()) {
-                message = GameString.missionError2();
+                message = GameString.MISSION_NOT_COMPLETED;
             } else if (missionLevel == requiredLevel) {
                 user.getMissionLevel()[missionEntry.getType()]++;
                 if (missionEntry.getRewardXu() > 0) {
@@ -458,11 +458,11 @@ public class UserService implements IUserService {
                     user.updateCup(missionEntry.getRewardCup());
                 }
                 sendMissionInfo();
-                message = GameString.missionComplete(missionEntry.getReward());
+                message = GameString.createMissionCompleteMessage(missionEntry.getReward());
             } else if (missionLevel < requiredLevel) {
-                message = GameString.missionError2();
+                message = GameString.MISSION_NOT_COMPLETED;
             } else {
-                message = GameString.missionError3();
+                message = GameString.MISSION_COMPLETED;
             }
         }
         sendServerMessage2(message);
@@ -577,14 +577,14 @@ public class UserService implements IUserService {
 
                 int minXuContributeClan = ServerManager.getInstance().getConfig().getMinXuContributeClan();
                 if (quantity < minXuContributeClan) {
-                    sendServerMessage(GameString.gopClanMinXu(minXuContributeClan));
+                    sendServerMessage(GameString.createClanContributionMinXuMessage(minXuContributeClan));
                     return;
                 }
                 //Update xu user
                 user.updateXu(-quantity);
                 //Update xu clan
                 ClanManager.getInstance().contributeClan(user.getClanId(), user.getPlayerId(), quantity, Boolean.TRUE);
-                sendServerMessage(GameString.gopClanThanhCong());
+                sendServerMessage(GameString.CONTRIBUTION_SUCCESS);
             } else if (type == 1) {
                 if (quantity > user.getLuong()) {
                     return;
@@ -593,7 +593,7 @@ public class UserService implements IUserService {
                 user.updateLuong(-quantity);
                 //Update lg clan
                 ClanManager.getInstance().contributeClan(user.getClanId(), user.getPlayerId(), quantity, Boolean.FALSE);
-                sendServerMessage(GameString.gopClanThanhCong());
+                sendServerMessage(GameString.CONTRIBUTION_SUCCESS);
             }
         } catch (IOException e) {
             ServerManager.getInstance().getLog().logException(UserService.class, e);
@@ -653,14 +653,14 @@ public class UserService implements IUserService {
 
         //Kiểm tra có đủ level chế đồ yêu cầu không
         if (user.getCurrentLevel() < formula.getLevelRequired()) {
-            sendFormulaProcessingResult(GameString.cheDoFail());
+            sendFormulaProcessingResult(GameString.ITEM_CRAFT_FAILURE);
             return;
         }
 
         //Kiểm tra có trang bị yêu cầu không
         EquipmentChestEntry requiredEquip = user.getEquipment(formula.getRequiredEquip().getEquipIndex(), user.getActiveCharacterId(), formula.getLevel());
         if (requiredEquip == null) {
-            sendFormulaProcessingResult(GameString.cheDoFail());
+            sendFormulaProcessingResult(GameString.ITEM_CRAFT_FAILURE);
             return;
         }
 
@@ -671,7 +671,7 @@ public class UserService implements IUserService {
         for (SpecialItemChestEntry item : formula.getRequiredItems()) {
             short itemCountInInventory = user.getInventorySpecialItemCount(item.getItem().getId());
             if (itemCountInInventory < item.getQuantity()) {
-                sendFormulaProcessingResult(GameString.cheDoFail());
+                sendFormulaProcessingResult(GameString.ITEM_CRAFT_FAILURE);
                 return;
             }
             itemsToRemove.add(item);
@@ -680,7 +680,7 @@ public class UserService implements IUserService {
         //Kiểm tra có công thức hoặc đủ xu không
         SpecialItemChestEntry material = user.getSpecialItemById(formula.getMaterial().getId());
         if (material == null && user.getXu() < formula.getMaterial().getPriceXu()) {
-            sendFormulaProcessingResult(GameString.cheDoFail());
+            sendFormulaProcessingResult(GameString.ITEM_CRAFT_FAILURE);
             return;
         } else {
             if (material != null) {//Nếu có công thức thì thêm vào danh sách item xóa
@@ -712,7 +712,7 @@ public class UserService implements IUserService {
         user.addEquipment(newEquip);
 
         //Gửi thông báo
-        sendFormulaProcessingResult(GameString.cheDoSuccess());
+        sendFormulaProcessingResult(GameString.ITEM_CRAFT_SUCCESS);
     }
 
     private void sendFormulaProcessingResult(String message) {
@@ -864,7 +864,7 @@ public class UserService implements IUserService {
     @Override
     public void handlePurchaseClanItem(IMessage ms) {
         if (user.getClanId() == null) {
-            sendServerMessage(GameString.notClan());
+            sendServerMessage(GameString.NO_CLAN_MEMBERSHIP);
             return;
         }
         try {
@@ -892,7 +892,7 @@ public class UserService implements IUserService {
 
         int currentLevel = clanManager.getClanLevel(user.getClanId());
         if (currentLevel < clanItemEntry.getLevel()) {
-            sendServerMessage(GameString.clanLevelNotEnought());
+            sendServerMessage(GameString.CLAN_LEVEL_INSUFFICIENT);
             return;
         }
 
@@ -902,7 +902,7 @@ public class UserService implements IUserService {
             }
             int xuClan = clanManager.getClanXu(user.getClanId());
             if (xuClan < clanItemEntry.getXu()) {
-                sendServerMessage(GameString.clanXuNotEnought());
+                sendServerMessage(GameString.CLAN_NOT_ENOUGH_XU);
                 return;
             }
 
@@ -913,13 +913,13 @@ public class UserService implements IUserService {
             }
             int luongClan = clanManager.getClanLuong(user.getClanId());
             if (luongClan < clanItemEntry.getLuong()) {
-                sendServerMessage(GameString.clanLuongNotEnought());
+                sendServerMessage(GameString.CLAN_NOT_ENOUGH_LUONG);
                 return;
             }
 
             clanManager.updateItemClan(user.getClanId(), user.getPlayerId(), clanItemEntry, false);
         }
-        sendServerMessage(GameString.buySuccess());
+        sendServerMessage(GameString.PURCHASE_SUCCESS);
     }
 
     private void sendClanShop() {
@@ -990,7 +990,7 @@ public class UserService implements IUserService {
 
         //Kiểm tra số lượng đang có trong rương
         if (user.getInventorySpecialItemCount(itemId) + quantity > ServerManager.getInstance().getConfig().getMaxSpecialItemSlots()) {
-            sendServerMessage(GameString.ruongMaxSlot());
+            sendServerMessage(GameString.CHEST_MAXIMUM_REACHED);
             return;
         }
 
@@ -1002,10 +1002,10 @@ public class UserService implements IUserService {
         //Giới hạn số lần mua vật liệu
         if (item.isMaterial()) {
             if (user.getMaterialsPurchased() >= 20) {
-                sendServerMessage(GameString.materialLimit());
+                sendServerMessage(GameString.MATERIAL_PURCHASE_LIMIT);
                 return;
             } else if (user.getMaterialsPurchased() + quantity > 20) {
-                sendServerMessage(GameString.materialLimit1(20 - user.getMaterialsPurchased()));
+                sendServerMessage(GameString.createMaterialPurchaseLimitMessage(20 - user.getMaterialsPurchased()));
                 return;
             }
         }
@@ -1013,14 +1013,14 @@ public class UserService implements IUserService {
         if (unit == 0) {//Mua bằng xu
             int totalPrice = quantity * item.getPriceXu();
             if (user.getXu() < totalPrice) {
-                sendServerMessage(GameString.xuNotEnought());
+                sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                 return;
             }
             user.updateXu(-totalPrice);
         } else {//Mua bằng lượng
             int totalPrice = quantity * item.getPriceLuong();
             if (user.getLuong() < totalPrice) {
-                sendServerMessage(GameString.xuNotEnought());
+                sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                 return;
             }
             user.updateLuong(-totalPrice);
@@ -1043,7 +1043,7 @@ public class UserService implements IUserService {
         }
 
         //Gửi thông báo mua thành công
-        sendServerMessage(GameString.buySuccess());
+        sendServerMessage(GameString.PURCHASE_SUCCESS);
     }
 
     private boolean handleSpecialItemPurchase(byte itemId) {
@@ -1140,7 +1140,7 @@ public class UserService implements IUserService {
                     return;
                 }
                 user.updateXu(-priceChatServer);
-                sendServerInfoToServer(GameString.mssTGString(user.getUsername(), content));
+                sendServerInfoToServer(GameString.createMessageFromSender(user.getUsername(), content));
                 return;
             }
             User receiver = ServerManager.getInstance().getUserByPlayerId(playerId);
@@ -1242,7 +1242,7 @@ public class UserService implements IUserService {
             }
             Room room = rooms[roomNumber];
             if (room.getType() == 6 && user.getClanId() == null) {
-                sendServerMessage(GameString.notClan());
+                sendServerMessage(GameString.NO_CLAN_MEMBERSHIP);
                 return;
             }
             ms = new Message(Cmd.BOARD_LIST);
@@ -1276,7 +1276,7 @@ public class UserService implements IUserService {
 
         long timeRemaining = minimumWaitTime - (System.currentTimeMillis() - timeSinceLeftRoom);
         if (timeRemaining > 0) {
-            sendServerMessage(GameString.joinKVError4((int) (timeRemaining / 1000) + 1));
+            sendServerMessage(GameString.createJoinAreaErrorMessage((int) (timeRemaining / 1000) + 1));
             return;
         }
 
@@ -1295,7 +1295,7 @@ public class UserService implements IUserService {
             }
             IFightWait fightWait = fightWaits[areaNumber];
             if (fightWait.isPassSet() && !fightWait.getPassword().equals(password)) {
-                sendServerMessage(GameString.joinKVError1());
+                sendServerMessage(GameString.AREA_INCORRECT_PASSWORD);
                 return;
             }
             fightWait.addUser(user);
@@ -1402,9 +1402,9 @@ public class UserService implements IUserService {
                             specialItemList.getFirst().getItem().isGem()
                     ) {
                         userAction = UserAction.GHEP_NGOC_VAO_TRANG_BI;
-                        sendMessageConfirm(GameString.hopNgocRequest());
+                        sendMessageConfirm(GameString.GEM_COMBINE_REQUEST);
                     } else {
-                        sendServerMessage(GameString.hopNgocError());
+                        sendServerMessage(GameString.COMBINE_ERROR);
                     }
                     return;
                 }
@@ -1422,11 +1422,11 @@ public class UserService implements IUserService {
                         if (itemChestEntry.getItem().isGem()) {
                             if (itemChestEntry.getQuantity() == 5 && ((itemChestEntry.getItem().getId() + 1) % 10 != 0)) {
                                 userAction = UserAction.NANG_CAP_NGOC;
-                                sendMessageConfirm(GameString.hopNgocNC((90 - (itemChestEntry.getItem().getId() % 10) * 10)));
+                                sendMessageConfirm(GameString.createGemFusionRequestMessage((90 - (itemChestEntry.getItem().getId() % 10) * 10)));
                             } else {
                                 userAction = UserAction.BAN_NGOC;
                                 totalTransactionAmount = itemChestEntry.getSellPrice();
-                                sendMessageConfirm(GameString.hopNgocSell(itemChestEntry.getQuantity(), totalTransactionAmount));
+                                sendMessageConfirm(GameString.createGemSellRequestMessage(itemChestEntry.getQuantity(), totalTransactionAmount));
                             }
                             return;
                         }
@@ -1438,7 +1438,7 @@ public class UserService implements IUserService {
                         }
                     }
                 }
-                sendServerMessage(GameString.hopNgocError());
+                sendServerMessage(GameString.COMBINE_ERROR);
             } else if (action == 1) {
                 switch (userAction) {
                     case GHEP_NGOC_VAO_TRANG_BI -> {
@@ -1451,9 +1451,9 @@ public class UserService implements IUserService {
                                 equip.addPoints(specialItem.getItem().getAbility());
                             }
                             user.updateInventory(equip, null, null, specialItemList);
-                            sendServerMessage(GameString.hopNgocSuccess());
+                            sendServerMessage(GameString.GEM_COMBINE_SUCCESS);
                         } else {
-                            sendServerMessage(GameString.hopNgocNoSlot());
+                            sendServerMessage(GameString.GEM_COMBINE_NO_SLOT);
                         }
                     }
                     case NANG_CAP_NGOC -> {
@@ -1466,22 +1466,22 @@ public class UserService implements IUserService {
                             newItem.setItem(SpecialItemRepository.getSpecialItemById((byte) (specialItemChestEntry.getItem().getId() + 1)));
 
                             user.updateInventory(null, null, List.of(newItem), List.of(specialItemChestEntry));
-                            sendServerMessage(GameString.nangNgocSuccess(newItem.getQuantity(), newItem.getItem().getName()));
+                            sendServerMessage(GameString.createGemUpgradeSuccessMessage(newItem.getQuantity(), newItem.getItem().getName()));
                         } else {
                             specialItemChestEntry.setQuantity((short) 1);
                             user.updateInventory(null, null, null, List.of(specialItemChestEntry));
-                            sendServerMessage(GameString.hopNgocFail());
+                            sendServerMessage(GameString.COMBINE_FAILURE);
                         }
                     }
 
                     case BAN_NGOC -> {
                         if (user.isChestLocked()) {
-                            sendServerMessage(GameString.chestLocked());
+                            sendServerMessage(GameString.CHEST_LOCKED_NO_SELL);
                             return;
                         }
                         user.updateInventory(null, null, null, specialItemList);
                         user.updateXu(totalTransactionAmount);
-                        sendServerMessage(GameString.buySuccess());
+                        sendServerMessage(GameString.PURCHASE_SUCCESS);
                     }
 
                     case DUNG_SPEC_ITEM -> handleUseSpecialItem(specialItemList.getFirst());
@@ -1526,7 +1526,7 @@ public class UserService implements IUserService {
             case 54 -> {
                 user.addDaysToXpX2Time(1);
                 user.updateInventory(null, null, null, List.of(itemChestEntry));
-                sendServerMessage(GameString.specialItemId54Success);
+                sendServerMessage(GameString.ITEM_X2_XP_USAGE_SUCCESS);
             }
             case 86 -> {
                 if (itemChestEntry.getQuantity() == 50) {
@@ -1538,7 +1538,7 @@ public class UserService implements IUserService {
                 } else {
                     user.updateXp(1000 * itemChestEntry.getQuantity());
                     user.updateInventory(null, null, null, List.of(itemChestEntry));
-                    sendServerMessage(GameString.specialItemId86Success);
+                    sendServerMessage(GameString.USE_BANH_TRUNG_SUCCESS);
                 }
             }
             case 87 -> {
@@ -1551,44 +1551,42 @@ public class UserService implements IUserService {
                 } else {
                     user.updateXp(500 * itemChestEntry.getQuantity());
                     user.updateInventory(null, null, null, List.of(itemChestEntry));
-                    sendServerMessage(GameString.specialItemId87Success);
+                    sendServerMessage(GameString.USE_BANH_TET_SUCCESS);
                 }
             }
         }
-
     }
 
     private void confirmSpecialItemUse(SpecialItemChestEntry itemChestEntry) {
         switch (itemChestEntry.getItem().getId()) {
             case 54 -> {
                 if (itemChestEntry.getQuantity() == 1) {
-                    sendMessageConfirm(GameString.specialItemId54Request);
-                } else {
-                    sendServerMessage(GameString.hopNgocError());
+                    sendMessageConfirm(GameString.ITEM_X2_XP_USAGE_REQUEST);
                 }
             }
             case 86 -> {
                 if (itemChestEntry.getQuantity() == 50) {
-                    sendMessageConfirm(GameString.specialItemId86Request1);
+                    sendMessageConfirm(GameString.EXCHANGE_BANH_TRUNG_TO_GOLD_EQUIP_1);
                 } else if (itemChestEntry.getQuantity() == 100) {
-                    sendMessageConfirm(GameString.specialItemId86Request2);
+                    sendMessageConfirm(GameString.EXCHANGE_BANH_TRUNG_TO_GOLD_EQUIP_2);
                 } else if (itemChestEntry.getQuantity() == 150) {
-                    sendMessageConfirm(GameString.specialItemId86Request3);
+                    sendMessageConfirm(GameString.EXCHANGE_BANH_TRUNG_TO_GOLD_EQUIP_3);
                 } else {
-                    sendMessageConfirm(GameString.specialItemId86Request);
+                    sendMessageConfirm(GameString.USE_BANH_TRUNG_REQUEST);
                 }
             }
             case 87 -> {
                 if (itemChestEntry.getQuantity() == 50) {
-                    sendMessageConfirm(GameString.specialItemId87Request1);
+                    sendMessageConfirm(GameString.EXCHANGE_BANH_TET_TO_SILVER_EQUIP_1);
                 } else if (itemChestEntry.getQuantity() == 100) {
-                    sendMessageConfirm(GameString.specialItemId87Request2);
+                    sendMessageConfirm(GameString.EXCHANGE_BANH_TET_TO_SILVER_EQUIP_2);
                 } else if (itemChestEntry.getQuantity() == 150) {
-                    sendMessageConfirm(GameString.specialItemId87Request3);
+                    sendMessageConfirm(GameString.EXCHANGE_BANH_TET_TO_SILVER_EQUIP_3);
                 } else {
-                    sendMessageConfirm(GameString.specialItemId87Request);
+                    sendMessageConfirm(GameString.USE_BANH_TET_REQUEST);
                 }
             }
+            default -> sendServerMessage(GameString.COMBINE_ERROR);
         }
     }
 
@@ -1788,7 +1786,7 @@ public class UserService implements IUserService {
             }
 
             if (fightWait == null) {
-                sendServerMessage2(GameString.findKVError1());
+                sendServerMessage2(GameString.AREA_NOT_FOUND);
             } else {
                 fightWait.sendInfo(user);
                 fightWait.addUser(user);
@@ -1900,7 +1898,7 @@ public class UserService implements IUserService {
                 ds.writeInt(us.getCurrentXp());
                 ds.writeInt(us.getCurrentRequiredXp());
                 ds.writeInt(us.getCup());
-                ds.writeUTF(GameString.notRanking());
+                ds.writeUTF(GameString.notRanking);
             }
             ds.flush();
             user.sendMessage(ms);
@@ -1914,11 +1912,11 @@ public class UserService implements IUserService {
         try {
             String username = ms.reader().readUTF().trim();
             if (username.isEmpty()) {
-                sendMessageLoginFail(GameString.addFrienvError2());
+                sendMessageLoginFail(GameString.FRIEND_ADD_MISSING_NAME);
                 return;
             }
             if (isInvalidInput(username)) {
-                sendMessageLoginFail(GameString.addFrienvError1());
+                sendMessageLoginFail(GameString.FRIEND_ADD_INVALID_NAME);
                 return;
             }
             Integer id = userDao.findPlayerIdByUsername(username);
@@ -2074,7 +2072,7 @@ public class UserService implements IUserService {
             ds.writeInt(user.getLuong());
             ds.flush();
             user.sendMessage(ms);
-            sendServerMessage(GameString.buySuccess());
+            sendServerMessage(GameString.PURCHASE_SUCCESS);
         } catch (IOException e) {
             ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
@@ -2099,7 +2097,7 @@ public class UserService implements IUserService {
                     return;
                 }
                 if (user.getXu() < characterEntry.getPriceXu()) {
-                    sendServerMessage(GameString.xuNotEnought());
+                    sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                     return;
                 }
                 user.updateXu(-characterEntry.getPriceXu());
@@ -2108,7 +2106,7 @@ public class UserService implements IUserService {
                     return;
                 }
                 if (user.getLuong() < characterEntry.getPriceLuong()) {
-                    sendServerMessage(GameString.xuNotEnought());
+                    sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                     return;
                 }
                 user.updateLuong(-characterEntry.getPriceLuong());
@@ -2168,20 +2166,20 @@ public class UserService implements IUserService {
     private void handleGiftCode(String code) {
         GiftCodeEntry giftCode = giftCodeDao.getGiftCode(code, user.getPlayerId());
         if (giftCode == null) {
-            sendServerMessage(GameString.giftCodeError1());
+            sendServerMessage(GameString.GIFT_CODE_INVALID);
             return;
         }
         if (giftCode.isUsed()) {
-            sendServerMessage(GameString.giftCodeError4());
+            sendServerMessage(GameString.GIFT_CODE_ALREADY_USED);
             return;
         }
         if (giftCode.getLimit() <= 0) {
-            sendServerMessage(GameString.giftCodeError2());
+            sendServerMessage(GameString.GIFT_CODE_LIMIT_REACHED);
             return;
         }
         if (giftCode.getExpiryDate() != null && LocalDateTime.now().isAfter(giftCode.getExpiryDate())) {
             String formattedDate = Utils.formatLocalDateTime(giftCode.getExpiryDate());
-            sendServerMessage(GameString.giftCodeError3(formattedDate));
+            sendServerMessage(GameString.createGiftCodeExpiryMessage(formattedDate));
             return;
         }
 
@@ -2190,15 +2188,15 @@ public class UserService implements IUserService {
 
         if (giftCode.getXu() > 0) {
             user.updateXu(giftCode.getXu());
-            sendMessageToUser(GameString.giftCodeReward(code, Utils.getStringNumber(giftCode.getXu()) + " xu"));
+            sendMessageToUser(GameString.createGiftCodeRewardMessage(code, Utils.getStringNumber(giftCode.getXu()) + " xu"));
         }
         if (giftCode.getLuong() > 0) {
             user.updateLuong(giftCode.getLuong());
-            sendMessageToUser(GameString.giftCodeReward(code, Utils.getStringNumber(giftCode.getLuong()) + " lượng"));
+            sendMessageToUser(GameString.createGiftCodeRewardMessage(code, Utils.getStringNumber(giftCode.getLuong()) + " lượng"));
         }
         if (giftCode.getExp() > 0) {
             user.updateXp(giftCode.getExp());
-            sendMessageToUser(GameString.giftCodeReward(code, Utils.getStringNumber(giftCode.getExp()) + " exp"));
+            sendMessageToUser(GameString.createGiftCodeRewardMessage(code, Utils.getStringNumber(giftCode.getExp()) + " exp"));
         }
         if (giftCode.getItems() != null) {
             List<SpecialItemChestEntry> additionalItems = new ArrayList<>();
@@ -2210,7 +2208,7 @@ public class UserService implements IUserService {
                 }
                 newItem.setQuantity(item.getQuantity());
                 additionalItems.add(newItem);
-                sendMessageToUser(GameString.giftCodeReward(code, newItem.getQuantity(), newItem.getItem().getName()));
+                sendMessageToUser(GameString.createGiftCodeRewardMessageWithQuantity(code, newItem.getQuantity(), newItem.getItem().getName()));
             }
             user.updateInventory(null, null, additionalItems, null);
         }
@@ -2224,11 +2222,11 @@ public class UserService implements IUserService {
                 addEquip.setAddPoints(json.getAddPoints());
                 addEquip.setAddPercents(json.getAddPercents());
                 user.addEquipment(addEquip);
-                sendMessageToUser(GameString.giftCodeReward(code, addEquip.getEquipEntry().getName()));
+                sendMessageToUser(GameString.createGiftCodeRewardMessage(code, addEquip.getEquipEntry().getName()));
             }
         }
 
-        sendServerMessage(GameString.giftCodeSuccess());
+        sendServerMessage(GameString.GIFT_CODE_SUCCESS);
     }
 
     @Override
@@ -2273,17 +2271,17 @@ public class UserService implements IUserService {
             String newPass = dis.readUTF().trim();
 
             if (isInvalidInput(oldPass) || isInvalidInput(newPass)) {
-                sendServerMessage(GameString.changPassError1());
+                sendServerMessage(GameString.PASSWORD_INVALID_CHARACTER);
                 return;
             }
 
             if (!userDao.existsByUserIdAndPassword(user.getUserId(), oldPass)) {
-                sendServerMessage(GameString.changPassError2());
+                sendServerMessage(GameString.PASSWORD_INCORRECT_OLD);
                 return;
             }
 
             userDao.changePassword(user.getUserId(), newPass);
-            sendServerMessage(GameString.changPassSuccess());
+            sendServerMessage(GameString.PASSWORD_CHANGE_SUCCESS);
         } catch (IOException e) {
             ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
@@ -2594,10 +2592,10 @@ public class UserService implements IUserService {
                                     totalTransactionAmount += (int) (item.getPriceXu() * 0.25);
                                 }
                             }
-                            ds.writeUTF(GameString.thaoNgocRequest(totalTransactionAmount));
+                            ds.writeUTF(GameString.createGemRemovalRequestMessage(totalTransactionAmount));
                         } else {//Bán trang bị
                             userAction = UserAction.BAN_TRANG_BI;
-                            ds.writeUTF(GameString.sellTBRequest(equipList.size(), totalTransactionAmount));
+                            ds.writeUTF(GameString.createEquipmentSellRequestMessage(equipList.size(), totalTransactionAmount));
                         }
                     } else {//Trường hợp không trang bị nào hợp lệ
                         ds.writeByte(0);
@@ -2608,7 +2606,7 @@ public class UserService implements IUserService {
                 case 2 -> {//Xác nhận bán trang bị
                     if (userAction == UserAction.THAO_NGOC) {//Xác nhận tháo ngọc
                         if (user.getXu() < totalTransactionAmount) {
-                            sendServerMessage(GameString.xuNotEnought());
+                            sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                             return;
                         }
 
@@ -2642,21 +2640,21 @@ public class UserService implements IUserService {
                         user.updateInventory(selectedEquipment, null, recoveredGems, null);
 
                         //Gửi thông báo thành công
-                        sendServerMessage(GameString.thaoNgocSuccess());
+                        sendServerMessage(GameString.GEM_REMOVAL_SUCCESS);
                     } else if (userAction == UserAction.BAN_TRANG_BI) {//Xác nhận bán trang bị
                         //Kiểm tra có khóa rương không
                         if (user.isChestLocked()) {
-                            sendServerMessage(GameString.chestLocked());
+                            sendServerMessage(GameString.CHEST_LOCKED_NO_SELL);
                             return;
                         }
 
                         for (EquipmentChestEntry equipment : equipList) {
                             if (equipment.isInUse()) {
-                                sendServerMessage(GameString.sellTBError1());
+                                sendServerMessage(GameString.EQUIP_SELL_ERROR_IN_USE);
                                 return;
                             }
                             if (equipment.getEmptySlot() < 3) {
-                                sendServerMessage(GameString.sellTBError2());
+                                sendServerMessage(GameString.EQUIP_SELL_ERROR_REMOVE_GEMS);
                                 return;
                             }
                         }
@@ -2664,7 +2662,7 @@ public class UserService implements IUserService {
                             user.updateInventory(null, validEquipment, null, null);
                         }
                         user.updateXu(totalTransactionAmount);
-                        sendServerMessage(GameString.buySuccess());
+                        sendServerMessage(GameString.PURCHASE_SUCCESS);
                     }
                     userAction = null;
                 }
@@ -2676,7 +2674,7 @@ public class UserService implements IUserService {
 
     private void purchaseEquipment(short saleIndex, byte unit) {
         if (user.getEquipmentChest().size() >= ServerManager.getInstance().getConfig().getMaxEquipmentSlots()) {
-            sendServerMessage(GameString.ruongNoSlot());
+            sendServerMessage(GameString.CHEST_NO_SPACE);
             return;
         }
         EquipmentEntry equipmentEntry = CharacterRepository.getEquipEntryBySaleIndex(saleIndex);
@@ -2685,13 +2683,13 @@ public class UserService implements IUserService {
         }
         if (unit == 0) {
             if (user.getXu() < equipmentEntry.getPriceXu()) {
-                sendServerMessage(GameString.xuNotEnought());
+                sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                 return;
             }
             user.updateXu(-equipmentEntry.getPriceXu());
         } else {
             if (user.getLuong() < equipmentEntry.getPriceLuong()) {
-                sendServerMessage(GameString.xuNotEnought());
+                sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                 return;
             }
             user.updateLuong(-equipmentEntry.getPriceLuong());
@@ -2699,7 +2697,7 @@ public class UserService implements IUserService {
         EquipmentChestEntry newEquip = new EquipmentChestEntry();
         newEquip.setEquipEntry(equipmentEntry);
         user.addEquipment(newEquip);
-        sendServerMessage(GameString.buySuccess());
+        sendServerMessage(GameString.PURCHASE_SUCCESS);
     }
 
     @Override
@@ -2709,13 +2707,13 @@ public class UserService implements IUserService {
             byte unit = ms.reader().readByte();
             if (unit == 0) {
                 if (user.getXu() < config.getSpinXuCost()) {
-                    sendServerMessage(GameString.xuNotEnought());
+                    sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                     return;
                 }
                 user.updateXu(-config.getSpinXuCost());
             } else {
                 if (user.getLuong() < config.getSpinLuongCost()) {
-                    sendServerMessage(GameString.xuNotEnought());
+                    sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                     return;
                 }
                 user.updateLuong(-config.getSpinLuongCost());
@@ -2822,7 +2820,7 @@ public class UserService implements IUserService {
             short clanId = ms.reader().readShort();
             ClanInfo clanDetails = ClanManager.getInstance().getClanInfo(clanId);
             if (clanDetails == null) {
-                sendMessageLoginFail(GameString.clanNull());
+                sendMessageLoginFail(GameString.CLAN_NOT_FOUND);
                 return;
             }
             ms = new Message(Cmd.CLAN_INFO);
@@ -2923,7 +2921,7 @@ public class UserService implements IUserService {
 
     @Override
     public void handleRegister(IMessage ms) {
-        sendMessageLoginFail(GameString.reg_Error6());
+        sendMessageLoginFail(GameString.REGISTRATION_REQUIRED);
     }
 
     @Override
