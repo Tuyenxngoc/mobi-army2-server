@@ -25,7 +25,7 @@ import java.util.Objects;
 public class FightWait implements IFightWait {
     public static final byte MAX_ITEMS_SLOT = 8;
     public static final int KICK_BOSS_TIME = 90;
-    public static final byte[] continuousMaps = {30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
+    public static final byte[] CONTINUOUS_MAPS = {30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
 
     private final IFightManager fightManager;
     private final Room room;
@@ -92,7 +92,7 @@ public class FightWait implements IFightWait {
         readies = new boolean[maxPlayers];
         if (isContinuous()) {
             continuousLevel = 0;
-            mapId = continuousMaps[continuousLevel];
+            mapId = CONTINUOUS_MAPS[continuousLevel];
         }
         countdownTimer.stop();
     }

@@ -467,13 +467,6 @@ public class User {
         return 0;
     }
 
-    public short getBulletId() {
-        if (characterEquips[activeCharacterId][0] != null) {
-            return characterEquips[activeCharacterId][0].getEquipEntry().getBulletId();
-        }
-        return equipDefault[activeCharacterId][0].getBulletId();
-    }
-
     public short getGunId() {
         if (characterEquips[activeCharacterId][0] != null) {
             return this.characterEquips[activeCharacterId][0].getEquipEntry().getEquipIndex();
@@ -485,7 +478,7 @@ public class User {
      * Calculates the team points for the current character based on the bonus percent.
      *
      * @param bonusPercent The bonus percent to be applied to the team points.
-     * @return The calculated team points, capped at a maximum of 32000.
+     * @return The calculated team points, capped at a maximum of MAX_ABILITY_VALUE.
      */
     public short calculateTeamPoints(byte bonusPercent) {
         short percents = bonusPercent;
@@ -504,7 +497,7 @@ public class User {
         int teamPoints = points * 10;
         teamPoints += (teamPoints * percents / 100);
 
-        return (short) Math.min(teamPoints, 32000);
+        return (short) Math.min(teamPoints, GameConstants.MAX_ABILITY_VALUE);
     }
 
     public short[] calculateCharacterAbilities(short teamPoints) {
@@ -541,7 +534,7 @@ public class User {
 
         short[] result = new short[abilities.length];
         for (byte i = 0; i < result.length; i++) {
-            result[i] = (short) Math.min(abilities[i], 32000);
+            result[i] = (short) Math.min(abilities[i], GameConstants.MAX_ABILITY_VALUE);
         }
 
         return result;

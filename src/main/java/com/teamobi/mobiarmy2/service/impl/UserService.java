@@ -38,7 +38,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -60,6 +59,7 @@ public class UserService implements IUserService {
     private FabricateItemEntry fabricateItemEntry;
 
     private long timeSinceLeftRoom;
+    private long lastSpinTime;
 
     public UserService(User user) {
         this.user = user;
@@ -1680,7 +1680,7 @@ public class UserService implements IUserService {
 
     @Override
     public void processShootingResult(IMessage ms) {
-
+        //todo
     }
 
     @Override
@@ -1898,7 +1898,7 @@ public class UserService implements IUserService {
                 ds.writeInt(us.getCurrentXp());
                 ds.writeInt(us.getCurrentRequiredXp());
                 ds.writeInt(us.getCup());
-                ds.writeUTF(GameString.notRanking);
+                ds.writeUTF(GameString.NO_RANKING);
             }
             ds.flush();
             user.sendMessage(ms);
@@ -2256,8 +2256,7 @@ public class UserService implements IUserService {
                 x[i] = dis.readInt();
                 y[i] = dis.readInt();
             }
-
-            ServerManager.getInstance().getLog().log("Clear bullets: x=" + Arrays.toString(x) + "  y=" + Arrays.toString(y));
+            //todo
         } catch (IOException e) {
             ServerManager.getInstance().getLog().logException(UserService.class, e);
         }
@@ -2702,6 +2701,11 @@ public class UserService implements IUserService {
 
     @Override
     public void handleSpinWheel(IMessage ms) {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastSpinTime < 5000) {
+            sendServerMessage(GameString.SPIN_WAIT_TIME);
+            return;
+        }
         IServerConfig config = ServerManager.getInstance().getConfig();
         try {
             byte unit = ms.reader().readByte();
@@ -2754,6 +2758,8 @@ public class UserService implements IUserService {
             ds.writeByte(luckyIndex);
             ds.flush();
             user.sendMessage(ms);
+
+            lastSpinTime = currentTime;
         } catch (IOException e) {
             ServerManager.getInstance().getLog().logException(UserService.class, e);
         }

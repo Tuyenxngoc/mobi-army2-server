@@ -44,7 +44,8 @@ public class FightManager implements IFightManager {
     };
 
     //Danh sách id boss không có lượt chơi
-    private static final Set<Byte> invalidCharacterIds = new HashSet<>(Set.of((byte) 18, (byte) 19, (byte) 20, (byte) 21, (byte) 23, (byte) 24));
+    private static final Set<Byte> INVALID_CHARACTER_IDS = new HashSet<>(Set.of((byte) 18, (byte) 19, (byte) 20, (byte) 21, (byte) 23, (byte) 24));
+    private static final Set<Byte> UNAUTHORIZED_ITEMS = Set.of((byte) 9, (byte) 23, (byte) 26, (byte) 28, (byte) 30, (byte) 31);
 
     private final IFightWait fightWait;
     private Player[] players;
@@ -590,7 +591,7 @@ public class FightManager implements IFightManager {
                 } else {
                     next = Utils.nextInt(MAX_USER_FIGHT);
                 }
-                if (players[next] != null && !invalidCharacterIds.contains(players[next].getCharacterId())) {
+                if (players[next] != null && !INVALID_CHARACTER_IDS.contains(players[next].getCharacterId())) {
                     if (next < MAX_USER_FIGHT) {
                         playerTurn = next;
                         bossTurn = MAX_USER_FIGHT;
@@ -690,7 +691,7 @@ public class FightManager implements IFightManager {
                 turn = min;
             }
             Player player = players[turn];
-            if (player != null && !player.isDead() && !invalidCharacterIds.contains(player.getCharacterId())) {
+            if (player != null && !player.isDead() && !INVALID_CHARACTER_IDS.contains(player.getCharacterId())) {
                 return turn;
             }
             turn++;
@@ -811,6 +812,12 @@ public class FightManager implements IFightManager {
 
         //Cập nhật số cup nhận được
         updateCupPlayers();
+
+        //Nếu là đấu liên hoàn thì đổi map
+        //Nếu thắng thì đổi map
+        //Nếu thua thì kich người chơi đã bị hạ
+        if (fightWait.isContinuous() && result == MatchResult.BLUE_WIN) {
+        }
 
         long duration = System.currentTimeMillis() - startTime;
         boolean fightInValid = false;
@@ -1189,8 +1196,8 @@ public class FightManager implements IFightManager {
         }
 
         //Khi đấu boss thì cấm dùng 1 số item
-        if (fightWait.getRoomType() == 5 && (itemIndex == 9 || itemIndex == 23 || itemIndex == 26 || itemIndex == 28 || itemIndex == 30 || itemIndex == 31)) {
-            player.getUser().getUserService().sendServerMessage2(GameString.unauthorizedItem);
+        if (fightWait.getRoomType() == 5 && UNAUTHORIZED_ITEMS.contains(itemIndex)) {
+            player.getUser().getUserService().sendServerMessage2(GameString.ITEM_UNAUTHORIZED);
             return;
         }
 

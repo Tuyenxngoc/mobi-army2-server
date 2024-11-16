@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.fight;
 
+import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.fight.boss.GiftBox;
 import com.teamobi.mobiarmy2.fight.boss.GiftBoxFalling;
 import com.teamobi.mobiarmy2.model.User;
@@ -161,7 +162,9 @@ public class Player {
     }
 
     public void nextLuck() {
-        isLucky = Math.random() < 0.5;//todo
+        double luckNormalized = (double) luck / GameConstants.MAX_ABILITY_VALUE;
+        luckNormalized = Math.min(0.75, luckNormalized);
+        isLucky = Math.random() < luckNormalized;
     }
 
     public void decreaseWindStopCount() {

@@ -8,10 +8,7 @@ import com.teamobi.mobiarmy2.util.Utils;
 public class GameString {
     public static final String MAINTENANCE_MODE = "Server đang bảo trì. Vui lòng quay lại sau khi hoàn tất.";
     public static final String RANKING_NOT_LOADED = "Chưa tải xong bảng xếp hạng";
-    public static final String notRanking = "Chưa có hạng";
-
-    public static final String ESCAPED_GAME = "Đã bỏ chạy";
-    public static final String unauthorizedItem = "Bạn không thể dùng item này";
+    public static final String NO_RANKING = "Chưa có hạng";
 
     public static final String INVITE_OFFLINE = "Bạn đó đã offline rồi!";
     public static final String INVITE_ALREADY_IN_GAME = "Bạn đó đã vào bàn khác chơi rồi!";
@@ -77,6 +74,8 @@ public class GameString {
     public static final String MAP_SELECTION_ERROR = "Không thể chọn map";
     public static final String MATCH_NOT_COUNTED = "Ván chơi không tính vì thời gian quá ngắn hoặc bạn có hành vi tiêu cực!";
     public static final String TEAM_SIZE_MISMATCH = "Số lượng 2 bên chưa ngang nhau";
+    public static final String ESCAPED_GAME = "Đã bỏ chạy";
+    public static final String ITEM_UNAUTHORIZED = "Bạn không thể dùng item này";
 
     public static final String NO_CLAN_MEMBERSHIP = "Bạn chưa gia nhập biệt đội nào!";
     public static final String CLAN_NOT_FOUND = "Biệt đội không tồn tại!";
@@ -90,6 +89,7 @@ public class GameString {
     public static final String GIFT_CODE_LIMIT_REACHED = "Số lần sử dụng đã hết!";
     public static final String GIFT_CODE_ALREADY_USED = "Tài khoản đã sử dụng mã quà tặng này";
     public static final String GIFT_CODE_SUCCESS = "Sử dụng thành công";
+    public static final String SPIN_WAIT_TIME = "Quay từ từ thôi bạn ơi!";
 
     public static String createInviteMessage(String username) {
         return String.format("%s mời bạn chơi?", username);
