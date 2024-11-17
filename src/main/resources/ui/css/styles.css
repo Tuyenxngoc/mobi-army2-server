@@ -2,7 +2,16 @@
     -fx-font-weight: bold;
 }
 
-.text-area {
+.search-box {
+    -fx-padding: 10px 0 0 10px;
+}
+
+.footer {
+    -fx-padding: 5px;
     -fx-background-color: #f4f4f4;
-    -fx-border-color: #d4d4d4;
+}
+
+.copyright-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #777;
 }

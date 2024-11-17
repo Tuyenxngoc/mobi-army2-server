@@ -30,7 +30,7 @@ public class GiftCodeDao implements IGiftCodeDao {
             statement.setString(2, code);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    Gson gson = GsonUtil.GSON;
+                    Gson gson = GsonUtil.getInstance();
                     GiftCodeEntry giftCode = new GiftCodeEntry();
                     giftCode.setUsed(resultSet.getBoolean("used"));
                     if (!giftCode.isUsed()) {

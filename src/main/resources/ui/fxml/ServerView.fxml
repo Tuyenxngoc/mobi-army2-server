@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.*?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.teamobi.mobiarmy2.ui.controllers.ServerViewController">
     <top>
         <ToolBar>
@@ -17,6 +16,11 @@
         <TabPane>
             <Tab text="Players" closable="false">
                 <VBox spacing="10">
+                    <HBox spacing="10" alignment="CENTER_LEFT" styleClass="search-box">
+                        <Label text="Search Player:"/>
+                        <TextField fx:id="searchPlayerField" promptText="Enter username or ID"/>
+                        <Button text="Search" onAction="#searchPlayer"/>
+                    </HBox>
                     <TableView fx:id="playerTable">
                         <columns>
                             <TableColumn text="Player ID" fx:id="playerIdColumn"/>
@@ -27,7 +31,7 @@
                 </VBox>
             </Tab>
             <Tab text="Server Info" fx:id="serverInfoTab" closable="false">
-                <VBox spacing="10">
+                <VBox spacing="10" alignment="CENTER">
                     <Label text="CPU Usage:"/>
                     <Label fx:id="cpuUsage" text="N/A"/>
                     <Label text="Memory Usage:"/>
@@ -40,4 +44,9 @@
             </Tab>
         </TabPane>
     </center>
+    <bottom>
+        <HBox spacing="10" alignment="CENTER" styleClass="footer">
+            <Label text="© 2024 Teamobi. All rights reserved." styleClass="copyright-label"/>
+        </HBox>
+    </bottom>
 </BorderPane>

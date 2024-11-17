@@ -214,7 +214,7 @@ public class ClanDao implements IClanDao {
                     String formattedDate = Utils.formatLocalDateTime(createdDate.toLocalDateTime());
                     clanInfo.setCreatedDate(formattedDate);
 
-                    ClanItemJson[] clanItemJsonArray = GsonUtil.GSON.fromJson(resultSet.getString("item"), ClanItemJson[].class);
+                    ClanItemJson[] clanItemJsonArray = GsonUtil.getInstance().fromJson(resultSet.getString("item"), ClanItemJson[].class);
                     LocalDateTime currentDate = LocalDateTime.now();
 
                     List<ClanItem> filteredItems = Arrays.stream(clanItemJsonArray)
@@ -265,7 +265,7 @@ public class ClanDao implements IClanDao {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 byte index = 0;
-                Gson gson = GsonUtil.GSON;
+                Gson gson = GsonUtil.getInstance();
                 while (resultSet.next()) {
                     ClanMemEntry entry = new ClanMemEntry();
                     entry.setPlayerId(resultSet.getInt("player_id"));
@@ -332,7 +332,7 @@ public class ClanDao implements IClanDao {
             statement.setInt(1, clanId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    return GsonUtil.GSON.fromJson(resultSet.getString("item"), ClanItemJson[].class);
+                    return GsonUtil.getInstance().fromJson(resultSet.getString("item"), ClanItemJson[].class);
                 }
             }
         } catch (SQLException e) {
@@ -345,7 +345,7 @@ public class ClanDao implements IClanDao {
     @Override
     public void updateClanItems(short clanId, ClanItemJson[] items) {
         String sql = "UPDATE clans SET item = ? WHERE clan_id = ?";
-        HikariCPManager.getInstance().update(sql, GsonUtil.GSON.toJson(items), clanId);
+        HikariCPManager.getInstance().update(sql, GsonUtil.getInstance().toJson(items), clanId);
     }
 
     @Override

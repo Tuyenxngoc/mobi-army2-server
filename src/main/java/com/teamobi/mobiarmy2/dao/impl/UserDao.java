@@ -16,7 +16,6 @@ import com.teamobi.mobiarmy2.repository.FightItemRepository;
 import com.teamobi.mobiarmy2.repository.MissionRepository;
 import com.teamobi.mobiarmy2.repository.SpecialItemRepository;
 import com.teamobi.mobiarmy2.util.GsonUtil;
-import com.teamobi.mobiarmy2.util.JsonConverter;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.*;
@@ -37,10 +36,41 @@ public class UserDao implements IUserDao {
         HikariCPManager.getInstance().update("INSERT INTO `players`(`user_id`, `xu`, `luong`) VALUES (?,?,?)", user.getUserId(), user.getXu(), user.getLuong());
     }
 
+    public static String convertSpecialItemChestEntriesToJson(List<SpecialItemChestEntry> specialItemChestEntries) {
+        List<SpecialItemChestJson> specialItemChestJsons = specialItemChestEntries.stream().map(entry -> {
+            SpecialItemChestJson jsonItem = new SpecialItemChestJson();
+            jsonItem.setId(entry.getItem().getId());
+            jsonItem.setQuantity(entry.getQuantity());
+            return jsonItem;
+        }).collect(Collectors.toList());
+
+        return GsonUtil.getInstance().toJson(specialItemChestJsons);
+    }
+
+    public static String convertEquipmentChestEntriesToJson(List<EquipmentChestEntry> equipmentChestEntries) {
+        List<EquipmentChestJson> equipmentChestJsons = equipmentChestEntries.stream().map(entry -> {
+            EquipmentChestJson jsonItem = new EquipmentChestJson();
+            jsonItem.setCharacterId(entry.getEquipEntry().getCharacterId());
+            jsonItem.setEquipIndex(entry.getEquipEntry().getEquipIndex());
+            jsonItem.setEquipType(entry.getEquipEntry().getEquipType());
+            jsonItem.setKey(entry.getKey());
+            jsonItem.setInUse((byte) (entry.isInUse() ? 1 : 0));
+            jsonItem.setVipLevel(entry.getVipLevel());
+            jsonItem.setPurchaseDate(entry.getPurchaseDate());
+            jsonItem.setSlots(entry.getSlots());
+            jsonItem.setAddPoints(entry.getAddPoints());
+            jsonItem.setAddPercents(entry.getAddPercents());
+
+            return jsonItem;
+        }).collect(Collectors.toList());
+
+        return GsonUtil.getInstance().toJson(equipmentChestJsons);
+    }
+
     @Override
     public void update(User user) {
-        String specialItemChestJson = JsonConverter.convertSpecialItemChestEntriesToJson(user.getSpecialItemChest());
-        String equipmentChestJson = JsonConverter.convertEquipmentChestEntriesToJson(user.getEquipmentChest());
+        String specialItemChestJson = convertSpecialItemChestEntriesToJson(user.getSpecialItemChest());
+        String equipmentChestJson = convertEquipmentChestEntriesToJson(user.getEquipmentChest());
 
         String sql = "UPDATE `players` SET " +
                 "`friends` = ?, " +
@@ -135,7 +165,7 @@ public class UserDao implements IUserDao {
                 return user;
             }
 
-            Gson gson = GsonUtil.GSON;
+            Gson gson = GsonUtil.getInstance();
 
             //Truy vấn để lấy thông tin từ bảng player
             String playerQuery =
@@ -355,7 +385,7 @@ public class UserDao implements IUserDao {
                 statement.setInt(i + 1, friendIds.get(i));
             }
             try (ResultSet resultSet = statement.executeQuery()) {
-                Gson gson = GsonUtil.GSON;
+                Gson gson = GsonUtil.getInstance();
                 while (resultSet.next()) {
                     if (resultSet.getBoolean("is_locked") || !resultSet.getBoolean("is_enabled")) {
                         continue;
@@ -444,7 +474,7 @@ public class UserDao implements IUserDao {
             statement.setByte(2, characterId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    Gson gson = GsonUtil.GSON;
+                    Gson gson = GsonUtil.getInstance();
                     PlayerCharacterEntry characterEntry = new PlayerCharacterEntry();
                     characterEntry.setPlayerId(playerId);
                     characterEntry.setCharacterId(characterId);

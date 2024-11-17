@@ -80,7 +80,7 @@ public class ServerConfig implements IServerConfig {
     }
 
     private void initializeConfigProperties() {
-        Gson gson = GsonUtil.GSON;
+        Gson gson = GsonUtil.getInstance();
         try {
             debug = Boolean.parseBoolean(configMap.getProperty("debug", "false"));
             port = Short.parseShort(configMap.getProperty("port", "8122"));

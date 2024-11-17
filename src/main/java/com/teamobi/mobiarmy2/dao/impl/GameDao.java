@@ -94,7 +94,7 @@ public class GameDao implements IGameDao {
 
                 //Khởi tại danh sách trang bị mặc định ban đầu
                 User.equipDefault = new EquipmentEntry[CharacterRepository.CHARACTER_ENTRIES.size()][5];
-                Gson gson = GsonUtil.GSON;
+                Gson gson = GsonUtil.getInstance();
                 while (resultSet.next()) {
                     EquipmentEntry equipEntry = new EquipmentEntry();
                     equipEntry.setCharacterId(resultSet.getByte("character_id"));
@@ -249,7 +249,7 @@ public class GameDao implements IGameDao {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `special_items`")) {
-                Gson gson = GsonUtil.GSON;
+                Gson gson = GsonUtil.getInstance();
                 while (resultSet.next()) {
                     SpecialItemEntry specialItemEntry = new SpecialItemEntry();
                     specialItemEntry.setId(resultSet.getByte("special_item_id"));
@@ -286,7 +286,7 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
 
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM formula_details fd INNER JOIN formulas f on fd.formula_id = f.formula_id ORDER BY f.material_id, fd.character_id, f.level")) {
-                Gson gson = GsonUtil.GSON;
+                Gson gson = GsonUtil.getInstance();
                 while (resultSet.next()) {
                     FormulaEntry entry = new FormulaEntry();
                     entry.setMaterial(SpecialItemRepository.getSpecialItemById(resultSet.getByte("f.material_id")));
@@ -432,7 +432,7 @@ public class GameDao implements IGameDao {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `fabricate_items`")) {
-                Gson gson = GsonUtil.GSON;
+                Gson gson = GsonUtil.getInstance();
                 while (resultSet.next()) {
                     FabricateItemEntry entry = new FabricateItemEntry();
                     entry.setId(resultSet.getInt("fabricate_item_id"));

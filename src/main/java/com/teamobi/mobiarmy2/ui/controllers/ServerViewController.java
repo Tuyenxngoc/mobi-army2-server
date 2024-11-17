@@ -28,7 +28,7 @@ public class ServerViewController implements ServerListener {
     @FXML
     public Tab serverInfoTab;
     @FXML
-    private Label serverStatus;
+    public TextField searchPlayerField;
     @FXML
     private TableView<User> playerTable;
     @FXML
@@ -37,6 +37,8 @@ public class ServerViewController implements ServerListener {
     private TableColumn<User, String> usernameColumn;
     @FXML
     private TableColumn<User, String> ipAddressColumn;
+    @FXML
+    private Label serverStatus;
     @FXML
     private Label cpuUsage;
     @FXML
@@ -47,6 +49,7 @@ public class ServerViewController implements ServerListener {
     private Label uptime;
     @FXML
     private Button maintainButton;
+
     private ObservableList<User> userList;
     private Timeline countdownTimeline;
 
@@ -172,5 +175,19 @@ public class ServerViewController implements ServerListener {
                 showError("Invalid input", "Please enter a valid number for the countdown.");
             }
         });
+    }
+
+    @FXML
+    public void searchPlayer() {
+        String query = searchPlayerField.getText().toLowerCase().trim();
+
+        ObservableList<User> filteredUsers = FXCollections.observableArrayList();
+        for (User user : userList) {
+            if (user.getUsername().toLowerCase().contains(query) || String.valueOf(user.getPlayerId()).contains(query)) {
+                filteredUsers.add(user);
+            }
+        }
+
+        playerTable.setItems(filteredUsers);
     }
 }
