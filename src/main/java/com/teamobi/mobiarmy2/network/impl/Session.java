@@ -6,6 +6,7 @@ import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.IMessageHandler;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.server.ServerManager;
+import com.teamobi.mobiarmy2.util.LoggerUtil;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -96,7 +97,7 @@ public class Session implements ISession {
             }
 
             ServerManager serverManager = ServerManager.getInstance();
-            serverManager.getLog().log("Close " + this);
+            LoggerUtil.log("Close " + this);
             serverManager.disconnect(this);
             cleanNetwork();
         } catch (Exception e) {
@@ -267,7 +268,7 @@ public class Session implements ISession {
                 while (Session.this.isSendKeyComplete()) {
                     while (!sendingMessage.isEmpty() && Session.this.dis != null) {
                         IMessage message = sendingMessage.remove(0);
-                        ServerManager.getInstance().getLog().log("   Send mss " + Cmd.getCmdNameByValue(message.getCommand()) + " to " + Session.this);
+                        LoggerUtil.log("   Send mss " + Cmd.getCmdNameByValue(message.getCommand()) + " to " + Session.this);
                         Session.this.doSendMessage(message);
                     }
                     try {
@@ -293,7 +294,7 @@ public class Session implements ISession {
                     if (message == null) {
                         break;
                     }
-                    ServerManager.getInstance().getLog().log(Session.this + " send mss " + Cmd.getCmdNameByValue(message.getCommand()));
+                    LoggerUtil.log(Session.this + " send mss " + Cmd.getCmdNameByValue(message.getCommand()));
                     if (!Session.this.user.isLogged() && requiresAuthentication(message)) {
                         message.cleanup();
                         break;

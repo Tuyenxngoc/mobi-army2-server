@@ -1,8 +1,4 @@
-package com.teamobi.mobiarmy2.log;
-
-import com.teamobi.mobiarmy2.util.Utils;
-import lombok.Getter;
-import lombok.Setter;
+package com.teamobi.mobiarmy2.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -11,9 +7,7 @@ import java.time.LocalDateTime;
 /**
  * @author tuyen
  */
-@Setter
-@Getter
-public class LoggerUtil implements ILogManager {
+public class LoggerUtil {
 
     // Reset
     public static final String RESET = "\033[0m";  // Text Reset
@@ -88,13 +82,7 @@ public class LoggerUtil implements ILogManager {
     public static final String CYAN_BACKGROUND_BRIGHT = "\033[0;106m";  // CYAN
     public static final String WHITE_BACKGROUND_BRIGHT = "\033[0;107m";   // WHITE
 
-    private boolean isDebug;
-
-    public LoggerUtil(boolean isDebug) {
-        this.isDebug = isDebug;
-    }
-
-    private void log(String level, String message) {
+    private static void log(String level, String message) {
         String formattedDateTime = Utils.formatLocalDateTime(LocalDateTime.now());
         String logMessage = String.format("%s [%s] %s: %s",
                 formattedDateTime,
@@ -102,33 +90,26 @@ public class LoggerUtil implements ILogManager {
                 Thread.currentThread().getName(),
                 message);
 
-        if (isDebug) {
-            System.out.println(logMessage);
-        }
+        System.out.println(logMessage);
     }
 
-    @Override
-    public void log(String message) {
+    public static void log(String message) {
         log(BLUE + "INFO" + RESET, message);
     }
 
-    @Override
-    public void success(String message) {
+    public static void success(String message) {
         log(GREEN + "SUCCESS" + RESET, message);
     }
 
-    @Override
-    public void warning(String message) {
+    public static void warning(String message) {
         log(YELLOW + "WARNING" + RESET, message);
     }
 
-    @Override
-    public void error(String message) {
+    public static void error(String message) {
         log(RED + "ERROR" + RESET, message);
     }
 
-    @Override
-    public void logException(Class<?> exceptionClass, Exception exception, String... additionalMessages) {
+    public static void logException(Class<?> exceptionClass, Exception exception, String... additionalMessages) {
         if (additionalMessages != null && additionalMessages.length > 0) {
             log(PURPLE, additionalMessages[0]);
         }

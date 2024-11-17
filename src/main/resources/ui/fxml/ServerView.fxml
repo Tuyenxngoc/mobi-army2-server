@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.teamobi.mobiarmy2.ui.controllers.ServerViewController">
     <top>
         <ToolBar>
@@ -25,13 +26,6 @@
                             <TableColumn text="IP Address" fx:id="ipAddressColumn"/>
                         </columns>
                     </TableView>
-                    <Button text="Kick Selected Player" onAction="#kickPlayer"/>
-                </VBox>
-            </Tab>
-            <Tab text="Configuration" closable="false">
-                <VBox spacing="10">
-                    <Label text="Game Configuration"/>
-                    <Button text="Save Configuration" onAction="#saveConfig"/>
                 </VBox>
             </Tab>
             <Tab text="Server Info" fx:id="serverInfoTab" closable="false">
@@ -44,12 +38,6 @@
                     <Label fx:id="diskSpace" text="N/A"/>
                     <Label text="Uptime:"/>
                     <Label fx:id="uptime" text="N/A"/>
-                </VBox>
-            </Tab>
-            <Tab text="Logs" closable="false">
-                <VBox spacing="10">
-                    <TextArea fx:id="logArea" prefRowCount="15" wrapText="true" editable="false"/>
-                    <Button text="Clear Logs" onAction="#clearLogs"/>
                 </VBox>
             </Tab>
         </TabPane>

@@ -3,6 +3,7 @@ package com.teamobi.mobiarmy2.server;
 import com.teamobi.mobiarmy2.dao.IRankingDao;
 import com.teamobi.mobiarmy2.dao.impl.RankingDao;
 import com.teamobi.mobiarmy2.model.user.PlayerLeaderboardEntry;
+import com.teamobi.mobiarmy2.util.LoggerUtil;
 import lombok.Getter;
 
 import java.util.*;
@@ -54,7 +55,7 @@ public class LeaderboardManager {
                 }
                 addBonusGiftsForPlayers();
                 isComplete = true;
-                ServerManager.getInstance().getLog().success("Refresh BXH");
+                LoggerUtil.log("Refresh BXH");
             }
         }, calendar.getTime(), 86_400_000L);
     }

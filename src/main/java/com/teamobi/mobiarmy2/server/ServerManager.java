@@ -6,8 +6,6 @@ import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.dao.impl.GameDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
-import com.teamobi.mobiarmy2.log.ILogManager;
-import com.teamobi.mobiarmy2.log.LoggerUtil;
 import com.teamobi.mobiarmy2.model.Room;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
@@ -15,6 +13,7 @@ import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.impl.Session;
 import com.teamobi.mobiarmy2.service.IGameService;
 import com.teamobi.mobiarmy2.service.impl.GameService;
+import com.teamobi.mobiarmy2.util.LoggerUtil;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,8 +34,6 @@ public class ServerManager {
     private final IGameService gameService;
     @Getter
     private final IServerConfig config;
-    @Getter
-    private final ILogManager log;
 
     private ServerSocket server;
     private long countClients;
@@ -54,7 +51,6 @@ public class ServerManager {
         this.gameService = new GameService(gameDao);
 
         this.config = new ServerConfig();
-        this.log = new LoggerUtil(config.isDebug());
     }
 
     private static class SingletonHelper {
@@ -137,26 +133,26 @@ public class ServerManager {
     }
 
     public void start() {
-        log.log("Start server!");
+        LoggerUtil.log("Start server!");
         isStart = true;
         try {
             server = new ServerSocket(config.getPort());
-            log.success("Server start at port: " + config.getPort());
+            LoggerUtil.success("Server start at port: " + config.getPort());
             while (isStart) {
                 if (users.size() < config.getMaxClients()) {
                     try {
                         Socket socket = server.accept();
                         ISession session = new Session(++countClients, socket);
                         users.add(session);
-                        log.log("Accept socket client " + countClients + " done!");
+                        LoggerUtil.log("Accept socket client " + countClients + " done!");
                     } catch (Exception ignored) {
                     }
                 } else {
                     try {
-                        log.warning("Maximum number of players reached. Waiting for a slot to be free.");
+                        LoggerUtil.warning("Maximum number of players reached. Waiting for a slot to be free.");
                         Thread.sleep(1000L);
                     } catch (InterruptedException e) {
-                        log.logException(ServerManager.class, e);
+                        LoggerUtil.logException(ServerManager.class, e);
                     }
                 }
             }
@@ -166,7 +162,7 @@ public class ServerManager {
     }
 
     public void stop() {
-        log.log("Stop server!");
+        LoggerUtil.log("Stop server!");
         isStart = false;
         try {
             while (!users.isEmpty()) {

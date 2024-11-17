@@ -3,8 +3,8 @@ package com.teamobi.mobiarmy2.network.impl;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.IMessageHandler;
-import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IUserService;
+import com.teamobi.mobiarmy2.util.LoggerUtil;
 
 /**
  * @author tuyen
@@ -167,8 +167,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.GETSTRING -> userService.getStringMessage(ms);
 
-                default ->
-                        ServerManager.getInstance().getLog().warning("Command " + ms.getCommand() + " is not supported");
+                default -> LoggerUtil.warning("Command " + ms.getCommand() + " is not supported");
             }
         } catch (Exception e) {
             e.printStackTrace();

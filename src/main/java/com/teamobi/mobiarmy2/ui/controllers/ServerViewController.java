@@ -50,8 +50,6 @@ public class ServerViewController implements ServerListener {
     @FXML
     private Label uptime;
     @FXML
-    private TextArea logArea;
-    @FXML
     private Button maintainButton;
     private ObservableList<User> userList;
     private Timeline countdownTimeline;
@@ -183,18 +181,4 @@ public class ServerViewController implements ServerListener {
             }
         });
     }
-
-    @FXML
-    public void kickPlayer() {
-    }
-
-    @FXML
-    public void saveConfig() {
-    }
-
-    @FXML
-    public void clearLogs() {
-        logArea.clear();
-    }
-
 }
