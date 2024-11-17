@@ -18,9 +18,7 @@ public class TRex extends Boss {
     public void turnAction() {
         Player closestPlayer = fightManager.findClosestPlayer(x, y);
         if (closestPlayer == null) {
-            if (!fightManager.checkWin()) {
-                fightManager.nextTurn();
-            }
+            skipTurn();
             return;
         }
 

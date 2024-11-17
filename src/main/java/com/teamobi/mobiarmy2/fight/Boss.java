@@ -21,10 +21,10 @@ public abstract class Boss extends Player {
 
     public abstract void turnAction();
 
-    @Override
-    public void resetValueInNewTurn() {
-        super.resetValueInNewTurn();
-        stamina = 100;
+    protected void skipTurn() {
+        if (!fightManager.checkWin()) {
+            fightManager.nextTurn();
+        }
     }
 
     protected void moveToTarget(Player player) {
@@ -47,4 +47,9 @@ public abstract class Boss extends Player {
         return (int) Math.abs(Math.hypot(deltaX, deltaY));
     }
 
+    @Override
+    public void resetValueInNewTurn() {
+        super.resetValueInNewTurn();
+        stamina = 100;
+    }
 }

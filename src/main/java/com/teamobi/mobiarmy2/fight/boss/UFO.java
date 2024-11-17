@@ -43,9 +43,7 @@ public class UFO extends Boss {
                 fightManager.sendPlayerFlyPosition(index);
             }
 
-            if (!fightManager.checkWin()) {
-                fightManager.nextTurn();
-            }
+            skipTurn();
         }
     }
 }

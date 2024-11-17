@@ -17,9 +17,7 @@ public class SmallBoom extends Boss {
     public void turnAction() {
         Player player = fightManager.findClosestPlayer(x, y);
         if (player == null) {
-            if (!fightManager.checkWin()) {
-                fightManager.nextTurn();
-            }
+            skipTurn();
             return;
         }
 

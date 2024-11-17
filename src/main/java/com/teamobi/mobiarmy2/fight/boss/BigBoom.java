@@ -18,9 +18,7 @@ public class BigBoom extends Boss {
     public void turnAction() {
         Player player = fightManager.findClosestPlayer(x, y);
         if (player == null) {
-            if (!fightManager.checkWin()) {
-                fightManager.nextTurn();
-            }
+            skipTurn();
             return;
         }
 
@@ -46,9 +44,7 @@ public class BigBoom extends Boss {
                 fightManager.newShoot(index, (byte) 31, (short) 0, (byte) 0, (byte) 0, (byte) 1, true);
                 return;
             }
-            if (!fightManager.checkWin()) {
-                fightManager.nextTurn();
-            }
+            skipTurn();
         }
     }
 }

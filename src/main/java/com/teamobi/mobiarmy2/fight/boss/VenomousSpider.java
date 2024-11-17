@@ -49,9 +49,7 @@ public class VenomousSpider extends Boss {
             fightManager.sendPlayerFlyPosition(index);
 
             //Chuyển lượt tiếp theo
-            if (!fightManager.checkWin()) {
-                fightManager.nextTurn();
-            }
+            skipTurn();
         } else {
             if (actionCountdown > 0) {
                 actionCountdown--;

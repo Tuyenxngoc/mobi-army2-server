@@ -27,9 +27,7 @@ public class Balloon extends Boss {
             BalloonEye newBoss = new BalloonEye(fightManager, (byte) fightManager.getTotalPlayers(), (short) (x + 55), (short) (y - 27), (short) 1000);
             bodyParts[4] = newBoss;
             fightManager.addBoss(newBoss);
-            if (!fightManager.checkWin()) {
-                fightManager.nextTurn();
-            }
+            skipTurn();
             return;
         }
 
@@ -49,9 +47,7 @@ public class Balloon extends Boss {
 
         Player player = fightManager.findClosestPlayer(x, y);
         if (player == null) {
-            if (!fightManager.checkWin()) {
-                fightManager.nextTurn();
-            }
+            skipTurn();
             return;
         }
 
