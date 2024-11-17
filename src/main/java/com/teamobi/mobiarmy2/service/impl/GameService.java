@@ -8,9 +8,10 @@ import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
 import com.teamobi.mobiarmy2.model.map.MapEntry;
 import com.teamobi.mobiarmy2.repository.*;
 import com.teamobi.mobiarmy2.service.IGameService;
-import com.teamobi.mobiarmy2.util.LoggerUtil;
 import com.teamobi.mobiarmy2.util.TeamImageOutput;
 import com.teamobi.mobiarmy2.util.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -22,6 +23,7 @@ import java.util.List;
  * @author tuyen
  */
 public class GameService implements IGameService {
+    private static final Logger logger = LoggerFactory.getLogger(GameService.class);
 
     private final IGameDao gameDao;
 
@@ -51,9 +53,9 @@ public class GameService implements IGameService {
             byte[] ab = bas.toByteArray();
             Utils.saveFile(GameConstants.MAP_CACHE_NAME, ab);
 
-            LoggerUtil.success("Cache file created successfully: " + GameConstants.MAP_CACHE_NAME);
+            logger.info("Cache file created successfully: {}", GameConstants.MAP_CACHE_NAME);
         } catch (IOException e) {
-            LoggerUtil.logException(GameService.class, e);
+            logger.error(e.getMessage());
         }
     }
 
@@ -119,9 +121,9 @@ public class GameService implements IGameService {
             bas.close();
             ds.close();
 
-            LoggerUtil.success("Cache file created successfully: " + GameConstants.EQUIP_CACHE_NAME);
+            logger.info("Cache file created successfully: {}", GameConstants.EQUIP_CACHE_NAME);
         } catch (IOException e) {
-            LoggerUtil.logException(GameService.class, e);
+            logger.error(e.getMessage());
         }
     }
 
@@ -142,9 +144,9 @@ public class GameService implements IGameService {
             bas.close();
             ds.close();
 
-            LoggerUtil.success("Cache file created successfully: " + GameConstants.LEVEL_CACHE_NAME);
+            logger.info("Cache file created successfully: {}", GameConstants.LEVEL_CACHE_NAME);
         } catch (IOException e) {
-            LoggerUtil.logException(GameService.class, e);
+            logger.error(e.getMessage());
         }
     }
 
@@ -166,9 +168,9 @@ public class GameService implements IGameService {
             byte[] data = tio.output();
             Utils.saveFile(GameConstants.PLAYER_CACHE_NAME, data);
 
-            LoggerUtil.success("Cache file created successfully: " + GameConstants.PLAYER_CACHE_NAME);
+            logger.info("Cache file created successfully: {}", GameConstants.PLAYER_CACHE_NAME);
         } catch (IOException e) {
-            LoggerUtil.logException(GameService.class, e);
+            logger.error(e.getMessage());
         }
     }
 
@@ -190,82 +192,82 @@ public class GameService implements IGameService {
             byte[] data = tio.output();
             Utils.saveFile(GameConstants.ICON_CACHE_NAME, data);
 
-            LoggerUtil.success("Cache file created successfully: " + GameConstants.ICON_CACHE_NAME);
+            logger.info("Cache file created successfully: " + GameConstants.ICON_CACHE_NAME);
         } catch (IOException e) {
-            LoggerUtil.logException(GameService.class, e);
+            logger.error(e.getMessage());
         }
     }
 
     @Override
     public void getFormulaData() {
         gameDao.getAllFormula();
-        LoggerUtil.success("Loaded " + FormulaRepository.FORMULA.size() + " formula entries successfully.");
+        logger.info("Loaded {} formula entries successfully.", FormulaRepository.FORMULA.size());
     }
 
     @Override
     public void getPaymentData() {
         gameDao.getAllPayment();
-        LoggerUtil.success("Loaded " + PaymentRepository.PAYMENT_ENTRY_MAP.size() + " payment entries successfully.");
+        logger.info("Loaded {} payment entries successfully.", PaymentRepository.PAYMENT_ENTRY_MAP.size());
     }
 
     @Override
     public void getMissionData() {
         gameDao.getAllMissions();
-        LoggerUtil.success("Loaded " + MissionRepository.MISSION_LIST.size() + " mission entries successfully.");
+        logger.info("Loaded {} mission entries successfully.", MissionRepository.MISSION_LIST.size());
     }
 
     @Override
     public void getMapData() {
         gameDao.getAllMapData();
-        LoggerUtil.success("Loaded " + MapRepository.MAP_ENTRIES.size() + " map entries successfully.");
+        logger.info("Loaded {} map entries successfully.", MapRepository.MAP_ENTRIES.size());
     }
 
     @Override
     public void getCharacterData() {
         gameDao.getAllCharacterData();
-        LoggerUtil.success("Loaded " + CharacterRepository.CHARACTER_ENTRIES.size() + " character entries successfully.");
+        logger.info("Loaded {} character entries successfully.", CharacterRepository.CHARACTER_ENTRIES.size());
     }
 
     @Override
     public void getEquipData() {
         gameDao.getAllEquip();
-        LoggerUtil.success("Loaded " + CharacterRepository.EQUIPMENT_ENTRIES.size() + " equipment entries successfully.");
+        logger.info("Loaded {} equipment entries successfully.", CharacterRepository.EQUIPMENT_ENTRIES.size());
     }
 
     @Override
     public void getLvXpData() {
         gameDao.getAllXpData();
-        LoggerUtil.success("Loaded " + PlayerXpRepository.LEVEL_XP_REQUIRED_ENTRIES.size() + " player XP entries successfully.");
-        LoggerUtil.success("Loaded " + ClanXpRepository.LEVEL_XP_REQUIRED_ENTRIES.size() + " clan XP entries successfully.");
+        logger.info("Loaded {} player XP entries successfully.", PlayerXpRepository.LEVEL_XP_REQUIRED_ENTRIES.size());
+        logger.info("Loaded {} clan XP entries successfully.", ClanXpRepository.LEVEL_XP_REQUIRED_ENTRIES.size());
     }
 
     @Override
     public void getFabricateItemData() {
         gameDao.getAllFabricateItems();
-        LoggerUtil.success("Loaded " + FabricateItemRepository.FABRICATE_ITEM_ENTRIES.size() + " fabricate items successfully.");
+        logger.info("Loaded {} fabricate items successfully.", FabricateItemRepository.FABRICATE_ITEM_ENTRIES.size());
     }
 
     @Override
     public void setCaptionLevelData() {
         gameDao.getAllCaptionLevel();
-        LoggerUtil.success("Loaded " + CaptionRepository.CAPTION_ENTRIES.size() + " caption level entries successfully.");
+        logger.info("Loaded {} caption level entries successfully.", CaptionRepository.CAPTION_ENTRIES.size());
     }
 
     @Override
     public void getItemData() {
         gameDao.getAllItem();
-        LoggerUtil.success("Loaded " + FightItemRepository.FIGHT_ITEM_ENTRIES.size() + " fight item entries successfully.");
+        logger.info("Loaded {} fight item entries successfully.", FightItemRepository.FIGHT_ITEM_ENTRIES.size());
     }
 
     @Override
     public void getClanShopData() {
         gameDao.getAllItemClan();
-        LoggerUtil.success("Loaded " + ClanItemRepository.CLAN_ITEM_ENTRY_MAP.size() + " clan shop items successfully.");
+        logger.info("Loaded {} clan shop items successfully.", ClanItemRepository.CLAN_ITEM_ENTRY_MAP.size());
     }
 
     @Override
     public void getSpecialItemData() {
         gameDao.getAllSpecialItem();
-        LoggerUtil.success("Loaded " + SpecialItemRepository.SPECIAL_ITEM_ENTRIES.size() + " special items successfully.");
+        logger.info("Loaded {} special items successfully.", SpecialItemRepository.SPECIAL_ITEM_ENTRIES.size());
     }
 }

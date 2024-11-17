@@ -21,8 +21,6 @@
                         <columns>
                             <TableColumn text="Player ID" fx:id="playerIdColumn"/>
                             <TableColumn text="Username" fx:id="usernameColumn"/>
-                            <TableColumn text="Level" fx:id="levelColumn"/>
-                            <TableColumn text="Status" fx:id="statusColumn"/>
                             <TableColumn text="IP Address" fx:id="ipAddressColumn"/>
                         </columns>
                     </TableView>

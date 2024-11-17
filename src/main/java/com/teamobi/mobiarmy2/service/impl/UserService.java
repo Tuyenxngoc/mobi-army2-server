@@ -31,7 +31,6 @@ import com.teamobi.mobiarmy2.server.ClanManager;
 import com.teamobi.mobiarmy2.server.LeaderboardManager;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IUserService;
-import com.teamobi.mobiarmy2.util.LoggerUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.DataInputStream;
@@ -1897,8 +1896,6 @@ public class UserService implements IUserService {
             DataInputStream dis = ms.reader();
             short x = dis.readShort();
             short y = dis.readShort();
-
-            LoggerUtil.log("Update coordinates: x=" + x + "  y=" + y);
         } catch (IOException ignored) {
         }
     }

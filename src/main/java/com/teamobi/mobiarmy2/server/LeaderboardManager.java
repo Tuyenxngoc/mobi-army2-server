@@ -3,8 +3,9 @@ package com.teamobi.mobiarmy2.server;
 import com.teamobi.mobiarmy2.dao.IRankingDao;
 import com.teamobi.mobiarmy2.dao.impl.RankingDao;
 import com.teamobi.mobiarmy2.model.user.PlayerLeaderboardEntry;
-import com.teamobi.mobiarmy2.util.LoggerUtil;
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -12,6 +13,8 @@ import java.util.*;
  * @author tuyen
  */
 public class LeaderboardManager {
+    private static final Logger logger = LoggerFactory.getLogger(LeaderboardManager.class);
+
     private final IRankingDao rankingDao;
 
     public LeaderboardManager() {
@@ -55,7 +58,7 @@ public class LeaderboardManager {
                 }
                 addBonusGiftsForPlayers();
                 isComplete = true;
-                LoggerUtil.log("Refresh BXH");
+                logger.info("Refresh BXH");
             }
         }, calendar.getTime(), 86_400_000L);
     }

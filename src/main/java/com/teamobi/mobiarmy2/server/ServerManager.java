@@ -13,9 +13,10 @@ import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.impl.Session;
 import com.teamobi.mobiarmy2.service.IGameService;
 import com.teamobi.mobiarmy2.service.impl.GameService;
-import com.teamobi.mobiarmy2.util.LoggerUtil;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -27,6 +28,7 @@ import java.util.List;
  * @author tuyen
  */
 public class ServerManager {
+    private static final Logger logger = LoggerFactory.getLogger(ServerManager.class);
 
     //tmp variable
     public static byte maxPlayers = 8;
@@ -133,26 +135,26 @@ public class ServerManager {
     }
 
     public void start() {
-        LoggerUtil.log("Start server!");
+        logger.info("Start server!");
         isStart = true;
         try {
             server = new ServerSocket(config.getPort());
-            LoggerUtil.success("Server start at port: " + config.getPort());
+            logger.info("Server start at port: {}", config.getPort());
             while (isStart) {
                 if (users.size() < config.getMaxClients()) {
                     try {
                         Socket socket = server.accept();
                         ISession session = new Session(++countClients, socket);
                         users.add(session);
-                        LoggerUtil.log("Accept socket client " + countClients + " done!");
+                        logger.info("Accept socket client {} done!", countClients);
                     } catch (Exception ignored) {
                     }
                 } else {
                     try {
-                        LoggerUtil.warning("Maximum number of players reached. Waiting for a slot to be free.");
+                        logger.warn("Maximum number of players reached. Waiting for a slot to be free.");
                         Thread.sleep(1000L);
                     } catch (InterruptedException e) {
-                        LoggerUtil.logException(ServerManager.class, e);
+                        logger.error(e.getMessage());
                     }
                 }
             }
@@ -162,7 +164,7 @@ public class ServerManager {
     }
 
     public void stop() {
-        LoggerUtil.log("Stop server!");
+        logger.info("Stop server!");
         isStart = false;
         try {
             while (!users.isEmpty()) {

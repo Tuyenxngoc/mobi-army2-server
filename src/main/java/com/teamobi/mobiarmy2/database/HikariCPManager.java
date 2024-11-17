@@ -4,18 +4,20 @@ import com.teamobi.mobiarmy2.config.IDatabaseConfig;
 import com.teamobi.mobiarmy2.config.impl.HikariCPConfig;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 /**
  * @author tuyen
  */
 public class HikariCPManager {
-    private static final Logger logger = Logger.getLogger(HikariCPManager.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(HikariCPManager.class);
+
     private final IDatabaseConfig config;
     private HikariDataSource dataSource;
 
@@ -49,7 +51,7 @@ public class HikariCPManager {
 
     public Connection getConnection() throws SQLException {
         if (dataSource == null || dataSource.isClosed()) {
-            logger.warning("DataSource is closed or uninitialized; reinitializing DataSource.");
+            logger.warn("DataSource is closed or uninitialized; reinitializing DataSource.");
             initDataSource();
         }
         return dataSource.getConnection();
@@ -64,7 +66,7 @@ public class HikariCPManager {
             int rowsUpdated = statement.executeUpdate();
             return Optional.of(rowsUpdated);
         } catch (SQLException e) {
-            logger.severe("SQL Update failed: " + e.getMessage());
+            logger.error("SQL Update failed: {}", e.getMessage());
             return Optional.empty();
         }
     }

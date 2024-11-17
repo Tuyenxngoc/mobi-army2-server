@@ -4,12 +4,14 @@ import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.IMessageHandler;
 import com.teamobi.mobiarmy2.service.IUserService;
-import com.teamobi.mobiarmy2.util.LoggerUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author tuyen
  */
 public class MessageHandler implements IMessageHandler {
+    private static final Logger logger = LoggerFactory.getLogger(MessageHandler.class);
 
     private final IUserService userService;
 
@@ -167,7 +169,7 @@ public class MessageHandler implements IMessageHandler {
 
                 case Cmd.GETSTRING -> userService.getStringMessage(ms);
 
-                default -> LoggerUtil.warning("Command " + ms.getCommand() + " is not supported");
+                default -> logger.warn("Command {} is not supported", ms.getCommand());
             }
         } catch (Exception e) {
             e.printStackTrace();

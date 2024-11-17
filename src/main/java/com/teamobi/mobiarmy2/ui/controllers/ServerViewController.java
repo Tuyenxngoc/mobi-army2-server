@@ -36,10 +36,6 @@ public class ServerViewController implements ServerListener {
     @FXML
     private TableColumn<User, String> usernameColumn;
     @FXML
-    private TableColumn<User, Integer> levelColumn;
-    @FXML
-    private TableColumn<User, String> statusColumn;
-    @FXML
     private TableColumn<User, String> ipAddressColumn;
     @FXML
     private Label cpuUsage;
@@ -141,10 +137,6 @@ public class ServerViewController implements ServerListener {
                 new SimpleIntegerProperty(cellData.getValue().getPlayerId()).asObject());
         usernameColumn.setCellValueFactory(cellData ->
                 new SimpleStringProperty(cellData.getValue().getUsername()));
-        levelColumn.setCellValueFactory(cellData ->
-                new SimpleIntegerProperty(cellData.getValue().getCurrentLevel()).asObject());
-        statusColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getState().name()));
         ipAddressColumn.setCellValueFactory(cellData ->
                 new SimpleStringProperty(cellData.getValue().getSession().getIPAddress()));
 

@@ -6,7 +6,8 @@ import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.IMessageHandler;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.server.ServerManager;
-import com.teamobi.mobiarmy2.util.LoggerUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -20,6 +21,7 @@ import java.util.List;
  * @author tuyen
  */
 public class Session implements ISession {
+    private static final Logger logger = LoggerFactory.getLogger(Session.class);
 
     private static final int TIMEOUT_DURATION = 180_000;
     private static final List<Byte> WHITE_LIST_CMD = List.of(
@@ -96,10 +98,10 @@ public class Session implements ISession {
                 user.getUserService().handleLogout();
             }
 
-            ServerManager serverManager = ServerManager.getInstance();
-            LoggerUtil.log("Close " + this);
-            serverManager.disconnect(this);
+            ServerManager.getInstance().disconnect(this);
             cleanNetwork();
+
+            logger.info("Close {}", this);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -267,8 +269,8 @@ public class Session implements ISession {
             try {
                 while (Session.this.isSendKeyComplete()) {
                     while (!sendingMessage.isEmpty() && Session.this.dis != null) {
-                        IMessage message = sendingMessage.remove(0);
-                        LoggerUtil.log("   Send mss " + Cmd.getCmdNameByValue(message.getCommand()) + " to " + Session.this);
+                        IMessage message = sendingMessage.removeFirst();
+                        logger.info("   Send mss {} to {}", Cmd.getCmdNameByValue(message.getCommand()), Session.this);
                         Session.this.doSendMessage(message);
                     }
                     try {
@@ -294,7 +296,7 @@ public class Session implements ISession {
                     if (message == null) {
                         break;
                     }
-                    LoggerUtil.log(Session.this + " send mss " + Cmd.getCmdNameByValue(message.getCommand()));
+                    logger.info("{} send mss {}", Session.this, Cmd.getCmdNameByValue(message.getCommand()));
                     if (!Session.this.user.isLogged() && requiresAuthentication(message)) {
                         message.cleanup();
                         break;
