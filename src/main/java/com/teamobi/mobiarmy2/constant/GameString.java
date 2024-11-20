@@ -76,6 +76,7 @@ public class GameString {
     public static final String TEAM_SIZE_MISMATCH = "Số lượng 2 bên chưa ngang nhau";
     public static final String ESCAPED_GAME = "Đã bỏ chạy";
     public static final String ITEM_UNAUTHORIZED = "Bạn không thể dùng item này";
+    public static final String PLAYER_ELIMINATED = "Bạn đã bị loại khỏi vòng chơi";
 
     public static final String NO_CLAN_MEMBERSHIP = "Bạn chưa gia nhập biệt đội nào!";
     public static final String CLAN_NOT_FOUND = "Biệt đội không tồn tại!";

@@ -26,7 +26,7 @@ public class SpecialItemChestEntry {
         this.item = other.item;
     }
 
-    public void increaseQuantity(int quantityToAdd) {
+    public void increaseQuantity(short quantityToAdd) {
         if (quantityToAdd <= 0) {
             return;
         }

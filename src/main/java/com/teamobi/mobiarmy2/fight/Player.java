@@ -423,8 +423,13 @@ public class Player {
             //Logic cộng cup
             if (shooter.getUser() != null && user != null) {
                 int cupDifference = shooter.getUser().getCup() - user.getCup();
-                if (cupDifference > 0) {
-                    shooter.updateCup(cupDifference);
+                int cupUp = (3000 - cupDifference) / 100;
+                if (cupUp > 0) {
+                    if (cupUp > 60) {
+                        cupUp = 60;
+                    }
+                    updateCup(-cupUp);
+                    shooter.updateCup(cupUp);
                 }
             }
         }

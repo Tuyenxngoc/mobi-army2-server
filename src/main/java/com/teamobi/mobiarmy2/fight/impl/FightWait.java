@@ -317,10 +317,6 @@ public class FightWait implements IFightWait {
 
     @Override
     public void fightComplete() {
-        if (!started) {
-            return;
-        }
-
         resetReadies();
         countdownTimer.reset();
 
@@ -569,8 +565,23 @@ public class FightWait implements IFightWait {
     }
 
     @Override
+    public void handleKickPlayer(int targetPlayerId, int index, String message) {
+        sendMessageKick(index, message);
+        handleUserRemoval(index);
+        if (numPlayers <= 0) {
+            refreshFightWait();
+        } else {
+            if (bossIndex == index) {
+                findNewBoss();
+            }
+            notifyPlayerLeave(targetPlayerId);
+        }
+    }
+
+    @Override
     public void decreaseContinuousLevel() {
-        continuousLevel++;
+        continuousLevel = (byte) ((continuousLevel + 1) % CONTINUOUS_MAPS.length);
+        mapId = CONTINUOUS_MAPS[continuousLevel];
     }
 
     @Override

@@ -55,7 +55,9 @@ public interface IFightWait {
 
     void chatMessage(int playerId, String message);
 
-    void kickPlayer(int playerId, int playerId1);
+    void kickPlayer(int playerId, int targetPlayerId);
+
+    void handleKickPlayer(int targetPlayerId, int index, String message);
 
     void decreaseContinuousLevel();
 

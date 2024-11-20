@@ -12,6 +12,8 @@ import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.repository.ClanItemRepository;
+import com.teamobi.mobiarmy2.repository.FightItemRepository;
+import com.teamobi.mobiarmy2.repository.SpecialItemRepository;
 import com.teamobi.mobiarmy2.server.ClanManager;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -61,6 +63,7 @@ public class FightManager implements IFightManager {
     private final IBulletManager bulletManager;
     private final ICountdownTimer countdownTimer;
     private final ExecutorService executorNextTurn;
+    private final ExecutorService executorEndGame;
 
     public FightManager(IFightWait fightWait) {
         this.fightWait = fightWait;
@@ -69,6 +72,7 @@ public class FightManager implements IFightManager {
         this.bulletManager = new BulletManager(this);
         this.countdownTimer = new CountdownTimer(MAX_PLAY_TIME + 10, this::onTimeUp);
         this.executorNextTurn = Executors.newSingleThreadExecutor();
+        this.executorEndGame = Executors.newSingleThreadExecutor();
         this.playerTurn = -1;
     }
 
@@ -813,12 +817,6 @@ public class FightManager implements IFightManager {
         //Cập nhật số cup nhận được
         updateCupPlayers();
 
-        //Nếu là đấu liên hoàn thì đổi map
-        //Nếu thắng thì đổi map
-        //Nếu thua thì kich người chơi đã bị hạ
-        if (fightWait.isContinuous() && result == MatchResult.BLUE_WIN) {
-        }
-
         long duration = System.currentTimeMillis() - startTime;
         boolean fightInValid = false;
         if (duration < 5000) {
@@ -872,6 +870,34 @@ public class FightManager implements IFightManager {
                     //Nếu chiến thắng trong đấu boss thì cộng thêm 10xp
                     if (winStatus == 1 && fightWait.getRoomType() == 5) {
                         user.updateXp(10, true);
+
+                        int chance = Utils.nextInt(100);
+                        if (chance < 30) {//30% nhận nguyên liệu
+                            int quantity = Utils.nextInt(1, 5);
+                            byte id = getRewardMaterialId();
+
+                            //todo add new method in user
+                            List<SpecialItemChestEntry> addItems = new ArrayList<>();
+                            SpecialItemChestEntry newItem = new SpecialItemChestEntry((short) quantity, SpecialItemRepository.getSpecialItemById(id));
+                            addItems.add(newItem);
+
+                            user.updateInventory(null, null, addItems, null);
+
+                            String reward = String.format("Phần thưởng diệt trùm của bạn là %dx %s", quantity, newItem.getItem().getName());
+                            user.getUserService().sendServerMessage(reward);
+                        } else {
+                            StringBuilder reward = new StringBuilder("Phần thưởng diệt trùm của bạn là ");
+                            int count = Utils.nextInt(2, 3);
+                            for (int k = 0; k < count; k++) {
+                                byte indexItem = FightItemRepository.getRandomItem();
+                                byte quantity = 1;
+                                user.updateItems(indexItem, quantity);
+                                reward.append(quantity).append("x ");
+                                reward.append(FightItemRepository.FIGHT_ITEM_ENTRIES.get(indexItem).getName()).append(", ");
+                            }
+                            reward.deleteCharAt(reward.length() - 2);
+                            user.getUserService().sendServerMessage(reward.toString());
+                        }
                     }
 
                     //Cộng xp và cup cho clan
@@ -904,8 +930,84 @@ public class FightManager implements IFightManager {
             }
         }
 
-        refreshFightManager();
-        fightWait.fightComplete();
+        if (fightWait.isContinuous()) {
+            if (result == MatchResult.BLUE_WIN) {//Nếu là đấu liên hoàn và thắng thì đổi map
+                fightWait.decreaseContinuousLevel();
+
+                //Xóa người chơi bị hạ khỏi phòng
+                for (byte i = 0; i < MAX_USER_FIGHT; i++) {
+                    Player player = players[i];
+                    if (player == null || !player.isDead() || player.getUser() == null) {
+                        continue;
+                    }
+                    User user = player.getUser();
+                    fightWait.handleKickPlayer(user.getPlayerId(), i, GameString.PLAYER_ELIMINATED);
+                }
+            } else if (result == MatchResult.RED_WIN) { //Nếu thua thì đuổi toàn bộ người chơi
+                for (byte i = 0; i < MAX_USER_FIGHT; i++) {
+                    Player player = players[i];
+                    if (player == null || player.getUser() == null) {
+                        continue;
+                    }
+                    User user = player.getUser();
+                    fightWait.handleKickPlayer(user.getPlayerId(), i, GameString.PLAYER_ELIMINATED);
+                }
+            }
+        }
+
+        executorEndGame.execute(() -> {
+            try {
+                Thread.sleep(8000);
+            } catch (InterruptedException ignored) {
+
+            }
+            refreshFightManager();
+            fightWait.fightComplete();
+        });
+    }
+
+    private byte getRewardMaterialId() {
+        switch (fightWait.getMapId()) {
+            //Bom: Nhôm
+            case 30, 31 -> {
+                return 62;
+            }
+
+            //Nhện máy: Sắt
+            case 32 -> {
+                return 63;
+            }
+
+            //Người máy: Đồng
+            case 33 -> {
+                return 64;
+            }
+
+            //T-rex: Sắt
+            case 34 -> {
+                return 63;
+            }
+
+            //UFO: Gỗ
+            case 35 -> {
+                return 68;
+            }
+
+            //Khí cầu: Vàng
+            case 36 -> {
+                return 66;
+            }
+
+            //Nhện độc: Lông vũ
+            case 37 -> {
+                return 67;
+            }
+
+            //Nghĩa trang: Bạc
+            default -> {
+                return 65;
+            }
+        }
     }
 
     @Override
