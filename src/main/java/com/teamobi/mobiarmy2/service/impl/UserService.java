@@ -40,7 +40,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author tuyen
@@ -774,7 +773,7 @@ public class UserService implements IUserService {
             byte type = 2;
             byte itemId = 55;
             String name = "Tuyenngoc";
-
+//todo
             ms = new Message(Cmd.GET_LUCKYGIFT);
             DataOutputStream ds = ms.writer();
             ds.writeByte(0);
@@ -1470,7 +1469,7 @@ public class UserService implements IUserService {
                         List<SpecialItemChestEntry> addItems = fabricateItemEntry.getRewardItem()
                                 .stream()
                                 .map(SpecialItemChestEntry::new)
-                                .collect(Collectors.toCollection(ArrayList::new));
+                                .toList();
 
                         user.updateInventory(null, null, addItems, specialItemList);
 

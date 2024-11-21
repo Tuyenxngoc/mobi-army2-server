@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.model.user;
 
+import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.model.item.SpecialItemEntry;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,38 +14,48 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class SpecialItemChestEntry {
-    private static final short MAX_QUANTITY = 30_000;
-
     private short quantity;
     private SpecialItemEntry item;
+
+    public SpecialItemChestEntry(short quantity, SpecialItemEntry item) {
+        setQuantity(quantity);
+        this.item = item;
+    }
 
     public SpecialItemChestEntry(SpecialItemChestEntry other) {
         this.quantity = other.quantity;
         this.item = other.item;
     }
 
+    public void setQuantity(short quantity) {
+        if (quantity < 0) {
+            this.quantity = 0;
+        } else if (quantity > GameConstants.MAX_QUANTITY) {
+            this.quantity = GameConstants.MAX_QUANTITY;
+        } else {
+            this.quantity = quantity;
+        }
+    }
+
     public void increaseQuantity(short quantityToAdd) {
         if (quantityToAdd <= 0) {
             return;
         }
-        if (quantityToAdd + quantity > MAX_QUANTITY) {
-            quantity = MAX_QUANTITY;
-            return;
+        int newQuantity = quantity + quantityToAdd;
+        if (newQuantity > GameConstants.MAX_QUANTITY) {
+            quantity = GameConstants.MAX_QUANTITY;
+        } else {
+            quantity = (short) newQuantity;
         }
-        quantity += quantityToAdd;
     }
 
-    public void decreaseQuantity(int quantityToDecrease) {
+    public void decreaseQuantity(short quantityToDecrease) {
         if (quantityToDecrease <= 0) {
             return;
         }
-        if (quantityToDecrease > quantity) {
-            quantity = 0;
-            return;
-        }
-        quantity -= quantityToDecrease;
+        int newQuantity = quantity - quantityToDecrease;
+        quantity = (short) Math.max(newQuantity, 0);
     }
 
     public int getSellPrice() {

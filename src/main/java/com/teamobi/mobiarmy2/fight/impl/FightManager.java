@@ -876,14 +876,10 @@ public class FightManager implements IFightManager {
                             int quantity = Utils.nextInt(1, 5);
                             byte id = getRewardMaterialId();
 
-                            //todo add new method in user
-                            List<SpecialItemChestEntry> addItems = new ArrayList<>();
                             SpecialItemChestEntry newItem = new SpecialItemChestEntry((short) quantity, SpecialItemRepository.getSpecialItemById(id));
-                            addItems.add(newItem);
+                            user.updateInventory(null, null, List.of(newItem), null);
 
-                            user.updateInventory(null, null, addItems, null);
-
-                            String reward = String.format("Phần thưởng diệt trùm của bạn là %dx %s", quantity, newItem.getItem().getName());
+                            String reward = String.format("Phần thưởng diệt trùm của bạn là %dx %s", newItem.getQuantity(), newItem.getItem().getName());
                             user.getUserService().sendServerMessage(reward);
                         } else {
                             StringBuilder reward = new StringBuilder("Phần thưởng diệt trùm của bạn là ");

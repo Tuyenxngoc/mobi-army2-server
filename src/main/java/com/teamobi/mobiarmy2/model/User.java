@@ -311,7 +311,7 @@ public class User {
 
             if (addItems != null && !addItems.isEmpty()) {
                 for (SpecialItemChestEntry newItem : addItems) {
-                    if (newItem.getQuantity() <= 0) {//todo check quantity max 30000
+                    if (newItem.getQuantity() <= 0) {
                         continue;
                     }
                     updateQuantity++;
