@@ -271,7 +271,7 @@ public class GameDao implements IGameDao {
                         case 3 -> specialItemEntry.setUsable(true);
                     }
 
-                    SpecialItemRepository.SPECIAL_ITEM_ENTRIES.add(specialItemEntry);
+                    SpecialItemRepository.addSpecialItem(specialItemEntry);
                 }
             }
         } catch (SQLException e) {
@@ -447,7 +447,7 @@ public class GameDao implements IGameDao {
 
                     SpecialItemChestJson[] jsonArray = gson.fromJson(resultSet.getString("item_require"), SpecialItemChestJson[].class);
                     for (SpecialItemChestJson specialItemChestJson : jsonArray) {
-                        SpecialItemEntry specialItemEntry = SpecialItemRepository.SPECIAL_ITEM_ENTRIES.get(specialItemChestJson.getId());
+                        SpecialItemEntry specialItemEntry = SpecialItemRepository.getSpecialItemById(specialItemChestJson.getId());
                         if (specialItemEntry == null) {
                             continue;
                         }
@@ -456,7 +456,7 @@ public class GameDao implements IGameDao {
 
                     jsonArray = gson.fromJson(resultSet.getString("reward_item"), SpecialItemChestJson[].class);
                     for (SpecialItemChestJson specialItemChestJson : jsonArray) {
-                        SpecialItemEntry specialItemEntry = SpecialItemRepository.SPECIAL_ITEM_ENTRIES.get(specialItemChestJson.getId());
+                        SpecialItemEntry specialItemEntry = SpecialItemRepository.getSpecialItemById(specialItemChestJson.getId());
                         if (specialItemEntry == null) {
                             continue;
                         }

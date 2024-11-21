@@ -268,6 +268,6 @@ public class GameService implements IGameService {
     @Override
     public void getSpecialItemData() {
         gameDao.getAllSpecialItem();
-        logger.info("Loaded {} special items successfully.", SpecialItemRepository.SPECIAL_ITEM_ENTRIES.size());
+        logger.info("Loaded {} special items successfully.", SpecialItemRepository.getSpecialItems().size());
     }
 }

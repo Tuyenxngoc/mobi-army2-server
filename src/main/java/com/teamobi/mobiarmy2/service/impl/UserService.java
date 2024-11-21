@@ -1037,7 +1037,8 @@ public class UserService implements IUserService {
         try {
             IMessage ms = new Message(Cmd.SHOP_LINHTINH);
             DataOutputStream ds = ms.writer();
-            for (SpecialItemEntry spEntry : SpecialItemRepository.SPECIAL_ITEM_ENTRIES) {
+            for (Map.Entry<Byte, SpecialItemEntry> entry : SpecialItemRepository.getSpecialItems().entrySet()) {
+                SpecialItemEntry spEntry = entry.getValue();
                 if (!spEntry.isOnSale()) {
                     continue;
                 }
