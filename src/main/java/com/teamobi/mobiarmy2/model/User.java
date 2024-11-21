@@ -4,8 +4,11 @@ import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.fight.IFightWait;
+import com.teamobi.mobiarmy2.fight.IGiftBoxManager;
 import com.teamobi.mobiarmy2.fight.ITrainingManager;
+import com.teamobi.mobiarmy2.fight.impl.GiftBoxManager;
 import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
+import com.teamobi.mobiarmy2.model.item.SpecialItemEntry;
 import com.teamobi.mobiarmy2.model.user.EquipmentChestEntry;
 import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
 import com.teamobi.mobiarmy2.network.IMessage;
@@ -13,6 +16,7 @@ import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.repository.CharacterRepository;
 import com.teamobi.mobiarmy2.repository.PlayerXpRepository;
+import com.teamobi.mobiarmy2.repository.SpecialItemRepository;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.service.impl.UserService;
@@ -71,12 +75,13 @@ public class User {
     private IFightWait fightWait;
     private ITrainingManager trainingManager;
     private final IUserService userService;
-    private boolean openingGift;
+    private final IGiftBoxManager giftBoxManager;
     private int topEarningsXu;
 
     public User() {
         this.state = UserState.WAITING;
         this.userService = new UserService(this);
+        this.giftBoxManager = new GiftBoxManager(this);
     }
 
     public User(ISession session) {
@@ -86,6 +91,10 @@ public class User {
 
     public boolean isNotWaiting() {
         return !state.equals(UserState.WAITING);
+    }
+
+    public boolean isOpeningGift() {
+        return giftBoxManager.isOpeningGift();
     }
 
     public void sendMessage(IMessage ms) {
@@ -538,5 +547,14 @@ public class User {
         }
 
         return result;
+    }
+
+    public void addSpecialItem(byte id, short quantity) {
+        SpecialItemEntry specialItemEntry = SpecialItemRepository.getSpecialItemById(id);
+        if (specialItemEntry == null) {
+            return;
+        }
+        SpecialItemChestEntry newItem = new SpecialItemChestEntry(quantity, specialItemEntry);
+        updateInventory(null, null, List.of(newItem), null);
     }
 }

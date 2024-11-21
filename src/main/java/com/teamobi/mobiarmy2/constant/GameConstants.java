@@ -6,6 +6,7 @@ package com.teamobi.mobiarmy2.constant;
 public class GameConstants {
     public static final short MAX_ABILITY_VALUE = 32_000;
     public static final short MAX_QUANTITY = 30_000;
+    public static final int MAX_MATERIAL_PURCHASE_LIMIT = 20;
 
     private static final int MAX_INT_VALUE = 2_000_000_000;
 

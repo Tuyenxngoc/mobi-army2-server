@@ -172,6 +172,10 @@ public class GameString {
         return String.format("%s vẫn còn đang mở quà", name);
     }
 
+    public static String createGiftOpeningSummaryMessage(int freeOpened, int totalFreeGifts, int costPerExtraGift) {
+        return String.format("Bạn được mở %d trong %d hộp quà miễn phí. Trả thêm %s xu để mở thêm 1 hộp.", freeOpened, totalFreeGifts, Utils.formatThousands(costPerExtraGift));
+    }
+
     public static String createClanContributionMinXuMessage(int xu) {
         return String.format("Mức góp ít nhất là %s xu", Utils.getStringNumber(xu));
     }

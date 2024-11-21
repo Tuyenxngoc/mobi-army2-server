@@ -80,6 +80,11 @@ public class Utils {
         return -1;
     }
 
+    public static String formatThousands(int number) {
+        NumberFormat numberFormat = NumberFormat.getNumberInstance();
+        return numberFormat.format(number);
+    }
+
     public static String getStringNumber(float num) {
         NumberFormat format = NumberFormat.getNumberInstance();
         format.setMaximumFractionDigits(2);

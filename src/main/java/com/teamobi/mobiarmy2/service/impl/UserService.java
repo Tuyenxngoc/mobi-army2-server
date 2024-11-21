@@ -769,20 +769,7 @@ public class UserService implements IUserService {
     public void openLuckyGift(IMessage ms) {
         try {
             byte index = ms.reader().readByte();
-
-            byte type = 2;
-            byte itemId = 55;
-            String name = "Tuyenngoc";
-//todo
-            ms = new Message(Cmd.GET_LUCKYGIFT);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(0);
-            ds.writeByte(index);
-            ds.writeByte(type);
-            ds.writeByte(itemId);
-            ds.writeUTF(name);
-            ds.flush();
-            user.sendMessage(ms);
+            user.getGiftBoxManager().openGiftBoxAfterFight(index);
         } catch (IOException ignored) {
         }
     }
@@ -971,17 +958,17 @@ public class UserService implements IUserService {
         }
 
         SpecialItemEntry item = SpecialItemRepository.getSpecialItemById(itemId);
-        if (!item.isOnSale() || (unit == 0 ? item.getPriceXu() : item.getPriceLuong()) < 0) {
+        if (item == null || !item.isOnSale() || (unit == 0 ? item.getPriceXu() : item.getPriceLuong()) < 0) {
             return;
         }
 
         //Giới hạn số lần mua vật liệu
         if (item.isMaterial()) {
-            if (user.getMaterialsPurchased() >= 20) {
+            if (user.getMaterialsPurchased() >= GameConstants.MAX_MATERIAL_PURCHASE_LIMIT) {
                 sendServerMessage(GameString.MATERIAL_PURCHASE_LIMIT);
                 return;
-            } else if (user.getMaterialsPurchased() + quantity > 20) {
-                sendServerMessage(GameString.createMaterialPurchaseLimitMessage(20 - user.getMaterialsPurchased()));
+            } else if (user.getMaterialsPurchased() + quantity > GameConstants.MAX_MATERIAL_PURCHASE_LIMIT) {
+                sendServerMessage(GameString.createMaterialPurchaseLimitMessage(GameConstants.MAX_MATERIAL_PURCHASE_LIMIT - user.getMaterialsPurchased()));
                 return;
             }
         }

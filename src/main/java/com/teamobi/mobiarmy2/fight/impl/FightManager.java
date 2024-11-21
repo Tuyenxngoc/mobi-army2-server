@@ -873,10 +873,10 @@ public class FightManager implements IFightManager {
 
                         int chance = Utils.nextInt(100);
                         if (chance < 30) {//30% nhận nguyên liệu
-                            int quantity = Utils.nextInt(1, 5);
+                            short quantity = (short) Utils.nextInt(1, 5);
                             byte id = getRewardMaterialId();
 
-                            SpecialItemChestEntry newItem = new SpecialItemChestEntry((short) quantity, SpecialItemRepository.getSpecialItemById(id));
+                            SpecialItemChestEntry newItem = new SpecialItemChestEntry(quantity, SpecialItemRepository.getSpecialItemById(id));
                             user.updateInventory(null, null, List.of(newItem), null);
 
                             String reward = String.format("Phần thưởng diệt trùm của bạn là %dx %s", newItem.getQuantity(), newItem.getItem().getName());
@@ -955,10 +955,29 @@ public class FightManager implements IFightManager {
             try {
                 Thread.sleep(8000);
             } catch (InterruptedException ignored) {
-
             }
-            refreshFightManager();
             fightWait.fightComplete();
+
+            //Cập nhật mở quà
+            if (turnCount > 5 && fightWait.getRoomType() != 5) {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException ignored) {
+                }
+
+                for (byte i = 0; i < MAX_USER_FIGHT; i++) {
+                    Player player = players[i];
+                    if (player == null || player.getUser() == null) {
+                        continue;
+                    }
+                    if ((player.isTeamBlue() && result == MatchResult.BLUE_WIN) ||
+                            (!player.isTeamBlue() && result == MatchResult.RED_WIN)) {
+                        player.getUser().getGiftBoxManager().startGiftBoxOpening(2, 30);
+                    }
+                }
+            }
+
+            refreshFightManager();
         });
     }
 
