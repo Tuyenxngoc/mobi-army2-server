@@ -110,18 +110,18 @@ public class GiftBoxManager implements IGiftBoxManager {
         int randomIndex = Utils.nextInt(rate);
         switch (randomIndex) {
             case 0 -> {
-                int randomXu = Utils.nextInt(50, 1000);
+                int randomXu = Utils.getNonLinearRandom(50, 1049);
                 int xuUp = (randomXu / 50) * 50;
                 if (updateUser) {
                     user.updateXu(xuUp);
                 } else {
-                    xuUp += 50;
+                    xuUp += 100;
                 }
                 id = 55;
                 str = "+" + Utils.getStringNumber(xuUp) + " xu";
             }
             case 1 -> {
-                int randomXp = Utils.nextInt(50, 1000);
+                int randomXp = Utils.getNonLinearRandom(50, 1049);
                 int xpUp = (randomXp / 50) * 50;
                 if (updateUser) {
                     user.updateXp(xpUp, false);

@@ -47,6 +47,20 @@ public class Utils {
     }
 
     /**
+     * Generates a random integer within the specified range using a non-linear distribution.
+     * The generated number is more likely to be closer to the minimum value than to the maximum value.
+     *
+     * @param min the lower bound of the range (inclusive)
+     * @param max the upper bound of the range (inclusive)
+     * @return a random integer between {@code min} and {@code max} (inclusive)
+     * @throws IllegalArgumentException if {@code min} is greater than {@code max}
+     */
+    public static int getNonLinearRandom(int min, int max) {
+        double rand = RANDOM.nextDouble();
+        return (int) (min + (1 - Math.sqrt(1 - rand)) * (max - min));
+    }
+
+    /**
      * Generates a random integer within the specified range (inclusive).
      *
      * @param x1 the lower bound of the range (inclusive)
