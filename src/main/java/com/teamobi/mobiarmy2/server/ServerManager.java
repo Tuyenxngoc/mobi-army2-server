@@ -13,8 +13,6 @@ import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.impl.Session;
 import com.teamobi.mobiarmy2.service.IGameService;
 import com.teamobi.mobiarmy2.service.impl.GameService;
-import lombok.Getter;
-import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,29 +28,40 @@ import java.util.List;
 public class ServerManager {
     private static final Logger logger = LoggerFactory.getLogger(ServerManager.class);
 
-    //tmp variable
-    public static byte maxPlayers = 8;
-
     private final IGameService gameService;
-    @Getter
     private final IServerConfig config;
-
     private ServerSocket server;
     private long countClients;
     private boolean isStart;
-    @Getter
-    @Setter
-    private boolean isMaintenanceMode = false;
-    @Getter
+    private boolean isMaintenanceMode;
     private Room[] rooms;
-    private final ArrayList<ISession> users = new ArrayList<>();
-    private final List<ServerListener> listeners = new ArrayList<>();
+    private final ArrayList<ISession> sessions;
+    private final List<ServerListener> listeners;
 
     public ServerManager() {
         IGameDao gameDao = new GameDao();
         this.gameService = new GameService(gameDao);
 
+        this.isMaintenanceMode = false;
         this.config = new ServerConfig();
+        this.sessions = new ArrayList<>();
+        this.listeners = new ArrayList<>();
+    }
+
+    public IServerConfig getConfig() {
+        return config;
+    }
+
+    public Room[] getRooms() {
+        return rooms;
+    }
+
+    public boolean isMaintenanceMode() {
+        return isMaintenanceMode;
+    }
+
+    public void setMaintenanceMode(boolean maintenanceMode) {
+        isMaintenanceMode = maintenanceMode;
     }
 
     private static class SingletonHelper {
@@ -141,11 +150,11 @@ public class ServerManager {
             server = new ServerSocket(config.getPort());
             logger.info("Server start at port: {}", config.getPort());
             while (isStart) {
-                if (users.size() < config.getMaxClients()) {
+                if (sessions.size() < config.getMaxClients()) {
                     try {
                         Socket socket = server.accept();
                         ISession session = new Session(++countClients, socket);
-                        users.add(session);
+                        sessions.add(session);
                         logger.info("Accept socket client {} done!", countClients);
                     } catch (Exception ignored) {
                     }
@@ -167,8 +176,8 @@ public class ServerManager {
         logger.info("Stop server!");
         isStart = false;
         try {
-            while (!users.isEmpty()) {
-                ISession session = users.getFirst();
+            while (!sessions.isEmpty()) {
+                ISession session = sessions.getFirst();
                 session.close();
             }
             if (server != null) {
@@ -181,18 +190,18 @@ public class ServerManager {
     }
 
     public synchronized void disconnect(Session session) {
-        users.remove(session);
+        sessions.remove(session);
         notifyListeners();
     }
 
     public void sendToServer(IMessage ms) {
-        for (ISession session : users) {
+        for (ISession session : sessions) {
             session.sendMessage(ms);
         }
     }
 
     public User getUserByPlayerId(int playerId) {
-        return users.stream()
+        return sessions.stream()
                 .filter(session -> session != null && session.getUser() != null && session.getUser().getPlayerId() == playerId)
                 .map(ISession::getUser)
                 .findFirst()
@@ -200,7 +209,7 @@ public class ServerManager {
     }
 
     public List<User> findWaitPlayers(int excludedPlayerId) {
-        return users.stream()
+        return sessions.stream()
                 .filter(session -> session != null && session.getUser() != null &&
                         session.getUser().getPlayerId() != excludedPlayerId &&
                         session.getUser().getState() == UserState.WAITING)
@@ -215,7 +224,7 @@ public class ServerManager {
 
     public void notifyListeners() {
         for (ServerListener listener : listeners) {
-            listener.onUsersUpdated(users);
+            listener.onUsersUpdated(sessions);
         }
     }
 }

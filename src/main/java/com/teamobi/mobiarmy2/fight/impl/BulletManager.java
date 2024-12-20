@@ -627,7 +627,7 @@ public class BulletManager implements IBulletManager {
                 }
             }
             if (us.getCharacterId() == 16) {
-                for (int j = 0; j < ServerManager.maxPlayers; j++) {
+                for (int j = 0; j < 8; j++) {
                     Player pl = this.fightManager.getPlayers()[j];
                     if (pl == null || pl.isDead()) {
                         continue;

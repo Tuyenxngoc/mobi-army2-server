@@ -4,7 +4,6 @@ import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.fight.boss.GiftBox;
 import com.teamobi.mobiarmy2.fight.boss.GiftBoxFalling;
 import com.teamobi.mobiarmy2.model.User;
-import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
@@ -324,7 +323,7 @@ public class Player {
         }
 
         //Bỏ qua va chạm cho boom bum
-        if ((bull.bullId == 31 || bull.bullId == 32 || bull.bullId == 35) && this.index >= ServerManager.maxPlayers) {
+        if ((bull.bullId == 31 || bull.bullId == 32 || bull.bullId == 35) && this.index >= 8) {
             return;
         }
 

@@ -17,7 +17,7 @@ public class BigRocKet extends Bullet {
         super(bullMNG, bullId, satThuong, pl, pl.getX(), pl.getY() - (pl.getHeight() + 12), 0, -50, 0, 0);
         super.g100 = 80;
         ArrayList<Short> ar = new ArrayList<>();
-        for (int i = 0; i < ServerManager.maxPlayers; i++) {
+        for (int i = 0; i < 8; i++) {
             if (bulletManager.getFightManager().getPlayers()[i] != null && !bulletManager.getFightManager().getPlayers()[i].isDead()) {
                 ar.add(bulletManager.getFightManager().getPlayers()[i].getX());
             }

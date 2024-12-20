@@ -15,7 +15,7 @@ public class ItemKhoiDoc extends Bullet {
     public void nextXY() {
         super.nextXY();
         if (super.collect) {
-            for (int i = 0; i < ServerManager.maxPlayers; i++) {
+            for (int i = 0; i < 8; i++) {
                 Player pl = bulletManager.getFightManager().getPlayers()[i];
                 if (pl != null) {
                     int tamAH = Bullet.getImpactRadiusByBullId(bullId);
