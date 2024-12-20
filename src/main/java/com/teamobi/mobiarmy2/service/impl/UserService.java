@@ -490,7 +490,7 @@ public class UserService implements IUserService {
             ds.writeInt(user.getLuong());
             ds.writeByte(user.getActiveCharacterId());
             ds.writeShort(user.getClanId() != null ? user.getClanId() : 0);
-            ds.writeByte(0);
+            ds.writeByte(0);//clan rights
 
             for (int i = 0; i < 10; i++) {
                 EquipmentChestEntry equip = user.getCharacterEquips()[i][5];
@@ -1354,7 +1354,7 @@ public class UserService implements IUserService {
                             specialItemList.size() == 1 &&
                             specialItemList.getFirst().getItem().isGem()
                     ) {
-                        userAction = UserAction.GHEP_NGOC_VAO_TRANG_BI;
+                        userAction = UserAction.INSERT_GEM_INTO_EQUIPMENT;
                         sendMessageConfirm(GameString.GEM_COMBINE_REQUEST);
                     } else {
                         sendServerMessage(GameString.COMBINE_ERROR);
@@ -1365,7 +1365,7 @@ public class UserService implements IUserService {
                 if (!specialItemList.isEmpty()) {
                     fabricateItemEntry = FabricateItemRepository.getFabricateItem(specialItemList);
                     if (fabricateItemEntry != null) {
-                        userAction = UserAction.GHEP_SPEC_ITEM;
+                        userAction = UserAction.COMBINE_SPECIAL_ITEM;
                         sendMessageConfirm(fabricateItemEntry.getConfirmationMessage());
                         return;
                     }
@@ -1374,10 +1374,10 @@ public class UserService implements IUserService {
                         SpecialItemChestEntry itemChestEntry = specialItemList.getFirst();
                         if (itemChestEntry.getItem().isGem()) {
                             if (itemChestEntry.getQuantity() == 5 && ((itemChestEntry.getItem().getId() + 1) % 10 != 0)) {
-                                userAction = UserAction.NANG_CAP_NGOC;
+                                userAction = UserAction.UPGRADE_GEM;
                                 sendMessageConfirm(GameString.createGemFusionRequestMessage((90 - (itemChestEntry.getItem().getId() % 10) * 10)));
                             } else {
-                                userAction = UserAction.BAN_NGOC;
+                                userAction = UserAction.SELL_GEM;
                                 totalTransactionAmount = itemChestEntry.getSellPrice();
                                 sendMessageConfirm(GameString.createGemSellRequestMessage(itemChestEntry.getQuantity(), totalTransactionAmount));
                             }
@@ -1385,7 +1385,7 @@ public class UserService implements IUserService {
                         }
 
                         if (itemChestEntry.getItem().isUsable()) {
-                            userAction = UserAction.DUNG_SPEC_ITEM;
+                            userAction = UserAction.USE_SPECIAL_ITEM;
                             confirmSpecialItemUse(itemChestEntry);
                             return;
                         }
@@ -1394,7 +1394,7 @@ public class UserService implements IUserService {
                 sendServerMessage(GameString.COMBINE_ERROR);
             } else if (action == 1) {
                 switch (userAction) {
-                    case GHEP_NGOC_VAO_TRANG_BI -> {
+                    case INSERT_GEM_INTO_EQUIPMENT -> {
                         EquipmentChestEntry equip = equipList.getFirst();
                         SpecialItemChestEntry specialItem = specialItemList.getFirst();
                         if (equip.getEmptySlot() >= specialItem.getQuantity()) {
@@ -1409,7 +1409,7 @@ public class UserService implements IUserService {
                             sendServerMessage(GameString.GEM_COMBINE_NO_SLOT);
                         }
                     }
-                    case NANG_CAP_NGOC -> {
+                    case UPGRADE_GEM -> {
                         SpecialItemChestEntry specialItemChestEntry = specialItemList.getFirst();
                         int successRate = (90 - (specialItemChestEntry.getItem().getId() % 10) * 10);
                         int randomNumber = Utils.nextInt(100);
@@ -1427,7 +1427,7 @@ public class UserService implements IUserService {
                         }
                     }
 
-                    case BAN_NGOC -> {
+                    case SELL_GEM -> {
                         if (user.isChestLocked()) {
                             sendServerMessage(GameString.CHEST_LOCKED_NO_SELL);
                             return;
@@ -1437,9 +1437,9 @@ public class UserService implements IUserService {
                         sendServerMessage(GameString.PURCHASE_SUCCESS);
                     }
 
-                    case DUNG_SPEC_ITEM -> handleUseSpecialItem(specialItemList.getFirst());
+                    case USE_SPECIAL_ITEM -> handleUseSpecialItem(specialItemList.getFirst());
 
-                    case GHEP_SPEC_ITEM -> {
+                    case COMBINE_SPECIAL_ITEM -> {
                         if (fabricateItemEntry.getRewardXu() > 0) {
                             user.updateXu(fabricateItemEntry.getRewardXu());
                         }
@@ -2499,7 +2499,7 @@ public class UserService implements IUserService {
                     if (!equipList.isEmpty()) {//Trường hợp có trang bị hợp lệ
                         ds.writeByte(1);
                         if (equipList.size() == 1 && equipList.getFirst().getEmptySlot() < 3) {//Tháo ngọc
-                            userAction = UserAction.THAO_NGOC;
+                            userAction = UserAction.REMOVE_GEM_FROM_EQUIPMENT;
                             totalTransactionAmount = 0;
 
                             //Tính tiền gia hạn theo 25% giá ngọc
@@ -2511,7 +2511,7 @@ public class UserService implements IUserService {
                             }
                             ds.writeUTF(GameString.createGemRemovalRequestMessage(totalTransactionAmount));
                         } else {//Bán trang bị
-                            userAction = UserAction.BAN_TRANG_BI;
+                            userAction = UserAction.SELL_EQUIPMENT;
                             ds.writeUTF(GameString.createEquipmentSellRequestMessage(equipList.size(), totalTransactionAmount));
                         }
                     } else {//Trường hợp không trang bị nào hợp lệ
@@ -2521,7 +2521,7 @@ public class UserService implements IUserService {
                     user.sendMessage(ms);
                 }
                 case 2 -> {//Xác nhận bán trang bị
-                    if (userAction == UserAction.THAO_NGOC) {//Xác nhận tháo ngọc
+                    if (userAction == UserAction.REMOVE_GEM_FROM_EQUIPMENT) {//Xác nhận tháo ngọc
                         if (user.getXu() < totalTransactionAmount) {
                             sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                             return;
@@ -2558,7 +2558,7 @@ public class UserService implements IUserService {
 
                         //Gửi thông báo thành công
                         sendServerMessage(GameString.GEM_REMOVAL_SUCCESS);
-                    } else if (userAction == UserAction.BAN_TRANG_BI) {//Xác nhận bán trang bị
+                    } else if (userAction == UserAction.SELL_EQUIPMENT) {//Xác nhận bán trang bị
                         //Kiểm tra có khóa rương không
                         if (user.isChestLocked()) {
                             sendServerMessage(GameString.CHEST_LOCKED_NO_SELL);

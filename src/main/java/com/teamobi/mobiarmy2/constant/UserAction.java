@@ -1,12 +1,21 @@
 package com.teamobi.mobiarmy2.constant;
 
 public enum UserAction {
-    GHEP_NGOC_VAO_TRANG_BI,
-    NANG_CAP_NGOC,
-    BAN_NGOC,
-    DUNG_SPEC_ITEM,
-    GHEP_SPEC_ITEM,
+    INSERT_GEM_INTO_EQUIPMENT("Ghép ngọc vào trang bị"),
+    REMOVE_GEM_FROM_EQUIPMENT("Tháo ngọc khỏi trang bị"),
+    UPGRADE_GEM("Nâng cấp ngọc"),
+    SELL_GEM("Bán ngọc"),
+    USE_SPECIAL_ITEM("Dùng vật phẩm đặc biệt"),
+    COMBINE_SPECIAL_ITEM("Ghép vật phẩm đặc biệt"),
+    SELL_EQUIPMENT("Bán trang bị");
 
-    THAO_NGOC,
-    BAN_TRANG_BI,
+    private final String name;
+
+    UserAction(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
 }
