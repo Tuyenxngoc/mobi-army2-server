@@ -80,13 +80,21 @@ public class UserService implements IUserService {
         return selectedSpecialItems;
     }
 
+    private void sendMessage(IMessage ms) {
+        user.sendMessage(ms);
+    }
+
+    private boolean isInvalidInput(String input) {
+        return !input.matches(CommonConstant.ALPHANUMERIC_PATTERN);
+    }
+
     private void sendMessageLoginFail(String message) {
         try {
             IMessage ms = new Message(Cmd.LOGIN_FAIL);
             DataOutputStream ds = ms.writer();
             ds.writeUTF(message);
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -192,10 +200,6 @@ public class UserService implements IUserService {
         }
     }
 
-    private boolean isInvalidInput(String input) {
-        return !input.matches(CommonConstant.ALPHANUMERIC_PATTERN);
-    }
-
     private void copyUserData(User target, User source) {
         target.setUserId(source.getUserId());
         target.setPlayerId(source.getPlayerId());
@@ -272,7 +276,7 @@ public class UserService implements IUserService {
             }
             ds.writeByte(config.getNumPlayer());
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -291,7 +295,7 @@ public class UserService implements IUserService {
                 ds.writeByte(5);
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -307,7 +311,7 @@ public class UserService implements IUserService {
                 ds.writeUTF(config.getRoomNameEn()[i]);
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -321,7 +325,7 @@ public class UserService implements IUserService {
                 ds.writeShort(i);
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -333,7 +337,7 @@ public class UserService implements IUserService {
             DataOutputStream ds = ms.writer();
             ds.writeUTF(message);
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -345,7 +349,7 @@ public class UserService implements IUserService {
             DataOutputStream ds = ms.writer();
             ds.writeUTF(message);
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -387,7 +391,7 @@ public class UserService implements IUserService {
                 ds.writeInt(equip.getKey());
                 ds.writeUTF(GameString.createEquipmentRenewalRequestMessage(gia));
                 ds.flush();
-                user.sendMessage(ms);
+                sendMessage(ms);
             } else {
                 if (user.getXu() < gia) {
                     sendServerMessage(GameString.INSUFFICIENT_FUNDS);
@@ -477,7 +481,7 @@ public class UserService implements IUserService {
             i++;
         }
         ds.flush();
-        user.sendMessage(ms);
+        sendMessage(ms);
     }
 
     @Override
@@ -535,7 +539,7 @@ public class UserService implements IUserService {
             ds.writeUTF(config.getAddInfoUrl());
             ds.writeUTF(config.getRegTeamUrl());
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -706,7 +710,7 @@ public class UserService implements IUserService {
             ds.writeByte(0);
             ds.writeUTF(message);
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -760,7 +764,7 @@ public class UserService implements IUserService {
                 }
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -823,7 +827,7 @@ public class UserService implements IUserService {
                 }
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -902,7 +906,7 @@ public class UserService implements IUserService {
                 ds.writeByte(clanItemEntry.getLevel());
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -915,7 +919,7 @@ public class UserService implements IUserService {
             DataOutputStream ds = ms.writer();
             ds.writeByte(user.getTrainingManager().getMapId());
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -1037,7 +1041,7 @@ public class UserService implements IUserService {
                 ds.writeByte(spEntry.isShowSelection() ? 0 : 1);
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -1076,7 +1080,7 @@ public class UserService implements IUserService {
                 }
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -1127,7 +1131,7 @@ public class UserService implements IUserService {
             if (toServer) {
                 ServerManager.getInstance().sendToServer(ms);
             } else {
-                user.sendMessage(ms);
+                sendMessage(ms);
             }
         } catch (IOException ignored) {
         }
@@ -1161,7 +1165,7 @@ public class UserService implements IUserService {
             }
             ds.writeUTF(message);
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -1182,7 +1186,7 @@ public class UserService implements IUserService {
                 ds.writeByte(room.getType());
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -1220,7 +1224,7 @@ public class UserService implements IUserService {
                 ds.writeByte(fightWait.getRoom().getIconType());
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -1549,7 +1553,7 @@ public class UserService implements IUserService {
             ds.writeByte(0);
             ds.writeUTF(message);
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -1764,7 +1768,7 @@ public class UserService implements IUserService {
                 }
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -1810,7 +1814,7 @@ public class UserService implements IUserService {
             DataOutputStream ds = ms.writer();
             ds.writeByte(status);
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -1842,7 +1846,7 @@ public class UserService implements IUserService {
                 ds.writeUTF(GameString.NO_RANKING);
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -1867,7 +1871,7 @@ public class UserService implements IUserService {
                 ds.writeUTF(username);
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -1938,7 +1942,7 @@ public class UserService implements IUserService {
             ds.writeInt(user.getPlayerId());
             ds.writeByte(characterId);
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
 
             sendCharacterInfo();
             sendEquipInfo();
@@ -1954,7 +1958,7 @@ public class UserService implements IUserService {
                 ds.writeInt(user.getEquipData()[user.getActiveCharacterId()][i]);
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -2002,7 +2006,7 @@ public class UserService implements IUserService {
             ds.writeInt(user.getXu());
             ds.writeInt(user.getLuong());
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
             sendServerMessage(GameString.PURCHASE_SUCCESS);
         } catch (IOException ignored) {
         }
@@ -2057,7 +2061,7 @@ public class UserService implements IUserService {
                     DataOutputStream ds = ms.writer();
                     ds.writeByte(index - 3);
                     ds.flush();
-                    user.sendMessage(ms);
+                    sendMessage(ms);
                 }
             }
         } catch (IOException ignored) {
@@ -2233,7 +2237,7 @@ public class UserService implements IUserService {
                         ds.write(ab);
                     }
                     ds.flush();
-                    user.sendMessage(ms);
+                    sendMessage(ms);
                 }
 
                 case 2 -> {
@@ -2251,7 +2255,7 @@ public class UserService implements IUserService {
                         ds.write(ab);
                     }
                     ds.flush();
-                    user.sendMessage(ms);
+                    sendMessage(ms);
                 }
                 case 3 -> {
                     IServerConfig config = ServerManager.getInstance().getConfig();
@@ -2268,7 +2272,7 @@ public class UserService implements IUserService {
                         ds.write(ab);
                     }
                     ds.flush();
-                    user.sendMessage(ms);
+                    sendMessage(ms);
                 }
                 case 4 -> {
                     IServerConfig config = ServerManager.getInstance().getConfig();
@@ -2285,7 +2289,7 @@ public class UserService implements IUserService {
                         ds.write(ab);
                     }
                     ds.flush();
-                    user.sendMessage(ms);
+                    sendMessage(ms);
                 }
                 case 5 -> {
                     IServerConfig config = ServerManager.getInstance().getConfig();
@@ -2302,7 +2306,7 @@ public class UserService implements IUserService {
                         ds.write(ab);
                     }
                     ds.flush();
-                    user.sendMessage(ms);
+                    sendMessage(ms);
                 }
                 case 6 -> {
                     sendCharacterInfo();
@@ -2338,7 +2342,7 @@ public class UserService implements IUserService {
                 ds.writeInt(user.getEquipData()[user.getActiveCharacterId()][i]);
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
 
             ms = new Message(Cmd.MATERIAL);
             ds = ms.writer();
@@ -2351,7 +2355,7 @@ public class UserService implements IUserService {
                 ds.writeUTF(item.getItem().getDetail());
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -2391,7 +2395,7 @@ public class UserService implements IUserService {
             ds.writeInt(user.getCurrentRequiredXp());
             ds.writeInt(user.getCup());
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -2425,7 +2429,7 @@ public class UserService implements IUserService {
             DataOutputStream ds = ms.writer();
             ds.writeByte(changeSuccessful ? 1 : 0);
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -2450,7 +2454,7 @@ public class UserService implements IUserService {
                 ds.writeByte(equip.getLevelRequirement());
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -2518,7 +2522,7 @@ public class UserService implements IUserService {
                         ds.writeByte(0);
                     }
                     ds.flush();
-                    user.sendMessage(ms);
+                    sendMessage(ms);
                 }
                 case 2 -> {//Xác nhận bán trang bị
                     if (userAction == UserAction.REMOVE_GEM_FROM_EQUIPMENT) {//Xác nhận tháo ngọc
@@ -2674,7 +2678,7 @@ public class UserService implements IUserService {
             }
             ds.writeByte(luckyIndex);
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
 
             lastSpinTime = currentTime;
         } catch (IOException ignored) {
@@ -2695,7 +2699,7 @@ public class UserService implements IUserService {
             ds.writeShort(data.length);
             ds.write(data);
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -2729,7 +2733,7 @@ public class UserService implements IUserService {
                 ds.writeUTF(clan.getDescription());
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -2765,7 +2769,7 @@ public class UserService implements IUserService {
                 ds.writeInt(item.getTime());
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -2811,7 +2815,7 @@ public class UserService implements IUserService {
                 ds.writeUTF(memClan.getContributeCount());
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -2831,7 +2835,7 @@ public class UserService implements IUserService {
                 ds.writeShort(0);
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -2857,7 +2861,7 @@ public class UserService implements IUserService {
                         ds.writeUTF(paymentEntry.getUrl());
                     }
                     ds.flush();
-                    user.sendMessage(ms);
+                    sendMessage(ms);
                 }
                 case 1 -> {
                     String id = dis.readUTF();
@@ -2869,7 +2873,7 @@ public class UserService implements IUserService {
                         ds.writeUTF(paymentEntry.getMssTo());
                         ds.writeUTF(paymentEntry.getMssContent());
                         ds.flush();
-                        user.sendMessage(ms);
+                        sendMessage(ms);
                     }
                 }
             }
@@ -2908,7 +2912,7 @@ public class UserService implements IUserService {
                 ds.writeByte(indexIcon);
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -2939,7 +2943,7 @@ public class UserService implements IUserService {
                 DataOutputStream ds = ms.writer();
                 ds.writeByte(1);
                 ds.flush();
-                user.sendMessage(ms);
+                sendMessage(ms);
             }
         } catch (IOException ignored) {
         }
@@ -2983,7 +2987,7 @@ public class UserService implements IUserService {
             ds.writeInt(user.getXu());
             ds.writeInt(user.getLuong());
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -2996,7 +3000,7 @@ public class UserService implements IUserService {
             ds.writeByte(cupUp);
             ds.writeInt(user.getCup());
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -3019,7 +3023,7 @@ public class UserService implements IUserService {
                 ds.writeByte(user.getCurrentLevelPercent());
             }
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -3038,7 +3042,7 @@ public class UserService implements IUserService {
             ds.writeUTF(config.getDownloadInfo());
             ds.writeUTF(config.getDownloadUrl());
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -3051,7 +3055,7 @@ public class UserService implements IUserService {
             ds.writeUTF("none");
             ds.writeByte(0);
             ds.flush();
-            user.sendMessage(ms);
+            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
