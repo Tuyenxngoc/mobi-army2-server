@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.repository;
+package com.teamobi.mobiarmy2.manager;
 
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.model.ImageData;
@@ -15,11 +15,10 @@ import java.util.*;
 /**
  * @author tuyen
  */
-public class MapRepository {
+public class MapManager {
     public static final List<MapEntry> MAP_ENTRIES = new ArrayList<>();
     public static final Map<Integer, MapBrick> MAP_BRICKS = new HashMap<>();
-    public static final short[] ID_NOT_COLLISIONS = {70, 71, 73, 74, 75, 77, 78, 79, 97};
-    public static final Set<Integer> ID_NOT_COLLISIONS_SET = Set.of(70, 71, 73, 74, 75, 77, 78, 79, 97);
+    public static final Set<Integer> ID_NOT_COLLISIONS = Set.of(70, 71, 73, 74, 75, 77, 78, 79, 97);
 
     public static byte randomMap(int idNotSelect) {
         byte selectedId;
@@ -31,7 +30,7 @@ public class MapRepository {
     }
 
     public static byte[] getMapData(byte mapId) {
-        for (MapEntry mapEntry : MapRepository.MAP_ENTRIES) {
+        for (MapEntry mapEntry : MapManager.MAP_ENTRIES) {
             if (mapEntry.getId() == mapId) {
                 return mapEntry.getData();
             }
@@ -54,7 +53,7 @@ public class MapRepository {
     }
 
     public static boolean isCollision(int id) {
-        return !ID_NOT_COLLISIONS_SET.contains(id);
+        return !ID_NOT_COLLISIONS.contains(id);
     }
 
     public static MapBrick loadMapBrick(int brickId) {

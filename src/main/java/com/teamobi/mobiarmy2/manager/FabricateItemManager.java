@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.repository;
+package com.teamobi.mobiarmy2.manager;
 
 import com.teamobi.mobiarmy2.model.FabricateItemEntry;
 import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * @author tuyen
  */
-public class FabricateItemRepository {
+public class FabricateItemManager {
     public static final List<FabricateItemEntry> FABRICATE_ITEM_ENTRIES = new ArrayList<>();
 
     /**

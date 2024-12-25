@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.repository;
+package com.teamobi.mobiarmy2.manager;
 
 import com.teamobi.mobiarmy2.model.item.SpecialItemEntry;
 
@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * @author tuyen
  */
-public class SpecialItemRepository {
+public class SpecialItemManager {
     private static final Map<Byte, SpecialItemEntry> SPECIAL_ITEM_ENTRIES = new HashMap<>();
 
     public static void addSpecialItem(SpecialItemEntry entry) {

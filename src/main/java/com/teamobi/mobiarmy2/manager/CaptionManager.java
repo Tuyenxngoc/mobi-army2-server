@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.repository;
+package com.teamobi.mobiarmy2.manager;
 
 import com.teamobi.mobiarmy2.model.CaptionEntry;
 
@@ -8,6 +8,6 @@ import java.util.List;
 /**
  * @author tuyen
  */
-public class CaptionRepository {
+public class CaptionManager {
     public static final List<CaptionEntry> CAPTION_ENTRIES = new ArrayList<>();
 }

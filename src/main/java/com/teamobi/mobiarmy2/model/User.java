@@ -7,6 +7,9 @@ import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.fight.IGiftBoxManager;
 import com.teamobi.mobiarmy2.fight.ITrainingManager;
 import com.teamobi.mobiarmy2.fight.impl.GiftBoxManager;
+import com.teamobi.mobiarmy2.manager.CharacterManager;
+import com.teamobi.mobiarmy2.manager.PlayerXpManager;
+import com.teamobi.mobiarmy2.manager.SpecialItemManager;
 import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
 import com.teamobi.mobiarmy2.model.item.SpecialItemEntry;
 import com.teamobi.mobiarmy2.model.user.EquipmentChestEntry;
@@ -14,9 +17,6 @@ import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.impl.Message;
-import com.teamobi.mobiarmy2.repository.CharacterRepository;
-import com.teamobi.mobiarmy2.repository.PlayerXpRepository;
-import com.teamobi.mobiarmy2.repository.SpecialItemRepository;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.service.impl.UserService;
@@ -103,8 +103,8 @@ public class User {
         int currentXp = getCurrentXp();
         int currentLevel = getCurrentLevel();
 
-        int requiredXpCurrentLevel = PlayerXpRepository.getRequiredXpLevel(currentLevel - 1);
-        int requiredXpNextLevel = PlayerXpRepository.getRequiredXpLevel(currentLevel);
+        int requiredXpCurrentLevel = PlayerXpManager.getRequiredXpLevel(currentLevel - 1);
+        int requiredXpNextLevel = PlayerXpManager.getRequiredXpLevel(currentLevel);
 
         int currentXpInLevel = currentXp - requiredXpCurrentLevel;
         int xpNeededForNextLevel = requiredXpNextLevel - requiredXpCurrentLevel;
@@ -113,7 +113,7 @@ public class User {
     }
 
     public int getCurrentRequiredXp() {
-        return PlayerXpRepository.getRequiredXpLevel(getCurrentLevel());
+        return PlayerXpManager.getRequiredXpLevel(getCurrentLevel());
     }
 
     public int getCurrentLevel() {
@@ -199,7 +199,7 @@ public class User {
         }
 
         int currentLevel = getCurrentLevel();
-        int newLevel = PlayerXpRepository.getLevelByXP(totalXp);
+        int newLevel = PlayerXpManager.getLevelByXP(totalXp);
 
         int levelDiff = newLevel - currentLevel;
         if (levelDiff > 0) {
@@ -531,7 +531,7 @@ public class User {
         abilities[0] = 1000 + (points[0] * 10);
         abilities[0] += (abilities[0] * percents[0] / 100);
 
-        short baseDamage = CharacterRepository.CHARACTER_ENTRIES.get(activeCharacterId).getDamage();
+        short baseDamage = CharacterManager.CHARACTER_ENTRIES.get(activeCharacterId).getDamage();
         abilities[1] = (baseDamage * (100 + (points[1] / 3) + percents[1]) / 100) * 100 / baseDamage;
 
         for (byte i = 2; i < abilities.length; i++) {
@@ -548,7 +548,7 @@ public class User {
     }
 
     public void addSpecialItem(byte id, short quantity) {
-        SpecialItemEntry specialItemEntry = SpecialItemRepository.getSpecialItemById(id);
+        SpecialItemEntry specialItemEntry = SpecialItemManager.getSpecialItemById(id);
         if (specialItemEntry == null) {
             return;
         }

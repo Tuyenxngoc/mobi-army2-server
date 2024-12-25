@@ -6,14 +6,14 @@ import com.teamobi.mobiarmy2.constant.MatchResult;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.fight.*;
 import com.teamobi.mobiarmy2.fight.boss.*;
+import com.teamobi.mobiarmy2.manager.ClanItemManager;
+import com.teamobi.mobiarmy2.manager.FightItemManager;
+import com.teamobi.mobiarmy2.manager.SpecialItemManager;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
 import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.impl.Message;
-import com.teamobi.mobiarmy2.repository.ClanItemRepository;
-import com.teamobi.mobiarmy2.repository.FightItemRepository;
-import com.teamobi.mobiarmy2.repository.SpecialItemRepository;
 import com.teamobi.mobiarmy2.server.ClanManager;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -59,7 +59,7 @@ public class FightManager implements IFightManager {
     private byte windX;
     private byte windY;
     private long startTime;
-    private final IMapManager mapManager;
+    private final IFightMapManager mapManager;
     private final IBulletManager bulletManager;
     private final ICountdownTimer countdownTimer;
     private final ExecutorService executorNextTurn;
@@ -68,7 +68,7 @@ public class FightManager implements IFightManager {
     public FightManager(IFightWait fightWait) {
         this.fightWait = fightWait;
         this.players = new Player[MAX_ELEMENT_FIGHT];
-        this.mapManager = new MapManager(this);
+        this.mapManager = new FightMapManager(this);
         this.bulletManager = new BulletManager(this);
         this.countdownTimer = new CountdownTimer(MAX_PLAY_TIME + 10, this::onTimeUp);
         this.executorNextTurn = Executors.newSingleThreadExecutor();
@@ -876,7 +876,7 @@ public class FightManager implements IFightManager {
                             short quantity = (short) Utils.nextInt(1, 5);
                             byte id = getRewardMaterialId();
 
-                            SpecialItemChestEntry newItem = new SpecialItemChestEntry(quantity, SpecialItemRepository.getSpecialItemById(id));
+                            SpecialItemChestEntry newItem = new SpecialItemChestEntry(quantity, SpecialItemManager.getSpecialItemById(id));
                             user.updateInventory(null, null, List.of(newItem), null);
 
                             String reward = String.format("Phần thưởng diệt trùm của bạn là %dx %s", newItem.getQuantity(), newItem.getItem().getName());
@@ -885,11 +885,11 @@ public class FightManager implements IFightManager {
                             StringBuilder reward = new StringBuilder("Phần thưởng diệt trùm của bạn là ");
                             int count = Utils.nextInt(2, 3);
                             for (int k = 0; k < count; k++) {
-                                byte indexItem = FightItemRepository.getRandomItem();
+                                byte indexItem = FightItemManager.getRandomItem();
                                 byte quantity = 1;
                                 user.updateItems(indexItem, quantity);
                                 reward.append(quantity).append("x ");
-                                reward.append(FightItemRepository.FIGHT_ITEM_ENTRIES.get(indexItem).getName()).append(", ");
+                                reward.append(FightItemManager.FIGHT_ITEM_ENTRIES.get(indexItem).getName()).append(", ");
                             }
                             reward.deleteCharAt(reward.length() - 2);
                             user.getUserService().sendServerMessage(reward.toString());
@@ -1061,7 +1061,7 @@ public class FightManager implements IFightManager {
             short[] abilities = user.calculateCharacterAbilities(teamPoints);
 
             //Lấy danh sách items của clan
-            boolean[] clanItems = new boolean[ClanItemRepository.CLAN_ITEM_ENTRY_MAP.size()];
+            boolean[] clanItems = new boolean[ClanItemManager.CLAN_ITEM_ENTRY_MAP.size()];
             if (user.getClanId() != null) {
                 if (clanItemsCache.containsKey(user.getClanId())) {
                     clanItems = clanItemsCache.get(user.getClanId());
@@ -1424,7 +1424,7 @@ public class FightManager implements IFightManager {
     }
 
     @Override
-    public IMapManager getMapManger() {
+    public IFightMapManager getMapManger() {
         return mapManager;
     }
 

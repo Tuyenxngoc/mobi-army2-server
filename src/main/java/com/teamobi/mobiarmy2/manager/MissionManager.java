@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.repository;
+package com.teamobi.mobiarmy2.manager;
 
 import com.teamobi.mobiarmy2.model.MissionEntry;
 
@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * @author tuyen
  */
-public class MissionRepository {
+public class MissionManager {
     public static final Map<Byte, List<MissionEntry>> MISSION_LIST = new HashMap<>();
 
     public static void addMission(MissionEntry missionEntry) {

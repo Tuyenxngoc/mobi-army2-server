@@ -3,7 +3,6 @@ package com.teamobi.mobiarmy2.fight.bullet;
 import com.teamobi.mobiarmy2.fight.Bullet;
 import com.teamobi.mobiarmy2.fight.Player;
 import com.teamobi.mobiarmy2.fight.impl.BulletManager;
-import com.teamobi.mobiarmy2.server.ServerManager;
 
 public class ItemDongBang extends Bullet {
 

@@ -309,8 +309,8 @@ public class Utils {
      * If the array is larger, it is truncated.
      *
      * @param originalArray The original array to adjust.
-     * @param desiredSize The target size of the array.
-     * @param defaultValue The default value to pad if the array is smaller.
+     * @param desiredSize   The target size of the array.
+     * @param defaultValue  The default value to pad if the array is smaller.
      * @return The adjusted array.
      */
     public static int[] adjustArray(int[] originalArray, int desiredSize, int defaultValue) {
@@ -328,8 +328,8 @@ public class Utils {
      * If the array is larger, it is truncated.
      *
      * @param originalArray The original array to adjust.
-     * @param desiredSize The target size of the array.
-     * @param defaultValue The default value to pad if the array is smaller.
+     * @param desiredSize   The target size of the array.
+     * @param defaultValue  The default value to pad if the array is smaller.
      * @return The adjusted array.
      */
     public static byte[] adjustArray(byte[] originalArray, int desiredSize, byte defaultValue) {

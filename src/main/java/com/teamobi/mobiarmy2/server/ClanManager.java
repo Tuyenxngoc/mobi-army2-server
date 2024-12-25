@@ -4,12 +4,12 @@ import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.dao.IClanDao;
 import com.teamobi.mobiarmy2.dao.impl.ClanDao;
 import com.teamobi.mobiarmy2.json.ClanItemJson;
+import com.teamobi.mobiarmy2.manager.ClanItemManager;
+import com.teamobi.mobiarmy2.manager.ClanXpManager;
 import com.teamobi.mobiarmy2.model.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
 import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
-import com.teamobi.mobiarmy2.repository.ClanItemRepository;
-import com.teamobi.mobiarmy2.repository.ClanXpRepository;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.time.LocalDateTime;
@@ -83,7 +83,7 @@ public class ClanManager {
     }
 
     public boolean[] getClanItems(short clanId) {
-        boolean[] result = new boolean[ClanItemRepository.CLAN_ITEM_ENTRY_MAP.size()];
+        boolean[] result = new boolean[ClanItemManager.CLAN_ITEM_ENTRY_MAP.size()];
         LocalDateTime now = LocalDateTime.now();
         ClanItemJson[] items = clanDao.getClanItems(clanId);
 
@@ -158,7 +158,7 @@ public class ClanManager {
                 newXp = GameConstants.MIN_XP;
             }
 
-            int level = ClanXpRepository.getLevelByXP((int) newXp);
+            int level = ClanXpManager.getLevelByXP((int) newXp);
             clanDao.updateXp(clanId, playerId, (int) newXp, level);
             clanDao.updateClanMemberPoints(playerId, xpUp);
         }

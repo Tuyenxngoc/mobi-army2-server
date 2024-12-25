@@ -16,7 +16,7 @@ public class SmallBoomAdd extends Bullet {
     public void nextXY() {
         super.nextXY();
         IFightManager fightManager = bulletManager.getFightManager();
-        IMapManager mapManager = fightManager.getMapManger();
+        IFightMapManager mapManager = fightManager.getMapManger();
         if (super.collect && X > 0 && X < mapManager.getWidth() && Y < mapManager.getHeight()) {
             Boss smallBoom = new SmallBoom(fightManager, (byte) fightManager.getTotalPlayers(), X, Y, (short) 1000);
             bulletManager.getAddBosses().add(smallBoom);

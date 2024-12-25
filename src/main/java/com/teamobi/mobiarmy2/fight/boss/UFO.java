@@ -2,7 +2,7 @@ package com.teamobi.mobiarmy2.fight.boss;
 
 import com.teamobi.mobiarmy2.fight.Boss;
 import com.teamobi.mobiarmy2.fight.IFightManager;
-import com.teamobi.mobiarmy2.fight.IMapManager;
+import com.teamobi.mobiarmy2.fight.IFightMapManager;
 import com.teamobi.mobiarmy2.fight.Player;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -22,7 +22,7 @@ public class UFO extends Boss {
     @Override
     public void turnAction() {
         short ys = y, xs = x;
-        IMapManager mapManager = fightManager.getMapManger();
+        IFightMapManager mapManager = fightManager.getMapManger();
         while (turnShoot && ys < mapManager.getHeight() + 200 && !mapManager.isCollision(xs, ys)) {
             if (ys > mapManager.getHeight()) {
                 turnShoot = false;

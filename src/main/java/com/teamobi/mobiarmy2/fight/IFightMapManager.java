@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * @author tuyen
  */
-public interface IMapManager {
+public interface IFightMapManager {
 
     short getWidth();
 

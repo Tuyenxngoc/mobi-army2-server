@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.repository;
+package com.teamobi.mobiarmy2.manager;
 
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.model.LevelXpRequiredEntry;
@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author tuyen
  */
-public class PlayerXpRepository {
+public class PlayerXpManager {
     public static final List<LevelXpRequiredEntry> LEVEL_XP_REQUIRED_ENTRIES = new ArrayList<>();
 
     public static int getRequiredXpLevel(int level) {

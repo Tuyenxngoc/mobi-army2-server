@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.repository;
+package com.teamobi.mobiarmy2.manager;
 
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.model.User;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 /**
  * @author tuyen
  */
-public class CharacterRepository {
+public class CharacterManager {
     public static final List<CharacterEntry> CHARACTER_ENTRIES = new ArrayList<>();
     public static final List<EquipmentEntry> EQUIPMENT_ENTRIES = new ArrayList<>();
     public static short totalSaleEquipments = 0;

@@ -2,12 +2,12 @@ package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.constant.GameString;
+import com.teamobi.mobiarmy2.dao.HikariCPManager;
 import com.teamobi.mobiarmy2.dao.IRankingDao;
-import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
+import com.teamobi.mobiarmy2.manager.CharacterManager;
+import com.teamobi.mobiarmy2.manager.PlayerXpManager;
 import com.teamobi.mobiarmy2.model.user.PlayerLeaderboardEntry;
-import com.teamobi.mobiarmy2.repository.CharacterRepository;
-import com.teamobi.mobiarmy2.repository.PlayerXpRepository;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -42,8 +42,8 @@ public class RankingDao implements IRankingDao {
 
                 int currentLevel = resultSet.getInt("level");
                 int currentXp = resultSet.getInt("xp");
-                int requiredXpCurrentLevel = PlayerXpRepository.getRequiredXpLevel(currentLevel - 1);
-                int requiredXpNextLevel = PlayerXpRepository.getRequiredXpLevel(currentLevel);
+                int requiredXpCurrentLevel = PlayerXpManager.getRequiredXpLevel(currentLevel - 1);
+                int requiredXpNextLevel = PlayerXpManager.getRequiredXpLevel(currentLevel);
                 int currentXpInLevel = currentXp - requiredXpCurrentLevel;
                 int xpNeededForNextLevel = requiredXpNextLevel - requiredXpCurrentLevel;
                 byte levelPercent = Utils.calculateLevelPercent(currentXpInLevel, xpNeededForNextLevel);
@@ -60,7 +60,7 @@ public class RankingDao implements IRankingDao {
 
                 EquipmentChestJson[] equipmentData = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
                 int[] data = gson.fromJson(resultSet.getString("data"), int[].class);
-                entry.setData(CharacterRepository.getEquipData(equipmentData, data, entry.getActiveCharacter()));
+                entry.setData(CharacterManager.getEquipData(equipmentData, data, entry.getActiveCharacter()));
 
                 top.add(entry);
                 index++;

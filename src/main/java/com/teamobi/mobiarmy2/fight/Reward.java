@@ -1,10 +1,10 @@
 package com.teamobi.mobiarmy2.fight;
 
+import com.teamobi.mobiarmy2.manager.CharacterManager;
+import com.teamobi.mobiarmy2.manager.SpecialItemManager;
 import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
 import com.teamobi.mobiarmy2.model.user.EquipmentChestEntry;
 import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
-import com.teamobi.mobiarmy2.repository.CharacterRepository;
-import com.teamobi.mobiarmy2.repository.SpecialItemRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,7 +36,7 @@ public class Reward {
 
     public void equip() {
         this.type = 2;
-        EquipmentEntry entry = CharacterRepository.getRandomEquip(
+        EquipmentEntry entry = CharacterManager.getRandomEquip(
                 equipmentEntry ->
                         equipmentEntry.isOnSale()
                                 && !equipmentEntry.isDisguise()
@@ -58,7 +58,7 @@ public class Reward {
     public void specialItems(byte id, byte quantity) {
         this.type = 4;
         specialItem = new SpecialItemChestEntry();
-        specialItem.setItem(SpecialItemRepository.getSpecialItemById(id));
+        specialItem.setItem(SpecialItemManager.getSpecialItemById(id));
         if (specialItem.getItem() == null) {
             throw new IllegalArgumentException("Special item with ID " + id + " does not exist.");
         }

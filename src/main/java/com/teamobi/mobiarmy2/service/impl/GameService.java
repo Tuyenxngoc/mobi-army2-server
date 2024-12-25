@@ -2,11 +2,11 @@ package com.teamobi.mobiarmy2.service.impl;
 
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.dao.IGameDao;
+import com.teamobi.mobiarmy2.manager.*;
 import com.teamobi.mobiarmy2.model.CaptionEntry;
 import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
 import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
 import com.teamobi.mobiarmy2.model.map.MapEntry;
-import com.teamobi.mobiarmy2.repository.*;
 import com.teamobi.mobiarmy2.service.IGameService;
 import com.teamobi.mobiarmy2.util.TeamImageOutput;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -35,10 +35,10 @@ public class GameService implements IGameService {
     public void setCacheMaps() {
         try (ByteArrayOutputStream bas = new ByteArrayOutputStream();
              DataOutputStream ds = new DataOutputStream(bas)) {
-            int size = MapRepository.MAP_ENTRIES.size();
+            int size = MapManager.MAP_ENTRIES.size();
             ds.writeByte(size);
             for (int i = 0; i < size; i++) {
-                MapEntry mapEntry = MapRepository.MAP_ENTRIES.get(i);
+                MapEntry mapEntry = MapManager.MAP_ENTRIES.get(i);
                 ds.writeByte(mapEntry.getId());
                 ds.writeShort(mapEntry.getData().length);
                 ds.write(mapEntry.getData());
@@ -64,9 +64,9 @@ public class GameService implements IGameService {
         try {
             ByteArrayOutputStream bas = new ByteArrayOutputStream();
             DataOutputStream ds = new DataOutputStream(bas);
-            ds.writeByte(CharacterRepository.CHARACTER_ENTRIES.size());
+            ds.writeByte(CharacterManager.CHARACTER_ENTRIES.size());
 
-            for (CharacterEntry characterEntry : CharacterRepository.CHARACTER_ENTRIES) {
+            for (CharacterEntry characterEntry : CharacterManager.CHARACTER_ENTRIES) {
                 ds.writeByte(characterEntry.getId());
                 ds.writeShort(characterEntry.getDamage());
                 ds.writeByte(characterEntry.getEquips().size());
@@ -107,7 +107,7 @@ public class GameService implements IGameService {
             }
             ds.writeShort(bytes.length);
             ds.write(bytes);
-            for (int i = 0; i < CharacterRepository.CHARACTER_ENTRIES.size(); i++) {
+            for (int i = 0; i < CharacterManager.CHARACTER_ENTRIES.size(); i++) {
                 bytes = Utils.getFile(String.format(GameConstants.BULLET_IMAGE_PATH, i));
                 if (bytes == null) {
                     System.exit(1);
@@ -132,10 +132,10 @@ public class GameService implements IGameService {
         try {
             ByteArrayOutputStream bas = new ByteArrayOutputStream();
             DataOutputStream ds = new DataOutputStream(bas);
-            int size = CaptionRepository.CAPTION_ENTRIES.size();
+            int size = CaptionManager.CAPTION_ENTRIES.size();
             ds.writeByte(size);
             for (int i = size - 1; i >= 0; i--) {
-                CaptionEntry capEntry = CaptionRepository.CAPTION_ENTRIES.get(i);
+                CaptionEntry capEntry = CaptionManager.CAPTION_ENTRIES.get(i);
                 ds.writeUTF(capEntry.getCaption());
                 ds.writeByte(capEntry.getLevel());
             }
@@ -201,73 +201,73 @@ public class GameService implements IGameService {
     @Override
     public void getFormulaData() {
         gameDao.getAllFormula();
-        logger.info("Loaded {} formula entries successfully.", FormulaRepository.FORMULA.size());
+        logger.info("Loaded {} formula entries successfully.", FormulaManager.FORMULA.size());
     }
 
     @Override
     public void getPaymentData() {
         gameDao.getAllPayment();
-        logger.info("Loaded {} payment entries successfully.", PaymentRepository.PAYMENT_ENTRY_MAP.size());
+        logger.info("Loaded {} payment entries successfully.", PaymentManager.PAYMENT_ENTRY_MAP.size());
     }
 
     @Override
     public void getMissionData() {
         gameDao.getAllMissions();
-        logger.info("Loaded {} mission entries successfully.", MissionRepository.MISSION_LIST.size());
+        logger.info("Loaded {} mission entries successfully.", MissionManager.MISSION_LIST.size());
     }
 
     @Override
     public void getMapData() {
         gameDao.getAllMapData();
-        logger.info("Loaded {} map entries successfully.", MapRepository.MAP_ENTRIES.size());
+        logger.info("Loaded {} map entries successfully.", MapManager.MAP_ENTRIES.size());
     }
 
     @Override
     public void getCharacterData() {
         gameDao.getAllCharacterData();
-        logger.info("Loaded {} character entries successfully.", CharacterRepository.CHARACTER_ENTRIES.size());
+        logger.info("Loaded {} character entries successfully.", CharacterManager.CHARACTER_ENTRIES.size());
     }
 
     @Override
     public void getEquipData() {
         gameDao.getAllEquip();
-        logger.info("Loaded {} equipment entries successfully.", CharacterRepository.EQUIPMENT_ENTRIES.size());
+        logger.info("Loaded {} equipment entries successfully.", CharacterManager.EQUIPMENT_ENTRIES.size());
     }
 
     @Override
     public void getLvXpData() {
         gameDao.getAllXpData();
-        logger.info("Loaded {} player XP entries successfully.", PlayerXpRepository.LEVEL_XP_REQUIRED_ENTRIES.size());
-        logger.info("Loaded {} clan XP entries successfully.", ClanXpRepository.LEVEL_XP_REQUIRED_ENTRIES.size());
+        logger.info("Loaded {} player XP entries successfully.", PlayerXpManager.LEVEL_XP_REQUIRED_ENTRIES.size());
+        logger.info("Loaded {} clan XP entries successfully.", ClanXpManager.LEVEL_XP_REQUIRED_ENTRIES.size());
     }
 
     @Override
     public void getFabricateItemData() {
         gameDao.getAllFabricateItems();
-        logger.info("Loaded {} fabricate items successfully.", FabricateItemRepository.FABRICATE_ITEM_ENTRIES.size());
+        logger.info("Loaded {} fabricate items successfully.", FabricateItemManager.FABRICATE_ITEM_ENTRIES.size());
     }
 
     @Override
     public void setCaptionLevelData() {
         gameDao.getAllCaptionLevel();
-        logger.info("Loaded {} caption level entries successfully.", CaptionRepository.CAPTION_ENTRIES.size());
+        logger.info("Loaded {} caption level entries successfully.", CaptionManager.CAPTION_ENTRIES.size());
     }
 
     @Override
     public void getItemData() {
         gameDao.getAllItem();
-        logger.info("Loaded {} fight item entries successfully.", FightItemRepository.FIGHT_ITEM_ENTRIES.size());
+        logger.info("Loaded {} fight item entries successfully.", FightItemManager.FIGHT_ITEM_ENTRIES.size());
     }
 
     @Override
     public void getClanShopData() {
         gameDao.getAllItemClan();
-        logger.info("Loaded {} clan shop items successfully.", ClanItemRepository.CLAN_ITEM_ENTRY_MAP.size());
+        logger.info("Loaded {} clan shop items successfully.", ClanItemManager.CLAN_ITEM_ENTRY_MAP.size());
     }
 
     @Override
     public void getSpecialItemData() {
         gameDao.getAllSpecialItem();
-        logger.info("Loaded {} special items successfully.", SpecialItemRepository.getSpecialItems().size());
+        logger.info("Loaded {} special items successfully.", SpecialItemManager.getSpecialItems().size());
     }
 }

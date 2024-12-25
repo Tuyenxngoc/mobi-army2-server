@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.repository;
+package com.teamobi.mobiarmy2.manager;
 
 import com.teamobi.mobiarmy2.model.FormulaEntry;
 
@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * @author tuyen
  */
-public class FormulaRepository {
+public class FormulaManager {
     public static final Map<Byte, Map<Byte, List<FormulaEntry>>> FORMULA = new HashMap<>();
 
     /**

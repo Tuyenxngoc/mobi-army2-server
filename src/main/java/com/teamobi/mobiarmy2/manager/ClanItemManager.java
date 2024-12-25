@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.repository;
+package com.teamobi.mobiarmy2.manager;
 
 import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
 
@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * @author tuyen
  */
-public class ClanItemRepository {
+public class ClanItemManager {
     public static final Map<Byte, ClanItemEntry> CLAN_ITEM_ENTRY_MAP = new HashMap<>();
 
     public static ClanItemEntry getItemClanById(byte id) {

@@ -31,7 +31,7 @@ public interface IFightManager {
 
     void useItem(int playerId, byte itemIndex);
 
-    IMapManager getMapManger();
+    IFightMapManager getMapManger();
 
     void onTimeUp();
 

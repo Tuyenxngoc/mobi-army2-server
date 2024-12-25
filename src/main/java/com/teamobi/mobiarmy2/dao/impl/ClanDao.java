@@ -1,19 +1,19 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
+import com.teamobi.mobiarmy2.dao.HikariCPManager;
 import com.teamobi.mobiarmy2.dao.IClanDao;
-import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.ClanItemJson;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
+import com.teamobi.mobiarmy2.manager.CharacterManager;
+import com.teamobi.mobiarmy2.manager.ClanItemManager;
+import com.teamobi.mobiarmy2.manager.ClanXpManager;
+import com.teamobi.mobiarmy2.manager.PlayerXpManager;
 import com.teamobi.mobiarmy2.model.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.clan.ClanItem;
 import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
 import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
-import com.teamobi.mobiarmy2.repository.CharacterRepository;
-import com.teamobi.mobiarmy2.repository.ClanItemRepository;
-import com.teamobi.mobiarmy2.repository.ClanXpRepository;
-import com.teamobi.mobiarmy2.repository.PlayerXpRepository;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -197,8 +197,8 @@ public class ClanDao implements IClanDao {
 
                     int xp = resultSet.getInt("xp");
                     int level = resultSet.getInt("level");
-                    int xpForCurrentLevel = ClanXpRepository.getRequiredXpLevel(level - 1);
-                    int xpForNextLevel = ClanXpRepository.getRequiredXpLevel(level);
+                    int xpForCurrentLevel = ClanXpManager.getRequiredXpLevel(level - 1);
+                    int xpForNextLevel = ClanXpManager.getRequiredXpLevel(level);
                     int currentXpInLevel = xp - xpForCurrentLevel;
                     int xpNeededForNextLevel = xpForNextLevel - xpForCurrentLevel;
                     byte levelPercent = Utils.calculateLevelPercent(currentXpInLevel, xpNeededForNextLevel);
@@ -220,7 +220,7 @@ public class ClanDao implements IClanDao {
                     List<ClanItem> filteredItems = Arrays.stream(clanItemJsonArray)
                             .filter(item -> !item.getTime().isBefore(currentDate))
                             .map(item -> {
-                                ClanItemEntry clanItemEntry = ClanItemRepository.getItemClanById(item.getId());
+                                ClanItemEntry clanItemEntry = ClanItemManager.getItemClanById(item.getId());
                                 if (clanItemEntry != null) {
                                     ClanItem newClanItem = new ClanItem();
                                     newClanItem.setName(clanItemEntry.getName());
@@ -282,8 +282,8 @@ public class ClanDao implements IClanDao {
 
                     int currentLevel = resultSet.getInt("level");
                     int currentXp = resultSet.getInt("xp");
-                    int requiredXpCurrentLevel = PlayerXpRepository.getRequiredXpLevel(currentLevel - 1);
-                    int requiredXpNextLevel = PlayerXpRepository.getRequiredXpLevel(currentLevel);
+                    int requiredXpCurrentLevel = PlayerXpManager.getRequiredXpLevel(currentLevel - 1);
+                    int requiredXpNextLevel = PlayerXpManager.getRequiredXpLevel(currentLevel);
                     int currentXpInLevel = currentXp - requiredXpCurrentLevel;
                     int xpNeededForNextLevel = requiredXpNextLevel - requiredXpCurrentLevel;
                     byte levelPercent = Utils.calculateLevelPercent(currentXpInLevel, xpNeededForNextLevel);
@@ -296,7 +296,7 @@ public class ClanDao implements IClanDao {
 
                     int[] data = gson.fromJson(resultSet.getString("data"), int[].class);
                     EquipmentChestJson[] equipmentChests = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
-                    entry.setDataEquip(CharacterRepository.getEquipData(equipmentChests, data, entry.getActiveCharacter()));
+                    entry.setDataEquip(CharacterManager.getEquipData(equipmentChests, data, entry.getActiveCharacter()));
 
                     short contributeCount = resultSet.getShort("contribute_count");
                     if (contributeCount > 0) {
@@ -394,8 +394,8 @@ public class ClanDao implements IClanDao {
 
                     int xp = resultSet.getInt("xp");
                     int level = resultSet.getInt("level");
-                    int xpForCurrentLevel = ClanXpRepository.getRequiredXpLevel(level - 1);
-                    int xpForNextLevel = ClanXpRepository.getRequiredXpLevel(level);
+                    int xpForCurrentLevel = ClanXpManager.getRequiredXpLevel(level - 1);
+                    int xpForNextLevel = ClanXpManager.getRequiredXpLevel(level);
                     int currentXpInLevel = xp - xpForCurrentLevel;
                     int xpNeededForNextLevel = xpForNextLevel - xpForCurrentLevel;
                     byte levelPercent = Utils.calculateLevelPercent(currentXpInLevel, xpNeededForNextLevel);

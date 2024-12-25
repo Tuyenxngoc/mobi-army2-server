@@ -1,8 +1,8 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
+import com.teamobi.mobiarmy2.dao.HikariCPManager;
 import com.teamobi.mobiarmy2.dao.IGiftCodeDao;
-import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.GiftCodeEntry;

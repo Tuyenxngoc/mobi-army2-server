@@ -261,7 +261,7 @@ public class Player {
     }
 
     private void move(boolean addX) {
-        IMapManager mapManager = fightManager.getMapManger();
+        IFightMapManager mapManager = fightManager.getMapManger();
         if (this.freezeCount > 0) {
             return;
         }
@@ -297,7 +297,7 @@ public class Player {
     }
 
     public synchronized void updateYPosition() {
-        IMapManager mapManager = fightManager.getMapManger();
+        IFightMapManager mapManager = fightManager.getMapManger();
         while (y < mapManager.getHeight() + 200) {
             if (mapManager.isCollision(x, y) || isFlying) {
                 return;

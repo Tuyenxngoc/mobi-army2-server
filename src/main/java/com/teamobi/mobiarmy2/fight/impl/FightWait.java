@@ -6,12 +6,12 @@ import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.fight.ICountdownTimer;
 import com.teamobi.mobiarmy2.fight.IFightManager;
 import com.teamobi.mobiarmy2.fight.IFightWait;
+import com.teamobi.mobiarmy2.manager.FightItemManager;
+import com.teamobi.mobiarmy2.manager.MapManager;
 import com.teamobi.mobiarmy2.model.Room;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.impl.Message;
-import com.teamobi.mobiarmy2.repository.FightItemRepository;
-import com.teamobi.mobiarmy2.repository.MapRepository;
 import com.teamobi.mobiarmy2.server.ServerManager;
 
 import java.io.DataOutputStream;
@@ -409,7 +409,7 @@ public class FightWait implements IFightWait {
             }
 
             byte[] userItems = items[i];
-            byte[] itemUsageMap = new byte[FightItemRepository.FIGHT_ITEM_ENTRIES.size()];
+            byte[] itemUsageMap = new byte[FightItemManager.FIGHT_ITEM_ENTRIES.size()];
 
             //Đếm số lượng item mà người dùng đang có
             for (byte itemIndex : userItems) {
@@ -426,7 +426,7 @@ public class FightWait implements IFightWait {
                 }
 
                 //Kiểm tra điều kiện số lượng item
-                if (itemUsageMap[itemIndex] > FightItemRepository.FIGHT_ITEM_ENTRIES.get(itemIndex).getCarriedItemCount() || //Số lượng vượt quá số lượng cho phép
+                if (itemUsageMap[itemIndex] > FightItemManager.FIGHT_ITEM_ENTRIES.get(itemIndex).getCarriedItemCount() || //Số lượng vượt quá số lượng cho phép
                         itemUsageMap[itemIndex] > user.getItemFightQuantity(itemIndex) || //Số lượng vượt quá số lượng đang có
                         (j >= 4 && user.getItemFightQuantity(12 + j - 4) == 0) //Item chứa đã hết
                 ) {
@@ -792,7 +792,7 @@ public class FightWait implements IFightWait {
             }
 
             if (!mapIdFound) {
-                roomOwner.getUserService().sendServerMessage(GameString.createMapSelectionErrorMessage(MapRepository.getMapNames(room.getMapCanSelected())));
+                roomOwner.getUserService().sendServerMessage(GameString.createMapSelectionErrorMessage(MapManager.getMapNames(room.getMapCanSelected())));
                 return;
             }
         } else {
@@ -801,9 +801,9 @@ public class FightWait implements IFightWait {
             if (mapIdSet < minMap || mapIdSet > maxMap) {
                 String msg;
                 if (minMap == maxMap) {
-                    msg = GameString.createMapSelectionErrorMessage(MapRepository.getMapNames(minMap));
+                    msg = GameString.createMapSelectionErrorMessage(MapManager.getMapNames(minMap));
                 } else if (minMap == maxMap - 1) {
-                    msg = GameString.createMapSelectionErrorMessage(MapRepository.getMapNames(minMap, maxMap));
+                    msg = GameString.createMapSelectionErrorMessage(MapManager.getMapNames(minMap, maxMap));
                 } else {
                     msg = GameString.MAP_SELECTION_ERROR;
                 }
@@ -814,7 +814,7 @@ public class FightWait implements IFightWait {
 
         mapId = mapIdSet;
         if (mapId == 27) {
-            byte mapRandom = MapRepository.randomMap(27);
+            byte mapRandom = MapManager.randomMap(27);
             try {
                 IMessage ms = new Message(Cmd.TRAINING_MAP);
                 DataOutputStream ds = ms.writer();

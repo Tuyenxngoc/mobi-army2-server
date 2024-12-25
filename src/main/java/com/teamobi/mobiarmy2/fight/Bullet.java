@@ -74,7 +74,7 @@ public class Bullet {
 
     public void nextXY() {
         IFightManager fightManager = bulletManager.getFightManager();
-        IMapManager mapManager = fightManager.getMapManger();
+        IFightMapManager mapManager = fightManager.getMapManger();
 
         frame++;
         this.XArray.add(X);

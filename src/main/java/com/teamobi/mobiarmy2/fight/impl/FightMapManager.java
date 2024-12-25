@@ -2,7 +2,6 @@ package com.teamobi.mobiarmy2.fight.impl;
 
 import com.teamobi.mobiarmy2.fight.*;
 import com.teamobi.mobiarmy2.model.map.MapBrick;
-import com.teamobi.mobiarmy2.repository.MapRepository;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.util.ArrayList;
@@ -12,7 +11,7 @@ import java.util.List;
 /**
  * @author tuyen
  */
-public class MapManager implements IMapManager {
+public class FightMapManager implements IFightMapManager {
 
     private short width;
     private short height;
@@ -21,7 +20,7 @@ public class MapManager implements IMapManager {
     private final List<MapTile> mapTiles = new ArrayList<>();
     private final IFightManager fightManager;
 
-    public MapManager(IFightManager fightManager) {
+    public FightMapManager(IFightManager fightManager) {
         this.fightManager = fightManager;
     }
 
@@ -70,7 +69,7 @@ public class MapManager implements IMapManager {
     @Override
     public void loadMapId(byte mapId) {
         mapTiles.clear();
-        byte[] mapData = MapRepository.getMapData(mapId);
+        byte[] mapData = com.teamobi.mobiarmy2.manager.MapManager.getMapData(mapId);
 
         if (mapData == null) {
             return;
@@ -86,7 +85,7 @@ public class MapManager implements IMapManager {
         for (int i = 0; i < entryCount; i++) {
             int brickId = mapData[offset];
 
-            MapBrick mapBrick = MapRepository.loadMapBrick(brickId);
+            MapBrick mapBrick = com.teamobi.mobiarmy2.manager.MapManager.loadMapBrick(brickId);
             if (mapBrick == null) {
                 continue;
             }
@@ -96,7 +95,7 @@ public class MapManager implements IMapManager {
                     Utils.getShort(mapData, offset + 1),
                     Utils.getShort(mapData, offset + 3),
                     mapBrick.getImage(),
-                    MapRepository.isCollision(brickId)
+                    com.teamobi.mobiarmy2.manager.MapManager.isCollision(brickId)
             );
 
             mapTiles.add(mapTile);
