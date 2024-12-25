@@ -1,9 +1,10 @@
 package com.teamobi.mobiarmy2.dao;
 
 import com.teamobi.mobiarmy2.constant.TransactionType;
-import com.teamobi.mobiarmy2.model.PlayerCharacterEntry;
+import com.teamobi.mobiarmy2.model.PlayerCharacterDTO;
 import com.teamobi.mobiarmy2.model.User;
-import com.teamobi.mobiarmy2.model.user.FriendEntry;
+import com.teamobi.mobiarmy2.model.user.FriendDTO;
+import com.teamobi.mobiarmy2.model.user.UserDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,11 +14,11 @@ import java.util.List;
  */
 public interface IUserDao extends Dao<User> {
 
-    User findByUsernameAndPassword(String username, String password);
+    UserDTO findByUsernameAndPassword(String username, String password);
 
     void updateOnline(boolean flag, int playerId);
 
-    List<FriendEntry> getFriendsList(int playerId, List<Integer> friends);
+    List<FriendDTO> getFriendsList(int playerId, List<Integer> friends);
 
     boolean existsByUserIdAndPassword(String userId, String oldPass);
 
@@ -25,11 +26,11 @@ public interface IUserDao extends Dao<User> {
 
     Integer findPlayerIdByUsername(String username);
 
-    void updateLastOnline(LocalDateTime now, int playerId);
+    void updateLastOnline(LocalDateTime time, int playerId);
 
     boolean createPlayerCharacter(int playerId, byte characterId);
 
-    PlayerCharacterEntry getPlayerCharacter(int playerId, byte characterId);
+    PlayerCharacterDTO getPlayerCharacter(int playerId, byte characterId);
 
     void createTransaction(TransactionType type, int amount, int playerId);
 

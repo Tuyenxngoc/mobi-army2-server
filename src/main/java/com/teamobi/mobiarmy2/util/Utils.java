@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -302,4 +303,41 @@ public class Utils {
         return Math.max(min, Math.min(value, max));
     }
 
+    /**
+     * Adjusts an array to match the desired size.
+     * If the array is smaller than the desired size, it is padded with the default value.
+     * If the array is larger, it is truncated.
+     *
+     * @param originalArray The original array to adjust.
+     * @param desiredSize The target size of the array.
+     * @param defaultValue The default value to pad if the array is smaller.
+     * @return The adjusted array.
+     */
+    public static int[] adjustArray(int[] originalArray, int desiredSize, int defaultValue) {
+        int[] adjustedArray = new int[desiredSize];
+        System.arraycopy(originalArray, 0, adjustedArray, 0, Math.min(originalArray.length, desiredSize));
+        if (originalArray.length < desiredSize) {
+            Arrays.fill(adjustedArray, originalArray.length, desiredSize, defaultValue);
+        }
+        return adjustedArray;
+    }
+
+    /**
+     * Adjusts a byte array to match the desired size.
+     * If the array is smaller than the desired size, it is padded with the default value.
+     * If the array is larger, it is truncated.
+     *
+     * @param originalArray The original array to adjust.
+     * @param desiredSize The target size of the array.
+     * @param defaultValue The default value to pad if the array is smaller.
+     * @return The adjusted array.
+     */
+    public static byte[] adjustArray(byte[] originalArray, int desiredSize, byte defaultValue) {
+        byte[] adjustedArray = new byte[desiredSize];
+        System.arraycopy(originalArray, 0, adjustedArray, 0, Math.min(originalArray.length, desiredSize));
+        if (originalArray.length < desiredSize) {
+            Arrays.fill(adjustedArray, originalArray.length, desiredSize, defaultValue);
+        }
+        return adjustedArray;
+    }
 }

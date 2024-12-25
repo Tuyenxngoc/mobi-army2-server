@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FriendEntry {
+public class FriendDTO {
     private int id;
     private String name;
     private int xu;

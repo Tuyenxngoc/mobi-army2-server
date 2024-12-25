@@ -20,10 +20,7 @@ import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
 import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
 import com.teamobi.mobiarmy2.model.item.FightItemEntry;
 import com.teamobi.mobiarmy2.model.item.SpecialItemEntry;
-import com.teamobi.mobiarmy2.model.user.EquipmentChestEntry;
-import com.teamobi.mobiarmy2.model.user.FriendEntry;
-import com.teamobi.mobiarmy2.model.user.PlayerLeaderboardEntry;
-import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
+import com.teamobi.mobiarmy2.model.user.*;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.repository.*;
@@ -127,7 +124,7 @@ public class UserService implements IUserService {
                 return;
             }
 
-            User userFound = userDao.findByUsernameAndPassword(username, password);
+            UserDTO userFound = userDao.findByUsernameAndPassword(username, password);
             if (userFound == null) {
                 sendMessageLoginFail(GameString.LOGIN_FAILED);
                 return;
@@ -200,7 +197,7 @@ public class UserService implements IUserService {
         }
     }
 
-    private void copyUserData(User target, User source) {
+    private void copyUserData(User target, UserDTO source) {
         target.setUserId(source.getUserId());
         target.setPlayerId(source.getPlayerId());
         target.setUsername(source.getUsername());
@@ -223,7 +220,7 @@ public class UserService implements IUserService {
         target.setMission(source.getMission());
         target.setMissionLevel(source.getMissionLevel());
         target.setSpecialItemChest(source.getSpecialItemChest());
-        target.setEquipmentChest(source.getEquipmentChest());
+        // target.setEquipmentChest(source.getEquipmentChest());
         target.setItems(source.getItems());
         target.setXpX2Time(source.getXpX2Time());
         target.setLastOnline(source.getLastOnline());
@@ -1752,8 +1749,8 @@ public class UserService implements IUserService {
             DataOutputStream ds = ms.writer();
 
             if (!user.getFriends().isEmpty()) {
-                List<FriendEntry> friends = userDao.getFriendsList(user.getPlayerId(), user.getFriends());
-                for (FriendEntry friend : friends) {
+                List<FriendDTO> friends = userDao.getFriendsList(user.getPlayerId(), user.getFriends());
+                for (FriendDTO friend : friends) {
                     ds.writeInt(friend.getId());
                     ds.writeUTF(friend.getName());
                     ds.writeInt(friend.getXu());
@@ -2047,7 +2044,7 @@ public class UserService implements IUserService {
             }
 
             if (userDao.createPlayerCharacter(user.getPlayerId(), index)) {
-                PlayerCharacterEntry character = userDao.getPlayerCharacter(user.getPlayerId(), index);
+                PlayerCharacterDTO character = userDao.getPlayerCharacter(user.getPlayerId(), index);
                 if (character != null) {
                     user.getLevels()[index] = character.getLevel();
                     user.getXps()[index] = character.getXp();

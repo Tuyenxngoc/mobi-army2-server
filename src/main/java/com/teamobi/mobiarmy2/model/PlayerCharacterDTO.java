@@ -8,7 +8,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class PlayerCharacterEntry {
+public class PlayerCharacterDTO {
     private long id;
     private short[] additionalPoints;
     private int[] data;
