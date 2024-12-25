@@ -1,14 +1,14 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
-import com.teamobi.mobiarmy2.dao.HikariCPManager;
 import com.teamobi.mobiarmy2.dao.IClanDao;
+import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.ClanItemJson;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
-import com.teamobi.mobiarmy2.manager.CharacterManager;
-import com.teamobi.mobiarmy2.manager.ClanItemManager;
-import com.teamobi.mobiarmy2.manager.ClanXpManager;
-import com.teamobi.mobiarmy2.manager.PlayerXpManager;
+import com.teamobi.mobiarmy2.server.CharacterManager;
+import com.teamobi.mobiarmy2.server.ClanItemManager;
+import com.teamobi.mobiarmy2.server.ClanXpManager;
+import com.teamobi.mobiarmy2.server.PlayerXpManager;
 import com.teamobi.mobiarmy2.model.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.clan.ClanItem;

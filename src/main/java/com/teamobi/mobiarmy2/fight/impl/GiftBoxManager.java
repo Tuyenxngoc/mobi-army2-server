@@ -3,7 +3,7 @@ package com.teamobi.mobiarmy2.fight.impl;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.fight.IGiftBoxManager;
-import com.teamobi.mobiarmy2.manager.FightItemManager;
+import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.impl.Message;

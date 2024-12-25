@@ -10,7 +10,6 @@ import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.fight.impl.TrainingManager;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
-import com.teamobi.mobiarmy2.manager.*;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.clan.ClanInfo;
@@ -24,9 +23,7 @@ import com.teamobi.mobiarmy2.model.item.SpecialItemEntry;
 import com.teamobi.mobiarmy2.model.user.*;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.impl.Message;
-import com.teamobi.mobiarmy2.server.ClanManager;
-import com.teamobi.mobiarmy2.server.LeaderboardManager;
-import com.teamobi.mobiarmy2.server.ServerManager;
+import com.teamobi.mobiarmy2.server.*;
 import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.util.Utils;
 

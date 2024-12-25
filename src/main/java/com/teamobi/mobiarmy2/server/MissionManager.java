@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.manager;
+package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.model.MissionEntry;
 

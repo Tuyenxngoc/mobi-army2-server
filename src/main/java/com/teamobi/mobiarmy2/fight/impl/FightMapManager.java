@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.fight.impl;
 
 import com.teamobi.mobiarmy2.fight.*;
+import com.teamobi.mobiarmy2.server.MapManager;
 import com.teamobi.mobiarmy2.model.map.MapBrick;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -69,7 +70,7 @@ public class FightMapManager implements IFightMapManager {
     @Override
     public void loadMapId(byte mapId) {
         mapTiles.clear();
-        byte[] mapData = com.teamobi.mobiarmy2.manager.MapManager.getMapData(mapId);
+        byte[] mapData = MapManager.getMapData(mapId);
 
         if (mapData == null) {
             return;
@@ -85,7 +86,7 @@ public class FightMapManager implements IFightMapManager {
         for (int i = 0; i < entryCount; i++) {
             int brickId = mapData[offset];
 
-            MapBrick mapBrick = com.teamobi.mobiarmy2.manager.MapManager.loadMapBrick(brickId);
+            MapBrick mapBrick = MapManager.loadMapBrick(brickId);
             if (mapBrick == null) {
                 continue;
             }
@@ -95,7 +96,7 @@ public class FightMapManager implements IFightMapManager {
                     Utils.getShort(mapData, offset + 1),
                     Utils.getShort(mapData, offset + 3),
                     mapBrick.getImage(),
-                    com.teamobi.mobiarmy2.manager.MapManager.isCollision(brickId)
+                    MapManager.isCollision(brickId)
             );
 
             mapTiles.add(mapTile);

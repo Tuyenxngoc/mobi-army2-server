@@ -4,8 +4,6 @@ import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.dao.IClanDao;
 import com.teamobi.mobiarmy2.dao.impl.ClanDao;
 import com.teamobi.mobiarmy2.json.ClanItemJson;
-import com.teamobi.mobiarmy2.manager.ClanItemManager;
-import com.teamobi.mobiarmy2.manager.ClanXpManager;
 import com.teamobi.mobiarmy2.model.clan.ClanEntry;
 import com.teamobi.mobiarmy2.model.clan.ClanInfo;
 import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;

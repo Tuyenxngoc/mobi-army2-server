@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.fight;
 
-import com.teamobi.mobiarmy2.manager.CharacterManager;
-import com.teamobi.mobiarmy2.manager.SpecialItemManager;
+import com.teamobi.mobiarmy2.server.CharacterManager;
+import com.teamobi.mobiarmy2.server.SpecialItemManager;
 import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
 import com.teamobi.mobiarmy2.model.user.EquipmentChestEntry;
 import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
