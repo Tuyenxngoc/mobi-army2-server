@@ -47,8 +47,6 @@ public class User {
     private int luong;
     private int cup;
     private boolean isLogged;
-    private boolean isLock;
-    private boolean isActive;
     private boolean isChestLocked;
     private boolean isInvitationLocked;
     private byte activeCharacterId;

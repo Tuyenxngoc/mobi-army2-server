@@ -317,8 +317,8 @@ public class UserService implements IUserService {
         try {
             IMessage ms = new Message(Cmd.UNDESTROYTILE);
             DataOutputStream ds = ms.writer();
-            ds.writeShort(MapRepository.idNotCollisions.length);
-            for (short i : MapRepository.idNotCollisions) {
+            ds.writeShort(MapRepository.ID_NOT_COLLISIONS.length);
+            for (short i : MapRepository.ID_NOT_COLLISIONS) {
                 ds.writeShort(i);
             }
             ds.flush();

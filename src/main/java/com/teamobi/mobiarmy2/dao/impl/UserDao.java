@@ -181,7 +181,7 @@ public class UserDao implements IUserDao {
                             "cm.clan_id " +
                             "FROM players p " +
                             "INNER JOIN player_characters pc ON p.active_character_id = pc.player_character_id " +
-                            "LEFT JOIN clan_members cm on p.player_id = cm.player_id " +
+                            "LEFT JOIN clan_members cm ON p.player_id = cm.player_id " +
                             "WHERE user_id = ?";
 
             try (PreparedStatement playerStatement = connection.prepareStatement(playerQuery)) {

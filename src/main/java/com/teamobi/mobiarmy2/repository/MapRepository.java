@@ -10,16 +10,16 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author tuyen
  */
 public class MapRepository {
     public static final List<MapEntry> MAP_ENTRIES = new ArrayList<>();
-    public static final List<MapBrick> MAP_BRICKS = new ArrayList<>();
-    public static final short[] idNotCollisions = new short[]{70, 71, 73, 74, 75, 77, 78, 79, 97};
+    public static final Map<Integer, MapBrick> MAP_BRICKS = new HashMap<>();
+    public static final short[] ID_NOT_COLLISIONS = {70, 71, 73, 74, 75, 77, 78, 79, 97};
+    public static final Set<Integer> ID_NOT_COLLISIONS_SET = Set.of(70, 71, 73, 74, 75, 77, 78, 79, 97);
 
     public static byte randomMap(int idNotSelect) {
         byte selectedId;
@@ -54,19 +54,15 @@ public class MapRepository {
     }
 
     public static boolean isCollision(int id) {
-        for (short idNotCollision : idNotCollisions) {
-            if (id == idNotCollision) {
-                return false;
-            }
-        }
-        return true;
+        return !ID_NOT_COLLISIONS_SET.contains(id);
     }
 
     public static MapBrick loadMapBrick(int brickId) {
-        int index = MAP_BRICKS.indexOf(new MapBrick(brickId));
-        if (index != -1) {
-            return MAP_BRICKS.get(index);
+        MapBrick existingBrick = MAP_BRICKS.get(brickId);
+        if (existingBrick != null) {
+            return existingBrick;
         }
+
         try {
             File imageFile = new File(String.format(GameConstants.MAP_ICON_PATH, brickId));
             BufferedImage image = ImageIO.read(imageFile);
@@ -79,7 +75,7 @@ public class MapRepository {
             image.getRGB(0, 0, width, height, pixelData, 0, width);
             ImageData imageData = new ImageData(width, height, pixelData);
             MapBrick mapBrick = new MapBrick(brickId, imageData);
-            MAP_BRICKS.add(mapBrick);
+            MAP_BRICKS.put(brickId, mapBrick);
             return mapBrick;
         } catch (IOException e) {
             System.err.println("Error loading map brick with id " + brickId + ": " + e.getMessage());
