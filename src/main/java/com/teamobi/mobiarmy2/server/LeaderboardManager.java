@@ -2,7 +2,7 @@ package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.dao.IRankingDao;
 import com.teamobi.mobiarmy2.dao.impl.RankingDao;
-import com.teamobi.mobiarmy2.model.user.PlayerLeaderboardEntry;
+import com.teamobi.mobiarmy2.dto.PlayerLeaderboardDTO;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ public class LeaderboardManager {
     @Getter
     private final String[] leaderboardLabels = {"Danh dự", "XP", "Xu", "Lượng", "Danh dự", "Xu"};
     @Getter
-    private final List<List<PlayerLeaderboardEntry>> leaderboardEntries = new ArrayList<>(leaderboardCategories.length);
+    private final List<List<PlayerLeaderboardDTO>> leaderboardEntries = new ArrayList<>(leaderboardCategories.length);
 
     public void init() {
         for (int i = 0; i < leaderboardCategories.length; i++) {
@@ -67,7 +67,7 @@ public class LeaderboardManager {
         int[] topBonus = ServerManager.getInstance().getConfig().getTopBonus();
 
         int i = 0;
-        for (PlayerLeaderboardEntry entry : leaderboardEntries.getFirst()) {
+        for (PlayerLeaderboardDTO entry : leaderboardEntries.getFirst()) {
             if (i >= 3) {
                 break;
             }
@@ -76,15 +76,15 @@ public class LeaderboardManager {
         }
     }
 
-    public List<PlayerLeaderboardEntry> getLeaderboardEntries(int type, int page, int pageSize) {
-        List<PlayerLeaderboardEntry> list = leaderboardEntries.get(type);
+    public List<PlayerLeaderboardDTO> getLeaderboardEntries(int type, int page, int pageSize) {
+        List<PlayerLeaderboardDTO> list = leaderboardEntries.get(type);
         int startIndex = page * pageSize;
         int endIndex = Math.min(startIndex + pageSize, list.size());
         return list.subList(startIndex, endIndex);
     }
 
     private void refreshXH(int type) {
-        List<PlayerLeaderboardEntry> list = leaderboardEntries.get(type);
+        List<PlayerLeaderboardDTO> list = leaderboardEntries.get(type);
         list.clear();
         switch (type) {
             case 0 -> list.addAll(rankingDao.getTopHonor());

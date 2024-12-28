@@ -3,9 +3,9 @@ package com.teamobi.mobiarmy2.dao.impl;
 import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.dao.IGiftCodeDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
+import com.teamobi.mobiarmy2.dto.GiftCodeDTO;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
-import com.teamobi.mobiarmy2.model.GiftCodeEntry;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 
 import java.sql.*;
@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class GiftCodeDao implements IGiftCodeDao {
 
     @Override
-    public GiftCodeEntry getGiftCode(String code, int playerId) {
+    public GiftCodeDTO getGiftCode(String code, int playerId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT gc.gift_code_id, gc.usage_limit, gc.expiration_date, gc.xu, gc.luong, gc.exp, gc.items, gc.equips, " +
@@ -31,7 +31,7 @@ public class GiftCodeDao implements IGiftCodeDao {
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     Gson gson = GsonUtil.getInstance();
-                    GiftCodeEntry giftCode = new GiftCodeEntry();
+                    GiftCodeDTO giftCode = new GiftCodeDTO();
                     giftCode.setUsed(resultSet.getBoolean("used"));
                     if (!giftCode.isUsed()) {
                         giftCode.setId(resultSet.getLong("gift_code_id"));

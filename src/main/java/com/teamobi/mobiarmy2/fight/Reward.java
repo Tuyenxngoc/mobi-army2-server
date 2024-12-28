@@ -1,10 +1,10 @@
 package com.teamobi.mobiarmy2.fight;
 
+import com.teamobi.mobiarmy2.model.Equipment;
+import com.teamobi.mobiarmy2.model.EquipmentChest;
+import com.teamobi.mobiarmy2.model.SpecialItemChest;
 import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
-import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
-import com.teamobi.mobiarmy2.model.user.EquipmentChestEntry;
-import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,8 +20,8 @@ public class Reward {
     private short quantity;
     private short xu;
     private short xp;
-    private EquipmentChestEntry equip;
-    private SpecialItemChestEntry specialItem;
+    private EquipmentChest equip;
+    private SpecialItemChest specialItem;
 
     public void coins(short xu) {
         this.type = 0;
@@ -36,7 +36,7 @@ public class Reward {
 
     public void equip() {
         this.type = 2;
-        EquipmentEntry entry = CharacterManager.getRandomEquip(
+        Equipment entry = CharacterManager.getRandomEquip(
                 equipmentEntry ->
                         equipmentEntry.isOnSale()
                                 && !equipmentEntry.isDisguise()
@@ -46,8 +46,8 @@ public class Reward {
         if (entry == null) {
             throw new IllegalStateException("No suitable equipment entry found for reward.");
         }
-        equip = new EquipmentChestEntry();
-        equip.setEquipEntry(entry);
+        equip = new EquipmentChest();
+        equip.setEquipment(entry);
     }
 
     public void xp(short xp) {
@@ -57,7 +57,7 @@ public class Reward {
 
     public void specialItems(byte id, byte quantity) {
         this.type = 4;
-        specialItem = new SpecialItemChestEntry();
+        specialItem = new SpecialItemChest();
         specialItem.setItem(SpecialItemManager.getSpecialItemById(id));
         if (specialItem.getItem() == null) {
             throw new IllegalArgumentException("Special item with ID " + id + " does not exist.");

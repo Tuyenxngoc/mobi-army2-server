@@ -12,7 +12,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LevelXpRequiredEntry {
-    private short level;
-    private int xp;
+public class ClanItem {
+    private byte id;
+    private byte level;
+    private String name;
+    private byte time;
+    private byte onSale;
+    private int xu;
+    private int luong;
 }

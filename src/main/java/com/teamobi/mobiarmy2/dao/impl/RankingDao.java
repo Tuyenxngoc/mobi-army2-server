@@ -4,10 +4,10 @@ import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dao.IRankingDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
+import com.teamobi.mobiarmy2.dto.PlayerLeaderboardDTO;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.PlayerXpManager;
-import com.teamobi.mobiarmy2.model.user.PlayerLeaderboardEntry;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -24,16 +24,16 @@ import java.util.List;
  */
 public class RankingDao implements IRankingDao {
 
-    private List<PlayerLeaderboardEntry> getTopFromQuery(String query, String detailColumn, boolean applyBonus) {
+    private List<PlayerLeaderboardDTO> getTopFromQuery(String query, String detailColumn, boolean applyBonus) {
         Gson gson = GsonUtil.getInstance();
         int[] topBonus = ServerManager.getInstance().getConfig().getTopBonus();
-        List<PlayerLeaderboardEntry> top = new ArrayList<>();
+        List<PlayerLeaderboardDTO> top = new ArrayList<>();
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             byte index = 1;
             while (resultSet.next()) {
-                PlayerLeaderboardEntry entry = new PlayerLeaderboardEntry();
+                PlayerLeaderboardDTO entry = new PlayerLeaderboardDTO();
 
                 entry.setIndex(index);
                 entry.setPlayerId(resultSet.getInt("player_id"));
@@ -72,7 +72,7 @@ public class RankingDao implements IRankingDao {
     }
 
     @Override
-    public List<PlayerLeaderboardEntry> getTopHonor() {
+    public List<PlayerLeaderboardDTO> getTopHonor() {
         String query = "SELECT " +
                 "p.player_id, p.equipment_chest, p.cup, " +
                 "pc.data, pc.character_id, pc.level, pc.xp, " +
@@ -89,7 +89,7 @@ public class RankingDao implements IRankingDao {
     }
 
     @Override
-    public List<PlayerLeaderboardEntry> getTopMasters() {
+    public List<PlayerLeaderboardDTO> getTopMasters() {
         String query = "SELECT " +
                 "pc.data, pc.character_id, pc.level, pc.xp, " +
                 "p.player_id, p.equipment_chest, " +
@@ -106,7 +106,7 @@ public class RankingDao implements IRankingDao {
     }
 
     @Override
-    public List<PlayerLeaderboardEntry> getTopRichestXu() {
+    public List<PlayerLeaderboardDTO> getTopRichestXu() {
         String query = "SELECT " +
                 "p.player_id, p.equipment_chest, p.xu, " +
                 "pc.data, pc.character_id, pc.level, pc.xp, " +
@@ -123,7 +123,7 @@ public class RankingDao implements IRankingDao {
     }
 
     @Override
-    public List<PlayerLeaderboardEntry> getTopRichestLuong() {
+    public List<PlayerLeaderboardDTO> getTopRichestLuong() {
         String query = "SELECT " +
                 "p.player_id, p.equipment_chest, p.luong, " +
                 "pc.data, pc.character_id, pc.level, pc.xp, " +
@@ -140,7 +140,7 @@ public class RankingDao implements IRankingDao {
     }
 
     @Override
-    public List<PlayerLeaderboardEntry> getWeeklyTopHonor() {
+    public List<PlayerLeaderboardDTO> getWeeklyTopHonor() {
         String query = "SELECT " +
                 "p.player_id, p.equipment_chest, SUM(t.amount) AS cup, " +
                 "pc.data, pc.character_id, pc.level, pc.xp, " +
@@ -160,7 +160,7 @@ public class RankingDao implements IRankingDao {
     }
 
     @Override
-    public List<PlayerLeaderboardEntry> getWeeklyTopRichest() {
+    public List<PlayerLeaderboardDTO> getWeeklyTopRichest() {
         String query = "SELECT " +
                 "p.player_id, p.equipment_chest, SUM(t.amount) AS xu, " +
                 "pc.data, pc.character_id, pc.level, pc.xp, " +

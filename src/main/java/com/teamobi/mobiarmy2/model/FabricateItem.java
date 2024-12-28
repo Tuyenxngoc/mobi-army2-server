@@ -1,7 +1,8 @@
 package com.teamobi.mobiarmy2.model;
 
-import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -14,19 +15,18 @@ import java.util.Set;
  */
 @Getter
 @Setter
-public class FabricateItemEntry {
+@NoArgsConstructor
+@AllArgsConstructor
+public class FabricateItem {
     private int id;
-
     private int xuRequire;
     private int luongRequire;
-    private Set<SpecialItemChestEntry> itemRequire = new HashSet<>();
-
+    private Set<SpecialItemChest> itemRequire = new HashSet<>();
     private int rewardXu;
     private int rewardLuong;
     private int rewardCup;
     private int rewardExp;
-    private List<SpecialItemChestEntry> rewardItem = new ArrayList<>();
-
+    private List<SpecialItemChest> rewardItem = new ArrayList<>();
     private String confirmationMessage;
     private String completionMessage;
 }

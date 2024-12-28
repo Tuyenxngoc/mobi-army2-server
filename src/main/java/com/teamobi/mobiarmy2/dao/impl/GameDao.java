@@ -5,14 +5,8 @@ import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.dao.IGameDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
+import com.teamobi.mobiarmy2.model.Character;
 import com.teamobi.mobiarmy2.model.*;
-import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
-import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
-import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
-import com.teamobi.mobiarmy2.model.item.FightItemEntry;
-import com.teamobi.mobiarmy2.model.item.SpecialItemEntry;
-import com.teamobi.mobiarmy2.model.map.MapEntry;
-import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
 import com.teamobi.mobiarmy2.server.*;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -34,22 +28,22 @@ public class GameDao implements IGameDao {
 
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `maps`")) {
                 while (resultSet.next()) {
-                    MapEntry map = new MapEntry();
-                    map.setId(resultSet.getByte("map_id"));
-                    map.setName(resultSet.getString("name"));
-                    map.setFileName(resultSet.getString("file"));
-                    byte[] dataMap = Utils.getFile(GameConstants.MAP_PATH + "/" + map.getFileName());
+                    ArmyMap armyMap = new ArmyMap();
+                    armyMap.setId(resultSet.getByte("map_id"));
+                    armyMap.setName(resultSet.getString("name"));
+                    armyMap.setFileName(resultSet.getString("file"));
+                    byte[] dataMap = Utils.getFile(GameConstants.MAP_PATH + "/" + armyMap.getFileName());
                     if (dataMap == null) {
                         System.exit(1);
                     }
-                    map.setData(dataMap);
-                    map.setBg(resultSet.getShort("background"));
-                    map.setMapAddY(resultSet.getShort("map_add_y"));
-                    map.setBullEffShower(resultSet.getShort("bullet_effect_shower"));
-                    map.setInWaterAddY(resultSet.getShort("in_water_add_y"));
-                    map.setCl2AddY(resultSet.getShort("cl2_add_y"));
+                    armyMap.setData(dataMap);
+                    armyMap.setBg(resultSet.getShort("background"));
+                    armyMap.setMapAddY(resultSet.getShort("map_add_y"));
+                    armyMap.setBullEffShower(resultSet.getShort("bullet_effect_shower"));
+                    armyMap.setInWaterAddY(resultSet.getShort("in_water_add_y"));
+                    armyMap.setCl2AddY(resultSet.getShort("cl2_add_y"));
 
-                    MapManager.MAP_ENTRIES.add(map);
+                    MapManager.ARMY_MAPS.add(armyMap);
                 }
             }
         } catch (SQLException e) {
@@ -65,18 +59,18 @@ public class GameDao implements IGameDao {
 
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `characters`")) {
                 while (resultSet.next()) {
-                    CharacterEntry characterEntry = new CharacterEntry();
-                    characterEntry.setId(resultSet.getByte("character_id"));
-                    characterEntry.setName(resultSet.getString("name"));
-                    characterEntry.setPriceXu(resultSet.getInt("xu"));
-                    characterEntry.setPriceLuong(resultSet.getInt("luong"));
-                    characterEntry.setWindResistance(resultSet.getByte("wind_resistance"));
-                    characterEntry.setMinAngle(resultSet.getByte("min_angle"));
-                    characterEntry.setDamage(resultSet.getShort("damage"));
-                    characterEntry.setBulletDamage(resultSet.getByte("bullet_damage"));
-                    characterEntry.setBulletCount(resultSet.getByte("bullet_count"));
+                    Character character = new Character();
+                    character.setId(resultSet.getByte("character_id"));
+                    character.setName(resultSet.getString("name"));
+                    character.setPriceXu(resultSet.getInt("xu"));
+                    character.setPriceLuong(resultSet.getInt("luong"));
+                    character.setWindResistance(resultSet.getByte("wind_resistance"));
+                    character.setMinAngle(resultSet.getByte("min_angle"));
+                    character.setDamage(resultSet.getShort("damage"));
+                    character.setBulletDamage(resultSet.getByte("bullet_damage"));
+                    character.setBulletCount(resultSet.getByte("bullet_count"));
 
-                    CharacterManager.CHARACTER_ENTRIES.add(characterEntry);
+                    CharacterManager.CHARACTERS.add(character);
                 }
             }
         } catch (SQLException e) {
@@ -93,10 +87,10 @@ public class GameDao implements IGameDao {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `equips` ORDER BY equip_type, equip_index, character_id")) {
 
                 //Khởi tại danh sách trang bị mặc định ban đầu
-                User.equipDefault = new EquipmentEntry[CharacterManager.CHARACTER_ENTRIES.size()][5];
+                User.equipDefault = new Equipment[CharacterManager.CHARACTERS.size()][5];
                 Gson gson = GsonUtil.getInstance();
                 while (resultSet.next()) {
-                    EquipmentEntry equipEntry = new EquipmentEntry();
+                    Equipment equipEntry = new Equipment();
                     equipEntry.setCharacterId(resultSet.getByte("character_id"));
                     equipEntry.setEquipType(resultSet.getByte("equip_type"));
                     equipEntry.setEquipIndex(resultSet.getShort("equip_index"));
@@ -185,10 +179,10 @@ public class GameDao implements IGameDao {
 
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `caption_levels`")) {
                 while (resultSet.next()) {
-                    CaptionEntry capEntry = new CaptionEntry();
+                    Caption capEntry = new Caption();
                     capEntry.setLevel(resultSet.getByte("level"));
                     capEntry.setCaption(resultSet.getString("caption"));
-                    CaptionManager.CAPTION_ENTRIES.add(capEntry);
+                    CaptionManager.CAPTIONS.add(capEntry);
                 }
             }
         } catch (SQLException e) {
@@ -204,13 +198,13 @@ public class GameDao implements IGameDao {
 
             try (ResultSet resultSet = statement.executeQuery("SELECT name, xu, luong, carried_item_count FROM `fight_items`")) {
                 while (resultSet.next()) {
-                    FightItemEntry fightItemEntry = new FightItemEntry();
-                    fightItemEntry.setName(resultSet.getString("name"));
-                    fightItemEntry.setBuyXu(resultSet.getShort("xu"));
-                    fightItemEntry.setBuyLuong(resultSet.getShort("luong"));
-                    fightItemEntry.setCarriedItemCount(resultSet.getByte("carried_item_count"));
+                    FightItem fightItem = new FightItem();
+                    fightItem.setName(resultSet.getString("name"));
+                    fightItem.setBuyXu(resultSet.getShort("xu"));
+                    fightItem.setBuyLuong(resultSet.getShort("luong"));
+                    fightItem.setCarriedItemCount(resultSet.getByte("carried_item_count"));
 
-                    FightItemManager.FIGHT_ITEM_ENTRIES.add(fightItemEntry);
+                    FightItemManager.FIGHT_ITEMS.add(fightItem);
                 }
             }
         } catch (SQLException e) {
@@ -226,7 +220,7 @@ public class GameDao implements IGameDao {
 
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `clan_shops`")) {
                 while (resultSet.next()) {
-                    ClanItemEntry item = new ClanItemEntry();
+                    ClanItem item = new ClanItem();
                     item.setId(resultSet.getByte("clan_shop_id"));
                     item.setLevel(resultSet.getByte("level"));
                     item.setName(resultSet.getString("name"));
@@ -235,7 +229,7 @@ public class GameDao implements IGameDao {
                     item.setXu(resultSet.getInt("xu"));
                     item.setLuong(resultSet.getInt("luong"));
 
-                    ClanItemManager.CLAN_ITEM_ENTRY_MAP.put(item.getId(), item);
+                    ClanItemManager.CLAN_ITEM_MAP.put(item.getId(), item);
                 }
             }
         } catch (SQLException e) {
@@ -251,27 +245,27 @@ public class GameDao implements IGameDao {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `special_items`")) {
                 Gson gson = GsonUtil.getInstance();
                 while (resultSet.next()) {
-                    SpecialItemEntry specialItemEntry = new SpecialItemEntry();
-                    specialItemEntry.setId(resultSet.getByte("special_item_id"));
-                    specialItemEntry.setName(resultSet.getString("name"));
-                    specialItemEntry.setDetail(resultSet.getString("detail"));
-                    specialItemEntry.setPriceXu(resultSet.getInt("price_xu"));
-                    specialItemEntry.setPriceLuong(resultSet.getInt("price_luong"));
-                    specialItemEntry.setPriceSellXu(resultSet.getInt("price_sell_xu"));
-                    specialItemEntry.setExpirationDays(resultSet.getShort("expiration_days"));
-                    specialItemEntry.setShowSelection(resultSet.getBoolean("show_selection"));
-                    specialItemEntry.setOnSale(resultSet.getBoolean("is_on_sale"));
-                    specialItemEntry.setAbility(gson.fromJson(resultSet.getString("ability"), short[].class));
+                    SpecialItem specialItem = new SpecialItem();
+                    specialItem.setId(resultSet.getByte("special_item_id"));
+                    specialItem.setName(resultSet.getString("name"));
+                    specialItem.setDetail(resultSet.getString("detail"));
+                    specialItem.setPriceXu(resultSet.getInt("price_xu"));
+                    specialItem.setPriceLuong(resultSet.getInt("price_luong"));
+                    specialItem.setPriceSellXu(resultSet.getInt("price_sell_xu"));
+                    specialItem.setExpirationDays(resultSet.getShort("expiration_days"));
+                    specialItem.setShowSelection(resultSet.getBoolean("show_selection"));
+                    specialItem.setOnSale(resultSet.getBoolean("is_on_sale"));
+                    specialItem.setAbility(gson.fromJson(resultSet.getString("ability"), short[].class));
 
                     //Phân loại item
                     byte specialItemType = resultSet.getByte("type");
                     switch (specialItemType) {
-                        case 1 -> specialItemEntry.setGem(true);
-                        case 2 -> specialItemEntry.setMaterial(true);
-                        case 3 -> specialItemEntry.setUsable(true);
+                        case 1 -> specialItem.setGem(true);
+                        case 2 -> specialItem.setMaterial(true);
+                        case 3 -> specialItem.setUsable(true);
                     }
 
-                    SpecialItemManager.addSpecialItem(specialItemEntry);
+                    SpecialItemManager.addSpecialItem(specialItem);
                 }
             }
         } catch (SQLException e) {
@@ -288,7 +282,7 @@ public class GameDao implements IGameDao {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM formula_details fd INNER JOIN formulas f on fd.formula_id = f.formula_id ORDER BY f.material_id, fd.character_id, f.level")) {
                 Gson gson = GsonUtil.getInstance();
                 while (resultSet.next()) {
-                    FormulaEntry entry = new FormulaEntry();
+                    Formula entry = new Formula();
                     entry.setMaterial(SpecialItemManager.getSpecialItemById(resultSet.getByte("f.material_id")));
                     entry.setLevel(resultSet.getByte("f.level"));
                     entry.setLevelRequired(resultSet.getByte("f.level_required"));
@@ -303,9 +297,9 @@ public class GameDao implements IGameDao {
                     entry.setResultEquip(CharacterManager.getEquipEntry(entry.getCharacterId(), entry.getEquipType(), resultSet.getShort("fd.result_equip")));
                     SpecialItemChestJson[] json = gson.fromJson(resultSet.getString("fd.required_items"), SpecialItemChestJson[].class);
                     for (SpecialItemChestJson itemChestJson : json) {
-                        SpecialItemEntry specialItemEntry = SpecialItemManager.getSpecialItemById(itemChestJson.getId());
-                        if (specialItemEntry != null) {
-                            entry.getRequiredItems().add(new SpecialItemChestEntry(itemChestJson.getQuantity(), specialItemEntry));
+                        SpecialItem specialItem = SpecialItemManager.getSpecialItemById(itemChestJson.getId());
+                        if (specialItem != null) {
+                            entry.getRequiredItems().add(new SpecialItemChest(itemChestJson.getQuantity(), specialItem));
                         }
                     }
 
@@ -324,14 +318,14 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `payments`")) {
                 while (resultSet.next()) {
-                    PaymentEntry paymentEntry = new PaymentEntry();
-                    paymentEntry.setId(resultSet.getString("payment_id"));
-                    paymentEntry.setInfo(resultSet.getString("info"));
-                    paymentEntry.setUrl(resultSet.getString("url"));
-                    paymentEntry.setMssTo(resultSet.getString("mss_to"));
-                    paymentEntry.setMssContent(resultSet.getString("mss_content"));
+                    Payment payment = new Payment();
+                    payment.setId(resultSet.getString("payment_id"));
+                    payment.setInfo(resultSet.getString("info"));
+                    payment.setUrl(resultSet.getString("url"));
+                    payment.setMssTo(resultSet.getString("mss_to"));
+                    payment.setMssContent(resultSet.getString("mss_content"));
 
-                    PaymentManager.PAYMENT_ENTRY_MAP.put(paymentEntry.getId(), paymentEntry);
+                    PaymentManager.PAYMENT_MAP.put(payment.getId(), payment);
                 }
             }
         } catch (SQLException e) {
@@ -346,19 +340,19 @@ public class GameDao implements IGameDao {
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `missions` ORDER BY mission_type, level")) {
                 while (resultSet.next()) {
-                    MissionEntry missionEntry = new MissionEntry();
-                    missionEntry.setId(resultSet.getByte("mission_id"));
-                    missionEntry.setType(resultSet.getByte("mission_type"));
-                    missionEntry.setLevel(resultSet.getByte("level"));
-                    missionEntry.setName(resultSet.getString("mission_name"));
-                    missionEntry.setRequirement(resultSet.getInt("requirement"));
-                    missionEntry.setReward(resultSet.getString("reward_items"));
-                    missionEntry.setRewardXu(resultSet.getInt("reward_xu"));
-                    missionEntry.setRewardLuong(resultSet.getInt("reward_luong"));
-                    missionEntry.setRewardXp(resultSet.getInt("reward_xp"));
-                    missionEntry.setRewardCup(resultSet.getInt("reward_cup"));
+                    Mission mission = new Mission();
+                    mission.setId(resultSet.getByte("mission_id"));
+                    mission.setType(resultSet.getByte("mission_type"));
+                    mission.setLevel(resultSet.getByte("level"));
+                    mission.setName(resultSet.getString("mission_name"));
+                    mission.setRequirement(resultSet.getInt("requirement"));
+                    mission.setReward(resultSet.getString("reward_items"));
+                    mission.setRewardXu(resultSet.getInt("reward_xu"));
+                    mission.setRewardLuong(resultSet.getInt("reward_luong"));
+                    mission.setRewardXp(resultSet.getInt("reward_xp"));
+                    mission.setRewardCup(resultSet.getInt("reward_cup"));
 
-                    MissionManager.addMission(missionEntry);
+                    MissionManager.addMission(mission);
                 }
             }
         } catch (SQLException e) {
@@ -392,8 +386,8 @@ public class GameDao implements IGameDao {
                             }
 
                             // Tạo bản ghi cho player
-                            LevelXpRequiredEntry playerXpRequired = new LevelXpRequiredEntry(level, playerXp);
-                            PlayerXpManager.LEVEL_XP_REQUIRED_ENTRIES.add(playerXpRequired);
+                            LevelXpRequired playerXpRequired = new LevelXpRequired(level, playerXp);
+                            PlayerXpManager.LEVEL_XP_REQUIRED_LIST.add(playerXpRequired);
 
                             previousPlayerXp = playerXp;
                         }
@@ -409,8 +403,8 @@ public class GameDao implements IGameDao {
                             }
 
                             // Tạo bản ghi cho clan
-                            LevelXpRequiredEntry clanXpRequired = new LevelXpRequiredEntry(level, clanXp);
-                            ClanXpManager.LEVEL_XP_REQUIRED_ENTRIES.add(clanXpRequired);
+                            LevelXpRequired clanXpRequired = new LevelXpRequired(level, clanXp);
+                            ClanXpManager.LEVEL_XP_REQUIRED_LIST.add(clanXpRequired);
 
                             previousClanXp = clanXp;
                         }
@@ -434,7 +428,7 @@ public class GameDao implements IGameDao {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `fabricate_items`")) {
                 Gson gson = GsonUtil.getInstance();
                 while (resultSet.next()) {
-                    FabricateItemEntry entry = new FabricateItemEntry();
+                    FabricateItem entry = new FabricateItem();
                     entry.setId(resultSet.getInt("fabricate_item_id"));
                     entry.setXuRequire(resultSet.getInt("xu_require"));
                     entry.setLuongRequire(resultSet.getInt("luong_require"));
@@ -447,24 +441,24 @@ public class GameDao implements IGameDao {
 
                     SpecialItemChestJson[] jsonArray = gson.fromJson(resultSet.getString("item_require"), SpecialItemChestJson[].class);
                     for (SpecialItemChestJson specialItemChestJson : jsonArray) {
-                        SpecialItemEntry specialItemEntry = SpecialItemManager.getSpecialItemById(specialItemChestJson.getId());
-                        if (specialItemEntry == null) {
+                        SpecialItem specialItem = SpecialItemManager.getSpecialItemById(specialItemChestJson.getId());
+                        if (specialItem == null) {
                             continue;
                         }
-                        entry.getItemRequire().add(new SpecialItemChestEntry(specialItemChestJson.getQuantity(), specialItemEntry));
+                        entry.getItemRequire().add(new SpecialItemChest(specialItemChestJson.getQuantity(), specialItem));
                     }
 
                     jsonArray = gson.fromJson(resultSet.getString("reward_item"), SpecialItemChestJson[].class);
                     for (SpecialItemChestJson specialItemChestJson : jsonArray) {
-                        SpecialItemEntry specialItemEntry = SpecialItemManager.getSpecialItemById(specialItemChestJson.getId());
-                        if (specialItemEntry == null) {
+                        SpecialItem specialItem = SpecialItemManager.getSpecialItemById(specialItemChestJson.getId());
+                        if (specialItem == null) {
                             continue;
                         }
-                        entry.getRewardItem().add(new SpecialItemChestEntry(specialItemChestJson.getQuantity(), specialItemEntry));
+                        entry.getRewardItem().add(new SpecialItemChest(specialItemChestJson.getQuantity(), specialItem));
                     }
 
                     if (!entry.getItemRequire().isEmpty() && !entry.getRewardItem().isEmpty()) {
-                        FabricateItemManager.FABRICATE_ITEM_ENTRIES.add(entry);
+                        FabricateItemManager.FABRICATE_ITEMS.add(entry);
                     }
                 }
             }

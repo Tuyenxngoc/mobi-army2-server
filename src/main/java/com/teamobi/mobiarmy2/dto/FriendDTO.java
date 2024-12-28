@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.model.user;
+package com.teamobi.mobiarmy2.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,6 +1,5 @@
-package com.teamobi.mobiarmy2.model.map;
+package com.teamobi.mobiarmy2.model;
 
-import com.teamobi.mobiarmy2.model.ImageData;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MapBrick {
-    private int id;
-    private ImageData image;
+public class Caption {
+    private byte level;
+    private String caption;
 }

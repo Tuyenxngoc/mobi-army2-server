@@ -1,6 +1,8 @@
-package com.teamobi.mobiarmy2.model.equip;
+package com.teamobi.mobiarmy2.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -8,7 +10,9 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class EquipmentEntry {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Equipment {
     private int saleIndex;
     private byte characterId;
     private byte equipType;

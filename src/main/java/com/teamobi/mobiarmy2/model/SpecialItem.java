@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.model.item;
+package com.teamobi.mobiarmy2.model;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +10,7 @@ import java.util.Objects;
  */
 @Getter
 @Setter
-public class SpecialItemEntry {
+public class SpecialItem {
     private byte id;
     private int saleIndex;
     private String name;
@@ -30,7 +30,7 @@ public class SpecialItemEntry {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SpecialItemEntry that = (SpecialItemEntry) o;
+        SpecialItem that = (SpecialItem) o;
         return id == that.id;
     }
 

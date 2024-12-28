@@ -7,17 +7,13 @@ import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.fight.IGiftBoxManager;
 import com.teamobi.mobiarmy2.fight.ITrainingManager;
 import com.teamobi.mobiarmy2.fight.impl.GiftBoxManager;
-import com.teamobi.mobiarmy2.server.CharacterManager;
-import com.teamobi.mobiarmy2.server.PlayerXpManager;
-import com.teamobi.mobiarmy2.server.SpecialItemManager;
-import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
-import com.teamobi.mobiarmy2.model.item.SpecialItemEntry;
-import com.teamobi.mobiarmy2.model.user.EquipmentChestEntry;
-import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.impl.Message;
+import com.teamobi.mobiarmy2.server.CharacterManager;
+import com.teamobi.mobiarmy2.server.PlayerXpManager;
 import com.teamobi.mobiarmy2.server.ServerManager;
+import com.teamobi.mobiarmy2.server.SpecialItemManager;
 import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.service.impl.UserService;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -36,7 +32,7 @@ import java.util.List;
 @Getter
 @Setter
 public class User {
-    public static EquipmentEntry[][] equipDefault;
+    public static Equipment[][] equipDefault;
     private ISession session;
     private UserState state;
     private String userId;
@@ -66,10 +62,10 @@ public class User {
     private int[][] equipData;
     private int[] mission;
     private byte[] missionLevel;
-    private EquipmentChestEntry[][] characterEquips;
+    private EquipmentChest[][] characterEquips;
     private List<Integer> friends;
-    private List<SpecialItemChestEntry> specialItemChest;
-    private List<EquipmentChestEntry> equipmentChest;
+    private List<SpecialItemChest> specialItemChest;
+    private List<EquipmentChest> equipmentChest;
     private IFightWait fightWait;
     private ITrainingManager trainingManager;
     private final IUserService userService;
@@ -213,15 +209,15 @@ public class User {
 
     public short[] getEquips() {
         short[] equips = new short[5];
-        EquipmentChestEntry[] equipEntries = characterEquips[activeCharacterId];
+        EquipmentChest[] equipEntries = characterEquips[activeCharacterId];
 
-        if (equipEntries[5] != null && equipEntries[5].getEquipEntry().isDisguise()) {
-            short[] disguiseIndexes = equipEntries[5].getEquipEntry().getDisguiseEquippedIndexes();
+        if (equipEntries[5] != null && equipEntries[5].getEquipment().isDisguise()) {
+            short[] disguiseIndexes = equipEntries[5].getEquipment().getDisguiseEquippedIndexes();
             System.arraycopy(disguiseIndexes, 0, equips, 0, 5);
         } else {
             for (byte i = 0; i < 5; i++) {
-                if (equipEntries[i] != null && !equipEntries[i].getEquipEntry().isDisguise()) {
-                    equips[i] = equipEntries[i].getEquipEntry().getEquipIndex();
+                if (equipEntries[i] != null && !equipEntries[i].getEquipment().isDisguise()) {
+                    equips[i] = equipEntries[i].getEquipment().getEquipIndex();
                 } else if (equipDefault[activeCharacterId][i] != null) {
                     equips[i] = equipDefault[activeCharacterId][i].getEquipIndex();
                 } else {
@@ -247,7 +243,7 @@ public class User {
         items[0] = items[1] = 99;
     }
 
-    public synchronized void addEquipment(EquipmentChestEntry addEquipment) {
+    public synchronized void addEquipment(EquipmentChest addEquipment) {
         if (addEquipment == null) {
             return;
         }
@@ -255,10 +251,10 @@ public class User {
         addEquipment.setPurchaseDate(LocalDateTime.now());
         addEquipment.setInUse(false);
         if (addEquipment.getAddPoints() == null) {
-            addEquipment.setAddPoints(addEquipment.getEquipEntry().getAddPoints());
+            addEquipment.setAddPoints(addEquipment.getEquipment().getAddPoints());
         }
         if (addEquipment.getAddPercents() == null) {
-            addEquipment.setAddPercents(addEquipment.getEquipEntry().getAddPercents());
+            addEquipment.setAddPercents(addEquipment.getEquipment().getAddPercents());
         }
         addEquipment.setEmptySlot((byte) 3);
         addEquipment.setSlots(new byte[]{-1, -1, -1});
@@ -273,17 +269,17 @@ public class User {
             DataOutputStream ds = ms.writer();
             ds.writeByte(0);
             ds.writeInt(addEquipment.getKey());
-            ds.writeByte(addEquipment.getEquipEntry().getCharacterId());
-            ds.writeByte(addEquipment.getEquipEntry().getEquipType());
-            ds.writeShort(addEquipment.getEquipEntry().getEquipIndex());
-            ds.writeUTF(addEquipment.getEquipEntry().getName());
+            ds.writeByte(addEquipment.getEquipment().getCharacterId());
+            ds.writeByte(addEquipment.getEquipment().getEquipType());
+            ds.writeShort(addEquipment.getEquipment().getEquipIndex());
+            ds.writeUTF(addEquipment.getEquipment().getName());
             ds.writeByte(addEquipment.getAddPoints().length * 2);
             for (int i = 0; i < addEquipment.getAddPoints().length; i++) {
                 ds.writeByte(addEquipment.getAddPoints()[i]);
                 ds.writeByte(addEquipment.getAddPercents()[i]);
             }
-            ds.writeByte(addEquipment.getEquipEntry().getExpirationDays());
-            ds.writeByte(addEquipment.getEquipEntry().isDisguise() ? 1 : 0);
+            ds.writeByte(addEquipment.getEquipment().getExpirationDays());
+            ds.writeByte(addEquipment.getEquipment().isDisguise() ? 1 : 0);
             ds.writeByte(addEquipment.getVipLevel());
             ds.flush();
             sendMessage(ms);
@@ -293,10 +289,10 @@ public class User {
     }
 
     public synchronized void updateInventory(
-            EquipmentChestEntry updateEquip,
-            EquipmentChestEntry removeEquip,
-            List<SpecialItemChestEntry> addItems,
-            List<SpecialItemChestEntry> removeItems
+            EquipmentChest updateEquip,
+            EquipmentChest removeEquip,
+            List<SpecialItemChest> addItems,
+            List<SpecialItemChest> removeItems
     ) {
         try {
             ByteArrayOutputStream bas = new ByteArrayOutputStream();
@@ -317,12 +313,12 @@ public class User {
             }
 
             if (addItems != null && !addItems.isEmpty()) {
-                for (SpecialItemChestEntry newItem : addItems) {
+                for (SpecialItemChest newItem : addItems) {
                     if (newItem.getQuantity() <= 0) {
                         continue;
                     }
                     updateQuantity++;
-                    SpecialItemChestEntry existingItem = getSpecialItemById(newItem.getItem().getId());
+                    SpecialItemChest existingItem = getSpecialItemById(newItem.getItem().getId());
                     if (existingItem != null) {
                         existingItem.increaseQuantity(newItem.getQuantity());
                     } else {
@@ -339,11 +335,11 @@ public class User {
             }
 
             if (removeItems != null && !removeItems.isEmpty()) {
-                for (SpecialItemChestEntry itemToRemove : removeItems) {
+                for (SpecialItemChest itemToRemove : removeItems) {
                     if (itemToRemove.getQuantity() <= 0) {
                         continue;
                     }
-                    SpecialItemChestEntry existingItem = getSpecialItemById(itemToRemove.getItem().getId());
+                    SpecialItemChest existingItem = getSpecialItemById(itemToRemove.getItem().getId());
                     if (existingItem != null) {
                         existingItem.decreaseQuantity(itemToRemove.getQuantity());
                         if (existingItem.getQuantity() <= 0) {
@@ -397,14 +393,14 @@ public class User {
         mission[missionId] += quantity;
     }
 
-    public EquipmentChestEntry getEquipmentByKey(int key) {
+    public EquipmentChest getEquipmentByKey(int key) {
         return equipmentChest.stream()
                 .filter(equip -> equip.getKey() == key)
                 .findFirst()
                 .orElse(null);
     }
 
-    public SpecialItemChestEntry getSpecialItemById(byte id) {
+    public SpecialItemChest getSpecialItemById(byte id) {
         return specialItemChest.stream()
                 .filter(item -> item.getItem().getId() == id)
                 .findFirst()
@@ -425,14 +421,14 @@ public class User {
     }
 
     public short getInventorySpecialItemCount(byte itemId) {
-        SpecialItemChestEntry specialItemChestEntry = specialItemChest.stream()
+        SpecialItemChest specialItemChest = this.specialItemChest.stream()
                 .filter(item -> item.getItem().getId() == itemId)
                 .findFirst()
                 .orElse(null);
-        if (specialItemChestEntry == null) {
+        if (specialItemChest == null) {
             return 0;
         }
-        return specialItemChestEntry.getQuantity();
+        return specialItemChest.getQuantity();
     }
 
     public synchronized void addDaysToXpX2Time(int days) {
@@ -445,8 +441,8 @@ public class User {
 
     public boolean hasEquipment(short equipIndex, byte vipLevel) {
         return equipmentChest.stream()
-                .anyMatch(equip -> equip != null && equip.getEquipEntry() != null &&
-                        equip.getEquipEntry().getEquipIndex() == equipIndex &&
+                .anyMatch(equip -> equip != null && equip.getEquipment() != null &&
+                        equip.getEquipment().getEquipIndex() == equipIndex &&
                         equip.getVipLevel() == vipLevel &&
                         equip.getEmptySlot() == 3 &&
                         !equip.isInUse() &&
@@ -454,11 +450,11 @@ public class User {
                 );
     }
 
-    public EquipmentChestEntry getEquipment(short equipIndex, byte characterId, byte vipLevel) {
+    public EquipmentChest getEquipment(short equipIndex, byte characterId, byte vipLevel) {
         return equipmentChest.stream()
-                .filter(equip -> equip != null && equip.getEquipEntry() != null &&
-                        equip.getEquipEntry().getEquipIndex() == equipIndex &&
-                        equip.getEquipEntry().getCharacterId() == characterId &&
+                .filter(equip -> equip != null && equip.getEquipment() != null &&
+                        equip.getEquipment().getEquipIndex() == equipIndex &&
+                        equip.getEquipment().getCharacterId() == characterId &&
                         equip.getVipLevel() == vipLevel &&
                         equip.getEmptySlot() == 3 &&
                         !equip.isInUse() &&
@@ -476,7 +472,7 @@ public class User {
 
     public short getGunId() {
         if (characterEquips[activeCharacterId][0] != null) {
-            return this.characterEquips[activeCharacterId][0].getEquipEntry().getEquipIndex();
+            return this.characterEquips[activeCharacterId][0].getEquipment().getEquipIndex();
         }
         return equipDefault[activeCharacterId][0].getEquipIndex();
     }
@@ -491,8 +487,8 @@ public class User {
         short percents = bonusPercent;
         short points = addedPoints[activeCharacterId][4];
 
-        EquipmentChestEntry[] equippedItems = characterEquips[activeCharacterId];
-        for (EquipmentChestEntry equip : equippedItems) {
+        EquipmentChest[] equippedItems = characterEquips[activeCharacterId];
+        for (EquipmentChest equip : equippedItems) {
             if (equip == null || equip.isExpired()) {
                 continue;//Bỏ qua nếu trang bị không tồn tại hoặc đã hết hạn
             }
@@ -516,8 +512,8 @@ public class User {
             points[i] += teamPoints;
         }
 
-        EquipmentChestEntry[] equippedItems = characterEquips[activeCharacterId];
-        for (EquipmentChestEntry equip : equippedItems) {
+        EquipmentChest[] equippedItems = characterEquips[activeCharacterId];
+        for (EquipmentChest equip : equippedItems) {
             if (equip == null || equip.isExpired()) {
                 continue;//Bỏ qua nếu trang bị không tồn tại hoặc đã hết hạn
             }
@@ -531,7 +527,7 @@ public class User {
         abilities[0] = 1000 + (points[0] * 10);
         abilities[0] += (abilities[0] * percents[0] / 100);
 
-        short baseDamage = CharacterManager.CHARACTER_ENTRIES.get(activeCharacterId).getDamage();
+        short baseDamage = CharacterManager.CHARACTERS.get(activeCharacterId).getDamage();
         abilities[1] = (baseDamage * (100 + (points[1] / 3) + percents[1]) / 100) * 100 / baseDamage;
 
         for (byte i = 2; i < abilities.length; i++) {
@@ -548,11 +544,11 @@ public class User {
     }
 
     public void addSpecialItem(byte id, short quantity) {
-        SpecialItemEntry specialItemEntry = SpecialItemManager.getSpecialItemById(id);
-        if (specialItemEntry == null) {
+        SpecialItem specialItem = SpecialItemManager.getSpecialItemById(id);
+        if (specialItem == null) {
             return;
         }
-        SpecialItemChestEntry newItem = new SpecialItemChestEntry(quantity, specialItemEntry);
+        SpecialItemChest newItem = new SpecialItemChest(quantity, specialItem);
         updateInventory(null, null, List.of(newItem), null);
     }
 }

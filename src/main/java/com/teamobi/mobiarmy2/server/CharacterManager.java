@@ -1,9 +1,9 @@
 package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
+import com.teamobi.mobiarmy2.model.Character;
+import com.teamobi.mobiarmy2.model.Equipment;
 import com.teamobi.mobiarmy2.model.User;
-import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
-import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.time.LocalDateTime;
@@ -16,22 +16,22 @@ import java.util.stream.Collectors;
  * @author tuyen
  */
 public class CharacterManager {
-    public static final List<CharacterEntry> CHARACTER_ENTRIES = new ArrayList<>();
-    public static final List<EquipmentEntry> EQUIPMENT_ENTRIES = new ArrayList<>();
+    public static final List<Character> CHARACTERS = new ArrayList<>();
+    public static final List<Equipment> EQUIPMENTS = new ArrayList<>();
     public static short totalSaleEquipments = 0;
 
-    public static void addEquip(EquipmentEntry newEquip) {
+    public static void addEquip(Equipment newEquip) {
         //Tìm nhân vật theo id
-        CharacterEntry characterEntry = CHARACTER_ENTRIES.stream()
-                .filter(entry -> entry.getId() == newEquip.getCharacterId())
+        Character character = CHARACTERS.stream()
+                .filter(c -> c.getId() == newEquip.getCharacterId())
                 .findFirst()
                 .orElse(null);
-        if (characterEntry == null) {
+        if (character == null) {
             return;
         }
 
         //Lấy danh sách theo loại trang bị, chưa có thì tạo mới
-        List<EquipmentEntry> entryList = characterEntry.getEquips().computeIfAbsent(newEquip.getEquipType(), k -> new ArrayList<>());
+        List<Equipment> entryList = character.getEquips().computeIfAbsent(newEquip.getEquipType(), k -> new ArrayList<>());
         if (entryList.stream().anyMatch(entry -> entry.getEquipIndex() == newEquip.getEquipIndex())) {//Nếu tồn tại trong danh sách rồi thì bỏ qua
             return;
         }
@@ -42,12 +42,12 @@ public class CharacterManager {
             newEquip.setSaleIndex(-1);
         }
         entryList.add(newEquip);
-        EQUIPMENT_ENTRIES.add(newEquip);
+        EQUIPMENTS.add(newEquip);
     }
 
-    public static EquipmentEntry getRandomEquip(Predicate<EquipmentEntry> filter) {
+    public static Equipment getRandomEquip(Predicate<Equipment> filter) {
         // Áp dụng bộ lọc để lấy danh sách trang bị phù hợp
-        List<EquipmentEntry> filteredEquipments = EQUIPMENT_ENTRIES.stream()
+        List<Equipment> filteredEquipments = EQUIPMENTS.stream()
                 .filter(filter)
                 .toList();
 
@@ -59,13 +59,13 @@ public class CharacterManager {
         return filteredEquipments.get(Utils.nextInt(filteredEquipments.size()));
     }
 
-    public static EquipmentEntry getEquipEntry(byte characterId, byte equipType, short equipIndex) {
+    public static Equipment getEquipEntry(byte characterId, byte equipType, short equipIndex) {
         if (equipIndex < 0) {
             return null;
         }
 
         //Find the character entry by ID
-        Optional<CharacterEntry> characterEntryOpt = CHARACTER_ENTRIES.stream()
+        Optional<Character> characterEntryOpt = CHARACTERS.stream()
                 .filter(entry -> entry.getId() == characterId)
                 .findFirst();
         if (characterEntryOpt.isEmpty()) {
@@ -73,7 +73,7 @@ public class CharacterManager {
         }
 
         //Get the equipment list for the given type
-        List<EquipmentEntry> entries = characterEntryOpt.get().getEquips().get(equipType);
+        List<Equipment> entries = characterEntryOpt.get().getEquips().get(equipType);
         if (entries == null) {
             return null;
         }
@@ -85,8 +85,8 @@ public class CharacterManager {
                 .orElse(null);
     }
 
-    public static EquipmentEntry getEquipEntryBySaleIndex(int saleIndex) {
-        return EQUIPMENT_ENTRIES.stream()
+    public static Equipment getEquipEntryBySaleIndex(int saleIndex) {
+        return EQUIPMENTS.stream()
                 .filter(equipEntry -> equipEntry.isOnSale() && equipEntry.getSaleIndex() == saleIndex)
                 .findFirst()
                 .orElse(null);
@@ -104,7 +104,7 @@ public class CharacterManager {
         int disguiseKey = data[5];
         if (disguiseKey != -1 && equipmentMap.containsKey(disguiseKey)) {
             EquipmentChestJson json = equipmentMap.get(disguiseKey);
-            EquipmentEntry equip = getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex());
+            Equipment equip = getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex());
             if (equip != null && equip.getExpirationDays() - ChronoUnit.DAYS.between(json.getPurchaseDate(), now) > 0) {
                 return equip.getDisguiseEquippedIndexes();
             }
@@ -117,7 +117,7 @@ public class CharacterManager {
 
             if (equipKey != -1 && equipmentMap.containsKey(equipKey)) {
                 EquipmentChestJson json = equipmentMap.get(equipKey);
-                EquipmentEntry equip = getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex());
+                Equipment equip = getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex());
                 if (equip != null && equip.getExpirationDays() - ChronoUnit.DAYS.between(json.getPurchaseDate(), now) > 0) {
                     equipData[i] = json.getEquipIndex();
                     exists = true;

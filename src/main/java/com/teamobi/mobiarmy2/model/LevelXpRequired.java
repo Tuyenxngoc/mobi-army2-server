@@ -12,8 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ImageData {
-    private int width;
-    private int height;
-    private int[] pixelData;
+public class LevelXpRequired {
+    private short level;
+    private int xp;
 }

@@ -1,9 +1,9 @@
 package com.teamobi.mobiarmy2.dao;
 
+import com.teamobi.mobiarmy2.dto.ClanDTO;
+import com.teamobi.mobiarmy2.dto.ClanInfoDTO;
+import com.teamobi.mobiarmy2.dto.ClanMemDTO;
 import com.teamobi.mobiarmy2.json.ClanItemJson;
-import com.teamobi.mobiarmy2.model.clan.ClanEntry;
-import com.teamobi.mobiarmy2.model.clan.ClanInfo;
-import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
 
 import java.util.List;
 
@@ -32,9 +32,9 @@ public interface IClanDao {
 
     void gopClanContribute(String txtContribute, int playerId, int xu, int luong);
 
-    ClanInfo getClanInfo(short clanId);
+    ClanInfoDTO getClanInfo(short clanId);
 
-    List<ClanMemEntry> getClanMember(short clanId, byte page);
+    List<ClanMemDTO> getClanMember(short clanId, byte page);
 
     ClanItemJson[] getClanItems(short clanId);
 
@@ -42,7 +42,7 @@ public interface IClanDao {
 
     short getCountClan();
 
-    List<ClanEntry> getTopTeams(byte page);
+    List<ClanDTO> getTopTeams(byte page);
 
     void updateXp(short clanId, int playerId, int xp, int level);
 

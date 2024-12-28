@@ -12,8 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ImageData {
-    private int width;
-    private int height;
-    private int[] pixelData;
+public class MapBrick {
+    private int id;
+    private ImageData image;
 }

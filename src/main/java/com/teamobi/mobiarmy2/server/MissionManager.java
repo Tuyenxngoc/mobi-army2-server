@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.server;
 
-import com.teamobi.mobiarmy2.model.MissionEntry;
+import com.teamobi.mobiarmy2.model.Mission;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,21 +11,21 @@ import java.util.Map;
  * @author tuyen
  */
 public class MissionManager {
-    public static final Map<Byte, List<MissionEntry>> MISSION_LIST = new HashMap<>();
+    public static final Map<Byte, List<Mission>> MISSION_LIST = new HashMap<>();
 
-    public static void addMission(MissionEntry missionEntry) {
-        Byte type = missionEntry.getType();
+    public static void addMission(Mission mission) {
+        Byte type = mission.getType();
         if (!MISSION_LIST.containsKey(type)) {
             MISSION_LIST.put(type, new ArrayList<>());
         }
-        MISSION_LIST.get(type).add(missionEntry);
+        MISSION_LIST.get(type).add(mission);
     }
 
-    public static MissionEntry getMissionById(byte missionId) {
-        for (List<MissionEntry> missionEntryList : MISSION_LIST.values()) {
-            for (MissionEntry missionEntry : missionEntryList) {
-                if (missionEntry.getId() == missionId) {
-                    return missionEntry;
+    public static Mission getMissionById(byte missionId) {
+        for (List<Mission> missionList : MISSION_LIST.values()) {
+            for (Mission mission : missionList) {
+                if (mission.getId() == missionId) {
+                    return mission;
                 }
             }
         }

@@ -1,5 +1,7 @@
-package com.teamobi.mobiarmy2.model.user;
+package com.teamobi.mobiarmy2.dto;
 
+import com.teamobi.mobiarmy2.model.EquipmentChest;
+import com.teamobi.mobiarmy2.model.SpecialItemChest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,7 +28,6 @@ public class UserDTO {
     private int xu;
     private int luong;
     private int cup;
-    private boolean isLogged;
     private boolean isLock;
     private boolean isActive;
     private boolean isChestLocked;
@@ -48,13 +49,13 @@ public class UserDTO {
     private int[][] equipData;
     private int[] mission;
     private byte[] missionLevel;
-    private EquipmentChestEntry[][] characterEquips;
+    private EquipmentChest[][] characterEquips;
     private List<Integer> friends;
-    private List<SpecialItemChestEntry> specialItemChest;
-    private Map<Integer, EquipmentChestEntry> equipmentChest;
+    private List<SpecialItemChest> specialItemChest;
+    private Map<Integer, EquipmentChest> equipmentChest;
     private int topEarningsXu;
 
-    public EquipmentChestEntry getEquipmentByKey(int key) {
+    public EquipmentChest getEquipmentByKey(int key) {
         return equipmentChest.get(key);
     }
 
@@ -67,7 +68,7 @@ public class UserDTO {
         this.points = new int[totalCharacter];
         this.addedPoints = new short[totalCharacter][5];
         this.equipData = new int[totalCharacter][6];
-        this.characterEquips = new EquipmentChestEntry[totalCharacter][6];
+        this.characterEquips = new EquipmentChest[totalCharacter][6];
         this.specialItemChest = new ArrayList<>();
         this.equipmentChest = new HashMap<>();
     }

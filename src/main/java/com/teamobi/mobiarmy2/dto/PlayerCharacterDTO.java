@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.model;
+package com.teamobi.mobiarmy2.dto;
 
 import lombok.Getter;
 import lombok.Setter;

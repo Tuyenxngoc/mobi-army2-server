@@ -1,6 +1,8 @@
 package com.teamobi.mobiarmy2.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -8,7 +10,9 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class PaymentEntry {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Payment {
     private String id;
     private String info;
     private String url;

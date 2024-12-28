@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.model.clan;
+package com.teamobi.mobiarmy2.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class ClanEntry {
+public class ClanDTO {
     private short id;
     private String name;
     private byte memberCount;

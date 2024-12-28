@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.model;
+package com.teamobi.mobiarmy2.dto;
 
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-public class GiftCodeEntry {
+public class GiftCodeDTO {
     private long id;
     private boolean isUsed;
     private short limit;

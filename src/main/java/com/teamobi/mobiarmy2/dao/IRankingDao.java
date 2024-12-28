@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.dao;
 
-import com.teamobi.mobiarmy2.model.user.PlayerLeaderboardEntry;
+import com.teamobi.mobiarmy2.dto.PlayerLeaderboardDTO;
 
 import java.util.List;
 
@@ -9,17 +9,17 @@ import java.util.List;
  */
 public interface IRankingDao {
 
-    List<PlayerLeaderboardEntry> getTopHonor();
+    List<PlayerLeaderboardDTO> getTopHonor();
 
-    List<PlayerLeaderboardEntry> getTopMasters();
+    List<PlayerLeaderboardDTO> getTopMasters();
 
-    List<PlayerLeaderboardEntry> getTopRichestXu();
+    List<PlayerLeaderboardDTO> getTopRichestXu();
 
-    List<PlayerLeaderboardEntry> getTopRichestLuong();
+    List<PlayerLeaderboardDTO> getTopRichestLuong();
 
-    List<PlayerLeaderboardEntry> getWeeklyTopHonor();
+    List<PlayerLeaderboardDTO> getWeeklyTopHonor();
 
-    List<PlayerLeaderboardEntry> getWeeklyTopRichest();
+    List<PlayerLeaderboardDTO> getWeeklyTopRichest();
 
     void addBonusGift(int playerId, int quantity);
 

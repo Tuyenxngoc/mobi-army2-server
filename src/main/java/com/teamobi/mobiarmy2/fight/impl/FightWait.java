@@ -6,12 +6,12 @@ import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.fight.ICountdownTimer;
 import com.teamobi.mobiarmy2.fight.IFightManager;
 import com.teamobi.mobiarmy2.fight.IFightWait;
-import com.teamobi.mobiarmy2.server.FightItemManager;
-import com.teamobi.mobiarmy2.server.MapManager;
 import com.teamobi.mobiarmy2.model.Room;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.impl.Message;
+import com.teamobi.mobiarmy2.server.FightItemManager;
+import com.teamobi.mobiarmy2.server.MapManager;
 import com.teamobi.mobiarmy2.server.ServerManager;
 
 import java.io.DataOutputStream;
@@ -409,7 +409,7 @@ public class FightWait implements IFightWait {
             }
 
             byte[] userItems = items[i];
-            byte[] itemUsageMap = new byte[FightItemManager.FIGHT_ITEM_ENTRIES.size()];
+            byte[] itemUsageMap = new byte[FightItemManager.FIGHT_ITEMS.size()];
 
             //Đếm số lượng item mà người dùng đang có
             for (byte itemIndex : userItems) {
@@ -426,7 +426,7 @@ public class FightWait implements IFightWait {
                 }
 
                 //Kiểm tra điều kiện số lượng item
-                if (itemUsageMap[itemIndex] > FightItemManager.FIGHT_ITEM_ENTRIES.get(itemIndex).getCarriedItemCount() || //Số lượng vượt quá số lượng cho phép
+                if (itemUsageMap[itemIndex] > FightItemManager.FIGHT_ITEMS.get(itemIndex).getCarriedItemCount() || //Số lượng vượt quá số lượng cho phép
                         itemUsageMap[itemIndex] > user.getItemFightQuantity(itemIndex) || //Số lượng vượt quá số lượng đang có
                         (j >= 4 && user.getItemFightQuantity(12 + j - 4) == 0) //Item chứa đã hết
                 ) {

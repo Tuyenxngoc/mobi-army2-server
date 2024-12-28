@@ -1,6 +1,8 @@
-package com.teamobi.mobiarmy2.model.equip;
+package com.teamobi.mobiarmy2.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashMap;
@@ -12,7 +14,9 @@ import java.util.Map;
  */
 @Getter
 @Setter
-public class CharacterEntry {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Character {
     private byte id;
     private String name;
     private int priceXu;
@@ -22,5 +26,5 @@ public class CharacterEntry {
     private short damage;
     private byte bulletDamage;
     private byte bulletCount;
-    private Map<Byte, List<EquipmentEntry>> equips = new HashMap<>();
+    private Map<Byte, List<Equipment>> equips = new HashMap<>();
 }

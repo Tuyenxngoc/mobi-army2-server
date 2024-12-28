@@ -2,10 +2,10 @@ package com.teamobi.mobiarmy2.service.impl;
 
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.dao.IGameDao;
-import com.teamobi.mobiarmy2.model.CaptionEntry;
-import com.teamobi.mobiarmy2.model.equip.CharacterEntry;
-import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
-import com.teamobi.mobiarmy2.model.map.MapEntry;
+import com.teamobi.mobiarmy2.model.ArmyMap;
+import com.teamobi.mobiarmy2.model.Caption;
+import com.teamobi.mobiarmy2.model.Character;
+import com.teamobi.mobiarmy2.model.Equipment;
 import com.teamobi.mobiarmy2.server.*;
 import com.teamobi.mobiarmy2.service.IGameService;
 import com.teamobi.mobiarmy2.util.TeamImageOutput;
@@ -35,20 +35,20 @@ public class GameService implements IGameService {
     public void setCacheMaps() {
         try (ByteArrayOutputStream bas = new ByteArrayOutputStream();
              DataOutputStream ds = new DataOutputStream(bas)) {
-            int size = MapManager.MAP_ENTRIES.size();
+            int size = MapManager.ARMY_MAPS.size();
             ds.writeByte(size);
             for (int i = 0; i < size; i++) {
-                MapEntry mapEntry = MapManager.MAP_ENTRIES.get(i);
-                ds.writeByte(mapEntry.getId());
-                ds.writeShort(mapEntry.getData().length);
-                ds.write(mapEntry.getData());
-                ds.writeShort(mapEntry.getBg());
-                ds.writeShort(mapEntry.getMapAddY());
-                ds.writeShort(mapEntry.getBullEffShower());
-                ds.writeShort(mapEntry.getInWaterAddY());
-                ds.writeShort(mapEntry.getCl2AddY());
-                ds.writeUTF(mapEntry.getName());
-                ds.writeUTF(mapEntry.getFileName());
+                ArmyMap armyMap = MapManager.ARMY_MAPS.get(i);
+                ds.writeByte(armyMap.getId());
+                ds.writeShort(armyMap.getData().length);
+                ds.write(armyMap.getData());
+                ds.writeShort(armyMap.getBg());
+                ds.writeShort(armyMap.getMapAddY());
+                ds.writeShort(armyMap.getBullEffShower());
+                ds.writeShort(armyMap.getInWaterAddY());
+                ds.writeShort(armyMap.getCl2AddY());
+                ds.writeUTF(armyMap.getName());
+                ds.writeUTF(armyMap.getFileName());
             }
             byte[] ab = bas.toByteArray();
             Utils.saveFile(GameConstants.MAP_CACHE_NAME, ab);
@@ -64,19 +64,19 @@ public class GameService implements IGameService {
         try {
             ByteArrayOutputStream bas = new ByteArrayOutputStream();
             DataOutputStream ds = new DataOutputStream(bas);
-            ds.writeByte(CharacterManager.CHARACTER_ENTRIES.size());
+            ds.writeByte(CharacterManager.CHARACTERS.size());
 
-            for (CharacterEntry characterEntry : CharacterManager.CHARACTER_ENTRIES) {
-                ds.writeByte(characterEntry.getId());
-                ds.writeShort(characterEntry.getDamage());
-                ds.writeByte(characterEntry.getEquips().size());
+            for (Character character : CharacterManager.CHARACTERS) {
+                ds.writeByte(character.getId());
+                ds.writeShort(character.getDamage());
+                ds.writeByte(character.getEquips().size());
 
-                for (byte i = 0; i < characterEntry.getEquips().size(); i++) {
-                    List<EquipmentEntry> equipmentEntries = characterEntry.getEquips().get(i);
+                for (byte i = 0; i < character.getEquips().size(); i++) {
+                    List<Equipment> equipmentEntries = character.getEquips().get(i);
                     ds.writeByte(i);
                     ds.writeByte(equipmentEntries.size());
 
-                    for (EquipmentEntry equipEntry : equipmentEntries) {
+                    for (Equipment equipEntry : equipmentEntries) {
                         ds.writeShort(equipEntry.getEquipIndex());
                         if (i == 0) {
                             ds.writeByte(equipEntry.getBulletId());
@@ -107,7 +107,7 @@ public class GameService implements IGameService {
             }
             ds.writeShort(bytes.length);
             ds.write(bytes);
-            for (int i = 0; i < CharacterManager.CHARACTER_ENTRIES.size(); i++) {
+            for (int i = 0; i < CharacterManager.CHARACTERS.size(); i++) {
                 bytes = Utils.getFile(String.format(GameConstants.BULLET_IMAGE_PATH, i));
                 if (bytes == null) {
                     System.exit(1);
@@ -132,10 +132,10 @@ public class GameService implements IGameService {
         try {
             ByteArrayOutputStream bas = new ByteArrayOutputStream();
             DataOutputStream ds = new DataOutputStream(bas);
-            int size = CaptionManager.CAPTION_ENTRIES.size();
+            int size = CaptionManager.CAPTIONS.size();
             ds.writeByte(size);
             for (int i = size - 1; i >= 0; i--) {
-                CaptionEntry capEntry = CaptionManager.CAPTION_ENTRIES.get(i);
+                Caption capEntry = CaptionManager.CAPTIONS.get(i);
                 ds.writeUTF(capEntry.getCaption());
                 ds.writeByte(capEntry.getLevel());
             }
@@ -207,7 +207,7 @@ public class GameService implements IGameService {
     @Override
     public void getPaymentData() {
         gameDao.getAllPayment();
-        logger.info("Loaded {} payment entries successfully.", PaymentManager.PAYMENT_ENTRY_MAP.size());
+        logger.info("Loaded {} payment entries successfully.", PaymentManager.PAYMENT_MAP.size());
     }
 
     @Override
@@ -219,50 +219,50 @@ public class GameService implements IGameService {
     @Override
     public void getMapData() {
         gameDao.getAllMapData();
-        logger.info("Loaded {} map entries successfully.", MapManager.MAP_ENTRIES.size());
+        logger.info("Loaded {} map entries successfully.", MapManager.ARMY_MAPS.size());
     }
 
     @Override
     public void getCharacterData() {
         gameDao.getAllCharacterData();
-        logger.info("Loaded {} character entries successfully.", CharacterManager.CHARACTER_ENTRIES.size());
+        logger.info("Loaded {} character entries successfully.", CharacterManager.CHARACTERS.size());
     }
 
     @Override
     public void getEquipData() {
         gameDao.getAllEquip();
-        logger.info("Loaded {} equipment entries successfully.", CharacterManager.EQUIPMENT_ENTRIES.size());
+        logger.info("Loaded {} equipment entries successfully.", CharacterManager.EQUIPMENTS.size());
     }
 
     @Override
     public void getLvXpData() {
         gameDao.getAllXpData();
-        logger.info("Loaded {} player XP entries successfully.", PlayerXpManager.LEVEL_XP_REQUIRED_ENTRIES.size());
-        logger.info("Loaded {} clan XP entries successfully.", ClanXpManager.LEVEL_XP_REQUIRED_ENTRIES.size());
+        logger.info("Loaded {} player XP entries successfully.", PlayerXpManager.LEVEL_XP_REQUIRED_LIST.size());
+        logger.info("Loaded {} clan XP entries successfully.", ClanXpManager.LEVEL_XP_REQUIRED_LIST.size());
     }
 
     @Override
     public void getFabricateItemData() {
         gameDao.getAllFabricateItems();
-        logger.info("Loaded {} fabricate items successfully.", FabricateItemManager.FABRICATE_ITEM_ENTRIES.size());
+        logger.info("Loaded {} fabricate items successfully.", FabricateItemManager.FABRICATE_ITEMS.size());
     }
 
     @Override
     public void setCaptionLevelData() {
         gameDao.getAllCaptionLevel();
-        logger.info("Loaded {} caption level entries successfully.", CaptionManager.CAPTION_ENTRIES.size());
+        logger.info("Loaded {} caption level entries successfully.", CaptionManager.CAPTIONS.size());
     }
 
     @Override
     public void getItemData() {
         gameDao.getAllItem();
-        logger.info("Loaded {} fight item entries successfully.", FightItemManager.FIGHT_ITEM_ENTRIES.size());
+        logger.info("Loaded {} fight item entries successfully.", FightItemManager.FIGHT_ITEMS.size());
     }
 
     @Override
     public void getClanShopData() {
         gameDao.getAllItemClan();
-        logger.info("Loaded {} clan shop items successfully.", ClanItemManager.CLAN_ITEM_ENTRY_MAP.size());
+        logger.info("Loaded {} clan shop items successfully.", ClanItemManager.CLAN_ITEM_MAP.size());
     }
 
     @Override

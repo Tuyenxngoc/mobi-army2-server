@@ -1,7 +1,8 @@
-package com.teamobi.mobiarmy2.model.user;
+package com.teamobi.mobiarmy2.model;
 
-import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -13,7 +14,9 @@ import java.util.Objects;
  */
 @Getter
 @Setter
-public class EquipmentChestEntry {
+@NoArgsConstructor
+@AllArgsConstructor
+public class EquipmentChest {
     private int key;
     private LocalDateTime purchaseDate;
     private byte vipLevel;
@@ -22,7 +25,7 @@ public class EquipmentChestEntry {
     private byte[] addPercents;
     private byte[] slots;
     private boolean inUse;
-    private EquipmentEntry equipEntry;
+    private Equipment equipment;
 
     /**
      * Checks if the equipment is expired based on its expiration days and the current date.
@@ -30,7 +33,7 @@ public class EquipmentChestEntry {
      * @return true if the equipment is expired, false otherwise
      */
     public boolean isExpired() {
-        return equipEntry != null && ChronoUnit.DAYS.between(purchaseDate, LocalDateTime.now()) > equipEntry.getExpirationDays();
+        return equipment != null && ChronoUnit.DAYS.between(purchaseDate, LocalDateTime.now()) > equipment.getExpirationDays();
     }
 
     /**
@@ -49,10 +52,10 @@ public class EquipmentChestEntry {
      * @return the number of remaining days for the equipment entry
      */
     public int getRemainingDays() {
-        if (equipEntry == null) {
+        if (equipment == null) {
             return 0;
         }
-        return Math.max(equipEntry.getExpirationDays() - getDaysSincePurchase(), 0);
+        return Math.max(equipment.getExpirationDays() - getDaysSincePurchase(), 0);
     }
 
     public void decrementEmptySlot() {
@@ -85,7 +88,7 @@ public class EquipmentChestEntry {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        EquipmentChestEntry that = (EquipmentChestEntry) o;
+        EquipmentChest that = (EquipmentChest) o;
         return key == that.key;
     }
 

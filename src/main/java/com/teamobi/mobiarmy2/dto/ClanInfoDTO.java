@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.model.clan;
+package com.teamobi.mobiarmy2.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -10,9 +10,9 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class ClanInfo extends ClanEntry {
+public class ClanInfoDTO extends ClanDTO {
     private int exp;
     private int xpUpLevel;
     private String createdDate;
-    private List<ClanItem> items;
+    private List<ClanItemDTO> items;
 }

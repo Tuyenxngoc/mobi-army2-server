@@ -3,17 +3,17 @@ package com.teamobi.mobiarmy2.dao.impl;
 import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.dao.IClanDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
+import com.teamobi.mobiarmy2.dto.ClanDTO;
+import com.teamobi.mobiarmy2.dto.ClanInfoDTO;
+import com.teamobi.mobiarmy2.dto.ClanItemDTO;
+import com.teamobi.mobiarmy2.dto.ClanMemDTO;
 import com.teamobi.mobiarmy2.json.ClanItemJson;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
+import com.teamobi.mobiarmy2.model.ClanItem;
 import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.server.ClanXpManager;
 import com.teamobi.mobiarmy2.server.PlayerXpManager;
-import com.teamobi.mobiarmy2.model.clan.ClanEntry;
-import com.teamobi.mobiarmy2.model.clan.ClanInfo;
-import com.teamobi.mobiarmy2.model.clan.ClanItem;
-import com.teamobi.mobiarmy2.model.clan.ClanMemEntry;
-import com.teamobi.mobiarmy2.model.item.ClanItemEntry;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -168,7 +168,7 @@ public class ClanDao implements IClanDao {
     }
 
     @Override
-    public ClanInfo getClanInfo(short clanId) {
+    public ClanInfoDTO getClanInfo(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT " +
@@ -185,15 +185,15 @@ public class ClanDao implements IClanDao {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    ClanInfo clanInfo = new ClanInfo();
-                    clanInfo.setId(resultSet.getShort("clan_id"));
-                    clanInfo.setName(resultSet.getString("name"));
-                    clanInfo.setMemberCount(resultSet.getByte("member_count"));
-                    clanInfo.setMaxMemberCount(resultSet.getByte("mem_max"));
-                    clanInfo.setMasterName(resultSet.getString("username"));
-                    clanInfo.setXu(resultSet.getInt("xu"));
-                    clanInfo.setLuong(resultSet.getInt("luong"));
-                    clanInfo.setCup(resultSet.getInt("cup"));
+                    ClanInfoDTO clanInfoDTO = new ClanInfoDTO();
+                    clanInfoDTO.setId(resultSet.getShort("clan_id"));
+                    clanInfoDTO.setName(resultSet.getString("name"));
+                    clanInfoDTO.setMemberCount(resultSet.getByte("member_count"));
+                    clanInfoDTO.setMaxMemberCount(resultSet.getByte("mem_max"));
+                    clanInfoDTO.setMasterName(resultSet.getString("username"));
+                    clanInfoDTO.setXu(resultSet.getInt("xu"));
+                    clanInfoDTO.setLuong(resultSet.getInt("luong"));
+                    clanInfoDTO.setCup(resultSet.getInt("cup"));
 
                     int xp = resultSet.getInt("xp");
                     int level = resultSet.getInt("level");
@@ -203,38 +203,38 @@ public class ClanDao implements IClanDao {
                     int xpNeededForNextLevel = xpForNextLevel - xpForCurrentLevel;
                     byte levelPercent = Utils.calculateLevelPercent(currentXpInLevel, xpNeededForNextLevel);
 
-                    clanInfo.setExp(xp);
-                    clanInfo.setLevel((byte) level);
-                    clanInfo.setXpUpLevel(xpForNextLevel);
-                    clanInfo.setLevelPercentage(levelPercent);
+                    clanInfoDTO.setExp(xp);
+                    clanInfoDTO.setLevel((byte) level);
+                    clanInfoDTO.setXpUpLevel(xpForNextLevel);
+                    clanInfoDTO.setLevelPercentage(levelPercent);
 
-                    clanInfo.setDescription(resultSet.getString("description"));
+                    clanInfoDTO.setDescription(resultSet.getString("description"));
 
                     Timestamp createdDate = resultSet.getTimestamp("created_date");
                     String formattedDate = Utils.formatLocalDateTime(createdDate.toLocalDateTime());
-                    clanInfo.setCreatedDate(formattedDate);
+                    clanInfoDTO.setCreatedDate(formattedDate);
 
                     ClanItemJson[] clanItemJsonArray = GsonUtil.getInstance().fromJson(resultSet.getString("item"), ClanItemJson[].class);
                     LocalDateTime currentDate = LocalDateTime.now();
 
-                    List<ClanItem> filteredItems = Arrays.stream(clanItemJsonArray)
+                    List<ClanItemDTO> filteredItems = Arrays.stream(clanItemJsonArray)
                             .filter(item -> !item.getTime().isBefore(currentDate))
                             .map(item -> {
-                                ClanItemEntry clanItemEntry = ClanItemManager.getItemClanById(item.getId());
-                                if (clanItemEntry != null) {
-                                    ClanItem newClanItem = new ClanItem();
-                                    newClanItem.setName(clanItemEntry.getName());
-                                    newClanItem.setTime((int) Duration.between(currentDate, item.getTime()).getSeconds());
-                                    return newClanItem;
+                                ClanItem clanItem = ClanItemManager.getItemClanById(item.getId());
+                                if (clanItem != null) {
+                                    ClanItemDTO newClanItemDTO = new ClanItemDTO();
+                                    newClanItemDTO.setName(clanItem.getName());
+                                    newClanItemDTO.setTime((int) Duration.between(currentDate, item.getTime()).getSeconds());
+                                    return newClanItemDTO;
                                 }
                                 return null;
                             })
                             .filter(Objects::nonNull)
                             .collect(Collectors.toList());
 
-                    clanInfo.setItems(filteredItems);
+                    clanInfoDTO.setItems(filteredItems);
 
-                    return clanInfo;
+                    return clanInfoDTO;
                 }
             }
         } catch (SQLException e) {
@@ -244,8 +244,8 @@ public class ClanDao implements IClanDao {
     }
 
     @Override
-    public List<ClanMemEntry> getClanMember(short clanId, byte page) {
-        List<ClanMemEntry> entries = new ArrayList<>();
+    public List<ClanMemDTO> getClanMember(short clanId, byte page) {
+        List<ClanMemDTO> entries = new ArrayList<>();
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT " +
@@ -267,7 +267,7 @@ public class ClanDao implements IClanDao {
                 byte index = 0;
                 Gson gson = GsonUtil.getInstance();
                 while (resultSet.next()) {
-                    ClanMemEntry entry = new ClanMemEntry();
+                    ClanMemDTO entry = new ClanMemDTO();
                     entry.setPlayerId(resultSet.getInt("player_id"));
 
                     byte rights = resultSet.getByte("rights");
@@ -364,8 +364,8 @@ public class ClanDao implements IClanDao {
     }
 
     @Override
-    public List<ClanEntry> getTopTeams(byte page) {
-        List<ClanEntry> top = new ArrayList<>(10);
+    public List<ClanDTO> getTopTeams(byte page) {
+        List<ClanDTO> top = new ArrayList<>(10);
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT " +
@@ -382,7 +382,7 @@ public class ClanDao implements IClanDao {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    ClanEntry clanInfo = new ClanEntry();
+                    ClanDTO clanInfo = new ClanDTO();
                     clanInfo.setId(resultSet.getShort("clan_id"));
                     clanInfo.setName(resultSet.getString("name"));
                     clanInfo.setMemberCount(resultSet.getByte("member_count"));

@@ -1,6 +1,8 @@
-package com.teamobi.mobiarmy2.model.item;
+package com.teamobi.mobiarmy2.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -8,7 +10,9 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class FightItemEntry {
+@NoArgsConstructor
+@AllArgsConstructor
+public class FightItem {
     private String name;
     private short buyXu;
     private short buyLuong;

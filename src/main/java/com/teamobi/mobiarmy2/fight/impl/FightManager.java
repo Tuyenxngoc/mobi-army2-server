@@ -6,15 +6,15 @@ import com.teamobi.mobiarmy2.constant.MatchResult;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.fight.*;
 import com.teamobi.mobiarmy2.fight.boss.*;
-import com.teamobi.mobiarmy2.server.ClanItemManager;
-import com.teamobi.mobiarmy2.server.FightItemManager;
-import com.teamobi.mobiarmy2.server.SpecialItemManager;
+import com.teamobi.mobiarmy2.model.Equipment;
+import com.teamobi.mobiarmy2.model.SpecialItemChest;
 import com.teamobi.mobiarmy2.model.User;
-import com.teamobi.mobiarmy2.model.equip.EquipmentEntry;
-import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.impl.Message;
+import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.server.ClanManager;
+import com.teamobi.mobiarmy2.server.FightItemManager;
+import com.teamobi.mobiarmy2.server.SpecialItemManager;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.DataOutputStream;
@@ -876,7 +876,7 @@ public class FightManager implements IFightManager {
                             short quantity = (short) Utils.nextInt(1, 5);
                             byte id = getRewardMaterialId();
 
-                            SpecialItemChestEntry newItem = new SpecialItemChestEntry(quantity, SpecialItemManager.getSpecialItemById(id));
+                            SpecialItemChest newItem = new SpecialItemChest(quantity, SpecialItemManager.getSpecialItemById(id));
                             user.updateInventory(null, null, List.of(newItem), null);
 
                             String reward = String.format("Phần thưởng diệt trùm của bạn là %dx %s", newItem.getQuantity(), newItem.getItem().getName());
@@ -889,7 +889,7 @@ public class FightManager implements IFightManager {
                                 byte quantity = 1;
                                 user.updateItems(indexItem, quantity);
                                 reward.append(quantity).append("x ");
-                                reward.append(FightItemManager.FIGHT_ITEM_ENTRIES.get(indexItem).getName()).append(", ");
+                                reward.append(FightItemManager.FIGHT_ITEMS.get(indexItem).getName()).append(", ");
                             }
                             reward.deleteCharAt(reward.length() - 2);
                             user.getUserService().sendServerMessage(reward.toString());
@@ -1061,7 +1061,7 @@ public class FightManager implements IFightManager {
             short[] abilities = user.calculateCharacterAbilities(teamPoints);
 
             //Lấy danh sách items của clan
-            boolean[] clanItems = new boolean[ClanItemManager.CLAN_ITEM_ENTRY_MAP.size()];
+            boolean[] clanItems = new boolean[ClanItemManager.CLAN_ITEM_MAP.size()];
             if (user.getClanId() != null) {
                 if (clanItemsCache.containsKey(user.getClanId())) {
                     clanItems = clanItemsCache.get(user.getClanId());
@@ -1612,7 +1612,7 @@ public class FightManager implements IFightManager {
 
                 //equip
                 case 2 -> {
-                    EquipmentEntry equip = reward.getEquip().getEquipEntry();
+                    Equipment equip = reward.getEquip().getEquipment();
                     ds.writeByte(equip.getCharacterId());
                     ds.writeByte(equip.getEquipType());
                     ds.writeShort(equip.getEquipIndex());
@@ -1623,7 +1623,7 @@ public class FightManager implements IFightManager {
 
                 //notification
                 case 4 -> {
-                    SpecialItemChestEntry specialItem = reward.getSpecialItem();
+                    SpecialItemChest specialItem = reward.getSpecialItem();
                     ds.writeUTF(specialItem.getItem().getName());
                 }
             }

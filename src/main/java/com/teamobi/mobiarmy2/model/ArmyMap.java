@@ -1,5 +1,6 @@
-package com.teamobi.mobiarmy2.model.map;
+package com.teamobi.mobiarmy2.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,7 +13,8 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
-public class MapEntry {
+@AllArgsConstructor
+public class ArmyMap {
     private byte id;
     private String name;
     private String fileName;
@@ -25,7 +27,7 @@ public class MapEntry {
     private short[] XPlayer;
     private short[] YPlayer;
 
-    public MapEntry(byte id) {
+    public ArmyMap(byte id) {
         this.id = id;
     }
 
@@ -33,7 +35,7 @@ public class MapEntry {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MapEntry entry = (MapEntry) o;
+        ArmyMap entry = (ArmyMap) o;
         return id == entry.id;
     }
 

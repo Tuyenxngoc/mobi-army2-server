@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.model.user;
+package com.teamobi.mobiarmy2.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,14 +8,17 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class PlayerLeaderboardEntry {
+public class ClanMemDTO {
     private int playerId;
     private String username;
-    private short clanId;
+    private int point;
     private byte activeCharacter;
+    private byte online;
     private byte level;
     private byte levelPt;
     private byte index;
-    private short[] data;
-    private String detail;
+    private int cup;
+    private short[] dataEquip;
+    private String contributeText;
+    private String contributeCount;
 }

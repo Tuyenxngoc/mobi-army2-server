@@ -1,13 +1,13 @@
 package com.teamobi.mobiarmy2.dao;
 
-import com.teamobi.mobiarmy2.model.GiftCodeEntry;
+import com.teamobi.mobiarmy2.dto.GiftCodeDTO;
 
 /**
  * @author tuyen
  */
 public interface IGiftCodeDao {
 
-    GiftCodeEntry getGiftCode(String code, int playerId);
+    GiftCodeDTO getGiftCode(String code, int playerId);
 
     void decrementGiftCodeUsageLimit(long giftCodeId);
 

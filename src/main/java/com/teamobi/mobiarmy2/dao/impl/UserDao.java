@@ -4,18 +4,18 @@ import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.constant.TransactionType;
 import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
+import com.teamobi.mobiarmy2.dto.FriendDTO;
+import com.teamobi.mobiarmy2.dto.PlayerCharacterDTO;
+import com.teamobi.mobiarmy2.dto.UserDTO;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
+import com.teamobi.mobiarmy2.model.EquipmentChest;
+import com.teamobi.mobiarmy2.model.SpecialItemChest;
+import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.MissionManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
-import com.teamobi.mobiarmy2.model.PlayerCharacterDTO;
-import com.teamobi.mobiarmy2.model.User;
-import com.teamobi.mobiarmy2.model.user.EquipmentChestEntry;
-import com.teamobi.mobiarmy2.model.user.FriendDTO;
-import com.teamobi.mobiarmy2.model.user.SpecialItemChestEntry;
-import com.teamobi.mobiarmy2.model.user.UserDTO;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 import org.mindrot.jbcrypt.BCrypt;
@@ -38,30 +38,30 @@ public class UserDao implements IUserDao {
         HikariCPManager.getInstance().update("INSERT INTO `players`(`user_id`, `xu`, `luong`) VALUES (?,?,?)", user.getUserId(), user.getXu(), user.getLuong());
     }
 
-    public static String convertSpecialItemChestEntriesToJson(List<SpecialItemChestEntry> specialItemChestEntries) {
-        List<SpecialItemChestJson> specialItemChestJsons = specialItemChestEntries.stream().map(entry -> {
+    public static String convertSpecialItemChestEntriesToJson(List<SpecialItemChest> specialItemChestEntries) {
+        List<SpecialItemChestJson> specialItemChestJsons = specialItemChestEntries.stream().map(e -> {
             SpecialItemChestJson jsonItem = new SpecialItemChestJson();
-            jsonItem.setId(entry.getItem().getId());
-            jsonItem.setQuantity(entry.getQuantity());
+            jsonItem.setId(e.getItem().getId());
+            jsonItem.setQuantity(e.getQuantity());
             return jsonItem;
         }).collect(Collectors.toList());
 
         return GsonUtil.getInstance().toJson(specialItemChestJsons);
     }
 
-    public static String convertEquipmentChestEntriesToJson(List<EquipmentChestEntry> equipmentChestEntries) {
-        List<EquipmentChestJson> equipmentChestJsons = equipmentChestEntries.stream().map(entry -> {
+    public static String convertEquipmentChestEntriesToJson(List<EquipmentChest> equipmentChestEntries) {
+        List<EquipmentChestJson> equipmentChestJsons = equipmentChestEntries.stream().map(e -> {
             EquipmentChestJson jsonItem = new EquipmentChestJson();
-            jsonItem.setCharacterId(entry.getEquipEntry().getCharacterId());
-            jsonItem.setEquipIndex(entry.getEquipEntry().getEquipIndex());
-            jsonItem.setEquipType(entry.getEquipEntry().getEquipType());
-            jsonItem.setKey(entry.getKey());
-            jsonItem.setInUse((byte) (entry.isInUse() ? 1 : 0));
-            jsonItem.setVipLevel(entry.getVipLevel());
-            jsonItem.setPurchaseDate(entry.getPurchaseDate());
-            jsonItem.setSlots(entry.getSlots());
-            jsonItem.setAddPoints(entry.getAddPoints());
-            jsonItem.setAddPercents(entry.getAddPercents());
+            jsonItem.setCharacterId(e.getEquipment().getCharacterId());
+            jsonItem.setEquipIndex(e.getEquipment().getEquipIndex());
+            jsonItem.setEquipType(e.getEquipment().getEquipType());
+            jsonItem.setKey(e.getKey());
+            jsonItem.setInUse((byte) (e.isInUse() ? 1 : 0));
+            jsonItem.setVipLevel(e.getVipLevel());
+            jsonItem.setPurchaseDate(e.getPurchaseDate());
+            jsonItem.setSlots(e.getSlots());
+            jsonItem.setAddPoints(e.getAddPoints());
+            jsonItem.setAddPercents(e.getAddPercents());
 
             return jsonItem;
         }).collect(Collectors.toList());
@@ -190,7 +190,7 @@ public class UserDao implements IUserDao {
             try (PreparedStatement playerStatement = connection.prepareStatement(playerQuery)) {
                 playerStatement.setString(1, userDTO.getUserId());
                 try (ResultSet playerResultSet = playerStatement.executeQuery()) {
-                    int totalCharacter = CharacterManager.CHARACTER_ENTRIES.size();
+                    int totalCharacter = CharacterManager.CHARACTERS.size();
                     userDTO.initialize(totalCharacter);
 
                     if (playerResultSet.next()) {
@@ -215,9 +215,9 @@ public class UserDao implements IUserDao {
                         //Đọc dữ liệu trang bị
                         EquipmentChestJson[] equipmentChestJsons = gson.fromJson(playerResultSet.getString("equipment_chest"), EquipmentChestJson[].class);
                         for (EquipmentChestJson json : equipmentChestJsons) {
-                            EquipmentChestEntry equip = new EquipmentChestEntry();
-                            equip.setEquipEntry(CharacterManager.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
-                            if (equip.getEquipEntry() == null) {
+                            EquipmentChest equip = new EquipmentChest();
+                            equip.setEquipment(CharacterManager.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
+                            if (equip.getEquipment() == null) {
                                 continue;
                             }
                             equip.setKey(json.getKey());
@@ -240,13 +240,13 @@ public class UserDao implements IUserDao {
                         //Đọc dữ liệu item
                         SpecialItemChestJson[] specialItemChestJsons = gson.fromJson(playerResultSet.getString("item_chest"), SpecialItemChestJson[].class);
                         for (SpecialItemChestJson item : specialItemChestJsons) {
-                            SpecialItemChestEntry specialItemChestEntry = new SpecialItemChestEntry();
-                            specialItemChestEntry.setItem(SpecialItemManager.getSpecialItemById(item.getId()));
-                            if (specialItemChestEntry.getItem() == null) {
+                            SpecialItemChest specialItemChest = new SpecialItemChest();
+                            specialItemChest.setItem(SpecialItemManager.getSpecialItemById(item.getId()));
+                            if (specialItemChest.getItem() == null) {
                                 continue;
                             }
-                            specialItemChestEntry.setQuantity(item.getQuantity());
-                            userDTO.getSpecialItemChest().add(specialItemChestEntry);
+                            specialItemChest.setQuantity(item.getQuantity());
+                            userDTO.getSpecialItemChest().add(specialItemChest);
                         }
 
                         //Dữ liệu bạn bè
@@ -257,7 +257,7 @@ public class UserDao implements IUserDao {
 
                         //Đọc dữ liệu item chiến đấu
                         byte[] items = gson.fromJson(playerResultSet.getString("item"), byte[].class);
-                        int desiredSizeItem = FightItemManager.FIGHT_ITEM_ENTRIES.size();
+                        int desiredSizeItem = FightItemManager.FIGHT_ITEMS.size();
                         userDTO.setItems(
                                 items.length != desiredSizeItem
                                         ? Utils.adjustArray(items, desiredSizeItem, (byte) 0)
@@ -317,7 +317,7 @@ public class UserDao implements IUserDao {
                         int[] data = gson.fromJson(characterResultSet.getString("data"), int[].class);
                         for (int j = 0; j < data.length; j++) {
                             int key = data[j];
-                            EquipmentChestEntry equip = userDTO.getEquipmentByKey(key);
+                            EquipmentChest equip = userDTO.getEquipmentByKey(key);
                             if (equip != null) {
                                 if (equip.isExpired()) {
                                     equip.setInUse(false);
