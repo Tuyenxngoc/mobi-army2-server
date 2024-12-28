@@ -16,24 +16,29 @@ import java.util.*;
  * @author tuyen
  */
 public class MapManager {
-    public static final List<ArmyMap> ARMY_MAPS = new ArrayList<>();
+    public static final Map<Byte, ArmyMap> ARMY_MAPS = new HashMap<>();
     public static final Map<Integer, MapBrick> MAP_BRICKS = new HashMap<>();
     public static final Set<Integer> ID_NOT_COLLISIONS = Set.of(70, 71, 73, 74, 75, 77, 78, 79, 97);
 
-    public static byte randomMap(int idNotSelect) {
-        byte selectedId;
-        do {
-            selectedId = ARMY_MAPS.get(Utils.nextInt(30)).getId();
-        } while (selectedId == idNotSelect);
+    public static byte randomMap(Set<Byte> notSelectableSet) {
+        List<Byte> selectableMapIds = new ArrayList<>();
+        for (Map.Entry<Byte, ArmyMap> entry : ARMY_MAPS.entrySet()) {
+            if (!notSelectableSet.contains(entry.getKey())) {
+                selectableMapIds.add(entry.getKey());
+            }
+        }
 
-        return selectedId;
+        if (selectableMapIds.isEmpty()) {
+            return -1;
+        }
+
+        return selectableMapIds.get(Utils.nextInt(selectableMapIds.size()));
     }
 
     public static byte[] getMapData(byte mapId) {
-        for (ArmyMap armyMap : MapManager.ARMY_MAPS) {
-            if (armyMap.getId() == mapId) {
-                return armyMap.getData();
-            }
+        ArmyMap armyMap = ARMY_MAPS.get(mapId);
+        if (armyMap != null) {
+            return armyMap.getData();
         }
         return null;
     }
@@ -41,9 +46,9 @@ public class MapManager {
     public static String getMapNames(byte... ids) {
         StringBuilder result = new StringBuilder();
         for (byte id : ids) {
-            int index = ARMY_MAPS.indexOf(new ArmyMap(id));
-            if (index != -1) {
-                result.append(ARMY_MAPS.get(index).getName()).append(", ");
+            ArmyMap armyMap = ARMY_MAPS.get(id);
+            if (armyMap != null) {
+                result.append(armyMap.getName()).append(", ");
             }
         }
         if (!result.isEmpty()) {

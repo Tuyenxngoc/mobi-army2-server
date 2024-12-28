@@ -18,6 +18,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author tuyen
@@ -814,7 +815,10 @@ public class FightWait implements IFightWait {
 
         mapId = mapIdSet;
         if (mapId == 27) {
-            byte mapRandom = MapManager.randomMap(27);
+            byte mapRandom = MapManager.randomMap(Set.of(
+                    (byte) 27, (byte) 30, (byte) 31, (byte) 32, (byte) 33,
+                    (byte) 34, (byte) 35, (byte) 36, (byte) 37, (byte) 38, (byte) 39
+            ));
             try {
                 IMessage ms = new Message(Cmd.TRAINING_MAP);
                 DataOutputStream ds = ms.writer();

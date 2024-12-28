@@ -18,6 +18,8 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author tuyen
@@ -35,10 +37,12 @@ public class GameService implements IGameService {
     public void setCacheMaps() {
         try (ByteArrayOutputStream bas = new ByteArrayOutputStream();
              DataOutputStream ds = new DataOutputStream(bas)) {
-            int size = MapManager.ARMY_MAPS.size();
+            Map<Byte, ArmyMap> sortedMaps = new TreeMap<>(MapManager.ARMY_MAPS);
+
+            int size = sortedMaps.size();
             ds.writeByte(size);
-            for (int i = 0; i < size; i++) {
-                ArmyMap armyMap = MapManager.ARMY_MAPS.get(i);
+
+            for (ArmyMap armyMap : sortedMaps.values()) {
                 ds.writeByte(armyMap.getId());
                 ds.writeShort(armyMap.getData().length);
                 ds.write(armyMap.getData());
@@ -50,6 +54,7 @@ public class GameService implements IGameService {
                 ds.writeUTF(armyMap.getName());
                 ds.writeUTF(armyMap.getFileName());
             }
+
             byte[] ab = bas.toByteArray();
             Utils.saveFile(GameConstants.MAP_CACHE_NAME, ab);
 

@@ -26,6 +26,8 @@ public class GameDao implements IGameDao {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
 
+            MapManager.ARMY_MAPS.clear();
+
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `maps`")) {
                 while (resultSet.next()) {
                     ArmyMap armyMap = new ArmyMap();
@@ -43,7 +45,7 @@ public class GameDao implements IGameDao {
                     armyMap.setInWaterAddY(resultSet.getShort("in_water_add_y"));
                     armyMap.setCl2AddY(resultSet.getShort("cl2_add_y"));
 
-                    MapManager.ARMY_MAPS.add(armyMap);
+                    MapManager.ARMY_MAPS.put(armyMap.getId(), armyMap);
                 }
             }
         } catch (SQLException e) {
