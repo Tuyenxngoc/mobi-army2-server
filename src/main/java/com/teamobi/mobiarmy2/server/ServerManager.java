@@ -3,8 +3,8 @@ package com.teamobi.mobiarmy2.server;
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.config.impl.ServerConfig;
 import com.teamobi.mobiarmy2.constant.UserState;
-import com.teamobi.mobiarmy2.dao.IGameDao;
-import com.teamobi.mobiarmy2.dao.impl.GameDao;
+import com.teamobi.mobiarmy2.dao.IGameDAO;
+import com.teamobi.mobiarmy2.dao.impl.GameDAO;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.Room;
 import com.teamobi.mobiarmy2.model.User;
@@ -39,7 +39,7 @@ public class ServerManager {
     private final List<ServerListener> listeners;
 
     public ServerManager() {
-        IGameDao gameDao = new GameDao();
+        IGameDAO gameDao = new GameDAO();
         this.gameService = new GameService(gameDao);
 
         this.isMaintenanceMode = false;

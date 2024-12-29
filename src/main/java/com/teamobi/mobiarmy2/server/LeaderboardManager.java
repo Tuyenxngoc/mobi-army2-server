@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.server;
 
-import com.teamobi.mobiarmy2.dao.IRankingDao;
-import com.teamobi.mobiarmy2.dao.impl.RankingDao;
+import com.teamobi.mobiarmy2.dao.IRankingDAO;
+import com.teamobi.mobiarmy2.dao.impl.RankingDAO;
 import com.teamobi.mobiarmy2.dto.PlayerLeaderboardDTO;
 import lombok.Getter;
 import org.slf4j.Logger;
@@ -15,10 +15,10 @@ import java.util.*;
 public class LeaderboardManager {
     private static final Logger logger = LoggerFactory.getLogger(LeaderboardManager.class);
 
-    private final IRankingDao rankingDao;
+    private final IRankingDAO rankingDao;
 
     public LeaderboardManager() {
-        this.rankingDao = new RankingDao();
+        this.rankingDao = new RankingDAO();
     }
 
     private static class SingletonHelper {

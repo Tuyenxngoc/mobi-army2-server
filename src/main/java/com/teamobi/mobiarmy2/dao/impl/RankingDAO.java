@@ -2,10 +2,10 @@ package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.constant.GameString;
-import com.teamobi.mobiarmy2.dao.IRankingDao;
+import com.teamobi.mobiarmy2.dao.IRankingDAO;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.dto.PlayerLeaderboardDTO;
-import com.teamobi.mobiarmy2.json.EquipmentChestJson;
+import com.teamobi.mobiarmy2.model.EquipmentChestJson;
 import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.PlayerXpManager;
 import com.teamobi.mobiarmy2.server.ServerManager;
@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * @author tuyen
  */
-public class RankingDao implements IRankingDao {
+public class RankingDAO implements IRankingDAO {
 
     private List<PlayerLeaderboardDTO> getTopFromQuery(String query, String detailColumn, boolean applyBonus) {
         Gson gson = GsonUtil.getInstance();

@@ -2,9 +2,8 @@ package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.constant.GameConstants;
-import com.teamobi.mobiarmy2.dao.IGameDao;
+import com.teamobi.mobiarmy2.dao.IGameDAO;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
-import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.Character;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.server.*;
@@ -19,7 +18,7 @@ import java.sql.Statement;
 /**
  * @author tuyen
  */
-public class GameDao implements IGameDao {
+public class GameDAO implements IGameDAO {
 
     @Override
     public void getAllMapData() {
@@ -222,7 +221,7 @@ public class GameDao implements IGameDao {
 
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `clan_shops`")) {
                 while (resultSet.next()) {
-                    ClanItem item = new ClanItem();
+                    ClanItemShop item = new ClanItemShop();
                     item.setId(resultSet.getByte("clan_shop_id"));
                     item.setLevel(resultSet.getByte("level"));
                     item.setName(resultSet.getString("name"));

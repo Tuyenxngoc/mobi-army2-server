@@ -1,15 +1,15 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
-import com.teamobi.mobiarmy2.dao.IClanDao;
+import com.teamobi.mobiarmy2.dao.IClanDAO;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.dto.ClanDTO;
 import com.teamobi.mobiarmy2.dto.ClanInfoDTO;
 import com.teamobi.mobiarmy2.dto.ClanItemDTO;
 import com.teamobi.mobiarmy2.dto.ClanMemDTO;
-import com.teamobi.mobiarmy2.json.ClanItemJson;
-import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.model.ClanItem;
+import com.teamobi.mobiarmy2.model.ClanItemShop;
+import com.teamobi.mobiarmy2.model.EquipmentChestJson;
 import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.server.ClanXpManager;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 /**
  * @author tuyen
  */
-public class ClanDao implements IClanDao {
+public class ClanDAO implements IClanDAO {
 
     @Override
     public Short getClanIcon(int clanId) {
@@ -214,16 +214,16 @@ public class ClanDao implements IClanDao {
                     String formattedDate = Utils.formatLocalDateTime(createdDate.toLocalDateTime());
                     clanInfoDTO.setCreatedDate(formattedDate);
 
-                    ClanItemJson[] clanItemJsonArray = GsonUtil.getInstance().fromJson(resultSet.getString("item"), ClanItemJson[].class);
+                    ClanItem[] clanItemArray = GsonUtil.getInstance().fromJson(resultSet.getString("item"), ClanItem[].class);
                     LocalDateTime currentDate = LocalDateTime.now();
 
-                    List<ClanItemDTO> filteredItems = Arrays.stream(clanItemJsonArray)
+                    List<ClanItemDTO> filteredItems = Arrays.stream(clanItemArray)
                             .filter(item -> !item.getTime().isBefore(currentDate))
                             .map(item -> {
-                                ClanItem clanItem = ClanItemManager.getItemClanById(item.getId());
-                                if (clanItem != null) {
+                                ClanItemShop clanItemShop = ClanItemManager.getItemClanById(item.getId());
+                                if (clanItemShop != null) {
                                     ClanItemDTO newClanItemDTO = new ClanItemDTO();
-                                    newClanItemDTO.setName(clanItem.getName());
+                                    newClanItemDTO.setName(clanItemShop.getName());
                                     newClanItemDTO.setTime((int) Duration.between(currentDate, item.getTime()).getSeconds());
                                     return newClanItemDTO;
                                 }
@@ -326,13 +326,13 @@ public class ClanDao implements IClanDao {
     }
 
     @Override
-    public ClanItemJson[] getClanItems(short clanId) {
+    public ClanItem[] getClanItems(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT item FROM clans WHERE clan_id = ?")) {
             statement.setInt(1, clanId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    return GsonUtil.getInstance().fromJson(resultSet.getString("item"), ClanItemJson[].class);
+                    return GsonUtil.getInstance().fromJson(resultSet.getString("item"), ClanItem[].class);
                 }
             }
         } catch (SQLException e) {
@@ -343,7 +343,7 @@ public class ClanDao implements IClanDao {
     }
 
     @Override
-    public void updateClanItems(short clanId, ClanItemJson[] items) {
+    public void updateClanItems(short clanId, ClanItem[] items) {
         String sql = "UPDATE clans SET item = ? WHERE clan_id = ?";
         HikariCPManager.getInstance().update(sql, GsonUtil.getInstance().toJson(items), clanId);
     }

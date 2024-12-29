@@ -3,7 +3,7 @@ package com.teamobi.mobiarmy2.dao;
 /**
  * @author tuyen
  */
-public interface IGameDao {
+public interface IGameDAO {
 
     void getAllMapData();
 

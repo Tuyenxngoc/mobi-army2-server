@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.service.impl;
 
 import com.teamobi.mobiarmy2.constant.GameConstants;
-import com.teamobi.mobiarmy2.dao.IGameDao;
+import com.teamobi.mobiarmy2.dao.IGameDAO;
 import com.teamobi.mobiarmy2.model.ArmyMap;
 import com.teamobi.mobiarmy2.model.Caption;
 import com.teamobi.mobiarmy2.model.Character;
@@ -27,9 +27,9 @@ import java.util.TreeMap;
 public class GameService implements IGameService {
     private static final Logger logger = LoggerFactory.getLogger(GameService.class);
 
-    private final IGameDao gameDao;
+    private final IGameDAO gameDao;
 
-    public GameService(IGameDao gameDao) {
+    public GameService(IGameDAO gameDao) {
         this.gameDao = gameDao;
     }
 

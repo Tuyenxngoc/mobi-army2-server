@@ -5,7 +5,7 @@ import com.teamobi.mobiarmy2.dto.GiftCodeDTO;
 /**
  * @author tuyen
  */
-public interface IGiftCodeDao {
+public interface IGiftCodeDAO {
 
     GiftCodeDTO getGiftCode(String code, int playerId);
 

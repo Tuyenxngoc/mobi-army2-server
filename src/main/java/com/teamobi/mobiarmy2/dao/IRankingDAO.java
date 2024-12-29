@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author tuyen
  */
-public interface IRankingDao {
+public interface IRankingDAO {
 
     List<PlayerLeaderboardDTO> getTopHonor();
 

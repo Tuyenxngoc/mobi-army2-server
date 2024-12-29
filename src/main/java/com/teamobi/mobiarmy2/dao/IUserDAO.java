@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * @author tuyen
  */
-public interface IUserDao extends Dao<User> {
+public interface IUserDAO extends DAO<User> {
 
     UserDTO findByUsernameAndPassword(String username, String password);
 

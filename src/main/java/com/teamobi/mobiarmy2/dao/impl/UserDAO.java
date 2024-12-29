@@ -2,16 +2,12 @@ package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.constant.TransactionType;
-import com.teamobi.mobiarmy2.dao.IUserDao;
+import com.teamobi.mobiarmy2.dao.IUserDAO;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.dto.FriendDTO;
 import com.teamobi.mobiarmy2.dto.PlayerCharacterDTO;
 import com.teamobi.mobiarmy2.dto.UserDTO;
-import com.teamobi.mobiarmy2.json.EquipmentChestJson;
-import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
-import com.teamobi.mobiarmy2.model.EquipmentChest;
-import com.teamobi.mobiarmy2.model.SpecialItemChest;
-import com.teamobi.mobiarmy2.model.User;
+import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.MissionManager;
@@ -31,7 +27,7 @@ import java.util.stream.Collectors;
 /**
  * @author tuyen
  */
-public class UserDao implements IUserDao {
+public class UserDAO implements IUserDAO {
 
     @Override
     public void save(User user) {
@@ -132,6 +128,21 @@ public class UserDao implements IUserDao {
                 );
             }
         }
+    }
+
+    @Override
+    public User findById(int id) {
+        return null;
+    }
+
+    @Override
+    public void deleteById(int id) {
+
+    }
+
+    @Override
+    public List<User> findAll() {
+        return List.of();
     }
 
     @Override

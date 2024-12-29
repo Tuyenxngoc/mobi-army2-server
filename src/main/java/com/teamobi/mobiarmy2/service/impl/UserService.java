@@ -2,15 +2,13 @@ package com.teamobi.mobiarmy2.service.impl;
 
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.constant.*;
-import com.teamobi.mobiarmy2.dao.IGiftCodeDao;
-import com.teamobi.mobiarmy2.dao.IUserDao;
-import com.teamobi.mobiarmy2.dao.impl.GiftCodeDao;
-import com.teamobi.mobiarmy2.dao.impl.UserDao;
+import com.teamobi.mobiarmy2.dao.IGiftCodeDAO;
+import com.teamobi.mobiarmy2.dao.IUserDAO;
+import com.teamobi.mobiarmy2.dao.impl.GiftCodeDAO;
+import com.teamobi.mobiarmy2.dao.impl.UserDAO;
 import com.teamobi.mobiarmy2.dto.*;
 import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.fight.impl.TrainingManager;
-import com.teamobi.mobiarmy2.json.EquipmentChestJson;
-import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.Character;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.network.IMessage;
@@ -34,8 +32,8 @@ public class UserService implements IUserService {
     private static final int minimumWaitTime = 5000;
 
     private final User user;
-    private final IUserDao userDao;
-    private final IGiftCodeDao giftCodeDao;
+    private final IUserDAO userDao;
+    private final IGiftCodeDAO giftCodeDao;
 
     private UserAction userAction;
     private int totalTransactionAmount;
@@ -48,8 +46,8 @@ public class UserService implements IUserService {
 
     public UserService(User user) {
         this.user = user;
-        this.userDao = new UserDao();
-        this.giftCodeDao = new GiftCodeDao();
+        this.userDao = new UserDAO();
+        this.giftCodeDao = new GiftCodeDAO();
     }
 
     private List<EquipmentChest> getSelectedEquips() {
@@ -840,40 +838,40 @@ public class UserService implements IUserService {
 
     private void buyClanShop(byte unit, byte itemId) {
         ClanManager clanManager = ClanManager.getInstance();
-        ClanItem clanItem = ClanItemManager.getItemClanById(itemId);
+        ClanItemShop clanItemShop = ClanItemManager.getItemClanById(itemId);
 
-        if (clanItem == null || clanItem.getOnSale() != 1) {
+        if (clanItemShop == null || clanItemShop.getOnSale() != 1) {
             return;
         }
 
         int currentLevel = clanManager.getClanLevel(user.getClanId());
-        if (currentLevel < clanItem.getLevel()) {
+        if (currentLevel < clanItemShop.getLevel()) {
             sendServerMessage(GameString.CLAN_LEVEL_INSUFFICIENT);
             return;
         }
 
         if (unit == 0) {//Xu
-            if (clanItem.getXu() < 0) {
+            if (clanItemShop.getXu() < 0) {
                 return;
             }
             int xuClan = clanManager.getClanXu(user.getClanId());
-            if (xuClan < clanItem.getXu()) {
+            if (xuClan < clanItemShop.getXu()) {
                 sendServerMessage(GameString.CLAN_NOT_ENOUGH_XU);
                 return;
             }
 
-            clanManager.updateItemClan(user.getClanId(), user.getPlayerId(), clanItem, true);
+            clanManager.updateItemClan(user.getClanId(), user.getPlayerId(), clanItemShop, true);
         } else if (unit == 1) {//Luong
-            if (clanItem.getLuong() < 0) {
+            if (clanItemShop.getLuong() < 0) {
                 return;
             }
             int luongClan = clanManager.getClanLuong(user.getClanId());
-            if (luongClan < clanItem.getLuong()) {
+            if (luongClan < clanItemShop.getLuong()) {
                 sendServerMessage(GameString.CLAN_NOT_ENOUGH_LUONG);
                 return;
             }
 
-            clanManager.updateItemClan(user.getClanId(), user.getPlayerId(), clanItem, false);
+            clanManager.updateItemClan(user.getClanId(), user.getPlayerId(), clanItemShop, false);
         }
         sendServerMessage(GameString.PURCHASE_SUCCESS);
     }
@@ -883,13 +881,13 @@ public class UserService implements IUserService {
             IMessage ms = new Message(Cmd.SHOP_BIETDOI);
             DataOutputStream ds = ms.writer();
             ds.writeByte(ClanItemManager.CLAN_ITEM_MAP.size());
-            for (ClanItem clanItem : ClanItemManager.CLAN_ITEM_MAP.values()) {
-                ds.writeByte(clanItem.getId());
-                ds.writeUTF(clanItem.getName());
-                ds.writeInt(clanItem.getXu());
-                ds.writeInt(clanItem.getLuong());
-                ds.writeByte(clanItem.getTime());
-                ds.writeByte(clanItem.getLevel());
+            for (ClanItemShop clanItemShop : ClanItemManager.CLAN_ITEM_MAP.values()) {
+                ds.writeByte(clanItemShop.getId());
+                ds.writeUTF(clanItemShop.getName());
+                ds.writeInt(clanItemShop.getXu());
+                ds.writeInt(clanItemShop.getLuong());
+                ds.writeByte(clanItemShop.getTime());
+                ds.writeByte(clanItemShop.getLevel());
             }
             ds.flush();
             sendMessage(ms);

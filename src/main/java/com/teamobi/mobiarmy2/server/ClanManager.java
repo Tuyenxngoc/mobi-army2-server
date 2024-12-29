@@ -1,13 +1,13 @@
 package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.constant.GameConstants;
-import com.teamobi.mobiarmy2.dao.IClanDao;
-import com.teamobi.mobiarmy2.dao.impl.ClanDao;
+import com.teamobi.mobiarmy2.dao.IClanDAO;
+import com.teamobi.mobiarmy2.dao.impl.ClanDAO;
 import com.teamobi.mobiarmy2.dto.ClanDTO;
 import com.teamobi.mobiarmy2.dto.ClanInfoDTO;
 import com.teamobi.mobiarmy2.dto.ClanMemDTO;
-import com.teamobi.mobiarmy2.json.ClanItemJson;
 import com.teamobi.mobiarmy2.model.ClanItem;
+import com.teamobi.mobiarmy2.model.ClanItemShop;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.time.LocalDateTime;
@@ -21,10 +21,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ClanManager {
     private final ConcurrentHashMap<Short, Object> clanLocks = new ConcurrentHashMap<>();
-    private final IClanDao clanDao;
+    private final IClanDAO clanDao;
 
     public ClanManager() {
-        clanDao = new ClanDao();
+        clanDao = new ClanDAO();
     }
 
     private static class SingletonHelper {
@@ -83,9 +83,9 @@ public class ClanManager {
     public boolean[] getClanItems(short clanId) {
         boolean[] result = new boolean[ClanItemManager.CLAN_ITEM_MAP.size()];
         LocalDateTime now = LocalDateTime.now();
-        ClanItemJson[] items = clanDao.getClanItems(clanId);
+        ClanItem[] items = clanDao.getClanItems(clanId);
 
-        for (ClanItemJson item : items) {
+        for (ClanItem item : items) {
             if (item.getTime().isAfter(now)) {
                 result[item.getId() - 1] = true;
             }
@@ -94,38 +94,38 @@ public class ClanManager {
         return result;
     }
 
-    public void updateItemClan(short clanId, int playerId, ClanItem clanItem, boolean isBuyXu) {
+    public void updateItemClan(short clanId, int playerId, ClanItemShop clanItemShop, boolean isBuyXu) {
         synchronized (getClanLock(clanId)) {
             if (isBuyXu) {
-                clanDao.updateXu(clanId, -clanItem.getXu());
-                clanDao.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItem.getXu()) + " xu", playerId, -clanItem.getXu(), 0);
+                clanDao.updateXu(clanId, -clanItemShop.getXu());
+                clanDao.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItemShop.getXu()) + " xu", playerId, -clanItemShop.getXu(), 0);
             } else {
-                clanDao.updateLuong(clanId, -clanItem.getLuong());
-                clanDao.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItem.getLuong()) + " lượng", playerId, 0, -clanItem.getLuong());
+                clanDao.updateLuong(clanId, -clanItemShop.getLuong());
+                clanDao.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItemShop.getLuong()) + " lượng", playerId, 0, -clanItemShop.getLuong());
             }
 
-            ClanItemJson[] items = clanDao.getClanItems(clanId);
+            ClanItem[] items = clanDao.getClanItems(clanId);
             boolean found = false;
             LocalDateTime now = LocalDateTime.now();
 
-            for (ClanItemJson item : items) {
-                if (item.getId() == clanItem.getId()) {
+            for (ClanItem item : items) {
+                if (item.getId() == clanItemShop.getId()) {
                     if (item.getTime().isBefore(now)) {
                         item.setTime(now);
                     }
-                    item.setTime(item.getTime().plusHours(clanItem.getTime()));
+                    item.setTime(item.getTime().plusHours(clanItemShop.getTime()));
                     found = true;
                     break;
                 }
             }
 
             if (!found) {
-                List<ClanItemJson> updatedItems = new ArrayList<>(Arrays.asList(items));
-                ClanItemJson newItem = new ClanItemJson();
-                newItem.setId(clanItem.getId());
-                newItem.setTime(now.plusHours(clanItem.getTime()));
+                List<ClanItem> updatedItems = new ArrayList<>(Arrays.asList(items));
+                ClanItem newItem = new ClanItem();
+                newItem.setId(clanItemShop.getId());
+                newItem.setTime(now.plusHours(clanItemShop.getTime()));
                 updatedItems.add(newItem);
-                items = updatedItems.toArray(new ClanItemJson[0]);
+                items = updatedItems.toArray(new ClanItem[0]);
             }
             clanDao.updateClanItems(clanId, items);
         }

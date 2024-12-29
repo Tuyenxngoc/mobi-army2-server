@@ -3,14 +3,14 @@ package com.teamobi.mobiarmy2.dao;
 import com.teamobi.mobiarmy2.dto.ClanDTO;
 import com.teamobi.mobiarmy2.dto.ClanInfoDTO;
 import com.teamobi.mobiarmy2.dto.ClanMemDTO;
-import com.teamobi.mobiarmy2.json.ClanItemJson;
+import com.teamobi.mobiarmy2.model.ClanItem;
 
 import java.util.List;
 
 /**
  * @author tuyen
  */
-public interface IClanDao {
+public interface IClanDAO {
 
     Short getClanIcon(int clanId);
 
@@ -36,9 +36,9 @@ public interface IClanDao {
 
     List<ClanMemDTO> getClanMember(short clanId, byte page);
 
-    ClanItemJson[] getClanItems(short clanId);
+    ClanItem[] getClanItems(short clanId);
 
-    void updateClanItems(short clanId, ClanItemJson[] items);
+    void updateClanItems(short clanId, ClanItem[] items);
 
     short getCountClan();
 
