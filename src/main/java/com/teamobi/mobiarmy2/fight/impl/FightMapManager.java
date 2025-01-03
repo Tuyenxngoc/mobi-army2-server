@@ -1,7 +1,10 @@
 package com.teamobi.mobiarmy2.fight.impl;
 
 import com.teamobi.mobiarmy2.fight.*;
+import com.teamobi.mobiarmy2.model.Bullet;
 import com.teamobi.mobiarmy2.model.MapBrick;
+import com.teamobi.mobiarmy2.model.MapTile;
+import com.teamobi.mobiarmy2.model.Player;
 import com.teamobi.mobiarmy2.server.MapManager;
 import com.teamobi.mobiarmy2.util.Utils;
 

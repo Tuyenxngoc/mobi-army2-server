@@ -1,5 +1,8 @@
 package com.teamobi.mobiarmy2.fight;
 
+import com.teamobi.mobiarmy2.model.Bullet;
+import com.teamobi.mobiarmy2.model.MapTile;
+
 import java.util.List;
 
 /**
