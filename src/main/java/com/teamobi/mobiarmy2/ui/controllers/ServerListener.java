@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.server;
+package com.teamobi.mobiarmy2.ui.controllers;
 
 import com.teamobi.mobiarmy2.network.ISession;
 
