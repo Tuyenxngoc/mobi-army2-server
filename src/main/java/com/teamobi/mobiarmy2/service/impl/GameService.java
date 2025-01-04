@@ -60,7 +60,7 @@ public class GameService implements IGameService {
         equipmentDAO = new EquipmentDAO();
     }
 
-    public void setCacheMaps() {
+    private void setCacheMaps() {
         try (ByteArrayOutputStream bas = new ByteArrayOutputStream();
              DataOutputStream ds = new DataOutputStream(bas)) {
             Map<Byte, ArmyMap> sortedMaps = new TreeMap<>(MapManager.ARMY_MAPS);
@@ -90,7 +90,7 @@ public class GameService implements IGameService {
         }
     }
 
-    public void setCacheCharacters() {
+    private void setCacheCharacters() {
         try {
             ByteArrayOutputStream bas = new ByteArrayOutputStream();
             DataOutputStream ds = new DataOutputStream(bas);
@@ -157,7 +157,7 @@ public class GameService implements IGameService {
         }
     }
 
-    public void setCacheCaptionLevels() {
+    private void setCacheCaptionLevels() {
         try {
             ByteArrayOutputStream bas = new ByteArrayOutputStream();
             DataOutputStream ds = new DataOutputStream(bas);
@@ -179,7 +179,7 @@ public class GameService implements IGameService {
         }
     }
 
-    public void setCachePlayerImages() {
+    private void setCachePlayerImages() {
         try {
             TeamImageOutput tio = new TeamImageOutput();
             File playerDir = new File(GameConstants.PLAYER_PATH);
@@ -202,7 +202,7 @@ public class GameService implements IGameService {
         }
     }
 
-    public void setCacheMapIcons() {
+    private void setCacheMapIcons() {
         try {
             TeamImageOutput tio = new TeamImageOutput();
             File mapDir = new File(GameConstants.MAP_LOGO_PATH);

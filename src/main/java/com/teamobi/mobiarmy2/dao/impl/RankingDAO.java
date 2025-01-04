@@ -161,6 +161,7 @@ public class RankingDAO implements IRankingDAO {
 
     @Override
     public List<PlayerLeaderboardDTO> getWeeklyTopRichest() {
+        // language=SQL
         String query = "SELECT " +
                 "p.player_id, p.equipment_chest, SUM(t.amount) AS xu, " +
                 "pc.data, pc.character_id, pc.level, pc.xp, " +
@@ -181,6 +182,7 @@ public class RankingDAO implements IRankingDAO {
 
     @Override
     public void addBonusGift(int playerId, int quantity) {
+        // language=SQL
         String sql = "UPDATE players SET top_earnings_xu = ? WHERE player_id = ?";
         HikariCPManager.getInstance().update(sql, quantity, playerId);
     }

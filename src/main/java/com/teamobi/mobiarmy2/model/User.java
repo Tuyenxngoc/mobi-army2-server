@@ -35,8 +35,8 @@ public class User {
     public static Equipment[][] equipDefault;
     private ISession session;
     private UserState state;
-    private String userId;
-    private int playerId;
+    private String accountId;
+    private int userId;
     private String username;
     private Short clanId;
     private int xu;

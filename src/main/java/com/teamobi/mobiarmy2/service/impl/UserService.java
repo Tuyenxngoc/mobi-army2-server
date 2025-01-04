@@ -132,6 +132,14 @@ public class UserService implements IUserService {
             UserDTO userDTO = userDAO.findByAccountId(accountDTO.getAccountId());
 
             //Kiểm tra có đang đăng nhập hay không
+            User userLogin = serverManager.getUserByUserId(userDTO.getUserId());
+            if (userLogin != null) {
+                userLogin.getUserService().sendServerMessage2(GameString.ACCOUNT_OTHER_LOGIN);
+                userLogin.getSession().close();
+
+                sendMessageLoginFail(GameString.LOGIN_ANOTHER_DEVICE);
+                return;
+            }
 
             user.getSession().setVersion(version);
             user.setLogged(true);
@@ -164,10 +172,10 @@ public class UserService implements IUserService {
                 user.updateMission(16, 1);
 
                 //Lưu lại lần đăng nhập
-                userDAO.updateLastOnline(now, user.getPlayerId());
+                userDAO.updateLastOnline(now, user.getUserId());
             }
 
-            userDAO.updateOnline(true, accountDTO.getPlayerId());
+            userDAO.updateOnline(true, user.getUserId());
 
             sendLoginSuccess();
             IServerConfig config = serverManager.getConfig();
@@ -184,7 +192,7 @@ public class UserService implements IUserService {
     @Override
     public void handleLogout() {
         if (user.getState() == UserState.FIGHTING || user.getState() == UserState.WAIT_FIGHT) {
-            user.getFightWait().leaveTeam(user.getPlayerId());
+            user.getFightWait().leaveTeam(user.getUserId());
         }
 
         user.setLogged(false);
@@ -436,7 +444,7 @@ public class UserService implements IUserService {
         try {
             IMessage ms = new Message(Cmd.LOGIN_SUCESS);
             DataOutputStream ds = ms.writer();
-            ds.writeInt(user.getPlayerId());
+            ds.writeInt(user.getUserId());
             ds.writeInt(user.getXu());
             ds.writeInt(user.getLuong());
             ds.writeByte(user.getActiveCharacterId());
@@ -522,7 +530,7 @@ public class UserService implements IUserService {
                 //Update xu user
                 user.updateXu(-quantity);
                 //Update xu clan
-                ClanManager.getInstance().contributeClan(user.getClanId(), user.getPlayerId(), quantity, Boolean.TRUE);
+                ClanManager.getInstance().contributeClan(user.getClanId(), user.getUserId(), quantity, Boolean.TRUE);
                 sendServerMessage(GameString.CONTRIBUTION_SUCCESS);
             } else if (type == 1) {
                 if (quantity > user.getLuong()) {
@@ -531,7 +539,7 @@ public class UserService implements IUserService {
                 //Update lg user
                 user.updateLuong(-quantity);
                 //Update lg clan
-                ClanManager.getInstance().contributeClan(user.getClanId(), user.getPlayerId(), quantity, Boolean.FALSE);
+                ClanManager.getInstance().contributeClan(user.getClanId(), user.getUserId(), quantity, Boolean.FALSE);
                 sendServerMessage(GameString.CONTRIBUTION_SUCCESS);
             }
         } catch (IOException ignored) {
@@ -823,7 +831,7 @@ public class UserService implements IUserService {
                 return;
             }
 
-            clanManager.updateItemClan(user.getClanId(), user.getPlayerId(), clanItemShop, true);
+            clanManager.updateItemClan(user.getClanId(), user.getUserId(), clanItemShop, true);
         } else if (unit == 1) {//Luong
             if (clanItemShop.getLuong() < 0) {
                 return;
@@ -834,7 +842,7 @@ public class UserService implements IUserService {
                 return;
             }
 
-            clanManager.updateItemClan(user.getClanId(), user.getPlayerId(), clanItemShop, false);
+            clanManager.updateItemClan(user.getClanId(), user.getUserId(), clanItemShop, false);
         }
         sendServerMessage(GameString.PURCHASE_SUCCESS);
     }
@@ -1056,7 +1064,7 @@ public class UserService implements IUserService {
                 sendServerInfoToServer(GameString.createMessageFromSender(user.getUsername(), content));
                 return;
             }
-            User receiver = ServerManager.getInstance().getUserByPlayerId(playerId);
+            User receiver = ServerManager.getInstance().getUserByUserId(playerId);
             if (receiver == null) {
                 return;
             }
@@ -1104,7 +1112,7 @@ public class UserService implements IUserService {
             IMessage ms = new Message(Cmd.CHAT_TO);
             DataOutputStream ds = ms.writer();
             if (userSend != null) {
-                ds.writeInt(userSend.getPlayerId());
+                ds.writeInt(userSend.getUserId());
                 ds.writeUTF(userSend.getUsername());
             } else {
                 ds.writeInt(1);
@@ -1218,7 +1226,7 @@ public class UserService implements IUserService {
             if (message.isEmpty() || message.length() > 100) {
                 return;
             }
-            user.getFightWait().chatMessage(user.getPlayerId(), message);
+            user.getFightWait().chatMessage(user.getUserId(), message);
         } catch (IOException ignored) {
         }
     }
@@ -1227,7 +1235,7 @@ public class UserService implements IUserService {
     public void handleKickPlayer(IMessage ms) {
         try {
             int playerId = ms.reader().readInt();
-            user.getFightWait().kickPlayer(user.getPlayerId(), playerId);
+            user.getFightWait().kickPlayer(user.getUserId(), playerId);
         } catch (IOException ignored) {
         }
     }
@@ -1237,7 +1245,7 @@ public class UserService implements IUserService {
         if (user.getState() == UserState.WAITING) {
             return;
         }
-        user.getFightWait().leaveTeam(user.getPlayerId());
+        user.getFightWait().leaveTeam(user.getUserId());
         timeSinceLeftRoom = System.currentTimeMillis();
     }
 
@@ -1245,7 +1253,7 @@ public class UserService implements IUserService {
     public void setReady(IMessage ms) {
         try {
             boolean ready = ms.reader().readBoolean();
-            user.getFightWait().setReady(ready, user.getPlayerId());
+            user.getFightWait().setReady(ready, user.getUserId());
         } catch (IOException ignored) {
         }
     }
@@ -1512,7 +1520,7 @@ public class UserService implements IUserService {
             if (password.isEmpty() || password.length() > 10) {
                 return;
             }
-            user.getFightWait().setPassRoom(password, user.getPlayerId());
+            user.getFightWait().setPassRoom(password, user.getUserId());
         } catch (IOException ignored) {
         }
     }
@@ -1524,7 +1532,7 @@ public class UserService implements IUserService {
             if (xu < 0) {
                 return;
             }
-            user.getFightWait().setMoney(xu, user.getPlayerId());
+            user.getFightWait().setMoney(xu, user.getUserId());
         } catch (IOException ignored) {
         }
     }
@@ -1534,7 +1542,7 @@ public class UserService implements IUserService {
         if (user.getState() != UserState.WAIT_FIGHT) {
             return;
         }
-        user.getFightWait().startGame(user.getPlayerId());
+        user.getFightWait().startGame(user.getUserId());
     }
 
     @Override
@@ -1545,7 +1553,7 @@ public class UserService implements IUserService {
             short y = dis.readShort();
 
             if (user.getState() == UserState.FIGHTING) {
-                user.getFightWait().getFightManager().changeLocation(user.getPlayerId(), x, y);
+                user.getFightWait().getFightManager().changeLocation(user.getUserId(), x, y);
             } else if (user.getState() == UserState.TRAINING) {
                 user.getTrainingManager().changeLocation(x, y);
             }
@@ -1571,7 +1579,7 @@ public class UserService implements IUserService {
             }
             byte numShoot = dis.readByte();
 
-            user.getFightWait().getFightManager().addShoot(user.getPlayerId(), bullId, x, y, angle, force, force2, numShoot);
+            user.getFightWait().getFightManager().addShoot(user.getUserId(), bullId, x, y, angle, force, force2, numShoot);
         } catch (IOException ignored) {
         }
     }
@@ -1594,7 +1602,7 @@ public class UserService implements IUserService {
                     return;
                 }
             }
-            user.getFightWait().getFightManager().useItem(user.getPlayerId(), itemIndex);
+            user.getFightWait().getFightManager().useItem(user.getUserId(), itemIndex);
         } catch (IOException ignored) {
         }
     }
@@ -1699,7 +1707,7 @@ public class UserService implements IUserService {
             DataOutputStream ds = ms.writer();
 
             if (!user.getFriends().isEmpty()) {
-                List<FriendDTO> friends = userDAO.getFriendsList(user.getPlayerId(), user.getFriends());
+                List<FriendDTO> friends = userDAO.getFriendsList(user.getUserId(), user.getFriends());
                 for (FriendDTO friend : friends) {
                     ds.writeInt(friend.getId());
                     ds.writeUTF(friend.getName());
@@ -1771,7 +1779,7 @@ public class UserService implements IUserService {
         try {
             int playerId = ms.reader().readInt();
             User us = null;
-            if (playerId == user.getPlayerId()) {
+            if (playerId == user.getUserId()) {
                 us = user;
             } else if (user.isNotWaiting()) {
                 us = user.getFightWait().getUserByPlayerId(playerId);
@@ -1781,7 +1789,7 @@ public class UserService implements IUserService {
             if (us == null) {
                 ds.writeInt(-1);
             } else {
-                ds.writeInt(us.getPlayerId());
+                ds.writeInt(us.getUserId());
                 ds.writeUTF(us.getUsername());
                 ds.writeInt(us.getXu());
                 ds.writeByte(us.getCurrentLevel());
@@ -1825,7 +1833,7 @@ public class UserService implements IUserService {
 
     @Override
     public void skipTurn() {
-        user.getFightWait().getFightManager().skipTurn(user.getPlayerId());
+        user.getFightWait().getFightManager().skipTurn(user.getUserId());
     }
 
     @Override
@@ -1842,7 +1850,7 @@ public class UserService implements IUserService {
     public void handleSetFightWaitName(IMessage ms) {
         try {
             String name = ms.reader().readUTF().trim();
-            user.getFightWait().setRoomName(user.getPlayerId(), name);
+            user.getFightWait().setRoomName(user.getUserId(), name);
         } catch (IOException ignored) {
         }
     }
@@ -1851,7 +1859,7 @@ public class UserService implements IUserService {
     public void handleSetMaxPlayerFightWait(IMessage ms) {
         try {
             byte maxPlayers = ms.reader().readByte();
-            user.getFightWait().setMaxPlayers(user.getPlayerId(), maxPlayers);
+            user.getFightWait().setMaxPlayers(user.getUserId(), maxPlayers);
         } catch (IOException ignored) {
         }
     }
@@ -1870,7 +1878,7 @@ public class UserService implements IUserService {
                     items[i] = -1;
                 }
             }
-            user.getFightWait().setItems(user.getPlayerId(), items);
+            user.getFightWait().setItems(user.getUserId(), items);
         } catch (IOException ignored) {
         }
     }
@@ -1886,7 +1894,7 @@ public class UserService implements IUserService {
 
             ms = new Message(Cmd.CHOOSE_GUN);
             DataOutputStream ds = ms.writer();
-            ds.writeInt(user.getPlayerId());
+            ds.writeInt(user.getUserId());
             ds.writeByte(characterId);
             ds.flush();
             sendMessage(ms);
@@ -1993,8 +2001,8 @@ public class UserService implements IUserService {
                 user.updateLuong(-characterEntry.getPriceLuong());
             }
 
-            if (userDAO.createPlayerCharacter(user.getPlayerId(), index)) {
-                PlayerCharacterDTO character = userDAO.getPlayerCharacter(user.getPlayerId(), index);
+            if (userDAO.createPlayerCharacter(user.getUserId(), index)) {
+                PlayerCharacterDTO character = userDAO.getPlayerCharacter(user.getUserId(), index);
                 if (character != null) {
                     user.getLevels()[index] = character.getLevel();
                     user.getXps()[index] = character.getXp();
@@ -2019,7 +2027,7 @@ public class UserService implements IUserService {
     public void handleSelectMap(IMessage ms) {
         try {
             byte mapId = ms.reader().readByte();
-            user.getFightWait().setMap(user.getPlayerId(), mapId);
+            user.getFightWait().setMap(user.getUserId(), mapId);
         } catch (IOException ignored) {
         }
     }
@@ -2042,7 +2050,7 @@ public class UserService implements IUserService {
     }
 
     private void handleGiftCode(String code) {
-        GiftCodeDTO giftCode = giftCodeDAO.getGiftCode(code, user.getPlayerId());
+        GiftCodeDTO giftCode = giftCodeDAO.getGiftCode(code, user.getUserId());
         if (giftCode == null) {
             sendServerMessage(GameString.GIFT_CODE_INVALID);
             return;
@@ -2062,7 +2070,7 @@ public class UserService implements IUserService {
         }
 
         giftCodeDAO.decrementGiftCodeUsageLimit(giftCode.getId());
-        giftCodeDAO.logGiftCodeRedemption(giftCode.getId(), user.getPlayerId());
+        giftCodeDAO.logGiftCodeRedemption(giftCode.getId(), user.getUserId());
 
         if (giftCode.getXu() > 0) {
             user.updateXu(giftCode.getXu());
@@ -2113,7 +2121,7 @@ public class UserService implements IUserService {
             DataInputStream dis = ms.reader();
             boolean find = dis.readBoolean();
             if (find) {
-                user.getFightWait().findPlayer(user.getPlayerId());
+                user.getFightWait().findPlayer(user.getUserId());
             } else {
                 int playerId = dis.readInt();
                 user.getFightWait().inviteToRoom(playerId);
@@ -2150,12 +2158,12 @@ public class UserService implements IUserService {
                 return;
             }
 
-            if (!userDAO.existsByUserIdAndPassword(user.getUserId(), oldPass)) {
+            if (!userDAO.existsByUserIdAndPassword(user.getAccountId(), oldPass)) {
                 sendServerMessage(GameString.PASSWORD_INCORRECT_OLD);
                 return;
             }
 
-            userDAO.changePassword(user.getUserId(), newPass);
+            userDAO.changePassword(user.getAccountId(), newPass);
             sendServerMessage(GameString.PASSWORD_CHANGE_SUCCESS);
         } catch (IOException ignored) {
         }

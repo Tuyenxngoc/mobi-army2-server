@@ -30,7 +30,9 @@ public class UserDAO implements IUserDAO {
 
     @Override
     public void save(User user) {
-        HikariCPManager.getInstance().update("INSERT INTO `players`(`user_id`, `xu`, `luong`) VALUES (?,?,?)", user.getUserId(), user.getXu(), user.getLuong());
+        // language=SQL
+        String sql = "INSERT INTO `players`(`user_id`, `xu`, `luong`) VALUES (?,?,?)";
+        HikariCPManager.getInstance().update(sql, user.getAccountId(), user.getXu(), user.getLuong());
     }
 
     public static String convertSpecialItemChestEntriesToJson(List<SpecialItemChest> specialItemChestEntries) {
@@ -69,6 +71,7 @@ public class UserDAO implements IUserDAO {
         String specialItemChestJson = convertSpecialItemChestEntriesToJson(user.getSpecialItemChest());
         String equipmentChestJson = convertEquipmentChestEntriesToJson(user.getEquipmentChest());
 
+        // language=SQL
         String sql = "UPDATE `players` SET " +
                 "`friends` = ?, " +
                 "`xu` = ?, " +
@@ -108,10 +111,11 @@ public class UserDAO implements IUserDAO {
                 user.getXpX2Time(),
                 user.getPointEvent(),
                 //...//
-                user.getPlayerId());
+                user.getUserId());
 
         for (int i = 0; i < user.getOwnedCharacters().length; i++) {
             if (user.getOwnedCharacters()[i]) {
+                // language=SQL
                 String sqlUpdateCharacter =
                         "UPDATE player_characters SET level = ?, points = ?, xp = ?, data = ?, additional_points = ? " +
                                 "WHERE player_id = ? AND character_id = ?";
@@ -122,7 +126,7 @@ public class UserDAO implements IUserDAO {
                         user.getXps()[i],
                         Arrays.toString(user.getEquipData()[i]),
                         Arrays.toString(user.getAddedPoints()[i]),
-                        user.getPlayerId(),
+                        user.getUserId(),
                         i
                 );
             }
@@ -157,9 +161,10 @@ public class UserDAO implements IUserDAO {
     }
 
     @Override
-    public void updateOnline(boolean flag, int playerId) {
-        String sql = "UPDATE `players` SET `is_online` = ? WHERE player_id = ?";
-        HikariCPManager.getInstance().update(sql, flag, playerId);
+    public void updateOnline(boolean flag, int userId) {
+        // language=SQL
+        String sql = "UPDATE `users` SET `is_online` = ? WHERE user_id = ?";
+        HikariCPManager.getInstance().update(sql, flag, userId);
     }
 
     @Override
@@ -242,6 +247,7 @@ public class UserDAO implements IUserDAO {
     @Override
     public void changePassword(String userId, String newPass) {
         String hashedPassword = BCrypt.hashpw(newPass, BCrypt.gensalt());
+        // language=SQL
         String sql = "UPDATE `user` SET `password` = ? WHERE user_id = ?";
         HikariCPManager.getInstance().update(sql, hashedPassword, userId);
     }
@@ -264,12 +270,14 @@ public class UserDAO implements IUserDAO {
 
     @Override
     public void updateLastOnline(LocalDateTime time, int playerId) {
+        // language=SQL
         String sql = "UPDATE `players` SET `last_online` = ? WHERE player_id = ?";
         HikariCPManager.getInstance().update(sql, time.toString(), playerId);
     }
 
     @Override
     public boolean createPlayerCharacter(int playerId, byte characterId) {
+        // language=SQL
         Optional<Integer> result = HikariCPManager.getInstance().update("INSERT INTO `player_characters`(`player_id`, `character_id`) VALUES (?,?)", playerId, characterId);
         return result.isPresent();
     }
@@ -304,6 +312,7 @@ public class UserDAO implements IUserDAO {
 
     @Override
     public void createTransaction(TransactionType type, int amount, int playerId) {
+        // language=SQL
         HikariCPManager.getInstance().update("INSERT INTO `transactions`(`transaction_type`, `amount`, `transaction_date`, `player_id`) values (?,?,?,?)", type, amount, LocalDateTime.now(), playerId);
     }
 

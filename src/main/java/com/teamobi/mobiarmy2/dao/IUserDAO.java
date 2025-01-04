@@ -20,9 +20,9 @@ public interface IUserDAO {
 
     UserDTO findByAccountId(String accountId);
 
-    void updateOnline(boolean flag, int playerId);
+    void updateOnline(boolean flag, int userId);
 
-    List<FriendDTO> getFriendsList(int playerId, List<Integer> friends);
+    List<FriendDTO> getFriendsList(int userId, List<Integer> friends);
 
     boolean existsByUserIdAndPassword(String userId, String oldPass);
 
@@ -30,12 +30,12 @@ public interface IUserDAO {
 
     Integer findPlayerIdByUsername(String username);
 
-    void updateLastOnline(LocalDateTime time, int playerId);
+    void updateLastOnline(LocalDateTime time, int userId);
 
-    boolean createPlayerCharacter(int playerId, byte characterId);
+    boolean createPlayerCharacter(int userId, byte characterId);
 
-    PlayerCharacterDTO getPlayerCharacter(int playerId, byte characterId);
+    PlayerCharacterDTO getPlayerCharacter(int userId, byte characterId);
 
-    void createTransaction(TransactionType type, int amount, int playerId);
+    void createTransaction(TransactionType type, int amount, int userId);
 
 }

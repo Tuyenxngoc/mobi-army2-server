@@ -57,16 +57,16 @@ public class GiftCodeDAO implements IGiftCodeDAO {
 
     @Override
     public void decrementGiftCodeUsageLimit(long giftCodeId) {
+        // language=SQL
         String sql = "UPDATE gift_codes SET usage_limit = usage_limit - 1 WHERE gift_code_id = ?";
         HikariCPManager.getInstance().update(sql, giftCodeId);
-
     }
 
     @Override
     public void logGiftCodeRedemption(long giftCodeId, int playerId) {
+        // language=SQL
         String sql = "INSERT INTO player_gift_codes (redeem_time, gift_code_id, player_id) VALUES (?, ?, ?)";
         HikariCPManager.getInstance().update(sql, LocalDateTime.now(), giftCodeId, playerId);
-
     }
 
 }

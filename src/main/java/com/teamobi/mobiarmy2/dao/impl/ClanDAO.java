@@ -145,18 +145,21 @@ public class ClanDAO implements IClanDAO {
 
     @Override
     public void updateXu(int clanId, int xu) {
+        // language=SQL
         String sql = "UPDATE clans SET xu = xu + ? WHERE clan_id = ?";
         HikariCPManager.getInstance().update(sql, xu, clanId);
     }
 
     @Override
     public void updateLuong(int clanId, int luong) {
+        // language=SQL
         String sql = "UPDATE clans SET luong = luong + ? WHERE clan_id = ?";
         HikariCPManager.getInstance().update(sql, luong, clanId);
     }
 
     @Override
     public void gopClanContribute(String txtContribute, int playerId, int xu, int luong) {
+        // language=SQL
         String sql = "UPDATE `clan_members` SET " +
                 "`contribute_count` = `contribute_count` + 1, " +
                 "`contribute_time` = ?, " +
@@ -344,6 +347,7 @@ public class ClanDAO implements IClanDAO {
 
     @Override
     public void updateClanItems(short clanId, ClanItem[] items) {
+        // language=SQL
         String sql = "UPDATE clans SET item = ? WHERE clan_id = ?";
         HikariCPManager.getInstance().update(sql, GsonUtil.getInstance().toJson(items), clanId);
     }
@@ -415,6 +419,7 @@ public class ClanDAO implements IClanDAO {
 
     @Override
     public void updateXp(short clanId, int playerId, int xp, int level) {
+        // language=SQL
         String sql = "UPDATE clans c " +
                 "JOIN clan_members cm ON c.clan_id = cm.clan_id " +
                 "SET c.xp = ?, c.level = ? " +
@@ -424,6 +429,7 @@ public class ClanDAO implements IClanDAO {
 
     @Override
     public void updateCup(short clanId, int playerId, int cup) {
+        // language=SQL
         String sql = "UPDATE clans c " +
                 "JOIN clan_members cm ON c.clan_id = cm.clan_id " +
                 "SET c.cup = ? " +
@@ -433,6 +439,7 @@ public class ClanDAO implements IClanDAO {
 
     @Override
     public void updateClanMemberPoints(int playerId, int point) {
+        // language=SQL
         String sql = "UPDATE clan_members SET clan_point = clan_point + ? WHERE player_id = ?";
         HikariCPManager.getInstance().update(sql, point, playerId);
     }
