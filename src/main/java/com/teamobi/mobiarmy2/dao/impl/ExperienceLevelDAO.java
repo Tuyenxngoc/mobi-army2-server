@@ -14,7 +14,7 @@ import java.sql.Statement;
 public class ExperienceLevelDAO implements IExperienceLevelDAO {
 
     @Override
-    public void getAllXpData() {
+    public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT exp_user, exp_clan, level FROM `experience_levels` ORDER BY level")) {

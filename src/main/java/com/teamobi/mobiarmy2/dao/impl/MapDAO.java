@@ -15,7 +15,7 @@ import java.sql.Statement;
 public class MapDAO implements IMapDAO {
 
     @Override
-    public void loadMapData() {
+    public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
 

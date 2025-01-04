@@ -13,7 +13,7 @@ import java.sql.Statement;
 public class MissionDAO implements IMissionDAO {
 
     @Override
-    public void getAllMissions() {
+    public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `missions` ORDER BY mission_type, level")) {

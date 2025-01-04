@@ -13,7 +13,7 @@ import java.sql.Statement;
 public class PaymentDAO implements IPaymentDAO {
 
     @Override
-    public void getAllPayment() {
+    public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `payments`")) {

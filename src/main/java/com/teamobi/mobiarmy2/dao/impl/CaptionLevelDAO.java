@@ -13,7 +13,7 @@ import java.sql.Statement;
 public class CaptionLevelDAO implements ICaptionLevelDAO {
 
     @Override
-    public void getAllCaptionLevel() {
+    public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
 

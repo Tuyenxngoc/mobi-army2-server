@@ -13,7 +13,7 @@ import java.sql.Statement;
 public class FightItemDAO implements IFightItemDAO {
 
     @Override
-    public void getAllItem() {
+    public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
 

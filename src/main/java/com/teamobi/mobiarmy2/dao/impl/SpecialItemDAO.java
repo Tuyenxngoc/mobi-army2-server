@@ -15,7 +15,7 @@ import java.sql.Statement;
 public class SpecialItemDAO implements ISpecialItemDAO {
 
     @Override
-    public void getAllSpecialItem() {
+    public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `special_items`")) {

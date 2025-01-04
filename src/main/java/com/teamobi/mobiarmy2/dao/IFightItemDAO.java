@@ -1,5 +1,5 @@
 package com.teamobi.mobiarmy2.dao;
 
 public interface IFightItemDAO {
-    void getAllItem();
+    void loadAll();
 }

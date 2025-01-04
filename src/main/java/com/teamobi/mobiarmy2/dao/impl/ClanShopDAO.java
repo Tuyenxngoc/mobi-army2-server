@@ -13,7 +13,7 @@ import java.sql.Statement;
 public class ClanShopDAO implements IClanShopDAO {
 
     @Override
-    public void getAllItemClan() {
+    public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
 

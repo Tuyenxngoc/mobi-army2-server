@@ -16,7 +16,7 @@ import java.sql.Statement;
 public class CharacterDAO implements ICharacterDAO {
 
     @Override
-    public void getAllCharacterData() {
+    public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
 

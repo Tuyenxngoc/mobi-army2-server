@@ -19,7 +19,7 @@ import java.sql.Statement;
 public class FabricateItemDAO implements IFabricateItemDAO {
 
     @Override
-    public void getAllFabricateItems() {
+    public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `fabricate_items`")) {

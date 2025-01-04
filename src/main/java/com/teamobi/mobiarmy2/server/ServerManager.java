@@ -4,7 +4,6 @@ import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.config.impl.ServerConfig;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
-import com.teamobi.mobiarmy2.model.Room;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.ISession;
@@ -33,7 +32,6 @@ public class ServerManager {
     private long countClients;
     private boolean isStart;
     private boolean isMaintenanceMode;
-    private Room[] rooms;
     private final ArrayList<ISession> sessions;
     private final List<ServerListener> listeners;
 
@@ -48,10 +46,6 @@ public class ServerManager {
 
     public IServerConfig getConfig() {
         return config;
-    }
-
-    public Room[] getRooms() {
-        return rooms;
     }
 
     public boolean isMaintenanceMode() {
@@ -71,73 +65,9 @@ public class ServerManager {
     }
 
     public void init() {
-        initServerData();
-        setCache();
-        initRooms();
-        initRankings();
-    }
-
-    private void initServerData() {
-        gameService.getMapData();
-        gameService.getCharacterData();
-        gameService.getEquipData();
-        gameService.setCaptionLevelData();
-        gameService.getItemData();
-        gameService.getClanShopData();
-        gameService.getSpecialItemData();
-        gameService.getFormulaData();
-        gameService.getPaymentData();
-        gameService.getMissionData();
-        gameService.getLvXpData();
-        gameService.getFabricateItemData();
-    }
-
-    private void setCache() {
-        gameService.setCacheMaps();
-        gameService.setCacheCharacters();
-        gameService.setCacheCaptionLevels();
-        gameService.setCachePlayerImages();
-        gameService.setCacheMapIcons();
-    }
-
-    private void initRooms() {
-        byte[] roomQuantities = config.getRoomQuantity();
-        int totalRooms = 0;
-
-        for (int quantity : roomQuantities) {
-            totalRooms += quantity;
-        }
-
-        rooms = new Room[totalRooms];
-        byte index = 0;
-
-        for (byte type = 0; type < roomQuantities.length; type++) {
-            int minXu = config.getRoomMinXu()[type];
-            int maxXu = config.getRoomMaxXu()[type];
-            byte minMap = config.getRoomMinMap()[type];
-            byte maxMap = config.getRoomMaxMap()[type];
-            byte numArea = config.getNumArea();
-            byte maxPlayerFight = config.getMaxPlayerFight();
-            byte numPlayerInitRoom = config.getNumPlayerInitRoom();
-            byte roomIconType = config.getRoomIconType();
-
-            for (byte roomCount = 0; roomCount < roomQuantities[type]; roomCount++) {
-                byte[] mapCanSelected = null;
-                boolean isContinuous = false;
-                if (type == 5) {
-                    mapCanSelected = config.getBossRoomMapLimit()[roomCount];
-                    if (roomCount == 9) {
-                        isContinuous = true;
-                    }
-                }
-
-                rooms[index] = new Room(index, type, minXu, maxXu, minMap, maxMap, mapCanSelected, isContinuous, numArea, maxPlayerFight, numPlayerInitRoom, roomIconType);
-                index++;
-            }
-        }
-    }
-
-    private void initRankings() {
+        gameService.loadServerData();
+        gameService.setCache();
+        RoomManager.getInstance().init();
         LeaderboardManager.getInstance().init();
     }
 

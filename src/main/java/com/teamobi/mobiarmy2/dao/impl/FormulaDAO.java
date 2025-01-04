@@ -20,7 +20,7 @@ import java.sql.Statement;
 public class FormulaDAO implements IFormulaDAO {
 
     @Override
-    public void getAllFormula() {
+    public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
 

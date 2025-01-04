@@ -1122,11 +1122,11 @@ public class UserService implements IUserService {
         if (user.isNotWaiting()) {
             return;
         }
-        ServerManager server = ServerManager.getInstance();
+        RoomManager roomManager = RoomManager.getInstance();
         try {
             IMessage ms = new Message(Cmd.ROOM_LIST);
             DataOutputStream ds = ms.writer();
-            for (Room room : server.getRooms()) {
+            for (Room room : roomManager.getRooms()) {
                 ds.writeByte(room.getIndex());
                 ds.writeByte(room.getStatus());
                 ds.writeByte(room.getFightWaitsAvailable());
@@ -1143,7 +1143,7 @@ public class UserService implements IUserService {
         if (user.isNotWaiting()) {
             return;
         }
-        Room[] rooms = ServerManager.getInstance().getRooms();
+        Room[] rooms = RoomManager.getInstance().getRooms();
         try {
             byte roomNumber = ms.reader().readByte();
             if (roomNumber < 0 || roomNumber >= rooms.length) {
@@ -1188,7 +1188,7 @@ public class UserService implements IUserService {
             return;
         }
 
-        Room[] rooms = ServerManager.getInstance().getRooms();
+        Room[] rooms = RoomManager.getInstance().getRooms();
         try {
             DataInputStream dis = ms.reader();
             byte roomNumber = dis.readByte();
@@ -1602,7 +1602,7 @@ public class UserService implements IUserService {
     @Override
     public void handleJoinAnyBoard(IMessage ms) {
         ServerManager server = ServerManager.getInstance();
-        Room[] rooms = server.getRooms();
+        Room[] rooms = RoomManager.getInstance().getRooms();
         IFightWait fightWait = null;
         try {
             int type = ms.reader().readByte();

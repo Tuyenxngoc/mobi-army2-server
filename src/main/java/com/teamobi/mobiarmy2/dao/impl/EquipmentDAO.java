@@ -16,7 +16,7 @@ import java.sql.Statement;
 public class EquipmentDAO implements IEquipmentDAO {
 
     @Override
-    public void getAllEquip() {
+    public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
 
