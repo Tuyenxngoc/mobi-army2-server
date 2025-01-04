@@ -1,7 +1,8 @@
 package com.teamobi.mobiarmy2.service.impl;
 
 import com.teamobi.mobiarmy2.constant.GameConstants;
-import com.teamobi.mobiarmy2.dao.IGameDAO;
+import com.teamobi.mobiarmy2.dao.*;
+import com.teamobi.mobiarmy2.dao.impl.*;
 import com.teamobi.mobiarmy2.model.ArmyMap;
 import com.teamobi.mobiarmy2.model.Caption;
 import com.teamobi.mobiarmy2.model.Character;
@@ -27,10 +28,34 @@ import java.util.TreeMap;
 public class GameService implements IGameService {
     private static final Logger logger = LoggerFactory.getLogger(GameService.class);
 
-    private final IGameDAO gameDao;
+    private final IMapDAO mapDAO;
+    private final ICaptionLevelDAO captionLevelDAO;
+    private final ICharacterDAO characterDAO;
+    private final IClanDAO clanDAO;
+    private final IClanShopDAO clanShopDAO;
+    private final IExperienceLevelDAO experienceLevelDAO;
+    private final IFabricateItemDAO fabricateItemDAO;
+    private final IFightItemDAO fightItemDAO;
+    private final IFormulaDAO formulaDAO;
+    private final IMissionDAO missionDAO;
+    private final IPaymentDAO paymentDAO;
+    private final ISpecialItemDAO specialItemDAO;
+    private final IEquipmentDAO equipmentDAO;
 
-    public GameService(IGameDAO gameDao) {
-        this.gameDao = gameDao;
+    public GameService() {
+        mapDAO = new MapDAO();
+        captionLevelDAO = new CaptionLevelDAO();
+        characterDAO = new CharacterDAO();
+        clanDAO = new ClanDAO();
+        clanShopDAO = new ClanShopDAO();
+        experienceLevelDAO = new ExperienceLevelDAO();
+        fabricateItemDAO = new FabricateItemDAO();
+        fightItemDAO = new FightItemDAO();
+        formulaDAO = new FormulaDAO();
+        missionDAO = new MissionDAO();
+        paymentDAO = new PaymentDAO();
+        specialItemDAO = new SpecialItemDAO();
+        equipmentDAO = new EquipmentDAO();
     }
 
     @Override
@@ -205,74 +230,74 @@ public class GameService implements IGameService {
 
     @Override
     public void getFormulaData() {
-        gameDao.getAllFormula();
+        formulaDAO.getAllFormula();
         logger.info("Loaded {} formula entries successfully.", FormulaManager.FORMULA.size());
     }
 
     @Override
     public void getPaymentData() {
-        gameDao.getAllPayment();
+        paymentDAO.getAllPayment();
         logger.info("Loaded {} payment entries successfully.", PaymentManager.PAYMENT_MAP.size());
     }
 
     @Override
     public void getMissionData() {
-        gameDao.getAllMissions();
+        missionDAO.getAllMissions();
         logger.info("Loaded {} mission entries successfully.", MissionManager.MISSION_LIST.size());
     }
 
     @Override
     public void getMapData() {
-        gameDao.getAllMapData();
+        mapDAO.loadMapData();
         logger.info("Loaded {} map entries successfully.", MapManager.ARMY_MAPS.size());
     }
 
     @Override
     public void getCharacterData() {
-        gameDao.getAllCharacterData();
+        characterDAO.getAllCharacterData();
         logger.info("Loaded {} character entries successfully.", CharacterManager.CHARACTERS.size());
     }
 
     @Override
     public void getEquipData() {
-        gameDao.getAllEquip();
+        equipmentDAO.getAllEquip();
         logger.info("Loaded {} equipment entries successfully.", CharacterManager.EQUIPMENTS.size());
     }
 
     @Override
     public void getLvXpData() {
-        gameDao.getAllXpData();
+        experienceLevelDAO.getAllXpData();
         logger.info("Loaded {} player XP entries successfully.", PlayerXpManager.LEVEL_XP_REQUIRED_LIST.size());
         logger.info("Loaded {} clan XP entries successfully.", ClanXpManager.LEVEL_XP_REQUIRED_LIST.size());
     }
 
     @Override
     public void getFabricateItemData() {
-        gameDao.getAllFabricateItems();
+        fabricateItemDAO.getAllFabricateItems();
         logger.info("Loaded {} fabricate items successfully.", FabricateItemManager.FABRICATE_ITEMS.size());
     }
 
     @Override
     public void setCaptionLevelData() {
-        gameDao.getAllCaptionLevel();
+        captionLevelDAO.getAllCaptionLevel();
         logger.info("Loaded {} caption level entries successfully.", CaptionManager.CAPTIONS.size());
     }
 
     @Override
     public void getItemData() {
-        gameDao.getAllItem();
+        fightItemDAO.getAllItem();
         logger.info("Loaded {} fight item entries successfully.", FightItemManager.FIGHT_ITEMS.size());
     }
 
     @Override
     public void getClanShopData() {
-        gameDao.getAllItemClan();
+        clanShopDAO.getAllItemClan();
         logger.info("Loaded {} clan shop items successfully.", ClanItemManager.CLAN_ITEM_MAP.size());
     }
 
     @Override
     public void getSpecialItemData() {
-        gameDao.getAllSpecialItem();
+        specialItemDAO.getAllSpecialItem();
         logger.info("Loaded {} special items successfully.", SpecialItemManager.getSpecialItems().size());
     }
 }

@@ -1,11 +1,12 @@
 package com.teamobi.mobiarmy2.model.bullet;
 
-import com.teamobi.mobiarmy2.fight.*;
-import com.teamobi.mobiarmy2.model.boss.SmallBoom;
+import com.teamobi.mobiarmy2.fight.IFightManager;
+import com.teamobi.mobiarmy2.fight.IFightMapManager;
 import com.teamobi.mobiarmy2.fight.impl.BulletManager;
 import com.teamobi.mobiarmy2.model.Boss;
 import com.teamobi.mobiarmy2.model.Bullet;
 import com.teamobi.mobiarmy2.model.Player;
+import com.teamobi.mobiarmy2.model.boss.SmallBoom;
 
 public class SmallBoomAdd extends Bullet {
 

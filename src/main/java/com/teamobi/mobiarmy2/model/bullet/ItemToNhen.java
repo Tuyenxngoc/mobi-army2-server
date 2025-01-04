@@ -1,10 +1,10 @@
 package com.teamobi.mobiarmy2.model.bullet;
 
+import com.teamobi.mobiarmy2.fight.impl.BulletManager;
 import com.teamobi.mobiarmy2.model.Bullet;
-import com.teamobi.mobiarmy2.server.EffectManager;
 import com.teamobi.mobiarmy2.model.MapTile;
 import com.teamobi.mobiarmy2.model.Player;
-import com.teamobi.mobiarmy2.fight.impl.BulletManager;
+import com.teamobi.mobiarmy2.server.EffectManager;
 
 public class ItemToNhen extends Bullet {
 

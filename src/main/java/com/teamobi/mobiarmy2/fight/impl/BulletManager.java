@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.fight.impl;
 
-import com.teamobi.mobiarmy2.fight.*;
+import com.teamobi.mobiarmy2.fight.IBulletManager;
+import com.teamobi.mobiarmy2.fight.IFightManager;
 import com.teamobi.mobiarmy2.model.Boss;
 import com.teamobi.mobiarmy2.model.Bullet;
 import com.teamobi.mobiarmy2.model.Player;

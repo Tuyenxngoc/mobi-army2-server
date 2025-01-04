@@ -1,8 +1,8 @@
 package com.teamobi.mobiarmy2.model.bullet;
 
+import com.teamobi.mobiarmy2.fight.impl.BulletManager;
 import com.teamobi.mobiarmy2.model.Bullet;
 import com.teamobi.mobiarmy2.model.Player;
-import com.teamobi.mobiarmy2.fight.impl.BulletManager;
 import com.teamobi.mobiarmy2.util.Utils;
 
 public class ApaBullet extends Bullet {

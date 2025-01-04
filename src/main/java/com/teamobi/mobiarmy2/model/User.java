@@ -72,14 +72,10 @@ public class User {
     private final IGiftBoxManager giftBoxManager;
     private int topEarningsXu;
 
-    public User() {
+    public User(ISession session) {
         this.state = UserState.WAITING;
         this.userService = new UserService(this);
         this.giftBoxManager = new GiftBoxManager(this);
-    }
-
-    public User(ISession session) {
-        this();
         this.session = session;
     }
 

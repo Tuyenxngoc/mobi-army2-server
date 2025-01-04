@@ -2,8 +2,10 @@ package com.teamobi.mobiarmy2.service.impl;
 
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.constant.*;
+import com.teamobi.mobiarmy2.dao.IAccountDAO;
 import com.teamobi.mobiarmy2.dao.IGiftCodeDAO;
 import com.teamobi.mobiarmy2.dao.IUserDAO;
+import com.teamobi.mobiarmy2.dao.impl.AccountDAO;
 import com.teamobi.mobiarmy2.dao.impl.GiftCodeDAO;
 import com.teamobi.mobiarmy2.dao.impl.UserDAO;
 import com.teamobi.mobiarmy2.dto.*;
@@ -32,8 +34,9 @@ public class UserService implements IUserService {
     private static final int minimumWaitTime = 5000;
 
     private final User user;
-    private final IUserDAO userDao;
-    private final IGiftCodeDAO giftCodeDao;
+    private final IUserDAO userDAO;
+    private final IAccountDAO accountDAO;
+    private final IGiftCodeDAO giftCodeDAO;
 
     private UserAction userAction;
     private int totalTransactionAmount;
@@ -46,8 +49,9 @@ public class UserService implements IUserService {
 
     public UserService(User user) {
         this.user = user;
-        this.userDao = new UserDAO();
-        this.giftCodeDao = new GiftCodeDAO();
+        this.userDAO = new UserDAO();
+        this.accountDAO = new AccountDAO();
+        this.giftCodeDAO = new GiftCodeDAO();
     }
 
     private List<EquipmentChest> getSelectedEquips() {
@@ -111,31 +115,24 @@ public class UserService implements IUserService {
                 return;
             }
 
-            UserDTO userFound = userDao.findByUsernameAndPassword(username, password);
-            if (userFound == null) {
+            AccountDTO accountDTO = accountDAO.findByUsernameAndPassword(username, password);
+            if (accountDTO == null) {
                 sendMessageLoginFail(GameString.LOGIN_FAILED);
                 return;
             }
-            if (userFound.isLock()) {
+            if (accountDTO.isLock()) {
                 sendMessageLoginFail(GameString.ACCOUNT_LOCKED);
                 return;
             }
-            if (!userFound.isActive()) {
+            if (!accountDTO.isActive()) {
                 sendMessageLoginFail(GameString.ACCOUNT_INACTIVE);
                 return;
             }
 
+            UserDTO userDTO = userDAO.findByAccountId(accountDTO.getAccountId());
+
             //Kiểm tra có đang đăng nhập hay không
-            User userLogin = serverManager.getUserByPlayerId(userFound.getPlayerId());
-            if (userLogin != null) {
-                userLogin.getUserService().sendServerMessage2(GameString.ACCOUNT_OTHER_LOGIN);
-                userLogin.getSession().close();
 
-                sendMessageLoginFail(GameString.LOGIN_ANOTHER_DEVICE);
-                return;
-            }
-
-            copyUserData(user, userFound);//todo
             user.getSession().setVersion(version);
             user.setLogged(true);
 
@@ -167,10 +164,10 @@ public class UserService implements IUserService {
                 user.updateMission(16, 1);
 
                 //Lưu lại lần đăng nhập
-                userDao.updateLastOnline(now, user.getPlayerId());
+                userDAO.updateLastOnline(now, user.getPlayerId());
             }
 
-            userDao.updateOnline(true, userFound.getPlayerId());
+            userDAO.updateOnline(true, accountDTO.getPlayerId());
 
             sendLoginSuccess();
             IServerConfig config = serverManager.getConfig();
@@ -184,40 +181,6 @@ public class UserService implements IUserService {
         }
     }
 
-    private void copyUserData(User target, UserDTO source) {
-        target.setUserId(source.getUserId());
-        target.setPlayerId(source.getPlayerId());
-        target.setUsername(source.getUsername());
-        target.setXu(source.getXu());
-        target.setLuong(source.getLuong());
-        target.setCup(source.getCup());
-        target.setPointEvent(source.getPointEvent());
-        target.setClanId(source.getClanId());
-        target.setLevels(source.getLevels());
-        target.setLevelPercents(source.getLevelPercents());
-        target.setActiveCharacterId(source.getActiveCharacterId());
-        target.setPlayerCharacterIds(source.getPlayerCharacterIds());
-        target.setOwnedCharacters(source.getOwnedCharacters());
-        target.setXps(source.getXps());
-        target.setPoints(source.getPoints());
-        target.setAddedPoints(source.getAddedPoints());
-        target.setEquipData(source.getEquipData());
-        target.setCharacterEquips(source.getCharacterEquips());
-        target.setFriends(source.getFriends());
-        target.setMission(source.getMission());
-        target.setMissionLevel(source.getMissionLevel());
-        target.setSpecialItemChest(source.getSpecialItemChest());
-        target.setEquipmentChest(new ArrayList<>(source.getEquipmentChest().values()));
-        target.setItems(source.getItems());
-        target.setXpX2Time(source.getXpX2Time());
-        target.setLastOnline(source.getLastOnline());
-        target.setTopEarningsXu(source.getTopEarningsXu());
-        target.setMaterialsPurchased(source.getMaterialsPurchased());
-        target.setEquipmentPurchased(source.getEquipmentPurchased());
-        target.setChestLocked(source.isChestLocked());
-        target.setInvitationLocked(source.isInvitationLocked());
-    }
-
     @Override
     public void handleLogout() {
         if (user.getState() == UserState.FIGHTING || user.getState() == UserState.WAIT_FIGHT) {
@@ -225,7 +188,7 @@ public class UserService implements IUserService {
         }
 
         user.setLogged(false);
-        userDao.update(user);
+        userDAO.update(user);
     }
 
     public void sendCharacterData(IServerConfig config) {
@@ -1736,7 +1699,7 @@ public class UserService implements IUserService {
             DataOutputStream ds = ms.writer();
 
             if (!user.getFriends().isEmpty()) {
-                List<FriendDTO> friends = userDao.getFriendsList(user.getPlayerId(), user.getFriends());
+                List<FriendDTO> friends = userDAO.getFriendsList(user.getPlayerId(), user.getFriends());
                 for (FriendDTO friend : friends) {
                     ds.writeInt(friend.getId());
                     ds.writeUTF(friend.getName());
@@ -1847,7 +1810,7 @@ public class UserService implements IUserService {
                 sendMessageLoginFail(GameString.FRIEND_ADD_INVALID_NAME);
                 return;
             }
-            Integer id = userDao.findPlayerIdByUsername(username);
+            Integer id = userDAO.findPlayerIdByUsername(username);
             ms = new Message(Cmd.SEARCH);
             DataOutputStream ds = ms.writer();
             if (id != null) {
@@ -2030,8 +1993,8 @@ public class UserService implements IUserService {
                 user.updateLuong(-characterEntry.getPriceLuong());
             }
 
-            if (userDao.createPlayerCharacter(user.getPlayerId(), index)) {
-                PlayerCharacterDTO character = userDao.getPlayerCharacter(user.getPlayerId(), index);
+            if (userDAO.createPlayerCharacter(user.getPlayerId(), index)) {
+                PlayerCharacterDTO character = userDAO.getPlayerCharacter(user.getPlayerId(), index);
                 if (character != null) {
                     user.getLevels()[index] = character.getLevel();
                     user.getXps()[index] = character.getXp();
@@ -2079,7 +2042,7 @@ public class UserService implements IUserService {
     }
 
     private void handleGiftCode(String code) {
-        GiftCodeDTO giftCode = giftCodeDao.getGiftCode(code, user.getPlayerId());
+        GiftCodeDTO giftCode = giftCodeDAO.getGiftCode(code, user.getPlayerId());
         if (giftCode == null) {
             sendServerMessage(GameString.GIFT_CODE_INVALID);
             return;
@@ -2098,8 +2061,8 @@ public class UserService implements IUserService {
             return;
         }
 
-        giftCodeDao.decrementGiftCodeUsageLimit(giftCode.getId());
-        giftCodeDao.logGiftCodeRedemption(giftCode.getId(), user.getPlayerId());
+        giftCodeDAO.decrementGiftCodeUsageLimit(giftCode.getId());
+        giftCodeDAO.logGiftCodeRedemption(giftCode.getId(), user.getPlayerId());
 
         if (giftCode.getXu() > 0) {
             user.updateXu(giftCode.getXu());
@@ -2187,12 +2150,12 @@ public class UserService implements IUserService {
                 return;
             }
 
-            if (!userDao.existsByUserIdAndPassword(user.getUserId(), oldPass)) {
+            if (!userDAO.existsByUserIdAndPassword(user.getUserId(), oldPass)) {
                 sendServerMessage(GameString.PASSWORD_INCORRECT_OLD);
                 return;
             }
 
-            userDao.changePassword(user.getUserId(), newPass);
+            userDAO.changePassword(user.getUserId(), newPass);
             sendServerMessage(GameString.PASSWORD_CHANGE_SUCCESS);
         } catch (IOException ignored) {
         }

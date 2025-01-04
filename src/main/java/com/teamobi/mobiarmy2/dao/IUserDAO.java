@@ -12,9 +12,13 @@ import java.util.List;
 /**
  * @author tuyen
  */
-public interface IUserDAO extends DAO<User> {
+public interface IUserDAO {
 
-    UserDTO findByUsernameAndPassword(String username, String password);
+    void save(User user);
+
+    void update(User user);
+
+    UserDTO findByAccountId(String accountId);
 
     void updateOnline(boolean flag, int playerId);
 

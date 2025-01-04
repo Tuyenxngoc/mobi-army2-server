@@ -1,8 +1,8 @@
 package com.teamobi.mobiarmy2.model.bullet;
 
+import com.teamobi.mobiarmy2.fight.impl.BulletManager;
 import com.teamobi.mobiarmy2.model.Bullet;
 import com.teamobi.mobiarmy2.model.Player;
-import com.teamobi.mobiarmy2.fight.impl.BulletManager;
 
 public class ItemLaser extends Bullet {
     public ItemLaser(BulletManager bulletManager, byte bullId, int damage, Player pl, int X, int Y, int vx, int vy, int msg, int g100) {
