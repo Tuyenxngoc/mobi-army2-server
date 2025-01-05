@@ -14,8 +14,6 @@ public interface IClanDAO {
 
     Short getClanIcon(int clanId);
 
-    Byte getMembersOfClan(short clanId);
-
     int getXu(short clanId);
 
     int getLuong(short clanId);

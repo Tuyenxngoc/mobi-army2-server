@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author tuyen
@@ -130,6 +131,19 @@ public class UserService implements IUserService {
             }
 
             UserDTO userDTO = userDAO.findByAccountId(accountDTO.getAccountId());
+            if (userDTO == null) {
+                // Tạo mới người dùng
+                Optional<Integer> result = userDAO.create(accountDTO.getAccountId(), 1000, 0);
+
+                if (result.isPresent()) {
+                    userDTO = userDAO.findByAccountId(accountDTO.getAccountId());
+                }
+
+                if (userDTO == null) {
+                    sendMessageLoginFail(GameString.LOGIN_FAILED);
+                    return;
+                }
+            }
 
             //Kiểm tra có đang đăng nhập hay không
             User userLogin = serverManager.getUserByUserId(userDTO.getUserId());

@@ -7,7 +7,8 @@ import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.dto.FriendDTO;
 import com.teamobi.mobiarmy2.dto.PlayerCharacterDTO;
 import com.teamobi.mobiarmy2.dto.UserDTO;
-import com.teamobi.mobiarmy2.model.*;
+import com.teamobi.mobiarmy2.model.EquipmentChestJson;
+import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import org.mindrot.jbcrypt.BCrypt;
@@ -21,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * @author tuyen
@@ -29,58 +29,24 @@ import java.util.stream.Collectors;
 public class UserDAO implements IUserDAO {
 
     @Override
-    public void save(User user) {
+    public Optional<Integer> create(String accountId, int xu, int luong) {
         // language=SQL
-        String sql = "INSERT INTO `players`(`user_id`, `xu`, `luong`) VALUES (?,?,?)";
-        HikariCPManager.getInstance().update(sql, user.getAccountId(), user.getXu(), user.getLuong());
-    }
-
-    public static String convertSpecialItemChestEntriesToJson(List<SpecialItemChest> specialItemChestEntries) {
-        List<SpecialItemChestJson> specialItemChestJsons = specialItemChestEntries.stream().map(e -> {
-            SpecialItemChestJson jsonItem = new SpecialItemChestJson();
-            jsonItem.setId(e.getItem().getId());
-            jsonItem.setQuantity(e.getQuantity());
-            return jsonItem;
-        }).collect(Collectors.toList());
-
-        return GsonUtil.getInstance().toJson(specialItemChestJsons);
-    }
-
-    public static String convertEquipmentChestEntriesToJson(List<EquipmentChest> equipmentChestEntries) {
-        List<EquipmentChestJson> equipmentChestJsons = equipmentChestEntries.stream().map(e -> {
-            EquipmentChestJson jsonItem = new EquipmentChestJson();
-            jsonItem.setCharacterId(e.getEquipment().getCharacterId());
-            jsonItem.setEquipIndex(e.getEquipment().getEquipIndex());
-            jsonItem.setEquipType(e.getEquipment().getEquipType());
-            jsonItem.setKey(e.getKey());
-            jsonItem.setInUse((byte) (e.isInUse() ? 1 : 0));
-            jsonItem.setVipLevel(e.getVipLevel());
-            jsonItem.setPurchaseDate(e.getPurchaseDate());
-            jsonItem.setSlots(e.getSlots());
-            jsonItem.setAddPoints(e.getAddPoints());
-            jsonItem.setAddPercents(e.getAddPercents());
-
-            return jsonItem;
-        }).collect(Collectors.toList());
-
-        return GsonUtil.getInstance().toJson(equipmentChestJsons);
+        String sql = "INSERT INTO `users`(`user_id`, `xu`, `luong`) VALUES (?,?,?)";
+        return HikariCPManager.getInstance().update(sql, accountId, xu, luong);
     }
 
     @Override
     public void update(User user) {
-        String specialItemChestJson = convertSpecialItemChestEntriesToJson(user.getSpecialItemChest());
-        String equipmentChestJson = convertEquipmentChestEntriesToJson(user.getEquipmentChest());
+        String specialItemChestJson = "";
+        String equipmentChestJson = "";
 
         // language=SQL
-        String sql = "UPDATE `players` SET " +
-                "`friends` = ?, " +
+        String sql = "UPDATE `users` SET " +
                 "`xu` = ?, " +
                 "`luong` = ?, " +
                 "`cup` = ?, " +
                 "`clan_id` = ?, " +
                 "`item` = ?, " +
-                "`equipment_chest` = ?, " +
-                "`item_chest` = ? ," +
                 "`is_online` = ?, " +
                 "`mission` = ?, " +
                 "`missionLevel` = ?, " +
@@ -91,7 +57,7 @@ public class UserDAO implements IUserDAO {
                 "`x2_xp_time` = ?, " +
                 "`point_event` = ? " +
                 //...//
-                " WHERE player_id = ?";
+                " WHERE user_id = ?";
         HikariCPManager.getInstance().update(sql,
                 user.getFriends().toString(),
                 user.getXu(),
@@ -117,8 +83,8 @@ public class UserDAO implements IUserDAO {
             if (user.getOwnedCharacters()[i]) {
                 // language=SQL
                 String sqlUpdateCharacter =
-                        "UPDATE player_characters SET level = ?, points = ?, xp = ?, data = ?, additional_points = ? " +
-                                "WHERE player_id = ? AND character_id = ?";
+                        "UPDATE user_characters SET level = ?, points = ?, xp = ?, data = ?, additional_points = ? " +
+                                "WHERE user_id = ? AND character_id = ?";
                 HikariCPManager.getInstance().update(
                         sqlUpdateCharacter,
                         user.getLevels()[i],

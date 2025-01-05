@@ -8,13 +8,14 @@ import com.teamobi.mobiarmy2.model.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author tuyen
  */
 public interface IUserDAO {
 
-    void save(User user);
+    Optional<Integer> create(String accountId, int xu, int luong);
 
     void update(User user);
 

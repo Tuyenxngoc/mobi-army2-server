@@ -22,7 +22,7 @@ public class CharacterDAO implements ICharacterDAO {
 
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `characters`")) {
                 while (resultSet.next()) {
-                    com.teamobi.mobiarmy2.model.Character character = new Character();
+                    Character character = new Character();
                     character.setId(resultSet.getByte("character_id"));
                     character.setName(resultSet.getString("name"));
                     character.setPriceXu(resultSet.getInt("xu"));
