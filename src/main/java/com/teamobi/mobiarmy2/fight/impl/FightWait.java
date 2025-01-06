@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.fight.impl;
 
+import com.teamobi.mobiarmy2.ApplicationContext;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.constant.UserState;
@@ -13,6 +14,7 @@ import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.MapManager;
 import com.teamobi.mobiarmy2.server.ServerManager;
+import com.teamobi.mobiarmy2.service.IClanService;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -55,7 +57,7 @@ public class FightWait implements IFightWait {
 
         byte maxPlayers = room.getMaxPlayerFight();
 
-        this.fightManager = new FightManager(this);
+        this.fightManager = new FightManager(this, ApplicationContext.getInstance().getBean(IClanService.class));
         this.users = new User[maxPlayers];
         this.items = new byte[maxPlayers][MAX_ITEMS_SLOT];
         this.readies = new boolean[maxPlayers];

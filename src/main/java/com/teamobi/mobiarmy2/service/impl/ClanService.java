@@ -86,6 +86,7 @@ public class ClanService implements IClanService {
         return clanDAO.getTopTeams(page);
     }
 
+    @Override
     public boolean[] getClanItems(short clanId) {
         boolean[] result = new boolean[ClanItemManager.CLAN_ITEM_MAP.size()];
         LocalDateTime now = LocalDateTime.now();
@@ -151,6 +152,7 @@ public class ClanService implements IClanService {
         }
     }
 
+    @Override
     public void updateXp(short clanId, int playerId, int xpUp) {
         if (xpUp == 0) {
             return;
@@ -170,6 +172,7 @@ public class ClanService implements IClanService {
         }
     }
 
+    @Override
     public void updateCup(short clanId, int playerId, int cupUp) {
         if (cupUp == 0) {
             return;

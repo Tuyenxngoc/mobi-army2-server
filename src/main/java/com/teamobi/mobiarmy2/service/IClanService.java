@@ -26,7 +26,13 @@ public interface IClanService {
 
     List<ClanDTO> getTopTeams(byte page);
 
+    boolean[] getClanItems(short clanId);
+
     void updateItemClan(short clanId, int playerId, ClanItemShop clanItemShop, boolean isBuyXu);
 
     void contributeClan(short clanId, int playerId, int quantity, boolean isXu);
+
+    void updateXp(short clanId, int playerId, int xpUp);
+
+    void updateCup(short clanId, int playerId, int cupUp);
 }

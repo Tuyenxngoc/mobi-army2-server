@@ -12,7 +12,7 @@ import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
-import com.teamobi.mobiarmy2.service.impl.ClanService;
+import com.teamobi.mobiarmy2.service.IClanService;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.DataOutputStream;
@@ -62,9 +62,11 @@ public class FightManager implements IFightManager {
     private final ICountdownTimer countdownTimer;
     private final ExecutorService executorNextTurn;
     private final ExecutorService executorEndGame;
+    private final IClanService clanService;
 
-    public FightManager(IFightWait fightWait) {
+    public FightManager(IFightWait fightWait, IClanService clanService) {
         this.fightWait = fightWait;
+        this.clanService = clanService;
         this.players = new Player[MAX_ELEMENT_FIGHT];
         this.mapManager = new FightMapManager(this);
         this.bulletManager = new BulletManager(this);
@@ -828,7 +830,6 @@ public class FightManager implements IFightManager {
             }
         }
 
-        ClanService clanService = null;
         for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             Player player = players[i];
             if (player == null || player.getUser() == null) {
@@ -1033,7 +1034,6 @@ public class FightManager implements IFightManager {
 
         //Sử dụng cache để lưu trữ kết quả clan items
         Map<Short, boolean[]> clanItemsCache = new HashMap<>();
-        ClanService clanService = null;
 
         for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             User user = fightWait.getUsers()[i];
