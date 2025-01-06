@@ -1,15 +1,16 @@
-package com.teamobi.mobiarmy2.server;
+package com.teamobi.mobiarmy2.service.impl;
 
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.dao.IClanDAO;
 import com.teamobi.mobiarmy2.dao.IClanMemberDAO;
-import com.teamobi.mobiarmy2.dao.impl.ClanDAO;
-import com.teamobi.mobiarmy2.dao.impl.ClanMemberDAO;
 import com.teamobi.mobiarmy2.dto.ClanDTO;
 import com.teamobi.mobiarmy2.dto.ClanInfoDTO;
 import com.teamobi.mobiarmy2.dto.ClanMemDTO;
 import com.teamobi.mobiarmy2.model.ClanItem;
 import com.teamobi.mobiarmy2.model.ClanItemShop;
+import com.teamobi.mobiarmy2.server.ClanItemManager;
+import com.teamobi.mobiarmy2.server.ClanXpManager;
+import com.teamobi.mobiarmy2.service.IClanService;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.time.LocalDateTime;
@@ -21,44 +22,41 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author tuyen
  */
-public class ClanManager {
+public class ClanService implements IClanService {
     private final ConcurrentHashMap<Short, Object> clanLocks = new ConcurrentHashMap<>();
     private final IClanDAO clanDAO;
     private final IClanMemberDAO clanMemberDAO;
 
-    public ClanManager() {
-        clanDAO = new ClanDAO();
-        clanMemberDAO = new ClanMemberDAO();
-    }
-
-    private static class SingletonHelper {
-        private static final ClanManager INSTANCE = new ClanManager();
-    }
-
-    public static ClanManager getInstance() {
-        return SingletonHelper.INSTANCE;
+    public ClanService(IClanDAO clanDAO, IClanMemberDAO clanMemberDAO) {
+        this.clanDAO = clanDAO;
+        this.clanMemberDAO = clanMemberDAO;
     }
 
     private Object getClanLock(short clanId) {
         return clanLocks.computeIfAbsent(clanId, k -> new Object());
     }
 
+    @Override
     public int getClanLevel(short clanId) {
         return clanDAO.getLevel(clanId);
     }
 
+    @Override
     public int getClanXu(short clanId) {
         return clanDAO.getXu(clanId);
     }
 
+    @Override
     public int getClanLuong(short clanId) {
         return clanDAO.getLuong(clanId);
     }
 
+    @Override
     public byte[] getClanIcon(short clanId) {
         return Utils.getFile(String.format(GameConstants.CLAN_ICON_PATH, clanDAO.getClanIcon(clanId)));
     }
 
+    @Override
     public byte getTotalPage(short clanId) {
         Byte mem = clanMemberDAO.count(clanId);
         if (mem == null) {
@@ -67,19 +65,23 @@ public class ClanManager {
         return (byte) Math.ceil((double) mem / 10);
     }
 
+    @Override
     public byte getTotalPagesClan() {
         double count = clanDAO.getCountClan();
         return (byte) Math.ceil(count / 10);
     }
 
+    @Override
     public ClanInfoDTO getClanInfo(short clanId) {
         return clanDAO.getClanInfo(clanId);
     }
 
+    @Override
     public List<ClanMemDTO> getMemberClan(short clanId, byte page) {
         return clanDAO.getClanMember(clanId, page);
     }
 
+    @Override
     public List<ClanDTO> getTopTeams(byte page) {
         return clanDAO.getTopTeams(page);
     }
@@ -98,6 +100,7 @@ public class ClanManager {
         return result;
     }
 
+    @Override
     public void updateItemClan(short clanId, int playerId, ClanItemShop clanItemShop, boolean isBuyXu) {
         synchronized (getClanLock(clanId)) {
             if (isBuyXu) {
@@ -135,6 +138,7 @@ public class ClanManager {
         }
     }
 
+    @Override
     public void contributeClan(short clanId, int playerId, int quantity, boolean isXu) {
         synchronized (getClanLock(clanId)) {
             if (isXu) {

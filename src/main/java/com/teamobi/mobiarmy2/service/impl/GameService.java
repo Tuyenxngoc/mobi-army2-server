@@ -2,7 +2,6 @@ package com.teamobi.mobiarmy2.service.impl;
 
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.dao.*;
-import com.teamobi.mobiarmy2.dao.impl.*;
 import com.teamobi.mobiarmy2.model.ArmyMap;
 import com.teamobi.mobiarmy2.model.Caption;
 import com.teamobi.mobiarmy2.model.Character;
@@ -44,20 +43,20 @@ public class GameService implements IGameService {
     private final ISpecialItemDAO specialItemDAO;
     private final IEquipmentDAO equipmentDAO;
 
-    public GameService() {
-        mapDAO = new MapDAO();
-        captionLevelDAO = new CaptionLevelDAO();
-        characterDAO = new CharacterDAO();
-        clanDAO = new ClanDAO();
-        clanShopDAO = new ClanShopDAO();
-        experienceLevelDAO = new ExperienceLevelDAO();
-        fabricateItemDAO = new FabricateItemDAO();
-        fightItemDAO = new FightItemDAO();
-        formulaDAO = new FormulaDAO();
-        missionDAO = new MissionDAO();
-        paymentDAO = new PaymentDAO();
-        specialItemDAO = new SpecialItemDAO();
-        equipmentDAO = new EquipmentDAO();
+    public GameService(IMapDAO mapDAO, ICaptionLevelDAO captionLevelDAO, ICharacterDAO characterDAO, IClanDAO clanDAO, IClanShopDAO clanShopDAO, IExperienceLevelDAO experienceLevelDAO, IFabricateItemDAO fabricateItemDAO, IFightItemDAO fightItemDAO, IFormulaDAO formulaDAO, IMissionDAO missionDAO, IPaymentDAO paymentDAO, ISpecialItemDAO specialItemDAO, IEquipmentDAO equipmentDAO) {
+        this.mapDAO = mapDAO;
+        this.captionLevelDAO = captionLevelDAO;
+        this.characterDAO = characterDAO;
+        this.clanDAO = clanDAO;
+        this.clanShopDAO = clanShopDAO;
+        this.experienceLevelDAO = experienceLevelDAO;
+        this.fabricateItemDAO = fabricateItemDAO;
+        this.fightItemDAO = fightItemDAO;
+        this.formulaDAO = formulaDAO;
+        this.missionDAO = missionDAO;
+        this.paymentDAO = paymentDAO;
+        this.specialItemDAO = specialItemDAO;
+        this.equipmentDAO = equipmentDAO;
     }
 
     private void setCacheMaps() {

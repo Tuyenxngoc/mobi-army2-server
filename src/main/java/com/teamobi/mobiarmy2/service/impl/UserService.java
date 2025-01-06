@@ -5,9 +5,6 @@ import com.teamobi.mobiarmy2.constant.*;
 import com.teamobi.mobiarmy2.dao.IAccountDAO;
 import com.teamobi.mobiarmy2.dao.IGiftCodeDAO;
 import com.teamobi.mobiarmy2.dao.IUserDAO;
-import com.teamobi.mobiarmy2.dao.impl.AccountDAO;
-import com.teamobi.mobiarmy2.dao.impl.GiftCodeDAO;
-import com.teamobi.mobiarmy2.dao.impl.UserDAO;
 import com.teamobi.mobiarmy2.dto.*;
 import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.fight.impl.TrainingManager;
@@ -16,6 +13,7 @@ import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.server.*;
+import com.teamobi.mobiarmy2.service.IClanService;
 import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -35,6 +33,8 @@ public class UserService implements IUserService {
     private static final int minimumWaitTime = 5000;
 
     private final User user;
+
+    private final IClanService clanService;
     private final IUserDAO userDAO;
     private final IAccountDAO accountDAO;
     private final IGiftCodeDAO giftCodeDAO;
@@ -48,11 +48,12 @@ public class UserService implements IUserService {
     private long timeSinceLeftRoom;
     private long lastSpinTime;
 
-    public UserService(User user) {
+    public UserService(User user, IClanService clanService, IUserDAO userDAO, IAccountDAO accountDAO, IGiftCodeDAO giftCodeDAO) {
         this.user = user;
-        this.userDAO = new UserDAO();
-        this.accountDAO = new AccountDAO();
-        this.giftCodeDAO = new GiftCodeDAO();
+        this.clanService = clanService;
+        this.userDAO = userDAO;
+        this.accountDAO = accountDAO;
+        this.giftCodeDAO = giftCodeDAO;
     }
 
     private List<EquipmentChest> getSelectedEquips() {
@@ -544,7 +545,7 @@ public class UserService implements IUserService {
                 //Update xu user
                 user.updateXu(-quantity);
                 //Update xu clan
-                ClanManager.getInstance().contributeClan(user.getClanId(), user.getUserId(), quantity, Boolean.TRUE);
+                clanService.contributeClan(user.getClanId(), user.getUserId(), quantity, Boolean.TRUE);
                 sendServerMessage(GameString.CONTRIBUTION_SUCCESS);
             } else if (type == 1) {
                 if (quantity > user.getLuong()) {
@@ -553,7 +554,7 @@ public class UserService implements IUserService {
                 //Update lg user
                 user.updateLuong(-quantity);
                 //Update lg clan
-                ClanManager.getInstance().contributeClan(user.getClanId(), user.getUserId(), quantity, Boolean.FALSE);
+                clanService.contributeClan(user.getClanId(), user.getUserId(), quantity, Boolean.FALSE);
                 sendServerMessage(GameString.CONTRIBUTION_SUCCESS);
             }
         } catch (IOException ignored) {
@@ -822,14 +823,13 @@ public class UserService implements IUserService {
     }
 
     private void buyClanShop(byte unit, byte itemId) {
-        ClanManager clanManager = ClanManager.getInstance();
         ClanItemShop clanItemShop = ClanItemManager.getItemClanById(itemId);
 
         if (clanItemShop == null || clanItemShop.getOnSale() != 1) {
             return;
         }
 
-        int currentLevel = clanManager.getClanLevel(user.getClanId());
+        int currentLevel = clanService.getClanLevel(user.getClanId());
         if (currentLevel < clanItemShop.getLevel()) {
             sendServerMessage(GameString.CLAN_LEVEL_INSUFFICIENT);
             return;
@@ -839,24 +839,24 @@ public class UserService implements IUserService {
             if (clanItemShop.getXu() < 0) {
                 return;
             }
-            int xuClan = clanManager.getClanXu(user.getClanId());
+            int xuClan = clanService.getClanXu(user.getClanId());
             if (xuClan < clanItemShop.getXu()) {
                 sendServerMessage(GameString.CLAN_NOT_ENOUGH_XU);
                 return;
             }
 
-            clanManager.updateItemClan(user.getClanId(), user.getUserId(), clanItemShop, true);
+            clanService.updateItemClan(user.getClanId(), user.getUserId(), clanItemShop, true);
         } else if (unit == 1) {//Luong
             if (clanItemShop.getLuong() < 0) {
                 return;
             }
-            int luongClan = clanManager.getClanLuong(user.getClanId());
+            int luongClan = clanService.getClanLuong(user.getClanId());
             if (luongClan < clanItemShop.getLuong()) {
                 sendServerMessage(GameString.CLAN_NOT_ENOUGH_LUONG);
                 return;
             }
 
-            clanManager.updateItemClan(user.getClanId(), user.getUserId(), clanItemShop, false);
+            clanService.updateItemClan(user.getClanId(), user.getUserId(), clanItemShop, false);
         }
         sendServerMessage(GameString.PURCHASE_SUCCESS);
     }
@@ -2658,7 +2658,7 @@ public class UserService implements IUserService {
     public void getClanIcon(IMessage ms) {
         try {
             short clanId = ms.reader().readShort();
-            byte[] data = ClanManager.getInstance().getClanIcon(clanId);
+            byte[] data = clanService.getClanIcon(clanId);
             if (data == null) {
                 return;
             }
@@ -2678,13 +2678,12 @@ public class UserService implements IUserService {
         try {
             byte page = ms.reader().readByte();
 
-            ClanManager clanManager = ClanManager.getInstance();
-            byte totalPages = clanManager.getTotalPagesClan();
+            byte totalPages = clanService.getTotalPagesClan();
             if (page > totalPages) {
                 page = 0;
             }
 
-            List<ClanDTO> topClan = clanManager.getTopTeams(page);
+            List<ClanDTO> topClan = clanService.getTopTeams(page);
             ms = new Message(Cmd.TOP_CLAN);
             DataOutputStream ds = ms.writer();
             ds.writeByte(page);
@@ -2711,7 +2710,7 @@ public class UserService implements IUserService {
     public void getInfoClan(IMessage ms) {
         try {
             short clanId = ms.reader().readShort();
-            ClanInfoDTO clanDetails = ClanManager.getInstance().getClanInfo(clanId);
+            ClanInfoDTO clanDetails = clanService.getClanInfo(clanId);
             if (clanDetails == null) {
                 sendMessageLoginFail(GameString.CLAN_NOT_FOUND);
                 return;
@@ -2750,7 +2749,7 @@ public class UserService implements IUserService {
             byte page = dis.readByte();
             short clanId = dis.readShort();
 
-            byte totalPage = ClanManager.getInstance().getTotalPage(clanId);
+            byte totalPage = clanService.getTotalPage(clanId);
             if (totalPage == -1) {
                 return;
             }
@@ -2761,7 +2760,7 @@ public class UserService implements IUserService {
                 page = (byte) (totalPage - 1);
             }
 
-            List<ClanMemDTO> clanMemDTO = ClanManager.getInstance().getMemberClan(clanId, page);
+            List<ClanMemDTO> clanMemDTO = clanService.getMemberClan(clanId, page);
 
             ms = new Message(Cmd.CLAN_MEMBER);
             DataOutputStream ds = ms.writer();

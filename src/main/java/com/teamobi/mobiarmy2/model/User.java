@@ -1,8 +1,12 @@
 package com.teamobi.mobiarmy2.model;
 
+import com.teamobi.mobiarmy2.ApplicationContext;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.constant.UserState;
+import com.teamobi.mobiarmy2.dao.IAccountDAO;
+import com.teamobi.mobiarmy2.dao.IGiftCodeDAO;
+import com.teamobi.mobiarmy2.dao.IUserDAO;
 import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.fight.IGiftBoxManager;
 import com.teamobi.mobiarmy2.fight.ITrainingManager;
@@ -14,6 +18,7 @@ import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.PlayerXpManager;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
+import com.teamobi.mobiarmy2.service.IClanService;
 import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.service.impl.UserService;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -73,10 +78,17 @@ public class User {
     private int topEarningsXu;
 
     public User(ISession session) {
-        this.state = UserState.WAITING;
-        this.userService = new UserService(this);
-        this.giftBoxManager = new GiftBoxManager(this);
         this.session = session;
+        this.state = UserState.WAITING;
+        ApplicationContext context = ApplicationContext.getInstance();
+        this.userService = new UserService(
+                this,
+                context.getBean(IClanService.class),
+                context.getBean(IUserDAO.class),
+                context.getBean(IAccountDAO.class),
+                context.getBean(IGiftCodeDAO.class)
+        );
+        this.giftBoxManager = new GiftBoxManager(this);
     }
 
     public boolean isNotWaiting() {

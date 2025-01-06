@@ -1,8 +1,10 @@
 package com.teamobi.mobiarmy2.server;
 
+import com.teamobi.mobiarmy2.ApplicationContext;
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.config.impl.ServerConfig;
 import com.teamobi.mobiarmy2.constant.UserState;
+import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
@@ -36,7 +38,22 @@ public class ServerManager {
     private final List<ServerListener> listeners;
 
     public ServerManager() {
-        this.gameService = new GameService();
+        ApplicationContext context = ApplicationContext.getInstance();
+        this.gameService = new GameService(
+                context.getBean(IMapDAO.class),
+                context.getBean(ICaptionLevelDAO.class),
+                context.getBean(ICharacterDAO.class),
+                context.getBean(IClanDAO.class),
+                context.getBean(IClanShopDAO.class),
+                context.getBean(IExperienceLevelDAO.class),
+                context.getBean(IFabricateItemDAO.class),
+                context.getBean(IFightItemDAO.class),
+                context.getBean(IFormulaDAO.class),
+                context.getBean(IMissionDAO.class),
+                context.getBean(IPaymentDAO.class),
+                context.getBean(ISpecialItemDAO.class),
+                context.getBean(IEquipmentDAO.class)
+        );
 
         this.isMaintenanceMode = false;
         this.config = new ServerConfig();

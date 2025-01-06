@@ -10,9 +10,9 @@ import com.teamobi.mobiarmy2.model.boss.*;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
-import com.teamobi.mobiarmy2.server.ClanManager;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
+import com.teamobi.mobiarmy2.service.impl.ClanService;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.DataOutputStream;
@@ -828,7 +828,7 @@ public class FightManager implements IFightManager {
             }
         }
 
-        ClanManager clanManager = ClanManager.getInstance();
+        ClanService clanService = null;
         for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             Player player = players[i];
             if (player == null || player.getUser() == null) {
@@ -896,8 +896,8 @@ public class FightManager implements IFightManager {
 
                     //Cộng xp và cup cho clan
                     if (user.getClanId() != null) {
-                        clanManager.updateXp(user.getClanId(), user.getUserId(), player.getAllXpUp() / 100);
-                        clanManager.updateCup(user.getClanId(), user.getUserId(), player.getAllCupUp());
+                        clanService.updateXp(user.getClanId(), user.getUserId(), player.getAllXpUp() / 100);
+                        clanService.updateCup(user.getClanId(), user.getUserId(), player.getAllCupUp());
                     }
                 }
 
@@ -1033,7 +1033,7 @@ public class FightManager implements IFightManager {
 
         //Sử dụng cache để lưu trữ kết quả clan items
         Map<Short, boolean[]> clanItemsCache = new HashMap<>();
-        ClanManager clanManager = ClanManager.getInstance();
+        ClanService clanService = null;
 
         for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             User user = fightWait.getUsers()[i];
@@ -1064,7 +1064,7 @@ public class FightManager implements IFightManager {
                 if (clanItemsCache.containsKey(user.getClanId())) {
                     clanItems = clanItemsCache.get(user.getClanId());
                 } else {
-                    clanItems = clanManager.getClanItems(user.getClanId());
+                    clanItems = clanService.getClanItems(user.getClanId());
                     clanItemsCache.put(user.getClanId(), clanItems);
                 }
             }
