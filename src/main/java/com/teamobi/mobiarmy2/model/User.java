@@ -4,9 +4,7 @@ import com.teamobi.mobiarmy2.ApplicationContext;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.constant.UserState;
-import com.teamobi.mobiarmy2.dao.IAccountDAO;
-import com.teamobi.mobiarmy2.dao.IGiftCodeDAO;
-import com.teamobi.mobiarmy2.dao.IUserDAO;
+import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.fight.IGiftBoxManager;
 import com.teamobi.mobiarmy2.fight.ITrainingManager;
@@ -86,7 +84,9 @@ public class User {
                 context.getBean(IClanService.class),
                 context.getBean(IUserDAO.class),
                 context.getBean(IAccountDAO.class),
-                context.getBean(IGiftCodeDAO.class)
+                context.getBean(IGiftCodeDAO.class),
+                context.getBean(IUserGiftCodeDAO.class),
+                context.getBean(IUserCharacterDAO.class)
         );
         this.giftBoxManager = new GiftBoxManager(this);
     }

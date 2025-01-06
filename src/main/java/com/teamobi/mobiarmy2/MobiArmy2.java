@@ -36,6 +36,10 @@ public class MobiArmy2 {
         context.registerBean(ISpecialItemDAO.class, new SpecialItemDAO());
         context.registerBean(IUserCharacterDAO.class, new UserCharacterDAO());
         context.registerBean(IUserDAO.class, new UserDAO());
+        context.registerBean(IUserEquipmentDAO.class, new UserEquipmentDAO());
+        context.registerBean(IUserFriendDAO.class, new UserFriendDAO());
+        context.registerBean(IUserGiftCodeDAO.class, new UserGiftCodeDAO());
+        context.registerBean(IUserSpecialItemDAO.class, new UserSpecialItemDAO());
         context.registerBean(IClanService.class, new ClanService(context.getBean(IClanDAO.class), context.getBean(IClanMemberDAO.class)));
 
         ServerManager serverManager = ServerManager.getInstance();

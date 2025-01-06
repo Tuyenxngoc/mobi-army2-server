@@ -7,10 +7,8 @@ import com.teamobi.mobiarmy2.dto.GiftCodeDTO;
  */
 public interface IGiftCodeDAO {
 
-    GiftCodeDTO getGiftCode(String code, int playerId);
+    GiftCodeDTO findById(String code);
 
-    void decrementGiftCodeUsageLimit(long giftCodeId);
-
-    void logGiftCodeRedemption(long giftCodeId, int playerId);
+    void decrementUsageLimit(long giftCodeId);
 
 }

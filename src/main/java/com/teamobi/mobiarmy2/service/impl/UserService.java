@@ -2,9 +2,7 @@ package com.teamobi.mobiarmy2.service.impl;
 
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.constant.*;
-import com.teamobi.mobiarmy2.dao.IAccountDAO;
-import com.teamobi.mobiarmy2.dao.IGiftCodeDAO;
-import com.teamobi.mobiarmy2.dao.IUserDAO;
+import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.dto.*;
 import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.fight.impl.TrainingManager;
@@ -38,6 +36,8 @@ public class UserService implements IUserService {
     private final IUserDAO userDAO;
     private final IAccountDAO accountDAO;
     private final IGiftCodeDAO giftCodeDAO;
+    private final IUserGiftCodeDAO userGiftCodeDAO;
+    private final IUserCharacterDAO userCharacterDAO;
 
     private UserAction userAction;
     private int totalTransactionAmount;
@@ -48,12 +48,14 @@ public class UserService implements IUserService {
     private long timeSinceLeftRoom;
     private long lastSpinTime;
 
-    public UserService(User user, IClanService clanService, IUserDAO userDAO, IAccountDAO accountDAO, IGiftCodeDAO giftCodeDAO) {
+    public UserService(User user, IClanService clanService, IUserDAO userDAO, IAccountDAO accountDAO, IGiftCodeDAO giftCodeDAO, IUserGiftCodeDAO userGiftCodeDAO, IUserCharacterDAO userCharacterDAO) {
         this.user = user;
         this.clanService = clanService;
         this.userDAO = userDAO;
         this.accountDAO = accountDAO;
         this.giftCodeDAO = giftCodeDAO;
+        this.userGiftCodeDAO = userGiftCodeDAO;
+        this.userCharacterDAO = userCharacterDAO;
     }
 
     private List<EquipmentChest> getSelectedEquips() {
@@ -156,6 +158,8 @@ public class UserService implements IUserService {
                 return;
             }
 
+            updateUserFromDTO(userDTO);
+
             user.getSession().setVersion(version);
             user.setLogged(true);
 
@@ -204,6 +208,18 @@ public class UserService implements IUserService {
         }
     }
 
+    private void updateUserFromDTO(UserDTO userDTO) {
+        user.setUserId(userDTO.getUserId());
+        user.setXpX2Time(userDTO.getX2XpTime());
+        user.setXu(userDTO.getXu());
+        user.setLuong(userDTO.getLuong());
+        user.setCup(userDTO.getCup());
+        user.setPointEvent(userDTO.getPointEvent());
+        user.setMaterialsPurchased(userDTO.getMaterialsPurchased());
+        user.setChestLocked(userDTO.isChestLocked());
+        user.setInvitationLocked(userDTO.isInvitationLocked());
+    }
+
     @Override
     public void handleLogout() {
         if (user.getState() == UserState.FIGHTING || user.getState() == UserState.WAIT_FIGHT) {
@@ -212,6 +228,7 @@ public class UserService implements IUserService {
 
         user.setLogged(false);
         userDAO.update(user);
+        //todo
     }
 
     public void sendCharacterData(IServerConfig config) {
@@ -2064,13 +2081,9 @@ public class UserService implements IUserService {
     }
 
     private void handleGiftCode(String code) {
-        GiftCodeDTO giftCode = giftCodeDAO.getGiftCode(code, user.getUserId());
+        GiftCodeDTO giftCode = giftCodeDAO.findById(code);
         if (giftCode == null) {
             sendServerMessage(GameString.GIFT_CODE_INVALID);
-            return;
-        }
-        if (giftCode.isUsed()) {
-            sendServerMessage(GameString.GIFT_CODE_ALREADY_USED);
             return;
         }
         if (giftCode.getLimit() <= 0) {
@@ -2083,8 +2096,14 @@ public class UserService implements IUserService {
             return;
         }
 
-        giftCodeDAO.decrementGiftCodeUsageLimit(giftCode.getId());
-        giftCodeDAO.logGiftCodeRedemption(giftCode.getId(), user.getUserId());
+        boolean existsByUserId = userGiftCodeDAO.existsByUserId(user.getUserId());
+        if (existsByUserId) {
+            sendServerMessage(GameString.GIFT_CODE_ALREADY_USED);
+            return;
+        }
+
+        giftCodeDAO.decrementUsageLimit(giftCode.getId());
+        userGiftCodeDAO.create(giftCode.getId(), user.getUserId());
 
         if (giftCode.getXu() > 0) {
             user.updateXu(giftCode.getXu());
@@ -2098,33 +2117,8 @@ public class UserService implements IUserService {
             user.updateXp(giftCode.getExp());
             sendMessageToUser(GameString.createGiftCodeRewardMessage(code, Utils.getStringNumber(giftCode.getExp()) + " exp"));
         }
-        if (giftCode.getItems() != null) {
-            List<SpecialItemChest> additionalItems = new ArrayList<>();
-            for (SpecialItemChestJson item : giftCode.getItems()) {
-                SpecialItemChest newItem = new SpecialItemChest();
-                newItem.setItem(SpecialItemManager.getSpecialItemById(item.getId()));
-                if (newItem.getItem() == null) {
-                    continue;
-                }
-                newItem.setQuantity(item.getQuantity());
-                additionalItems.add(newItem);
-                sendMessageToUser(GameString.createGiftCodeRewardMessageWithQuantity(code, newItem.getQuantity(), newItem.getItem().getName()));
-            }
-            user.updateInventory(null, null, additionalItems, null);
-        }
-        if (giftCode.getEquips() != null) {
-            for (EquipmentChestJson json : giftCode.getEquips()) {
-                EquipmentChest addEquip = new EquipmentChest();
-                addEquip.setEquipment(CharacterManager.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
-                if (addEquip.getEquipment() == null) {
-                    continue;
-                }
-                addEquip.setAddPoints(json.getAddPoints());
-                addEquip.setAddPercents(json.getAddPercents());
-                user.addEquipment(addEquip);
-                sendMessageToUser(GameString.createGiftCodeRewardMessage(code, addEquip.getEquipment().getName()));
-            }
-        }
+
+        //todo add fight items, special items and equips
 
         sendServerMessage(GameString.GIFT_CODE_SUCCESS);
     }

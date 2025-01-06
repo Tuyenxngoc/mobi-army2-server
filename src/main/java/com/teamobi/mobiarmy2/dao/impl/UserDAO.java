@@ -19,7 +19,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,85 +36,53 @@ public class UserDAO implements IUserDAO {
 
     @Override
     public void update(User user) {
-        String specialItemChestJson = "";
-        String equipmentChestJson = "";
-
         // language=SQL
         String sql = "UPDATE `users` SET " +
                 "`xu` = ?, " +
                 "`luong` = ?, " +
                 "`cup` = ?, " +
-                "`clan_id` = ?, " +
-                "`item` = ?, " +
                 "`is_online` = ?, " +
-                "`mission` = ?, " +
-                "`missionLevel` = ?, " +
-                "`top_earnings_xu` = ?, " +
-                "`active_character_id` = ?, " +
                 "`materials_purchased` = ?, " +
-                "`equipment_purchased` = ?, " +
                 "`x2_xp_time` = ?, " +
                 "`point_event` = ? " +
                 //...//
                 " WHERE user_id = ?";
+
         HikariCPManager.getInstance().update(sql,
                 user.getFriends().toString(),
                 user.getXu(),
                 user.getLuong(),
                 user.getCup(),
-                user.getClanId(),
-                Arrays.toString(user.getItems()),
-                equipmentChestJson,
-                specialItemChestJson,
                 false,
-                Arrays.toString(user.getMission()),
-                Arrays.toString(user.getMissionLevel()),
-                user.getTopEarningsXu(),
-                user.getPlayerCharacterIds()[user.getActiveCharacterId()],
                 user.getMaterialsPurchased(),
-                user.getEquipmentPurchased(),
                 user.getXpX2Time(),
                 user.getPointEvent(),
                 //...//
                 user.getUserId());
-
-        for (int i = 0; i < user.getOwnedCharacters().length; i++) {
-            if (user.getOwnedCharacters()[i]) {
-                // language=SQL
-                String sqlUpdateCharacter =
-                        "UPDATE user_characters SET level = ?, points = ?, xp = ?, data = ?, additional_points = ? " +
-                                "WHERE user_id = ? AND character_id = ?";
-                HikariCPManager.getInstance().update(
-                        sqlUpdateCharacter,
-                        user.getLevels()[i],
-                        user.getPoints()[i],
-                        user.getXps()[i],
-                        Arrays.toString(user.getEquipData()[i]),
-                        Arrays.toString(user.getAddedPoints()[i]),
-                        user.getUserId(),
-                        i
-                );
-            }
-        }
     }
 
     @Override
     public UserDTO findByAccountId(String accountId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection()) {
-            String query = "SELECT " +
-                    "u.user_id, u.xu, u.luong, u.cup, u.point_event " +
-                    "FROM users u " +
-                    "WHERE account_id = ?";
+            String query = "SELECT * FROM users WHERE account_id = ?";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setString(1, accountId);
                 try (ResultSet resultSet = statement.executeQuery()) {
                     if (resultSet.next()) {
                         UserDTO userDTO = new UserDTO();
                         userDTO.setUserId(resultSet.getInt("user_id"));
+                        userDTO.setX2XpTime(
+                                resultSet.getTimestamp("x2_xp_time") != null
+                                        ? resultSet.getTimestamp("x2_xp_time").toLocalDateTime()
+                                        : null
+                        );
                         userDTO.setXu(resultSet.getInt("xu"));
                         userDTO.setLuong(resultSet.getInt("luong"));
                         userDTO.setCup(resultSet.getInt("cup"));
                         userDTO.setPointEvent(resultSet.getInt("point_event"));
+                        userDTO.setMaterialsPurchased(resultSet.getByte("materials_purchased"));
+                        userDTO.setChestLocked(resultSet.getBoolean("is_chest_locked"));
+                        userDTO.setInvitationLocked(resultSet.getBoolean("is_invitation_locked"));
                         return userDTO;
                     }
                 }
