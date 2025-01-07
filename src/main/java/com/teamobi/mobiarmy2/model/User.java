@@ -12,10 +12,7 @@ import com.teamobi.mobiarmy2.fight.impl.GiftBoxManager;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.impl.Message;
-import com.teamobi.mobiarmy2.server.CharacterManager;
-import com.teamobi.mobiarmy2.server.PlayerXpManager;
-import com.teamobi.mobiarmy2.server.ServerManager;
-import com.teamobi.mobiarmy2.server.SpecialItemManager;
+import com.teamobi.mobiarmy2.server.*;
 import com.teamobi.mobiarmy2.service.IClanService;
 import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.service.impl.UserService;
@@ -35,7 +32,6 @@ import java.util.List;
 @Getter
 @Setter
 public class User {
-    public static Equipment[][] equipDefault;
     private ISession session;
     private UserState state;
     private String accountId;
@@ -57,7 +53,6 @@ public class User {
     private long[] playerCharacterIds;
     private boolean[] ownedCharacters;
     private int[] levels;
-    private byte[] levelPercents;
     private int[] xps;
     private int[] points;
     private short[][] addedPoints;
@@ -86,7 +81,9 @@ public class User {
                 context.getBean(IAccountDAO.class),
                 context.getBean(IGiftCodeDAO.class),
                 context.getBean(IUserGiftCodeDAO.class),
-                context.getBean(IUserCharacterDAO.class)
+                context.getBean(IUserCharacterDAO.class),
+                context.getBean(IUserEquipmentDAO.class),
+                context.getBean(IUserSpecialItemDAO.class)
         );
         this.giftBoxManager = new GiftBoxManager(this);
     }
@@ -226,8 +223,8 @@ public class User {
             for (byte i = 0; i < 5; i++) {
                 if (equipEntries[i] != null && !equipEntries[i].getEquipment().isDisguise()) {
                     equips[i] = equipEntries[i].getEquipment().getEquipIndex();
-                } else if (equipDefault[activeCharacterId][i] != null) {
-                    equips[i] = equipDefault[activeCharacterId][i].getEquipIndex();
+                } else if (EquipmentManager.equipDefault[activeCharacterId][i] != null) {
+                    equips[i] = EquipmentManager.equipDefault[activeCharacterId][i].getEquipIndex();
                 } else {
                     equips[i] = -1;
                 }
@@ -482,7 +479,7 @@ public class User {
         if (characterEquips[activeCharacterId][0] != null) {
             return this.characterEquips[activeCharacterId][0].getEquipment().getEquipIndex();
         }
-        return equipDefault[activeCharacterId][0].getEquipIndex();
+        return EquipmentManager.equipDefault[activeCharacterId][0].getEquipIndex();
     }
 
     /**

@@ -13,6 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Equipment {
+    private short equipmentId;
     private int saleIndex;
     private byte characterId;
     private byte equipType;

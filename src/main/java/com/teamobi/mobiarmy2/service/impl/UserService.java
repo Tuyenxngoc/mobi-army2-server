@@ -38,6 +38,8 @@ public class UserService implements IUserService {
     private final IGiftCodeDAO giftCodeDAO;
     private final IUserGiftCodeDAO userGiftCodeDAO;
     private final IUserCharacterDAO userCharacterDAO;
+    private final IUserEquipmentDAO userEquipmentDAO;
+    private final IUserSpecialItemDAO userSpecialItemDAO;
 
     private UserAction userAction;
     private int totalTransactionAmount;
@@ -48,7 +50,7 @@ public class UserService implements IUserService {
     private long timeSinceLeftRoom;
     private long lastSpinTime;
 
-    public UserService(User user, IClanService clanService, IUserDAO userDAO, IAccountDAO accountDAO, IGiftCodeDAO giftCodeDAO, IUserGiftCodeDAO userGiftCodeDAO, IUserCharacterDAO userCharacterDAO) {
+    public UserService(User user, IClanService clanService, IUserDAO userDAO, IAccountDAO accountDAO, IGiftCodeDAO giftCodeDAO, IUserGiftCodeDAO userGiftCodeDAO, IUserCharacterDAO userCharacterDAO, IUserEquipmentDAO userEquipmentDAO, IUserSpecialItemDAO userSpecialItemDAO) {
         this.user = user;
         this.clanService = clanService;
         this.userDAO = userDAO;
@@ -56,6 +58,8 @@ public class UserService implements IUserService {
         this.giftCodeDAO = giftCodeDAO;
         this.userGiftCodeDAO = userGiftCodeDAO;
         this.userCharacterDAO = userCharacterDAO;
+        this.userEquipmentDAO = userEquipmentDAO;
+        this.userSpecialItemDAO = userSpecialItemDAO;
     }
 
     private List<EquipmentChest> getSelectedEquips() {
@@ -158,7 +162,20 @@ public class UserService implements IUserService {
                 return;
             }
 
+            //Dữ liệu tài khoản
             updateUserFromDTO(userDTO);
+
+            //Dữ liệu trang bị
+            List<UserEquipmentDTO> userEquipmentDTOS = userEquipmentDAO.findAllByUserId(user.getUserId());
+            updateUserEquipment(userEquipmentDTOS);
+
+            //Dữ liệu vật phẩm
+            List<UserSpecialItemDTO> userSpecialItemDTOS = userSpecialItemDAO.findAllByUserId(user.getUserId());
+            updateUserSpecialItems(userSpecialItemDTOS);
+
+            //Dữ liệu nhân vật
+            List<UserCharacterDTO> userCharacterDTOS = userCharacterDAO.findAllByUserId(user.getUserId());
+            updateUserCharacters(userCharacterDTOS);
 
             user.getSession().setVersion(version);
             user.setLogged(true);
@@ -205,6 +222,70 @@ public class UserService implements IUserService {
 
             serverManager.notifyListeners();
         } catch (IOException ignored) {
+        }
+    }
+
+    private void updateUserSpecialItems(List<UserSpecialItemDTO> userSpecialItemDTOS) {
+        for (UserSpecialItemDTO userSpecialItemDTO : userSpecialItemDTOS) {
+            SpecialItemChest specialItemChest = new SpecialItemChest();
+            specialItemChest.setItem(SpecialItemManager.getSpecialItemById(userSpecialItemDTO.getSpecialItemId()));
+            if (specialItemChest.getItem() == null) {
+                continue;
+            }
+            specialItemChest.setQuantity(userSpecialItemDTO.getQuantity());
+            user.getSpecialItemChest().add(specialItemChest);
+        }
+    }
+
+    private void updateUserEquipment(List<UserEquipmentDTO> userEquipmentDTOS) {
+        for (UserEquipmentDTO userEquipmentDTO : userEquipmentDTOS) {
+            EquipmentChest equip = new EquipmentChest();
+            //    equip.setEquipment(EquipmentManager.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
+            if (equip.getEquipment() == null) {
+                continue;
+            }
+            equip.setKey(userEquipmentDTO.getUserEquipmentId());
+            equip.setPurchaseDate(userEquipmentDTO.getPurchaseDate());
+            equip.setVipLevel(userEquipmentDTO.getVipLevel());
+            equip.setInUse(userEquipmentDTO.isInUse());
+            equip.setAddPoints(userEquipmentDTO.getAddPoints());
+            equip.setAddPercents(userEquipmentDTO.getAddPercents());
+            equip.setSlots(userEquipmentDTO.getSlots());
+            byte emptySlot = 0;
+            for (int i = 0; i < equip.getSlots().length; i++) {
+                if (equip.getSlots()[i] < 0) {
+                    emptySlot++;
+                }
+            }
+            equip.setEmptySlot(emptySlot);
+            user.getEquipmentChest().add(equip);
+        }
+    }
+
+    private void updateUserCharacters(List<UserCharacterDTO> userCharacterDTOS) {
+        for (UserCharacterDTO userCharacterDTO : userCharacterDTOS) {
+            byte i = userCharacterDTO.getCharacterId();
+            user.getOwnedCharacters()[i] = true;
+            user.getLevels()[i] = userCharacterDTO.getLevel();
+            user.getXps()[i] = userCharacterDTO.getXp();
+            user.getPoints()[i] = userCharacterDTO.getPoints();
+            user.getAddedPoints()[i] = userCharacterDTO.getAdditionalPoints();
+            user.getEquipData()[i] = userCharacterDTO.getData();
+            /**
+             *   int[] data = gson.fromJson(characterResultSet.getString("data"), int[].class);
+             *                         for (int j = 0; j < data.length; j++) {
+             *                             int key = data[j];
+             *                             EquipmentChestEntry equip = user.getEquipmentByKey(key);
+             *                             if (equip != null) {
+             *                                 if (equip.isExpired()) {
+             *                                     equip.setInUse(false);
+             *                                 } else {
+             *                                     user.getCharacterEquips()[characterId][j] = equip;
+             *                                     user.getEquipData()[characterId][j] = equip.getKey();
+             *                                 }
+             *                             }
+             *                         }
+             */
         }
     }
 
@@ -497,8 +578,8 @@ public class UserService implements IUserService {
                 for (int j = 0; j < 5; j++) {
                     if (user.getCharacterEquips()[i][j] != null) {
                         ds.writeShort(user.getCharacterEquips()[i][j].getEquipment().getEquipIndex());
-                    } else if (User.equipDefault[i][j] != null) {
-                        ds.writeShort(User.equipDefault[i][j].getEquipIndex());
+                    } else if (EquipmentManager.equipDefault[i][j] != null) {
+                        ds.writeShort(EquipmentManager.equipDefault[i][j].getEquipIndex());
                     } else {
                         ds.writeShort(-1);
                     }

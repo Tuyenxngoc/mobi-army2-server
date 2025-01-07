@@ -3,7 +3,6 @@ package com.teamobi.mobiarmy2.server;
 import com.teamobi.mobiarmy2.model.Character;
 import com.teamobi.mobiarmy2.model.Equipment;
 import com.teamobi.mobiarmy2.model.EquipmentChestJson;
-import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.time.LocalDateTime;
@@ -126,8 +125,8 @@ public class CharacterManager {
 
             //Nếu không tìm thấy thì lấy dữ liệu mặc định
             if (!exists) {
-                equipData[i] = (User.equipDefault[activeCharacter][i] != null)
-                        ? User.equipDefault[activeCharacter][i].getEquipIndex()
+                equipData[i] = (EquipmentManager.equipDefault[activeCharacter][i] != null)
+                        ? EquipmentManager.equipDefault[activeCharacter][i].getEquipIndex()
                         : -1;
             }
         }
