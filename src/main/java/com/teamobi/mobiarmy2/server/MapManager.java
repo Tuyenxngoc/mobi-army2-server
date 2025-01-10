@@ -22,6 +22,10 @@ public class MapManager {
     public static final Map<Integer, MapBrick> MAP_BRICKS = new HashMap<>();
     public static final Set<Integer> ID_NOT_COLLISIONS = Set.of(70, 71, 73, 74, 75, 77, 78, 79, 97);
 
+    public static void addMap(ArmyMap armyMap) {
+        ARMY_MAPS.put(armyMap.getId(), armyMap);
+    }
+
     public static byte randomMap(Set<Byte> notSelectableSet) {
         int count = 0;
         byte result = -1;

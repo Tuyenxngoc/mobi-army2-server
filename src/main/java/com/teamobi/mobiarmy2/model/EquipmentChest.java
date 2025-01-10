@@ -65,6 +65,15 @@ public class EquipmentChest {
         }
     }
 
+    public void calculateEmptySlots() {
+        emptySlot = 0;
+        for (byte slot : slots) {
+            if (slot < 0) {
+                emptySlot++;
+            }
+        }
+    }
+
     public void addPoints(short[] ability) {
         for (int i = 0; i < addPoints.length; i++) {
             addPoints[i] += ability[i];

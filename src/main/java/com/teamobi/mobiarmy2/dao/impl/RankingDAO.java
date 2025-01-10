@@ -60,7 +60,7 @@ public class RankingDAO implements IRankingDAO {
 
                 EquipmentChestJson[] equipmentData = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
                 int[] data = gson.fromJson(resultSet.getString("data"), int[].class);
-                entry.setData(EquipmentManager.getEquipData(equipmentData, data, entry.getActiveCharacter()));
+                entry.setData(EquipmentManager.getEquipmentData(equipmentData, data, entry.getActiveCharacter()));
 
                 top.add(entry);
                 index++;

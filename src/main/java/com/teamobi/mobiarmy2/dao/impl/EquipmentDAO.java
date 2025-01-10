@@ -99,10 +99,10 @@ public class EquipmentDAO implements IEquipmentDAO {
 
                     //Đặt trang bị mặc định cho nhân vật
                     if (resultSet.getBoolean("is_default")) {
-                        EquipmentManager.equipDefault[equipment.getCharacterId()][equipment.getEquipType()] = equipment;
+                        EquipmentManager.equipDefault[equipment.getCharacterId() - 1][equipment.getEquipType()] = equipment;
                     }
 
-                    EquipmentManager.addEquip(equipment);
+                    EquipmentManager.addEquipment(equipment);
                 }
             }
         } catch (SQLException e) {

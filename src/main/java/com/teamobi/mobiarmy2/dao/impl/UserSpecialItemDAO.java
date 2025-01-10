@@ -16,7 +16,7 @@ public class UserSpecialItemDAO implements IUserSpecialItemDAO {
         List<UserSpecialItemDTO> result = new ArrayList<>();
 
         try (Connection connection = HikariCPManager.getInstance().getConnection()) {
-            String query = "SELECT special_item_id, quantity FROM user_special_items WHERE user_id = ?";
+            String query = "SELECT special_item_id, quantity FROM user_special_items WHERE user_id = ? AND (expiration_time IS NULL OR expiration_time > CURRENT_TIMESTAMP)";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setInt(1, userId);
                 try (ResultSet resultSet = statement.executeQuery()) {

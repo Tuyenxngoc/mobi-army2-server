@@ -8,6 +8,7 @@ import com.teamobi.mobiarmy2.model.Character;
 import com.teamobi.mobiarmy2.model.Equipment;
 import com.teamobi.mobiarmy2.server.CaptionManager;
 import com.teamobi.mobiarmy2.server.CharacterManager;
+import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.MapManager;
 import com.teamobi.mobiarmy2.service.IGameService;
 import com.teamobi.mobiarmy2.util.TeamImageOutput;
@@ -96,35 +97,39 @@ public class GameService implements IGameService {
             ds.writeByte(CharacterManager.CHARACTERS.size());
 
             for (Character character : CharacterManager.CHARACTERS) {
-                ds.writeByte(character.getId());
+                Map<Byte, List<Short>> equipmentByCharacter = EquipmentManager.getEquipmentByCharacterId(character.getCharacterId());
+
+                ds.writeByte(character.getCharacterId() - 1);
                 ds.writeShort(character.getDamage());
-                ds.writeByte(character.getEquips().size());
+                ds.writeByte(equipmentByCharacter.size());
 
-                for (byte i = 0; i < character.getEquips().size(); i++) {
-                    List<Equipment> equipmentEntries = character.getEquips().get(i);
+                for (byte i = 0; i < equipmentByCharacter.size(); i++) {
+                    List<Short> equipmentIds = equipmentByCharacter.get(i);
                     ds.writeByte(i);
-                    ds.writeByte(equipmentEntries.size());
+                    ds.writeByte(equipmentIds.size());
 
-                    for (Equipment equipEntry : equipmentEntries) {
-                        ds.writeShort(equipEntry.getEquipIndex());
+                    for (Short equipmentId : equipmentIds) {
+                        Equipment equipment = EquipmentManager.getEquipment(equipmentId);
+
+                        ds.writeShort(equipment.getEquipIndex());
                         if (i == 0) {
-                            ds.writeByte(equipEntry.getBulletId());
+                            ds.writeByte(equipment.getBulletId());
                         }
-                        ds.writeShort(equipEntry.getFrameCount());
-                        ds.writeByte(equipEntry.getLevelRequirement());
+                        ds.writeShort(equipment.getFrameCount());
+                        ds.writeByte(equipment.getLevelRequirement());
 
                         for (int j = 0; j < 6; j++) {
-                            ds.writeShort(equipEntry.getBigImageCutX()[j]);
-                            ds.writeShort(equipEntry.getBigImageCutY()[j]);
-                            ds.writeByte(equipEntry.getBigImageSizeX()[j]);
-                            ds.writeByte(equipEntry.getBigImageSizeY()[j]);
-                            ds.writeByte(equipEntry.getBigImageAlignX()[j]);
-                            ds.writeByte(equipEntry.getBigImageAlignY()[j]);
+                            ds.writeShort(equipment.getBigImageCutX()[j]);
+                            ds.writeShort(equipment.getBigImageCutY()[j]);
+                            ds.writeByte(equipment.getBigImageSizeX()[j]);
+                            ds.writeByte(equipment.getBigImageSizeY()[j]);
+                            ds.writeByte(equipment.getBigImageAlignX()[j]);
+                            ds.writeByte(equipment.getBigImageAlignY()[j]);
                         }
 
                         for (int j = 0; j < 5; j++) {
-                            ds.writeByte(equipEntry.getAddPoints()[j]);
-                            ds.writeByte(equipEntry.getAddPercents()[j]);
+                            ds.writeByte(equipment.getAddPoints()[j]);
+                            ds.writeByte(equipment.getAddPercents()[j]);
                         }
                     }
                 }

@@ -3,26 +3,34 @@ package com.teamobi.mobiarmy2.server;
 import com.teamobi.mobiarmy2.model.Equipment;
 import com.teamobi.mobiarmy2.model.EquipmentChestJson;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class EquipmentManager {
     public static Equipment[][] equipDefault;
-    public static short totalSaleEquipments = 0;
     public static final Map<Short, Equipment> EQUIPMENTS = new HashMap<>();
 
-    public static void addEquip(Equipment equipment) {
+    private static final List<Short> SALE_INDEX_TO_ID = new ArrayList<>();
+    private static final Map<Byte, Map<Byte, List<Short>>> EQUIPMENTS_BY_CHARACTER_AND_TYPE = new HashMap<>();
+
+    public static void addEquipment(Equipment equipment) {
+        // Thêm vào danh sách trang bị đang bán
         if (equipment.isOnSale()) {
-            equipment.setSaleIndex(totalSaleEquipments);
-            totalSaleEquipments++;
+            SALE_INDEX_TO_ID.add(equipment.getEquipmentId());
+            equipment.setSaleIndex((short) (SALE_INDEX_TO_ID.size() - 1));
         } else {
             equipment.setSaleIndex(-1);
         }
+
+        // Thêm vào danh sách nhóm trang bị theo nhân vật và loại
+        Map<Byte, List<Short>> equipmentsByType = EQUIPMENTS_BY_CHARACTER_AND_TYPE.computeIfAbsent(equipment.getCharacterId(), k -> new HashMap<>());
+        List<Short> equipmentIds = equipmentsByType.computeIfAbsent(equipment.getEquipType(), k -> new ArrayList<>());
+        equipmentIds.add(equipment.getEquipmentId());
+
+        // Thêm vào danh sách
         EQUIPMENTS.put(equipment.getEquipmentId(), equipment);
     }
 
@@ -30,59 +38,31 @@ public class EquipmentManager {
         return EQUIPMENTS.get(equipmentId);
     }
 
+    public static Equipment getEquipmentBySaleIndex(short saleIndex) {
+        Short equipmentId = SALE_INDEX_TO_ID.get(saleIndex);
+        return equipmentId != null ? EQUIPMENTS.get(equipmentId) : null;
+    }
+
     public static Equipment getRandomEquip(Predicate<Equipment> filter) {
         return null;
     }
 
-    public static Equipment getEquipEntryBySaleIndex(int saleIndex) {
-        return null;
-    }
-
-    public static short[] getEquipData(EquipmentChestJson[] equipmentChestJsons, int[] data, byte activeCharacter) {
-        short[] equipData = new short[5];
-        LocalDateTime now = LocalDateTime.now();
-
-        Map<Integer, EquipmentChestJson> equipmentMap = Arrays.stream(equipmentChestJsons)
-                .filter(json -> json != null && json.getCharacterId() == activeCharacter)
-                .collect(Collectors.toMap(EquipmentChestJson::getKey, json -> json));
-
-        //Tìm cải trang
-        int disguiseKey = data[5];
-        if (disguiseKey != -1 && equipmentMap.containsKey(disguiseKey)) {
-            EquipmentChestJson json = equipmentMap.get(disguiseKey);
-            Equipment equip = getEquipment((short) 0);
-            if (equip != null && equip.getExpirationDays() - ChronoUnit.DAYS.between(json.getPurchaseDate(), now) > 0) {
-                return equip.getDisguiseEquippedIndexes();
-            }
-        }
-
-        //Tìm trang bị
-        for (int i = 0; i < equipData.length; i++) {
-            int equipKey = data[i];
-            boolean exists = false;
-
-            if (equipKey != -1 && equipmentMap.containsKey(equipKey)) {
-                EquipmentChestJson json = equipmentMap.get(equipKey);
-                Equipment equip = getEquipment((short) 0);
-                if (equip != null && equip.getExpirationDays() - ChronoUnit.DAYS.between(json.getPurchaseDate(), now) > 0) {
-                    equipData[i] = json.getEquipIndex();
-                    exists = true;
-                }
-            }
-
-            //Nếu không tìm thấy thì lấy dữ liệu mặc định
-            if (!exists) {
-                equipData[i] = (EquipmentManager.equipDefault[activeCharacter][i] != null)
-                        ? EquipmentManager.equipDefault[activeCharacter][i].getEquipIndex()
-                        : -1;
-            }
-        }
-
-        return equipData;
+    public static short[] getEquipmentData(EquipmentChestJson[] equipmentChestJsons, int[] data, byte activeCharacter) {
+        return new short[5];
     }
 
     public static void clear() {
         EQUIPMENTS.clear();
+        SALE_INDEX_TO_ID.clear();
+        EQUIPMENTS_BY_CHARACTER_AND_TYPE.clear();
         equipDefault = null;
+    }
+
+    public static int getTotalSaleEquipments() {
+        return SALE_INDEX_TO_ID.size();
+    }
+
+    public static Map<Byte, List<Short>> getEquipmentByCharacterId(byte characterId) {
+        return EQUIPMENTS_BY_CHARACTER_AND_TYPE.get(characterId);
     }
 }

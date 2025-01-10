@@ -11,8 +11,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class UserCharacterDAO implements IUserCharacterDAO {
+
     @Override
     public List<UserCharacterDTO> findAllByUserId(int userId) {
         List<UserCharacterDTO> result = new ArrayList<>();
@@ -42,4 +44,13 @@ public class UserCharacterDAO implements IUserCharacterDAO {
         }
         return result;
     }
+
+    @Override
+    public Optional<Integer> create(int userId, byte characterId, boolean isActive) {
+        // language=SQL
+        String sql = "INSERT INTO `user_characters`(`user_id`, `character_id`, `is_active`) VALUES (?,?,?)";
+        return HikariCPManager.getInstance().update(sql, userId, characterId, isActive);
+    }
+
+
 }

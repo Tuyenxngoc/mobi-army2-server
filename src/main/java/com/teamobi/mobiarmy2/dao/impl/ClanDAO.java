@@ -283,7 +283,7 @@ public class ClanDAO implements IClanDAO {
 
                     int[] data = gson.fromJson(resultSet.getString("data"), int[].class);
                     EquipmentChestJson[] equipmentChests = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
-                    entry.setDataEquip(EquipmentManager.getEquipData(equipmentChests, data, entry.getActiveCharacter()));
+                    entry.setDataEquip(EquipmentManager.getEquipmentData(equipmentChests, data, entry.getActiveCharacter()));
 
                     short contributeCount = resultSet.getShort("contribute_count");
                     if (contributeCount > 0) {

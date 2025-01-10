@@ -9,7 +9,7 @@ import java.util.Map;
  * @author tuyen
  */
 public class SpecialItemManager {
-    private static final Map<Byte, SpecialItem> SPECIAL_ITEMS = new HashMap<>();
+    public static final Map<Byte, SpecialItem> SPECIAL_ITEMS = new HashMap<>();
 
     public static void addSpecialItem(SpecialItem specialItem) {
         SPECIAL_ITEMS.put(specialItem.getId(), specialItem);
@@ -19,7 +19,4 @@ public class SpecialItemManager {
         return SPECIAL_ITEMS.get(id);
     }
 
-    public static Map<Byte, SpecialItem> getSpecialItems() {
-        return SPECIAL_ITEMS;
-    }
 }

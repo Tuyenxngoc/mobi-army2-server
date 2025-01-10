@@ -30,8 +30,8 @@ public class UserDAO implements IUserDAO {
     @Override
     public Optional<Integer> create(String accountId, int xu, int luong) {
         // language=SQL
-        String sql = "INSERT INTO `users`(`user_id`, `xu`, `luong`) VALUES (?,?,?)";
-        return HikariCPManager.getInstance().update(sql, accountId, xu, luong);
+        String sql = "INSERT INTO `users`(`account_id`, `xu`, `luong`, `created_date`, `last_modified_date`) VALUES (?,?,?,?,?)";
+        return HikariCPManager.getInstance().update(sql, accountId, xu, luong, LocalDateTime.now(), LocalDateTime.now());
     }
 
     @Override
@@ -147,7 +147,7 @@ public class UserDAO implements IUserDAO {
                     friend.setLevelPt((byte) 0);
                     int[] data = gson.fromJson(resultSet.getString("data"), int[].class);
                     EquipmentChestJson[] equipmentChests = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
-                    friend.setData(EquipmentManager.getEquipData(equipmentChests, data, friend.getActiveCharacterId()));
+                    friend.setData(EquipmentManager.getEquipmentData(equipmentChests, data, friend.getActiveCharacterId()));
 
                     friendsList.add(friend);
                 }
