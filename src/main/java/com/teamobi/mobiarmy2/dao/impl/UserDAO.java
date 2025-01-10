@@ -9,7 +9,7 @@ import com.teamobi.mobiarmy2.dto.PlayerCharacterDTO;
 import com.teamobi.mobiarmy2.dto.UserDTO;
 import com.teamobi.mobiarmy2.model.EquipmentChestJson;
 import com.teamobi.mobiarmy2.model.User;
-import com.teamobi.mobiarmy2.server.CharacterManager;
+import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -147,7 +147,7 @@ public class UserDAO implements IUserDAO {
                     friend.setLevelPt((byte) 0);
                     int[] data = gson.fromJson(resultSet.getString("data"), int[].class);
                     EquipmentChestJson[] equipmentChests = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
-                    friend.setData(CharacterManager.getEquipData(equipmentChests, data, friend.getActiveCharacterId()));
+                    friend.setData(EquipmentManager.getEquipData(equipmentChests, data, friend.getActiveCharacterId()));
 
                     friendsList.add(friend);
                 }

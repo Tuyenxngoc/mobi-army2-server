@@ -20,7 +20,7 @@ public class EquipmentDAO implements IEquipmentDAO {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
 
-            EquipmentManager.EQUIPMENTS.clear();
+            EquipmentManager.clear();
 
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `equipments` ORDER BY equip_type, equip_index, character_id")) {
 

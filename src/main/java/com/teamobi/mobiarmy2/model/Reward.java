@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.model;
 
-import com.teamobi.mobiarmy2.server.CharacterManager;
+import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,7 +33,7 @@ public class Reward {
 
     public void equip() {
         this.type = 2;
-        Equipment entry = CharacterManager.getRandomEquip(
+        Equipment entry = EquipmentManager.getRandomEquip(
                 equipmentEntry ->
                         equipmentEntry.isOnSale()
                                 && !equipmentEntry.isDisguise()

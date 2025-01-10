@@ -7,7 +7,7 @@ import com.teamobi.mobiarmy2.model.Formula;
 import com.teamobi.mobiarmy2.model.SpecialItem;
 import com.teamobi.mobiarmy2.model.SpecialItemChest;
 import com.teamobi.mobiarmy2.model.SpecialItemChestJson;
-import com.teamobi.mobiarmy2.server.CharacterManager;
+import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.FormulaManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
 import com.teamobi.mobiarmy2.util.GsonUtil;
@@ -38,8 +38,8 @@ public class FormulaDAO implements IFormulaDAO {
                     entry.setAddPointsMin(gson.fromJson(resultSet.getString("f.add_points_min"), byte[].class));
                     entry.setAddPercentsMax(gson.fromJson(resultSet.getString("f.add_percents_max"), byte[].class));
                     entry.setAddPercentsMin(gson.fromJson(resultSet.getString("f.add_percents_min"), byte[].class));
-                    entry.setRequiredEquip(CharacterManager.getEquipEntry(entry.getCharacterId(), entry.getEquipType(), resultSet.getShort("fd.required_equip")));
-                    entry.setResultEquip(CharacterManager.getEquipEntry(entry.getCharacterId(), entry.getEquipType(), resultSet.getShort("fd.result_equip")));
+                    entry.setRequiredEquip(EquipmentManager.getEquipment(resultSet.getShort("fd.required_equip")));
+                    entry.setResultEquip(EquipmentManager.getEquipment(resultSet.getShort("fd.result_equip")));
                     SpecialItemChestJson[] json = gson.fromJson(resultSet.getString("fd.required_items"), SpecialItemChestJson[].class);
                     for (SpecialItemChestJson itemChestJson : json) {
                         SpecialItem specialItem = SpecialItemManager.getSpecialItemById(itemChestJson.getId());

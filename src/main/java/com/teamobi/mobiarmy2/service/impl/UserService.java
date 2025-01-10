@@ -2483,8 +2483,8 @@ public class UserService implements IUserService {
         try {
             IMessage ms = new Message(Cmd.SHOP_EQUIP);
             DataOutputStream ds = ms.writer();
-            ds.writeShort(CharacterManager.totalSaleEquipments);
-            for (Equipment equip : CharacterManager.EQUIPMENTS) {
+            ds.writeShort(EquipmentManager.totalSaleEquipments);
+            for (Equipment equip : EquipmentManager.EQUIPMENTS.values()) {
                 if (!equip.isOnSale()) {
                     continue;
                 }
@@ -2641,7 +2641,7 @@ public class UserService implements IUserService {
             sendServerMessage(GameString.CHEST_NO_SPACE);
             return;
         }
-        Equipment equipment = CharacterManager.getEquipEntryBySaleIndex(saleIndex);
+        Equipment equipment = EquipmentManager.getEquipEntryBySaleIndex(saleIndex);
         if (equipment == null || (unit == 0 ? equipment.getPriceXu() : equipment.getPriceLuong()) < 0) {
             return;
         }
