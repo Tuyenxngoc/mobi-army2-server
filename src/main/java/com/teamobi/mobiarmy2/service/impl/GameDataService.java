@@ -10,7 +10,7 @@ import com.teamobi.mobiarmy2.server.CaptionManager;
 import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.MapManager;
-import com.teamobi.mobiarmy2.service.IGameService;
+import com.teamobi.mobiarmy2.service.IGameDataService;
 import com.teamobi.mobiarmy2.util.TeamImageOutput;
 import com.teamobi.mobiarmy2.util.Utils;
 import org.slf4j.Logger;
@@ -27,13 +27,12 @@ import java.util.TreeMap;
 /**
  * @author tuyen
  */
-public class GameService implements IGameService {
-    private static final Logger logger = LoggerFactory.getLogger(GameService.class);
+public class GameDataService implements IGameDataService {
+    private static final Logger logger = LoggerFactory.getLogger(GameDataService.class);
 
     private final IMapDAO mapDAO;
     private final ICaptionLevelDAO captionLevelDAO;
     private final ICharacterDAO characterDAO;
-    private final IClanDAO clanDAO;
     private final IClanShopDAO clanShopDAO;
     private final IExperienceLevelDAO experienceLevelDAO;
     private final IFabricateItemDAO fabricateItemDAO;
@@ -44,11 +43,10 @@ public class GameService implements IGameService {
     private final ISpecialItemDAO specialItemDAO;
     private final IEquipmentDAO equipmentDAO;
 
-    public GameService(IMapDAO mapDAO, ICaptionLevelDAO captionLevelDAO, ICharacterDAO characterDAO, IClanDAO clanDAO, IClanShopDAO clanShopDAO, IExperienceLevelDAO experienceLevelDAO, IFabricateItemDAO fabricateItemDAO, IFightItemDAO fightItemDAO, IFormulaDAO formulaDAO, IMissionDAO missionDAO, IPaymentDAO paymentDAO, ISpecialItemDAO specialItemDAO, IEquipmentDAO equipmentDAO) {
+    public GameDataService(IMapDAO mapDAO, ICaptionLevelDAO captionLevelDAO, ICharacterDAO characterDAO, IClanShopDAO clanShopDAO, IExperienceLevelDAO experienceLevelDAO, IFabricateItemDAO fabricateItemDAO, IFightItemDAO fightItemDAO, IFormulaDAO formulaDAO, IMissionDAO missionDAO, IPaymentDAO paymentDAO, ISpecialItemDAO specialItemDAO, IEquipmentDAO equipmentDAO) {
         this.mapDAO = mapDAO;
         this.captionLevelDAO = captionLevelDAO;
         this.characterDAO = characterDAO;
-        this.clanDAO = clanDAO;
         this.clanShopDAO = clanShopDAO;
         this.experienceLevelDAO = experienceLevelDAO;
         this.fabricateItemDAO = fabricateItemDAO;
@@ -61,45 +59,40 @@ public class GameService implements IGameService {
     }
 
     private void setCacheMaps() {
+        Map<Byte, ArmyMap> sortedMap = new TreeMap<>(MapManager.ARMY_MAPS);
+
         try (ByteArrayOutputStream bas = new ByteArrayOutputStream();
              DataOutputStream ds = new DataOutputStream(bas)) {
-            Map<Byte, ArmyMap> sortedMaps = new TreeMap<>(MapManager.ARMY_MAPS);
-
-            int size = sortedMaps.size();
-            ds.writeByte(size);
-
-            for (ArmyMap armyMap : sortedMaps.values()) {
-                ds.writeByte(armyMap.getId());
-                ds.writeShort(armyMap.getData().length);
-                ds.write(armyMap.getData());
-                ds.writeShort(armyMap.getBg());
-                ds.writeShort(armyMap.getMapAddY());
-                ds.writeShort(armyMap.getBullEffShower());
-                ds.writeShort(armyMap.getInWaterAddY());
-                ds.writeShort(armyMap.getCl2AddY());
-                ds.writeUTF(armyMap.getName());
-                ds.writeUTF(armyMap.getFileName());
+            ds.writeByte(sortedMap.size());
+            for (ArmyMap map : sortedMap.values()) {
+                ds.writeByte(map.getId());
+                ds.writeShort(map.getData().length);
+                ds.write(map.getData());
+                ds.writeShort(map.getBg());
+                ds.writeShort(map.getMapAddY());
+                ds.writeShort(map.getBullEffShower());
+                ds.writeShort(map.getInWaterAddY());
+                ds.writeShort(map.getCl2AddY());
+                ds.writeUTF(map.getName());
+                ds.writeUTF(map.getFileName());
             }
-
             byte[] ab = bas.toByteArray();
             Utils.saveFile(GameConstants.MAP_CACHE_NAME, ab);
-
-            logger.info("Cache file created successfully: {}", GameConstants.MAP_CACHE_NAME);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
     private void setCacheCharacters() {
-        try {
-            ByteArrayOutputStream bas = new ByteArrayOutputStream();
-            DataOutputStream ds = new DataOutputStream(bas);
+        try (ByteArrayOutputStream bas = new ByteArrayOutputStream();
+             DataOutputStream ds = new DataOutputStream(bas)) {
+
             ds.writeByte(CharacterManager.CHARACTERS.size());
 
             for (Character character : CharacterManager.CHARACTERS) {
                 Map<Byte, List<Short>> equipmentByCharacter = EquipmentManager.getEquipmentByCharacterId(character.getCharacterId());
 
-                ds.writeByte(character.getCharacterId() - 1);
+                ds.writeByte(character.getCharacterId());
                 ds.writeShort(character.getDamage());
                 ds.writeByte(equipmentByCharacter.size());
 
@@ -135,7 +128,7 @@ public class GameService implements IGameService {
                 }
             }
 
-            byte[] bytes = Utils.getFile(GameConstants.IMAGE_BASE_URL + "/itemSpecial.png");
+            byte[] bytes = Utils.getFile(GameConstants.ITEM_SPECIAL_PATH);
             if (bytes == null) {
                 System.exit(1);
             }
@@ -152,32 +145,21 @@ public class GameService implements IGameService {
 
             byte[] data = bas.toByteArray();
             Utils.saveFile(GameConstants.EQUIP_CACHE_NAME, data);
-            bas.close();
-            ds.close();
-
-            logger.info("Cache file created successfully: {}", GameConstants.EQUIP_CACHE_NAME);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
     private void setCacheCaptionLevels() {
-        try {
-            ByteArrayOutputStream bas = new ByteArrayOutputStream();
-            DataOutputStream ds = new DataOutputStream(bas);
-            int size = CaptionManager.CAPTIONS.size();
-            ds.writeByte(size);
-            for (int i = size - 1; i >= 0; i--) {
-                Caption capEntry = CaptionManager.CAPTIONS.get(i);
-                ds.writeUTF(capEntry.getCaption());
-                ds.writeByte(capEntry.getLevel());
+        try (ByteArrayOutputStream bas = new ByteArrayOutputStream();
+             DataOutputStream ds = new DataOutputStream(bas)) {
+            ds.writeByte(CaptionManager.CAPTIONS.size());
+            for (Caption caption : CaptionManager.CAPTIONS) {
+                ds.writeUTF(caption.getCaption());
+                ds.writeByte(caption.getLevel());
             }
             byte[] data = bas.toByteArray();
             Utils.saveFile(GameConstants.LEVEL_CACHE_NAME, data);
-            bas.close();
-            ds.close();
-
-            logger.info("Cache file created successfully: {}", GameConstants.LEVEL_CACHE_NAME);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
@@ -199,8 +181,6 @@ public class GameService implements IGameService {
             }
             byte[] data = tio.output();
             Utils.saveFile(GameConstants.PLAYER_CACHE_NAME, data);
-
-            logger.info("Cache file created successfully: {}", GameConstants.PLAYER_CACHE_NAME);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
@@ -222,8 +202,6 @@ public class GameService implements IGameService {
             }
             byte[] data = tio.output();
             Utils.saveFile(GameConstants.ICON_CACHE_NAME, data);
-
-            logger.info("Cache file created successfully: " + GameConstants.ICON_CACHE_NAME);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }

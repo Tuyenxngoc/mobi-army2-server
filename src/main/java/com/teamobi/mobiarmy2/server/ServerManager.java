@@ -10,8 +10,8 @@ import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.impl.Session;
-import com.teamobi.mobiarmy2.service.IGameService;
-import com.teamobi.mobiarmy2.service.impl.GameService;
+import com.teamobi.mobiarmy2.service.IGameDataService;
+import com.teamobi.mobiarmy2.service.impl.GameDataService;
 import com.teamobi.mobiarmy2.ui.controllers.ServerListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ import java.util.List;
 public class ServerManager {
     private static final Logger logger = LoggerFactory.getLogger(ServerManager.class);
 
-    private final IGameService gameService;
+    private final IGameDataService gameService;
     private final IServerConfig config;
     private ServerSocket server;
     private long countClients;
@@ -39,11 +39,10 @@ public class ServerManager {
 
     public ServerManager() {
         ApplicationContext context = ApplicationContext.getInstance();
-        this.gameService = new GameService(
+        this.gameService = new GameDataService(
                 context.getBean(IMapDAO.class),
                 context.getBean(ICaptionLevelDAO.class),
                 context.getBean(ICharacterDAO.class),
-                context.getBean(IClanDAO.class),
                 context.getBean(IClanShopDAO.class),
                 context.getBean(IExperienceLevelDAO.class),
                 context.getBean(IFabricateItemDAO.class),

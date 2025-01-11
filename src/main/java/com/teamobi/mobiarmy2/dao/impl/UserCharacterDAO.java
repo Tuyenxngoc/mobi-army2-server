@@ -52,5 +52,4 @@ public class UserCharacterDAO implements IUserCharacterDAO {
         return HikariCPManager.getInstance().update(sql, userId, characterId, isActive);
     }
 
-
 }

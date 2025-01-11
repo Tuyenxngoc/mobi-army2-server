@@ -34,6 +34,7 @@ public class GameConstants {
     public static final String MAP_PATH = IMAGE_BASE_URL + "/map";
     public static final String MAP_LOGO_PATH = IMAGE_BASE_URL + "/map/icon";
     public static final String PLAYER_PATH = IMAGE_BASE_URL + "/player";
+    public static final String ITEM_SPECIAL_PATH = IMAGE_BASE_URL + "/itemSpecial.png";
 
     public static final String CACHE_FOLDER = "cache";
     public static final String MAP_CACHE_NAME = CACHE_FOLDER + "/valuesdata2";
