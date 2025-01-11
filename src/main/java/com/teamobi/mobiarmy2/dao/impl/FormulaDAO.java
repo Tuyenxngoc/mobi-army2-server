@@ -24,6 +24,8 @@ public class FormulaDAO implements IFormulaDAO {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
 
+            FormulaManager.FORMULAS.clear();
+
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM formula_details fd INNER JOIN formulas f on fd.formula_id = f.formula_id ORDER BY f.material_id, fd.character_id, f.level")) {
                 Gson gson = GsonUtil.getInstance();
                 while (resultSet.next()) {

@@ -17,6 +17,8 @@ public class ClanShopDAO implements IClanShopDAO {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
 
+            ClanItemManager.CLAN_ITEM_MAP.clear();
+
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `clan_shops`")) {
                 while (resultSet.next()) {
                     ClanItemShop item = new ClanItemShop();

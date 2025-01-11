@@ -9,7 +9,7 @@ import java.util.List;
  */
 public interface IRankingDAO {
 
-    List<PlayerLeaderboardDTO> getTopHonor();
+    List<PlayerLeaderboardDTO> getTopCup();
 
     List<PlayerLeaderboardDTO> getTopMasters();
 

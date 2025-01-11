@@ -16,6 +16,9 @@ public class PaymentDAO implements IPaymentDAO {
     public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
+
+            PaymentManager.PAYMENT_MAP.clear();
+
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `payments`")) {
                 while (resultSet.next()) {
                     Payment payment = new Payment();

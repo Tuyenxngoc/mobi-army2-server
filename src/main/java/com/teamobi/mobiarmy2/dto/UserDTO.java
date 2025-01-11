@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 public class UserDTO {
     private int userId;
     private LocalDateTime x2XpTime;
+    private LocalDateTime lastOnline;
     private int xu;
     private int luong;
     private int cup;

@@ -17,6 +17,10 @@ public class ExperienceLevelDAO implements IExperienceLevelDAO {
     public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
+
+            ClanXpManager.LEVEL_XP_REQUIRED_LIST.clear();
+            PlayerXpManager.LEVEL_XP_REQUIRED_LIST.clear();
+
             try (ResultSet resultSet = statement.executeQuery("SELECT exp_user, exp_clan, level FROM `experience_levels` ORDER BY level")) {
                 int previousPlayerXp = 0;
                 int previousClanXp = 0;

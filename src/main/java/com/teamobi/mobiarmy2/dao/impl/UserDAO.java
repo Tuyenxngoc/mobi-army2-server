@@ -11,6 +11,7 @@ import com.teamobi.mobiarmy2.model.EquipmentChestJson;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.util.GsonUtil;
+import com.teamobi.mobiarmy2.util.Utils;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
@@ -71,11 +72,8 @@ public class UserDAO implements IUserDAO {
                     if (resultSet.next()) {
                         UserDTO userDTO = new UserDTO();
                         userDTO.setUserId(resultSet.getInt("user_id"));
-                        userDTO.setX2XpTime(
-                                resultSet.getTimestamp("x2_xp_time") != null
-                                        ? resultSet.getTimestamp("x2_xp_time").toLocalDateTime()
-                                        : null
-                        );
+                        userDTO.setX2XpTime(Utils.getLocalDateTimeFromTimestamp(resultSet, "x2_xp_time"));
+                        userDTO.setLastOnline(Utils.getLocalDateTimeFromTimestamp(resultSet, "last_online"));
                         userDTO.setXu(resultSet.getInt("xu"));
                         userDTO.setLuong(resultSet.getInt("luong"));
                         userDTO.setCup(resultSet.getInt("cup"));

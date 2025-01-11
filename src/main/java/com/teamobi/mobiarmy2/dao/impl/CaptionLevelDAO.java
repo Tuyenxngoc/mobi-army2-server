@@ -17,11 +17,14 @@ public class CaptionLevelDAO implements ICaptionLevelDAO {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
 
+            CaptionManager.CAPTIONS.clear();
+
             try (ResultSet resultSet = statement.executeQuery("SELECT level, caption FROM `caption_levels` order by caption_level_id desc")) {
                 while (resultSet.next()) {
                     Caption capEntry = new Caption();
                     capEntry.setLevel(resultSet.getByte("level"));
                     capEntry.setCaption(resultSet.getString("caption"));
+
                     CaptionManager.CAPTIONS.add(capEntry);
                 }
             }

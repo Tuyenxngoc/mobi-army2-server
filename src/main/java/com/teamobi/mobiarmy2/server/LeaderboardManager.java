@@ -71,7 +71,7 @@ public class LeaderboardManager {
             if (i >= 3) {
                 break;
             }
-            rankingDao.addBonusGift(entry.getPlayerId(), topBonus[i]);
+            rankingDao.addBonusGift(entry.getUserId(), topBonus[i]);
             i++;
         }
     }
@@ -87,7 +87,7 @@ public class LeaderboardManager {
         List<PlayerLeaderboardDTO> list = leaderboardEntries.get(type);
         list.clear();
         switch (type) {
-            case 0 -> list.addAll(rankingDao.getTopHonor());
+            case 0 -> list.addAll(rankingDao.getTopCup());
             case 1 -> list.addAll(rankingDao.getTopMasters());
             case 2 -> list.addAll(rankingDao.getTopRichestXu());
             case 3 -> list.addAll(rankingDao.getTopRichestLuong());

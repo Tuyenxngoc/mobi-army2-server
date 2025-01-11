@@ -274,6 +274,18 @@ public class UserService implements IUserService {
     }
 
     private void updateUserCharacters(List<UserCharacterDTO> userCharacterDTOS) {
+        int totalCharacter = CharacterManager.CHARACTERS.size();
+        user.setPlayerCharacterIds(new long[totalCharacter]);
+        user.setOwnedCharacters(new boolean[totalCharacter]);
+        user.setLevels(new int[totalCharacter]);
+        user.setXps(new int[totalCharacter]);
+        user.setPoints(new int[totalCharacter]);
+        user.setAddedPoints(new short[totalCharacter][5]);
+        user.setEquipData(new int[totalCharacter][6]);
+        user.setCharacterEquips(new EquipmentChest[totalCharacter][6]);
+        user.setSpecialItemChest(new ArrayList<>());
+        user.setEquipmentChest(new ArrayList<>());
+
         for (UserCharacterDTO userCharacterDTO : userCharacterDTOS) {
             byte i = userCharacterDTO.getCharacterId();
             user.getOwnedCharacters()[i] = true;
@@ -287,6 +299,7 @@ public class UserService implements IUserService {
     private void updateUserFromDTO(UserDTO userDTO) {
         user.setUserId(userDTO.getUserId());
         user.setXpX2Time(userDTO.getX2XpTime());
+        user.setLastOnline(userDTO.getLastOnline());
         user.setXu(userDTO.getXu());
         user.setLuong(userDTO.getLuong());
         user.setCup(userDTO.getCup());
@@ -689,7 +702,7 @@ public class UserService implements IUserService {
     }
 
     private void processFormulaCrafting(byte id, byte level) {
-        Map<Byte, List<Formula>> formulaMap = FormulaManager.FORMULA.get(id);
+        Map<Byte, List<Formula>> formulaMap = FormulaManager.FORMULAS.get(id);
         if (formulaMap == null) {
             return;
         }
@@ -780,7 +793,7 @@ public class UserService implements IUserService {
 
     private void sendFormulaInfo(byte id) {
         try {
-            Map<Byte, List<Formula>> formulaMap = FormulaManager.FORMULA.get(id);
+            Map<Byte, List<Formula>> formulaMap = FormulaManager.FORMULAS.get(id);
             if (formulaMap == null) {
                 return;
             }
@@ -875,7 +888,7 @@ public class UserService implements IUserService {
                 List<PlayerLeaderboardDTO> bangXH = leaderboardManager.getLeaderboardEntries(type, page, 10);
                 if (bangXH != null) {
                     for (PlayerLeaderboardDTO pl : bangXH) {
-                        ds.writeInt(pl.getPlayerId());
+                        ds.writeInt(pl.getUserId());
                         ds.writeUTF(pl.getUsername());
                         ds.writeByte(pl.getActiveCharacter());
                         ds.writeShort(pl.getClanId());

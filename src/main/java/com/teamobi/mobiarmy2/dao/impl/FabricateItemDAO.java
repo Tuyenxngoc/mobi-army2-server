@@ -22,6 +22,9 @@ public class FabricateItemDAO implements IFabricateItemDAO {
     public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
+
+            FabricateItemManager.FABRICATE_ITEMS.clear();
+
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `fabricate_items`")) {
                 Gson gson = GsonUtil.getInstance();
                 while (resultSet.next()) {

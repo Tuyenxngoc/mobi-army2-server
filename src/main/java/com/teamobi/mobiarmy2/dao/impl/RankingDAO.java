@@ -36,7 +36,7 @@ public class RankingDAO implements IRankingDAO {
                 PlayerLeaderboardDTO entry = new PlayerLeaderboardDTO();
 
                 entry.setIndex(index);
-                entry.setPlayerId(resultSet.getInt("player_id"));
+                entry.setUserId(resultSet.getInt("player_id"));
                 entry.setClanId(resultSet.getShort("clan_id"));
                 entry.setActiveCharacter(resultSet.getByte("character_id"));
 
@@ -72,7 +72,8 @@ public class RankingDAO implements IRankingDAO {
     }
 
     @Override
-    public List<PlayerLeaderboardDTO> getTopHonor() {
+    public List<PlayerLeaderboardDTO> getTopCup() {
+        // language=SQL
         String query = "SELECT " +
                 "p.player_id, p.equipment_chest, p.cup, " +
                 "pc.data, pc.character_id, pc.level, pc.xp, " +
@@ -90,6 +91,7 @@ public class RankingDAO implements IRankingDAO {
 
     @Override
     public List<PlayerLeaderboardDTO> getTopMasters() {
+        // language=SQL
         String query = "SELECT " +
                 "pc.data, pc.character_id, pc.level, pc.xp, " +
                 "p.player_id, p.equipment_chest, " +
@@ -107,6 +109,7 @@ public class RankingDAO implements IRankingDAO {
 
     @Override
     public List<PlayerLeaderboardDTO> getTopRichestXu() {
+        // language=SQL
         String query = "SELECT " +
                 "p.player_id, p.equipment_chest, p.xu, " +
                 "pc.data, pc.character_id, pc.level, pc.xp, " +
@@ -124,6 +127,7 @@ public class RankingDAO implements IRankingDAO {
 
     @Override
     public List<PlayerLeaderboardDTO> getTopRichestLuong() {
+        // language=SQL
         String query = "SELECT " +
                 "p.player_id, p.equipment_chest, p.luong, " +
                 "pc.data, pc.character_id, pc.level, pc.xp, " +
@@ -141,6 +145,7 @@ public class RankingDAO implements IRankingDAO {
 
     @Override
     public List<PlayerLeaderboardDTO> getWeeklyTopHonor() {
+        // language=SQL
         String query = "SELECT " +
                 "p.player_id, p.equipment_chest, SUM(t.amount) AS cup, " +
                 "pc.data, pc.character_id, pc.level, pc.xp, " +
@@ -183,7 +188,7 @@ public class RankingDAO implements IRankingDAO {
     @Override
     public void addBonusGift(int playerId, int quantity) {
         // language=SQL
-        String sql = "UPDATE players SET top_earnings_xu = ? WHERE player_id = ?";
+        String sql = "UPDATE users SET top_earnings_xu = ? WHERE player_id = ?";
         HikariCPManager.getInstance().update(sql, quantity, playerId);
     }
 

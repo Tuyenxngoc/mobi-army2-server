@@ -18,6 +18,9 @@ public class SpecialItemDAO implements ISpecialItemDAO {
     public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
+
+            SpecialItemManager.SPECIAL_ITEMS.clear();
+
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `special_items`")) {
                 Gson gson = GsonUtil.getInstance();
                 while (resultSet.next()) {
