@@ -18,6 +18,7 @@ public class MobiArmy2 {
         context.registerBean(ICaptionLevelDAO.class, new CaptionLevelDAO());
         context.registerBean(ICharacterDAO.class, new CharacterDAO());
         context.registerBean(IClanDAO.class, new ClanDAO());
+        context.registerBean(IClanItemDAO.class, new ClanItemDAO());
         context.registerBean(IClanMemberDAO.class, new ClanMemberDAO());
         context.registerBean(IClanShopDAO.class, new ClanShopDAO());
         context.registerBean(IEquipmentDAO.class, new EquipmentDAO());
@@ -40,7 +41,7 @@ public class MobiArmy2 {
         context.registerBean(IUserFriendDAO.class, new UserFriendDAO());
         context.registerBean(IUserGiftCodeDAO.class, new UserGiftCodeDAO());
         context.registerBean(IUserSpecialItemDAO.class, new UserSpecialItemDAO());
-        context.registerBean(IClanService.class, new ClanService(context.getBean(IClanDAO.class), context.getBean(IClanMemberDAO.class)));
+        context.registerBean(IClanService.class, new ClanService(context.getBean(IClanDAO.class), context.getBean(IClanItemDAO.class), context.getBean(IClanMemberDAO.class)));
 
         ServerManager serverManager = ServerManager.getInstance();
         Runtime.getRuntime().addShutdownHook(new Thread(serverManager::stop, "ServerShutdownHook"));

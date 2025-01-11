@@ -75,7 +75,7 @@ public class UserDAO implements IUserDAO {
     @Override
     public UserDTO findByAccountId(String accountId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection()) {
-            String query = "SELECT * FROM users WHERE account_id = ?";
+            String query = "SELECT u.*, cm.clan_id FROM users u LEFT JOIN clan_members cm ON u.user_id = cm.user_id WHERE account_id = ?";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setString(1, accountId);
                 try (ResultSet resultSet = statement.executeQuery()) {
@@ -83,6 +83,12 @@ public class UserDAO implements IUserDAO {
                         Gson gson = GsonUtil.getInstance();
                         UserDTO userDTO = new UserDTO();
                         userDTO.setUserId(resultSet.getInt("user_id"));
+                        Object clanIdObj = resultSet.getObject("clan_id");
+                        if (clanIdObj != null) {
+                            userDTO.setClanId(((Number) clanIdObj).shortValue());
+                        } else {
+                            userDTO.setClanId(null);
+                        }
                         userDTO.setX2XpTime(Utils.getLocalDateTimeFromTimestamp(resultSet, "x2_xp_time"));
                         userDTO.setLastOnline(Utils.getLocalDateTimeFromTimestamp(resultSet, "last_online"));
                         userDTO.setXu(resultSet.getInt("xu"));

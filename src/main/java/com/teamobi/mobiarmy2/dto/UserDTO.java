@@ -13,6 +13,7 @@ import java.util.List;
 @Setter
 public class UserDTO {
     private int userId;
+    private Short clanId;
     private LocalDateTime x2XpTime;
     private LocalDateTime lastOnline;
     private int xu;

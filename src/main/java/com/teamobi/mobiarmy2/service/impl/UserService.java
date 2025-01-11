@@ -298,6 +298,7 @@ public class UserService implements IUserService {
 
     private void updateUserFromDTO(UserDTO userDTO) {
         user.setUserId(userDTO.getUserId());
+        user.setClanId(userDTO.getClanId());
         user.setXpX2Time(userDTO.getX2XpTime());
         user.setLastOnline(userDTO.getLastOnline());
         user.setXu(userDTO.getXu());

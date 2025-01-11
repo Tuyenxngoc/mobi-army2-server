@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.service.impl;
 
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.dao.IClanDAO;
+import com.teamobi.mobiarmy2.dao.IClanItemDAO;
 import com.teamobi.mobiarmy2.dao.IClanMemberDAO;
 import com.teamobi.mobiarmy2.dto.ClanDTO;
 import com.teamobi.mobiarmy2.dto.ClanInfoDTO;
@@ -25,10 +26,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClanService implements IClanService {
     private final ConcurrentHashMap<Short, Object> clanLocks = new ConcurrentHashMap<>();
     private final IClanDAO clanDAO;
+    private final IClanItemDAO clanItemDAO;
     private final IClanMemberDAO clanMemberDAO;
 
-    public ClanService(IClanDAO clanDAO, IClanMemberDAO clanMemberDAO) {
+    public ClanService(IClanDAO clanDAO, IClanItemDAO clanItemDAO, IClanMemberDAO clanMemberDAO) {
         this.clanDAO = clanDAO;
+        this.clanItemDAO = clanItemDAO;
         this.clanMemberDAO = clanMemberDAO;
     }
 
@@ -78,7 +81,7 @@ public class ClanService implements IClanService {
 
     @Override
     public List<ClanMemDTO> getMemberClan(short clanId, byte page) {
-        return clanDAO.getClanMember(clanId, page);
+        return clanMemberDAO.getClanMember(clanId, page);
     }
 
     @Override
@@ -90,7 +93,7 @@ public class ClanService implements IClanService {
     public boolean[] getClanItems(short clanId) {
         boolean[] result = new boolean[ClanItemManager.CLAN_ITEM_MAP.size()];
         LocalDateTime now = LocalDateTime.now();
-        ClanItem[] items = clanDAO.getClanItems(clanId);
+        ClanItem[] items = clanItemDAO.getClanItems(clanId);
 
         for (ClanItem item : items) {
             if (item.getTime().isAfter(now)) {
@@ -112,7 +115,7 @@ public class ClanService implements IClanService {
                 clanDAO.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItemShop.getLuong()) + " lượng", playerId, 0, -clanItemShop.getLuong());
             }
 
-            ClanItem[] items = clanDAO.getClanItems(clanId);
+            ClanItem[] items = clanItemDAO.getClanItems(clanId);
             boolean found = false;
             LocalDateTime now = LocalDateTime.now();
 
@@ -135,7 +138,7 @@ public class ClanService implements IClanService {
                 updatedItems.add(newItem);
                 items = updatedItems.toArray(new ClanItem[0]);
             }
-            clanDAO.updateClanItems(clanId, items);
+            clanItemDAO.updateClanItems(clanId, items);
         }
     }
 
