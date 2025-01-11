@@ -10,6 +10,8 @@ import com.teamobi.mobiarmy2.dto.UserDTO;
 import com.teamobi.mobiarmy2.model.EquipmentChestJson;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
+import com.teamobi.mobiarmy2.server.FightItemManager;
+import com.teamobi.mobiarmy2.server.MissionManager;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 import org.mindrot.jbcrypt.BCrypt;
@@ -20,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,9 +33,17 @@ public class UserDAO implements IUserDAO {
 
     @Override
     public Optional<Integer> create(String accountId, int xu, int luong) {
+        byte[] fightItems = new byte[FightItemManager.FIGHT_ITEMS.size()];
+        fightItems[0] = 99;
+        fightItems[1] = 99;
+
+        int[] missions = new int[MissionManager.MISSIONS.size()];
+        byte[] missionLevels = new byte[missions.length];
+
+        Gson gson = GsonUtil.getInstance();
         // language=SQL
-        String sql = "INSERT INTO `users`(`account_id`, `xu`, `luong`, `created_date`, `last_modified_date`) VALUES (?,?,?,?,?)";
-        return HikariCPManager.getInstance().update(sql, accountId, xu, luong, LocalDateTime.now(), LocalDateTime.now());
+        String sql = "INSERT INTO `users`(account_id, xu, luong, created_date, last_modified_date, fight_items, missions, mission_levels) VALUES (?,?,?,?,?,?,?,?)";
+        return HikariCPManager.getInstance().update(sql, accountId, xu, luong, LocalDateTime.now(), LocalDateTime.now(), gson.toJson(fightItems), gson.toJson(missions), gson.toJson(missionLevels));
     }
 
     @Override
@@ -69,6 +80,7 @@ public class UserDAO implements IUserDAO {
                 statement.setString(1, accountId);
                 try (ResultSet resultSet = statement.executeQuery()) {
                     if (resultSet.next()) {
+                        Gson gson = GsonUtil.getInstance();
                         UserDTO userDTO = new UserDTO();
                         userDTO.setUserId(resultSet.getInt("user_id"));
                         userDTO.setX2XpTime(Utils.getLocalDateTimeFromTimestamp(resultSet, "x2_xp_time"));
@@ -80,6 +92,39 @@ public class UserDAO implements IUserDAO {
                         userDTO.setMaterialsPurchased(resultSet.getByte("materials_purchased"));
                         userDTO.setChestLocked(resultSet.getBoolean("is_chest_locked"));
                         userDTO.setInvitationLocked(resultSet.getBoolean("is_invitation_locked"));
+
+                        //Dữ liệu item chiến
+                        byte[] fightItems = gson.fromJson(resultSet.getString("fight_items"), byte[].class);
+                        int desiredSizeFightItem = FightItemManager.FIGHT_ITEMS.size();
+                        userDTO.setFightItems(
+                                fightItems.length != desiredSizeFightItem
+                                        ? Utils.adjustArray(fightItems, desiredSizeFightItem, (byte) 0)
+                                        : fightItems
+                        );
+
+                        //Dữ liệu nhiệm vụ
+                        int[] missions = gson.fromJson(resultSet.getString("missions"), int[].class);
+                        int desiredSizeMission = MissionManager.MISSIONS.size();
+                        userDTO.setMissions(
+                                missions.length != desiredSizeMission
+                                        ? Utils.adjustArray(missions, desiredSizeMission, 0)
+                                        : missions
+                        );
+
+                        //Dữ liệu cấp nhiệm vụ
+                        byte[] missionLevels = gson.fromJson(resultSet.getString("mission_levels"), byte[].class);
+                        userDTO.setMissionLevels(
+                                missionLevels.length != desiredSizeMission
+                                        ? Utils.adjustArray(missionLevels, desiredSizeMission, (byte) 1)
+                                        : missionLevels
+                        );
+
+                        //Dữ liệu bạn bè
+                        int[] friendsArray = gson.fromJson(resultSet.getString("friends"), int[].class);
+                        List<Integer> friendsList = Arrays.stream(friendsArray)
+                                .boxed().toList();
+                        userDTO.setFriends(friendsList);
+
                         return userDTO;
                     }
                 }

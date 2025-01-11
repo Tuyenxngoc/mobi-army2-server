@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author tuyen
@@ -21,4 +22,8 @@ public class UserDTO {
     private byte materialsPurchased;
     private boolean isChestLocked;
     private boolean isInvitationLocked;
+    private byte[] fightItems;
+    private List<Integer> friends;
+    private int[] missions;
+    private byte[] missionLevels;
 }

@@ -307,6 +307,10 @@ public class UserService implements IUserService {
         user.setMaterialsPurchased(userDTO.getMaterialsPurchased());
         user.setChestLocked(userDTO.isChestLocked());
         user.setInvitationLocked(userDTO.isInvitationLocked());
+        user.setFriends(userDTO.getFriends());
+        user.setFightItems(userDTO.getFightItems());
+        user.setMission(userDTO.getMissions());
+        user.setMissionLevel(userDTO.getMissionLevels());
     }
 
     @Override
