@@ -149,7 +149,7 @@ public class GiftBoxManager implements IGiftBoxManager {
                 byte numb;
                 if (updateUser) {
                     numb = (byte) Utils.nextInt(1, 5);
-                    user.updateItems(id, numb);
+                    user.updateFightItems(id, numb);
                 } else {
                     numb = (byte) Utils.nextInt(1, 10);
                 }

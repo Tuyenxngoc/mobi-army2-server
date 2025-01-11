@@ -201,7 +201,7 @@ public class UserService implements IUserService {
                 //Gửi item
                 byte indexItem = FightItemManager.getRandomItem();
                 byte quantity = 1;
-                user.updateItems(indexItem, quantity);
+                user.updateFightItems(indexItem, quantity);
                 sendMessageToUser(GameString.createDailyRewardMessage(quantity, FightItemManager.FIGHT_ITEMS.get(indexItem).getName()));
 
                 //Cập nhật quà top
@@ -489,10 +489,9 @@ public class UserService implements IUserService {
         }
         try {
             byte action = ms.reader().readByte();
-
             if (action == 0) {
                 sendMissionInfo();
-            } else if (action == 1) {
+            } else {
                 byte missionId = ms.reader().readByte();
                 missionComplete(missionId);
             }
@@ -541,13 +540,13 @@ public class UserService implements IUserService {
         IMessage ms = new Message(Cmd.MISSISON);
         DataOutputStream ds = ms.writer();
         int i = 0;
-        for (List<Mission> missionList : MissionManager.MISSION_LIST.values()) {
-            int index = user.getMissionLevel()[i] - 1;//Subtracting 1 to access the correct index
-            if (index >= missionList.size()) {
-                index = missionList.size() - 1;
+        for (List<Byte> missionIds : MissionManager.MISSIONS_BY_TYPE.values()) {
+            int index = user.getMissionLevel()[i] - 1;
+            if (index >= missionIds.size()) {
+                index = missionIds.size() - 1;
             }
-            Mission mission = missionList.get(index);
-            ds.writeByte(mission.getId());
+            Mission mission = MissionManager.getMissionById(missionIds.get(index));
+            ds.writeByte(mission.getMissionId());
             ds.writeByte(mission.getLevel());
             ds.writeUTF(mission.getName());
             ds.writeUTF(mission.getReward());
@@ -595,7 +594,7 @@ public class UserService implements IUserService {
             }
 
             for (int i = 0; i < FightItemManager.FIGHT_ITEMS.size(); i++) {
-                ds.writeByte(user.getItems()[i]);
+                ds.writeByte(user.getFightItems()[i]);
                 FightItem fightItem = FightItemManager.FIGHT_ITEMS.get(i);
                 ds.writeInt(fightItem.getBuyXu());
                 ds.writeInt(fightItem.getBuyLuong());
@@ -1717,7 +1716,7 @@ public class UserService implements IUserService {
                     return;
                 }
 
-                if (user.getItemFightQuantity(itemIndex) < 1) {
+                if (user.getFightItemQuantity(itemIndex) < 1) {
                     return;
                 }
             }
@@ -1991,7 +1990,7 @@ public class UserService implements IUserService {
         try {
             for (int i = 0; i < items.length; i++) {
                 byte index = dis.readByte();
-                if (user.getItemFightQuantity(index) > 0) {
+                if (user.getFightItemQuantity(index) > 0) {
                     items[i] = index;
                 } else {
                     items[i] = -1;
@@ -2055,7 +2054,7 @@ public class UserService implements IUserService {
             if (itemIndex < 0 || itemIndex >= FightItemManager.FIGHT_ITEMS.size()) {
                 return;
             }
-            if (user.getItems()[itemIndex] + quantity > ServerManager.getInstance().getConfig().getMaxItem()) {
+            if (user.getFightItems()[itemIndex] + quantity > ServerManager.getInstance().getConfig().getMaxItem()) {
                 return;
             }
             if (unit == 0) {
@@ -2071,12 +2070,12 @@ public class UserService implements IUserService {
                 }
                 user.updateLuong(-total);
             }
-            user.updateItems(itemIndex, quantity);
+            user.updateFightItems(itemIndex, quantity);
             ms = new Message(Cmd.BUY_ITEM);
             DataOutputStream ds = ms.writer();
             ds.writeByte(1);
             ds.writeByte(itemIndex);
-            ds.writeByte(user.getItems()[itemIndex]);
+            ds.writeByte(user.getFightItems()[itemIndex]);
             ds.writeInt(user.getXu());
             ds.writeInt(user.getLuong());
             ds.flush();
@@ -2707,7 +2706,7 @@ public class UserService implements IUserService {
                         itemId = FightItemManager.getRandomItem();
                         quantity = config.getSpinItemCounts()[0][Utils.nextInt(config.getSpinItemCounts()[1])];
                         if (i == luckyIndex) {
-                            user.updateItems(itemId, (byte) quantity);
+                            user.updateFightItems(itemId, (byte) quantity);
                         }
                     }
                     case 1 -> {

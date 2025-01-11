@@ -56,7 +56,7 @@ public class User {
     private int[] xps;
     private int[] points;
     private short[][] addedPoints;
-    private byte[] items;
+    private byte[] fightItems;
     private int[][] equipData;
     private int[] mission;
     private byte[] missionLevel;
@@ -233,19 +233,21 @@ public class User {
         return equips;
     }
 
-    public synchronized void updateItems(byte itemIndex, byte quantity) {
-        if (itemIndex < 0 || itemIndex >= items.length) {
+    public synchronized void updateFightItems(byte itemIndex, byte quantity) {
+        if (itemIndex < 0 || itemIndex >= fightItems.length) {
             return;
         }
 
-        items[itemIndex] += quantity;
-        if (items[itemIndex] < 0) {
-            items[itemIndex] = 0;
+        fightItems[itemIndex] += quantity;
+        if (fightItems[itemIndex] < 0) {
+            fightItems[itemIndex] = 0;
         }
-        if (items[itemIndex] > ServerManager.getInstance().getConfig().getMaxItem()) {
-            items[itemIndex] = ServerManager.getInstance().getConfig().getMaxItem();
+
+        byte maxItem = ServerManager.getInstance().getConfig().getMaxItem();
+        if (fightItems[itemIndex] > maxItem) {
+            fightItems[itemIndex] = maxItem;
         }
-        items[0] = items[1] = 99;
+        fightItems[0] = fightItems[1] = maxItem;
     }
 
     public synchronized void addEquipment(EquipmentChest addEquipment) {
@@ -468,9 +470,9 @@ public class User {
                 .orElse(null);
     }
 
-    public byte getItemFightQuantity(int index) {
-        if (index >= 0 && index < items.length) {
-            return items[index];
+    public byte getFightItemQuantity(int index) {
+        if (index >= 0 && index < fightItems.length) {
+            return fightItems[index];
         }
         return 0;
     }

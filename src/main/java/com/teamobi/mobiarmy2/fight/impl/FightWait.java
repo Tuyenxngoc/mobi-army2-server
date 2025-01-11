@@ -152,7 +152,7 @@ public class FightWait implements IFightWait {
             IMessage ms = new Message(Cmd.ITEM_SLOT);
             DataOutputStream ds = ms.writer();
             for (byte i = 0; i < 4; i++) {
-                ds.writeByte(us.getItemFightQuantity(12 + i));
+                ds.writeByte(us.getFightItemQuantity(12 + i));
             }
             ds.flush();
             us.sendMessage(ms);
@@ -430,8 +430,8 @@ public class FightWait implements IFightWait {
 
                 //Kiểm tra điều kiện số lượng item
                 if (itemUsageMap[itemIndex] > FightItemManager.FIGHT_ITEMS.get(itemIndex).getCarriedItemCount() || //Số lượng vượt quá số lượng cho phép
-                        itemUsageMap[itemIndex] > user.getItemFightQuantity(itemIndex) || //Số lượng vượt quá số lượng đang có
-                        (j >= 4 && user.getItemFightQuantity(12 + j - 4) == 0) //Item chứa đã hết
+                        itemUsageMap[itemIndex] > user.getFightItemQuantity(itemIndex) || //Số lượng vượt quá số lượng đang có
+                        (j >= 4 && user.getFightItemQuantity(12 + j - 4) == 0) //Item chứa đã hết
                 ) {
                     try {
                         IMessage ms = new Message(Cmd.SERVER_MESSAGE);

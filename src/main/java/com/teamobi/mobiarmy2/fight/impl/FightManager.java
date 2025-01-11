@@ -886,7 +886,7 @@ public class FightManager implements IFightManager {
                             for (int k = 0; k < count; k++) {
                                 byte indexItem = FightItemManager.getRandomItem();
                                 byte quantity = 1;
-                                user.updateItems(indexItem, quantity);
+                                user.updateFightItems(indexItem, quantity);
                                 reward.append(quantity).append("x ");
                                 reward.append(FightItemManager.FIGHT_ITEMS.get(indexItem).getName()).append(", ");
                             }
@@ -1073,7 +1073,7 @@ public class FightManager implements IFightManager {
             byte[] items = fightWait.getItems(i);
             for (int j = 4; j < items.length; j++) {
                 if (items[i] > 0) {
-                    user.updateItems((byte) (12 + j - 4), (byte) -1);
+                    user.updateFightItems((byte) (12 + j - 4), (byte) -1);
                 }
             }
 
@@ -1336,7 +1336,7 @@ public class FightManager implements IFightManager {
             }
 
             player.usedItem(slot);
-            player.getUser().updateItems(itemIndex, (byte) -1);
+            player.getUser().updateFightItems(itemIndex, (byte) -1);
         }
 
         try {

@@ -50,7 +50,6 @@ public class UserDAO implements IUserDAO {
                 " WHERE user_id = ?";
 
         HikariCPManager.getInstance().update(sql,
-                user.getFriends().toString(),
                 user.getXu(),
                 user.getLuong(),
                 user.getCup(),
