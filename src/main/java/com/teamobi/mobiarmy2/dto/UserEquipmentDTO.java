@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 public class UserEquipmentDTO {
     private int userEquipmentId;
-    private long userId;
+    private int userId;
     private short equipmentId;
     private byte vipLevel;
     private LocalDateTime purchaseDate;

@@ -6,7 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserCharacterDTO {
-    private long userId;
     private byte characterId;
     private short[] additionalPoints;
     private int[] data;

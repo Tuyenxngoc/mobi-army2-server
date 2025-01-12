@@ -38,4 +38,29 @@ public class AccountDAO implements IAccountDAO {
         return null;
     }
 
+    @Override
+    public boolean existsByAccountIdAndPassword(String accountId, String password) {
+        try (Connection connection = HikariCPManager.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT password FROM accounts WHERE account_id = ?")) {
+            statement.setString(1, accountId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    String hashedPassword = resultSet.getString("password");
+                    return BCrypt.checkpw(password, hashedPassword);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public void changePassword(String accountId, String newPass) {
+        String hashedPassword = BCrypt.hashpw(newPass, BCrypt.gensalt());
+        // language=SQL
+        String sql = "UPDATE `accounts` SET `password` = ? WHERE account_id = ?";
+        HikariCPManager.getInstance().update(sql, hashedPassword, accountId);
+    }
+
 }

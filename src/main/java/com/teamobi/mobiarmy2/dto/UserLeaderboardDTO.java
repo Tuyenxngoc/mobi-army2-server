@@ -8,7 +8,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class PlayerLeaderboardDTO {
+public class UserLeaderboardDTO {
     private int userId;
     private String username;
     private short clanId;

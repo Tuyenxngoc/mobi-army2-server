@@ -275,7 +275,6 @@ public class UserService implements IUserService {
 
     private void updateUserCharacters(List<UserCharacterDTO> userCharacterDTOS) {
         int totalCharacter = CharacterManager.CHARACTERS.size();
-        user.setPlayerCharacterIds(new long[totalCharacter]);
         user.setOwnedCharacters(new boolean[totalCharacter]);
         user.setLevels(new int[totalCharacter]);
         user.setXps(new int[totalCharacter]);
@@ -293,6 +292,9 @@ public class UserService implements IUserService {
             user.getXps()[i] = userCharacterDTO.getXp();
             user.getPoints()[i] = userCharacterDTO.getPoints();
             user.getAddedPoints()[i] = userCharacterDTO.getAdditionalPoints();
+            if (userCharacterDTO.isActive()) {
+                user.setActiveCharacterId(userCharacterDTO.getCharacterId());
+            }
         }
     }
 
@@ -576,7 +578,7 @@ public class UserService implements IUserService {
             ds.writeShort(user.getClanId() != null ? user.getClanId() : 0);
             ds.writeByte(0);//clan rights
 
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < CharacterManager.CHARACTERS.size(); i++) {
                 EquipmentChest equip = user.getCharacterEquips()[i][5];
                 if (equip != null) {
                     ds.writeBoolean(true);
@@ -605,13 +607,11 @@ public class UserService implements IUserService {
                 ds.writeInt(fightItem.getBuyLuong());
             }
 
-            for (int i = 0; i < 10; i++) {
-                if (i > 2) {
-                    ds.writeByte(user.getOwnedCharacters()[i] ? 1 : 0);
-                    Character character = CharacterManager.CHARACTERS.get(i);
-                    ds.writeShort(character.getPriceXu() / 1000);
-                    ds.writeShort(character.getPriceLuong());
-                }
+            for (int i = 3; i < CharacterManager.CHARACTERS.size(); i++) {
+                ds.writeByte(user.getOwnedCharacters()[i] ? 1 : 0);
+                Character character = CharacterManager.CHARACTERS.get(i);
+                ds.writeShort(character.getPriceXu() / 1000);
+                ds.writeShort(character.getPriceLuong());
             }
 
             IServerConfig config = ServerManager.getInstance().getConfig();
@@ -889,9 +889,9 @@ public class UserService implements IUserService {
                 //Gửi dữ liệu
                 ds.writeByte(page);
                 ds.writeUTF(leaderboardManager.getLeaderboardLabels()[type]);
-                List<PlayerLeaderboardDTO> bangXH = leaderboardManager.getLeaderboardEntries(type, page, 10);
+                List<UserLeaderboardDTO> bangXH = leaderboardManager.getLeaderboardEntries(type, page, 10);
                 if (bangXH != null) {
-                    for (PlayerLeaderboardDTO pl : bangXH) {
+                    for (UserLeaderboardDTO pl : bangXH) {
                         ds.writeInt(pl.getUserId());
                         ds.writeUTF(pl.getUsername());
                         ds.writeByte(pl.getActiveCharacter());
@@ -1941,11 +1941,11 @@ public class UserService implements IUserService {
                 sendMessageLoginFail(GameString.FRIEND_ADD_INVALID_NAME);
                 return;
             }
-            Integer id = userDAO.findPlayerIdByUsername(username);
+            Integer userId = userDAO.findUserIdByUsername(username);
             ms = new Message(Cmd.SEARCH);
             DataOutputStream ds = ms.writer();
-            if (id != null) {
-                ds.writeInt(id);
+            if (userId != null) {
+                ds.writeInt(userId);
                 ds.writeUTF(username);
             }
             ds.flush();
@@ -2095,45 +2095,45 @@ public class UserService implements IUserService {
         try {
             DataInputStream dis = ms.reader();
             byte index = dis.readByte();
+            index += 3;
             byte unit = dis.readByte();
-            if (index < 0 || index >= user.getOwnedCharacters().length - 3) {
+            if (index < 3 || index >= user.getOwnedCharacters().length) {
                 return;
             }
-            index += 3;
             if (user.getOwnedCharacters()[index]) {
                 return;
             }
-            Character characterEntry = CharacterManager.CHARACTERS.get(index);
+            Character character = CharacterManager.CHARACTERS.get(index);
             if (unit == 0) {
-                if (characterEntry.getPriceXu() <= 0) {
+                if (character.getPriceXu() <= 0) {
                     return;
                 }
-                if (user.getXu() < characterEntry.getPriceXu()) {
+                if (user.getXu() < character.getPriceXu()) {
                     sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                     return;
                 }
-                user.updateXu(-characterEntry.getPriceXu());
+                user.updateXu(-character.getPriceXu());
             } else {
-                if (characterEntry.getPriceLuong() <= 0) {
+                if (character.getPriceLuong() <= 0) {
                     return;
                 }
-                if (user.getLuong() < characterEntry.getPriceLuong()) {
+                if (user.getLuong() < character.getPriceLuong()) {
                     sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                     return;
                 }
-                user.updateLuong(-characterEntry.getPriceLuong());
+                user.updateLuong(-character.getPriceLuong());
             }
 
-            if (userDAO.createPlayerCharacter(user.getUserId(), index)) {
-                PlayerCharacterDTO character = userDAO.getPlayerCharacter(user.getUserId(), index);
-                if (character != null) {
-                    user.getLevels()[index] = character.getLevel();
-                    user.getXps()[index] = character.getXp();
-                    user.getPoints()[index] = character.getPoints();
-                    user.getAddedPoints()[index] = character.getAdditionalPoints();
-                    user.getPlayerCharacterIds()[index] = character.getId();
+            Optional<Integer> result = userCharacterDAO.create(user.getUserId(), index, Boolean.FALSE);
+            if (result.isPresent()) {
+                UserCharacterDTO playerCharacterDTO = userCharacterDAO.findByUserIdAndCharacterId(user.getUserId(), index);
+                if (playerCharacterDTO != null) {
+                    user.getLevels()[index] = playerCharacterDTO.getLevel();
+                    user.getXps()[index] = playerCharacterDTO.getXp();
+                    user.getPoints()[index] = playerCharacterDTO.getPoints();
+                    user.getAddedPoints()[index] = playerCharacterDTO.getAdditionalPoints();
                     user.getOwnedCharacters()[index] = true;
-                    user.getEquipData()[index] = character.getData();
+                    user.getEquipData()[index] = playerCharacterDTO.getData();
 
                     ms = new Message(Cmd.BUY_GUN);
                     DataOutputStream ds = ms.writer();
@@ -2258,12 +2258,12 @@ public class UserService implements IUserService {
                 return;
             }
 
-            if (!userDAO.existsByUserIdAndPassword(user.getAccountId(), oldPass)) {
+            if (!accountDAO.existsByAccountIdAndPassword(user.getAccountId(), oldPass)) {
                 sendServerMessage(GameString.PASSWORD_INCORRECT_OLD);
                 return;
             }
 
-            userDAO.changePassword(user.getAccountId(), newPass);
+            accountDAO.changePassword(user.getAccountId(), newPass);
             sendServerMessage(GameString.PASSWORD_CHANGE_SUCCESS);
         } catch (IOException ignored) {
         }

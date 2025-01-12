@@ -8,5 +8,7 @@ import java.util.Optional;
 public interface IUserCharacterDAO {
     List<UserCharacterDTO> findAllByUserId(int userId);
 
+    UserCharacterDTO findByUserIdAndCharacterId(int userId, byte characterId);
+
     Optional<Integer> create(int userId, byte characterId, boolean isActive);
 }

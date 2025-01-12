@@ -1,11 +1,9 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
-import com.teamobi.mobiarmy2.constant.TransactionType;
 import com.teamobi.mobiarmy2.dao.IUserDAO;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.dto.FriendDTO;
-import com.teamobi.mobiarmy2.dto.PlayerCharacterDTO;
 import com.teamobi.mobiarmy2.dto.UserDTO;
 import com.teamobi.mobiarmy2.model.EquipmentChestJson;
 import com.teamobi.mobiarmy2.model.User;
@@ -14,7 +12,6 @@ import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.MissionManager;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -208,39 +205,13 @@ public class UserDAO implements IUserDAO {
     }
 
     @Override
-    public boolean existsByUserIdAndPassword(String userId, String oldPass) {
+    public Integer findUserIdByUsername(String username) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT password FROM users WHERE user_id = ?")) {
-            statement.setString(1, userId);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    String hashedPassword = resultSet.getString("password");
-                    //Check if the provided password matches the hashed password from the database
-                    return BCrypt.checkpw(oldPass, hashedPassword);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    @Override
-    public void changePassword(String userId, String newPass) {
-        String hashedPassword = BCrypt.hashpw(newPass, BCrypt.gensalt());
-        // language=SQL
-        String sql = "UPDATE `user` SET `password` = ? WHERE user_id = ?";
-        HikariCPManager.getInstance().update(sql, hashedPassword, userId);
-    }
-
-    @Override
-    public Integer findPlayerIdByUsername(String username) {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT p.player_id FROM users u INNER JOIN players p ON u.user_id = p.user_id WHERE u.username = ?")) {
+             PreparedStatement statement = connection.prepareStatement("SELECT u.user_id FROM accounts a LEFT JOIN users u ON a.account_id = u.account_id WHERE a.username = ?")) {
             statement.setString(1, username);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    return resultSet.getInt("player_id");
+                    return resultSet.getInt("user_id");
                 }
             }
         } catch (SQLException e) {
@@ -250,51 +221,9 @@ public class UserDAO implements IUserDAO {
     }
 
     @Override
-    public void updateLastOnline(LocalDateTime time, int playerId) {
+    public void updateLastOnline(LocalDateTime time, int userId) {
         // language=SQL
-        String sql = "UPDATE `players` SET `last_online` = ? WHERE player_id = ?";
-        HikariCPManager.getInstance().update(sql, time.toString(), playerId);
+        String sql = "UPDATE `users` SET `last_online` = ? WHERE user_id = ?";
+        HikariCPManager.getInstance().update(sql, time, userId);
     }
-
-    @Override
-    public boolean createPlayerCharacter(int playerId, byte characterId) {
-        // language=SQL
-        Optional<Integer> result = HikariCPManager.getInstance().update("INSERT INTO `player_characters`(`player_id`, `character_id`) VALUES (?,?)", playerId, characterId);
-        return result.isPresent();
-    }
-
-    @Override
-    public PlayerCharacterDTO getPlayerCharacter(int playerId, byte characterId) {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM `player_characters` pc WHERE pc.player_id = ? AND pc.character_id = ?")) {
-            statement.setInt(1, playerId);
-            statement.setByte(2, characterId);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    Gson gson = GsonUtil.getInstance();
-                    PlayerCharacterDTO characterEntry = new PlayerCharacterDTO();
-                    characterEntry.setPlayerId(playerId);
-                    characterEntry.setCharacterId(characterId);
-                    characterEntry.setId(resultSet.getLong("player_character_id"));
-                    characterEntry.setAdditionalPoints(gson.fromJson(resultSet.getString("additional_points"), short[].class));
-                    characterEntry.setData(gson.fromJson(resultSet.getString("data"), int[].class));
-                    characterEntry.setLevel(resultSet.getInt("level"));
-                    characterEntry.setXp(resultSet.getInt("xp"));
-                    characterEntry.setPoints(resultSet.getInt("points"));
-
-                    return characterEntry;
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public void createTransaction(TransactionType type, int amount, int playerId) {
-        // language=SQL
-        HikariCPManager.getInstance().update("INSERT INTO `transactions`(`transaction_type`, `amount`, `transaction_date`, `player_id`) values (?,?,?,?)", type, amount, LocalDateTime.now(), playerId);
-    }
-
 }
