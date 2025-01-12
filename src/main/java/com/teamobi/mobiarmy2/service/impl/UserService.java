@@ -20,10 +20,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author tuyen
@@ -244,7 +241,7 @@ public class UserService implements IUserService {
     }
 
     private void updateUserSpecialItems(List<UserSpecialItemDTO> userSpecialItemDTOS) {
-        user.setSpecialItemChest(new ArrayList<>());
+        user.setSpecialItemChest(new HashMap<>());
         for (UserSpecialItemDTO userSpecialItemDTO : userSpecialItemDTOS) {
             SpecialItemChest specialItemChest = new SpecialItemChest();
             specialItemChest.setItem(SpecialItemManager.getSpecialItemById(userSpecialItemDTO.getSpecialItemId()));
@@ -253,12 +250,12 @@ public class UserService implements IUserService {
             }
             specialItemChest.setQuantity(userSpecialItemDTO.getQuantity());
 
-            user.getSpecialItemChest().add(specialItemChest);
+            user.getSpecialItemChest().put(specialItemChest.getItem().getId(), specialItemChest);
         }
     }
 
     private void updateUserEquipment(List<UserEquipmentDTO> userEquipmentDTOS) {
-        user.setEquipmentChest(new ArrayList<>());
+        user.setEquipmentChest(new HashMap<>());
         for (UserEquipmentDTO userEquipmentDTO : userEquipmentDTOS) {
             EquipmentChest equipmentChest = new EquipmentChest();
             equipmentChest.setEquipment(EquipmentManager.getEquipment(userEquipmentDTO.getEquipmentId()));
@@ -274,7 +271,7 @@ public class UserService implements IUserService {
             equipmentChest.setSlots(userEquipmentDTO.getSlots());
             equipmentChest.calculateEmptySlots();
 
-            user.getEquipmentChest().add(equipmentChest);
+            user.getEquipmentChest().put(equipmentChest.getKey(), equipmentChest);
         }
     }
 
@@ -2385,8 +2382,9 @@ public class UserService implements IUserService {
         try {
             IMessage ms = new Message(Cmd.INVENTORY);
             DataOutputStream ds = ms.writer();
-            ds.writeByte(user.getEquipmentChest().size());
-            for (EquipmentChest entry : user.getEquipmentChest()) {
+            Map<Integer, EquipmentChest> sortedEquipments = new TreeMap<>(user.getEquipmentChest());
+            ds.writeByte(sortedEquipments.size());
+            for (EquipmentChest entry : sortedEquipments.values()) {
                 ds.writeInt(entry.getKey());
                 ds.writeByte(entry.getEquipment().getCharacterId());
                 ds.writeByte(entry.getEquipment().getEquipType());
@@ -2412,8 +2410,9 @@ public class UserService implements IUserService {
             ms = new Message(Cmd.MATERIAL);
             ds = ms.writer();
             ds.writeByte(0);
-            ds.writeByte(user.getSpecialItemChest().size());
-            for (SpecialItemChest item : user.getSpecialItemChest()) {
+            Map<Byte, SpecialItemChest> sortedItems = new TreeMap<>(user.getSpecialItemChest());
+            ds.writeByte(sortedItems.size());
+            for (SpecialItemChest item : sortedItems.values()) {
                 ds.writeByte(item.getItem().getId());
                 ds.writeShort(item.getQuantity());
                 ds.writeUTF(item.getItem().getName());
@@ -2707,7 +2706,7 @@ public class UserService implements IUserService {
             return;
         }
         equipmentChest.setKey(result.get());
-        user.getEquipmentChest().add(equipmentChest);
+        user.getEquipmentChest().put(equipmentChest.getKey(), equipmentChest);
 
         try {
             IMessage ms = new Message(Cmd.BUY_EQUIP);

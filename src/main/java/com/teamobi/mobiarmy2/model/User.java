@@ -26,6 +26,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tuyen
@@ -60,8 +61,8 @@ public class User {
     private byte[] missionLevel;
     private EquipmentChest[][] characterEquips;
     private List<Integer> friends;
-    private List<SpecialItemChest> specialItemChest;
-    private List<EquipmentChest> equipmentChest;
+    private Map<Byte, SpecialItemChest> specialItemChest;
+    private Map<Integer, EquipmentChest> equipmentChest;
     private IFightWait fightWait;
     private ITrainingManager trainingManager;
     private final IUserService userService;
@@ -283,7 +284,7 @@ public class User {
                     if (existingItem != null) {
                         existingItem.increaseQuantity(newItem.getQuantity());
                     } else {
-                        specialItemChest.add(newItem);
+                        specialItemChest.put(newItem.getItem().getId(), newItem);
                     }
                     ds.writeByte(newItem.getQuantity() > 1 ? 3 : 1);
                     ds.writeByte(newItem.getItem().getId());
@@ -304,7 +305,7 @@ public class User {
                     if (existingItem != null) {
                         existingItem.decreaseQuantity(itemToRemove.getQuantity());
                         if (existingItem.getQuantity() <= 0) {
-                            specialItemChest.remove(existingItem);
+                            specialItemChest.remove(itemToRemove.getItem().getId());
                         }
                         updateQuantity++;
                         ds.writeByte(0);
@@ -316,7 +317,7 @@ public class User {
 
             if (removeEquip != null) {
                 updateQuantity++;
-                equipmentChest.remove(removeEquip);
+                equipmentChest.remove(removeEquip.getKey());
                 ds.writeByte(0);
                 ds.writeInt(removeEquip.getKey());
                 ds.writeByte(1);
@@ -355,17 +356,11 @@ public class User {
     }
 
     public EquipmentChest getEquipmentByKey(int key) {
-        return equipmentChest.stream()
-                .filter(equip -> equip.getKey() == key)
-                .findFirst()
-                .orElse(null);
+        return equipmentChest.get(key);
     }
 
     public SpecialItemChest getSpecialItemById(byte id) {
-        return specialItemChest.stream()
-                .filter(item -> item.getItem().getId() == id)
-                .findFirst()
-                .orElse(null);
+        return specialItemChest.get(id);
     }
 
     public synchronized void resetPoints() {
@@ -382,10 +377,7 @@ public class User {
     }
 
     public short getInventorySpecialItemCount(byte itemId) {
-        SpecialItemChest specialItemChest = this.specialItemChest.stream()
-                .filter(item -> item.getItem().getId() == itemId)
-                .findFirst()
-                .orElse(null);
+        SpecialItemChest specialItemChest = getSpecialItemById(itemId);
         if (specialItemChest == null) {
             return 0;
         }
@@ -401,7 +393,7 @@ public class User {
     }
 
     public boolean hasEquipment(short equipIndex, byte vipLevel) {
-        return equipmentChest.stream()
+        return equipmentChest.values().stream()
                 .anyMatch(equip -> equip != null && equip.getEquipment() != null &&
                         equip.getEquipment().getEquipIndex() == equipIndex &&
                         equip.getVipLevel() == vipLevel &&
@@ -412,7 +404,7 @@ public class User {
     }
 
     public EquipmentChest getEquipment(short equipIndex, byte characterId, byte vipLevel) {
-        return equipmentChest.stream()
+        return equipmentChest.values().stream()
                 .filter(equip -> equip != null && equip.getEquipment() != null &&
                         equip.getEquipment().getEquipIndex() == equipIndex &&
                         equip.getEquipment().getCharacterId() == characterId &&

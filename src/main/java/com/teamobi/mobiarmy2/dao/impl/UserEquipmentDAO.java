@@ -115,4 +115,11 @@ public class UserEquipmentDAO implements IUserEquipmentDAO {
                 gson.toJson(equipmentChest.getAddPercents())
         );
     }
+
+    @Override
+    public Optional<Integer> delete(int userId, int userEquipmentId) {
+        // language=SQL
+        String sql = "DELETE FROM `user_equipments` WHERE user_id = ? AND user_equipment_id = ?";
+        return HikariCPManager.getInstance().update(sql, userId, userEquipmentId);
+    }
 }

@@ -13,4 +13,6 @@ public interface IUserEquipmentDAO {
     Map<Integer, UserEquipmentDTO> findAllByIdIn(int[] ids);
 
     Optional<Integer> create(int userId, EquipmentChest equipmentChest);
+
+    Optional<Integer> delete(int userId, int userEquipmentId);
 }
