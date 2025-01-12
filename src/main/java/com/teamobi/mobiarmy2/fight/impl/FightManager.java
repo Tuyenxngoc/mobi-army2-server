@@ -876,7 +876,7 @@ public class FightManager implements IFightManager {
                             byte id = getRewardMaterialId();
 
                             SpecialItemChest newItem = new SpecialItemChest(quantity, SpecialItemManager.getSpecialItemById(id));
-                            user.updateInventory(null, null, List.of(newItem), null);
+                            user.getUserService().updateInventory(null, null, List.of(newItem), null);
 
                             String reward = String.format("Phần thưởng diệt trùm của bạn là %dx %s", newItem.getQuantity(), newItem.getItem().getName());
                             user.getUserService().sendServerMessage(reward);

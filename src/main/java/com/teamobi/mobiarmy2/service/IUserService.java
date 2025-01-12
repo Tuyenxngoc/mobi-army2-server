@@ -1,6 +1,10 @@
 package com.teamobi.mobiarmy2.service;
 
+import com.teamobi.mobiarmy2.model.EquipmentChest;
+import com.teamobi.mobiarmy2.model.SpecialItemChest;
 import com.teamobi.mobiarmy2.network.IMessage;
+
+import java.util.List;
 
 /**
  * @author tuyen
@@ -130,6 +134,10 @@ public interface IUserService {
     void handleSendShopEquipments();
 
     void handleEquipmentTransactions(IMessage ms);
+
+    void addEquipment(EquipmentChest equipmentChest);
+
+    void updateInventory(EquipmentChest updateEquip, EquipmentChest removeEquip, List<SpecialItemChest> addItems, List<SpecialItemChest> removeItems);
 
     void handleSpinWheel(IMessage ms);
 

@@ -16,6 +16,7 @@ import com.teamobi.mobiarmy2.service.ILeaderboardService;
 import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.util.Utils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -250,7 +251,7 @@ public class UserService implements IUserService {
             }
             specialItemChest.setQuantity(userSpecialItemDTO.getQuantity());
 
-            user.getSpecialItemChest().put(specialItemChest.getItem().getId(), specialItemChest);
+            user.addSpecialItemChest(specialItemChest);
         }
     }
 
@@ -271,7 +272,7 @@ public class UserService implements IUserService {
             equipmentChest.setSlots(userEquipmentDTO.getSlots());
             equipmentChest.calculateEmptySlots();
 
-            user.getEquipmentChest().put(equipmentChest.getKey(), equipmentChest);
+            user.addEquipmentChest(equipmentChest);
         }
     }
 
@@ -493,7 +494,7 @@ public class UserService implements IUserService {
                 }
                 user.updateXu(-gia);
                 equip.setPurchaseDate(LocalDateTime.now());
-                user.updateInventory(equip, null, null, null);
+                updateInventory(equip, null, null, null);
                 sendServerMessage(GameString.EXTEND_SUCCESS);
             }
         } catch (IOException ignored) {
@@ -770,7 +771,7 @@ public class UserService implements IUserService {
         }
 
         //Xoá trang bị và item yêu cầu
-        user.updateInventory(null, requiredEquip, null, itemsToRemove);
+        updateInventory(null, requiredEquip, null, itemsToRemove);
 
         //Random chỉ số
         byte[] addPoints = new byte[5];
@@ -1088,7 +1089,7 @@ public class UserService implements IUserService {
             SpecialItemChest newItem = new SpecialItemChest(quantity, item);
 
             //Thêm vào rương đồ
-            user.updateInventory(null, null, List.of(newItem), null);
+            updateInventory(null, null, List.of(newItem), null);
         }
 
         //Cập nhật số lượng mua nếu là vật liệu
@@ -1491,7 +1492,7 @@ public class UserService implements IUserService {
                                 equip.decrementEmptySlot();
                                 equip.addPoints(specialItem.getItem().getAbility());
                             }
-                            user.updateInventory(equip, null, null, specialItemList);
+                            updateInventory(equip, null, null, specialItemList);
                             sendServerMessage(GameString.GEM_COMBINE_SUCCESS);
                         } else {
                             sendServerMessage(GameString.GEM_COMBINE_NO_SLOT);
@@ -1506,11 +1507,11 @@ public class UserService implements IUserService {
                             newItem.setQuantity((short) 1);
                             newItem.setItem(SpecialItemManager.getSpecialItemById((byte) (specialItemChest.getItem().getId() + 1)));
 
-                            user.updateInventory(null, null, List.of(newItem), List.of(specialItemChest));
+                            updateInventory(null, null, List.of(newItem), List.of(specialItemChest));
                             sendServerMessage(GameString.createGemUpgradeSuccessMessage(newItem.getQuantity(), newItem.getItem().getName()));
                         } else {
                             specialItemChest.setQuantity((short) 1);
-                            user.updateInventory(null, null, null, List.of(specialItemChest));
+                            updateInventory(null, null, null, List.of(specialItemChest));
                             sendServerMessage(GameString.COMBINE_FAILURE);
                         }
                     }
@@ -1520,7 +1521,7 @@ public class UserService implements IUserService {
                             sendServerMessage(GameString.CHEST_LOCKED_NO_SELL);
                             return;
                         }
-                        user.updateInventory(null, null, null, specialItemList);
+                        updateInventory(null, null, null, specialItemList);
                         user.updateXu(totalTransactionAmount);
                         sendServerMessage(GameString.PURCHASE_SUCCESS);
                     }
@@ -1546,7 +1547,7 @@ public class UserService implements IUserService {
                                 .map(SpecialItemChest::new)
                                 .toList();
 
-                        user.updateInventory(null, null, addItems, specialItemList);
+                        updateInventory(null, null, addItems, specialItemList);
 
                         if (!fabricateItem.getCompletionMessage().isEmpty()) {
                             sendServerMessage(fabricateItem.getCompletionMessage());
@@ -1565,7 +1566,7 @@ public class UserService implements IUserService {
         switch (itemChestEntry.getItem().getId()) {
             case 54 -> {
                 user.addDaysToXpX2Time(1);
-                user.updateInventory(null, null, null, List.of(itemChestEntry));
+                updateInventory(null, null, null, List.of(itemChestEntry));
                 sendServerMessage(GameString.ITEM_X2_XP_USAGE_SUCCESS);
             }
             case 86 -> {
@@ -1577,7 +1578,7 @@ public class UserService implements IUserService {
                     System.out.println("Cong trang bi vang 3");
                 } else {
                     user.updateXp(1000 * itemChestEntry.getQuantity());
-                    user.updateInventory(null, null, null, List.of(itemChestEntry));
+                    updateInventory(null, null, null, List.of(itemChestEntry));
                     sendServerMessage(GameString.USE_BANH_TRUNG_SUCCESS);
                 }
             }
@@ -1590,7 +1591,7 @@ public class UserService implements IUserService {
                     System.out.println("Cong trang bi bac 3");
                 } else {
                     user.updateXp(500 * itemChestEntry.getQuantity());
-                    user.updateInventory(null, null, null, List.of(itemChestEntry));
+                    updateInventory(null, null, null, List.of(itemChestEntry));
                     sendServerMessage(GameString.USE_BANH_TET_SUCCESS);
                 }
             }
@@ -2621,7 +2622,7 @@ public class UserService implements IUserService {
                         selectedEquipment.setEmptySlot((byte) 3);
 
                         //Cập nhật rương
-                        user.updateInventory(selectedEquipment, null, recoveredGems, null);
+                        updateInventory(selectedEquipment, null, recoveredGems, null);
 
                         //Gửi thông báo thành công
                         sendServerMessage(GameString.GEM_REMOVAL_SUCCESS);
@@ -2643,7 +2644,7 @@ public class UserService implements IUserService {
                             }
                         }
                         for (EquipmentChest validEquipment : equipList) {
-                            user.updateInventory(null, validEquipment, null, null);
+                            updateInventory(null, validEquipment, null, null);
                         }
                         user.updateXu(totalTransactionAmount);
                         sendServerMessage(GameString.PURCHASE_SUCCESS);
@@ -2689,6 +2690,7 @@ public class UserService implements IUserService {
         sendServerMessage(GameString.PURCHASE_SUCCESS);
     }
 
+    @Override
     public void addEquipment(EquipmentChest equipmentChest) {
         equipmentChest.setPurchaseDate(LocalDateTime.now());
         equipmentChest.setInUse(false);
@@ -2706,7 +2708,7 @@ public class UserService implements IUserService {
             return;
         }
         equipmentChest.setKey(result.get());
-        user.getEquipmentChest().put(equipmentChest.getKey(), equipmentChest);
+        user.addEquipmentChest(equipmentChest);
 
         try {
             IMessage ms = new Message(Cmd.BUY_EQUIP);
@@ -2725,6 +2727,98 @@ public class UserService implements IUserService {
             ds.writeByte(equipmentChest.getEquipment().getExpirationDays());
             ds.writeByte(equipmentChest.getEquipment().isDisguise() ? 1 : 0);
             ds.writeByte(equipmentChest.getVipLevel());
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void updateInventory(
+            EquipmentChest updateEquip,
+            EquipmentChest removeEquip,
+            List<SpecialItemChest> addItems,
+            List<SpecialItemChest> removeItems
+    ) {
+        try {
+            ByteArrayOutputStream bas = new ByteArrayOutputStream();
+            DataOutputStream ds = new DataOutputStream(bas);
+            int updateQuantity = 0;
+
+            if (updateEquip != null) {
+                updateQuantity++;
+                ds.writeByte(2);
+                ds.writeInt(updateEquip.getKey());
+                ds.writeByte(updateEquip.getAddPoints().length * 2);
+                for (int i = 0; i < updateEquip.getAddPoints().length; i++) {
+                    ds.writeByte(updateEquip.getAddPoints()[i]);
+                    ds.writeByte(updateEquip.getAddPercents()[i]);
+                }
+                ds.writeByte(updateEquip.getEmptySlot());
+                ds.writeByte(updateEquip.getRemainingDays());
+            }
+
+            if (addItems != null && !addItems.isEmpty()) {
+                for (SpecialItemChest newItem : addItems) {
+                    if (newItem.getQuantity() <= 0) {
+                        continue;
+                    }
+                    updateQuantity++;
+                    SpecialItemChest existingItem = user.getSpecialItemById(newItem.getItem().getId());
+                    if (existingItem != null) {
+                        existingItem.increaseQuantity(newItem.getQuantity());
+                    } else {
+                        user.addSpecialItemChest(newItem);
+                    }
+                    ds.writeByte(newItem.getQuantity() > 1 ? 3 : 1);
+                    ds.writeByte(newItem.getItem().getId());
+                    if (newItem.getQuantity() > 1) {
+                        ds.writeByte(newItem.getQuantity());
+                    }
+                    ds.writeUTF(newItem.getItem().getName());
+                    ds.writeUTF(newItem.getItem().getDetail());
+                }
+            }
+
+            if (removeItems != null && !removeItems.isEmpty()) {
+                for (SpecialItemChest itemToRemove : removeItems) {
+                    if (itemToRemove.getQuantity() <= 0) {
+                        continue;
+                    }
+                    SpecialItemChest existingItem = user.getSpecialItemById(itemToRemove.getItem().getId());
+                    if (existingItem != null) {
+                        existingItem.decreaseQuantity(itemToRemove.getQuantity());
+                        if (existingItem.getQuantity() <= 0) {
+                            user.getSpecialItemChest().remove(itemToRemove.getItem().getId());
+                        }
+                        updateQuantity++;
+                        ds.writeByte(0);
+                        ds.writeInt(itemToRemove.getItem().getId());
+                        ds.writeByte(itemToRemove.getQuantity());
+                    }
+                }
+            }
+
+            if (removeEquip != null) {
+                updateQuantity++;
+                user.getEquipmentChest().remove(removeEquip.getKey());
+                ds.writeByte(0);
+                ds.writeInt(removeEquip.getKey());
+                ds.writeByte(1);
+            }
+
+            ds.flush();
+            bas.flush();
+
+            if (updateQuantity == 0) {
+                return;
+            }
+
+            IMessage ms = new Message(Cmd.INVENTORY_UPDATE);
+            ds = ms.writer();
+            ds.writeByte(updateQuantity);
+            ds.write(bas.toByteArray());
             ds.flush();
             sendMessage(ms);
         } catch (IOException e) {

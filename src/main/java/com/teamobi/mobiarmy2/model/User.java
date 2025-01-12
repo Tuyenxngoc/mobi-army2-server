@@ -1,7 +1,6 @@
 package com.teamobi.mobiarmy2.model;
 
 import com.teamobi.mobiarmy2.ApplicationContext;
-import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.dao.*;
@@ -9,7 +8,6 @@ import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.fight.ITrainingManager;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.ISession;
-import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.server.*;
 import com.teamobi.mobiarmy2.service.IClanService;
 import com.teamobi.mobiarmy2.service.IGiftBoxService;
@@ -21,9 +19,6 @@ import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -250,97 +245,6 @@ public class User {
         fightItems[0] = fightItems[1] = maxItem;
     }
 
-    public synchronized void updateInventory(
-            EquipmentChest updateEquip,
-            EquipmentChest removeEquip,
-            List<SpecialItemChest> addItems,
-            List<SpecialItemChest> removeItems
-    ) {
-        try {
-            ByteArrayOutputStream bas = new ByteArrayOutputStream();
-            DataOutputStream ds = new DataOutputStream(bas);
-            int updateQuantity = 0;
-
-            if (updateEquip != null) {
-                updateQuantity++;
-                ds.writeByte(2);
-                ds.writeInt(updateEquip.getKey());
-                ds.writeByte(updateEquip.getAddPoints().length * 2);
-                for (int i = 0; i < updateEquip.getAddPoints().length; i++) {
-                    ds.writeByte(updateEquip.getAddPoints()[i]);
-                    ds.writeByte(updateEquip.getAddPercents()[i]);
-                }
-                ds.writeByte(updateEquip.getEmptySlot());
-                ds.writeByte(updateEquip.getRemainingDays());
-            }
-
-            if (addItems != null && !addItems.isEmpty()) {
-                for (SpecialItemChest newItem : addItems) {
-                    if (newItem.getQuantity() <= 0) {
-                        continue;
-                    }
-                    updateQuantity++;
-                    SpecialItemChest existingItem = getSpecialItemById(newItem.getItem().getId());
-                    if (existingItem != null) {
-                        existingItem.increaseQuantity(newItem.getQuantity());
-                    } else {
-                        specialItemChest.put(newItem.getItem().getId(), newItem);
-                    }
-                    ds.writeByte(newItem.getQuantity() > 1 ? 3 : 1);
-                    ds.writeByte(newItem.getItem().getId());
-                    if (newItem.getQuantity() > 1) {
-                        ds.writeByte(newItem.getQuantity());
-                    }
-                    ds.writeUTF(newItem.getItem().getName());
-                    ds.writeUTF(newItem.getItem().getDetail());
-                }
-            }
-
-            if (removeItems != null && !removeItems.isEmpty()) {
-                for (SpecialItemChest itemToRemove : removeItems) {
-                    if (itemToRemove.getQuantity() <= 0) {
-                        continue;
-                    }
-                    SpecialItemChest existingItem = getSpecialItemById(itemToRemove.getItem().getId());
-                    if (existingItem != null) {
-                        existingItem.decreaseQuantity(itemToRemove.getQuantity());
-                        if (existingItem.getQuantity() <= 0) {
-                            specialItemChest.remove(itemToRemove.getItem().getId());
-                        }
-                        updateQuantity++;
-                        ds.writeByte(0);
-                        ds.writeInt(itemToRemove.getItem().getId());
-                        ds.writeByte(itemToRemove.getQuantity());
-                    }
-                }
-            }
-
-            if (removeEquip != null) {
-                updateQuantity++;
-                equipmentChest.remove(removeEquip.getKey());
-                ds.writeByte(0);
-                ds.writeInt(removeEquip.getKey());
-                ds.writeByte(1);
-            }
-
-            ds.flush();
-            bas.flush();
-
-            if (updateQuantity == 0) {
-                return;
-            }
-
-            IMessage ms = new Message(Cmd.INVENTORY_UPDATE);
-            ds = ms.writer();
-            ds.writeByte(updateQuantity);
-            ds.write(bas.toByteArray());
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public synchronized void updatePoints(short[] pointsToAdd, int totalPointsToSubtract) {
         for (int i = 0; i < 5; i++) {
             addedPoints[activeCharacterId][i] += pointsToAdd[i];
@@ -382,6 +286,14 @@ public class User {
             return 0;
         }
         return specialItemChest.getQuantity();
+    }
+
+    public synchronized void addEquipmentChest(EquipmentChest addEquipmentChest) {
+        equipmentChest.put(addEquipmentChest.getKey(), addEquipmentChest);
+    }
+
+    public synchronized void addSpecialItemChest(SpecialItemChest addSpecialItemChest) {
+        specialItemChest.put(addSpecialItemChest.getItem().getId(), addSpecialItemChest);
     }
 
     public synchronized void addDaysToXpX2Time(int days) {
@@ -502,6 +414,6 @@ public class User {
             return;
         }
         SpecialItemChest newItem = new SpecialItemChest(quantity, specialItem);
-        updateInventory(null, null, List.of(newItem), null);
+        userService.updateInventory(null, null, List.of(newItem), null);
     }
 }
