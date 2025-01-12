@@ -48,7 +48,6 @@ public class User {
     private byte activeCharacterId;
     private int pointEvent;
     private byte materialsPurchased;
-    private short equipmentPurchased;
     private LocalDateTime xpX2Time;
     private LocalDateTime lastOnline;
     private boolean[] ownedCharacters;
@@ -57,7 +56,6 @@ public class User {
     private int[] points;
     private short[][] addedPoints;
     private byte[] fightItems;
-    private int[][] equipData;
     private int[] mission;
     private byte[] missionLevel;
     private EquipmentChest[][] characterEquips;
@@ -249,51 +247,6 @@ public class User {
             fightItems[itemIndex] = maxItem;
         }
         fightItems[0] = fightItems[1] = maxItem;
-    }
-
-    public synchronized void addEquipment(EquipmentChest addEquipment) {
-        if (addEquipment == null) {
-            return;
-        }
-
-        addEquipment.setPurchaseDate(LocalDateTime.now());
-        addEquipment.setInUse(false);
-        if (addEquipment.getAddPoints() == null) {
-            addEquipment.setAddPoints(addEquipment.getEquipment().getAddPoints());
-        }
-        if (addEquipment.getAddPercents() == null) {
-            addEquipment.setAddPercents(addEquipment.getEquipment().getAddPercents());
-        }
-        addEquipment.setEmptySlot((byte) 3);
-        addEquipment.setSlots(new byte[]{-1, -1, -1});
-        addEquipment.setKey(equipmentPurchased | 0x10000);
-        equipmentChest.add(addEquipment);
-
-        //Tăng số lượng trang bị mua
-        equipmentPurchased++;
-
-        try {
-            IMessage ms = new Message(Cmd.BUY_EQUIP);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(0);
-            ds.writeInt(addEquipment.getKey());
-            ds.writeByte(addEquipment.getEquipment().getCharacterId());
-            ds.writeByte(addEquipment.getEquipment().getEquipType());
-            ds.writeShort(addEquipment.getEquipment().getEquipIndex());
-            ds.writeUTF(addEquipment.getEquipment().getName());
-            ds.writeByte(addEquipment.getAddPoints().length * 2);
-            for (int i = 0; i < addEquipment.getAddPoints().length; i++) {
-                ds.writeByte(addEquipment.getAddPoints()[i]);
-                ds.writeByte(addEquipment.getAddPercents()[i]);
-            }
-            ds.writeByte(addEquipment.getEquipment().getExpirationDays());
-            ds.writeByte(addEquipment.getEquipment().isDisguise() ? 1 : 0);
-            ds.writeByte(addEquipment.getVipLevel());
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public synchronized void updateInventory(

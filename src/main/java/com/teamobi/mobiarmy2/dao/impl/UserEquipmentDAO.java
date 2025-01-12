@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.dao.IUserEquipmentDAO;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.dto.UserEquipmentDTO;
+import com.teamobi.mobiarmy2.model.EquipmentChest;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 
 import java.sql.Connection;
@@ -53,7 +54,7 @@ public class UserEquipmentDAO implements IUserEquipmentDAO {
                 .boxed()
                 .toList();
 
-        if(validIds.isEmpty()){
+        if (validIds.isEmpty()) {
             return result;
         }
 
@@ -93,5 +94,25 @@ public class UserEquipmentDAO implements IUserEquipmentDAO {
         return result;
     }
 
+    @Override
+    public Optional<Integer> create(int userId, EquipmentChest equipmentChest) {
+        Gson gson = GsonUtil.getInstance();
 
+        // language=SQL
+        String sql =
+                "INSERT INTO `user_equipments` " +
+                        "(user_id, equipment_id, vip_level, purchase_date, slots, add_points, add_percents) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        return HikariCPManager.getInstance().update(
+                sql,
+                userId,
+                equipmentChest.getEquipment().getEquipmentId(),
+                equipmentChest.getVipLevel(),
+                equipmentChest.getPurchaseDate(),
+                gson.toJson(equipmentChest.getSlots()),
+                gson.toJson(equipmentChest.getAddPoints()),
+                gson.toJson(equipmentChest.getAddPercents())
+        );
+    }
 }

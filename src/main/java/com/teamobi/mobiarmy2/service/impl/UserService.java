@@ -244,6 +244,7 @@ public class UserService implements IUserService {
     }
 
     private void updateUserSpecialItems(List<UserSpecialItemDTO> userSpecialItemDTOS) {
+        user.setSpecialItemChest(new ArrayList<>());
         for (UserSpecialItemDTO userSpecialItemDTO : userSpecialItemDTOS) {
             SpecialItemChest specialItemChest = new SpecialItemChest();
             specialItemChest.setItem(SpecialItemManager.getSpecialItemById(userSpecialItemDTO.getSpecialItemId()));
@@ -257,6 +258,7 @@ public class UserService implements IUserService {
     }
 
     private void updateUserEquipment(List<UserEquipmentDTO> userEquipmentDTOS) {
+        user.setEquipmentChest(new ArrayList<>());
         for (UserEquipmentDTO userEquipmentDTO : userEquipmentDTOS) {
             EquipmentChest equipmentChest = new EquipmentChest();
             equipmentChest.setEquipment(EquipmentManager.getEquipment(userEquipmentDTO.getEquipmentId()));
@@ -283,10 +285,7 @@ public class UserService implements IUserService {
         user.setXps(new int[totalCharacter]);
         user.setPoints(new int[totalCharacter]);
         user.setAddedPoints(new short[totalCharacter][5]);
-        user.setEquipData(new int[totalCharacter][6]);
         user.setCharacterEquips(new EquipmentChest[totalCharacter][6]);
-        user.setSpecialItemChest(new ArrayList<>());
-        user.setEquipmentChest(new ArrayList<>());
 
         for (UserCharacterDTO userCharacterDTO : userCharacterDTOS) {
             byte i = userCharacterDTO.getCharacterId();
@@ -297,6 +296,18 @@ public class UserService implements IUserService {
             user.getAddedPoints()[i] = userCharacterDTO.getAdditionalPoints();
             if (userCharacterDTO.isActive()) {
                 user.setActiveCharacterId(userCharacterDTO.getCharacterId());
+            }
+            int[] data = userCharacterDTO.getData();
+            for (int j = 0; j < data.length; j++) {
+                int key = data[j];
+                EquipmentChest equip = user.getEquipmentByKey(key);
+                if (equip != null) {
+                    if (equip.isExpired()) {
+                        equip.setInUse(false);
+                    } else {
+                        user.getCharacterEquips()[i][j] = equip;
+                    }
+                }
             }
         }
     }
@@ -780,7 +791,7 @@ public class UserService implements IUserService {
         newEquip.setAddPercents(addPercents);
 
         //Thêm trang bị vào rương
-        user.addEquipment(newEquip);
+        addEquipment(newEquip);
 
         //Gửi thông báo
         sendFormulaProcessingResult(GameString.ITEM_CRAFT_SUCCESS);
@@ -1147,11 +1158,9 @@ public class UserService implements IUserService {
             DataOutputStream ds = ms.writer();
             ds.writeByte(action);
             if (action == 0) {
-                user.getEquipData()[user.getActiveCharacterId()][5] = -1;
                 user.getCharacterEquips()[user.getActiveCharacterId()][5] = null;
             } else {
                 equip.setInUse(true);
-                user.getEquipData()[user.getActiveCharacterId()][5] = equip.getKey();
                 user.getCharacterEquips()[user.getActiveCharacterId()][5] = equip;
                 for (short a : equip.getEquipment().getDisguiseEquippedIndexes()) {
                     ds.writeShort(a);
@@ -2033,7 +2042,7 @@ public class UserService implements IUserService {
             IMessage ms = new Message(Cmd.CURR_EQUIP_DBKEY);
             DataOutputStream ds = ms.writer();
             for (int i = 0; i < 5; i++) {
-                ds.writeInt(user.getEquipData()[user.getActiveCharacterId()][i]);
+                ds.writeInt(user.getCharacterEquips()[user.getActiveCharacterId()][i].getKey());
             }
             ds.flush();
             sendMessage(ms);
@@ -2133,7 +2142,6 @@ public class UserService implements IUserService {
                     user.getPoints()[index] = playerCharacterDTO.getPoints();
                     user.getAddedPoints()[index] = playerCharacterDTO.getAdditionalPoints();
                     user.getOwnedCharacters()[index] = true;
-                    user.getEquipData()[index] = playerCharacterDTO.getData();
 
                     ms = new Message(Cmd.BUY_GUN);
                     DataOutputStream ds = ms.writer();
@@ -2394,7 +2402,8 @@ public class UserService implements IUserService {
                 ds.writeByte(entry.getVipLevel());
             }
             for (int i = 0; i < 5; i++) {
-                ds.writeInt(user.getEquipData()[user.getActiveCharacterId()][i]);
+                EquipmentChest equip = user.getCharacterEquips()[user.getActiveCharacterId()][i];
+                ds.writeInt(equip != null ? equip.getKey() : -1);
             }
             ds.flush();
             sendMessage(ms);
@@ -2477,7 +2486,6 @@ public class UserService implements IUserService {
                 }
                 equip.setInUse(true);
                 user.getCharacterEquips()[user.getActiveCharacterId()][i] = equip;
-                user.getEquipData()[user.getActiveCharacterId()][i] = equip.getKey();
                 changeSuccessful = true;
             }
             ms = new Message(Cmd.CHANGE_EQUIP);
@@ -2669,10 +2677,59 @@ public class UserService implements IUserService {
             }
             user.updateLuong(-equipment.getPriceLuong());
         }
+
+        //Tạo trang bị
         EquipmentChest newEquip = new EquipmentChest();
         newEquip.setEquipment(equipment);
-        user.addEquipment(newEquip);
+
+        //Thêm vào rương
+        addEquipment(newEquip);
+
+        //Gửi thông báo
         sendServerMessage(GameString.PURCHASE_SUCCESS);
+    }
+
+    public void addEquipment(EquipmentChest equipmentChest) {
+        equipmentChest.setPurchaseDate(LocalDateTime.now());
+        equipmentChest.setInUse(false);
+        if (equipmentChest.getAddPoints() == null) {
+            equipmentChest.setAddPoints(equipmentChest.getEquipment().getAddPoints());
+        }
+        if (equipmentChest.getAddPercents() == null) {
+            equipmentChest.setAddPercents(equipmentChest.getEquipment().getAddPercents());
+        }
+        equipmentChest.setEmptySlot((byte) 3);
+        equipmentChest.setSlots(new byte[]{-1, -1, -1});
+
+        Optional<Integer> result = userEquipmentDAO.create(user.getUserId(), equipmentChest);
+        if (result.isEmpty()) {
+            return;
+        }
+        equipmentChest.setKey(result.get());
+        user.getEquipmentChest().add(equipmentChest);
+
+        try {
+            IMessage ms = new Message(Cmd.BUY_EQUIP);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(0);
+            ds.writeInt(equipmentChest.getKey());
+            ds.writeByte(equipmentChest.getEquipment().getCharacterId());
+            ds.writeByte(equipmentChest.getEquipment().getEquipType());
+            ds.writeShort(equipmentChest.getEquipment().getEquipIndex());
+            ds.writeUTF(equipmentChest.getEquipment().getName());
+            ds.writeByte(equipmentChest.getAddPoints().length * 2);
+            for (int i = 0; i < equipmentChest.getAddPoints().length; i++) {
+                ds.writeByte(equipmentChest.getAddPoints()[i]);
+                ds.writeByte(equipmentChest.getAddPercents()[i]);
+            }
+            ds.writeByte(equipmentChest.getEquipment().getExpirationDays());
+            ds.writeByte(equipmentChest.getEquipment().isDisguise() ? 1 : 0);
+            ds.writeByte(equipmentChest.getVipLevel());
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
