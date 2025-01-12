@@ -971,7 +971,7 @@ public class FightManager implements IFightManager {
                     }
                     if ((player.isTeamBlue() && result == MatchResult.BLUE_WIN) ||
                             (!player.isTeamBlue() && result == MatchResult.RED_WIN)) {
-                        player.getUser().getGiftBoxManager().startGiftBoxOpening(2, 30);
+                        player.getUser().getGiftBoxService().startGiftBoxOpening(2, 30);
                     }
                 }
             }

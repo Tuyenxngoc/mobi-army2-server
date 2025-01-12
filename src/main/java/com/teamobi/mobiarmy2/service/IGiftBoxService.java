@@ -1,10 +1,9 @@
-package com.teamobi.mobiarmy2.fight;
+package com.teamobi.mobiarmy2.service;
 
 /**
  * @author tuyen
  */
-public interface IGiftBoxManager {
-
+public interface IGiftBoxService {
     boolean isOpeningGift();
 
     void startGiftBoxOpening(int availableGifts, int giftOpenTime);

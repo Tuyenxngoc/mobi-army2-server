@@ -12,6 +12,7 @@ import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.server.*;
 import com.teamobi.mobiarmy2.service.IClanService;
+import com.teamobi.mobiarmy2.service.ILeaderboardService;
 import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -33,6 +34,7 @@ public class UserService implements IUserService {
     private final User user;
 
     private final IClanService clanService;
+    private final ILeaderboardService leaderboardService;
     private final IUserDAO userDAO;
     private final IAccountDAO accountDAO;
     private final IGiftCodeDAO giftCodeDAO;
@@ -50,9 +52,10 @@ public class UserService implements IUserService {
     private long timeSinceLeftRoom;
     private long lastSpinTime;
 
-    public UserService(User user, IClanService clanService, IUserDAO userDAO, IAccountDAO accountDAO, IGiftCodeDAO giftCodeDAO, IUserGiftCodeDAO userGiftCodeDAO, IUserCharacterDAO userCharacterDAO, IUserEquipmentDAO userEquipmentDAO, IUserSpecialItemDAO userSpecialItemDAO) {
+    public UserService(User user, IClanService clanService, ILeaderboardService leaderboardService, IUserDAO userDAO, IAccountDAO accountDAO, IGiftCodeDAO giftCodeDAO, IUserGiftCodeDAO userGiftCodeDAO, IUserCharacterDAO userCharacterDAO, IUserEquipmentDAO userEquipmentDAO, IUserSpecialItemDAO userSpecialItemDAO) {
         this.user = user;
         this.clanService = clanService;
+        this.leaderboardService = leaderboardService;
         this.userDAO = userDAO;
         this.accountDAO = accountDAO;
         this.giftCodeDAO = giftCodeDAO;
@@ -101,7 +104,7 @@ public class UserService implements IUserService {
             return;
         }
 
-        if (!LeaderboardManager.getInstance().isComplete()) {
+        if (!leaderboardService.isComplete()) {
             sendMessageLoginFail(GameString.RANKING_NOT_LOADED);
             return;
         }
@@ -853,7 +856,7 @@ public class UserService implements IUserService {
     public void openLuckyGift(IMessage ms) {
         try {
             byte index = ms.reader().readByte();
-            user.getGiftBoxManager().openGiftBoxAfterFight(index);
+            user.getGiftBoxService().openGiftBoxAfterFight(index);
         } catch (IOException ignored) {
         }
     }
@@ -865,45 +868,42 @@ public class UserService implements IUserService {
             byte type = dis.readByte();
             byte page = dis.readByte();
 
-            LeaderboardManager leaderboardManager = LeaderboardManager.getInstance();
-            if (type >= leaderboardManager.getLeaderboardCategories().length) {
+            if (type >= leaderboardService.getCategories().length) {
                 return;
             }
             ms = new Message(Cmd.BANGTHANHTICH);
             DataOutputStream ds = ms.writer();
             ds.writeByte(type);
             if (type < 0) {
-                ds.writeByte(leaderboardManager.getLeaderboardCategories().length);
-                for (String name : leaderboardManager.getLeaderboardCategories()) {
+                ds.writeByte(leaderboardService.getCategories().length);
+                for (String name : leaderboardService.getCategories()) {
                     ds.writeUTF(name);
                 }
             } else {
                 //Kiểm tra page num
-                byte maxPage = (byte) (leaderboardManager.getLeaderboardEntries().get(type).size() / 10);
+                int maxPage = leaderboardService.getTotalPageByType(type);
                 if (page > maxPage || page >= 10) {
                     page = 0;
                 }
                 if (page < 0) {
-                    page = maxPage;
+                    page = (byte) maxPage;
                 }
                 //Gửi dữ liệu
                 ds.writeByte(page);
-                ds.writeUTF(leaderboardManager.getLeaderboardLabels()[type]);
-                List<UserLeaderboardDTO> bangXH = leaderboardManager.getLeaderboardEntries(type, page, 10);
-                if (bangXH != null) {
-                    for (UserLeaderboardDTO pl : bangXH) {
-                        ds.writeInt(pl.getUserId());
-                        ds.writeUTF(pl.getUsername());
-                        ds.writeByte(pl.getActiveCharacter());
-                        ds.writeShort(pl.getClanId());
-                        ds.writeByte(pl.getLevel());
-                        ds.writeByte(pl.getLevelPt());
-                        ds.writeByte(pl.getIndex());
-                        for (short i : pl.getData()) {
-                            ds.writeShort(i);
-                        }
-                        ds.writeUTF(pl.getDetail());
+                ds.writeUTF(leaderboardService.getLabels()[type]);
+                List<UserLeaderboardDTO> bangXH = leaderboardService.getUsers(type, page, 10);
+                for (UserLeaderboardDTO us : bangXH) {
+                    ds.writeInt(us.getUserId());
+                    ds.writeUTF(us.getUsername());
+                    ds.writeByte(us.getActiveCharacter());
+                    ds.writeShort(us.getClanId());
+                    ds.writeByte(us.getLevel());
+                    ds.writeByte(us.getLevelPt());
+                    ds.writeByte(us.getIndex());
+                    for (short i : us.getData()) {
+                        ds.writeShort(i);
                     }
+                    ds.writeUTF(us.getDetail());
                 }
             }
             ds.flush();

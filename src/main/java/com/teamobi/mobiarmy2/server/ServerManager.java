@@ -4,14 +4,13 @@ import com.teamobi.mobiarmy2.ApplicationContext;
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.config.impl.ServerConfig;
 import com.teamobi.mobiarmy2.constant.UserState;
-import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.impl.Session;
 import com.teamobi.mobiarmy2.service.IGameDataService;
-import com.teamobi.mobiarmy2.service.impl.GameDataService;
+import com.teamobi.mobiarmy2.service.ILeaderboardService;
 import com.teamobi.mobiarmy2.ui.controllers.ServerListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +28,7 @@ public class ServerManager {
     private static final Logger logger = LoggerFactory.getLogger(ServerManager.class);
 
     private final IGameDataService gameService;
+    private final ILeaderboardService leaderboardService;
     private final IServerConfig config;
     private ServerSocket server;
     private long countClients;
@@ -39,20 +39,8 @@ public class ServerManager {
 
     public ServerManager() {
         ApplicationContext context = ApplicationContext.getInstance();
-        this.gameService = new GameDataService(
-                context.getBean(IMapDAO.class),
-                context.getBean(ICaptionLevelDAO.class),
-                context.getBean(ICharacterDAO.class),
-                context.getBean(IClanShopDAO.class),
-                context.getBean(IExperienceLevelDAO.class),
-                context.getBean(IFabricateItemDAO.class),
-                context.getBean(IFightItemDAO.class),
-                context.getBean(IFormulaDAO.class),
-                context.getBean(IMissionDAO.class),
-                context.getBean(IPaymentDAO.class),
-                context.getBean(ISpecialItemDAO.class),
-                context.getBean(IEquipmentDAO.class)
-        );
+        this.gameService = context.getBean(IGameDataService.class);
+        this.leaderboardService = context.getBean(ILeaderboardService.class);
 
         this.isMaintenanceMode = false;
         this.config = new ServerConfig();
@@ -83,8 +71,8 @@ public class ServerManager {
     public void init() {
         gameService.loadServerData();
         gameService.setCache();
+        leaderboardService.init();
         RoomManager.getInstance().init();
-        LeaderboardManager.getInstance().init();
     }
 
     public void start() {

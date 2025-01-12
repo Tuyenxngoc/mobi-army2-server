@@ -5,8 +5,6 @@ import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dao.IRankingDAO;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.dto.UserLeaderboardDTO;
-import com.teamobi.mobiarmy2.model.EquipmentChestJson;
-import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.PlayerXpManager;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.util.GsonUtil;
@@ -24,7 +22,7 @@ import java.util.List;
  */
 public class RankingDAO implements IRankingDAO {
 
-    private List<UserLeaderboardDTO> getTopFromQuery(String query, String detailColumn, boolean applyBonus) {
+    private List<UserLeaderboardDTO> getTopFromQuery(String query, boolean applyBonus) {
         Gson gson = GsonUtil.getInstance();
         int[] topBonus = ServerManager.getInstance().getConfig().getTopBonus();
         List<UserLeaderboardDTO> top = new ArrayList<>();
@@ -33,12 +31,17 @@ public class RankingDAO implements IRankingDAO {
              ResultSet resultSet = statement.executeQuery(query)) {
             byte index = 1;
             while (resultSet.next()) {
-                UserLeaderboardDTO entry = new UserLeaderboardDTO();
+                UserLeaderboardDTO userLeaderboardDTO = new UserLeaderboardDTO();
 
-                entry.setIndex(index);
-                entry.setUserId(resultSet.getInt("player_id"));
-                entry.setClanId(resultSet.getShort("clan_id"));
-                entry.setActiveCharacter(resultSet.getByte("character_id"));
+                userLeaderboardDTO.setIndex(index);
+                userLeaderboardDTO.setUserId(resultSet.getInt("user_id"));
+                userLeaderboardDTO.setClanId(resultSet.getShort("clan_id"));
+                userLeaderboardDTO.setActiveCharacter(resultSet.getByte("character_id"));
+                if (applyBonus && index <= 3) {
+                    userLeaderboardDTO.setUsername(GameString.createTopBonusMessage(resultSet.getString("username"), Utils.getStringNumber(topBonus[index - 1])));
+                } else {
+                    userLeaderboardDTO.setUsername(resultSet.getString("username"));
+                }
 
                 int currentLevel = resultSet.getInt("level");
                 int currentXp = resultSet.getInt("xp");
@@ -48,21 +51,15 @@ public class RankingDAO implements IRankingDAO {
                 int xpNeededForNextLevel = requiredXpNextLevel - requiredXpCurrentLevel;
                 byte levelPercent = Utils.calculateLevelPercent(currentXpInLevel, xpNeededForNextLevel);
 
-                entry.setLevel((byte) currentLevel);
-                entry.setLevelPt(levelPercent);
-                entry.setDetail(Utils.getStringNumber(resultSet.getInt(detailColumn)));
+                userLeaderboardDTO.setLevel((byte) currentLevel);
+                userLeaderboardDTO.setLevelPt(levelPercent);
+                userLeaderboardDTO.setDetail(Utils.getStringNumber(resultSet.getInt("point")));
 
-                if (applyBonus && index <= 3) {
-                    entry.setUsername(GameString.createTopBonusMessage(resultSet.getString("username"), Utils.getStringNumber(topBonus[index - 1])));
-                } else {
-                    entry.setUsername(resultSet.getString("username"));
-                }
-
-                EquipmentChestJson[] equipmentData = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
                 int[] data = gson.fromJson(resultSet.getString("data"), int[].class);
-                entry.setData(EquipmentManager.getEquipmentData(equipmentData, data, entry.getActiveCharacter()));
 
-                top.add(entry);
+                //      userLeaderboardDTO.setData(EquipmentManager.getEquipmentData());
+
+                top.add(userLeaderboardDTO);
                 index++;
             }
         } catch (SQLException e) {
@@ -75,121 +72,89 @@ public class RankingDAO implements IRankingDAO {
     public List<UserLeaderboardDTO> getTopCup() {
         // language=SQL
         String query = "SELECT " +
-                "p.player_id, p.equipment_chest, p.cup, " +
-                "pc.data, pc.character_id, pc.level, pc.xp, " +
+                "u.user_id, u.cup as point, " +
+                "a.username, " +
                 "cm.clan_id, " +
-                "u.username " +
-                "FROM players p " +
-                "INNER JOIN users u ON p.user_id = u.user_id " +
-                "INNER JOIN player_characters pc ON pc.player_character_id = p.active_character_id " +
-                "LEFT JOIN clan_members cm ON p.player_id = cm.player_id " +
-                "WHERE p.cup > 0 " +
-                "ORDER BY p.cup DESC " +
-                "LIMIT 100";
-        return getTopFromQuery(query, "cup", true);
+                "uc.character_id, uc.level, uc.xp, uc.data " +
+                "FROM users u " +
+                "INNER JOIN accounts a ON u.account_id = a.account_id " +
+                "INNER JOIN user_characters uc ON u.user_id = uc.user_id " +
+                "LEFT JOIN clan_members cm ON u.user_id = cm.user_id " +
+                "WHERE uc.is_active = 1 " +
+                "AND u.cup > 0 " +
+                "ORDER BY u.cup DESC";
+        return getTopFromQuery(query, true);
     }
 
     @Override
     public List<UserLeaderboardDTO> getTopMasters() {
         // language=SQL
         String query = "SELECT " +
-                "pc.data, pc.character_id, pc.level, pc.xp, " +
-                "p.player_id, p.equipment_chest, " +
-                "u.username, " +
-                "cm.clan_id " +
-                "FROM player_characters pc " +
-                "INNER JOIN players p on pc.player_id = p.player_id " +
-                "INNER JOIN users u on p.user_id = u.user_id " +
-                "LEFT JOIN clan_members cm on p.player_id = cm.player_id " +
-                "WHERE pc.xp > 0 " +
-                "ORDER BY pc.xp DESC " +
-                "LIMIT 100";
-        return getTopFromQuery(query, "xp", false);
+                "u.user_id, u.cup as point, " +
+                "a.username, " +
+                "cm.clan_id, " +
+                "uc.character_id, uc.level, uc.xp, uc.data " +
+                "FROM users u " +
+                "INNER JOIN accounts a ON u.account_id = a.account_id " +
+                "INNER JOIN user_characters uc ON u.user_id = uc.user_id " +
+                "LEFT JOIN clan_members cm ON u.user_id = cm.user_id " +
+                "WHERE uc.is_active = 1 " +
+                "AND uc.xp > 0 " +
+                "ORDER BY uc.xp DESC";
+        return getTopFromQuery(query, false);
     }
 
     @Override
     public List<UserLeaderboardDTO> getTopRichestXu() {
         // language=SQL
         String query = "SELECT " +
-                "p.player_id, p.equipment_chest, p.xu, " +
-                "pc.data, pc.character_id, pc.level, pc.xp, " +
+                "u.user_id, u.cup as point, " +
+                "a.username, " +
                 "cm.clan_id, " +
-                "u.username " +
-                "FROM players p " +
-                "INNER JOIN users u ON p.user_id = u.user_id " +
-                "INNER JOIN player_characters pc ON pc.player_character_id = p.active_character_id " +
-                "LEFT JOIN clan_members cm ON p.player_id = cm.player_id " +
-                "WHERE p.xu > 0 " +
-                "ORDER BY p.xu DESC " +
-                "LIMIT 100";
-        return getTopFromQuery(query, "xu", false);
+                "uc.character_id, uc.level, uc.xp, uc.data " +
+                "FROM users u " +
+                "INNER JOIN accounts a ON u.account_id = a.account_id " +
+                "INNER JOIN user_characters uc ON u.user_id = uc.user_id " +
+                "LEFT JOIN clan_members cm ON u.user_id = cm.user_id " +
+                "WHERE uc.is_active = 1 " +
+                "AND u.xu > 0 " +
+                "ORDER BY u.xu DESC";
+        return getTopFromQuery(query, false);
     }
 
     @Override
     public List<UserLeaderboardDTO> getTopRichestLuong() {
         // language=SQL
         String query = "SELECT " +
-                "p.player_id, p.equipment_chest, p.luong, " +
-                "pc.data, pc.character_id, pc.level, pc.xp, " +
+                "u.user_id, u.cup as point, " +
+                "a.username, " +
                 "cm.clan_id, " +
-                "u.username " +
-                "FROM players p " +
-                "INNER JOIN users u ON p.user_id = u.user_id " +
-                "INNER JOIN player_characters pc ON pc.player_character_id = p.active_character_id " +
-                "LEFT JOIN clan_members cm ON p.player_id = cm.player_id " +
-                "WHERE p.luong > 0 " +
-                "ORDER BY p.luong DESC " +
-                "LIMIT 100";
-        return getTopFromQuery(query, "luong", false);
+                "uc.character_id, uc.level, uc.xp, uc.data " +
+                "FROM users u " +
+                "INNER JOIN accounts a ON u.account_id = a.account_id " +
+                "INNER JOIN user_characters uc ON u.user_id = uc.user_id " +
+                "LEFT JOIN clan_members cm ON u.user_id = cm.user_id " +
+                "WHERE uc.is_active = 1 " +
+                "AND u.luong > 0 " +
+                "ORDER BY u.luong DESC";
+        return getTopFromQuery(query, false);
     }
 
     @Override
     public List<UserLeaderboardDTO> getWeeklyTopHonor() {
-        // language=SQL
-        String query = "SELECT " +
-                "p.player_id, p.equipment_chest, SUM(t.amount) AS cup, " +
-                "pc.data, pc.character_id, pc.level, pc.xp, " +
-                "cm.clan_id, " +
-                "u.username " +
-                "FROM transactions t " +
-                "INNER JOIN players p ON t.player_id = p.player_id " +
-                "INNER JOIN users u ON p.user_id = u.user_id " +
-                "INNER JOIN player_characters pc ON pc.player_character_id = p.active_character_id " +
-                "LEFT JOIN clan_members cm ON p.player_id = cm.player_id " +
-                "WHERE t.transaction_type = 'CUP' AND t.transaction_date >= (CURDATE() - INTERVAL (WEEKDAY(CURDATE())) DAY) " +
-                "GROUP BY p.player_id " +
-                "HAVING SUM(t.amount) > 0 " +
-                "ORDER BY cup DESC " +
-                "LIMIT 100";
-        return getTopFromQuery(query, "cup", false);
+        return List.of();
     }
 
     @Override
     public List<UserLeaderboardDTO> getWeeklyTopRichest() {
-        // language=SQL
-        String query = "SELECT " +
-                "p.player_id, p.equipment_chest, SUM(t.amount) AS xu, " +
-                "pc.data, pc.character_id, pc.level, pc.xp, " +
-                "cm.clan_id, " +
-                "u.username " +
-                "FROM transactions t " +
-                "INNER JOIN players p ON t.player_id = p.player_id " +
-                "INNER JOIN users u ON p.user_id = u.user_id " +
-                "INNER JOIN player_characters pc ON pc.player_character_id = p.active_character_id " +
-                "LEFT JOIN clan_members cm ON p.player_id = cm.player_id " +
-                "WHERE t.transaction_type = 'XU' AND t.transaction_date >= (CURDATE() - INTERVAL (WEEKDAY(CURDATE())) DAY) " +
-                "GROUP BY p.player_id " +
-                "HAVING SUM(t.amount) > 0 " +
-                "ORDER BY xu DESC " +
-                "LIMIT 100";
-        return getTopFromQuery(query, "xu", false);
+        return List.of();
     }
 
     @Override
-    public void addBonusGift(int playerId, int quantity) {
+    public void addBonusGift(int userId, int quantity) {
         // language=SQL
-        String sql = "UPDATE users SET top_earnings_xu = ? WHERE player_id = ?";
-        HikariCPManager.getInstance().update(sql, quantity, playerId);
+        String sql = "UPDATE users SET top_earnings_xu = ? WHERE user_id = ?";
+        HikariCPManager.getInstance().update(sql, quantity, userId);
     }
 
 }

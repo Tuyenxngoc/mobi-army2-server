@@ -1,12 +1,12 @@
-package com.teamobi.mobiarmy2.fight.impl;
+package com.teamobi.mobiarmy2.service.impl;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
-import com.teamobi.mobiarmy2.fight.IGiftBoxManager;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.server.FightItemManager;
+import com.teamobi.mobiarmy2.service.IGiftBoxService;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.DataOutputStream;
@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author tuyen
  */
-public class GiftBoxManager implements IGiftBoxManager {
+public class GiftBoxService implements IGiftBoxService {
     private record Reward(byte id, byte type, String str) {
     }
 
@@ -36,7 +36,7 @@ public class GiftBoxManager implements IGiftBoxManager {
     private final ScheduledExecutorService executorService;
     private ScheduledFuture<?> giftBoxTask;
 
-    public GiftBoxManager(User user) {
+    public GiftBoxService(User user) {
         this.user = user;
         this.availableGifts = 0;
         this.giftOpenTime = 0;

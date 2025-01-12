@@ -6,15 +6,16 @@ import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.fight.IFightWait;
-import com.teamobi.mobiarmy2.fight.IGiftBoxManager;
 import com.teamobi.mobiarmy2.fight.ITrainingManager;
-import com.teamobi.mobiarmy2.fight.impl.GiftBoxManager;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.server.*;
 import com.teamobi.mobiarmy2.service.IClanService;
+import com.teamobi.mobiarmy2.service.IGiftBoxService;
+import com.teamobi.mobiarmy2.service.ILeaderboardService;
 import com.teamobi.mobiarmy2.service.IUserService;
+import com.teamobi.mobiarmy2.service.impl.GiftBoxService;
 import com.teamobi.mobiarmy2.service.impl.UserService;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
@@ -66,7 +67,7 @@ public class User {
     private IFightWait fightWait;
     private ITrainingManager trainingManager;
     private final IUserService userService;
-    private final IGiftBoxManager giftBoxManager;
+    private final IGiftBoxService giftBoxService;
     private int topEarningsXu;
 
     public User(ISession session) {
@@ -76,6 +77,7 @@ public class User {
         this.userService = new UserService(
                 this,
                 context.getBean(IClanService.class),
+                context.getBean(ILeaderboardService.class),
                 context.getBean(IUserDAO.class),
                 context.getBean(IAccountDAO.class),
                 context.getBean(IGiftCodeDAO.class),
@@ -84,7 +86,7 @@ public class User {
                 context.getBean(IUserEquipmentDAO.class),
                 context.getBean(IUserSpecialItemDAO.class)
         );
-        this.giftBoxManager = new GiftBoxManager(this);
+        this.giftBoxService = new GiftBoxService(this);
     }
 
     public boolean isNotWaiting() {
@@ -92,7 +94,7 @@ public class User {
     }
 
     public boolean isOpeningGift() {
-        return giftBoxManager.isOpeningGift();
+        return giftBoxService.isOpeningGift();
     }
 
     public void sendMessage(IMessage ms) {

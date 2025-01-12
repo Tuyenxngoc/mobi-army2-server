@@ -4,7 +4,11 @@ import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.dao.impl.*;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IClanService;
+import com.teamobi.mobiarmy2.service.IGameDataService;
+import com.teamobi.mobiarmy2.service.ILeaderboardService;
 import com.teamobi.mobiarmy2.service.impl.ClanService;
+import com.teamobi.mobiarmy2.service.impl.GameDataService;
+import com.teamobi.mobiarmy2.service.impl.LeaderboardService;
 import com.teamobi.mobiarmy2.ui.ServerUI;
 
 /**
@@ -41,7 +45,10 @@ public class MobiArmy2 {
         context.registerBean(IUserFriendDAO.class, new UserFriendDAO());
         context.registerBean(IUserGiftCodeDAO.class, new UserGiftCodeDAO());
         context.registerBean(IUserSpecialItemDAO.class, new UserSpecialItemDAO());
+
         context.registerBean(IClanService.class, new ClanService(context.getBean(IClanDAO.class), context.getBean(IClanItemDAO.class), context.getBean(IClanMemberDAO.class)));
+        context.registerBean(ILeaderboardService.class, new LeaderboardService(context.getBean(IRankingDAO.class)));
+        context.registerBean(IGameDataService.class, new GameDataService(context.getBean(IMapDAO.class), context.getBean(ICaptionLevelDAO.class), context.getBean(ICharacterDAO.class), context.getBean(IClanShopDAO.class), context.getBean(IExperienceLevelDAO.class), context.getBean(IFabricateItemDAO.class), context.getBean(IFightItemDAO.class), context.getBean(IFormulaDAO.class), context.getBean(IMissionDAO.class), context.getBean(IPaymentDAO.class), context.getBean(ISpecialItemDAO.class), context.getBean(IEquipmentDAO.class)));
 
         ServerManager serverManager = ServerManager.getInstance();
         Runtime.getRuntime().addShutdownHook(new Thread(serverManager::stop, "ServerShutdownHook"));

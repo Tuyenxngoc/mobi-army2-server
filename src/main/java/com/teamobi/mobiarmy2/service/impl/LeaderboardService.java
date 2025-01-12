@@ -1,9 +1,9 @@
-package com.teamobi.mobiarmy2.server;
+package com.teamobi.mobiarmy2.service.impl;
 
 import com.teamobi.mobiarmy2.dao.IRankingDAO;
-import com.teamobi.mobiarmy2.dao.impl.RankingDAO;
 import com.teamobi.mobiarmy2.dto.UserLeaderboardDTO;
-import lombok.Getter;
+import com.teamobi.mobiarmy2.server.ServerManager;
+import com.teamobi.mobiarmy2.service.ILeaderboardService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,33 +12,36 @@ import java.util.*;
 /**
  * @author tuyen
  */
-public class LeaderboardManager {
-    private static final Logger logger = LoggerFactory.getLogger(LeaderboardManager.class);
+public class LeaderboardService implements ILeaderboardService {
+    private static final Logger logger = LoggerFactory.getLogger(LeaderboardService.class);
 
-    private final IRankingDAO rankingDao;
-
-    public LeaderboardManager() {
-        this.rankingDao = new RankingDAO();
-    }
-
-    private static class SingletonHelper {
-        private static final LeaderboardManager INSTANCE = new LeaderboardManager();
-    }
-
-    public static LeaderboardManager getInstance() {
-        return SingletonHelper.INSTANCE;
-    }
-
-    @Getter
     private boolean isComplete;
+    private final IRankingDAO rankingDao;
     private final Timer timer = new Timer(true);
-    @Getter
     private final String[] leaderboardCategories = {"DANH DỰ", "CAO THỦ", "ĐẠI GIA XU", "ĐẠI GIA LƯỢNG", "DANH DỰ TUẦN", "ĐẠI GIA TUẦN"};
-    @Getter
     private final String[] leaderboardLabels = {"Danh dự", "XP", "Xu", "Lượng", "Danh dự", "Xu"};
-    @Getter
     private final List<List<UserLeaderboardDTO>> leaderboardEntries = new ArrayList<>(leaderboardCategories.length);
 
+    public LeaderboardService(IRankingDAO rankingDao) {
+        this.rankingDao = rankingDao;
+    }
+
+    @Override
+    public boolean isComplete() {
+        return isComplete;
+    }
+
+    @Override
+    public String[] getCategories() {
+        return leaderboardCategories;
+    }
+
+    @Override
+    public String[] getLabels() {
+        return leaderboardLabels;
+    }
+
+    @Override
     public void init() {
         for (int i = 0; i < leaderboardCategories.length; i++) {
             leaderboardEntries.add(new ArrayList<>());
@@ -67,20 +70,26 @@ public class LeaderboardManager {
         int[] topBonus = ServerManager.getInstance().getConfig().getTopBonus();
 
         int i = 0;
-        for (UserLeaderboardDTO entry : leaderboardEntries.getFirst()) {
+        for (UserLeaderboardDTO userLeaderboardDTO : leaderboardEntries.getFirst()) {
             if (i >= 3) {
                 break;
             }
-            rankingDao.addBonusGift(entry.getUserId(), topBonus[i]);
+            rankingDao.addBonusGift(userLeaderboardDTO.getUserId(), topBonus[i]);
             i++;
         }
     }
 
-    public List<UserLeaderboardDTO> getLeaderboardEntries(int type, int page, int pageSize) {
+    @Override
+    public List<UserLeaderboardDTO> getUsers(int type, int page, int pageSize) {
         List<UserLeaderboardDTO> list = leaderboardEntries.get(type);
         int startIndex = page * pageSize;
         int endIndex = Math.min(startIndex + pageSize, list.size());
         return list.subList(startIndex, endIndex);
+    }
+
+    @Override
+    public int getTotalPageByType(byte type) {
+        return leaderboardEntries.get(type).size() / 10;
     }
 
     private void refreshXH(int type) {
