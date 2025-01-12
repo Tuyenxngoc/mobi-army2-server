@@ -2042,7 +2042,8 @@ public class UserService implements IUserService {
             IMessage ms = new Message(Cmd.CURR_EQUIP_DBKEY);
             DataOutputStream ds = ms.writer();
             for (int i = 0; i < 5; i++) {
-                ds.writeInt(user.getCharacterEquips()[user.getActiveCharacterId()][i].getKey());
+                EquipmentChest equip = user.getCharacterEquips()[user.getActiveCharacterId()][i];
+                ds.writeInt(equip != null ? equip.getKey() : -1);
             }
             ds.flush();
             sendMessage(ms);
