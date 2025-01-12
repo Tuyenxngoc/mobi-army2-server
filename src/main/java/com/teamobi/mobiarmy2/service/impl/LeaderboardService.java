@@ -14,16 +14,21 @@ import java.util.*;
  */
 public class LeaderboardService implements ILeaderboardService {
     private static final Logger logger = LoggerFactory.getLogger(LeaderboardService.class);
+    private static final String[] CATEGORIES = {"DANH DỰ", "CAO THỦ", "ĐẠI GIA XU", "ĐẠI GIA LƯỢNG", "DANH DỰ TUẦN", "ĐẠI GIA TUẦN"};
+    private static final String[] LABELS = {"Danh dự", "XP", "Xu", "Lượng", "Danh dự", "Xu"};
 
     private boolean isComplete;
     private final IRankingDAO rankingDao;
-    private final Timer timer = new Timer(true);
-    private final String[] leaderboardCategories = {"DANH DỰ", "CAO THỦ", "ĐẠI GIA XU", "ĐẠI GIA LƯỢNG", "DANH DỰ TUẦN", "ĐẠI GIA TUẦN"};
-    private final String[] leaderboardLabels = {"Danh dự", "XP", "Xu", "Lượng", "Danh dự", "Xu"};
-    private final List<List<UserLeaderboardDTO>> leaderboardEntries = new ArrayList<>(leaderboardCategories.length);
+    private final Timer timer;
+    private final List<List<UserLeaderboardDTO>> userRankLists;
 
     public LeaderboardService(IRankingDAO rankingDao) {
         this.rankingDao = rankingDao;
+        this.timer = new Timer(true);
+        this.userRankLists = new ArrayList<>(CATEGORIES.length);
+        for (int i = 0; i < CATEGORIES.length; i++) {
+            userRankLists.add(new ArrayList<>());
+        }
     }
 
     @Override
@@ -33,19 +38,16 @@ public class LeaderboardService implements ILeaderboardService {
 
     @Override
     public String[] getCategories() {
-        return leaderboardCategories;
+        return CATEGORIES;
     }
 
     @Override
     public String[] getLabels() {
-        return leaderboardLabels;
+        return LABELS;
     }
 
     @Override
     public void init() {
-        for (int i = 0; i < leaderboardCategories.length; i++) {
-            leaderboardEntries.add(new ArrayList<>());
-        }
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         calendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -56,7 +58,7 @@ public class LeaderboardService implements ILeaderboardService {
             @Override
             public void run() {
                 isComplete = false;
-                for (byte i = 0; i < leaderboardCategories.length; i++) {
+                for (byte i = 0; i < CATEGORIES.length; i++) {
                     refreshXH(i);
                 }
                 addBonusGiftsForPlayers();
@@ -70,7 +72,7 @@ public class LeaderboardService implements ILeaderboardService {
         int[] topBonus = ServerManager.getInstance().getConfig().getTopBonus();
 
         int i = 0;
-        for (UserLeaderboardDTO userLeaderboardDTO : leaderboardEntries.getFirst()) {
+        for (UserLeaderboardDTO userLeaderboardDTO : userRankLists.getFirst()) {
             if (i >= 3) {
                 break;
             }
@@ -81,7 +83,7 @@ public class LeaderboardService implements ILeaderboardService {
 
     @Override
     public List<UserLeaderboardDTO> getUsers(int type, int page, int pageSize) {
-        List<UserLeaderboardDTO> list = leaderboardEntries.get(type);
+        List<UserLeaderboardDTO> list = userRankLists.get(type);
         int startIndex = page * pageSize;
         int endIndex = Math.min(startIndex + pageSize, list.size());
         return list.subList(startIndex, endIndex);
@@ -89,11 +91,11 @@ public class LeaderboardService implements ILeaderboardService {
 
     @Override
     public int getTotalPageByType(byte type) {
-        return leaderboardEntries.get(type).size() / 10;
+        return userRankLists.get(type).size() / 10;
     }
 
     private void refreshXH(int type) {
-        List<UserLeaderboardDTO> list = leaderboardEntries.get(type);
+        List<UserLeaderboardDTO> list = userRankLists.get(type);
         list.clear();
         switch (type) {
             case 0 -> list.addAll(rankingDao.getTopCup());
