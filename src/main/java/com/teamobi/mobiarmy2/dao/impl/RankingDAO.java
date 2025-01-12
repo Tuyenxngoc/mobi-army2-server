@@ -3,8 +3,11 @@ package com.teamobi.mobiarmy2.dao.impl;
 import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dao.IRankingDAO;
+import com.teamobi.mobiarmy2.dao.IUserEquipmentDAO;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
+import com.teamobi.mobiarmy2.dto.UserEquipmentDTO;
 import com.teamobi.mobiarmy2.dto.UserLeaderboardDTO;
+import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.PlayerXpManager;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.util.GsonUtil;
@@ -16,11 +19,18 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tuyen
  */
 public class RankingDAO implements IRankingDAO {
+
+    private final IUserEquipmentDAO userEquipmentDAO;
+
+    public RankingDAO(IUserEquipmentDAO userEquipmentDAO) {
+        this.userEquipmentDAO = userEquipmentDAO;
+    }
 
     private List<UserLeaderboardDTO> getTopFromQuery(String query, boolean applyBonus) {
         Gson gson = GsonUtil.getInstance();
@@ -56,8 +66,8 @@ public class RankingDAO implements IRankingDAO {
                 userLeaderboardDTO.setDetail(Utils.getStringNumber(resultSet.getInt("point")));
 
                 int[] data = gson.fromJson(resultSet.getString("data"), int[].class);
-
-                //      userLeaderboardDTO.setData(EquipmentManager.getEquipmentData());
+                Map<Integer, UserEquipmentDTO> userEquipmentDTOS = userEquipmentDAO.findAllByIdIn(data);
+                userLeaderboardDTO.setData(EquipmentManager.getEquipmentIndexes(userEquipmentDTOS, data, userLeaderboardDTO.getActiveCharacter()));
 
                 top.add(userLeaderboardDTO);
                 index++;

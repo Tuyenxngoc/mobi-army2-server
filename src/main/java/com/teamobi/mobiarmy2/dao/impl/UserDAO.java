@@ -2,14 +2,16 @@ package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.dao.IUserDAO;
+import com.teamobi.mobiarmy2.dao.IUserEquipmentDAO;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.dto.FriendDTO;
 import com.teamobi.mobiarmy2.dto.UserDTO;
-import com.teamobi.mobiarmy2.model.EquipmentChestJson;
+import com.teamobi.mobiarmy2.dto.UserEquipmentDTO;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.MissionManager;
+import com.teamobi.mobiarmy2.server.PlayerXpManager;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -18,15 +20,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author tuyen
  */
 public class UserDAO implements IUserDAO {
+
+    private final IUserEquipmentDAO userEquipmentDAO;
+
+    public UserDAO(IUserEquipmentDAO userEquipmentDAO) {
+        this.userEquipmentDAO = userEquipmentDAO;
+    }
 
     @Override
     public Optional<Integer> create(String accountId, int xu, int luong) {
@@ -151,15 +156,15 @@ public class UserDAO implements IUserDAO {
 
         StringBuilder queryBuilder = new StringBuilder(
                 "SELECT " +
-                        "u.username, u.is_locked, u.is_enabled, " +
-                        "p.player_id, p.xu, p.is_online, p.equipment_chest, " +
-                        "pc.character_id, pc.level, pc.data, " +
+                        "a.username, a.is_locked, a.is_enabled, " +
+                        "u.user_id, u.xu, u.is_online, " +
+                        "uc.character_id, uc.level, uc.xp, uc.data, " +
                         "cm.clan_id " +
-                        "FROM players p " +
-                        "INNER JOIN users u ON p.user_id = u.user_id " +
-                        "INNER JOIN player_characters pc ON p.active_character_id = pc.player_character_id " +
-                        "LEFT JOIN clan_members cm ON p.player_id = cm.player_id " +
-                        "WHERE p.player_id IN ("
+                        "FROM users u " +
+                        "INNER JOIN accounts a ON u.account_id = a.account_id " +
+                        "INNER JOIN user_characters uc ON u.user_id = uc.user_id " +
+                        "LEFT JOIN clan_members cm ON u.user_id = cm.user_id " +
+                        "WHERE u.user_id IN ("
         );
         for (int i = 0; i < friendIds.size(); i++) {
             queryBuilder.append("?");
@@ -182,17 +187,27 @@ public class UserDAO implements IUserDAO {
                         continue;
                     }
                     FriendDTO friend = new FriendDTO();
-                    friend.setId(resultSet.getInt("player_id"));
+                    friend.setUserId(resultSet.getInt("user_id"));
                     friend.setName(resultSet.getString("username"));
                     friend.setXu(resultSet.getInt("xu"));
                     friend.setActiveCharacterId(resultSet.getByte("character_id"));
                     friend.setClanId(resultSet.getShort("clan_id"));
                     friend.setOnline(resultSet.getByte("is_online"));
-                    friend.setLevel(resultSet.getByte("level"));
-                    friend.setLevelPt((byte) 0);
+
+                    int currentLevel = resultSet.getInt("level");
+                    int currentXp = resultSet.getInt("xp");
+                    int requiredXpCurrentLevel = PlayerXpManager.getRequiredXpLevel(currentLevel - 1);
+                    int requiredXpNextLevel = PlayerXpManager.getRequiredXpLevel(currentLevel);
+                    int currentXpInLevel = currentXp - requiredXpCurrentLevel;
+                    int xpNeededForNextLevel = requiredXpNextLevel - requiredXpCurrentLevel;
+                    byte levelPercent = Utils.calculateLevelPercent(currentXpInLevel, xpNeededForNextLevel);
+
+                    friend.setLevel((byte) currentLevel);
+                    friend.setLevelPt(levelPercent);
+
                     int[] data = gson.fromJson(resultSet.getString("data"), int[].class);
-                    EquipmentChestJson[] equipmentChests = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
-                    friend.setData(EquipmentManager.getEquipmentData(equipmentChests, data, friend.getActiveCharacterId()));
+                    Map<Integer, UserEquipmentDTO> userEquipmentDTOS = userEquipmentDAO.findAllByIdIn(data);
+                    friend.setData(EquipmentManager.getEquipmentIndexes(userEquipmentDTOS, data, friend.getActiveCharacterId()));
 
                     friendsList.add(friend);
                 }

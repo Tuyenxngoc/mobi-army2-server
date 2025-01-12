@@ -1,8 +1,10 @@
 package com.teamobi.mobiarmy2.server;
 
+import com.teamobi.mobiarmy2.dto.UserEquipmentDTO;
 import com.teamobi.mobiarmy2.model.Equipment;
-import com.teamobi.mobiarmy2.model.EquipmentChestJson;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,8 +49,43 @@ public class EquipmentManager {
         return null;
     }
 
-    public static short[] getEquipmentData(EquipmentChestJson[] equipmentChestJsons, int[] data, byte activeCharacter) {
-        return new short[5];
+    public static short[] getEquipmentIndexes(Map<Integer, UserEquipmentDTO> userEquipmentDTOS, int[] data, byte characterId) {
+        short[] equipData = new short[5];
+        LocalDateTime now = LocalDateTime.now();
+
+        //Tìm cải trang
+        int disguiseKey = data[5];
+        if (disguiseKey != -1 && userEquipmentDTOS.containsKey(disguiseKey)) {
+            UserEquipmentDTO userEquipmentDTO = userEquipmentDTOS.get(disguiseKey);
+            Equipment equip = getEquipment(userEquipmentDTO.getEquipmentId());
+            if (equip != null && equip.getExpirationDays() - ChronoUnit.DAYS.between(userEquipmentDTO.getPurchaseDate(), now) > 0) {
+                return equip.getDisguiseEquippedIndexes();
+            }
+        }
+
+        //Tìm trang bị
+        for (int i = 0; i < equipData.length; i++) {
+            int equipKey = data[i];
+            boolean exists = false;
+
+            if (equipKey != -1 && userEquipmentDTOS.containsKey(equipKey)) {
+                UserEquipmentDTO userEquipmentDTO = userEquipmentDTOS.get(equipKey);
+                Equipment equip = getEquipment(userEquipmentDTO.getEquipmentId());
+                if (equip != null && equip.getExpirationDays() - ChronoUnit.DAYS.between(userEquipmentDTO.getPurchaseDate(), now) > 0) {
+                    equipData[i] = equip.getEquipIndex();
+                    exists = true;
+                }
+            }
+
+            //Nếu không tìm thấy thì lấy dữ liệu mặc định
+            if (!exists) {
+                equipData[i] = (equipDefault[characterId][i] != null)
+                        ? equipDefault[characterId][i].getEquipIndex()
+                        : -1;
+            }
+        }
+
+        return equipData;
     }
 
     public static void clear() {

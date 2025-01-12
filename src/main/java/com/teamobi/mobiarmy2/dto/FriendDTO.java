@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FriendDTO {
-    private int id;
+    private int userId;
     private String name;
     private int xu;
     private byte activeCharacterId;

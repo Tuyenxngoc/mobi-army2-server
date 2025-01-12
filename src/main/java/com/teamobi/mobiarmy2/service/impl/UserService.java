@@ -1832,7 +1832,7 @@ public class UserService implements IUserService {
             if (!user.getFriends().isEmpty()) {
                 List<FriendDTO> friends = userDAO.getFriendsList(user.getUserId(), user.getFriends());
                 for (FriendDTO friend : friends) {
-                    ds.writeInt(friend.getId());
+                    ds.writeInt(friend.getUserId());
                     ds.writeUTF(friend.getName());
                     ds.writeInt(friend.getXu());
                     ds.writeByte(friend.getActiveCharacterId());
@@ -2853,7 +2853,7 @@ public class UserService implements IUserService {
             ds.writeByte(page);
             ds.writeUTF("BIỆT ĐỘI");
             for (ClanMemDTO memClan : clanMemDTO) {
-                ds.writeInt(memClan.getPlayerId());
+                ds.writeInt(memClan.getUserId());
                 ds.writeUTF(memClan.getUsername());
                 ds.writeInt(memClan.getPoint());
                 ds.writeByte(memClan.getActiveCharacter());
