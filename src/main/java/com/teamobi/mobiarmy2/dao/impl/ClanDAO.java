@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
-import com.teamobi.mobiarmy2.dao.IClanDao;
+import com.teamobi.mobiarmy2.dao.IClanDAO;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.dto.ClanDTO;
 import com.teamobi.mobiarmy2.dto.ClanInfoDTO;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 /**
  * @author tuyen
  */
-public class ClanDao implements IClanDao {
+public class ClanDAO implements IClanDAO {
 
     @Override
     public Short getClanIcon(int clanId) {

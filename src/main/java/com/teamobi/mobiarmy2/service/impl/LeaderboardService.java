@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.service.impl;
 
 import com.teamobi.mobiarmy2.config.IServerConfig;
-import com.teamobi.mobiarmy2.dao.IRankingDao;
+import com.teamobi.mobiarmy2.dao.IRankingDAO;
 import com.teamobi.mobiarmy2.dto.PlayerLeaderboardDTO;
 import com.teamobi.mobiarmy2.service.ILeaderboardService;
 import org.slf4j.Logger;
@@ -18,13 +18,13 @@ public class LeaderboardService implements ILeaderboardService {
     private static final String[] LABELS = {"Danh dự", "XP", "Xu", "Lượng", "Danh dự", "Xu"};
 
     private boolean isComplete;
-    private final IRankingDao rankingDao;
+    private final IRankingDAO rankingDAO;
     private final IServerConfig serverConfig;
     private final Timer timer;
     private final List<List<PlayerLeaderboardDTO>> leaderboardEntries;
 
-    public LeaderboardService(IRankingDao rankingDao, IServerConfig serverConfig) {
-        this.rankingDao = rankingDao;
+    public LeaderboardService(IRankingDAO rankingDAO, IServerConfig serverConfig) {
+        this.rankingDAO = rankingDAO;
         this.serverConfig = serverConfig;
         this.timer = new Timer(true);
         this.leaderboardEntries = new ArrayList<>(CATEGORIES.length);
@@ -78,7 +78,7 @@ public class LeaderboardService implements ILeaderboardService {
             if (i >= 3) {
                 break;
             }
-            rankingDao.addBonusGift(entry.getPlayerId(), topBonus[i]);
+            rankingDAO.addBonusGift(entry.getPlayerId(), topBonus[i]);
             i++;
         }
     }
@@ -100,12 +100,12 @@ public class LeaderboardService implements ILeaderboardService {
         List<PlayerLeaderboardDTO> list = leaderboardEntries.get(type);
         list.clear();
         switch (type) {
-            case 0 -> list.addAll(rankingDao.getTopHonor());
-            case 1 -> list.addAll(rankingDao.getTopMasters());
-            case 2 -> list.addAll(rankingDao.getTopRichestXu());
-            case 3 -> list.addAll(rankingDao.getTopRichestLuong());
-            case 4 -> list.addAll(rankingDao.getWeeklyTopHonor());
-            case 5 -> list.addAll(rankingDao.getWeeklyTopRichest());
+            case 0 -> list.addAll(rankingDAO.getTopHonor());
+            case 1 -> list.addAll(rankingDAO.getTopMasters());
+            case 2 -> list.addAll(rankingDAO.getTopRichestXu());
+            case 3 -> list.addAll(rankingDAO.getTopRichestLuong());
+            case 4 -> list.addAll(rankingDAO.getWeeklyTopHonor());
+            case 5 -> list.addAll(rankingDAO.getWeeklyTopRichest());
         }
     }
 

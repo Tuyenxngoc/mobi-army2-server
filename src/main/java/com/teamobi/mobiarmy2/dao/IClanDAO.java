@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * @author tuyen
  */
-public interface IClanDao {
+public interface IClanDAO {
 
     Short getClanIcon(int clanId);
 

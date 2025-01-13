@@ -2,8 +2,8 @@ package com.teamobi.mobiarmy2.service.impl;
 
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.constant.*;
-import com.teamobi.mobiarmy2.dao.IGiftCodeDao;
-import com.teamobi.mobiarmy2.dao.IUserDao;
+import com.teamobi.mobiarmy2.dao.IGiftCodeDAO;
+import com.teamobi.mobiarmy2.dao.IUserDAO;
 import com.teamobi.mobiarmy2.dto.*;
 import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.fight.impl.TrainingManager;
@@ -39,8 +39,8 @@ public class UserService implements IUserService {
     private final IClanService clanService;
     private final ILeaderboardService leaderboardService;
 
-    private final IUserDao userDao;
-    private final IGiftCodeDao giftCodeDao;
+    private final IUserDAO userDAO;
+    private final IGiftCodeDAO giftCodeDAO;
 
     private UserAction userAction;
     private int totalTransactionAmount;
@@ -51,13 +51,13 @@ public class UserService implements IUserService {
     private long timeSinceLeftRoom;
     private long lastSpinTime;
 
-    public UserService(User user, IServerConfig serverConfig, IClanService clanService, ILeaderboardService leaderboardService, IUserDao userDao, IGiftCodeDao giftCodeDao) {
+    public UserService(User user, IServerConfig serverConfig, IClanService clanService, ILeaderboardService leaderboardService, IUserDAO userDAO, IGiftCodeDAO giftCodeDAO) {
         this.user = user;
         this.serverConfig = serverConfig;
         this.clanService = clanService;
         this.leaderboardService = leaderboardService;
-        this.userDao = userDao;
-        this.giftCodeDao = giftCodeDao;
+        this.userDAO = userDAO;
+        this.giftCodeDAO = giftCodeDAO;
     }
 
     private List<EquipmentChest> getSelectedEquips() {
@@ -121,7 +121,7 @@ public class UserService implements IUserService {
                 return;
             }
 
-            UserDTO userFound = userDao.findByUsernameAndPassword(username, password);
+            UserDTO userFound = userDAO.findByUsernameAndPassword(username, password);
             if (userFound == null) {
                 sendMessageLoginFail(GameString.LOGIN_FAILED);
                 return;
@@ -177,10 +177,10 @@ public class UserService implements IUserService {
                 user.updateMission(16, 1);
 
                 //Lưu lại lần đăng nhập
-                userDao.updateLastOnline(now, user.getPlayerId());
+                userDAO.updateLastOnline(now, user.getPlayerId());
             }
 
-            userDao.updateOnline(true, userFound.getPlayerId());
+            userDAO.updateOnline(true, userFound.getPlayerId());
 
             sendLoginSuccess();
             sendCharacterData(serverConfig);
@@ -234,7 +234,7 @@ public class UserService implements IUserService {
         }
 
         user.setLogged(false);
-        userDao.update(user);
+        userDAO.update(user);
     }
 
     public void sendCharacterData(IServerConfig config) {
@@ -1741,7 +1741,7 @@ public class UserService implements IUserService {
             DataOutputStream ds = ms.writer();
 
             if (!user.getFriends().isEmpty()) {
-                List<FriendDTO> friends = userDao.getFriendsList(user.getPlayerId(), user.getFriends());
+                List<FriendDTO> friends = userDAO.getFriendsList(user.getPlayerId(), user.getFriends());
                 for (FriendDTO friend : friends) {
                     ds.writeInt(friend.getId());
                     ds.writeUTF(friend.getName());
@@ -1852,7 +1852,7 @@ public class UserService implements IUserService {
                 sendMessageLoginFail(GameString.FRIEND_ADD_INVALID_NAME);
                 return;
             }
-            Integer id = userDao.findPlayerIdByUsername(username);
+            Integer id = userDAO.findPlayerIdByUsername(username);
             ms = new Message(Cmd.SEARCH);
             DataOutputStream ds = ms.writer();
             if (id != null) {
@@ -2035,8 +2035,8 @@ public class UserService implements IUserService {
                 user.updateLuong(-characterEntry.getPriceLuong());
             }
 
-            if (userDao.createPlayerCharacter(user.getPlayerId(), index)) {
-                PlayerCharacterDTO character = userDao.getPlayerCharacter(user.getPlayerId(), index);
+            if (userDAO.createPlayerCharacter(user.getPlayerId(), index)) {
+                PlayerCharacterDTO character = userDAO.getPlayerCharacter(user.getPlayerId(), index);
                 if (character != null) {
                     user.getLevels()[index] = character.getLevel();
                     user.getXps()[index] = character.getXp();
@@ -2084,7 +2084,7 @@ public class UserService implements IUserService {
     }
 
     private void handleGiftCode(String code) {
-        GiftCodeDTO giftCode = giftCodeDao.getGiftCode(code, user.getPlayerId());
+        GiftCodeDTO giftCode = giftCodeDAO.getGiftCode(code, user.getPlayerId());
         if (giftCode == null) {
             sendServerMessage(GameString.GIFT_CODE_INVALID);
             return;
@@ -2103,8 +2103,8 @@ public class UserService implements IUserService {
             return;
         }
 
-        giftCodeDao.decrementGiftCodeUsageLimit(giftCode.getId());
-        giftCodeDao.logGiftCodeRedemption(giftCode.getId(), user.getPlayerId());
+        giftCodeDAO.decrementGiftCodeUsageLimit(giftCode.getId());
+        giftCodeDAO.logGiftCodeRedemption(giftCode.getId(), user.getPlayerId());
 
         if (giftCode.getXu() > 0) {
             user.updateXu(giftCode.getXu());
@@ -2192,12 +2192,12 @@ public class UserService implements IUserService {
                 return;
             }
 
-            if (!userDao.existsByUserIdAndPassword(user.getUserId(), oldPass)) {
+            if (!userDAO.existsByUserIdAndPassword(user.getUserId(), oldPass)) {
                 sendServerMessage(GameString.PASSWORD_INCORRECT_OLD);
                 return;
             }
 
-            userDao.changePassword(user.getUserId(), newPass);
+            userDAO.changePassword(user.getUserId(), newPass);
             sendServerMessage(GameString.PASSWORD_CHANGE_SUCCESS);
         } catch (IOException ignored) {
         }

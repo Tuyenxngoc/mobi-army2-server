@@ -23,15 +23,15 @@ public class MobiArmy2 {
         ApplicationContext context = ApplicationContext.getInstance();
         context.registerBean(IServerConfig.class, new ServerConfig());
 
-        context.registerBean(IClanDao.class, new ClanDao());
+        context.registerBean(IClanDAO.class, new ClanDAO());
         context.registerBean(IGameDao.class, new GameDao());
-        context.registerBean(IGiftCodeDao.class, new GiftCodeDao());
-        context.registerBean(IRankingDao.class, new RankingDao(context.getBean(IServerConfig.class)));
-        context.registerBean(IUserDao.class, new UserDao());
+        context.registerBean(IGiftCodeDAO.class, new GiftCodeDAO());
+        context.registerBean(IRankingDAO.class, new RankingDAO(context.getBean(IServerConfig.class)));
+        context.registerBean(IUserDAO.class, new UserDAO());
 
         context.registerBean(IGameDataService.class, new GameDataService(context.getBean(IGameDao.class)));
-        context.registerBean(ILeaderboardService.class, new LeaderboardService(context.getBean(IRankingDao.class), context.getBean(IServerConfig.class)));
-        context.registerBean(IClanService.class, new ClanService(context.getBean(IClanDao.class)));
+        context.registerBean(ILeaderboardService.class, new LeaderboardService(context.getBean(IRankingDAO.class), context.getBean(IServerConfig.class)));
+        context.registerBean(IClanService.class, new ClanService(context.getBean(IClanDAO.class)));
 
         ServerManager serverManager = ServerManager.getInstance();
         Runtime.getRuntime().addShutdownHook(new Thread(serverManager::stop, "ServerShutdownHook"));

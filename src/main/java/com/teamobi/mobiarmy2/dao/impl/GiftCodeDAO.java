@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
-import com.teamobi.mobiarmy2.dao.IGiftCodeDao;
+import com.teamobi.mobiarmy2.dao.IGiftCodeDAO;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.dto.GiftCodeDTO;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 /**
  * @author tuyen
  */
-public class GiftCodeDao implements IGiftCodeDao {
+public class GiftCodeDAO implements IGiftCodeDAO {
 
     @Override
     public GiftCodeDTO getGiftCode(String code, int playerId) {

@@ -3,7 +3,7 @@ package com.teamobi.mobiarmy2.dao.impl;
 import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.constant.GameString;
-import com.teamobi.mobiarmy2.dao.IRankingDao;
+import com.teamobi.mobiarmy2.dao.IRankingDAO;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.dto.PlayerLeaderboardDTO;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
@@ -22,11 +22,11 @@ import java.util.List;
 /**
  * @author tuyen
  */
-public class RankingDao implements IRankingDao {
+public class RankingDAO implements IRankingDAO {
 
     private final IServerConfig serverConfig;
 
-    public RankingDao(IServerConfig serverConfig) {
+    public RankingDAO(IServerConfig serverConfig) {
         this.serverConfig = serverConfig;
     }
 
