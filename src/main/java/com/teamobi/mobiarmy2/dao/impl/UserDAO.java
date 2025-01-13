@@ -2,7 +2,7 @@ package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.constant.TransactionType;
-import com.teamobi.mobiarmy2.dao.IUserDao;
+import com.teamobi.mobiarmy2.dao.IUserDAO;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.dto.FriendDTO;
 import com.teamobi.mobiarmy2.dto.PlayerCharacterDTO;
@@ -31,10 +31,10 @@ import java.util.stream.Collectors;
 /**
  * @author tuyen
  */
-public class UserDao implements IUserDao {
+public class UserDAO implements IUserDAO {
 
     @Override
-    public void save(User user) {
+    public void create(User user) {
         HikariCPManager.getInstance().update("INSERT INTO `players`(`user_id`, `xu`, `luong`) VALUES (?,?,?)", user.getUserId(), user.getXu(), user.getLuong());
     }
 
