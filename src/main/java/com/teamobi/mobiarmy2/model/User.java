@@ -1,20 +1,25 @@
 package com.teamobi.mobiarmy2.model;
 
+import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.constant.UserState;
+import com.teamobi.mobiarmy2.dao.IGiftCodeDao;
+import com.teamobi.mobiarmy2.dao.IUserDao;
 import com.teamobi.mobiarmy2.fight.IFightWait;
-import com.teamobi.mobiarmy2.fight.IGiftBoxManager;
 import com.teamobi.mobiarmy2.fight.ITrainingManager;
-import com.teamobi.mobiarmy2.fight.impl.GiftBoxManager;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.impl.Message;
+import com.teamobi.mobiarmy2.server.ApplicationContext;
 import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.PlayerXpManager;
-import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
+import com.teamobi.mobiarmy2.service.IClanService;
+import com.teamobi.mobiarmy2.service.IGiftBoxService;
+import com.teamobi.mobiarmy2.service.ILeaderboardService;
 import com.teamobi.mobiarmy2.service.IUserService;
+import com.teamobi.mobiarmy2.service.impl.GiftBoxService;
 import com.teamobi.mobiarmy2.service.impl.UserService;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
@@ -58,7 +63,7 @@ public class User {
     private int[] xps;
     private int[] points;
     private short[][] addedPoints;
-    private byte[] items;
+    private byte[] fightItems;
     private int[][] equipData;
     private int[] mission;
     private byte[] missionLevel;
@@ -69,18 +74,24 @@ public class User {
     private IFightWait fightWait;
     private ITrainingManager trainingManager;
     private final IUserService userService;
-    private final IGiftBoxManager giftBoxManager;
+    private final IServerConfig serverConfig;
+    private final IGiftBoxService giftBoxService;
     private int topEarningsXu;
 
-    public User() {
-        this.state = UserState.WAITING;
-        this.userService = new UserService(this);
-        this.giftBoxManager = new GiftBoxManager(this);
-    }
-
     public User(ISession session) {
-        this();
         this.session = session;
+        this.state = UserState.WAITING;
+        ApplicationContext context = ApplicationContext.getInstance();
+        this.userService = new UserService(
+                this,
+                context.getBean(IServerConfig.class),
+                context.getBean(IClanService.class),
+                context.getBean(ILeaderboardService.class),
+                context.getBean(IUserDao.class),
+                context.getBean(IGiftCodeDao.class)
+        );
+        this.serverConfig = context.getBean(IServerConfig.class);
+        this.giftBoxService = new GiftBoxService(this);
     }
 
     public boolean isNotWaiting() {
@@ -88,7 +99,7 @@ public class User {
     }
 
     public boolean isOpeningGift() {
-        return giftBoxManager.isOpeningGift();
+        return giftBoxService.isOpeningGift();
     }
 
     public void sendMessage(IMessage ms) {
@@ -228,19 +239,20 @@ public class User {
         return equips;
     }
 
-    public synchronized void updateItems(byte itemIndex, byte quantity) {
-        if (itemIndex < 0 || itemIndex >= items.length) {
+    public synchronized void updateFightItems(byte itemIndex, byte quantity) {
+        if (itemIndex < 0 || itemIndex >= fightItems.length) {
             return;
         }
 
-        items[itemIndex] += quantity;
-        if (items[itemIndex] < 0) {
-            items[itemIndex] = 0;
+        fightItems[itemIndex] += quantity;
+        if (fightItems[itemIndex] < 0) {
+            fightItems[itemIndex] = 0;
         }
-        if (items[itemIndex] > ServerManager.getInstance().getConfig().getMaxItem()) {
-            items[itemIndex] = ServerManager.getInstance().getConfig().getMaxItem();
+        byte maxItem = serverConfig.getMaxItem();
+        if (fightItems[itemIndex] > maxItem) {
+            fightItems[itemIndex] = maxItem;
         }
-        items[0] = items[1] = 99;
+        fightItems[0] = fightItems[1] = maxItem;
     }
 
     public synchronized void addEquipment(EquipmentChest addEquipment) {
@@ -464,8 +476,8 @@ public class User {
     }
 
     public byte getItemFightQuantity(int index) {
-        if (index >= 0 && index < items.length) {
-            return items[index];
+        if (index >= 0 && index < fightItems.length) {
+            return fightItems[index];
         }
         return 0;
     }

@@ -100,7 +100,7 @@ public class UserDao implements IUserDao {
                 user.getLuong(),
                 user.getCup(),
                 user.getClanId(),
-                Arrays.toString(user.getItems()),
+                Arrays.toString(user.getFightItems()),
                 equipmentChestJson,
                 specialItemChestJson,
                 false,

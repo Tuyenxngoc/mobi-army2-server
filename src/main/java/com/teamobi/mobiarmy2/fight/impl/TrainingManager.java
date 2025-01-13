@@ -2,7 +2,7 @@ package com.teamobi.mobiarmy2.fight.impl;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.fight.ITrainingManager;
-import com.teamobi.mobiarmy2.fight.Player;
+import com.teamobi.mobiarmy2.model.Player;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.impl.Message;

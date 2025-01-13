@@ -8,6 +8,9 @@ import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -172,10 +175,15 @@ public class Utils {
     }
 
     public static boolean hasLoggedInOnNewDay(LocalDateTime lastOnline, LocalDateTime now) {
-        if (lastOnline.isAfter(now)) {
+        if (lastOnline == null || lastOnline.isAfter(now)) {
             return false;
         }
         return !lastOnline.toLocalDate().isEqual(now.toLocalDate());
+    }
+
+    public static LocalDateTime getLocalDateTimeFromTimestamp(ResultSet resultSet, String columnName) throws SQLException {
+        Timestamp timestamp = resultSet.getTimestamp(columnName);
+        return (timestamp != null) ? timestamp.toLocalDateTime() : null;
     }
 
     public static float getArgXY(float Ax, float Ay, float Bx, float By) {

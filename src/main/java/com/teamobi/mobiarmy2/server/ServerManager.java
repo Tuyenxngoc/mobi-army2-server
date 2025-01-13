@@ -1,18 +1,15 @@
 package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.config.IServerConfig;
-import com.teamobi.mobiarmy2.config.impl.ServerConfig;
 import com.teamobi.mobiarmy2.constant.UserState;
-import com.teamobi.mobiarmy2.dao.IGameDao;
-import com.teamobi.mobiarmy2.dao.impl.GameDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
-import com.teamobi.mobiarmy2.model.Room;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.impl.Session;
-import com.teamobi.mobiarmy2.service.IGameService;
-import com.teamobi.mobiarmy2.service.impl.GameService;
+import com.teamobi.mobiarmy2.service.IGameDataService;
+import com.teamobi.mobiarmy2.service.ILeaderboardService;
+import com.teamobi.mobiarmy2.ui.controllers.ServerListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,40 +25,26 @@ import java.util.List;
 public class ServerManager {
     private static final Logger logger = LoggerFactory.getLogger(ServerManager.class);
 
-    private final IGameService gameService;
-    private final IServerConfig config;
+    private final IGameDataService gameDataService;
+    private final ILeaderboardService leaderboardService;
+    private final IServerConfig serverConfig;
+
     private ServerSocket server;
     private long countClients;
     private boolean isStart;
     private boolean isMaintenanceMode;
-    private Room[] rooms;
     private final ArrayList<ISession> sessions;
     private final List<ServerListener> listeners;
 
     public ServerManager() {
-        IGameDao gameDao = new GameDao();
-        this.gameService = new GameService(gameDao);
+        ApplicationContext context = ApplicationContext.getInstance();
+        this.gameDataService = context.getBean(IGameDataService.class);
+        this.leaderboardService = context.getBean(ILeaderboardService.class);
+        this.serverConfig = context.getBean(IServerConfig.class);
 
         this.isMaintenanceMode = false;
-        this.config = new ServerConfig();
         this.sessions = new ArrayList<>();
         this.listeners = new ArrayList<>();
-    }
-
-    public IServerConfig getConfig() {
-        return config;
-    }
-
-    public Room[] getRooms() {
-        return rooms;
-    }
-
-    public boolean isMaintenanceMode() {
-        return isMaintenanceMode;
-    }
-
-    public void setMaintenanceMode(boolean maintenanceMode) {
-        isMaintenanceMode = maintenanceMode;
     }
 
     private static class SingletonHelper {
@@ -72,85 +55,29 @@ public class ServerManager {
         return SingletonHelper.INSTANCE;
     }
 
+    public boolean isMaintenanceMode() {
+        return isMaintenanceMode;
+    }
+
+    public void setMaintenanceMode(boolean maintenanceMode) {
+        isMaintenanceMode = maintenanceMode;
+    }
+
     public void init() {
-        initServerData();
-        setCache();
-        initRooms();
-        initRankings();
-    }
-
-    private void initServerData() {
-        gameService.getMapData();
-        gameService.getCharacterData();
-        gameService.getEquipData();
-        gameService.setCaptionLevelData();
-        gameService.getItemData();
-        gameService.getClanShopData();
-        gameService.getSpecialItemData();
-        gameService.getFormulaData();
-        gameService.getPaymentData();
-        gameService.getMissionData();
-        gameService.getLvXpData();
-        gameService.getFabricateItemData();
-    }
-
-    private void setCache() {
-        gameService.setCacheMaps();
-        gameService.setCacheCharacters();
-        gameService.setCacheCaptionLevels();
-        gameService.setCachePlayerImages();
-        gameService.setCacheMapIcons();
-    }
-
-    private void initRooms() {
-        byte[] roomQuantities = config.getRoomQuantity();
-        int totalRooms = 0;
-
-        for (int quantity : roomQuantities) {
-            totalRooms += quantity;
-        }
-
-        rooms = new Room[totalRooms];
-        byte index = 0;
-
-        for (byte type = 0; type < roomQuantities.length; type++) {
-            int minXu = config.getRoomMinXu()[type];
-            int maxXu = config.getRoomMaxXu()[type];
-            byte minMap = config.getRoomMinMap()[type];
-            byte maxMap = config.getRoomMaxMap()[type];
-            byte numArea = config.getNumArea();
-            byte maxPlayerFight = config.getMaxPlayerFight();
-            byte numPlayerInitRoom = config.getNumPlayerInitRoom();
-            byte roomIconType = config.getRoomIconType();
-
-            for (byte roomCount = 0; roomCount < roomQuantities[type]; roomCount++) {
-                byte[] mapCanSelected = null;
-                boolean isContinuous = false;
-                if (type == 5) {
-                    mapCanSelected = config.getBossRoomMapLimit()[roomCount];
-                    if (roomCount == 9) {
-                        isContinuous = true;
-                    }
-                }
-
-                rooms[index] = new Room(index, type, minXu, maxXu, minMap, maxMap, mapCanSelected, isContinuous, numArea, maxPlayerFight, numPlayerInitRoom, roomIconType);
-                index++;
-            }
-        }
-    }
-
-    private void initRankings() {
-        LeaderboardManager.getInstance().init();
+        gameDataService.loadServerData();
+        gameDataService.setCache();
+        leaderboardService.init();
+        RoomManager.getInstance().init();
     }
 
     public void start() {
         logger.info("Start server!");
         isStart = true;
         try {
-            server = new ServerSocket(config.getPort());
-            logger.info("Server start at port: {}", config.getPort());
+            server = new ServerSocket(serverConfig.getPort());
+            logger.info("Server start at port: {}", serverConfig.getPort());
             while (isStart) {
-                if (sessions.size() < config.getMaxClients()) {
+                if (sessions.size() < serverConfig.getMaxClients()) {
                     try {
                         Socket socket = server.accept();
                         ISession session = new Session(++countClients, socket);

@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
+import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dao.IRankingDao;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
@@ -8,7 +9,6 @@ import com.teamobi.mobiarmy2.dto.PlayerLeaderboardDTO;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.PlayerXpManager;
-import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -24,9 +24,15 @@ import java.util.List;
  */
 public class RankingDao implements IRankingDao {
 
+    private final IServerConfig serverConfig;
+
+    public RankingDao(IServerConfig serverConfig) {
+        this.serverConfig = serverConfig;
+    }
+
     private List<PlayerLeaderboardDTO> getTopFromQuery(String query, String detailColumn, boolean applyBonus) {
         Gson gson = GsonUtil.getInstance();
-        int[] topBonus = ServerManager.getInstance().getConfig().getTopBonus();
+        int[] topBonus = serverConfig.getTopBonus();
         List<PlayerLeaderboardDTO> top = new ArrayList<>();
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement();

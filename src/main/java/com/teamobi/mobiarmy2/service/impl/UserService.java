@@ -4,8 +4,6 @@ import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.constant.*;
 import com.teamobi.mobiarmy2.dao.IGiftCodeDao;
 import com.teamobi.mobiarmy2.dao.IUserDao;
-import com.teamobi.mobiarmy2.dao.impl.GiftCodeDao;
-import com.teamobi.mobiarmy2.dao.impl.UserDao;
 import com.teamobi.mobiarmy2.dto.*;
 import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.fight.impl.TrainingManager;
@@ -16,6 +14,8 @@ import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.server.*;
+import com.teamobi.mobiarmy2.service.IClanService;
+import com.teamobi.mobiarmy2.service.ILeaderboardService;
 import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -34,6 +34,11 @@ public class UserService implements IUserService {
     private static final int minimumWaitTime = 5000;
 
     private final User user;
+
+    private final IServerConfig serverConfig;
+    private final IClanService clanService;
+    private final ILeaderboardService leaderboardService;
+
     private final IUserDao userDao;
     private final IGiftCodeDao giftCodeDao;
 
@@ -46,10 +51,13 @@ public class UserService implements IUserService {
     private long timeSinceLeftRoom;
     private long lastSpinTime;
 
-    public UserService(User user) {
+    public UserService(User user, IServerConfig serverConfig, IClanService clanService, ILeaderboardService leaderboardService, IUserDao userDao, IGiftCodeDao giftCodeDao) {
         this.user = user;
-        this.userDao = new UserDao();
-        this.giftCodeDao = new GiftCodeDao();
+        this.serverConfig = serverConfig;
+        this.clanService = clanService;
+        this.leaderboardService = leaderboardService;
+        this.userDao = userDao;
+        this.giftCodeDao = giftCodeDao;
     }
 
     private List<EquipmentChest> getSelectedEquips() {
@@ -91,7 +99,7 @@ public class UserService implements IUserService {
             return;
         }
 
-        if (!LeaderboardManager.getInstance().isComplete()) {
+        if (!leaderboardService.isComplete()) {
             sendMessageLoginFail(GameString.RANKING_NOT_LOADED);
             return;
         }
@@ -147,7 +155,7 @@ public class UserService implements IUserService {
                 //Gửi item
                 byte indexItem = FightItemManager.getRandomItem();
                 byte quantity = 1;
-                user.updateItems(indexItem, quantity);
+                user.updateFightItems(indexItem, quantity);
                 sendMessageToUser(GameString.createDailyRewardMessage(quantity, FightItemManager.FIGHT_ITEMS.get(indexItem).getName()));
 
                 //Cập nhật quà top
@@ -161,7 +169,7 @@ public class UserService implements IUserService {
                 user.setMaterialsPurchased((byte) 0);
 
                 //Gửi messeage khi login
-                for (String msg : serverManager.getConfig().getMessage()) {
+                for (String msg : serverConfig.getMessage()) {
                     sendMessageToUser(msg);
                 }
 
@@ -175,11 +183,10 @@ public class UserService implements IUserService {
             userDao.updateOnline(true, userFound.getPlayerId());
 
             sendLoginSuccess();
-            IServerConfig config = serverManager.getConfig();
-            sendCharacterData(config);
-            sendRoomCaption(config);
+            sendCharacterData(serverConfig);
+            sendRoomCaption(serverConfig);
             sendMapCollisionInfo();
-            sendServerInfoToUser(config.getMessageLogin());
+            sendServerInfoToUser(serverConfig.getMessageLogin());
 
             serverManager.notifyListeners();
         } catch (IOException ignored) {
@@ -210,7 +217,7 @@ public class UserService implements IUserService {
         target.setMissionLevel(source.getMissionLevel());
         target.setSpecialItemChest(source.getSpecialItemChest());
         target.setEquipmentChest(new ArrayList<>(source.getEquipmentChest().values()));
-        target.setItems(source.getItems());
+        target.setFightItems(source.getItems());
         target.setXpX2Time(source.getXpX2Time());
         target.setLastOnline(source.getLastOnline());
         target.setTopEarningsXu(source.getTopEarningsXu());
@@ -268,9 +275,8 @@ public class UserService implements IUserService {
     }
 
     public void sendRoomName() {
-        IServerConfig config = ServerManager.getInstance().getConfig();
-        String[] names = config.getBossRoomName();
-        int startMapBoss = config.getStartMapBoss();
+        String[] names = serverConfig.getBossRoomName();
+        int startMapBoss = serverConfig.getStartMapBoss();
         try {
             IMessage ms = new Message(Cmd.CHANGE_ROOM_NAME);
             DataOutputStream ds = ms.writer();
@@ -505,7 +511,7 @@ public class UserService implements IUserService {
             }
 
             for (int i = 0; i < FightItemManager.FIGHT_ITEMS.size(); i++) {
-                ds.writeByte(user.getItems()[i]);
+                ds.writeByte(user.getFightItems()[i]);
                 FightItem fightItem = FightItemManager.FIGHT_ITEMS.get(i);
                 ds.writeInt(fightItem.getBuyXu());
                 ds.writeInt(fightItem.getBuyLuong());
@@ -520,10 +526,9 @@ public class UserService implements IUserService {
                 }
             }
 
-            IServerConfig config = ServerManager.getInstance().getConfig();
-            ds.writeUTF(config.getAddInfo());
-            ds.writeUTF(config.getAddInfoUrl());
-            ds.writeUTF(config.getRegTeamUrl());
+            ds.writeUTF(serverConfig.getAddInfo());
+            ds.writeUTF(serverConfig.getAddInfoUrl());
+            ds.writeUTF(serverConfig.getRegTeamUrl());
             ds.flush();
             sendMessage(ms);
         } catch (IOException ignored) {
@@ -553,7 +558,7 @@ public class UserService implements IUserService {
                     return;
                 }
 
-                int minXuContributeClan = ServerManager.getInstance().getConfig().getMinXuContributeClan();
+                int minXuContributeClan = serverConfig.getMinXuContributeClan();
                 if (quantity < minXuContributeClan) {
                     sendServerMessage(GameString.createClanContributionMinXuMessage(minXuContributeClan));
                     return;
@@ -561,7 +566,7 @@ public class UserService implements IUserService {
                 //Update xu user
                 user.updateXu(-quantity);
                 //Update xu clan
-                ClanManager.getInstance().contributeClan(user.getClanId(), user.getPlayerId(), quantity, Boolean.TRUE);
+                clanService.contributeClan(user.getClanId(), user.getPlayerId(), quantity, Boolean.TRUE);
                 sendServerMessage(GameString.CONTRIBUTION_SUCCESS);
             } else if (type == 1) {
                 if (quantity > user.getLuong()) {
@@ -570,7 +575,7 @@ public class UserService implements IUserService {
                 //Update lg user
                 user.updateLuong(-quantity);
                 //Update lg clan
-                ClanManager.getInstance().contributeClan(user.getClanId(), user.getPlayerId(), quantity, Boolean.FALSE);
+                clanService.contributeClan(user.getClanId(), user.getPlayerId(), quantity, Boolean.FALSE);
                 sendServerMessage(GameString.CONTRIBUTION_SUCCESS);
             }
         } catch (IOException ignored) {
@@ -759,7 +764,7 @@ public class UserService implements IUserService {
     public void openLuckyGift(IMessage ms) {
         try {
             byte index = ms.reader().readByte();
-            user.getGiftBoxManager().openGiftBoxAfterFight(index);
+            user.getGiftBoxService().openGiftBoxAfterFight(index);
         } catch (IOException ignored) {
         }
     }
@@ -771,31 +776,30 @@ public class UserService implements IUserService {
             byte type = dis.readByte();
             byte page = dis.readByte();
 
-            LeaderboardManager leaderboardManager = LeaderboardManager.getInstance();
-            if (type >= leaderboardManager.getLeaderboardCategories().length) {
+            if (type >= leaderboardService.getCategories().length) {
                 return;
             }
             ms = new Message(Cmd.BANGTHANHTICH);
             DataOutputStream ds = ms.writer();
             ds.writeByte(type);
             if (type < 0) {
-                ds.writeByte(leaderboardManager.getLeaderboardCategories().length);
-                for (String name : leaderboardManager.getLeaderboardCategories()) {
+                ds.writeByte(leaderboardService.getCategories().length);
+                for (String name : leaderboardService.getCategories()) {
                     ds.writeUTF(name);
                 }
             } else {
                 //Kiểm tra page num
-                byte maxPage = (byte) (leaderboardManager.getLeaderboardEntries().get(type).size() / 10);
+                int maxPage = leaderboardService.getTotalPageByType(type);
                 if (page > maxPage || page >= 10) {
                     page = 0;
                 }
                 if (page < 0) {
-                    page = maxPage;
+                    page = (byte) maxPage;
                 }
                 //Gửi dữ liệu
                 ds.writeByte(page);
-                ds.writeUTF(leaderboardManager.getLeaderboardLabels()[type]);
-                List<PlayerLeaderboardDTO> bangXH = leaderboardManager.getLeaderboardEntries(type, page, 10);
+                ds.writeUTF(leaderboardService.getLabels()[type]);
+                List<PlayerLeaderboardDTO> bangXH = leaderboardService.getUsers(type, page, 10);
                 if (bangXH != null) {
                     for (PlayerLeaderboardDTO pl : bangXH) {
                         ds.writeInt(pl.getPlayerId());
@@ -839,14 +843,13 @@ public class UserService implements IUserService {
     }
 
     private void buyClanShop(byte unit, byte itemId) {
-        ClanManager clanManager = ClanManager.getInstance();
         ClanItem clanItem = ClanItemManager.getItemClanById(itemId);
 
         if (clanItem == null || clanItem.getOnSale() != 1) {
             return;
         }
 
-        int currentLevel = clanManager.getClanLevel(user.getClanId());
+        int currentLevel = clanService.getClanLevel(user.getClanId());
         if (currentLevel < clanItem.getLevel()) {
             sendServerMessage(GameString.CLAN_LEVEL_INSUFFICIENT);
             return;
@@ -856,24 +859,24 @@ public class UserService implements IUserService {
             if (clanItem.getXu() < 0) {
                 return;
             }
-            int xuClan = clanManager.getClanXu(user.getClanId());
+            int xuClan = clanService.getClanXu(user.getClanId());
             if (xuClan < clanItem.getXu()) {
                 sendServerMessage(GameString.CLAN_NOT_ENOUGH_XU);
                 return;
             }
 
-            clanManager.updateItemClan(user.getClanId(), user.getPlayerId(), clanItem, true);
+            clanService.updateItemClan(user.getClanId(), user.getPlayerId(), clanItem, true);
         } else if (unit == 1) {//Luong
             if (clanItem.getLuong() < 0) {
                 return;
             }
-            int luongClan = clanManager.getClanLuong(user.getClanId());
+            int luongClan = clanService.getClanLuong(user.getClanId());
             if (luongClan < clanItem.getLuong()) {
                 sendServerMessage(GameString.CLAN_NOT_ENOUGH_LUONG);
                 return;
             }
 
-            clanManager.updateItemClan(user.getClanId(), user.getPlayerId(), clanItem, false);
+            clanService.updateItemClan(user.getClanId(), user.getPlayerId(), clanItem, false);
         }
         sendServerMessage(GameString.PURCHASE_SUCCESS);
     }
@@ -942,7 +945,7 @@ public class UserService implements IUserService {
         }
 
         //Kiểm tra số lượng đang có trong rương
-        if (user.getInventorySpecialItemCount(itemId) + quantity > ServerManager.getInstance().getConfig().getMaxSpecialItemSlots()) {
+        if (user.getInventorySpecialItemCount(itemId) + quantity > serverConfig.getMaxSpecialItemSlots()) {
             sendServerMessage(GameString.CHEST_MAXIMUM_REACHED);
             return;
         }
@@ -1086,7 +1089,7 @@ public class UserService implements IUserService {
             }
             //Neu la nguoi dua tin -> send Mss 46-> chat The gioi
             if (playerId == 2) {
-                int priceChatServer = ServerManager.getInstance().getConfig().getPriceChatServer();
+                int priceChatServer = serverConfig.getPriceChatServer();
 
                 if (user.getXu() < priceChatServer) {
                     return;
@@ -1161,11 +1164,11 @@ public class UserService implements IUserService {
         if (user.isNotWaiting()) {
             return;
         }
-        ServerManager server = ServerManager.getInstance();
+        RoomManager roomManager = RoomManager.getInstance();
         try {
             IMessage ms = new Message(Cmd.ROOM_LIST);
             DataOutputStream ds = ms.writer();
-            for (Room room : server.getRooms()) {
+            for (Room room : roomManager.getRooms()) {
                 ds.writeByte(room.getIndex());
                 ds.writeByte(room.getStatus());
                 ds.writeByte(room.getFightWaitsAvailable());
@@ -1182,7 +1185,7 @@ public class UserService implements IUserService {
         if (user.isNotWaiting()) {
             return;
         }
-        Room[] rooms = ServerManager.getInstance().getRooms();
+        Room[] rooms = RoomManager.getInstance().getRooms();
         try {
             byte roomNumber = ms.reader().readByte();
             if (roomNumber < 0 || roomNumber >= rooms.length) {
@@ -1227,7 +1230,7 @@ public class UserService implements IUserService {
             return;
         }
 
-        Room[] rooms = ServerManager.getInstance().getRooms();
+        Room[] rooms = RoomManager.getInstance().getRooms();
         try {
             DataInputStream dis = ms.reader();
             byte roomNumber = dis.readByte();
@@ -1641,15 +1644,15 @@ public class UserService implements IUserService {
     @Override
     public void handleJoinAnyBoard(IMessage ms) {
         ServerManager server = ServerManager.getInstance();
-        Room[] rooms = server.getRooms();
+        Room[] rooms = RoomManager.getInstance().getRooms();
         IFightWait fightWait = null;
         try {
             int type = ms.reader().readByte();
             switch (type) {
                 // Đấu trùm
                 case 5 -> {
-                    int start = server.getConfig().getStartMapBoss();
-                    int end = start + server.getConfig().getRoomQuantity()[5];
+                    int start = serverConfig.getStartMapBoss();
+                    int end = start + serverConfig.getRoomQuantity()[5];
 
                     outerLoop:
                     for (int i = start; i < end; i++) {
@@ -1670,7 +1673,7 @@ public class UserService implements IUserService {
 
                 //4vs4->1vs1
                 case 4, 3, 2, 1 -> {
-                    int end = server.getConfig().getStartMapBoss();
+                    int end = serverConfig.getStartMapBoss();
                     int index = Utils.nextInt(0, end - 1);
                     Room room = rooms[index];
                     for (IFightWait fight : room.getFightWaits()) {
@@ -1688,7 +1691,7 @@ public class UserService implements IUserService {
 
                 //Khu vực trống
                 case 0 -> {
-                    int end = server.getConfig().getStartMapBoss();
+                    int end = serverConfig.getStartMapBoss();
                     int index = Utils.nextInt(0, end - 1);
                     Room room = rooms[index];
                     for (IFightWait fight : room.getFightWaits()) {
@@ -1705,7 +1708,7 @@ public class UserService implements IUserService {
 
                 //Ngẫu nhiên
                 case -1 -> {
-                    int end = server.getConfig().getStartMapBoss();
+                    int end = serverConfig.getStartMapBoss();
                     int index = Utils.nextInt(0, end - 1);
                     Room room = rooms[index];
                     for (IFightWait fight : room.getFightWaits()) {
@@ -1763,7 +1766,7 @@ public class UserService implements IUserService {
     public void handleAddFriend(IMessage ms) {
         try {
             Integer id = ms.reader().readInt();
-            if (user.getFriends().size() > ServerManager.getInstance().getConfig().getMaxFriends()) {
+            if (user.getFriends().size() > serverConfig.getMaxFriends()) {
                 sendMessageUpdateFriends(Boolean.FALSE, 2);
                 return;
             }
@@ -1967,7 +1970,7 @@ public class UserService implements IUserService {
             if (itemIndex < 0 || itemIndex >= FightItemManager.FIGHT_ITEMS.size()) {
                 return;
             }
-            if (user.getItems()[itemIndex] + quantity > ServerManager.getInstance().getConfig().getMaxItem()) {
+            if (user.getFightItems()[itemIndex] + quantity > serverConfig.getMaxItem()) {
                 return;
             }
             if (unit == 0) {
@@ -1983,12 +1986,12 @@ public class UserService implements IUserService {
                 }
                 user.updateLuong(-total);
             }
-            user.updateItems(itemIndex, quantity);
+            user.updateFightItems(itemIndex, quantity);
             ms = new Message(Cmd.BUY_ITEM);
             DataOutputStream ds = ms.writer();
             ds.writeByte(1);
             ds.writeByte(itemIndex);
-            ds.writeByte(user.getItems()[itemIndex]);
+            ds.writeByte(user.getFightItems()[itemIndex]);
             ds.writeInt(user.getXu());
             ds.writeInt(user.getLuong());
             ds.flush();
@@ -2209,12 +2212,11 @@ public class UserService implements IUserService {
 
             switch (type) {
                 case 1 -> {
-                    IServerConfig config = ServerManager.getInstance().getConfig();
                     ms = new Message(Cmd.GET_FILEPACK);
                     DataOutputStream ds = ms.writer();
                     ds.writeByte(type);
-                    ds.writeByte(config.getIconVersion2());
-                    if (version != config.getIconVersion2()) {
+                    ds.writeByte(serverConfig.getIconVersion2());
+                    if (version != serverConfig.getIconVersion2()) {
                         byte[] ab = Utils.getFile(GameConstants.ICON_CACHE_NAME);
                         if (ab == null) {
                             return;
@@ -2227,12 +2229,11 @@ public class UserService implements IUserService {
                 }
 
                 case 2 -> {
-                    IServerConfig config = ServerManager.getInstance().getConfig();
                     ms = new Message(Cmd.GET_FILEPACK);
                     DataOutputStream ds = ms.writer();
                     ds.writeByte(type);
-                    ds.writeByte(config.getValuesVersion2());
-                    if (version != config.getValuesVersion2()) {
+                    ds.writeByte(serverConfig.getValuesVersion2());
+                    if (version != serverConfig.getValuesVersion2()) {
                         byte[] ab = Utils.getFile(GameConstants.MAP_CACHE_NAME);
                         if (ab == null) {
                             return;
@@ -2244,12 +2245,11 @@ public class UserService implements IUserService {
                     sendMessage(ms);
                 }
                 case 3 -> {
-                    IServerConfig config = ServerManager.getInstance().getConfig();
                     ms = new Message(Cmd.GET_FILEPACK);
                     DataOutputStream ds = ms.writer();
                     ds.writeByte(type);
-                    ds.writeByte(config.getPlayerVersion2());
-                    if (version != config.getPlayerVersion2()) {
+                    ds.writeByte(serverConfig.getPlayerVersion2());
+                    if (version != serverConfig.getPlayerVersion2()) {
                         byte[] ab = Utils.getFile(GameConstants.PLAYER_CACHE_NAME);
                         if (ab == null) {
                             return;
@@ -2261,12 +2261,11 @@ public class UserService implements IUserService {
                     sendMessage(ms);
                 }
                 case 4 -> {
-                    IServerConfig config = ServerManager.getInstance().getConfig();
                     ms = new Message(Cmd.GET_FILEPACK);
                     DataOutputStream ds = ms.writer();
                     ds.writeByte(type);
-                    ds.writeByte(config.getEquipVersion2());
-                    if (version != config.getEquipVersion2()) {
+                    ds.writeByte(serverConfig.getEquipVersion2());
+                    if (version != serverConfig.getEquipVersion2()) {
                         byte[] ab = Utils.getFile(GameConstants.EQUIP_CACHE_NAME);
                         if (ab == null) {
                             return;
@@ -2278,12 +2277,11 @@ public class UserService implements IUserService {
                     sendMessage(ms);
                 }
                 case 5 -> {
-                    IServerConfig config = ServerManager.getInstance().getConfig();
                     ms = new Message(Cmd.GET_FILEPACK);
                     DataOutputStream ds = ms.writer();
                     ds.writeByte(type);
-                    ds.writeByte(config.getLevelCVersion2());
-                    if (version != config.getLevelCVersion2()) {
+                    ds.writeByte(serverConfig.getLevelCVersion2());
+                    if (version != serverConfig.getLevelCVersion2()) {
                         byte[] ab = Utils.getFile(GameConstants.LEVEL_CACHE_NAME);
                         if (ab == null) {
                             return;
@@ -2579,7 +2577,7 @@ public class UserService implements IUserService {
     }
 
     private void purchaseEquipment(short saleIndex, byte unit) {
-        if (user.getEquipmentChest().size() >= ServerManager.getInstance().getConfig().getMaxEquipmentSlots()) {
+        if (user.getEquipmentChest().size() >= serverConfig.getMaxEquipmentSlots()) {
             sendServerMessage(GameString.CHEST_NO_SPACE);
             return;
         }
@@ -2613,46 +2611,45 @@ public class UserService implements IUserService {
             sendServerMessage(GameString.SPIN_WAIT_TIME);
             return;
         }
-        IServerConfig config = ServerManager.getInstance().getConfig();
         try {
             byte unit = ms.reader().readByte();
             if (unit == 0) {
-                if (user.getXu() < config.getSpinXuCost()) {
+                if (user.getXu() < serverConfig.getSpinXuCost()) {
                     sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                     return;
                 }
-                user.updateXu(-config.getSpinXuCost());
+                user.updateXu(-serverConfig.getSpinXuCost());
             } else {
-                if (user.getLuong() < config.getSpinLuongCost()) {
+                if (user.getLuong() < serverConfig.getSpinLuongCost()) {
                     sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                     return;
                 }
-                user.updateLuong(-config.getSpinLuongCost());
+                user.updateLuong(-serverConfig.getSpinLuongCost());
             }
             ms = new Message(Cmd.RULET);
             DataOutputStream ds = ms.writer();
             int luckyIndex = Utils.nextInt(10);
             for (byte i = 0; i < 10; i++) {
-                byte type = (byte) Utils.nextInt(config.getSpinTypeProbabilities());
+                byte type = (byte) Utils.nextInt(serverConfig.getSpinTypeProbabilities());
                 byte itemId = 0;
                 int quantity = 0;
 
                 switch (type) {
                     case 0 -> {
                         itemId = FightItemManager.getRandomItem();
-                        quantity = config.getSpinItemCounts()[0][Utils.nextInt(config.getSpinItemCounts()[1])];
+                        quantity = serverConfig.getSpinItemCounts()[0][Utils.nextInt(serverConfig.getSpinItemCounts()[1])];
                         if (i == luckyIndex) {
-                            user.updateItems(itemId, (byte) quantity);
+                            user.updateFightItems(itemId, (byte) quantity);
                         }
                     }
                     case 1 -> {
-                        quantity = config.getSpinXuCounts()[0][Utils.nextInt(config.getSpinXuCounts()[1])];
+                        quantity = serverConfig.getSpinXuCounts()[0][Utils.nextInt(serverConfig.getSpinXuCounts()[1])];
                         if (i == luckyIndex) {
                             user.updateXu(quantity);
                         }
                     }
                     case 2 -> {
-                        quantity = config.getSpinXpCounts()[0][Utils.nextInt(config.getSpinXpCounts()[1])];
+                        quantity = serverConfig.getSpinXpCounts()[0][Utils.nextInt(serverConfig.getSpinXpCounts()[1])];
                         if (i == luckyIndex) {
                             user.updateXp(quantity);
                         }
@@ -2675,7 +2672,7 @@ public class UserService implements IUserService {
     public void getClanIcon(IMessage ms) {
         try {
             short clanId = ms.reader().readShort();
-            byte[] data = ClanManager.getInstance().getClanIcon(clanId);
+            byte[] data = clanService.getClanIcon(clanId);
             if (data == null) {
                 return;
             }
@@ -2695,13 +2692,12 @@ public class UserService implements IUserService {
         try {
             byte page = ms.reader().readByte();
 
-            ClanManager clanManager = ClanManager.getInstance();
-            byte totalPages = clanManager.getTotalPagesClan();
+            byte totalPages = clanService.getTotalPagesClan();
             if (page > totalPages) {
                 page = 0;
             }
 
-            List<ClanDTO> topClan = clanManager.getTopTeams(page);
+            List<ClanDTO> topClan = clanService.getTopTeams(page);
             ms = new Message(Cmd.TOP_CLAN);
             DataOutputStream ds = ms.writer();
             ds.writeByte(page);
@@ -2728,7 +2724,7 @@ public class UserService implements IUserService {
     public void getInfoClan(IMessage ms) {
         try {
             short clanId = ms.reader().readShort();
-            ClanInfoDTO clanDetails = ClanManager.getInstance().getClanInfo(clanId);
+            ClanInfoDTO clanDetails = clanService.getClanInfo(clanId);
             if (clanDetails == null) {
                 sendMessageLoginFail(GameString.CLAN_NOT_FOUND);
                 return;
@@ -2767,7 +2763,7 @@ public class UserService implements IUserService {
             byte page = dis.readByte();
             short clanId = dis.readShort();
 
-            byte totalPage = ClanManager.getInstance().getTotalPage(clanId);
+            byte totalPage = clanService.getTotalPage(clanId);
             if (totalPage == -1) {
                 return;
             }
@@ -2778,7 +2774,7 @@ public class UserService implements IUserService {
                 page = (byte) (totalPage - 1);
             }
 
-            List<ClanMemDTO> clanMemDTO = ClanManager.getInstance().getMemberClan(clanId, page);
+            List<ClanMemDTO> clanMemDTO = clanService.getMemberClan(clanId, page);
 
             ms = new Message(Cmd.CLAN_MEMBER);
             DataOutputStream ds = ms.writer();
@@ -2937,7 +2933,7 @@ public class UserService implements IUserService {
 
     private void initializeTrainingManager() {
         if (user.getTrainingManager() == null) {
-            user.setTrainingManager(new TrainingManager(user, ServerManager.getInstance().getConfig().getTrainingMapId()));
+            user.setTrainingManager(new TrainingManager(user, serverConfig.getTrainingMapId()));
         }
     }
 
@@ -3020,13 +3016,12 @@ public class UserService implements IUserService {
 
     @Override
     public void getMoreGame() {
-        IServerConfig config = ServerManager.getInstance().getConfig();
         try {
             IMessage ms = new Message(Cmd.MORE_GAME);
             DataOutputStream ds = ms.writer();
-            ds.writeUTF(config.getDownloadTitle());
-            ds.writeUTF(config.getDownloadInfo());
-            ds.writeUTF(config.getDownloadUrl());
+            ds.writeUTF(serverConfig.getDownloadTitle());
+            ds.writeUTF(serverConfig.getDownloadInfo());
+            ds.writeUTF(serverConfig.getDownloadUrl());
             ds.flush();
             sendMessage(ms);
         } catch (IOException ignored) {

@@ -1,5 +1,8 @@
 package com.teamobi.mobiarmy2.fight;
 
+import com.teamobi.mobiarmy2.model.Boss;
+import com.teamobi.mobiarmy2.model.Player;
+
 import java.util.function.Predicate;
 
 /**

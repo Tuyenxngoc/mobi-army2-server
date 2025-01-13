@@ -5,16 +5,14 @@ import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.constant.MatchResult;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.fight.*;
-import com.teamobi.mobiarmy2.fight.boss.*;
-import com.teamobi.mobiarmy2.model.Equipment;
-import com.teamobi.mobiarmy2.model.SpecialItemChest;
-import com.teamobi.mobiarmy2.model.User;
+import com.teamobi.mobiarmy2.model.*;
+import com.teamobi.mobiarmy2.model.boss.*;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
-import com.teamobi.mobiarmy2.server.ClanManager;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
+import com.teamobi.mobiarmy2.service.IClanService;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.DataOutputStream;
@@ -65,8 +63,11 @@ public class FightManager implements IFightManager {
     private final ExecutorService executorNextTurn;
     private final ExecutorService executorEndGame;
 
-    public FightManager(IFightWait fightWait) {
+    private final IClanService clanService;
+
+    public FightManager(IFightWait fightWait, IClanService clanService) {
         this.fightWait = fightWait;
+        this.clanService = clanService;
         this.players = new Player[MAX_ELEMENT_FIGHT];
         this.mapManager = new FightMapManager(this);
         this.bulletManager = new BulletManager(this);
@@ -830,7 +831,6 @@ public class FightManager implements IFightManager {
             }
         }
 
-        ClanManager clanManager = ClanManager.getInstance();
         for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             Player player = players[i];
             if (player == null || player.getUser() == null) {
@@ -887,7 +887,7 @@ public class FightManager implements IFightManager {
                             for (int k = 0; k < count; k++) {
                                 byte indexItem = FightItemManager.getRandomItem();
                                 byte quantity = 1;
-                                user.updateItems(indexItem, quantity);
+                                user.updateFightItems(indexItem, quantity);
                                 reward.append(quantity).append("x ");
                                 reward.append(FightItemManager.FIGHT_ITEMS.get(indexItem).getName()).append(", ");
                             }
@@ -898,8 +898,8 @@ public class FightManager implements IFightManager {
 
                     //Cộng xp và cup cho clan
                     if (user.getClanId() != null) {
-                        clanManager.updateXp(user.getClanId(), user.getPlayerId(), player.getAllXpUp() / 100);
-                        clanManager.updateCup(user.getClanId(), user.getPlayerId(), player.getAllCupUp());
+                        clanService.updateXp(user.getClanId(), user.getPlayerId(), player.getAllXpUp() / 100);
+                        clanService.updateCup(user.getClanId(), user.getPlayerId(), player.getAllCupUp());
                     }
                 }
 
@@ -972,7 +972,7 @@ public class FightManager implements IFightManager {
                     }
                     if ((player.isTeamBlue() && result == MatchResult.BLUE_WIN) ||
                             (!player.isTeamBlue() && result == MatchResult.RED_WIN)) {
-                        player.getUser().getGiftBoxManager().startGiftBoxOpening(2, 30);
+                        player.getUser().getGiftBoxService().startGiftBoxOpening(2, 30);
                     }
                 }
             }
@@ -1035,8 +1035,6 @@ public class FightManager implements IFightManager {
 
         //Sử dụng cache để lưu trữ kết quả clan items
         Map<Short, boolean[]> clanItemsCache = new HashMap<>();
-        ClanManager clanManager = ClanManager.getInstance();
-
         for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             User user = fightWait.getUsers()[i];
             if (user == null) {
@@ -1066,7 +1064,7 @@ public class FightManager implements IFightManager {
                 if (clanItemsCache.containsKey(user.getClanId())) {
                     clanItems = clanItemsCache.get(user.getClanId());
                 } else {
-                    clanItems = clanManager.getClanItems(user.getClanId());
+                    clanItems = clanService.getClanItems(user.getClanId());
                     clanItemsCache.put(user.getClanId(), clanItems);
                 }
             }
@@ -1075,7 +1073,7 @@ public class FightManager implements IFightManager {
             byte[] items = fightWait.getItems(i);
             for (int j = 4; j < items.length; j++) {
                 if (items[i] > 0) {
-                    user.updateItems((byte) (12 + j - 4), (byte) -1);
+                    user.updateFightItems((byte) (12 + j - 4), (byte) -1);
                 }
             }
 
@@ -1338,7 +1336,7 @@ public class FightManager implements IFightManager {
             }
 
             player.usedItem(slot);
-            player.getUser().updateItems(itemIndex, (byte) -1);
+            player.getUser().updateFightItems(itemIndex, (byte) -1);
         }
 
         try {
