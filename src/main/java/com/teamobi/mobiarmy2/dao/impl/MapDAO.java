@@ -12,6 +12,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * @author tuyen
+ */
 public class MapDAO implements IMapDAO {
 
     @Override
@@ -38,7 +41,7 @@ public class MapDAO implements IMapDAO {
                     armyMap.setInWaterAddY(resultSet.getShort("in_water_add_y"));
                     armyMap.setCl2AddY(resultSet.getShort("cl2_add_y"));
 
-                    MapManager.ARMY_MAPS.put(armyMap.getId(), armyMap);
+                    MapManager.addMap(armyMap);
                 }
             }
         } catch (SQLException e) {

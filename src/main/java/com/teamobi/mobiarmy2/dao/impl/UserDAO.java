@@ -12,10 +12,7 @@ import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.EquipmentChest;
 import com.teamobi.mobiarmy2.model.SpecialItemChest;
 import com.teamobi.mobiarmy2.model.User;
-import com.teamobi.mobiarmy2.server.CharacterManager;
-import com.teamobi.mobiarmy2.server.FightItemManager;
-import com.teamobi.mobiarmy2.server.MissionManager;
-import com.teamobi.mobiarmy2.server.SpecialItemManager;
+import com.teamobi.mobiarmy2.server.*;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 import org.mindrot.jbcrypt.BCrypt;
@@ -216,7 +213,7 @@ public class UserDAO implements IUserDAO {
                         EquipmentChestJson[] equipmentChestJsons = gson.fromJson(playerResultSet.getString("equipment_chest"), EquipmentChestJson[].class);
                         for (EquipmentChestJson json : equipmentChestJsons) {
                             EquipmentChest equip = new EquipmentChest();
-                            equip.setEquipment(CharacterManager.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
+                            equip.setEquipment(EquipmentManager.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
                             if (equip.getEquipment() == null) {
                                 continue;
                             }
@@ -390,7 +387,7 @@ public class UserDAO implements IUserDAO {
                     friend.setLevelPt((byte) 0);
                     int[] data = gson.fromJson(resultSet.getString("data"), int[].class);
                     EquipmentChestJson[] equipmentChests = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
-                    friend.setData(CharacterManager.getEquipData(equipmentChests, data, friend.getActiveCharacterId()));
+                    friend.setData(EquipmentManager.getEquipmentIndexes(equipmentChests, data, friend.getActiveCharacterId()));
 
                     friendsList.add(friend);
                 }

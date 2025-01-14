@@ -16,6 +16,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * @author tuyen
+ */
 public class FabricateItemDAO implements IFabricateItemDAO {
 
     @Override

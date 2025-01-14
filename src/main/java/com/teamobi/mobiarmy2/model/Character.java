@@ -5,10 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author tuyen
  */
@@ -26,5 +22,4 @@ public class Character {
     private short damage;
     private byte bulletDamage;
     private byte bulletCount;
-    private Map<Byte, List<Equipment>> equips = new HashMap<>();
 }

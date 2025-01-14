@@ -111,6 +111,7 @@ public class ServerManager {
                 server.close();
             }
             HikariCPManager.getInstance().closeDataSource();
+            ApplicationContext.getInstance().clearDependencies();
         } catch (IOException e) {
             e.printStackTrace();
         }

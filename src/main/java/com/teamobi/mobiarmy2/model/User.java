@@ -11,10 +11,7 @@ import com.teamobi.mobiarmy2.fight.ITrainingManager;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.impl.Message;
-import com.teamobi.mobiarmy2.server.ApplicationContext;
-import com.teamobi.mobiarmy2.server.CharacterManager;
-import com.teamobi.mobiarmy2.server.PlayerXpManager;
-import com.teamobi.mobiarmy2.server.SpecialItemManager;
+import com.teamobi.mobiarmy2.server.*;
 import com.teamobi.mobiarmy2.service.IClanService;
 import com.teamobi.mobiarmy2.service.IGiftBoxService;
 import com.teamobi.mobiarmy2.service.ILeaderboardService;
@@ -37,7 +34,6 @@ import java.util.List;
 @Getter
 @Setter
 public class User {
-    public static Equipment[][] equipDefault;
     private ISession session;
     private UserState state;
     private String userId;
@@ -229,8 +225,8 @@ public class User {
             for (byte i = 0; i < 5; i++) {
                 if (equipEntries[i] != null && !equipEntries[i].getEquipment().isDisguise()) {
                     equips[i] = equipEntries[i].getEquipment().getEquipIndex();
-                } else if (equipDefault[activeCharacterId][i] != null) {
-                    equips[i] = equipDefault[activeCharacterId][i].getEquipIndex();
+                } else if (EquipmentManager.equipDefault[activeCharacterId][i] != null) {
+                    equips[i] = EquipmentManager.equipDefault[activeCharacterId][i].getEquipIndex();
                 } else {
                     equips[i] = -1;
                 }
@@ -486,7 +482,7 @@ public class User {
         if (characterEquips[activeCharacterId][0] != null) {
             return this.characterEquips[activeCharacterId][0].getEquipment().getEquipIndex();
         }
-        return equipDefault[activeCharacterId][0].getEquipIndex();
+        return EquipmentManager.equipDefault[activeCharacterId][0].getEquipIndex();
     }
 
     /**

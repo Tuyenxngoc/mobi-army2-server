@@ -10,7 +10,9 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author tuyen
@@ -20,19 +22,24 @@ public class MapManager {
     public static final Map<Integer, MapBrick> MAP_BRICKS = new HashMap<>();
     public static final Set<Integer> ID_NOT_COLLISIONS = Set.of(70, 71, 73, 74, 75, 77, 78, 79, 97);
 
+    public static void addMap(ArmyMap armyMap) {
+        ARMY_MAPS.put(armyMap.getId(), armyMap);
+    }
+
     public static byte randomMap(Set<Byte> notSelectableSet) {
-        List<Byte> selectableMapIds = new ArrayList<>();
+        int count = 0;
+        byte result = -1;
         for (Map.Entry<Byte, ArmyMap> entry : ARMY_MAPS.entrySet()) {
             if (!notSelectableSet.contains(entry.getKey())) {
-                selectableMapIds.add(entry.getKey());
+                count++;
+                // Xác suất chọn phần tử hiện tại
+                if (Utils.nextInt(count) == 0) {
+                    result = entry.getKey();
+                }
             }
         }
 
-        if (selectableMapIds.isEmpty()) {
-            return -1;
-        }
-
-        return selectableMapIds.get(Utils.nextInt(selectableMapIds.size()));
+        return count > 0 ? result : -1;
     }
 
     public static byte[] getMapData(byte mapId) {

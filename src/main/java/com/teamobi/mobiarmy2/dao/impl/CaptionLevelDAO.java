@@ -10,6 +10,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * @author tuyen
+ */
 public class CaptionLevelDAO implements ICaptionLevelDAO {
 
     @Override
@@ -19,7 +22,7 @@ public class CaptionLevelDAO implements ICaptionLevelDAO {
 
             CaptionManager.CAPTIONS.clear();
 
-            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `caption_levels`")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT level, caption FROM `caption_levels`")) {
                 while (resultSet.next()) {
                     Caption capEntry = new Caption();
                     capEntry.setLevel(resultSet.getByte("level"));

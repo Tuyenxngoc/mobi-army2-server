@@ -10,9 +10,9 @@ import com.teamobi.mobiarmy2.dto.ClanMemDTO;
 import com.teamobi.mobiarmy2.json.ClanItemJson;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.model.ClanItem;
-import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.server.ClanXpManager;
+import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.PlayerXpManager;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -296,7 +296,7 @@ public class ClanDAO implements IClanDAO {
 
                     int[] data = gson.fromJson(resultSet.getString("data"), int[].class);
                     EquipmentChestJson[] equipmentChests = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
-                    entry.setDataEquip(CharacterManager.getEquipData(equipmentChests, data, entry.getActiveCharacter()));
+                    entry.setDataEquip(EquipmentManager.getEquipmentIndexes(equipmentChests, data, entry.getActiveCharacter()));
 
                     short contributeCount = resultSet.getShort("contribute_count");
                     if (contributeCount > 0) {

@@ -502,8 +502,8 @@ public class UserService implements IUserService {
                 for (int j = 0; j < 5; j++) {
                     if (user.getCharacterEquips()[i][j] != null) {
                         ds.writeShort(user.getCharacterEquips()[i][j].getEquipment().getEquipIndex());
-                    } else if (User.equipDefault[i][j] != null) {
-                        ds.writeShort(User.equipDefault[i][j].getEquipIndex());
+                    } else if (EquipmentManager.equipDefault[i][j] != null) {
+                        ds.writeShort(EquipmentManager.equipDefault[i][j].getEquipIndex());
                     } else {
                         ds.writeShort(-1);
                     }
@@ -2135,7 +2135,7 @@ public class UserService implements IUserService {
         if (giftCode.getEquips() != null) {
             for (EquipmentChestJson json : giftCode.getEquips()) {
                 EquipmentChest addEquip = new EquipmentChest();
-                addEquip.setEquipment(CharacterManager.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
+                addEquip.setEquipment(EquipmentManager.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
                 if (addEquip.getEquipment() == null) {
                     continue;
                 }
@@ -2423,11 +2423,10 @@ public class UserService implements IUserService {
         try {
             IMessage ms = new Message(Cmd.SHOP_EQUIP);
             DataOutputStream ds = ms.writer();
-            ds.writeShort(CharacterManager.totalSaleEquipments);
-            for (Equipment equip : CharacterManager.EQUIPMENTS) {
-                if (!equip.isOnSale()) {
-                    continue;
-                }
+            List<Short> equipIds = EquipmentManager.SALE_INDEX_TO_ID;
+            ds.writeShort(equipIds.size());
+            for (Short id : equipIds) {
+                Equipment equip = EquipmentManager.getEquipment(id);
                 ds.writeByte(equip.getCharacterId());
                 ds.writeByte(equip.getEquipType());
                 ds.writeShort(equip.getEquipIndex());
@@ -2581,7 +2580,7 @@ public class UserService implements IUserService {
             sendServerMessage(GameString.CHEST_NO_SPACE);
             return;
         }
-        Equipment equipment = CharacterManager.getEquipEntryBySaleIndex(saleIndex);
+        Equipment equipment = EquipmentManager.getEquipmentBySaleIndex(saleIndex);
         if (equipment == null || (unit == 0 ? equipment.getPriceXu() : equipment.getPriceLuong()) < 0) {
             return;
         }
