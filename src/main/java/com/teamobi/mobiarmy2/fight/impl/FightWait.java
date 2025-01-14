@@ -119,7 +119,7 @@ public class FightWait implements IFightWait {
             if (user == null) {
                 continue;
             }
-            if (user.getPlayerId() == playerId) {
+            if (user.getUserId() == playerId) {
                 return i;
             }
         }
@@ -138,7 +138,7 @@ public class FightWait implements IFightWait {
             refreshFightWait();
         } else {
             findNewBoss();
-            notifyPlayerLeave(user.getPlayerId());
+            notifyPlayerLeave(user.getUserId());
         }
     }
 
@@ -179,7 +179,7 @@ public class FightWait implements IFightWait {
             IMessage ms = new Message(Cmd.KICK);
             DataOutputStream ds = ms.writer();
             ds.writeShort(index);
-            ds.writeInt(user.getPlayerId());
+            ds.writeInt(user.getUserId());
             ds.writeUTF(s);
             ds.flush();
             user.sendMessage(ms);
@@ -221,7 +221,7 @@ public class FightWait implements IFightWait {
             IMessage ms = new Message(Cmd.SOMEONE_LEAVEBOARD);
             DataOutputStream ds = ms.writer();
             ds.writeInt(playerId);
-            ds.writeInt(getRoomOwner().getPlayerId());
+            ds.writeInt(getRoomOwner().getUserId());
             ds.flush();
             sendToTeam(ms);
         } catch (IOException e) {
@@ -344,7 +344,7 @@ public class FightWait implements IFightWait {
         }
 
         User roomOwner = getRoomOwner();
-        if (roomOwner.getPlayerId() != playerId) {
+        if (roomOwner.getUserId() != playerId) {
             return;
         }
 
@@ -543,7 +543,7 @@ public class FightWait implements IFightWait {
         }
 
         User roomOwner = getRoomOwner();
-        if (roomOwner.getPlayerId() != playerId) {
+        if (roomOwner.getUserId() != playerId) {
             return;
         }
 
@@ -593,7 +593,7 @@ public class FightWait implements IFightWait {
             return;
         }
 
-        if (getRoomOwner().getPlayerId() == playerId) {
+        if (getRoomOwner().getUserId() == playerId) {
             return;
         }
 
@@ -628,7 +628,7 @@ public class FightWait implements IFightWait {
         if (started) {
             return;
         }
-        if (getRoomOwner().getPlayerId() != playerId) {
+        if (getRoomOwner().getUserId() != playerId) {
             return;
         }
 
@@ -643,7 +643,7 @@ public class FightWait implements IFightWait {
         }
 
         User roomOwner = getRoomOwner();
-        if (roomOwner.getPlayerId() != playerId) {
+        if (roomOwner.getUserId() != playerId) {
             return;
         }
 
@@ -681,7 +681,7 @@ public class FightWait implements IFightWait {
             return;
         }
 
-        if (getRoomOwner().getPlayerId() != playerId) {
+        if (getRoomOwner().getUserId() != playerId) {
             return;
         }
 
@@ -694,7 +694,7 @@ public class FightWait implements IFightWait {
             return;
         }
 
-        if (getRoomOwner().getPlayerId() != playerId) {
+        if (getRoomOwner().getUserId() != playerId) {
             return;
         }
 
@@ -723,7 +723,7 @@ public class FightWait implements IFightWait {
             return;
         }
 
-        int index = getUserIndexByPlayerId(user.getPlayerId());
+        int index = getUserIndexByPlayerId(user.getUserId());
         if (index == -1) {
             return;
         }
@@ -750,7 +750,7 @@ public class FightWait implements IFightWait {
         try {
             IMessage ms = new Message(Cmd.CHANGE_TEAM);
             DataOutputStream ds = ms.writer();
-            ds.writeInt(user.getPlayerId());
+            ds.writeInt(user.getUserId());
             ds.writeByte(newIndex);
             ds.flush();
             sendToTeam(ms);
@@ -766,7 +766,7 @@ public class FightWait implements IFightWait {
         }
 
         User roomOwner = getRoomOwner();
-        if (roomOwner.getPlayerId() != playerId) {
+        if (roomOwner.getUserId() != playerId) {
             return;
         }
 
@@ -855,7 +855,7 @@ public class FightWait implements IFightWait {
         }
 
         User roomOwner = getRoomOwner();
-        if (roomOwner.getPlayerId() != playerId) {
+        if (roomOwner.getUserId() != playerId) {
             return;
         }
 
@@ -868,7 +868,7 @@ public class FightWait implements IFightWait {
             ds.writeByte(userList.size());
             for (User u : userList) {
                 ds.writeUTF(u.getUsername());
-                ds.writeInt(u.getPlayerId());
+                ds.writeInt(u.getUserId());
                 ds.writeByte(u.getActiveCharacterId());
                 ds.writeInt(u.getXu());
                 ds.writeByte(u.getCurrentLevel());
@@ -889,7 +889,7 @@ public class FightWait implements IFightWait {
     public void inviteToRoom(int playerId) {
         User roomOwner = getRoomOwner();
 
-        User user = ServerManager.getInstance().getUserByPlayerId(playerId);
+        User user = ServerManager.getInstance().getUserByUserId(playerId);
         if (user == null) {
             roomOwner.getUserService().sendServerMessage(GameString.INVITE_OFFLINE);
             return;
@@ -969,7 +969,7 @@ public class FightWait implements IFightWait {
             ms = new Message(Cmd.SOMEONE_JOINBOARD);
             ds = ms.writer();
             ds.writeByte(bestLocation);
-            ds.writeInt(us.getPlayerId());
+            ds.writeInt(us.getUserId());
             ds.writeShort(us.getClanId() != null ? us.getClanId() : 0);
             ds.writeUTF(us.getUsername());
             ds.writeByte(us.getCurrentLevel());
@@ -996,14 +996,14 @@ public class FightWait implements IFightWait {
 
         ms = new Message(Cmd.JOIN_BOARD);
         ds = ms.writer();
-        ds.writeInt(getRoomOwner().getPlayerId());
+        ds.writeInt(getRoomOwner().getUserId());
         ds.writeInt(money);
         ds.writeByte(mapId);
         ds.writeByte(0);//GameMode
         for (byte i = 0; i < users.length; i++) {
             User user = users[i];
             if (user != null) {
-                ds.writeInt(user.getPlayerId());
+                ds.writeInt(user.getUserId());
                 ds.writeShort(user.getClanId() != null ? user.getClanId() : 0);
                 ds.writeUTF(user.getUsername());
                 ds.writeInt(user.getXu());

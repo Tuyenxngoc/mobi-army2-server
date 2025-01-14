@@ -4,9 +4,7 @@ import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.constant.UserState;
-import com.teamobi.mobiarmy2.dao.IAccountDAO;
-import com.teamobi.mobiarmy2.dao.IGiftCodeDAO;
-import com.teamobi.mobiarmy2.dao.IUserDAO;
+import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.fight.ITrainingManager;
 import com.teamobi.mobiarmy2.network.IMessage;
@@ -37,8 +35,8 @@ import java.util.List;
 public class User {
     private ISession session;
     private UserState state;
-    private String userId;
-    private int playerId;
+    private String accountId;
+    private int userId;
     private String username;
     private Short clanId;
     private int xu;
@@ -86,7 +84,9 @@ public class User {
                 context.getBean(ILeaderboardService.class),
                 context.getBean(IUserDAO.class),
                 context.getBean(IAccountDAO.class),
-                context.getBean(IGiftCodeDAO.class)
+                context.getBean(IGiftCodeDAO.class),
+                context.getBean(IUserGiftCodeDAO.class),
+                context.getBean(IUserCharacterDAO.class)
         );
         this.serverConfig = context.getBean(IServerConfig.class);
         this.giftBoxService = new GiftBoxService(this);
@@ -108,8 +108,8 @@ public class User {
         int currentXp = getCurrentXp();
         int currentLevel = getCurrentLevel();
 
-        int requiredXpCurrentLevel = PlayerXpManager.getRequiredXpLevel(currentLevel - 1);
-        int requiredXpNextLevel = PlayerXpManager.getRequiredXpLevel(currentLevel);
+        int requiredXpCurrentLevel = UserXpManager.getRequiredXpLevel(currentLevel - 1);
+        int requiredXpNextLevel = UserXpManager.getRequiredXpLevel(currentLevel);
 
         int currentXpInLevel = currentXp - requiredXpCurrentLevel;
         int xpNeededForNextLevel = requiredXpNextLevel - requiredXpCurrentLevel;
@@ -118,7 +118,7 @@ public class User {
     }
 
     public int getCurrentRequiredXp() {
-        return PlayerXpManager.getRequiredXpLevel(getCurrentLevel());
+        return UserXpManager.getRequiredXpLevel(getCurrentLevel());
     }
 
     public int getCurrentLevel() {
@@ -204,7 +204,7 @@ public class User {
         }
 
         int currentLevel = getCurrentLevel();
-        int newLevel = PlayerXpManager.getLevelByXP(totalXp);
+        int newLevel = UserXpManager.getLevelByXP(totalXp);
 
         int levelDiff = newLevel - currentLevel;
         if (levelDiff > 0) {

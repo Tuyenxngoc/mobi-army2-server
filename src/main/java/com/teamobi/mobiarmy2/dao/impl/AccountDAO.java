@@ -15,7 +15,7 @@ public class AccountDAO implements IAccountDAO {
     @Override
     public AccountDTO findByUsernameAndPassword(String username, String password) {
         try (Connection connection = HikariCPManager.getInstance().getConnection()) {
-            String userQuery = "SELECT `user_id`, `password`, `is_enabled`, `is_locked` FROM users WHERE username = ?";
+            String userQuery = "SELECT `account_id`, `password`, `is_enabled`, `is_locked` FROM accounts WHERE username = ?";
             try (PreparedStatement userStatement = connection.prepareStatement(userQuery)) {
                 userStatement.setString(1, username);
                 try (ResultSet userResultSet = userStatement.executeQuery()) {
@@ -25,7 +25,7 @@ public class AccountDAO implements IAccountDAO {
                             return null;
                         }
                         AccountDTO accountDTO = new AccountDTO();
-                        accountDTO.setAccountId(userResultSet.getString("user_id"));
+                        accountDTO.setAccountId(userResultSet.getString("account_id"));
                         accountDTO.setLock(userResultSet.getBoolean("is_locked"));
                         accountDTO.setActive(userResultSet.getBoolean("is_enabled"));
                         return accountDTO;
@@ -41,7 +41,7 @@ public class AccountDAO implements IAccountDAO {
     @Override
     public boolean existsByAccountIdAndPassword(String accountId, String password) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT password FROM users WHERE user_id = ?")) {
+             PreparedStatement statement = connection.prepareStatement("SELECT password FROM accounts WHERE account_id = ?")) {
             statement.setString(1, accountId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
@@ -59,7 +59,7 @@ public class AccountDAO implements IAccountDAO {
     public void changePassword(String accountId, String newPass) {
         String hashedPassword = BCrypt.hashpw(newPass, BCrypt.gensalt());
         // language=SQL
-        String sql = "UPDATE `users` SET `password` = ? WHERE user_id = ?";
+        String sql = "UPDATE `accounts` SET `password` = ? WHERE account_id = ?";
         HikariCPManager.getInstance().update(sql, hashedPassword, accountId);
     }
 

@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.service;
 
-import com.teamobi.mobiarmy2.dto.PlayerLeaderboardDTO;
+import com.teamobi.mobiarmy2.dto.UserLeaderboardDTO;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ public interface ILeaderboardService {
 
     void init();
 
-    List<PlayerLeaderboardDTO> getUsers(int type, int page, int pageSize);
+    List<UserLeaderboardDTO> getUsers(int type, int page, int pageSize);
 
     int getTotalPageByType(byte type);
 }

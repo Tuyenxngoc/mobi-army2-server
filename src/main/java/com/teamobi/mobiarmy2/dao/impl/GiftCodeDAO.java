@@ -7,9 +7,12 @@ import com.teamobi.mobiarmy2.dto.GiftCodeDTO;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.util.GsonUtil;
+import com.teamobi.mobiarmy2.util.Utils;
 
-import java.sql.*;
-import java.time.LocalDateTime;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * @author tuyen
@@ -17,35 +20,22 @@ import java.time.LocalDateTime;
 public class GiftCodeDAO implements IGiftCodeDAO {
 
     @Override
-    public GiftCodeDTO getGiftCode(String code, int playerId) {
+    public GiftCodeDTO findById(String code) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement(
-                     "SELECT gc.gift_code_id, gc.usage_limit, gc.expiration_date, gc.xu, gc.luong, gc.exp, gc.items, gc.equips, " +
-                             "IF(pgc.player_id IS NOT NULL, TRUE, FALSE) AS used " +
-                             "FROM gift_codes gc " +
-                             "LEFT JOIN player_gift_codes pgc ON gc.gift_code_id = pgc.gift_code_id AND pgc.player_id = ? " +
-                             "WHERE gc.code = ?"
-             )) {
-            statement.setInt(1, playerId);
-            statement.setString(2, code);
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM gift_codes WHERE code = ?")) {
+            statement.setString(1, code);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     Gson gson = GsonUtil.getInstance();
                     GiftCodeDTO giftCode = new GiftCodeDTO();
-                    giftCode.setUsed(resultSet.getBoolean("used"));
-                    if (!giftCode.isUsed()) {
-                        giftCode.setId(resultSet.getLong("gift_code_id"));
-                        giftCode.setLimit(resultSet.getShort("usage_limit"));
-                        Timestamp expirationTimestamp = resultSet.getTimestamp("expiration_date");
-                        if (expirationTimestamp != null) {
-                            giftCode.setExpiryDate(expirationTimestamp.toLocalDateTime());
-                        }
-                        giftCode.setXu(resultSet.getInt("xu"));
-                        giftCode.setLuong(resultSet.getInt("luong"));
-                        giftCode.setExp(resultSet.getInt("exp"));
-                        giftCode.setItems(gson.fromJson(resultSet.getString("items"), SpecialItemChestJson[].class));
-                        giftCode.setEquips(gson.fromJson(resultSet.getString("equips"), EquipmentChestJson[].class));
-                    }
+                    giftCode.setId(resultSet.getLong("gift_code_id"));
+                    giftCode.setLimit(resultSet.getShort("usage_limit"));
+                    giftCode.setExpiryDate(Utils.getLocalDateTimeFromTimestamp(resultSet, "expiration_date"));
+                    giftCode.setXu(resultSet.getInt("xu"));
+                    giftCode.setLuong(resultSet.getInt("luong"));
+                    giftCode.setExp(resultSet.getInt("exp"));
+                    giftCode.setItems(gson.fromJson(resultSet.getString("items"), SpecialItemChestJson[].class));
+                    giftCode.setEquips(gson.fromJson(resultSet.getString("equips"), EquipmentChestJson[].class));
                     return giftCode;
                 }
             }
@@ -56,17 +46,10 @@ public class GiftCodeDAO implements IGiftCodeDAO {
     }
 
     @Override
-    public void decrementGiftCodeUsageLimit(long giftCodeId) {
+    public void decrementUsageLimit(long giftCodeId) {
+        // language=SQL
         String sql = "UPDATE gift_codes SET usage_limit = usage_limit - 1 WHERE gift_code_id = ?";
         HikariCPManager.getInstance().update(sql, giftCodeId);
-
-    }
-
-    @Override
-    public void logGiftCodeRedemption(long giftCodeId, int playerId) {
-        String sql = "INSERT INTO player_gift_codes (redeem_time, gift_code_id, player_id) VALUES (?, ?, ?)";
-        HikariCPManager.getInstance().update(sql, LocalDateTime.now(), giftCodeId, playerId);
-
     }
 
 }

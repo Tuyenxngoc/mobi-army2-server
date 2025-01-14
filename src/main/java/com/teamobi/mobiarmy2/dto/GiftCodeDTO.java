@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 @Setter
 public class GiftCodeDTO {
     private long id;
-    private boolean isUsed;
     private short limit;
     private LocalDateTime expiryDate;
     private int xu;

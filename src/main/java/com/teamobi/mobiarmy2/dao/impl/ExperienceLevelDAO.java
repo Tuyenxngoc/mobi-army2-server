@@ -4,7 +4,7 @@ import com.teamobi.mobiarmy2.dao.IExperienceLevelDAO;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.LevelXpRequired;
 import com.teamobi.mobiarmy2.server.ClanXpManager;
-import com.teamobi.mobiarmy2.server.PlayerXpManager;
+import com.teamobi.mobiarmy2.server.UserXpManager;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -20,10 +20,10 @@ public class ExperienceLevelDAO implements IExperienceLevelDAO {
     public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet resultSet = statement.executeQuery("SELECT exp_player, exp_clan, level FROM `experience_levels` ORDER BY level")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT exp_user, exp_clan, level FROM `experience_levels` ORDER BY level")) {
 
                 ClanXpManager.LEVEL_XP_REQUIRED_LIST.clear();
-                PlayerXpManager.LEVEL_XP_REQUIRED_LIST.clear();
+                UserXpManager.LEVEL_XP_REQUIRED_LIST.clear();
 
                 int previousPlayerXp = 0;
                 int previousClanXp = 0;
@@ -31,41 +31,41 @@ public class ExperienceLevelDAO implements IExperienceLevelDAO {
                 boolean reachedMaxClanLevel = false;
 
                 while (resultSet.next()) {
-                    Integer playerXp = resultSet.getObject("exp_player", Integer.class);
-                    Integer clanXp = resultSet.getObject("exp_clan", Integer.class);
+                    Integer expUser = resultSet.getObject("exp_user", Integer.class);
+                    Integer expClan = resultSet.getObject("exp_clan", Integer.class);
                     short level = resultSet.getShort("level");
 
                     if (!reachedMaxPlayerLevel) {
-                        if (playerXp == null) {
+                        if (expUser == null) {
                             reachedMaxPlayerLevel = true;
                         } else {
                             // Kiểm tra tính hợp lệ của XP cho player
-                            if (playerXp < previousPlayerXp) {
-                                throw new SQLException(String.format("XP của cấp độ tiếp theo cho player (%d) nhỏ hơn XP của cấp độ trước đó (%d)!", playerXp, previousPlayerXp));
+                            if (expUser < previousPlayerXp) {
+                                throw new SQLException(String.format("XP của cấp độ tiếp theo cho player (%d) nhỏ hơn XP của cấp độ trước đó (%d)!", expUser, previousPlayerXp));
                             }
 
                             // Tạo bản ghi cho player
-                            LevelXpRequired playerXpRequired = new LevelXpRequired(level, playerXp);
-                            PlayerXpManager.LEVEL_XP_REQUIRED_LIST.add(playerXpRequired);
+                            LevelXpRequired playerXpRequired = new LevelXpRequired(level, expUser);
+                            UserXpManager.LEVEL_XP_REQUIRED_LIST.add(playerXpRequired);
 
-                            previousPlayerXp = playerXp;
+                            previousPlayerXp = expUser;
                         }
                     }
 
                     if (!reachedMaxClanLevel) {
-                        if (clanXp == null) {
+                        if (expClan == null) {
                             reachedMaxClanLevel = true;
                         } else {
                             // Kiểm tra tính hợp lệ của XP cho clan
-                            if (clanXp < previousClanXp) {
-                                throw new SQLException(String.format("XP của cấp độ tiếp theo cho clan (%d) nhỏ hơn XP của cấp độ trước đó (%d)!", clanXp, previousClanXp));
+                            if (expClan < previousClanXp) {
+                                throw new SQLException(String.format("XP của cấp độ tiếp theo cho clan (%d) nhỏ hơn XP của cấp độ trước đó (%d)!", expClan, previousClanXp));
                             }
 
                             // Tạo bản ghi cho clan
-                            LevelXpRequired clanXpRequired = new LevelXpRequired(level, clanXp);
+                            LevelXpRequired clanXpRequired = new LevelXpRequired(level, expClan);
                             ClanXpManager.LEVEL_XP_REQUIRED_LIST.add(clanXpRequired);
 
-                            previousClanXp = clanXp;
+                            previousClanXp = expClan;
                         }
                     }
 

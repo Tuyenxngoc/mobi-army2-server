@@ -28,11 +28,11 @@ public interface IClanService {
 
     boolean[] getClanItems(short clanId);
 
-    void updateItemClan(short clanId, int playerId, ClanItemShop clanItemShop, boolean isBuyXu);
+    void updateItemClan(short clanId, int userId, ClanItemShop clanItemShop, boolean isBuyXu);
 
-    void contributeClan(short clanId, int playerId, int quantity, boolean isXu);
+    void contributeClan(short clanId, int userId, int quantity, boolean isXu);
 
-    void updateXp(short clanId, int playerId, int xpUp);
+    void updateXp(short clanId, int userId, int xpUp);
 
-    void updateCup(short clanId, int playerId, int cupUp);
+    void updateCup(short clanId, int userId, int cupUp);
 }

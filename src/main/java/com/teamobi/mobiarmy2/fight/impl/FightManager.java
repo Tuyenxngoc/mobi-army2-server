@@ -177,7 +177,7 @@ public class FightManager implements IFightManager {
             User user = player.getUser();
             IMessage ms = new Message(Cmd.BONUS_MONEY);
             DataOutputStream ds = ms.writer();
-            ds.writeInt(user.getPlayerId());
+            ds.writeInt(user.getUserId());
             ds.writeInt(money);
             ds.writeInt(user.getXu());
             ds.flush();
@@ -271,7 +271,7 @@ public class FightManager implements IFightManager {
         for (int i = 0; i < MAX_USER_FIGHT; i++) {
             if (players[i] != null
                     && players[i].getUser() != null
-                    && players[i].getUser().getPlayerId() == playerId) {
+                    && players[i].getUser().getUserId() == playerId) {
                 return i;
             }
         }
@@ -898,8 +898,8 @@ public class FightManager implements IFightManager {
 
                     //Cộng xp và cup cho clan
                     if (user.getClanId() != null) {
-                        clanService.updateXp(user.getClanId(), user.getPlayerId(), player.getAllXpUp() / 100);
-                        clanService.updateCup(user.getClanId(), user.getPlayerId(), player.getAllCupUp());
+                        clanService.updateXp(user.getClanId(), user.getUserId(), player.getAllXpUp() / 100);
+                        clanService.updateCup(user.getClanId(), user.getUserId(), player.getAllCupUp());
                     }
                 }
 
@@ -937,7 +937,7 @@ public class FightManager implements IFightManager {
                         continue;
                     }
                     User user = player.getUser();
-                    fightWait.handleKickPlayer(user.getPlayerId(), i, GameString.PLAYER_ELIMINATED);
+                    fightWait.handleKickPlayer(user.getUserId(), i, GameString.PLAYER_ELIMINATED);
                 }
             } else if (result == MatchResult.RED_WIN) { //Nếu thua thì đuổi toàn bộ người chơi
                 for (byte i = 0; i < MAX_USER_FIGHT; i++) {
@@ -946,7 +946,7 @@ public class FightManager implements IFightManager {
                         continue;
                     }
                     User user = player.getUser();
-                    fightWait.handleKickPlayer(user.getPlayerId(), i, GameString.PLAYER_ELIMINATED);
+                    fightWait.handleKickPlayer(user.getUserId(), i, GameString.PLAYER_ELIMINATED);
                 }
             }
         }

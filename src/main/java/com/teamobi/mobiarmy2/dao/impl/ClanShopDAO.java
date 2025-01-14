@@ -19,7 +19,7 @@ public class ClanShopDAO implements IClanShopDAO {
     public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `clan_shops`")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT clan_shop_id, level, name, time, on_sale, xu, luong FROM `clan_shops`")) {
 
                 ClanItemManager.CLAN_ITEM_MAP.clear();
 

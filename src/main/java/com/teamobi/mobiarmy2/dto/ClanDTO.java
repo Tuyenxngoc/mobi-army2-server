@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ClanDTO {
-    private short id;
+    private short clanId;
     private String name;
     private byte memberCount;
     private byte maxMemberCount;

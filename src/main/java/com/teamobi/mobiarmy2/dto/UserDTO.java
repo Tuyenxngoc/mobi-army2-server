@@ -7,9 +7,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author tuyen
@@ -17,15 +15,12 @@ import java.util.Map;
 @Getter
 @Setter
 public class UserDTO {
-    private String userId;
-    private int playerId;
+    private int userId;
     private String username;
     private Short clanId;
     private int xu;
     private int luong;
     private int cup;
-    private boolean isLock;
-    private boolean isActive;
     private boolean isChestLocked;
     private boolean isInvitationLocked;
     private byte activeCharacterId;
@@ -48,12 +43,8 @@ public class UserDTO {
     private EquipmentChest[][] characterEquips;
     private List<Integer> friends;
     private List<SpecialItemChest> specialItemChest;
-    private Map<Integer, EquipmentChest> equipmentChest;
+    private List<EquipmentChest> equipmentChest;
     private int topEarningsXu;
-
-    public EquipmentChest getEquipmentByKey(int key) {
-        return equipmentChest.get(key);
-    }
 
     public void initialize(int totalCharacter) {
         this.playerCharacterIds = new long[totalCharacter];
@@ -66,6 +57,6 @@ public class UserDTO {
         this.equipData = new int[totalCharacter][6];
         this.characterEquips = new EquipmentChest[totalCharacter][6];
         this.specialItemChest = new ArrayList<>();
-        this.equipmentChest = new HashMap<>();
+        this.equipmentChest = new ArrayList<>();
     }
 }

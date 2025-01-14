@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ClanMemDTO {
-    private int playerId;
+    private int userId;
     private String username;
     private int point;
     private byte activeCharacter;

@@ -99,14 +99,14 @@ public class ClanService implements IClanService {
     }
 
     @Override
-    public void updateItemClan(short clanId, int playerId, ClanItemShop clanItemShop, boolean isBuyXu) {
+    public void updateItemClan(short clanId, int userId, ClanItemShop clanItemShop, boolean isBuyXu) {
         synchronized (getClanLock(clanId)) {
             if (isBuyXu) {
                 clanDAO.updateXu(clanId, -clanItemShop.getXu());
-                clanDAO.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItemShop.getXu()) + " xu", playerId, -clanItemShop.getXu(), 0);
+                clanDAO.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItemShop.getXu()) + " xu", userId, -clanItemShop.getXu(), 0);
             } else {
                 clanDAO.updateLuong(clanId, -clanItemShop.getLuong());
-                clanDAO.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItemShop.getLuong()) + " lượng", playerId, 0, -clanItemShop.getLuong());
+                clanDAO.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItemShop.getLuong()) + " lượng", userId, 0, -clanItemShop.getLuong());
             }
 
             ClanItemJson[] items = clanDAO.getClanItems(clanId);
@@ -137,20 +137,20 @@ public class ClanService implements IClanService {
     }
 
     @Override
-    public void contributeClan(short clanId, int playerId, int quantity, boolean isXu) {
+    public void contributeClan(short clanId, int userId, int quantity, boolean isXu) {
         synchronized (getClanLock(clanId)) {
             if (isXu) {
                 clanDAO.updateXu(clanId, quantity);
-                clanDAO.gopClanContribute("Góp " + Utils.getStringNumber(quantity) + " xu", playerId, quantity, 0);
+                clanDAO.gopClanContribute("Góp " + Utils.getStringNumber(quantity) + " xu", userId, quantity, 0);
             } else {
                 clanDAO.updateLuong(clanId, quantity);
-                clanDAO.gopClanContribute("Góp " + Utils.getStringNumber(quantity) + " lượng", playerId, 0, quantity);
+                clanDAO.gopClanContribute("Góp " + Utils.getStringNumber(quantity) + " lượng", userId, 0, quantity);
             }
         }
     }
 
     @Override
-    public void updateXp(short clanId, int playerId, int xpUp) {
+    public void updateXp(short clanId, int userId, int xpUp) {
         if (xpUp == 0) {
             return;
         }
@@ -164,13 +164,13 @@ public class ClanService implements IClanService {
             }
 
             int level = ClanXpManager.getLevelByXP((int) newXp);
-            clanDAO.updateXp(clanId, playerId, (int) newXp, level);
-            clanDAO.updateClanMemberPoints(playerId, xpUp);
+            clanDAO.updateXp(clanId, userId, (int) newXp, level);
+            clanDAO.updateClanMemberPoints(userId, xpUp);
         }
     }
 
     @Override
-    public void updateCup(short clanId, int playerId, int cupUp) {
+    public void updateCup(short clanId, int userId, int cupUp) {
         if (cupUp == 0) {
             return;
         }
@@ -183,8 +183,8 @@ public class ClanService implements IClanService {
                 newCup = GameConstants.MIN_CUP;
             }
 
-            clanDAO.updateCup(clanId, playerId, (int) newCup);
-            clanDAO.updateClanMemberPoints(playerId, cupUp * 2);
+            clanDAO.updateCup(clanId, userId, (int) newCup);
+            clanDAO.updateClanMemberPoints(userId, cupUp * 2);
         }
     }
 

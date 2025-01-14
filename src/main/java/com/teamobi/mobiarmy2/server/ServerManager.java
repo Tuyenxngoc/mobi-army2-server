@@ -128,9 +128,9 @@ public class ServerManager {
         }
     }
 
-    public User getUserByPlayerId(int playerId) {
+    public User getUserByUserId(int userId) {
         return sessions.stream()
-                .filter(session -> session != null && session.getUser() != null && session.getUser().getPlayerId() == playerId)
+                .filter(session -> session != null && session.getUser() != null && session.getUser().getUserId() == userId)
                 .map(ISession::getUser)
                 .findFirst()
                 .orElse(null);
@@ -139,7 +139,7 @@ public class ServerManager {
     public List<User> findWaitPlayers(int excludedPlayerId) {
         return sessions.stream()
                 .filter(session -> session != null && session.getUser() != null &&
-                        session.getUser().getPlayerId() != excludedPlayerId &&
+                        session.getUser().getUserId() != excludedPlayerId &&
                         session.getUser().getState() == UserState.WAITING)
                 .map(ISession::getUser)
                 .limit(10)

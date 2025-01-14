@@ -33,7 +33,7 @@ public class UserCharacterDAO implements IUserCharacterDAO {
         List<UserCharacterDTO> result = new ArrayList<>();
 
         try (Connection connection = HikariCPManager.getInstance().getConnection()) {
-            String query = "SELECT * FROM player_characters WHERE player_id = ?";
+            String query = "SELECT * FROM user_characters WHERE user_id = ?";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setInt(1, userId);
                 try (ResultSet resultSet = statement.executeQuery()) {
@@ -51,7 +51,7 @@ public class UserCharacterDAO implements IUserCharacterDAO {
     @Override
     public UserCharacterDTO findByUserIdAndCharacterId(int userId, byte characterId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM `player_characters` WHERE player_id = ? AND character_id = ?")) {
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM `user_characters` WHERE user_id = ? AND character_id = ?")) {
             statement.setInt(1, userId);
             statement.setByte(2, characterId);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -68,7 +68,7 @@ public class UserCharacterDAO implements IUserCharacterDAO {
     @Override
     public Optional<Integer> create(int userId, byte characterId) {
         // language=SQL
-        String sql = "INSERT INTO `player_characters`(`player_id`, `character_id`) VALUES (?,?)";
+        String sql = "INSERT INTO `user_characters`(`user_id`, `character_id`) VALUES (?,?)";
         return HikariCPManager.getInstance().update(sql, userId, characterId);
     }
 }

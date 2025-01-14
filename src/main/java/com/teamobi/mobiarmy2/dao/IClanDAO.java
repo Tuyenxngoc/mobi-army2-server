@@ -30,7 +30,7 @@ public interface IClanDAO {
 
     void updateLuong(int clanId, int luong);
 
-    void gopClanContribute(String txtContribute, int playerId, int xu, int luong);
+    void gopClanContribute(String txtContribute, int userId, int xu, int luong);
 
     ClanInfoDTO getClanInfo(short clanId);
 
@@ -44,9 +44,9 @@ public interface IClanDAO {
 
     List<ClanDTO> getTopTeams(byte page);
 
-    void updateXp(short clanId, int playerId, int xp, int level);
+    void updateXp(short clanId, int userId, int xp, int level);
 
-    void updateCup(short clanId, int playerId, int cup);
+    void updateCup(short clanId, int userId, int cup);
 
-    void updateClanMemberPoints(int playerId, int point);
+    void updateClanMemberPoints(int userId, int point);
 }

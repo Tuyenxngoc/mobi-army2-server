@@ -136,7 +136,7 @@ public class ServerViewController implements ServerListener {
         userList = FXCollections.observableArrayList();
 
         playerIdColumn.setCellValueFactory(cellData ->
-                new SimpleIntegerProperty(cellData.getValue().getPlayerId()).asObject());
+                new SimpleIntegerProperty(cellData.getValue().getUserId()).asObject());
         usernameColumn.setCellValueFactory(cellData ->
                 new SimpleStringProperty(cellData.getValue().getUsername()));
         ipAddressColumn.setCellValueFactory(cellData ->
@@ -182,7 +182,7 @@ public class ServerViewController implements ServerListener {
 
         ObservableList<User> filteredUsers = FXCollections.observableArrayList();
         for (User user : userList) {
-            if (user.getUsername().toLowerCase().contains(query) || String.valueOf(user.getPlayerId()).contains(query)) {
+            if (user.getUsername().toLowerCase().contains(query) || String.valueOf(user.getUserId()).contains(query)) {
                 filteredUsers.add(user);
             }
         }

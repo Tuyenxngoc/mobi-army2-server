@@ -2,7 +2,7 @@ package com.teamobi.mobiarmy2.service.impl;
 
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.dao.IRankingDAO;
-import com.teamobi.mobiarmy2.dto.PlayerLeaderboardDTO;
+import com.teamobi.mobiarmy2.dto.UserLeaderboardDTO;
 import com.teamobi.mobiarmy2.service.ILeaderboardService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +21,7 @@ public class LeaderboardService implements ILeaderboardService {
     private final IRankingDAO rankingDAO;
     private final IServerConfig serverConfig;
     private final Timer timer;
-    private final List<List<PlayerLeaderboardDTO>> leaderboardEntries;
+    private final List<List<UserLeaderboardDTO>> leaderboardEntries;
 
     public LeaderboardService(IRankingDAO rankingDAO, IServerConfig serverConfig) {
         this.rankingDAO = rankingDAO;
@@ -74,11 +74,11 @@ public class LeaderboardService implements ILeaderboardService {
         int[] topBonus = serverConfig.getTopBonus();
 
         int i = 0;
-        for (PlayerLeaderboardDTO playerLeaderboardDTO : leaderboardEntries.getFirst()) {
+        for (UserLeaderboardDTO userLeaderboardDTO : leaderboardEntries.getFirst()) {
             if (i >= 3) {
                 break;
             }
-            rankingDAO.addBonusGift(playerLeaderboardDTO.getPlayerId(), topBonus[i]);
+            rankingDAO.addBonusGift(userLeaderboardDTO.getUserId(), topBonus[i]);
             i++;
         }
     }
@@ -89,22 +89,22 @@ public class LeaderboardService implements ILeaderboardService {
     }
 
     @Override
-    public List<PlayerLeaderboardDTO> getUsers(int type, int page, int pageSize) {
-        List<PlayerLeaderboardDTO> list = leaderboardEntries.get(type);
+    public List<UserLeaderboardDTO> getUsers(int type, int page, int pageSize) {
+        List<UserLeaderboardDTO> list = leaderboardEntries.get(type);
         int startIndex = page * pageSize;
         int endIndex = Math.min(startIndex + pageSize, list.size());
         return list.subList(startIndex, endIndex);
     }
 
     private void refreshXH(int type) {
-        List<PlayerLeaderboardDTO> list = leaderboardEntries.get(type);
+        List<UserLeaderboardDTO> list = leaderboardEntries.get(type);
         list.clear();
         switch (type) {
-            case 0 -> list.addAll(rankingDAO.getTopHonor());
+            case 0 -> list.addAll(rankingDAO.getTopCup());
             case 1 -> list.addAll(rankingDAO.getTopMasters());
             case 2 -> list.addAll(rankingDAO.getTopRichestXu());
             case 3 -> list.addAll(rankingDAO.getTopRichestLuong());
-            case 4 -> list.addAll(rankingDAO.getWeeklyTopHonor());
+            case 4 -> list.addAll(rankingDAO.getWeeklyTopCup());
             case 5 -> list.addAll(rankingDAO.getWeeklyTopRichest());
         }
     }
