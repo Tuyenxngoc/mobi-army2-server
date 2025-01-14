@@ -26,18 +26,21 @@ public class FabricateItemDAO implements IFabricateItemDAO {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `fabricate_items`")) {
+
                 Gson gson = GsonUtil.getInstance();
+                FabricateItemManager.FABRICATE_ITEMS.clear();
+
                 while (resultSet.next()) {
-                    FabricateItem entry = new FabricateItem();
-                    entry.setId(resultSet.getInt("fabricate_item_id"));
-                    entry.setXuRequire(resultSet.getInt("xu_require"));
-                    entry.setLuongRequire(resultSet.getInt("luong_require"));
-                    entry.setRewardXu(resultSet.getInt("reward_xu"));
-                    entry.setRewardLuong(resultSet.getInt("reward_luong"));
-                    entry.setRewardCup(resultSet.getInt("reward_cup"));
-                    entry.setRewardExp(resultSet.getInt("reward_exp"));
-                    entry.setConfirmationMessage(resultSet.getString("confirmation_message"));
-                    entry.setCompletionMessage(resultSet.getString("completion_message"));
+                    FabricateItem fabricateItem = new FabricateItem();
+                    fabricateItem.setId(resultSet.getInt("fabricate_item_id"));
+                    fabricateItem.setXuRequire(resultSet.getInt("xu_require"));
+                    fabricateItem.setLuongRequire(resultSet.getInt("luong_require"));
+                    fabricateItem.setRewardXu(resultSet.getInt("reward_xu"));
+                    fabricateItem.setRewardLuong(resultSet.getInt("reward_luong"));
+                    fabricateItem.setRewardCup(resultSet.getInt("reward_cup"));
+                    fabricateItem.setRewardExp(resultSet.getInt("reward_exp"));
+                    fabricateItem.setConfirmationMessage(resultSet.getString("confirmation_message"));
+                    fabricateItem.setCompletionMessage(resultSet.getString("completion_message"));
 
                     SpecialItemChestJson[] jsonArray = gson.fromJson(resultSet.getString("item_require"), SpecialItemChestJson[].class);
                     for (SpecialItemChestJson specialItemChestJson : jsonArray) {
@@ -45,7 +48,7 @@ public class FabricateItemDAO implements IFabricateItemDAO {
                         if (specialItem == null) {
                             continue;
                         }
-                        entry.getItemRequire().add(new SpecialItemChest(specialItemChestJson.getQuantity(), specialItem));
+                        fabricateItem.getItemRequire().add(new SpecialItemChest(specialItemChestJson.getQuantity(), specialItem));
                     }
 
                     jsonArray = gson.fromJson(resultSet.getString("reward_item"), SpecialItemChestJson[].class);
@@ -54,11 +57,11 @@ public class FabricateItemDAO implements IFabricateItemDAO {
                         if (specialItem == null) {
                             continue;
                         }
-                        entry.getRewardItem().add(new SpecialItemChest(specialItemChestJson.getQuantity(), specialItem));
+                        fabricateItem.getRewardItem().add(new SpecialItemChest(specialItemChestJson.getQuantity(), specialItem));
                     }
 
-                    if (!entry.getItemRequire().isEmpty() && !entry.getRewardItem().isEmpty()) {
-                        FabricateItemManager.FABRICATE_ITEMS.add(entry);
+                    if (!fabricateItem.getItemRequire().isEmpty() && !fabricateItem.getRewardItem().isEmpty()) {
+                        FabricateItemManager.FABRICATE_ITEMS.add(fabricateItem);
                     }
                 }
             }

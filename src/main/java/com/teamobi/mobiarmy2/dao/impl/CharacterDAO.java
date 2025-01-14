@@ -19,10 +19,10 @@ public class CharacterDAO implements ICharacterDAO {
     public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-
-            CharacterManager.CHARACTERS.clear();
-
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `characters`")) {
+
+                CharacterManager.CHARACTERS.clear();
+
                 while (resultSet.next()) {
                     Character character = new Character();
                     character.setId(resultSet.getByte("character_id"));

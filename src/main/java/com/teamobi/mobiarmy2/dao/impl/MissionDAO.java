@@ -20,6 +20,9 @@ public class MissionDAO implements IMissionDAO {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `missions` ORDER BY mission_type, level")) {
+
+                MissionManager.clear();
+
                 while (resultSet.next()) {
                     Mission mission = new Mission();
                     mission.setId(resultSet.getByte("mission_id"));

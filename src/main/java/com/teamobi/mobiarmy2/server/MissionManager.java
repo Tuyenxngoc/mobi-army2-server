@@ -11,24 +11,22 @@ import java.util.Map;
  * @author tuyen
  */
 public class MissionManager {
-    public static final Map<Byte, List<Mission>> MISSION_LIST = new HashMap<>();
+    public static final Map<Byte, Mission> MISSIONS = new HashMap<>();
+    public static final Map<Byte, List<Byte>> MISSIONS_BY_TYPE = new HashMap<>();
 
     public static void addMission(Mission mission) {
-        Byte type = mission.getType();
-        if (!MISSION_LIST.containsKey(type)) {
-            MISSION_LIST.put(type, new ArrayList<>());
-        }
-        MISSION_LIST.get(type).add(mission);
+        MISSIONS.put(mission.getId(), mission);
+
+        MISSIONS_BY_TYPE.computeIfAbsent(mission.getType(), k -> new ArrayList<>())
+                .add(mission.getId());
     }
 
     public static Mission getMissionById(byte missionId) {
-        for (List<Mission> missionList : MISSION_LIST.values()) {
-            for (Mission mission : missionList) {
-                if (mission.getId() == missionId) {
-                    return mission;
-                }
-            }
-        }
-        return null;
+        return MISSIONS.get(missionId);
+    }
+
+    public static void clear() {
+        MISSIONS.clear();
+        MISSIONS_BY_TYPE.clear();
     }
 }

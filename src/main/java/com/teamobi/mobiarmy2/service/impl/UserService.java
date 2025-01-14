@@ -457,12 +457,12 @@ public class UserService implements IUserService {
         IMessage ms = new Message(Cmd.MISSISON);
         DataOutputStream ds = ms.writer();
         int i = 0;
-        for (List<Mission> missionList : MissionManager.MISSION_LIST.values()) {
-            int index = user.getMissionLevel()[i] - 1;//Subtracting 1 to access the correct index
-            if (index >= missionList.size()) {
-                index = missionList.size() - 1;
+        for (List<Byte> missionIds : MissionManager.MISSIONS_BY_TYPE.values()) {
+            int index = user.getMissionLevel()[i] - 1;
+            if (index >= missionIds.size()) {
+                index = missionIds.size() - 1;
             }
-            Mission mission = missionList.get(index);
+            Mission mission = MissionManager.getMissionById(missionIds.get(index));
             ds.writeByte(mission.getId());
             ds.writeByte(mission.getLevel());
             ds.writeUTF(mission.getName());
@@ -617,7 +617,7 @@ public class UserService implements IUserService {
     }
 
     private void processFormulaCrafting(byte id, byte level) {
-        Map<Byte, List<Formula>> formulaMap = FormulaManager.FORMULA.get(id);
+        Map<Byte, List<Formula>> formulaMap = FormulaManager.FORMULAS.get(id);
         if (formulaMap == null) {
             return;
         }
@@ -708,7 +708,7 @@ public class UserService implements IUserService {
 
     private void sendFormulaInfo(byte id) {
         try {
-            Map<Byte, List<Formula>> formulaMap = FormulaManager.FORMULA.get(id);
+            Map<Byte, List<Formula>> formulaMap = FormulaManager.FORMULAS.get(id);
             if (formulaMap == null) {
                 return;
             }
@@ -843,40 +843,40 @@ public class UserService implements IUserService {
     }
 
     private void buyClanShop(byte unit, byte itemId) {
-        ClanItem clanItem = ClanItemManager.getItemClanById(itemId);
+        ClanItemShop clanItemShop = ClanItemManager.getItemClanById(itemId);
 
-        if (clanItem == null || clanItem.getOnSale() != 1) {
+        if (clanItemShop == null || clanItemShop.getOnSale() != 1) {
             return;
         }
 
         int currentLevel = clanService.getClanLevel(user.getClanId());
-        if (currentLevel < clanItem.getLevel()) {
+        if (currentLevel < clanItemShop.getLevel()) {
             sendServerMessage(GameString.CLAN_LEVEL_INSUFFICIENT);
             return;
         }
 
         if (unit == 0) {//Xu
-            if (clanItem.getXu() < 0) {
+            if (clanItemShop.getXu() < 0) {
                 return;
             }
             int xuClan = clanService.getClanXu(user.getClanId());
-            if (xuClan < clanItem.getXu()) {
+            if (xuClan < clanItemShop.getXu()) {
                 sendServerMessage(GameString.CLAN_NOT_ENOUGH_XU);
                 return;
             }
 
-            clanService.updateItemClan(user.getClanId(), user.getPlayerId(), clanItem, true);
+            clanService.updateItemClan(user.getClanId(), user.getPlayerId(), clanItemShop, true);
         } else if (unit == 1) {//Luong
-            if (clanItem.getLuong() < 0) {
+            if (clanItemShop.getLuong() < 0) {
                 return;
             }
             int luongClan = clanService.getClanLuong(user.getClanId());
-            if (luongClan < clanItem.getLuong()) {
+            if (luongClan < clanItemShop.getLuong()) {
                 sendServerMessage(GameString.CLAN_NOT_ENOUGH_LUONG);
                 return;
             }
 
-            clanService.updateItemClan(user.getClanId(), user.getPlayerId(), clanItem, false);
+            clanService.updateItemClan(user.getClanId(), user.getPlayerId(), clanItemShop, false);
         }
         sendServerMessage(GameString.PURCHASE_SUCCESS);
     }
@@ -886,13 +886,13 @@ public class UserService implements IUserService {
             IMessage ms = new Message(Cmd.SHOP_BIETDOI);
             DataOutputStream ds = ms.writer();
             ds.writeByte(ClanItemManager.CLAN_ITEM_MAP.size());
-            for (ClanItem clanItem : ClanItemManager.CLAN_ITEM_MAP.values()) {
-                ds.writeByte(clanItem.getId());
-                ds.writeUTF(clanItem.getName());
-                ds.writeInt(clanItem.getXu());
-                ds.writeInt(clanItem.getLuong());
-                ds.writeByte(clanItem.getTime());
-                ds.writeByte(clanItem.getLevel());
+            for (ClanItemShop clanItemShop : ClanItemManager.CLAN_ITEM_MAP.values()) {
+                ds.writeByte(clanItemShop.getId());
+                ds.writeUTF(clanItemShop.getName());
+                ds.writeInt(clanItemShop.getXu());
+                ds.writeInt(clanItemShop.getLuong());
+                ds.writeByte(clanItemShop.getTime());
+                ds.writeByte(clanItemShop.getLevel());
             }
             ds.flush();
             sendMessage(ms);
@@ -1016,18 +1016,18 @@ public class UserService implements IUserService {
         try {
             IMessage ms = new Message(Cmd.SHOP_LINHTINH);
             DataOutputStream ds = ms.writer();
-            for (Map.Entry<Byte, SpecialItem> entry : SpecialItemManager.getSpecialItems().entrySet()) {
-                SpecialItem spEntry = entry.getValue();
-                if (!spEntry.isOnSale()) {
+            for (Map.Entry<Byte, SpecialItem> entry : SpecialItemManager.SPECIAL_ITEMS.entrySet()) {
+                SpecialItem specialItem = entry.getValue();
+                if (!specialItem.isOnSale()) {
                     continue;
                 }
-                ds.writeByte(spEntry.getId());
-                ds.writeUTF(spEntry.getName());
-                ds.writeUTF(spEntry.getDetail());
-                ds.writeInt(spEntry.getPriceXu());
-                ds.writeInt(spEntry.getPriceLuong());
-                ds.writeByte(spEntry.getExpirationDays());
-                ds.writeByte(spEntry.isShowSelection() ? 0 : 1);
+                ds.writeByte(specialItem.getId());
+                ds.writeUTF(specialItem.getName());
+                ds.writeUTF(specialItem.getDetail());
+                ds.writeInt(specialItem.getPriceXu());
+                ds.writeInt(specialItem.getPriceLuong());
+                ds.writeByte(specialItem.getExpirationDays());
+                ds.writeByte(specialItem.isShowSelection() ? 0 : 1);
             }
             ds.flush();
             sendMessage(ms);
@@ -1364,22 +1364,22 @@ public class UserService implements IUserService {
                     }
 
                     if (specialItemList.size() == 1) {
-                        SpecialItemChest itemChestEntry = specialItemList.getFirst();
-                        if (itemChestEntry.getItem().isGem()) {
-                            if (itemChestEntry.getQuantity() == 5 && ((itemChestEntry.getItem().getId() + 1) % 10 != 0)) {
+                        SpecialItemChest specialItemChest = specialItemList.getFirst();
+                        if (specialItemChest.getItem().isGem()) {
+                            if (specialItemChest.getQuantity() == 5 && ((specialItemChest.getItem().getId() + 1) % 10 != 0)) {
                                 userAction = UserAction.UPGRADE_GEM;
-                                sendMessageConfirm(GameString.createGemFusionRequestMessage((90 - (itemChestEntry.getItem().getId() % 10) * 10)));
+                                sendMessageConfirm(GameString.createGemFusionRequestMessage((90 - (specialItemChest.getItem().getId() % 10) * 10)));
                             } else {
                                 userAction = UserAction.SELL_GEM;
-                                totalTransactionAmount = itemChestEntry.getSellPrice();
-                                sendMessageConfirm(GameString.createGemSellRequestMessage(itemChestEntry.getQuantity(), totalTransactionAmount));
+                                totalTransactionAmount = specialItemChest.getSellPrice();
+                                sendMessageConfirm(GameString.createGemSellRequestMessage(specialItemChest.getQuantity(), totalTransactionAmount));
                             }
                             return;
                         }
 
-                        if (itemChestEntry.getItem().isUsable()) {
+                        if (specialItemChest.getItem().isUsable()) {
                             userAction = UserAction.USE_SPECIAL_ITEM;
-                            confirmSpecialItemUse(itemChestEntry);
+                            confirmSpecialItemUse(specialItemChest);
                             return;
                         }
                     }
@@ -1466,66 +1466,66 @@ public class UserService implements IUserService {
         }
     }
 
-    private void handleUseSpecialItem(SpecialItemChest itemChestEntry) {
-        switch (itemChestEntry.getItem().getId()) {
+    private void handleUseSpecialItem(SpecialItemChest specialItemChest) {
+        switch (specialItemChest.getItem().getId()) {
             case 54 -> {
                 user.addDaysToXpX2Time(1);
-                user.updateInventory(null, null, null, List.of(itemChestEntry));
+                user.updateInventory(null, null, null, List.of(specialItemChest));
                 sendServerMessage(GameString.ITEM_X2_XP_USAGE_SUCCESS);
             }
             case 86 -> {
-                if (itemChestEntry.getQuantity() == 50) {
+                if (specialItemChest.getQuantity() == 50) {
                     System.out.println("Cong trang bi vang 1");
-                } else if (itemChestEntry.getQuantity() == 100) {
+                } else if (specialItemChest.getQuantity() == 100) {
                     System.out.println("Cong trang bi vang 2");
-                } else if (itemChestEntry.getQuantity() == 150) {
+                } else if (specialItemChest.getQuantity() == 150) {
                     System.out.println("Cong trang bi vang 3");
                 } else {
-                    user.updateXp(1000 * itemChestEntry.getQuantity());
-                    user.updateInventory(null, null, null, List.of(itemChestEntry));
+                    user.updateXp(1000 * specialItemChest.getQuantity());
+                    user.updateInventory(null, null, null, List.of(specialItemChest));
                     sendServerMessage(GameString.USE_BANH_TRUNG_SUCCESS);
                 }
             }
             case 87 -> {
-                if (itemChestEntry.getQuantity() == 50) {
+                if (specialItemChest.getQuantity() == 50) {
                     System.out.println("Cong trang bi bac 1");
-                } else if (itemChestEntry.getQuantity() == 100) {
+                } else if (specialItemChest.getQuantity() == 100) {
                     System.out.println("Cong trang bi bac 2");
-                } else if (itemChestEntry.getQuantity() == 150) {
+                } else if (specialItemChest.getQuantity() == 150) {
                     System.out.println("Cong trang bi bac 3");
                 } else {
-                    user.updateXp(500 * itemChestEntry.getQuantity());
-                    user.updateInventory(null, null, null, List.of(itemChestEntry));
+                    user.updateXp(500 * specialItemChest.getQuantity());
+                    user.updateInventory(null, null, null, List.of(specialItemChest));
                     sendServerMessage(GameString.USE_BANH_TET_SUCCESS);
                 }
             }
         }
     }
 
-    private void confirmSpecialItemUse(SpecialItemChest itemChestEntry) {
-        switch (itemChestEntry.getItem().getId()) {
+    private void confirmSpecialItemUse(SpecialItemChest specialItemChest) {
+        switch (specialItemChest.getItem().getId()) {
             case 54 -> {
-                if (itemChestEntry.getQuantity() == 1) {
+                if (specialItemChest.getQuantity() == 1) {
                     sendMessageConfirm(GameString.ITEM_X2_XP_USAGE_REQUEST);
                 }
             }
             case 86 -> {
-                if (itemChestEntry.getQuantity() == 50) {
+                if (specialItemChest.getQuantity() == 50) {
                     sendMessageConfirm(GameString.EXCHANGE_BANH_TRUNG_TO_GOLD_EQUIP_1);
-                } else if (itemChestEntry.getQuantity() == 100) {
+                } else if (specialItemChest.getQuantity() == 100) {
                     sendMessageConfirm(GameString.EXCHANGE_BANH_TRUNG_TO_GOLD_EQUIP_2);
-                } else if (itemChestEntry.getQuantity() == 150) {
+                } else if (specialItemChest.getQuantity() == 150) {
                     sendMessageConfirm(GameString.EXCHANGE_BANH_TRUNG_TO_GOLD_EQUIP_3);
                 } else {
                     sendMessageConfirm(GameString.USE_BANH_TRUNG_REQUEST);
                 }
             }
             case 87 -> {
-                if (itemChestEntry.getQuantity() == 50) {
+                if (specialItemChest.getQuantity() == 50) {
                     sendMessageConfirm(GameString.EXCHANGE_BANH_TET_TO_SILVER_EQUIP_1);
-                } else if (itemChestEntry.getQuantity() == 100) {
+                } else if (specialItemChest.getQuantity() == 100) {
                     sendMessageConfirm(GameString.EXCHANGE_BANH_TET_TO_SILVER_EQUIP_2);
-                } else if (itemChestEntry.getQuantity() == 150) {
+                } else if (specialItemChest.getQuantity() == 150) {
                     sendMessageConfirm(GameString.EXCHANGE_BANH_TET_TO_SILVER_EQUIP_3);
                 } else {
                     sendMessageConfirm(GameString.USE_BANH_TET_REQUEST);
@@ -2014,37 +2014,37 @@ public class UserService implements IUserService {
             if (user.getOwnedCharacters()[index]) {
                 return;
             }
-            Character characterEntry = CharacterManager.CHARACTERS.get(index);
+            Character character = CharacterManager.CHARACTERS.get(index);
             if (unit == 0) {
-                if (characterEntry.getPriceXu() <= 0) {
+                if (character.getPriceXu() <= 0) {
                     return;
                 }
-                if (user.getXu() < characterEntry.getPriceXu()) {
+                if (user.getXu() < character.getPriceXu()) {
                     sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                     return;
                 }
-                user.updateXu(-characterEntry.getPriceXu());
+                user.updateXu(-character.getPriceXu());
             } else {
-                if (characterEntry.getPriceLuong() <= 0) {
+                if (character.getPriceLuong() <= 0) {
                     return;
                 }
-                if (user.getLuong() < characterEntry.getPriceLuong()) {
+                if (user.getLuong() < character.getPriceLuong()) {
                     sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                     return;
                 }
-                user.updateLuong(-characterEntry.getPriceLuong());
+                user.updateLuong(-character.getPriceLuong());
             }
 
             if (userDAO.createPlayerCharacter(user.getPlayerId(), index)) {
-                PlayerCharacterDTO character = userDAO.getPlayerCharacter(user.getPlayerId(), index);
-                if (character != null) {
-                    user.getLevels()[index] = character.getLevel();
-                    user.getXps()[index] = character.getXp();
-                    user.getPoints()[index] = character.getPoints();
-                    user.getAddedPoints()[index] = character.getAdditionalPoints();
-                    user.getPlayerCharacterIds()[index] = character.getId();
+                PlayerCharacterDTO playerCharacterDTO = userDAO.getPlayerCharacter(user.getPlayerId(), index);
+                if (playerCharacterDTO != null) {
+                    user.getLevels()[index] = playerCharacterDTO.getLevel();
+                    user.getXps()[index] = playerCharacterDTO.getXp();
+                    user.getPoints()[index] = playerCharacterDTO.getPoints();
+                    user.getAddedPoints()[index] = playerCharacterDTO.getAdditionalPoints();
+                    user.getPlayerCharacterIds()[index] = playerCharacterDTO.getId();
                     user.getOwnedCharacters()[index] = true;
-                    user.getEquipData()[index] = character.getData();
+                    user.getEquipData()[index] = playerCharacterDTO.getData();
 
                     ms = new Message(Cmd.BUY_GUN);
                     DataOutputStream ds = ms.writer();
@@ -2135,7 +2135,7 @@ public class UserService implements IUserService {
         if (giftCode.getEquips() != null) {
             for (EquipmentChestJson json : giftCode.getEquips()) {
                 EquipmentChest addEquip = new EquipmentChest();
-                addEquip.setEquipment(EquipmentManager.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
+                addEquip.setEquipment(EquipmentManager.getEquipment(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
                 if (addEquip.getEquipment() == null) {
                     continue;
                 }
@@ -2306,21 +2306,21 @@ public class UserService implements IUserService {
             IMessage ms = new Message(Cmd.INVENTORY);
             DataOutputStream ds = ms.writer();
             ds.writeByte(user.getEquipmentChest().size());
-            for (EquipmentChest entry : user.getEquipmentChest()) {
-                ds.writeInt(entry.getKey());
-                ds.writeByte(entry.getEquipment().getCharacterId());
-                ds.writeByte(entry.getEquipment().getEquipType());
-                ds.writeShort(entry.getEquipment().getEquipIndex());
-                ds.writeUTF(entry.getEquipment().getName());
-                ds.writeByte(entry.getAddPoints().length * 2);
-                for (int j = 0; j < entry.getAddPoints().length; j++) {
-                    ds.writeByte(entry.getAddPoints()[j]);
-                    ds.writeByte(entry.getAddPercents()[j]);
+            for (EquipmentChest equipmentChest : user.getEquipmentChest()) {
+                ds.writeInt(equipmentChest.getKey());
+                ds.writeByte(equipmentChest.getEquipment().getCharacterId());
+                ds.writeByte(equipmentChest.getEquipment().getEquipType());
+                ds.writeShort(equipmentChest.getEquipment().getEquipIndex());
+                ds.writeUTF(equipmentChest.getEquipment().getName());
+                ds.writeByte(equipmentChest.getAddPoints().length * 2);
+                for (int j = 0; j < equipmentChest.getAddPoints().length; j++) {
+                    ds.writeByte(equipmentChest.getAddPoints()[j]);
+                    ds.writeByte(equipmentChest.getAddPercents()[j]);
                 }
-                ds.writeByte(entry.getRemainingDays());
-                ds.writeByte(entry.getEmptySlot());
-                ds.writeByte(entry.getEquipment().isDisguise() ? 1 : 0);
-                ds.writeByte(entry.getVipLevel());
+                ds.writeByte(equipmentChest.getRemainingDays());
+                ds.writeByte(equipmentChest.getEmptySlot());
+                ds.writeByte(equipmentChest.getEquipment().isDisguise() ? 1 : 0);
+                ds.writeByte(equipmentChest.getVipLevel());
             }
             for (int i = 0; i < 5; i++) {
                 ds.writeInt(user.getEquipData()[user.getActiveCharacterId()][i]);

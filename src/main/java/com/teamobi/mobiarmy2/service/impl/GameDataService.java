@@ -161,9 +161,9 @@ public class GameDataService implements IGameDataService {
             int size = CaptionManager.CAPTIONS.size();
             ds.writeByte(size);
             for (int i = size - 1; i >= 0; i--) {
-                Caption capEntry = CaptionManager.CAPTIONS.get(i);
-                ds.writeUTF(capEntry.getCaption());
-                ds.writeByte(capEntry.getLevel());
+                Caption caption = CaptionManager.CAPTIONS.get(i);
+                ds.writeUTF(caption.getCaption());
+                ds.writeByte(caption.getLevel());
             }
             byte[] data = bas.toByteArray();
             Utils.saveFile(GameConstants.LEVEL_CACHE_NAME, data);

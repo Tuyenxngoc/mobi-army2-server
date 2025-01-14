@@ -22,7 +22,10 @@ public class SpecialItemDAO implements ISpecialItemDAO {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `special_items`")) {
+
                 Gson gson = GsonUtil.getInstance();
+                SpecialItemManager.SPECIAL_ITEMS.clear();
+
                 while (resultSet.next()) {
                     SpecialItem specialItem = new SpecialItem();
                     specialItem.setId(resultSet.getByte("special_item_id"));

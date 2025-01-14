@@ -3,7 +3,7 @@ package com.teamobi.mobiarmy2.service;
 import com.teamobi.mobiarmy2.dto.ClanDTO;
 import com.teamobi.mobiarmy2.dto.ClanInfoDTO;
 import com.teamobi.mobiarmy2.dto.ClanMemDTO;
-import com.teamobi.mobiarmy2.model.ClanItem;
+import com.teamobi.mobiarmy2.model.ClanItemShop;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ public interface IClanService {
 
     boolean[] getClanItems(short clanId);
 
-    void updateItemClan(short clanId, int playerId, ClanItem clanItemShop, boolean isBuyXu);
+    void updateItemClan(short clanId, int playerId, ClanItemShop clanItemShop, boolean isBuyXu);
 
     void contributeClan(short clanId, int playerId, int quantity, boolean isXu);
 

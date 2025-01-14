@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ClanItem {
+public class ClanItemShop {
     private byte id;
     private byte level;
     private String name;

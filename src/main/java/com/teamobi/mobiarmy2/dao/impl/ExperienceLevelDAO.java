@@ -21,6 +21,10 @@ public class ExperienceLevelDAO implements IExperienceLevelDAO {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT exp_player, exp_clan, level FROM `experience_levels` ORDER BY level")) {
+
+                ClanXpManager.LEVEL_XP_REQUIRED_LIST.clear();
+                PlayerXpManager.LEVEL_XP_REQUIRED_LIST.clear();
+
                 int previousPlayerXp = 0;
                 int previousClanXp = 0;
                 boolean reachedMaxPlayerLevel = false;

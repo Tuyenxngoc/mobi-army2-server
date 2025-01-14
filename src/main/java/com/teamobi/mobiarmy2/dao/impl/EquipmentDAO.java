@@ -22,7 +22,6 @@ public class EquipmentDAO implements IEquipmentDAO {
     public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `equips` ORDER BY equip_type, equip_index, character_id")) {
                 EquipmentManager.clear();
 
@@ -75,7 +74,7 @@ public class EquipmentDAO implements IEquipmentDAO {
 
     private static void validateEquipment(Equipment equipment) throws SQLException {
         if (equipment.isDisguise() && equipment.getDisguiseEquippedIndexes().length != 5) {
-            throw new SQLException("Invalid disguise configuration for EquipmentEntry with ID: " +
+            throw new SQLException("Invalid disguise configuration for Equipment with ID: " +
                     equipment.getEquipIndex() +
                     ". Expected 5 disguise equipped indexes, but found " +
                     equipment.getDisguiseEquippedIndexes().length);
@@ -87,7 +86,7 @@ public class EquipmentDAO implements IEquipmentDAO {
                 equipment.getBigImageSizeY().length != 6 ||
                 equipment.getBigImageAlignX().length != 6 ||
                 equipment.getBigImageAlignY().length != 6) {
-            StringBuilder errorMessage = new StringBuilder("Invalid image configuration for EquipmentEntry with ID: ");
+            StringBuilder errorMessage = new StringBuilder("Invalid image configuration for Equipment with ID: ");
             errorMessage.append(equipment.getEquipIndex());
             errorMessage.append(". Expected arrays of length 6 for all image properties but found:\n");
 
@@ -114,7 +113,7 @@ public class EquipmentDAO implements IEquipmentDAO {
         }
 
         if (equipment.getAddPoints().length != 5 || equipment.getAddPercents().length != 5) {
-            throw new SQLException("Invalid additional points or percents configuration for EquipmentEntry with ID: " +
+            throw new SQLException("Invalid additional points or percents configuration for Equipment with ID: " +
                     equipment.getEquipIndex() +
                     ". Expected arrays of length 5 but found:\n");
         }

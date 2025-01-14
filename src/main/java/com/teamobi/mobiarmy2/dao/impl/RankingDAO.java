@@ -39,12 +39,12 @@ public class RankingDAO implements IRankingDAO {
              ResultSet resultSet = statement.executeQuery(query)) {
             byte index = 1;
             while (resultSet.next()) {
-                PlayerLeaderboardDTO entry = new PlayerLeaderboardDTO();
+                PlayerLeaderboardDTO playerLeaderboardDTO = new PlayerLeaderboardDTO();
 
-                entry.setIndex(index);
-                entry.setPlayerId(resultSet.getInt("player_id"));
-                entry.setClanId(resultSet.getShort("clan_id"));
-                entry.setActiveCharacter(resultSet.getByte("character_id"));
+                playerLeaderboardDTO.setIndex(index);
+                playerLeaderboardDTO.setPlayerId(resultSet.getInt("player_id"));
+                playerLeaderboardDTO.setClanId(resultSet.getShort("clan_id"));
+                playerLeaderboardDTO.setActiveCharacter(resultSet.getByte("character_id"));
 
                 int currentLevel = resultSet.getInt("level");
                 int currentXp = resultSet.getInt("xp");
@@ -54,21 +54,21 @@ public class RankingDAO implements IRankingDAO {
                 int xpNeededForNextLevel = requiredXpNextLevel - requiredXpCurrentLevel;
                 byte levelPercent = Utils.calculateLevelPercent(currentXpInLevel, xpNeededForNextLevel);
 
-                entry.setLevel((byte) currentLevel);
-                entry.setLevelPt(levelPercent);
-                entry.setDetail(Utils.getStringNumber(resultSet.getInt(detailColumn)));
+                playerLeaderboardDTO.setLevel((byte) currentLevel);
+                playerLeaderboardDTO.setLevelPt(levelPercent);
+                playerLeaderboardDTO.setDetail(Utils.getStringNumber(resultSet.getInt(detailColumn)));
 
                 if (applyBonus && index <= 3) {
-                    entry.setUsername(GameString.createTopBonusMessage(resultSet.getString("username"), Utils.getStringNumber(topBonus[index - 1])));
+                    playerLeaderboardDTO.setUsername(GameString.createTopBonusMessage(resultSet.getString("username"), Utils.getStringNumber(topBonus[index - 1])));
                 } else {
-                    entry.setUsername(resultSet.getString("username"));
+                    playerLeaderboardDTO.setUsername(resultSet.getString("username"));
                 }
 
                 EquipmentChestJson[] equipmentData = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
                 int[] data = gson.fromJson(resultSet.getString("data"), int[].class);
-                entry.setData(EquipmentManager.getEquipmentIndexes(equipmentData, data, entry.getActiveCharacter()));
+                playerLeaderboardDTO.setData(EquipmentManager.getEquipmentIndexes(equipmentData, data, playerLeaderboardDTO.getActiveCharacter()));
 
-                top.add(entry);
+                top.add(playerLeaderboardDTO);
                 index++;
             }
         } catch (SQLException e) {

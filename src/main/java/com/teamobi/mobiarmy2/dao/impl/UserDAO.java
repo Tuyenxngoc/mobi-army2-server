@@ -17,7 +17,10 @@ import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -213,7 +216,7 @@ public class UserDAO implements IUserDAO {
                         EquipmentChestJson[] equipmentChestJsons = gson.fromJson(playerResultSet.getString("equipment_chest"), EquipmentChestJson[].class);
                         for (EquipmentChestJson json : equipmentChestJsons) {
                             EquipmentChest equip = new EquipmentChest();
-                            equip.setEquipment(EquipmentManager.getEquipEntry(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
+                            equip.setEquipment(EquipmentManager.getEquipment(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
                             if (equip.getEquipment() == null) {
                                 continue;
                             }
@@ -263,7 +266,7 @@ public class UserDAO implements IUserDAO {
 
                         //Dữ liệu nhiệm vụ
                         int[] missions = gson.fromJson(playerResultSet.getString("mission"), int[].class);
-                        int desiredSizeMission = MissionManager.MISSION_LIST.size();
+                        int desiredSizeMission = MissionManager.MISSIONS.size();
                         userDTO.setMission(
                                 missions.length != desiredSizeMission
                                         ? Utils.adjustArray(missions, desiredSizeMission, 0)
@@ -278,15 +281,8 @@ public class UserDAO implements IUserDAO {
                                         : missionLevels
                         );
 
-                        Timestamp x2Timestamp = playerResultSet.getTimestamp("x2_xp_time");
-                        if (x2Timestamp != null) {
-                            userDTO.setXpX2Time(x2Timestamp.toLocalDateTime());
-                        } else {
-                            userDTO.setXpX2Time(null);
-                        }
-
-                        userDTO.setLastOnline(playerResultSet.getTimestamp("last_online").toLocalDateTime());
-
+                        userDTO.setXpX2Time(Utils.getLocalDateTimeFromTimestamp(playerResultSet, "x2_xp_time"));
+                        userDTO.setLastOnline(Utils.getLocalDateTimeFromTimestamp(playerResultSet, "last_online"));
                         userDTO.setTopEarningsXu(playerResultSet.getInt("top_earnings_xu"));
                     } else {
                         return null;
@@ -461,17 +457,17 @@ public class UserDAO implements IUserDAO {
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     Gson gson = GsonUtil.getInstance();
-                    PlayerCharacterDTO characterEntry = new PlayerCharacterDTO();
-                    characterEntry.setPlayerId(playerId);
-                    characterEntry.setCharacterId(characterId);
-                    characterEntry.setId(resultSet.getLong("player_character_id"));
-                    characterEntry.setAdditionalPoints(gson.fromJson(resultSet.getString("additional_points"), short[].class));
-                    characterEntry.setData(gson.fromJson(resultSet.getString("data"), int[].class));
-                    characterEntry.setLevel(resultSet.getInt("level"));
-                    characterEntry.setXp(resultSet.getInt("xp"));
-                    characterEntry.setPoints(resultSet.getInt("points"));
+                    PlayerCharacterDTO playerCharacterDTO = new PlayerCharacterDTO();
+                    playerCharacterDTO.setPlayerId(playerId);
+                    playerCharacterDTO.setCharacterId(characterId);
+                    playerCharacterDTO.setId(resultSet.getLong("player_character_id"));
+                    playerCharacterDTO.setAdditionalPoints(gson.fromJson(resultSet.getString("additional_points"), short[].class));
+                    playerCharacterDTO.setData(gson.fromJson(resultSet.getString("data"), int[].class));
+                    playerCharacterDTO.setLevel(resultSet.getInt("level"));
+                    playerCharacterDTO.setXp(resultSet.getInt("xp"));
+                    playerCharacterDTO.setPoints(resultSet.getInt("points"));
 
-                    return characterEntry;
+                    return playerCharacterDTO;
                 }
             }
         } catch (SQLException e) {

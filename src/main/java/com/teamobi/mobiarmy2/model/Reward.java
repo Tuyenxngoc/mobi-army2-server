@@ -33,18 +33,18 @@ public class Reward {
 
     public void equip() {
         this.type = 2;
-        Equipment entry = EquipmentManager.getRandomEquipment(
-                equipmentEntry ->
-                        equipmentEntry.isOnSale()
-                                && !equipmentEntry.isDisguise()
-                                && equipmentEntry.getPriceXu() > 0
-                                && equipmentEntry.getPriceXu() < 200_000
+        Equipment equipment = EquipmentManager.getRandomEquipment(
+                eq ->
+                        eq.isOnSale()
+                                && !eq.isDisguise()
+                                && eq.getPriceXu() > 0
+                                && eq.getPriceXu() < 200_000
         );
-        if (entry == null) {
-            throw new IllegalStateException("No suitable equipment entry found for reward.");
+        if (equipment == null) {
+            throw new IllegalStateException("No suitable equipment found for reward.");
         }
         equip = new EquipmentChest();
-        equip.setEquipment(entry);
+        equip.setEquipment(equipment);
     }
 
     public void xp(short xp) {

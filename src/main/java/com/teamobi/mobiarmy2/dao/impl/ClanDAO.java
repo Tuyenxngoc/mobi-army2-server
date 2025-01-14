@@ -9,7 +9,7 @@ import com.teamobi.mobiarmy2.dto.ClanItemDTO;
 import com.teamobi.mobiarmy2.dto.ClanMemDTO;
 import com.teamobi.mobiarmy2.json.ClanItemJson;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
-import com.teamobi.mobiarmy2.model.ClanItem;
+import com.teamobi.mobiarmy2.model.ClanItemShop;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.server.ClanXpManager;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
@@ -220,10 +220,10 @@ public class ClanDAO implements IClanDAO {
                     List<ClanItemDTO> filteredItems = Arrays.stream(clanItemJsonArray)
                             .filter(item -> !item.getTime().isBefore(currentDate))
                             .map(item -> {
-                                ClanItem clanItem = ClanItemManager.getItemClanById(item.getId());
-                                if (clanItem != null) {
+                                ClanItemShop clanItemShop = ClanItemManager.getItemClanById(item.getId());
+                                if (clanItemShop != null) {
                                     ClanItemDTO newClanItemDTO = new ClanItemDTO();
-                                    newClanItemDTO.setName(clanItem.getName());
+                                    newClanItemDTO.setName(clanItemShop.getName());
                                     newClanItemDTO.setTime((int) Duration.between(currentDate, item.getTime()).getSeconds());
                                     return newClanItemDTO;
                                 }
@@ -267,18 +267,19 @@ public class ClanDAO implements IClanDAO {
                 byte index = 0;
                 Gson gson = GsonUtil.getInstance();
                 while (resultSet.next()) {
-                    ClanMemDTO entry = new ClanMemDTO();
-                    entry.setPlayerId(resultSet.getInt("player_id"));
+                    ClanMemDTO clanMemDTO = new ClanMemDTO();
+                    clanMemDTO.setPlayerId(resultSet.getInt("player_id"));
 
                     byte rights = resultSet.getByte("rights");
                     switch (rights) {
-                        case 2 -> entry.setUsername(resultSet.getString("username") + " (Đội trưởng)");
-                        case 1 -> entry.setUsername(resultSet.getString("username") + " (Đội phó %d)".formatted(index));
-                        default -> entry.setUsername(resultSet.getString("username"));
+                        case 2 -> clanMemDTO.setUsername(resultSet.getString("username") + " (Đội trưởng)");
+                        case 1 ->
+                                clanMemDTO.setUsername(resultSet.getString("username") + " (Đội phó %d)".formatted(index));
+                        default -> clanMemDTO.setUsername(resultSet.getString("username"));
                     }
-                    entry.setPoint(resultSet.getInt("clan_point"));
-                    entry.setActiveCharacter(resultSet.getByte("character_id"));
-                    entry.setOnline(resultSet.getByte("is_online"));
+                    clanMemDTO.setPoint(resultSet.getInt("clan_point"));
+                    clanMemDTO.setActiveCharacter(resultSet.getByte("character_id"));
+                    clanMemDTO.setOnline(resultSet.getByte("is_online"));
 
                     int currentLevel = resultSet.getInt("level");
                     int currentXp = resultSet.getInt("xp");
@@ -288,15 +289,15 @@ public class ClanDAO implements IClanDAO {
                     int xpNeededForNextLevel = requiredXpNextLevel - requiredXpCurrentLevel;
                     byte levelPercent = Utils.calculateLevelPercent(currentXpInLevel, xpNeededForNextLevel);
 
-                    entry.setLevel((byte) currentLevel);
-                    entry.setLevelPt(levelPercent);
+                    clanMemDTO.setLevel((byte) currentLevel);
+                    clanMemDTO.setLevelPt(levelPercent);
 
-                    entry.setIndex((byte) ((page * 10) + index));
-                    entry.setCup(resultSet.getInt("cup"));
+                    clanMemDTO.setIndex((byte) ((page * 10) + index));
+                    clanMemDTO.setCup(resultSet.getInt("cup"));
 
                     int[] data = gson.fromJson(resultSet.getString("data"), int[].class);
                     EquipmentChestJson[] equipmentChests = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
-                    entry.setDataEquip(EquipmentManager.getEquipmentIndexes(equipmentChests, data, entry.getActiveCharacter()));
+                    clanMemDTO.setDataEquip(EquipmentManager.getEquipmentIndexes(equipmentChests, data, clanMemDTO.getActiveCharacter()));
 
                     short contributeCount = resultSet.getShort("contribute_count");
                     if (contributeCount > 0) {
@@ -308,14 +309,14 @@ public class ClanDAO implements IClanDAO {
 
                         String formattedTime = Utils.getStringTimeBySecond(Duration.between(currentTime, contributionTime).getSeconds());
 
-                        entry.setContributeText(String.format("%s %s trước", contributionText, formattedTime));
-                        entry.setContributeCount("%d lần: %s xu và %s lượng".formatted(contributeCount, Utils.getStringNumber(xuContribution), Utils.getStringNumber(luongContribution)));
+                        clanMemDTO.setContributeText(String.format("%s %s trước", contributionText, formattedTime));
+                        clanMemDTO.setContributeCount("%d lần: %s xu và %s lượng".formatted(contributeCount, Utils.getStringNumber(xuContribution), Utils.getStringNumber(luongContribution)));
                     } else {
-                        entry.setContributeText("Chưa đóng góp");
-                        entry.setContributeCount("");
+                        clanMemDTO.setContributeText("Chưa đóng góp");
+                        clanMemDTO.setContributeCount("");
                     }
 
-                    entries.add(entry);
+                    entries.add(clanMemDTO);
                     index++;
                 }
             }

@@ -23,9 +23,9 @@ public class ClanXpManager {
 
         while (left <= right) {
             int mid = (left + right) / 2;
-            LevelXpRequired midEntry = LEVEL_XP_REQUIRED_LIST.get(mid);
+            LevelXpRequired levelXpRequired = LEVEL_XP_REQUIRED_LIST.get(mid);
 
-            if (xp < midEntry.getXp()) {
+            if (xp < levelXpRequired.getXp()) {
                 right = mid - 1;
             } else {
                 left = mid + 1;

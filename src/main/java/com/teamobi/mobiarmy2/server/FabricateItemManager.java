@@ -14,17 +14,10 @@ import java.util.Set;
 public class FabricateItemManager {
     public static final List<FabricateItem> FABRICATE_ITEMS = new ArrayList<>();
 
-    /**
-     * Gets a FabricateItemEntry that matches the required special items.
-     *
-     * @param selectedSpecialItems The list of selected special items.
-     * @return The FabricateItemEntry if found, otherwise null.
-     */
     public static FabricateItem getFabricateItem(List<SpecialItemChest> selectedSpecialItems) {
-        //Convert the list to a set to eliminate duplicates and for faster comparison
-        Set<SpecialItemChest> entrySet = new HashSet<>(selectedSpecialItems);
+        Set<SpecialItemChest> specialItemChests = new HashSet<>(selectedSpecialItems);
         return FABRICATE_ITEMS.stream()
-                .filter(entry -> entry.getItemRequire().equals(entrySet))
+                .filter(fabricateItem -> fabricateItem.getItemRequire().equals(specialItemChests))
                 .findFirst()
                 .orElse(null);
     }

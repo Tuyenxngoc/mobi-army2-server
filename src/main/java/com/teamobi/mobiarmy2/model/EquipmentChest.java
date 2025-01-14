@@ -46,10 +46,10 @@ public class EquipmentChest {
     }
 
     /**
-     * Returns the number of remaining days for the equipment entry.
-     * If there is no equipment entry, it returns 0.
+     * Returns the number of remaining days for the equipment.
+     * If there is no equipment, it returns 0.
      *
-     * @return the number of remaining days for the equipment entry
+     * @return the number of remaining days for the equipment
      */
     public int getRemainingDays() {
         if (equipment == null) {

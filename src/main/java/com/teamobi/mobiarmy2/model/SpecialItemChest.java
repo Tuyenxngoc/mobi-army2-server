@@ -79,7 +79,7 @@ public class SpecialItemChest {
 
     @Override
     public String toString() {
-        return "SpecialItemChestEntry{" +
+        return "SpecialItemChest{" +
                 "quantity=" + quantity +
                 ", item=" + item +
                 '}';

@@ -6,7 +6,7 @@ import com.teamobi.mobiarmy2.dto.ClanDTO;
 import com.teamobi.mobiarmy2.dto.ClanInfoDTO;
 import com.teamobi.mobiarmy2.dto.ClanMemDTO;
 import com.teamobi.mobiarmy2.json.ClanItemJson;
-import com.teamobi.mobiarmy2.model.ClanItem;
+import com.teamobi.mobiarmy2.model.ClanItemShop;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.server.ClanXpManager;
 import com.teamobi.mobiarmy2.service.IClanService;
@@ -99,14 +99,14 @@ public class ClanService implements IClanService {
     }
 
     @Override
-    public void updateItemClan(short clanId, int playerId, ClanItem clanItem, boolean isBuyXu) {
+    public void updateItemClan(short clanId, int playerId, ClanItemShop clanItemShop, boolean isBuyXu) {
         synchronized (getClanLock(clanId)) {
             if (isBuyXu) {
-                clanDAO.updateXu(clanId, -clanItem.getXu());
-                clanDAO.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItem.getXu()) + " xu", playerId, -clanItem.getXu(), 0);
+                clanDAO.updateXu(clanId, -clanItemShop.getXu());
+                clanDAO.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItemShop.getXu()) + " xu", playerId, -clanItemShop.getXu(), 0);
             } else {
-                clanDAO.updateLuong(clanId, -clanItem.getLuong());
-                clanDAO.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItem.getLuong()) + " lượng", playerId, 0, -clanItem.getLuong());
+                clanDAO.updateLuong(clanId, -clanItemShop.getLuong());
+                clanDAO.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItemShop.getLuong()) + " lượng", playerId, 0, -clanItemShop.getLuong());
             }
 
             ClanItemJson[] items = clanDAO.getClanItems(clanId);
@@ -114,11 +114,11 @@ public class ClanService implements IClanService {
             LocalDateTime now = LocalDateTime.now();
 
             for (ClanItemJson item : items) {
-                if (item.getId() == clanItem.getId()) {
+                if (item.getId() == clanItemShop.getId()) {
                     if (item.getTime().isBefore(now)) {
                         item.setTime(now);
                     }
-                    item.setTime(item.getTime().plusHours(clanItem.getTime()));
+                    item.setTime(item.getTime().plusHours(clanItemShop.getTime()));
                     found = true;
                     break;
                 }
@@ -127,8 +127,8 @@ public class ClanService implements IClanService {
             if (!found) {
                 List<ClanItemJson> updatedItems = new ArrayList<>(Arrays.asList(items));
                 ClanItemJson newItem = new ClanItemJson();
-                newItem.setId(clanItem.getId());
-                newItem.setTime(now.plusHours(clanItem.getTime()));
+                newItem.setId(clanItemShop.getId());
+                newItem.setTime(now.plusHours(clanItemShop.getTime()));
                 updatedItems.add(newItem);
                 items = updatedItems.toArray(new ClanItemJson[0]);
             }

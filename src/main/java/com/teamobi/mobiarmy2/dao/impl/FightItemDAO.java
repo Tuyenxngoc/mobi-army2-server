@@ -19,10 +19,10 @@ public class FightItemDAO implements IFightItemDAO {
     public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-
-            FightItemManager.FIGHT_ITEMS.clear();
-
             try (ResultSet resultSet = statement.executeQuery("SELECT name, xu, luong, carried_item_count FROM `fight_items` ORDER BY fight_item_id")) {
+
+                FightItemManager.FIGHT_ITEMS.clear();
+
                 while (resultSet.next()) {
                     FightItem fightItem = new FightItem();
                     fightItem.setName(resultSet.getString("name"));

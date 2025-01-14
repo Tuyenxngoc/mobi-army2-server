@@ -2,7 +2,7 @@ package com.teamobi.mobiarmy2.dao.impl;
 
 import com.teamobi.mobiarmy2.dao.IClanShopDAO;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
-import com.teamobi.mobiarmy2.model.ClanItem;
+import com.teamobi.mobiarmy2.model.ClanItemShop;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
 
 import java.sql.Connection;
@@ -19,10 +19,12 @@ public class ClanShopDAO implements IClanShopDAO {
     public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `clan_shops`")) {
+
+                ClanItemManager.CLAN_ITEM_MAP.clear();
+
                 while (resultSet.next()) {
-                    ClanItem item = new ClanItem();
+                    ClanItemShop item = new ClanItemShop();
                     item.setId(resultSet.getByte("clan_shop_id"));
                     item.setLevel(resultSet.getByte("level"));
                     item.setName(resultSet.getString("name"));
@@ -31,7 +33,7 @@ public class ClanShopDAO implements IClanShopDAO {
                     item.setXu(resultSet.getInt("xu"));
                     item.setLuong(resultSet.getInt("luong"));
 
-                    ClanItemManager.CLAN_ITEM_MAP.put(item.getId(), item);
+                    ClanItemManager.addClanItemShop(item);
                 }
             }
         } catch (SQLException e) {

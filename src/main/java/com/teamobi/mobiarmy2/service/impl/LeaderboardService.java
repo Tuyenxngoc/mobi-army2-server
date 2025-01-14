@@ -74,11 +74,11 @@ public class LeaderboardService implements ILeaderboardService {
         int[] topBonus = serverConfig.getTopBonus();
 
         int i = 0;
-        for (PlayerLeaderboardDTO entry : leaderboardEntries.getFirst()) {
+        for (PlayerLeaderboardDTO playerLeaderboardDTO : leaderboardEntries.getFirst()) {
             if (i >= 3) {
                 break;
             }
-            rankingDAO.addBonusGift(entry.getPlayerId(), topBonus[i]);
+            rankingDAO.addBonusGift(playerLeaderboardDTO.getPlayerId(), topBonus[i]);
             i++;
         }
     }
