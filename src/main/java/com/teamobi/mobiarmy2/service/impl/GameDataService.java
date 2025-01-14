@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.service.impl;
 
 import com.teamobi.mobiarmy2.constant.GameConstants;
-import com.teamobi.mobiarmy2.dao.IGameDao;
+import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.model.ArmyMap;
 import com.teamobi.mobiarmy2.model.Caption;
 import com.teamobi.mobiarmy2.model.Character;
@@ -29,10 +29,32 @@ import java.util.TreeMap;
 public class GameDataService implements IGameDataService {
     private static final Logger logger = LoggerFactory.getLogger(GameDataService.class);
 
-    private final IGameDao gameDao;
+    private final IMapDAO mapDAO;
+    private final ICharacterDAO characterDAO;
+    private final IEquipmentDAO equipmentDAO;
+    private final ICaptionLevelDAO captionLevelDAO;
+    private final IFightItemDAO fightItemDAO;
+    private final IClanShopDAO clanShopDAO;
+    private final ISpecialItemDAO specialItemDAO;
+    private final IFormulaDAO formulaDAO;
+    private final IPaymentDAO paymentDAO;
+    private final IMissionDAO missionDAO;
+    private final IExperienceLevelDAO experienceLevelDAO;
+    private final IFabricateItemDAO fabricateItemDAO;
 
-    public GameDataService(IGameDao gameDao) {
-        this.gameDao = gameDao;
+    public GameDataService(IMapDAO mapDAO, ICharacterDAO characterDAO, IEquipmentDAO equipmentDAO, ICaptionLevelDAO captionLevelDAO, IFightItemDAO fightItemDAO, IClanShopDAO clanShopDAO, ISpecialItemDAO specialItemDAO, IFormulaDAO formulaDAO, IPaymentDAO paymentDAO, IMissionDAO missionDAO, IExperienceLevelDAO experienceLevelDAO, IFabricateItemDAO fabricateItemDAO) {
+        this.mapDAO = mapDAO;
+        this.characterDAO = characterDAO;
+        this.equipmentDAO = equipmentDAO;
+        this.captionLevelDAO = captionLevelDAO;
+        this.fightItemDAO = fightItemDAO;
+        this.clanShopDAO = clanShopDAO;
+        this.specialItemDAO = specialItemDAO;
+        this.formulaDAO = formulaDAO;
+        this.paymentDAO = paymentDAO;
+        this.missionDAO = missionDAO;
+        this.experienceLevelDAO = experienceLevelDAO;
+        this.fabricateItemDAO = fabricateItemDAO;
     }
 
     public void setCacheMaps() {
@@ -187,18 +209,18 @@ public class GameDataService implements IGameDataService {
 
     @Override
     public void loadServerData() {
-        gameDao.getAllMapData();
-        gameDao.getAllCharacterData();
-        gameDao.getAllEquip();
-        gameDao.getAllCaptionLevel();
-        gameDao.getAllItem();
-        gameDao.getAllItemClan();
-        gameDao.getAllSpecialItem();
-        gameDao.getAllFormula();
-        gameDao.getAllPayment();
-        gameDao.getAllMissions();
-        gameDao.getAllXpData();
-        gameDao.getAllFabricateItems();
+        mapDAO.loadAll();
+        characterDAO.loadAll();
+        equipmentDAO.loadAll();
+        captionLevelDAO.loadAll();
+        fightItemDAO.loadAll();
+        clanShopDAO.loadAll();
+        specialItemDAO.loadAll();
+        formulaDAO.loadAll();
+        paymentDAO.loadAll();
+        missionDAO.loadAll();
+        experienceLevelDAO.loadAll();
+        fabricateItemDAO.loadAll();
     }
 
     @Override

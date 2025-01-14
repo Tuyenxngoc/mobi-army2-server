@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.database;
 
 import com.teamobi.mobiarmy2.config.IDatabaseConfig;
-import com.teamobi.mobiarmy2.config.impl.HikariCPConfig;
+import com.teamobi.mobiarmy2.server.ApplicationContext;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ public class HikariCPManager {
     private HikariDataSource dataSource;
 
     private HikariCPManager() {
-        this.config = new HikariCPConfig();
+        this.config = ApplicationContext.getInstance().getBean(IDatabaseConfig.class);
         initDataSource();
     }
 
