@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.service.impl;
 
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.constant.*;
+import com.teamobi.mobiarmy2.dao.IAccountDAO;
 import com.teamobi.mobiarmy2.dao.IGiftCodeDAO;
 import com.teamobi.mobiarmy2.dao.IUserDAO;
 import com.teamobi.mobiarmy2.dto.*;
@@ -26,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author tuyen
@@ -40,6 +42,7 @@ public class UserService implements IUserService {
     private final ILeaderboardService leaderboardService;
 
     private final IUserDAO userDAO;
+    private final IAccountDAO accountDAO;
     private final IGiftCodeDAO giftCodeDAO;
 
     private UserAction userAction;
@@ -51,12 +54,13 @@ public class UserService implements IUserService {
     private long timeSinceLeftRoom;
     private long lastSpinTime;
 
-    public UserService(User user, IServerConfig serverConfig, IClanService clanService, ILeaderboardService leaderboardService, IUserDAO userDAO, IGiftCodeDAO giftCodeDAO) {
+    public UserService(User user, IServerConfig serverConfig, IClanService clanService, ILeaderboardService leaderboardService, IUserDAO userDAO, IAccountDAO accountDAO, IGiftCodeDAO giftCodeDAO) {
         this.user = user;
         this.serverConfig = serverConfig;
         this.clanService = clanService;
         this.leaderboardService = leaderboardService;
         this.userDAO = userDAO;
+        this.accountDAO = accountDAO;
         this.giftCodeDAO = giftCodeDAO;
     }
 
@@ -112,31 +116,46 @@ public class UserService implements IUserService {
 
         try {
             DataInputStream dis = ms.reader();
-            String username = dis.readUTF();
-            String password = dis.readUTF();
-            String version = dis.readUTF();
+            String username = dis.readUTF().trim();
+            String password = dis.readUTF().trim();
+            String version = dis.readUTF().trim();
 
             if (isInvalidInput(username) || isInvalidInput(password)) {
                 sendMessageLoginFail(GameString.INVALID_ACCOUNT_PASSWORD);
                 return;
             }
 
-            UserDTO userFound = userDAO.findByUsernameAndPassword(username, password);
-            if (userFound == null) {
+            AccountDTO accountDTO = accountDAO.findByUsernameAndPassword(username, password);
+            if (accountDTO == null) {
                 sendMessageLoginFail(GameString.LOGIN_FAILED);
                 return;
             }
-            if (userFound.isLock()) {
+            if (accountDTO.isLock()) {
                 sendMessageLoginFail(GameString.ACCOUNT_LOCKED);
                 return;
             }
-            if (!userFound.isActive()) {
+            if (!accountDTO.isActive()) {
                 sendMessageLoginFail(GameString.ACCOUNT_INACTIVE);
                 return;
             }
 
+            UserDTO userDTO = userDAO.findByAccountId(accountDTO.getAccountId());
+            if (userDTO == null) {
+                // Tạo mới người dùng
+                Optional<Integer> result = userDAO.create(accountDTO.getAccountId(), 1000, 0);
+
+                if (result.isPresent()) {
+                    userDTO = userDAO.findByAccountId(accountDTO.getAccountId());
+                }
+
+                if (userDTO == null) {
+                    sendMessageLoginFail(GameString.LOGIN_FAILED);
+                    return;
+                }
+            }
+
             //Kiểm tra có đang đăng nhập hay không
-            User userLogin = serverManager.getUserByPlayerId(userFound.getPlayerId());
+            User userLogin = serverManager.getUserByPlayerId(userDTO.getPlayerId());
             if (userLogin != null) {
                 userLogin.getUserService().sendServerMessage2(GameString.ACCOUNT_OTHER_LOGIN);
                 userLogin.getSession().close();
@@ -145,7 +164,29 @@ public class UserService implements IUserService {
                 return;
             }
 
-            copyUserData(user, userFound);//todo
+            //Dữ liệu tài khoản
+            updateUserFromDTO(userDTO);
+
+            //Dữ liệu nhân vật
+           /* List<UserCharacterDTO> userCharacterDTOS = userCharacterDAO.findAllByUserId(user.getUserId());
+            if (userCharacterDTOS.isEmpty()) {
+                //Tạo mới nhân vật
+                Optional<Integer> result1 = userCharacterDAO.create(user.getUserId(), CharacterManager.CHARACTERS.get(0).getCharacterId(), Boolean.TRUE);
+                Optional<Integer> result2 = userCharacterDAO.create(user.getUserId(), CharacterManager.CHARACTERS.get(1).getCharacterId(), Boolean.FALSE);
+                Optional<Integer> result3 = userCharacterDAO.create(user.getUserId(), CharacterManager.CHARACTERS.get(2).getCharacterId(), Boolean.FALSE);
+                if (result1.isPresent() && result2.isPresent() && result3.isPresent()) {
+                    userCharacterDTOS = userCharacterDAO.findAllByUserId(user.getUserId());
+                }
+
+                if (userCharacterDTOS.isEmpty()) {
+                    sendMessageLoginFail(GameString.LOGIN_FAILED);
+                    return;
+                }
+            }
+            updateUserCharacters(userCharacterDTOS);
+            */
+
+            user.setUsername(username);
             user.getSession().setVersion(version);
             user.setLogged(true);
 
@@ -180,7 +221,7 @@ public class UserService implements IUserService {
                 userDAO.updateLastOnline(now, user.getPlayerId());
             }
 
-            userDAO.updateOnline(true, userFound.getPlayerId());
+            userDAO.updateOnline(true, userDTO.getPlayerId());
 
             sendLoginSuccess();
             sendCharacterData(serverConfig);
@@ -193,38 +234,38 @@ public class UserService implements IUserService {
         }
     }
 
-    private void copyUserData(User target, UserDTO source) {
-        target.setUserId(source.getUserId());
-        target.setPlayerId(source.getPlayerId());
-        target.setUsername(source.getUsername());
-        target.setXu(source.getXu());
-        target.setLuong(source.getLuong());
-        target.setCup(source.getCup());
-        target.setPointEvent(source.getPointEvent());
-        target.setClanId(source.getClanId());
-        target.setLevels(source.getLevels());
-        target.setLevelPercents(source.getLevelPercents());
-        target.setActiveCharacterId(source.getActiveCharacterId());
-        target.setPlayerCharacterIds(source.getPlayerCharacterIds());
-        target.setOwnedCharacters(source.getOwnedCharacters());
-        target.setXps(source.getXps());
-        target.setPoints(source.getPoints());
-        target.setAddedPoints(source.getAddedPoints());
-        target.setEquipData(source.getEquipData());
-        target.setCharacterEquips(source.getCharacterEquips());
-        target.setFriends(source.getFriends());
-        target.setMission(source.getMission());
-        target.setMissionLevel(source.getMissionLevel());
-        target.setSpecialItemChest(source.getSpecialItemChest());
-        target.setEquipmentChest(new ArrayList<>(source.getEquipmentChest().values()));
-        target.setFightItems(source.getItems());
-        target.setXpX2Time(source.getXpX2Time());
-        target.setLastOnline(source.getLastOnline());
-        target.setTopEarningsXu(source.getTopEarningsXu());
-        target.setMaterialsPurchased(source.getMaterialsPurchased());
-        target.setEquipmentPurchased(source.getEquipmentPurchased());
-        target.setChestLocked(source.isChestLocked());
-        target.setInvitationLocked(source.isInvitationLocked());
+    private void updateUserFromDTO(UserDTO userDTO) {
+        user.setUserId(userDTO.getUserId());
+        user.setPlayerId(userDTO.getPlayerId());
+        user.setUsername(userDTO.getUsername());
+        user.setXu(userDTO.getXu());
+        user.setLuong(userDTO.getLuong());
+        user.setCup(userDTO.getCup());
+        user.setPointEvent(userDTO.getPointEvent());
+        user.setClanId(userDTO.getClanId());
+        user.setLevels(userDTO.getLevels());
+        user.setLevelPercents(userDTO.getLevelPercents());
+        user.setActiveCharacterId(userDTO.getActiveCharacterId());
+        user.setPlayerCharacterIds(userDTO.getPlayerCharacterIds());
+        user.setOwnedCharacters(userDTO.getOwnedCharacters());
+        user.setXps(userDTO.getXps());
+        user.setPoints(userDTO.getPoints());
+        user.setAddedPoints(userDTO.getAddedPoints());
+        user.setEquipData(userDTO.getEquipData());
+        user.setCharacterEquips(userDTO.getCharacterEquips());
+        user.setFriends(userDTO.getFriends());
+        user.setMission(userDTO.getMission());
+        user.setMissionLevel(userDTO.getMissionLevel());
+        user.setSpecialItemChest(userDTO.getSpecialItemChest());
+        user.setEquipmentChest(new ArrayList<>(userDTO.getEquipmentChest().values()));
+        user.setFightItems(userDTO.getItems());
+        user.setXpX2Time(userDTO.getXpX2Time());
+        user.setLastOnline(userDTO.getLastOnline());
+        user.setTopEarningsXu(userDTO.getTopEarningsXu());
+        user.setMaterialsPurchased(userDTO.getMaterialsPurchased());
+        user.setEquipmentPurchased(userDTO.getEquipmentPurchased());
+        user.setChestLocked(userDTO.isChestLocked());
+        user.setInvitationLocked(userDTO.isInvitationLocked());
     }
 
     @Override
@@ -2036,15 +2077,15 @@ public class UserService implements IUserService {
             }
 
             if (userDAO.createPlayerCharacter(user.getPlayerId(), index)) {
-                PlayerCharacterDTO playerCharacterDTO = userDAO.getPlayerCharacter(user.getPlayerId(), index);
-                if (playerCharacterDTO != null) {
-                    user.getLevels()[index] = playerCharacterDTO.getLevel();
-                    user.getXps()[index] = playerCharacterDTO.getXp();
-                    user.getPoints()[index] = playerCharacterDTO.getPoints();
-                    user.getAddedPoints()[index] = playerCharacterDTO.getAdditionalPoints();
-                    user.getPlayerCharacterIds()[index] = playerCharacterDTO.getId();
+                UserCharacterDTO userCharacterDTO = userDAO.getPlayerCharacter(user.getPlayerId(), index);
+                if (userCharacterDTO != null) {
+                    user.getLevels()[index] = userCharacterDTO.getLevel();
+                    user.getXps()[index] = userCharacterDTO.getXp();
+                    user.getPoints()[index] = userCharacterDTO.getPoints();
+                    user.getAddedPoints()[index] = userCharacterDTO.getAdditionalPoints();
+                    user.getPlayerCharacterIds()[index] = userCharacterDTO.getId();
                     user.getOwnedCharacters()[index] = true;
-                    user.getEquipData()[index] = playerCharacterDTO.getData();
+                    user.getEquipData()[index] = userCharacterDTO.getData();
 
                     ms = new Message(Cmd.BUY_GUN);
                     DataOutputStream ds = ms.writer();

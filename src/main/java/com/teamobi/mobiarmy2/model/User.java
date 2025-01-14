@@ -4,6 +4,7 @@ import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.constant.UserState;
+import com.teamobi.mobiarmy2.dao.IAccountDAO;
 import com.teamobi.mobiarmy2.dao.IGiftCodeDAO;
 import com.teamobi.mobiarmy2.dao.IUserDAO;
 import com.teamobi.mobiarmy2.fight.IFightWait;
@@ -84,6 +85,7 @@ public class User {
                 context.getBean(IClanService.class),
                 context.getBean(ILeaderboardService.class),
                 context.getBean(IUserDAO.class),
+                context.getBean(IAccountDAO.class),
                 context.getBean(IGiftCodeDAO.class)
         );
         this.serverConfig = context.getBean(IServerConfig.class);

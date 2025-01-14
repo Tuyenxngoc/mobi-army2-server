@@ -26,6 +26,7 @@ public class MobiArmy2 {
         context.registerBean(IServerConfig.class, new ServerConfig());
         context.registerBean(IDatabaseConfig.class, new HikariCPConfig());
 
+        context.registerBean(IAccountDAO.class, new AccountDAO());
         context.registerBean(ICaptionLevelDAO.class, new CaptionLevelDAO());
         context.registerBean(ICharacterDAO.class, new CharacterDAO());
         context.registerBean(IClanDAO.class, new ClanDAO());
@@ -41,6 +42,7 @@ public class MobiArmy2 {
         context.registerBean(IPaymentDAO.class, new PaymentDAO());
         context.registerBean(IRankingDAO.class, new RankingDAO(context.getBean(IServerConfig.class)));
         context.registerBean(ISpecialItemDAO.class, new SpecialItemDAO());
+        context.registerBean(IUserCharacterDAO.class, new UserCharacterDAO());
         context.registerBean(IUserDAO.class, new UserDAO());
 
         context.registerBean(IGameDataService.class, new GameDataService(

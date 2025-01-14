@@ -5,7 +5,7 @@ import com.teamobi.mobiarmy2.constant.TransactionType;
 import com.teamobi.mobiarmy2.dao.IUserDAO;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.dto.FriendDTO;
-import com.teamobi.mobiarmy2.dto.PlayerCharacterDTO;
+import com.teamobi.mobiarmy2.dto.UserCharacterDTO;
 import com.teamobi.mobiarmy2.dto.UserDTO;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
@@ -34,8 +34,18 @@ import java.util.stream.Collectors;
 public class UserDAO implements IUserDAO {
 
     @Override
-    public void create(User user) {
-        HikariCPManager.getInstance().update("INSERT INTO `players`(`user_id`, `xu`, `luong`) VALUES (?,?,?)", user.getUserId(), user.getXu(), user.getLuong());
+    public Optional<Integer> create(String accountId, int xu, int luong) {
+        byte[] fightItems = new byte[FightItemManager.FIGHT_ITEMS.size()];
+        fightItems[0] = 99;
+        fightItems[1] = 99;
+
+        int[] missions = new int[MissionManager.MISSIONS.size()];
+        byte[] missionLevels = new byte[missions.length];
+
+        Gson gson = GsonUtil.getInstance();
+        // language=SQL
+        String sql = "INSERT INTO `players` (user_id, xu, luong, created_date, last_modified_date, item, mission, missionLevel, equipment_chest, is_chest_locked, is_invitation_locked) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+        return HikariCPManager.getInstance().update(sql, accountId, xu, luong, LocalDateTime.now(), LocalDateTime.now(), gson.toJson(fightItems), gson.toJson(missions), gson.toJson(missionLevels), "[]", false, false);
     }
 
     public static String convertSpecialItemChestEntriesToJson(List<SpecialItemChest> specialItemChestEntries) {
@@ -135,42 +145,11 @@ public class UserDAO implements IUserDAO {
     }
 
     @Override
-    public UserDTO findByUsernameAndPassword(String username, String password) {
-        UserDTO userDTO = null;
+    public UserDTO findByAccountId(String accountId) {
+        Gson gson = GsonUtil.getInstance();
+        UserDTO userDTO;
+
         try (Connection connection = HikariCPManager.getInstance().getConnection()) {
-
-            //Truy vấn để lấy thông tin từ bảng user
-            String userQuery = "SELECT `user_id`, `password`, `is_enabled`, `is_locked` FROM users WHERE username = ?";
-            try (PreparedStatement userStatement = connection.prepareStatement(userQuery)) {
-                userStatement.setString(1, username);
-                try (ResultSet userResultSet = userStatement.executeQuery()) {
-                    if (userResultSet.next()) {
-
-                        //Kiểm tra mật khẩu đã được mã hóa bằng jBCrypt
-                        String hashedPassword = userResultSet.getString("password");
-                        if (!BCrypt.checkpw(password, hashedPassword)) {
-                            return null;
-                        }
-                        userDTO = new UserDTO();
-                        userDTO.setUsername(username);
-                        userDTO.setUserId(userResultSet.getString("user_id"));
-                        userDTO.setLock(userResultSet.getBoolean("is_locked"));
-                        userDTO.setActive(userResultSet.getBoolean("is_enabled"));
-                    }
-                }
-            }
-
-            if (userDTO == null) {
-                return null;
-            }
-
-            if (userDTO.isLock() || !userDTO.isActive()) {
-                return userDTO;
-            }
-
-            Gson gson = GsonUtil.getInstance();
-
-            //Truy vấn để lấy thông tin từ bảng player
             String playerQuery =
                     "SELECT " +
                             "p.player_id, p.xu, p.luong, p.cup, p.point_event, " +
@@ -186,11 +165,12 @@ public class UserDAO implements IUserDAO {
                             "INNER JOIN player_characters pc ON p.active_character_id = pc.player_character_id " +
                             "LEFT JOIN clan_members cm ON p.player_id = cm.player_id " +
                             "WHERE user_id = ?";
-
             try (PreparedStatement playerStatement = connection.prepareStatement(playerQuery)) {
-                playerStatement.setString(1, userDTO.getUserId());
+                playerStatement.setString(1, accountId);
                 try (ResultSet playerResultSet = playerStatement.executeQuery()) {
+
                     int totalCharacter = CharacterManager.CHARACTERS.size();
+                    userDTO = new UserDTO();
                     userDTO.initialize(totalCharacter);
 
                     if (playerResultSet.next()) {
@@ -344,7 +324,7 @@ public class UserDAO implements IUserDAO {
                 "SELECT " +
                         "u.username, u.is_locked, u.is_enabled, " +
                         "p.player_id, p.xu, p.is_online, p.equipment_chest, " +
-                        "pc.character_id, pc.level, pc.data, " +
+                        "pc.character_id, pc.level, pc.xp, pc.data, " +
                         "cm.clan_id " +
                         "FROM players p " +
                         "INNER JOIN users u ON p.user_id = u.user_id " +
@@ -379,8 +359,18 @@ public class UserDAO implements IUserDAO {
                     friend.setActiveCharacterId(resultSet.getByte("character_id"));
                     friend.setClanId(resultSet.getShort("clan_id"));
                     friend.setOnline(resultSet.getByte("is_online"));
-                    friend.setLevel(resultSet.getByte("level"));
-                    friend.setLevelPt((byte) 0);
+
+                    int currentLevel = resultSet.getInt("level");
+                    int currentXp = resultSet.getInt("xp");
+                    int requiredXpCurrentLevel = PlayerXpManager.getRequiredXpLevel(currentLevel - 1);
+                    int requiredXpNextLevel = PlayerXpManager.getRequiredXpLevel(currentLevel);
+                    int currentXpInLevel = currentXp - requiredXpCurrentLevel;
+                    int xpNeededForNextLevel = requiredXpNextLevel - requiredXpCurrentLevel;
+                    byte levelPercent = Utils.calculateLevelPercent(currentXpInLevel, xpNeededForNextLevel);
+
+                    friend.setLevel((byte) currentLevel);
+                    friend.setLevelPt(levelPercent);
+
                     int[] data = gson.fromJson(resultSet.getString("data"), int[].class);
                     EquipmentChestJson[] equipmentChests = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
                     friend.setData(EquipmentManager.getEquipmentIndexes(equipmentChests, data, friend.getActiveCharacterId()));
@@ -403,7 +393,6 @@ public class UserDAO implements IUserDAO {
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     String hashedPassword = resultSet.getString("password");
-                    //Check if the provided password matches the hashed password from the database
                     return BCrypt.checkpw(oldPass, hashedPassword);
                 }
             }
@@ -449,7 +438,7 @@ public class UserDAO implements IUserDAO {
     }
 
     @Override
-    public PlayerCharacterDTO getPlayerCharacter(int playerId, byte characterId) {
+    public UserCharacterDTO getPlayerCharacter(int playerId, byte characterId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT * FROM `player_characters` pc WHERE pc.player_id = ? AND pc.character_id = ?")) {
             statement.setInt(1, playerId);
@@ -457,17 +446,17 @@ public class UserDAO implements IUserDAO {
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     Gson gson = GsonUtil.getInstance();
-                    PlayerCharacterDTO playerCharacterDTO = new PlayerCharacterDTO();
-                    playerCharacterDTO.setPlayerId(playerId);
-                    playerCharacterDTO.setCharacterId(characterId);
-                    playerCharacterDTO.setId(resultSet.getLong("player_character_id"));
-                    playerCharacterDTO.setAdditionalPoints(gson.fromJson(resultSet.getString("additional_points"), short[].class));
-                    playerCharacterDTO.setData(gson.fromJson(resultSet.getString("data"), int[].class));
-                    playerCharacterDTO.setLevel(resultSet.getInt("level"));
-                    playerCharacterDTO.setXp(resultSet.getInt("xp"));
-                    playerCharacterDTO.setPoints(resultSet.getInt("points"));
+                    UserCharacterDTO userCharacterDTO = new UserCharacterDTO();
+                    userCharacterDTO.setPlayerId(playerId);
+                    userCharacterDTO.setCharacterId(characterId);
+                    userCharacterDTO.setId(resultSet.getLong("player_character_id"));
+                    userCharacterDTO.setAdditionalPoints(gson.fromJson(resultSet.getString("additional_points"), short[].class));
+                    userCharacterDTO.setData(gson.fromJson(resultSet.getString("data"), int[].class));
+                    userCharacterDTO.setLevel(resultSet.getInt("level"));
+                    userCharacterDTO.setXp(resultSet.getInt("xp"));
+                    userCharacterDTO.setPoints(resultSet.getInt("points"));
 
-                    return playerCharacterDTO;
+                    return userCharacterDTO;
                 }
             }
         } catch (SQLException e) {
