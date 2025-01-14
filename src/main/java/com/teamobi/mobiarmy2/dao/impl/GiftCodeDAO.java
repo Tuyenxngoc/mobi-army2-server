@@ -28,7 +28,7 @@ public class GiftCodeDAO implements IGiftCodeDAO {
                 if (resultSet.next()) {
                     Gson gson = GsonUtil.getInstance();
                     GiftCodeDTO giftCode = new GiftCodeDTO();
-                    giftCode.setId(resultSet.getLong("gift_code_id"));
+                    giftCode.setGiftCodeId(resultSet.getLong("gift_code_id"));
                     giftCode.setLimit(resultSet.getShort("usage_limit"));
                     giftCode.setExpiryDate(Utils.getLocalDateTimeFromTimestamp(resultSet, "expiration_date"));
                     giftCode.setXu(resultSet.getInt("xu"));

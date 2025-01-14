@@ -113,13 +113,13 @@ public class FightWait implements IFightWait {
         return -1;
     }
 
-    private int getUserIndexByPlayerId(int playerId) {
+    private int getUserIndexByUserId(int userId) {
         for (byte i = 0; i < users.length; i++) {
             User user = this.users[i];
             if (user == null) {
                 continue;
             }
-            if (user.getUserId() == playerId) {
+            if (user.getUserId() == userId) {
                 return i;
             }
         }
@@ -216,11 +216,11 @@ public class FightWait implements IFightWait {
         }
     }
 
-    private void notifyPlayerLeave(int playerId) {
+    private void notifyPlayerLeave(int userId) {
         try {
             IMessage ms = new Message(Cmd.SOMEONE_LEAVEBOARD);
             DataOutputStream ds = ms.writer();
-            ds.writeInt(playerId);
+            ds.writeInt(userId);
             ds.writeInt(getRoomOwner().getUserId());
             ds.flush();
             sendToTeam(ms);
@@ -295,8 +295,8 @@ public class FightWait implements IFightWait {
     }
 
     @Override
-    public User getUserByPlayerId(int playerId) {
-        int index = getUserIndexByPlayerId(playerId);
+    public User getUserByUserId(int userId) {
+        int index = getUserIndexByUserId(userId);
         if (index == -1) {
             return null;
         }
@@ -338,13 +338,13 @@ public class FightWait implements IFightWait {
     }
 
     @Override
-    public synchronized void startGame(int playerId) {
+    public synchronized void startGame(int userId) {
         if (started) {
             return;
         }
 
         User roomOwner = getRoomOwner();
-        if (roomOwner.getUserId() != playerId) {
+        if (roomOwner.getUserId() != userId) {
             return;
         }
 
@@ -495,12 +495,12 @@ public class FightWait implements IFightWait {
     }
 
     @Override
-    public synchronized void leaveTeam(int targetPlayerId) {
+    public synchronized void leaveTeam(int userId) {
         if (started) {
-            fightManager.leave(targetPlayerId);
+            fightManager.leave(userId);
         }
 
-        int index = getUserIndexByPlayerId(targetPlayerId);
+        int index = getUserIndexByUserId(userId);
         if (index == -1) {
             return;
         }
@@ -513,13 +513,13 @@ public class FightWait implements IFightWait {
             if (bossIndex == index) {
                 findNewBoss();
             }
-            notifyPlayerLeave(targetPlayerId);
+            notifyPlayerLeave(userId);
         }
     }
 
     @Override
-    public void chatMessage(int playerId, String message) {
-        int index = getUserIndexByPlayerId(playerId);
+    public void chatMessage(int userId, String message) {
+        int index = getUserIndexByUserId(userId);
         if (index == -1) {
             return;
         }
@@ -527,7 +527,7 @@ public class FightWait implements IFightWait {
         try {
             IMessage ms = new Message(Cmd.CHAT_TO_BOARD);
             DataOutputStream ds = ms.writer();
-            ds.writeInt(playerId);
+            ds.writeInt(userId);
             ds.writeUTF(message);
             ds.flush();
             sendToTeam(ms);
@@ -537,17 +537,17 @@ public class FightWait implements IFightWait {
     }
 
     @Override
-    public synchronized void kickPlayer(int playerId, int targetPlayerId) {
+    public synchronized void kickPlayer(int userId, int targetUserId) {
         if (started) {
             return;
         }
 
         User roomOwner = getRoomOwner();
-        if (roomOwner.getUserId() != playerId) {
+        if (roomOwner.getUserId() != userId) {
             return;
         }
 
-        int index = getUserIndexByPlayerId(targetPlayerId);
+        int index = getUserIndexByUserId(targetUserId);
         if (index == -1) {
             return;
         }
@@ -564,11 +564,11 @@ public class FightWait implements IFightWait {
 
         sendMessageKick(index, GameString.KICKED_BY_HOST);
         handleUserRemoval(index);
-        notifyPlayerLeave(targetPlayerId);
+        notifyPlayerLeave(targetUserId);
     }
 
     @Override
-    public void handleKickPlayer(int targetPlayerId, int index, String message) {
+    public void handleKickPlayer(int targetUserId, int index, String message) {
         sendMessageKick(index, message);
         handleUserRemoval(index);
         if (numPlayers <= 0) {
@@ -577,7 +577,7 @@ public class FightWait implements IFightWait {
             if (bossIndex == index) {
                 findNewBoss();
             }
-            notifyPlayerLeave(targetPlayerId);
+            notifyPlayerLeave(targetUserId);
         }
     }
 
@@ -588,16 +588,16 @@ public class FightWait implements IFightWait {
     }
 
     @Override
-    public synchronized void setReady(boolean ready, int playerId) {
+    public synchronized void setReady(boolean ready, int userId) {
         if (started) {
             return;
         }
 
-        if (getRoomOwner().getUserId() == playerId) {
+        if (getRoomOwner().getUserId() == userId) {
             return;
         }
 
-        int index = getUserIndexByPlayerId(playerId);
+        int index = getUserIndexByUserId(userId);
         if (index == -1) {
             return;
         }
@@ -614,7 +614,7 @@ public class FightWait implements IFightWait {
         try {
             IMessage ms = new Message(Cmd.READY);
             DataOutputStream ds = ms.writer();
-            ds.writeInt(playerId);
+            ds.writeInt(userId);
             ds.writeBoolean(ready);
             ds.flush();
             sendToTeam(ms);
@@ -624,11 +624,11 @@ public class FightWait implements IFightWait {
     }
 
     @Override
-    public synchronized void setPassRoom(String password, int playerId) {
+    public synchronized void setPassRoom(String password, int userId) {
         if (started) {
             return;
         }
-        if (getRoomOwner().getUserId() != playerId) {
+        if (getRoomOwner().getUserId() != userId) {
             return;
         }
 
@@ -637,13 +637,13 @@ public class FightWait implements IFightWait {
     }
 
     @Override
-    public synchronized void setMoney(int newMoney, int playerId) {
+    public synchronized void setMoney(int newMoney, int userId) {
         if (started) {
             return;
         }
 
         User roomOwner = getRoomOwner();
-        if (roomOwner.getUserId() != playerId) {
+        if (roomOwner.getUserId() != userId) {
             return;
         }
 
@@ -676,12 +676,12 @@ public class FightWait implements IFightWait {
     }
 
     @Override
-    public synchronized void setRoomName(int playerId, String name) {
+    public synchronized void setRoomName(int userId, String name) {
         if (started) {
             return;
         }
 
-        if (getRoomOwner().getUserId() != playerId) {
+        if (getRoomOwner().getUserId() != userId) {
             return;
         }
 
@@ -689,12 +689,12 @@ public class FightWait implements IFightWait {
     }
 
     @Override
-    public synchronized void setMaxPlayers(int playerId, byte maxPlayers) {
+    public synchronized void setMaxPlayers(int userId, byte maxPlayers) {
         if (started) {
             return;
         }
 
-        if (getRoomOwner().getUserId() != playerId) {
+        if (getRoomOwner().getUserId() != userId) {
             return;
         }
 
@@ -704,12 +704,12 @@ public class FightWait implements IFightWait {
     }
 
     @Override
-    public synchronized void setItems(int playerId, byte[] newItems) {
+    public synchronized void setItems(int userId, byte[] newItems) {
         if (started) {
             return;
         }
 
-        int index = getUserIndexByPlayerId(playerId);
+        int index = getUserIndexByUserId(userId);
         if (index == -1) {
             return;
         }
@@ -723,7 +723,7 @@ public class FightWait implements IFightWait {
             return;
         }
 
-        int index = getUserIndexByPlayerId(user.getUserId());
+        int index = getUserIndexByUserId(user.getUserId());
         if (index == -1) {
             return;
         }
@@ -760,13 +760,13 @@ public class FightWait implements IFightWait {
     }
 
     @Override
-    public synchronized void setMap(int playerId, byte mapIdSet) {
+    public synchronized void setMap(int userId, byte mapIdSet) {
         if (started) {
             return;
         }
 
         User roomOwner = getRoomOwner();
-        if (roomOwner.getUserId() != playerId) {
+        if (roomOwner.getUserId() != userId) {
             return;
         }
 
@@ -849,17 +849,17 @@ public class FightWait implements IFightWait {
     }
 
     @Override
-    public void findPlayer(int playerId) {
+    public void findPlayer(int userId) {
         if (started) {
             return;
         }
 
         User roomOwner = getRoomOwner();
-        if (roomOwner.getUserId() != playerId) {
+        if (roomOwner.getUserId() != userId) {
             return;
         }
 
-        List<User> userList = ServerManager.getInstance().findWaitPlayers(playerId);
+        List<User> userList = ServerManager.getInstance().findWaitPlayers(userId);
 
         try {
             IMessage ms = new Message(Cmd.FIND_PLAYER);
@@ -886,10 +886,10 @@ public class FightWait implements IFightWait {
     }
 
     @Override
-    public void inviteToRoom(int playerId) {
+    public void inviteToRoom(int userId) {
         User roomOwner = getRoomOwner();
 
-        User user = ServerManager.getInstance().getUserByUserId(playerId);
+        User user = ServerManager.getInstance().getUserByUserId(userId);
         if (user == null) {
             roomOwner.getUserService().sendServerMessage(GameString.INVITE_OFFLINE);
             return;

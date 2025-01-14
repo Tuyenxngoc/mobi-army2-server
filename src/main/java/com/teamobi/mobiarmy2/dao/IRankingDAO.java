@@ -21,6 +21,6 @@ public interface IRankingDAO {
 
     List<UserLeaderboardDTO> getWeeklyTopRichest();
 
-    void addBonusGift(int playerId, int quantity);
+    void addBonusGift(int userId, int quantity);
 
 }

@@ -9,12 +9,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserCharacterDTO {
-    private long id;
+    private long userCharacterId;
     private short[] additionalPoints;
     private int[] data;
     private int level;
     private int points;
     private int xp;
     private byte characterId;
-    private long playerId;
 }

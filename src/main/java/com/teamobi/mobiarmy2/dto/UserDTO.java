@@ -29,7 +29,7 @@ public class UserDTO {
     private short equipmentPurchased;
     private LocalDateTime xpX2Time;
     private LocalDateTime lastOnline;
-    private long[] playerCharacterIds;
+    private long[] userCharacterIds;
     private boolean[] ownedCharacters;
     private int[] levels;
     private byte[] levelPercents;
@@ -47,7 +47,7 @@ public class UserDTO {
     private int topEarningsXu;
 
     public void initialize(int totalCharacter) {
-        this.playerCharacterIds = new long[totalCharacter];
+        this.userCharacterIds = new long[totalCharacter];
         this.ownedCharacters = new boolean[totalCharacter];
         this.levels = new int[totalCharacter];
         this.levelPercents = new byte[totalCharacter];

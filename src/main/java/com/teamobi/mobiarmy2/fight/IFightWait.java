@@ -37,7 +37,7 @@ public interface IFightWait {
 
     Room getRoom();
 
-    User getUserByPlayerId(int playerId);
+    User getUserByUserId(int userId);
 
     byte[] getItems(byte i);
 
@@ -47,39 +47,39 @@ public interface IFightWait {
 
     void fightComplete();
 
-    void startGame(int playerId);
+    void startGame(int userId);
 
     void sendToTeam(IMessage message);
 
-    void leaveTeam(int playerId);
+    void leaveTeam(int userId);
 
-    void chatMessage(int playerId, String message);
+    void chatMessage(int userId, String message);
 
-    void kickPlayer(int playerId, int targetPlayerId);
+    void kickPlayer(int userId, int targetUserId);
 
-    void handleKickPlayer(int targetPlayerId, int index, String message);
+    void handleKickPlayer(int targetUserId, int index, String message);
 
     void decreaseContinuousLevel();
 
-    void setReady(boolean ready, int playerId);
+    void setReady(boolean ready, int userId);
 
-    void setPassRoom(String password, int playerId);
+    void setPassRoom(String password, int userId);
 
-    void setMoney(int xu, int playerId);
+    void setMoney(int xu, int userId);
 
-    void setRoomName(int playerId, String name);
+    void setRoomName(int userId, String name);
 
-    void setMaxPlayers(int playerId, byte maxPlayers);
+    void setMaxPlayers(int userId, byte maxPlayers);
 
-    void setItems(int playerId, byte[] items);
+    void setItems(int userId, byte[] items);
 
     void changeTeam(User user);
 
-    void setMap(int playerId, byte mapId);
+    void setMap(int userId, byte mapId);
 
-    void findPlayer(int playerId);
+    void findPlayer(int userId);
 
-    void inviteToRoom(int playerId);
+    void inviteToRoom(int userId);
 
     void sendInfo(User user);
 

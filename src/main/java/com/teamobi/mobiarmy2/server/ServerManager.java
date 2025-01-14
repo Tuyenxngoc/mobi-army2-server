@@ -136,10 +136,10 @@ public class ServerManager {
                 .orElse(null);
     }
 
-    public List<User> findWaitPlayers(int excludedPlayerId) {
+    public List<User> findWaitPlayers(int excludedUserId) {
         return sessions.stream()
                 .filter(session -> session != null && session.getUser() != null &&
-                        session.getUser().getUserId() != excludedPlayerId &&
+                        session.getUser().getUserId() != excludedUserId &&
                         session.getUser().getState() == UserState.WAITING)
                 .map(ISession::getUser)
                 .limit(10)

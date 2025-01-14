@@ -246,7 +246,7 @@ public class UserService implements IUserService {
         user.setLevels(userDTO.getLevels());
         user.setLevelPercents(userDTO.getLevelPercents());
         user.setActiveCharacterId(userDTO.getActiveCharacterId());
-        user.setPlayerCharacterIds(userDTO.getPlayerCharacterIds());
+        user.setUserCharacterIds(userDTO.getUserCharacterIds());
         user.setOwnedCharacters(userDTO.getOwnedCharacters());
         user.setXps(userDTO.getXps());
         user.setPoints(userDTO.getPoints());
@@ -1123,17 +1123,17 @@ public class UserService implements IUserService {
     public void handleSendMessage(IMessage ms) {
         try {
             DataInputStream dis = ms.reader();
-            int playerId = dis.readInt();
+            int userId = dis.readInt();
             String content = dis.readUTF().trim();
             if (content.isEmpty() || content.length() > 100) {
                 return;
             }
             //Neu la admin -> bo qua
-            if (playerId == 1) {
+            if (userId == 1) {
                 return;
             }
             //Neu la nguoi dua tin -> send Mss 46-> chat The gioi
-            if (playerId == 2) {
+            if (userId == 2) {
                 int priceChatServer = serverConfig.getPriceChatServer();
 
                 if (user.getXu() < priceChatServer) {
@@ -1143,7 +1143,7 @@ public class UserService implements IUserService {
                 sendServerInfoToServer(GameString.createMessageFromSender(user.getUsername(), content));
                 return;
             }
-            User receiver = ServerManager.getInstance().getUserByUserId(playerId);
+            User receiver = ServerManager.getInstance().getUserByUserId(userId);
             if (receiver == null) {
                 return;
             }
@@ -1313,8 +1313,8 @@ public class UserService implements IUserService {
     @Override
     public void handleKickPlayer(IMessage ms) {
         try {
-            int playerId = ms.reader().readInt();
-            user.getFightWait().kickPlayer(user.getUserId(), playerId);
+            int userId = ms.reader().readInt();
+            user.getFightWait().kickPlayer(user.getUserId(), userId);
         } catch (IOException ignored) {
         }
     }
@@ -1856,12 +1856,12 @@ public class UserService implements IUserService {
     @Override
     public void handleGetFlayerDetail(IMessage ms) {
         try {
-            int playerId = ms.reader().readInt();
+            int userId = ms.reader().readInt();
             User us = null;
-            if (playerId == user.getUserId()) {
+            if (userId == user.getUserId()) {
                 us = user;
             } else if (user.isNotWaiting()) {
-                us = user.getFightWait().getUserByPlayerId(playerId);
+                us = user.getFightWait().getUserByUserId(userId);
             }
             ms = new Message(Cmd.PLAYER_DETAIL);
             DataOutputStream ds = ms.writer();
@@ -2088,7 +2088,7 @@ public class UserService implements IUserService {
                     user.getXps()[index] = userCharacterDTO.getXp();
                     user.getPoints()[index] = userCharacterDTO.getPoints();
                     user.getAddedPoints()[index] = userCharacterDTO.getAdditionalPoints();
-                    user.getPlayerCharacterIds()[index] = userCharacterDTO.getId();
+                    user.getUserCharacterIds()[index] = userCharacterDTO.getUserCharacterId();
                     user.getOwnedCharacters()[index] = true;
                     user.getEquipData()[index] = userCharacterDTO.getData();
 
@@ -2151,8 +2151,8 @@ public class UserService implements IUserService {
             return;
         }
 
-        giftCodeDAO.decrementUsageLimit(giftCode.getId());
-        userGiftCodeDAO.create(giftCode.getId(), user.getUserId());
+        giftCodeDAO.decrementUsageLimit(giftCode.getGiftCodeId());
+        userGiftCodeDAO.create(giftCode.getGiftCodeId(), user.getUserId());
 
         if (giftCode.getXu() > 0) {
             user.updateXu(giftCode.getXu());
@@ -2205,8 +2205,8 @@ public class UserService implements IUserService {
             if (find) {
                 user.getFightWait().findPlayer(user.getUserId());
             } else {
-                int playerId = dis.readInt();
-                user.getFightWait().inviteToRoom(playerId);
+                int userId = dis.readInt();
+                user.getFightWait().inviteToRoom(userId);
             }
         } catch (IOException ignored) {
         }

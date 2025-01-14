@@ -115,7 +115,7 @@ public class UserDAO implements IUserDAO {
                 Arrays.toString(user.getMission()),
                 Arrays.toString(user.getMissionLevel()),
                 user.getTopEarningsXu(),
-                user.getPlayerCharacterIds()[user.getActiveCharacterId()],
+                user.getUserCharacterIds()[user.getActiveCharacterId()],
                 user.getMaterialsPurchased(),
                 user.getEquipmentPurchased(),
                 user.getXpX2Time(),

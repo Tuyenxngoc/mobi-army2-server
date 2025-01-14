@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class GiftCodeDTO {
-    private long id;
+    private long giftCodeId;
     private short limit;
     private LocalDateTime expiryDate;
     private int xu;

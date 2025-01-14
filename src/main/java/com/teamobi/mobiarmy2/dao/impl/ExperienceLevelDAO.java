@@ -25,9 +25,9 @@ public class ExperienceLevelDAO implements IExperienceLevelDAO {
                 ClanXpManager.LEVEL_XP_REQUIRED_LIST.clear();
                 UserXpManager.LEVEL_XP_REQUIRED_LIST.clear();
 
-                int previousPlayerXp = 0;
+                int previousUserXp = 0;
                 int previousClanXp = 0;
-                boolean reachedMaxPlayerLevel = false;
+                boolean reachedMaxUserLevel = false;
                 boolean reachedMaxClanLevel = false;
 
                 while (resultSet.next()) {
@@ -35,20 +35,20 @@ public class ExperienceLevelDAO implements IExperienceLevelDAO {
                     Integer expClan = resultSet.getObject("exp_clan", Integer.class);
                     short level = resultSet.getShort("level");
 
-                    if (!reachedMaxPlayerLevel) {
+                    if (!reachedMaxUserLevel) {
                         if (expUser == null) {
-                            reachedMaxPlayerLevel = true;
+                            reachedMaxUserLevel = true;
                         } else {
                             // Kiểm tra tính hợp lệ của XP cho player
-                            if (expUser < previousPlayerXp) {
-                                throw new SQLException(String.format("XP của cấp độ tiếp theo cho player (%d) nhỏ hơn XP của cấp độ trước đó (%d)!", expUser, previousPlayerXp));
+                            if (expUser < previousUserXp) {
+                                throw new SQLException(String.format("XP của cấp độ tiếp theo cho player (%d) nhỏ hơn XP của cấp độ trước đó (%d)!", expUser, previousUserXp));
                             }
 
                             // Tạo bản ghi cho player
                             LevelXpRequired playerXpRequired = new LevelXpRequired(level, expUser);
                             UserXpManager.LEVEL_XP_REQUIRED_LIST.add(playerXpRequired);
 
-                            previousPlayerXp = expUser;
+                            previousUserXp = expUser;
                         }
                     }
 
@@ -69,7 +69,7 @@ public class ExperienceLevelDAO implements IExperienceLevelDAO {
                         }
                     }
 
-                    if (reachedMaxPlayerLevel && reachedMaxClanLevel) {
+                    if (reachedMaxUserLevel && reachedMaxClanLevel) {
                         break;
                     }
                 }

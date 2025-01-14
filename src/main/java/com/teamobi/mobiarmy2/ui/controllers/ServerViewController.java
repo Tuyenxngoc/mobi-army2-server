@@ -27,11 +27,11 @@ public class ServerViewController implements ServerListener {
     @FXML
     public Tab serverInfoTab;
     @FXML
-    public TextField searchPlayerField;
+    public TextField searchUserField;
     @FXML
-    private TableView<User> playerTable;
+    private TableView<User> userTable;
     @FXML
-    private TableColumn<User, Integer> playerIdColumn;
+    private TableColumn<User, Integer> userIdColumn;
     @FXML
     private TableColumn<User, String> usernameColumn;
     @FXML
@@ -135,14 +135,14 @@ public class ServerViewController implements ServerListener {
     public void initialize() {
         userList = FXCollections.observableArrayList();
 
-        playerIdColumn.setCellValueFactory(cellData ->
+        userIdColumn.setCellValueFactory(cellData ->
                 new SimpleIntegerProperty(cellData.getValue().getUserId()).asObject());
         usernameColumn.setCellValueFactory(cellData ->
                 new SimpleStringProperty(cellData.getValue().getUsername()));
         ipAddressColumn.setCellValueFactory(cellData ->
                 new SimpleStringProperty(cellData.getValue().getSession().getIPAddress()));
 
-        playerTable.setItems(userList);
+        userTable.setItems(userList);
 
         ServerManager.getInstance().addServerListener(this);
 
@@ -177,8 +177,8 @@ public class ServerViewController implements ServerListener {
     }
 
     @FXML
-    public void searchPlayer() {
-        String query = searchPlayerField.getText().toLowerCase().trim();
+    public void searchUser() {
+        String query = searchUserField.getText().toLowerCase().trim();
 
         ObservableList<User> filteredUsers = FXCollections.observableArrayList();
         for (User user : userList) {
@@ -187,6 +187,6 @@ public class ServerViewController implements ServerListener {
             }
         }
 
-        playerTable.setItems(filteredUsers);
+        userTable.setItems(filteredUsers);
     }
 }
