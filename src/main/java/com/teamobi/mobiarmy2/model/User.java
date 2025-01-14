@@ -54,7 +54,6 @@ public class User {
     private long[] userCharacterIds;
     private boolean[] ownedCharacters;
     private int[] levels;
-    private byte[] levelPercents;
     private int[] xps;
     private int[] points;
     private short[][] addedPoints;

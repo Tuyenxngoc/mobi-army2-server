@@ -142,7 +142,7 @@ public class UserService implements IUserService {
             }
             user.setAccountId(accountDTO.getAccountId());
 
-            UserDTO userDTO = userDAO.findByAccountId(accountDTO.getAccountId());
+            UserDTO userDTO = userDAO.findByAccountId(user.getAccountId());
             if (userDTO == null) {
                 // Tạo mới người dùng
                 Optional<Integer> result = userDAO.create(accountDTO.getAccountId(), 1000, 0);
@@ -243,16 +243,7 @@ public class UserService implements IUserService {
         user.setCup(userDTO.getCup());
         user.setPointEvent(userDTO.getPointEvent());
         user.setClanId(userDTO.getClanId());
-        user.setLevels(userDTO.getLevels());
-        user.setLevelPercents(userDTO.getLevelPercents());
         user.setActiveCharacterId(userDTO.getActiveCharacterId());
-        user.setUserCharacterIds(userDTO.getUserCharacterIds());
-        user.setOwnedCharacters(userDTO.getOwnedCharacters());
-        user.setXps(userDTO.getXps());
-        user.setPoints(userDTO.getPoints());
-        user.setAddedPoints(userDTO.getAddedPoints());
-        user.setEquipData(userDTO.getEquipData());
-        user.setCharacterEquips(userDTO.getCharacterEquips());
         user.setFriends(userDTO.getFriends());
         user.setMission(userDTO.getMission());
         user.setMissionLevel(userDTO.getMissionLevel());
@@ -269,7 +260,38 @@ public class UserService implements IUserService {
     }
 
     private void updateUserCharacters(List<UserCharacterDTO> userCharacterDTOS) {
+        int totalCharacter = CharacterManager.CHARACTERS.size();
+        user.setUserCharacterIds(new long[totalCharacter]);
+        user.setOwnedCharacters(new boolean[totalCharacter]);
+        user.setLevels(new int[totalCharacter]);
+        user.setXps(new int[totalCharacter]);
+        user.setPoints(new int[totalCharacter]);
+        user.setAddedPoints(new short[totalCharacter][5]);
+        user.setCharacterEquips(new EquipmentChest[totalCharacter][6]);
+        user.setEquipData(new int[totalCharacter][6]);
 
+        for (UserCharacterDTO userCharacterDTO : userCharacterDTOS) {
+            byte characterId = userCharacterDTO.getCharacterId();
+            user.getUserCharacterIds()[characterId] = userCharacterDTO.getUserCharacterId();
+            user.getOwnedCharacters()[characterId] = true;
+            user.getLevels()[characterId] = userCharacterDTO.getLevel();
+            user.getXps()[characterId] = userCharacterDTO.getXp();
+            user.getPoints()[characterId] = userCharacterDTO.getPoints();
+            user.getAddedPoints()[characterId] = userCharacterDTO.getAdditionalPoints();
+
+            int[] data = userCharacterDTO.getData();
+            for (int j = 0; j < data.length; j++) {
+                int key = data[j];
+                EquipmentChest equip = user.getEquipmentByKey(key);
+                if (equip != null) {
+                    if (equip.isExpired()) {
+                        equip.setInUse(false);
+                    } else {
+                        user.getCharacterEquips()[characterId][j] = equip;
+                    }
+                }
+            }
+        }
     }
 
     @Override

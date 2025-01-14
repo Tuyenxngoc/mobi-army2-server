@@ -19,6 +19,7 @@ public class UserCharacterDAO implements IUserCharacterDAO {
     private UserCharacterDTO mapToUserCharacterDTO(ResultSet resultSet) throws SQLException {
         Gson gson = GsonUtil.getInstance();
         UserCharacterDTO userCharacterDTO = new UserCharacterDTO();
+        userCharacterDTO.setUserCharacterId(resultSet.getLong("user_character_id"));
         userCharacterDTO.setCharacterId(resultSet.getByte("character_id"));
         userCharacterDTO.setAdditionalPoints(gson.fromJson(resultSet.getString("additional_points"), short[].class));
         userCharacterDTO.setData(gson.fromJson(resultSet.getString("data"), int[].class));

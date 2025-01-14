@@ -66,7 +66,7 @@ public class HikariCPManager {
             int rowsUpdated = statement.executeUpdate();
             return Optional.of(rowsUpdated);
         } catch (SQLException e) {
-            logger.error("SQL Update failed: {}", e.getMessage());
+            logger.error("SQL Update failed: {}", e.getMessage(), e);
             return Optional.empty();
         }
     }

@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
  */
 public class UserDAO implements IUserDAO {
 
-    public static String convertSpecialItemChestEntriesToJson(List<SpecialItemChest> specialItemChestEntries) {
-        List<SpecialItemChestJson> specialItemChestJsons = specialItemChestEntries.stream().map(e -> {
+    public static String convertSpecialItemChestEntriesToJson(List<SpecialItemChest> specialItemChests) {
+        List<SpecialItemChestJson> specialItemChestJsons = specialItemChests.stream().map(e -> {
             SpecialItemChestJson jsonItem = new SpecialItemChestJson();
             jsonItem.setId(e.getItem().getId());
             jsonItem.setQuantity(e.getQuantity());
@@ -41,8 +41,8 @@ public class UserDAO implements IUserDAO {
         return GsonUtil.getInstance().toJson(specialItemChestJsons);
     }
 
-    public static String convertEquipmentChestEntriesToJson(List<EquipmentChest> equipmentChestEntries) {
-        List<EquipmentChestJson> equipmentChestJsons = equipmentChestEntries.stream().map(e -> {
+    public static String convertEquipmentChestEntriesToJson(List<EquipmentChest> equipmentChests) {
+        List<EquipmentChestJson> equipmentChestJsons = equipmentChests.stream().map(e -> {
             EquipmentChestJson jsonItem = new EquipmentChestJson();
             jsonItem.setCharacterId(e.getEquipment().getCharacterId());
             jsonItem.setEquipIndex(e.getEquipment().getEquipIndex());
@@ -146,31 +146,26 @@ public class UserDAO implements IUserDAO {
     @Override
     public UserDTO findByAccountId(String accountId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection()) {
-            String playerQuery =
-                    "SELECT " +
-                            "u.user_id, u.xu, u.luong, u.cup, u.point_event, " +
-                            "u.materials_purchased, u.equipment_purchased, " +
-                            "u.fight_items, u.equipment_chest, u.item_chest, " +
-                            "u.friends, u.missions, u.mission_levels, " +
-                            "u.x2_xp_time, u.last_online, u.top_earnings_xu, " +
-                            "u.is_chest_locked, u.is_invitation_locked, " +
-                            "pc.character_id, pc.user_character_id, pc.level, " +
-                            "pc.xp, pc.points, pc.additional_points, pc.data, " +
-                            "cm.clan_id " +
-                            "FROM users u " +
-                            "INNER JOIN user_characters pc ON u.active_character_id = pc.user_character_id " +
-                            "LEFT JOIN clan_members cm ON u.user_id = cm.user_id " +
-                            "WHERE account_id = ?";
+            String playerQuery = "SELECT " +
+                    "u.user_id, u.xu, u.luong, u.cup, u.point_event, " +
+                    "u.materials_purchased, u.equipment_purchased, " +
+                    "u.fight_items, u.equipment_chest, u.item_chest, " +
+                    "u.friends, u.missions, u.mission_levels, " +
+                    "u.x2_xp_time, u.last_online, u.top_earnings_xu, " +
+                    "u.is_chest_locked, u.is_invitation_locked, " +
+                    "uc.character_id, uc.user_character_id, uc.level, " +
+                    "uc.xp, uc.points, uc.additional_points, uc.data, " +
+                    "cm.clan_id " +
+                    "FROM users u " +
+                    "LEFT JOIN user_characters uc ON u.active_character_id = uc.user_character_id " +
+                    "LEFT JOIN clan_members cm ON u.user_id = cm.user_id " +
+                    "WHERE account_id = ?";
             try (PreparedStatement statement = connection.prepareStatement(playerQuery)) {
                 statement.setString(1, accountId);
                 try (ResultSet resultSet = statement.executeQuery()) {
-
-                    int totalCharacter = CharacterManager.CHARACTERS.size();
-                    Gson gson = GsonUtil.getInstance();
-                    UserDTO userDTO = new UserDTO();
-                    userDTO.initialize(totalCharacter);
-
                     if (resultSet.next()) {
+                        Gson gson = GsonUtil.getInstance();
+                        UserDTO userDTO = new UserDTO();
                         userDTO.setUserId(resultSet.getInt("user_id"));
                         userDTO.setXu(resultSet.getInt("xu"));
                         userDTO.setLuong(resultSet.getInt("luong"));
@@ -261,8 +256,8 @@ public class UserDAO implements IUserDAO {
                         userDTO.setXpX2Time(Utils.getLocalDateTimeFromTimestamp(resultSet, "x2_xp_time"));
                         userDTO.setLastOnline(Utils.getLocalDateTimeFromTimestamp(resultSet, "last_online"));
                         userDTO.setTopEarningsXu(resultSet.getInt("top_earnings_xu"));
-                    } else {
-                        return null;
+
+                        return userDTO;
                     }
                 }
             }
