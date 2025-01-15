@@ -19,31 +19,22 @@ public class EquipmentChestJson {
     @SerializedName("i")
     private short equipmentId;
 
-    @SerializedName("ei")
-    private short equipIndex;
-
-    @SerializedName("et")
-    private byte equipType;
-
-    @SerializedName("vl")
+    @SerializedName("v")
     private byte vipLevel;
 
-    @SerializedName("pd")
+    @SerializedName("d")
     private LocalDateTime purchaseDate;
 
-    @SerializedName("cid")
-    private byte characterId;
-
-    @SerializedName("iu")
+    @SerializedName("u")
     private byte inUse;
 
     @SerializedName("s")
     private byte[] slots;
 
-    @SerializedName("ap")
+    @SerializedName("p")
     private byte[] addPoints;
 
-    @SerializedName("apc")
+    @SerializedName("c")
     private byte[] addPercents;
 
 }

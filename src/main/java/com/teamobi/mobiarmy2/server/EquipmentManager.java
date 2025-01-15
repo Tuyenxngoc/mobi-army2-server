@@ -2,12 +2,15 @@ package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.model.Equipment;
+import com.teamobi.mobiarmy2.util.Utils;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class EquipmentManager {
     public static Equipment[][] equipDefault;
@@ -37,6 +40,18 @@ public class EquipmentManager {
         return EQUIPMENTS.get(equipmentId);
     }
 
+    public static Equipment getEquipment(byte characterId, byte equipType, short equipIndex) {
+        Map<Byte, List<Short>> equipmentByCharacter = getEquipmentByCharacterId(characterId);
+        List<Short> equipmentIds = equipmentByCharacter.get(equipType);
+        for (Short equipmentId : equipmentIds) {
+            Equipment equipment = getEquipment(equipmentId);
+            if (equipment != null && equipment.getEquipIndex() == equipIndex) {
+                return equipment;
+            }
+        }
+        return null;
+    }
+
     public static Equipment getEquipmentBySaleIndex(short saleIndex) {
         if (saleIndex < 0 || saleIndex >= SALE_INDEX_TO_ID.size()) {
             return null;
@@ -45,21 +60,33 @@ public class EquipmentManager {
         return equipmentId != null ? EQUIPMENTS.get(equipmentId) : null;
     }
 
-    public static Equipment getRandomEquipment(Predicate<Equipment> filter) {
-        return null;
-    }
-
     public static Map<Byte, List<Short>> getEquipmentByCharacterId(byte characterId) {
         return EQUIPMENTS_BY_CHARACTER_AND_TYPE.get(characterId);
     }
 
-    public static short[] getEquipmentIndexes(EquipmentChestJson[] equipmentChestJsons, int[] data, byte activeCharacter) {
+    public static Equipment getRandomEquipment(Predicate<Equipment> filter) {
+        List<Equipment> filteredEquipments = EQUIPMENTS.values().stream()
+                .filter(filter)
+                .toList();
+
+        if (filteredEquipments.isEmpty()) {
+            return null;
+        }
+
+        return filteredEquipments.get(Utils.nextInt(filteredEquipments.size()));
+    }
+
+    public static short[] getEquipmentIndexes(EquipmentChestJson[] equipmentChestJsons, int[] data, byte characterId) {
         short[] equipData = new short[5];
         LocalDateTime now = LocalDateTime.now();
 
-        Map<Integer, EquipmentChestJson> equipmentMap = Arrays.stream(equipmentChestJsons)
-                .filter(json -> json != null && json.getCharacterId() == activeCharacter)
-                .collect(Collectors.toMap(EquipmentChestJson::getKey, json -> json));
+        //Tạo map theo key
+        Map<Integer, EquipmentChestJson> equipmentMap = new HashMap<>();
+        for (EquipmentChestJson json : equipmentChestJsons) {
+            if (json != null) {
+                equipmentMap.put(json.getKey(), json);
+            }
+        }
 
         //Tìm cải trang
         int disguiseKey = data[5];
@@ -80,15 +107,15 @@ public class EquipmentManager {
                 EquipmentChestJson json = equipmentMap.get(equipKey);
                 Equipment equip = getEquipment(json.getEquipmentId());
                 if (equip != null && equip.getExpirationDays() - ChronoUnit.DAYS.between(json.getPurchaseDate(), now) > 0) {
-                    equipData[i] = json.getEquipIndex();
+                    equipData[i] = equip.getEquipIndex();
                     exists = true;
                 }
             }
 
             //Nếu không tìm thấy thì lấy dữ liệu mặc định
             if (!exists) {
-                equipData[i] = (EquipmentManager.equipDefault[activeCharacter][i] != null)
-                        ? EquipmentManager.equipDefault[activeCharacter][i].getEquipIndex()
+                equipData[i] = (EquipmentManager.equipDefault[characterId][i] != null)
+                        ? EquipmentManager.equipDefault[characterId][i].getEquipIndex()
                         : -1;
             }
         }

@@ -50,7 +50,7 @@ public class User {
     private byte materialsPurchased;
     private short equipmentPurchased;
     private LocalDateTime xpX2Time;
-    private LocalDateTime lastOnline;
+    private int topEarningsXu;
     private long[] userCharacterIds;
     private boolean[] ownedCharacters;
     private int[] levels;
@@ -70,7 +70,6 @@ public class User {
     private final IUserService userService;
     private final IServerConfig serverConfig;
     private final IGiftBoxService giftBoxService;
-    private int topEarningsXu;
 
     public User(ISession session) {
         this.session = session;

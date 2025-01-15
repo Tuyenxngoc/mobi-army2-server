@@ -194,7 +194,7 @@ public class UserService implements IUserService {
 
             //Kiểm tra chưa online hơn 1 ngày
             LocalDateTime now = LocalDateTime.now();
-            if (Utils.hasLoggedInOnNewDay(user.getLastOnline(), now)) {
+            if (Utils.hasLoggedInOnNewDay(userDTO.getLastOnline(), now)) {
                 //Gửi item
                 byte indexItem = FightItemManager.getRandomItem();
                 byte quantity = 1;
@@ -249,7 +249,6 @@ public class UserService implements IUserService {
         user.setEquipmentChest(userDTO.getEquipmentChest());
         user.setFightItems(userDTO.getItems());
         user.setXpX2Time(userDTO.getXpX2Time());
-        user.setLastOnline(userDTO.getLastOnline());
         user.setTopEarningsXu(userDTO.getTopEarningsXu());
         user.setMaterialsPurchased(userDTO.getMaterialsPurchased());
         user.setEquipmentPurchased(userDTO.getEquipmentPurchased());
@@ -2223,7 +2222,7 @@ public class UserService implements IUserService {
         if (giftCode.getEquips() != null) {
             for (EquipmentChestJson json : giftCode.getEquips()) {
                 EquipmentChest addEquip = new EquipmentChest();
-                addEquip.setEquipment(EquipmentManager.getEquipment(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
+                addEquip.setEquipment(EquipmentManager.getEquipment(json.getEquipmentId()));
                 if (addEquip.getEquipment() == null) {
                     continue;
                 }

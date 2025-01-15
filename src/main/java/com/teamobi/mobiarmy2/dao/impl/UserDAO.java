@@ -44,10 +44,8 @@ public class UserDAO implements IUserDAO {
     public static String convertEquipmentChestEntriesToJson(List<EquipmentChest> equipmentChests) {
         List<EquipmentChestJson> equipmentChestJsons = equipmentChests.stream().map(e -> {
             EquipmentChestJson jsonItem = new EquipmentChestJson();
-            jsonItem.setCharacterId(e.getEquipment().getCharacterId());
-            jsonItem.setEquipIndex(e.getEquipment().getEquipIndex());
-            jsonItem.setEquipType(e.getEquipment().getEquipType());
             jsonItem.setKey(e.getKey());
+            jsonItem.setEquipmentId(e.getEquipment().getEquipmentId());
             jsonItem.setInUse((byte) (e.isInUse() ? 1 : 0));
             jsonItem.setVipLevel(e.getVipLevel());
             jsonItem.setPurchaseDate(e.getPurchaseDate());
@@ -76,8 +74,8 @@ public class UserDAO implements IUserDAO {
 
         // language=SQL
         String sql = "INSERT INTO `users` " +
-                "(account_id, xu, luong, created_date, last_modified_date, " +
-                "fight_items, missions, mission_levels, friends, equipment_chest) " +
+                "(account_id, xu, luong, created_date, " +
+                "fight_items, missions, mission_levels, friends, equipment_chest, item_chest) " +
                 "VALUES (?,?,?,?,?,?,?,?,?,?)";
 
         return HikariCPManager.getInstance().update(
@@ -86,11 +84,11 @@ public class UserDAO implements IUserDAO {
                 xu,
                 luong,
                 LocalDateTime.now(),
-                LocalDateTime.now(),
                 gson.toJson(fightItems),
                 gson.toJson(missions),
                 gson.toJson(missionLevels),
                 gson.toJson(friends),
+                "[]",
                 "[]"
         );
     }
@@ -188,7 +186,7 @@ public class UserDAO implements IUserDAO {
                         EquipmentChestJson[] equipmentChestJsons = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
                         for (EquipmentChestJson json : equipmentChestJsons) {
                             EquipmentChest equip = new EquipmentChest();
-                            equip.setEquipment(EquipmentManager.getEquipment(json.getCharacterId(), json.getEquipType(), json.getEquipIndex()));
+                            equip.setEquipment(EquipmentManager.getEquipment(json.getEquipmentId()));
                             if (equip.getEquipment() == null) {
                                 continue;
                             }
