@@ -278,6 +278,7 @@ public class UserService implements IUserService {
             user.getXps()[characterId] = userCharacterDTO.getXp();
             user.getPoints()[characterId] = userCharacterDTO.getPoints();
             user.getAddedPoints()[characterId] = userCharacterDTO.getAdditionalPoints();
+            user.getEquipData()[characterId] = new int[]{-1, -1, -1, -1, -1, -1};
 
             int[] data = userCharacterDTO.getData();
             for (int j = 0; j < data.length; j++) {
@@ -288,6 +289,7 @@ public class UserService implements IUserService {
                         equip.setInUse(false);
                     } else {
                         user.getCharacterEquips()[characterId][j] = equip;
+                        user.getEquipData()[characterId][j] = equip.getKey();
                     }
                 }
             }
@@ -302,6 +304,7 @@ public class UserService implements IUserService {
 
         user.setLogged(false);
         userDAO.update(user);
+        userCharacterDAO.update(user);
     }
 
     public void sendCharacterData(IServerConfig config) {

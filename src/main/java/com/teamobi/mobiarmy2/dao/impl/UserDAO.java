@@ -36,7 +36,7 @@ public class UserDAO implements IUserDAO {
             jsonItem.setId(e.getItem().getId());
             jsonItem.setQuantity(e.getQuantity());
             return jsonItem;
-        }).collect(Collectors.toList());
+        }).toList();
 
         return GsonUtil.getInstance().toJson(specialItemChestJsons);
     }
@@ -54,23 +54,24 @@ public class UserDAO implements IUserDAO {
             jsonItem.setSlots(e.getSlots());
             jsonItem.setAddPoints(e.getAddPoints());
             jsonItem.setAddPercents(e.getAddPercents());
-
             return jsonItem;
-        }).collect(Collectors.toList());
+        }).toList();
 
         return GsonUtil.getInstance().toJson(equipmentChestJsons);
     }
 
     @Override
     public Optional<Integer> create(String accountId, int xu, int luong) {
+        Gson gson = GsonUtil.getInstance();
+
         byte[] fightItems = new byte[FightItemManager.FIGHT_ITEMS.size()];
         fightItems[0] = 99;
         fightItems[1] = 99;
 
         int[] missions = new int[MissionManager.MISSIONS.size()];
         byte[] missionLevels = new byte[missions.length];
+        Arrays.fill(missionLevels, (byte) 1);
 
-        Gson gson = GsonUtil.getInstance();
         // language=SQL
         String sql = "INSERT INTO `users`(account_id, xu, luong, created_date, last_modified_date, fight_items, missions, mission_levels, equipment_chest) VALUES (?,?,?,?,?,?,?,?,?)";
         return HikariCPManager.getInstance().update(sql, accountId, xu, luong, LocalDateTime.now(), LocalDateTime.now(), gson.toJson(fightItems), gson.toJson(missions), gson.toJson(missionLevels), "[]");
@@ -78,6 +79,8 @@ public class UserDAO implements IUserDAO {
 
     @Override
     public void update(User user) {
+        Gson gson = GsonUtil.getInstance();
+
         String specialItemChestJson = convertSpecialItemChestEntriesToJson(user.getSpecialItemChest());
         String equipmentChestJson = convertEquipmentChestEntriesToJson(user.getEquipmentChest());
 
@@ -87,7 +90,6 @@ public class UserDAO implements IUserDAO {
                 "`xu` = ?, " +
                 "`luong` = ?, " +
                 "`cup` = ?, " +
-                "`clan_id` = ?, " +
                 "`fight_items` = ?, " +
                 "`equipment_chest` = ?, " +
                 "`item_chest` = ? ," +
@@ -103,17 +105,16 @@ public class UserDAO implements IUserDAO {
                 //...//
                 " WHERE user_id = ?";
         HikariCPManager.getInstance().update(sql,
-                user.getFriends().toString(),
+                gson.toJson(user.getFriends()),
                 user.getXu(),
                 user.getLuong(),
                 user.getCup(),
-                user.getClanId(),
-                Arrays.toString(user.getFightItems()),
+                gson.toJson(user.getFightItems()),
                 equipmentChestJson,
                 specialItemChestJson,
                 false,
-                Arrays.toString(user.getMission()),
-                Arrays.toString(user.getMissionLevel()),
+                gson.toJson(user.getMission()),
+                gson.toJson(user.getMissionLevel()),
                 user.getTopEarningsXu(),
                 user.getUserCharacterIds()[user.getActiveCharacterId()],
                 user.getMaterialsPurchased(),
@@ -122,25 +123,6 @@ public class UserDAO implements IUserDAO {
                 user.getPointEvent(),
                 //...//
                 user.getUserId());
-
-        for (int i = 0; i < user.getOwnedCharacters().length; i++) {
-            if (user.getOwnedCharacters()[i]) {
-                // language=SQL
-                String sqlUpdateCharacter =
-                        "UPDATE user_characters SET level = ?, points = ?, xp = ?, data = ?, additional_points = ? " +
-                                "WHERE user_id = ? AND character_id = ?";
-                HikariCPManager.getInstance().update(
-                        sqlUpdateCharacter,
-                        user.getLevels()[i],
-                        user.getPoints()[i],
-                        user.getXps()[i],
-                        Arrays.toString(user.getEquipData()[i]),
-                        Arrays.toString(user.getAddedPoints()[i]),
-                        user.getUserId(),
-                        i
-                );
-            }
-        }
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.dao.IUserCharacterDAO;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.dto.UserCharacterDTO;
+import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 
 import java.sql.Connection;
@@ -71,5 +72,27 @@ public class UserCharacterDAO implements IUserCharacterDAO {
         // language=SQL
         String sql = "INSERT INTO `user_characters`(`user_id`, `character_id`) VALUES (?,?)";
         return HikariCPManager.getInstance().update(sql, userId, characterId);
+    }
+
+    @Override
+    public void update(User user) {
+        Gson gson = GsonUtil.getInstance();
+
+        for (int i = 0; i < user.getOwnedCharacters().length; i++) {
+            if (user.getOwnedCharacters()[i]) {
+                // language=SQL
+                String sqlUpdateCharacter = "UPDATE user_characters SET level = ?, points = ?, xp = ?, data = ?, additional_points = ? WHERE user_id = ? AND character_id = ?";
+                HikariCPManager.getInstance().update(
+                        sqlUpdateCharacter,
+                        user.getLevels()[i],
+                        user.getPoints()[i],
+                        user.getXps()[i],
+                        gson.toJson(user.getEquipData()[i]),
+                        gson.toJson(user.getAddedPoints()[i]),
+                        user.getUserId(),
+                        i
+                );
+            }
+        }
     }
 }

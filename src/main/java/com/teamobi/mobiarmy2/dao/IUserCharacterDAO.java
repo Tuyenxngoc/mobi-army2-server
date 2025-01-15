@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.dao;
 
 import com.teamobi.mobiarmy2.dto.UserCharacterDTO;
+import com.teamobi.mobiarmy2.model.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,4 +12,6 @@ public interface IUserCharacterDAO {
     UserCharacterDTO findByUserIdAndCharacterId(int userId, byte characterId);
 
     Optional<Integer> create(int userId, byte characterId);
+
+    void update(User user);
 }
