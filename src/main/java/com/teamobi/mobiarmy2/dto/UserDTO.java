@@ -27,7 +27,7 @@ public class UserDTO {
     private byte materialsPurchased;
     private short equipmentPurchased;
     private LocalDateTime xpX2Time;
-    private LocalDateTime lastOnline;
+    private LocalDateTime dailyRewardTime;
     private int topEarningsXu;
     private byte[] items;
     private int[] mission;

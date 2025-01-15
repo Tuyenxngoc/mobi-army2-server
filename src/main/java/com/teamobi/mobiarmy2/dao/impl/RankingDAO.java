@@ -86,7 +86,7 @@ public class RankingDAO implements IRankingDAO {
                 "a.username " +
                 "FROM users u " +
                 "INNER JOIN accounts a ON u.account_id = a.account_id " +
-                "INNER JOIN user_characters uc ON uc.user_character_id = u.active_character_id " +
+                "INNER JOIN user_characters uc ON uc.user_character_id = u.active_user_character_id " +
                 "LEFT JOIN clan_members cm ON u.user_id = cm.user_id " +
                 "WHERE u.cup > 0 " +
                 "ORDER BY u.cup DESC " +
@@ -122,7 +122,7 @@ public class RankingDAO implements IRankingDAO {
                 "a.username " +
                 "FROM users u " +
                 "INNER JOIN accounts a ON u.account_id = a.account_id " +
-                "INNER JOIN user_characters uc ON uc.user_character_id = u.active_character_id " +
+                "INNER JOIN user_characters uc ON uc.user_character_id = u.active_user_character_id " +
                 "LEFT JOIN clan_members cm ON u.user_id = cm.user_id " +
                 "WHERE u.xu > 0 " +
                 "ORDER BY u.xu DESC " +
@@ -140,7 +140,7 @@ public class RankingDAO implements IRankingDAO {
                 "a.username " +
                 "FROM users u " +
                 "INNER JOIN accounts a ON u.account_id = a.account_id " +
-                "INNER JOIN user_characters uc ON uc.user_character_id = u.active_character_id " +
+                "INNER JOIN user_characters uc ON uc.user_character_id = u.active_user_character_id " +
                 "LEFT JOIN clan_members cm ON u.user_id = cm.user_id " +
                 "WHERE u.luong > 0 " +
                 "ORDER BY u.luong DESC " +

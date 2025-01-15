@@ -192,9 +192,8 @@ public class UserService implements IUserService {
             user.getSession().setVersion(version);
             user.setLogged(true);
 
-            //Kiểm tra chưa online hơn 1 ngày
-            LocalDateTime now = LocalDateTime.now();
-            if (Utils.hasLoggedInOnNewDay(userDTO.getLastOnline(), now)) {
+            //Tặng quà hằng ngày
+            if (Utils.canReceiveDailyReward(userDTO.getDailyRewardTime())) {
                 //Gửi item
                 byte indexItem = FightItemManager.getRandomItem();
                 byte quantity = 1;
@@ -211,17 +210,20 @@ public class UserService implements IUserService {
                 //Đặt lại số lần mua nguyên liệu
                 user.setMaterialsPurchased((byte) 0);
 
-                //Gửi messeage khi login
+                //Gửi message khi login
                 for (String msg : serverConfig.getMessage()) {
                     sendMessageToUser(msg);
                 }
 
-                //Cập nhật nhiệm vụ
+                //Cập nhật nhiệm vụ đăng nhập
                 user.updateMission(16, 1);
+
+                // Cập nhật thời gian nhận quà
+                userDAO.setDailyRewardTime(user.getUserId(), LocalDateTime.now());
             }
 
-            //Lưu lại lần đăng nhập
-            userDAO.updateOnline(userDTO.getUserId());
+            //Đánh dấu trạng thái online
+            userDAO.setOnline(userDTO.getUserId(), Boolean.TRUE);
 
             sendLoginSuccess();
             sendCharacterData(serverConfig);

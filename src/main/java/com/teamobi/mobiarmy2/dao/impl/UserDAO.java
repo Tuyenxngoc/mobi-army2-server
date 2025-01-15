@@ -75,7 +75,7 @@ public class UserDAO implements IUserDAO {
         // language=SQL
         String sql = "INSERT INTO `users` " +
                 "(account_id, xu, luong, created_date, " +
-                "fight_items, missions, mission_levels, friends, equipment_chest, item_chest) " +
+                "fight_items, missions, mission_levels, friends, equipment_chest, special_item_chest) " +
                 "VALUES (?,?,?,?,?,?,?,?,?,?)";
 
         return HikariCPManager.getInstance().update(
@@ -108,17 +108,17 @@ public class UserDAO implements IUserDAO {
                 "`cup` = ?, " +
                 "`fight_items` = ?, " +
                 "`equipment_chest` = ?, " +
-                "`item_chest` = ? ," +
+                "`special_item_chest` = ? ," +
                 "`is_online` = ?, " +
                 "`missions` = ?, " +
                 "`mission_levels` = ?, " +
                 "`top_earnings_xu` = ?, " +
-                "`active_character_id` = ?, " +
+                "`active_user_character_id` = ?, " +
                 "`materials_purchased` = ?, " +
                 "`equipment_purchased` = ?, " +
                 "`x2_xp_time` = ?, " +
+                "`last_online` = ?, " +
                 "`point_event` = ? " +
-                //...//
                 " WHERE user_id = ?";
         HikariCPManager.getInstance().update(sql,
                 gson.toJson(user.getFriends()),
@@ -136,9 +136,10 @@ public class UserDAO implements IUserDAO {
                 user.getMaterialsPurchased(),
                 user.getEquipmentPurchased(),
                 user.getXpX2Time(),
+                LocalDateTime.now(),
                 user.getPointEvent(),
-                //...//
-                user.getUserId());
+                user.getUserId()
+        );
     }
 
     @Override
@@ -147,15 +148,15 @@ public class UserDAO implements IUserDAO {
             String playerQuery = "SELECT " +
                     "u.user_id, u.xu, u.luong, u.cup, u.point_event, " +
                     "u.materials_purchased, u.equipment_purchased, " +
-                    "u.fight_items, u.equipment_chest, u.item_chest, " +
+                    "u.fight_items, u.equipment_chest, u.special_item_chest, " +
                     "u.friends, u.missions, u.mission_levels, " +
-                    "u.x2_xp_time, u.last_online, u.top_earnings_xu, " +
+                    "u.x2_xp_time, u.daily_reward_time, u.top_earnings_xu, " +
                     "u.is_chest_locked, u.is_invitation_locked, " +
                     "uc.character_id, uc.user_character_id, uc.level, " +
                     "uc.xp, uc.points, uc.additional_points, uc.data, " +
                     "cm.clan_id " +
                     "FROM users u " +
-                    "LEFT JOIN user_characters uc ON u.active_character_id = uc.user_character_id " +
+                    "LEFT JOIN user_characters uc ON u.active_user_character_id = uc.user_character_id " +
                     "LEFT JOIN clan_members cm ON u.user_id = cm.user_id " +
                     "WHERE account_id = ?";
             try (PreparedStatement statement = connection.prepareStatement(playerQuery)) {
@@ -208,7 +209,7 @@ public class UserDAO implements IUserDAO {
                         }
 
                         //Đọc dữ liệu item
-                        SpecialItemChestJson[] specialItemChestJsons = gson.fromJson(resultSet.getString("item_chest"), SpecialItemChestJson[].class);
+                        SpecialItemChestJson[] specialItemChestJsons = gson.fromJson(resultSet.getString("special_item_chest"), SpecialItemChestJson[].class);
                         for (SpecialItemChestJson item : specialItemChestJsons) {
                             SpecialItemChest specialItemChest = new SpecialItemChest();
                             specialItemChest.setItem(SpecialItemManager.getSpecialItemById(item.getId()));
@@ -252,7 +253,7 @@ public class UserDAO implements IUserDAO {
                         );
 
                         userDTO.setXpX2Time(Utils.getLocalDateTimeFromTimestamp(resultSet, "x2_xp_time"));
-                        userDTO.setLastOnline(Utils.getLocalDateTimeFromTimestamp(resultSet, "last_online"));
+                        userDTO.setDailyRewardTime(Utils.getLocalDateTimeFromTimestamp(resultSet, "daily_reward_time"));
                         userDTO.setTopEarningsXu(resultSet.getInt("top_earnings_xu"));
 
                         return userDTO;
@@ -266,10 +267,17 @@ public class UserDAO implements IUserDAO {
     }
 
     @Override
-    public void updateOnline(int userId) {
+    public void setOnline(int userId, boolean online) {
         // language=SQL
-        String sql = "UPDATE `users` SET `is_online` = ?, `last_online` = ? WHERE user_id = ?";
-        HikariCPManager.getInstance().update(sql, true, LocalDateTime.now(), userId);
+        String sql = "UPDATE `users` SET `is_online` = ? WHERE user_id = ?";
+        HikariCPManager.getInstance().update(sql, online, userId);
+    }
+
+    @Override
+    public void setDailyRewardTime(int userId, LocalDateTime now) {
+        // language=SQL
+        String sql = "UPDATE `users` SET `daily_reward_time` = ? WHERE user_id = ?";
+        HikariCPManager.getInstance().update(sql, now, userId);
     }
 
     @Override
@@ -284,7 +292,7 @@ public class UserDAO implements IUserDAO {
                         "cm.clan_id " +
                         "FROM users u " +
                         "INNER JOIN accounts a ON u.account_id = a.account_id " +
-                        "INNER JOIN user_characters uc ON u.active_character_id = uc.user_character_id " +
+                        "INNER JOIN user_characters uc ON u.active_user_character_id = uc.user_character_id " +
                         "LEFT JOIN clan_members cm ON u.user_id = cm.user_id " +
                         "WHERE a.is_locked = 0 AND a.is_enabled = 1 AND " +
                         "u.user_id IN ("

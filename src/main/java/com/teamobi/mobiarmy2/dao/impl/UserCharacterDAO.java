@@ -87,8 +87,8 @@ public class UserCharacterDAO implements IUserCharacterDAO {
                 userCharacterDTO.getXp(),
                 gson.toJson(userCharacterDTO.getData()),
                 gson.toJson(userCharacterDTO.getAdditionalPoints()),
-                userCharacterDTO.getUserCharacterId(),
-                userCharacterDTO.getUserId()
+                userCharacterDTO.getUserId(),
+                userCharacterDTO.getCharacterId()
         );
     }
 }

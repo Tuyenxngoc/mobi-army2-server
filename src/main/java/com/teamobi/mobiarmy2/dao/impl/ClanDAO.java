@@ -256,9 +256,9 @@ public class ClanDAO implements IClanDAO {
                              "a.username " +
                              "FROM clan_members c " +
                              "INNER JOIN users u on c.user_id = u.user_id " +
-                             "INNER JOIN user_characters uc on u.active_character_id = uc.user_character_id " +
+                             "INNER JOIN user_characters uc on u.active_user_character_id = uc.user_character_id " +
                              "INNER JOIN accounts a on u.account_id = a.account_id " +
-                             "WHERE u.clan_id = ? " +
+                             "WHERE c.clan_id = ? " +
                              "ORDER BY c.rights DESC " +
                              "LIMIT 10 OFFSET ?")) {
             statement.setShort(1, clanId);
