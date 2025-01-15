@@ -16,6 +16,9 @@ public class EquipmentChestJson {
     @SerializedName("k")
     private int key;
 
+    @SerializedName("i")
+    private short equipmentId;
+
     @SerializedName("ei")
     private short equipIndex;
 

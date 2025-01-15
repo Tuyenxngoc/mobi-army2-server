@@ -58,6 +58,17 @@ public class HikariCPManager {
     }
 
     public Optional<Integer> update(String sql, Object... params) {
+        if (config.isShowSql()) {
+            StringBuilder logMessage = new StringBuilder();
+            logMessage.append(sql).append(" [Parameters: ");
+            for (Object param : params) {
+                logMessage.append(param).append(", ");
+            }
+            logMessage.delete(logMessage.length() - 2, logMessage.length());
+            logMessage.append("]");
+            logger.info(logMessage.toString());
+        }
+
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {

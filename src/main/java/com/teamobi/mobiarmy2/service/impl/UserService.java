@@ -192,7 +192,7 @@ public class UserService implements IUserService {
             user.getSession().setVersion(version);
             user.setLogged(true);
 
-            //Kiểm tra chưa online hơn 1 ngày;
+            //Kiểm tra chưa online hơn 1 ngày
             LocalDateTime now = LocalDateTime.now();
             if (Utils.hasLoggedInOnNewDay(user.getLastOnline(), now)) {
                 //Gửi item
@@ -218,12 +218,10 @@ public class UserService implements IUserService {
 
                 //Cập nhật nhiệm vụ
                 user.updateMission(16, 1);
-
-                //Lưu lại lần đăng nhập
-                userDAO.updateLastOnline(now, user.getUserId());
             }
 
-            userDAO.updateOnline(true, userDTO.getUserId());
+            //Lưu lại lần đăng nhập
+            userDAO.updateOnline(userDTO.getUserId());
 
             sendLoginSuccess();
             sendCharacterData(serverConfig);
@@ -302,9 +300,26 @@ public class UserService implements IUserService {
             user.getFightWait().leaveTeam(user.getUserId());
         }
 
-        user.setLogged(false);
+        //Cập nhật thông tin tài khoản
         userDAO.update(user);
-        userCharacterDAO.update(user);
+
+        //Cập nhật thông tin nhân vật
+        for (byte i = 0; i < user.getOwnedCharacters().length; i++) {
+            if (user.getOwnedCharacters()[i]) {
+                UserCharacterDTO userCharacterDTO = new UserCharacterDTO();
+                userCharacterDTO.setCharacterId(i);
+                userCharacterDTO.setUserId(user.getUserId());
+                userCharacterDTO.setLevel(user.getLevels()[i]);
+                userCharacterDTO.setXp(user.getXps()[i]);
+                userCharacterDTO.setPoints(user.getPoints()[i]);
+                userCharacterDTO.setAdditionalPoints(user.getAddedPoints()[i]);
+                userCharacterDTO.setData(user.getEquipData()[i]);
+
+                userCharacterDAO.update(userCharacterDTO);
+            }
+        }
+
+        user.setLogged(false);
     }
 
     public void sendCharacterData(IServerConfig config) {

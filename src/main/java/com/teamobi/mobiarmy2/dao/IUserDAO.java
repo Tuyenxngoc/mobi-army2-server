@@ -4,7 +4,6 @@ import com.teamobi.mobiarmy2.dto.FriendDTO;
 import com.teamobi.mobiarmy2.dto.UserDTO;
 import com.teamobi.mobiarmy2.model.User;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,11 +18,10 @@ public interface IUserDAO {
 
     UserDTO findByAccountId(String accountId);
 
-    void updateOnline(boolean flag, int userId);
+    void updateOnline(int userId);
 
     List<FriendDTO> getFriendsList(int userId, List<Integer> friends);
 
     Optional<Integer> findUserIdByUsername(String username);
 
-    void updateLastOnline(LocalDateTime time, int userId);
 }

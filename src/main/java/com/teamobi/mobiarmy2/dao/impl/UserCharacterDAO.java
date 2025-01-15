@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.dao.IUserCharacterDAO;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.dto.UserCharacterDTO;
-import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 
 import java.sql.Connection;
@@ -22,6 +21,7 @@ public class UserCharacterDAO implements IUserCharacterDAO {
         UserCharacterDTO userCharacterDTO = new UserCharacterDTO();
         userCharacterDTO.setUserCharacterId(resultSet.getLong("user_character_id"));
         userCharacterDTO.setCharacterId(resultSet.getByte("character_id"));
+        userCharacterDTO.setUserId(resultSet.getInt("user_id"));
         userCharacterDTO.setAdditionalPoints(gson.fromJson(resultSet.getString("additional_points"), short[].class));
         userCharacterDTO.setData(gson.fromJson(resultSet.getString("data"), int[].class));
         userCharacterDTO.setLevel(resultSet.getInt("level"));
@@ -75,24 +75,20 @@ public class UserCharacterDAO implements IUserCharacterDAO {
     }
 
     @Override
-    public void update(User user) {
+    public void update(UserCharacterDTO userCharacterDTO) {
         Gson gson = GsonUtil.getInstance();
 
-        for (int i = 0; i < user.getOwnedCharacters().length; i++) {
-            if (user.getOwnedCharacters()[i]) {
-                // language=SQL
-                String sqlUpdateCharacter = "UPDATE user_characters SET level = ?, points = ?, xp = ?, data = ?, additional_points = ? WHERE user_id = ? AND character_id = ?";
-                HikariCPManager.getInstance().update(
-                        sqlUpdateCharacter,
-                        user.getLevels()[i],
-                        user.getPoints()[i],
-                        user.getXps()[i],
-                        gson.toJson(user.getEquipData()[i]),
-                        gson.toJson(user.getAddedPoints()[i]),
-                        user.getUserId(),
-                        i
-                );
-            }
-        }
+        // language=SQL
+        String sql = "UPDATE user_characters SET level = ?, points = ?, xp = ?, data = ?, additional_points = ? WHERE user_id = ? AND character_id = ?";
+        HikariCPManager.getInstance().update(
+                sql,
+                userCharacterDTO.getLevel(),
+                userCharacterDTO.getPoints(),
+                userCharacterDTO.getXp(),
+                gson.toJson(userCharacterDTO.getData()),
+                gson.toJson(userCharacterDTO.getAdditionalPoints()),
+                userCharacterDTO.getUserCharacterId(),
+                userCharacterDTO.getUserId()
+        );
     }
 }

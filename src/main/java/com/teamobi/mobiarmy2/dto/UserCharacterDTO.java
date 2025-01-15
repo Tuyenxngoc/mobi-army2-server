@@ -16,4 +16,5 @@ public class UserCharacterDTO {
     private int points;
     private int xp;
     private byte characterId;
+    private int userId;
 }

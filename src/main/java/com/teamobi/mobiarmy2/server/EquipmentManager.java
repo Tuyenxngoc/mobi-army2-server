@@ -49,10 +49,6 @@ public class EquipmentManager {
         return null;
     }
 
-    public static Equipment getEquipment(byte characterId, byte equipType, short equipIndex) {
-        return null;
-    }
-
     public static Map<Byte, List<Short>> getEquipmentByCharacterId(byte characterId) {
         return EQUIPMENTS_BY_CHARACTER_AND_TYPE.get(characterId);
     }
@@ -69,7 +65,7 @@ public class EquipmentManager {
         int disguiseKey = data[5];
         if (disguiseKey != -1 && equipmentMap.containsKey(disguiseKey)) {
             EquipmentChestJson json = equipmentMap.get(disguiseKey);
-            Equipment equip = getEquipment(json.getCharacterId(), json.getEquipType(), json.getEquipIndex());
+            Equipment equip = getEquipment(json.getEquipmentId());
             if (equip != null && equip.getExpirationDays() - ChronoUnit.DAYS.between(json.getPurchaseDate(), now) > 0) {
                 return equip.getDisguiseEquippedIndexes();
             }
@@ -82,7 +78,7 @@ public class EquipmentManager {
 
             if (equipKey != -1 && equipmentMap.containsKey(equipKey)) {
                 EquipmentChestJson json = equipmentMap.get(equipKey);
-                Equipment equip = getEquipment(json.getCharacterId(), json.getEquipType(), json.getEquipIndex());
+                Equipment equip = getEquipment(json.getEquipmentId());
                 if (equip != null && equip.getExpirationDays() - ChronoUnit.DAYS.between(json.getPurchaseDate(), now) > 0) {
                     equipData[i] = json.getEquipIndex();
                     exists = true;

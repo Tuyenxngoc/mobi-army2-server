@@ -72,9 +72,27 @@ public class UserDAO implements IUserDAO {
         byte[] missionLevels = new byte[missions.length];
         Arrays.fill(missionLevels, (byte) 1);
 
+        int[] friends = {2};
+
         // language=SQL
-        String sql = "INSERT INTO `users`(account_id, xu, luong, created_date, last_modified_date, fight_items, missions, mission_levels, equipment_chest) VALUES (?,?,?,?,?,?,?,?,?)";
-        return HikariCPManager.getInstance().update(sql, accountId, xu, luong, LocalDateTime.now(), LocalDateTime.now(), gson.toJson(fightItems), gson.toJson(missions), gson.toJson(missionLevels), "[]");
+        String sql = "INSERT INTO `users` " +
+                "(account_id, xu, luong, created_date, last_modified_date, " +
+                "fight_items, missions, mission_levels, friends, equipment_chest) " +
+                "VALUES (?,?,?,?,?,?,?,?,?,?)";
+
+        return HikariCPManager.getInstance().update(
+                sql,
+                accountId,
+                xu,
+                luong,
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                gson.toJson(fightItems),
+                gson.toJson(missions),
+                gson.toJson(missionLevels),
+                gson.toJson(friends),
+                "[]"
+        );
     }
 
     @Override
@@ -250,10 +268,10 @@ public class UserDAO implements IUserDAO {
     }
 
     @Override
-    public void updateOnline(boolean flag, int userId) {
+    public void updateOnline(int userId) {
         // language=SQL
-        String sql = "UPDATE `users` SET `is_online` = ? WHERE user_id = ?";
-        HikariCPManager.getInstance().update(sql, flag, userId);
+        String sql = "UPDATE `users` SET `is_online` = ?, `last_online` = ? WHERE user_id = ?";
+        HikariCPManager.getInstance().update(sql, true, LocalDateTime.now(), userId);
     }
 
     @Override
@@ -336,13 +354,6 @@ public class UserDAO implements IUserDAO {
             e.printStackTrace();
         }
         return Optional.empty();
-    }
-
-    @Override
-    public void updateLastOnline(LocalDateTime time, int userId) {
-        // language=SQL
-        String sql = "UPDATE `users` SET `last_online` = ? WHERE user_id = ?";
-        HikariCPManager.getInstance().update(sql, time, userId);
     }
 
 }

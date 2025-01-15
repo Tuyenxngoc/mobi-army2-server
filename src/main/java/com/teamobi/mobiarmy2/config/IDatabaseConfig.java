@@ -17,4 +17,5 @@ public interface IDatabaseConfig {
 
     int getConnectionTimeout();
 
+    boolean isShowSql();
 }

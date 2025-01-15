@@ -19,6 +19,7 @@ public class HikariCPConfig implements IDatabaseConfig {
     private int maxPoolSize;
     private int minIdle;
     private int connectionTimeout;
+    private boolean isShowSql;
 
     public HikariCPConfig() {
         properties = new Properties();
@@ -40,6 +41,7 @@ public class HikariCPConfig implements IDatabaseConfig {
             this.maxPoolSize = Integer.parseInt(properties.getProperty("jdbc.maxPoolSize", "10"));
             this.minIdle = Integer.parseInt(properties.getProperty("jdbc.minIdle", "2"));
             this.connectionTimeout = Integer.parseInt(properties.getProperty("jdbc.connectionTimeout", "30000"));
+            this.isShowSql = Boolean.parseBoolean(properties.getProperty("jdbc.showSql", "false"));
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
@@ -106,5 +108,10 @@ public class HikariCPConfig implements IDatabaseConfig {
     @Override
     public int getConnectionTimeout() {
         return connectionTimeout;
+    }
+
+    @Override
+    public boolean isShowSql() {
+        return isShowSql;
     }
 }
