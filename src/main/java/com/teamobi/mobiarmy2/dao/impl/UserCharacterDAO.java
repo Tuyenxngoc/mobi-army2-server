@@ -91,4 +91,29 @@ public class UserCharacterDAO implements IUserCharacterDAO {
                 userCharacterDTO.getCharacterId()
         );
     }
+
+    @Override
+    public void updateAll(List<UserCharacterDTO> userCharacterDTOs) {
+        Gson gson = GsonUtil.getInstance();
+
+        // language=SQL
+        String sql = "UPDATE user_characters SET level = ?, points = ?, xp = ?, data = ?, additional_points = ? WHERE user_id = ? AND character_id = ?";
+
+        HikariCPManager.getInstance().executeBatch(sql, statement -> {
+            for (UserCharacterDTO userCharacterDTO : userCharacterDTOs) {
+                try {
+                    statement.setInt(1, userCharacterDTO.getLevel());
+                    statement.setInt(2, userCharacterDTO.getPoints());
+                    statement.setInt(3, userCharacterDTO.getXp());
+                    statement.setString(4, gson.toJson(userCharacterDTO.getData()));
+                    statement.setString(5, gson.toJson(userCharacterDTO.getAdditionalPoints()));
+                    statement.setInt(6, userCharacterDTO.getUserId());
+                    statement.setByte(7, userCharacterDTO.getCharacterId());
+                    statement.addBatch();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 }

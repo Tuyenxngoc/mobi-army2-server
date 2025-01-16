@@ -13,4 +13,6 @@ public interface IUserCharacterDAO {
     Optional<Integer> create(int userId, byte characterId);
 
     void update(UserCharacterDTO userCharacterDTO);
+
+    void updateAll(List<UserCharacterDTO> userCharacterDTOs);
 }

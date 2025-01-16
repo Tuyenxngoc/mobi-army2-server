@@ -305,6 +305,7 @@ public class UserService implements IUserService {
         userDAO.update(user);
 
         //Cập nhật thông tin nhân vật
+        List<UserCharacterDTO> userCharacterDTOS = new ArrayList<>();
         for (byte i = 0; i < user.getOwnedCharacters().length; i++) {
             if (user.getOwnedCharacters()[i]) {
                 UserCharacterDTO userCharacterDTO = new UserCharacterDTO();
@@ -316,9 +317,10 @@ public class UserService implements IUserService {
                 userCharacterDTO.setAdditionalPoints(user.getAddedPoints()[i]);
                 userCharacterDTO.setData(user.getEquipData()[i]);
 
-                userCharacterDAO.update(userCharacterDTO);
+                userCharacterDTOS.add(userCharacterDTO);
             }
         }
+        userCharacterDAO.updateAll(userCharacterDTOS);
 
         user.setLogged(false);
     }

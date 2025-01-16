@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * @author tuyen
@@ -80,6 +81,21 @@ public class HikariCPManager {
             logger.error("SQL Update failed: {}", e.getMessage(), e);
             return Optional.empty();
         }
+    }
+
+    public int[] executeBatch(String sql, Consumer<PreparedStatement> batchConsumer) {
+        if (config.isShowSql()) {
+            logger.info("Executing batch for SQL: {}", sql);
+        }
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            batchConsumer.accept(statement);
+            return statement.executeBatch();
+        } catch (SQLException e) {
+            logger.error("Batch execution failed: {}", e.getMessage(), e);
+        }
+        return new int[0];
     }
 
     public void closeDataSource() {
