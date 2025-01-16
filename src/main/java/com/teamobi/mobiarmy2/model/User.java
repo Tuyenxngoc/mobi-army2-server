@@ -65,7 +65,7 @@ public class User {
     private EquipmentChest[][] characterEquips;
     private List<Integer> friends;
     private Map<Byte, SpecialItemChest> specialItemChest;
-    private List<EquipmentChest> equipmentChest;
+    private Map<Integer, EquipmentChest> equipmentChest;
     private IFightWait fightWait;
     private ITrainingManager trainingManager;
     private final IUserService userService;
@@ -268,7 +268,7 @@ public class User {
         addEquipment.setEmptySlot((byte) 3);
         addEquipment.setSlots(new byte[]{-1, -1, -1});
         addEquipment.setKey(equipmentPurchased | 0x10000);
-        equipmentChest.add(addEquipment);
+        addEquipmentChest(addEquipment);
 
         //Tăng số lượng trang bị mua
         equipmentPurchased++;
@@ -364,7 +364,7 @@ public class User {
 
             if (removeEquip != null) {
                 updateQuantity++;
-                equipmentChest.remove(removeEquip);
+                equipmentChest.remove(removeEquip.getKey());
                 ds.writeByte(0);
                 ds.writeInt(removeEquip.getKey());
                 ds.writeByte(1);
@@ -403,10 +403,7 @@ public class User {
     }
 
     public EquipmentChest getEquipmentByKey(int key) {
-        return equipmentChest.stream()
-                .filter(equip -> equip.getKey() == key)
-                .findFirst()
-                .orElse(null);
+        return equipmentChest.get(key);
     }
 
     public SpecialItemChest getSpecialItemById(byte id) {
@@ -435,7 +432,7 @@ public class User {
     }
 
     public synchronized void addEquipmentChest(EquipmentChest addEquipmentChest) {
-        // equipmentChest.put(addEquipmentChest.getKey(), addEquipmentChest);
+        equipmentChest.put(addEquipmentChest.getKey(), addEquipmentChest);
     }
 
     public synchronized void addSpecialItemChest(SpecialItemChest addSpecialItemChest) {
@@ -451,7 +448,7 @@ public class User {
     }
 
     public boolean hasEquipment(short equipIndex, byte vipLevel) {
-        return equipmentChest.stream()
+        return equipmentChest.values().stream()
                 .anyMatch(equip -> equip != null && equip.getEquipment() != null &&
                         equip.getEquipment().getEquipIndex() == equipIndex &&
                         equip.getVipLevel() == vipLevel &&
@@ -462,7 +459,7 @@ public class User {
     }
 
     public EquipmentChest getEquipment(short equipIndex, byte characterId, byte vipLevel) {
-        return equipmentChest.stream()
+        return equipmentChest.values().stream()
                 .filter(equip -> equip != null && equip.getEquipment() != null &&
                         equip.getEquipment().getEquipIndex() == equipIndex &&
                         equip.getEquipment().getCharacterId() == characterId &&

@@ -22,7 +22,10 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author tuyen
@@ -2393,22 +2396,23 @@ public class UserService implements IUserService {
         try {
             IMessage ms = new Message(Cmd.INVENTORY);
             DataOutputStream ds = ms.writer();
-            ds.writeByte(user.getEquipmentChest().size());
-            for (EquipmentChest equipmentChest : user.getEquipmentChest()) {
-                ds.writeInt(equipmentChest.getKey());
-                ds.writeByte(equipmentChest.getEquipment().getCharacterId());
-                ds.writeByte(equipmentChest.getEquipment().getEquipType());
-                ds.writeShort(equipmentChest.getEquipment().getEquipIndex());
-                ds.writeUTF(equipmentChest.getEquipment().getName());
-                ds.writeByte(equipmentChest.getAddPoints().length * 2);
-                for (int j = 0; j < equipmentChest.getAddPoints().length; j++) {
-                    ds.writeByte(equipmentChest.getAddPoints()[j]);
-                    ds.writeByte(equipmentChest.getAddPercents()[j]);
+            Map<Integer, EquipmentChest> equipmentChest = user.getEquipmentChest();
+            ds.writeByte(equipmentChest.size());
+            for (EquipmentChest equipment : equipmentChest.values()) {
+                ds.writeInt(equipment.getKey());
+                ds.writeByte(equipment.getEquipment().getCharacterId());
+                ds.writeByte(equipment.getEquipment().getEquipType());
+                ds.writeShort(equipment.getEquipment().getEquipIndex());
+                ds.writeUTF(equipment.getEquipment().getName());
+                ds.writeByte(equipment.getAddPoints().length * 2);
+                for (int j = 0; j < equipment.getAddPoints().length; j++) {
+                    ds.writeByte(equipment.getAddPoints()[j]);
+                    ds.writeByte(equipment.getAddPercents()[j]);
                 }
-                ds.writeByte(equipmentChest.getRemainingDays());
-                ds.writeByte(equipmentChest.getEmptySlot());
-                ds.writeByte(equipmentChest.getEquipment().isDisguise() ? 1 : 0);
-                ds.writeByte(equipmentChest.getVipLevel());
+                ds.writeByte(equipment.getRemainingDays());
+                ds.writeByte(equipment.getEmptySlot());
+                ds.writeByte(equipment.getEquipment().isDisguise() ? 1 : 0);
+                ds.writeByte(equipment.getVipLevel());
             }
             for (int i = 0; i < 5; i++) {
                 ds.writeInt(user.getEquipData()[user.getActiveCharacterId()][i]);
@@ -2419,9 +2423,9 @@ public class UserService implements IUserService {
             ms = new Message(Cmd.MATERIAL);
             ds = ms.writer();
             ds.writeByte(0);
-            Map<Byte, SpecialItemChest> sortedItems = new TreeMap<>(user.getSpecialItemChest());
-            ds.writeByte(sortedItems.size());
-            for (SpecialItemChest item : sortedItems.values()) {
+            Map<Byte, SpecialItemChest> specialItemChest = user.getSpecialItemChest();
+            ds.writeByte(specialItemChest.size());
+            for (SpecialItemChest item : specialItemChest.values()) {
                 ds.writeByte(item.getItem().getId());
                 ds.writeShort(item.getQuantity());
                 ds.writeUTF(item.getItem().getName());

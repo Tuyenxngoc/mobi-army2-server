@@ -32,11 +32,11 @@ public class UserDAO implements IUserDAO {
 
         for (Map.Entry<Byte, SpecialItemChest> entry : specialItemChests.entrySet()) {
             Byte id = entry.getKey();
-            SpecialItemChest specialItem = entry.getValue();
+            SpecialItemChest specialItemChest = entry.getValue();
 
             SpecialItemChestJson jsonItem = new SpecialItemChestJson();
             jsonItem.setId(id);
-            jsonItem.setQuantity(specialItem.getQuantity());
+            jsonItem.setQuantity(specialItemChest.getQuantity());
 
             specialItemChestJsons.add(jsonItem);
         }
@@ -44,21 +44,25 @@ public class UserDAO implements IUserDAO {
         return GsonUtil.getInstance().toJson(specialItemChestJsons);
     }
 
-    public static String convertEquipmentChestEntriesToJson(List<EquipmentChest> equipmentChests) {
+    public static String convertEquipmentChestEntriesToJson(Map<Integer, EquipmentChest> equipmentChests) {
         List<EquipmentChestJson> equipmentChestJsons = new ArrayList<>();
 
-        equipmentChests.stream().map(e -> {
+        for (Map.Entry<Integer, EquipmentChest> entry : equipmentChests.entrySet()) {
+            Integer key = entry.getKey();
+            EquipmentChest equipmentChest = entry.getValue();
+
             EquipmentChestJson jsonItem = new EquipmentChestJson();
-            jsonItem.setKey(e.getKey());
-            jsonItem.setEquipmentId(e.getEquipment().getEquipmentId());
-            jsonItem.setInUse((byte) (e.isInUse() ? 1 : 0));
-            jsonItem.setVipLevel(e.getVipLevel());
-            jsonItem.setPurchaseDate(e.getPurchaseDate());
-            jsonItem.setSlots(e.getSlots());
-            jsonItem.setAddPoints(e.getAddPoints());
-            jsonItem.setAddPercents(e.getAddPercents());
-            return jsonItem;
-        }).toList();
+            jsonItem.setKey(key);
+            jsonItem.setEquipmentId(equipmentChest.getEquipment().getEquipmentId());
+            jsonItem.setInUse((byte) (equipmentChest.isInUse() ? 1 : 0));
+            jsonItem.setVipLevel(equipmentChest.getVipLevel());
+            jsonItem.setPurchaseDate(equipmentChest.getPurchaseDate());
+            jsonItem.setSlots(equipmentChest.getSlots());
+            jsonItem.setAddPoints(equipmentChest.getAddPoints());
+            jsonItem.setAddPercents(equipmentChest.getAddPercents());
+
+            equipmentChestJsons.add(jsonItem);
+        }
 
         return GsonUtil.getInstance().toJson(equipmentChestJsons);
     }
@@ -210,7 +214,7 @@ public class UserDAO implements IUserDAO {
                                 }
                             }
                             equip.setEmptySlot(emptySlot);
-                            userDTO.getEquipmentChest().add(equip);
+                            userDTO.getEquipmentChest().put(equip.getKey(), equip);
                         }
 
                         //Đọc dữ liệu item

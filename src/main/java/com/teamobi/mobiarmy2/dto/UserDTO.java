@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,5 +35,5 @@ public class UserDTO {
     private byte[] missionLevel;
     private List<Integer> friends;
     private Map<Byte, SpecialItemChest> specialItemChest = new HashMap<>();
-    private List<EquipmentChest> equipmentChest = new ArrayList<>();
+    private Map<Integer, EquipmentChest> equipmentChest = new HashMap<>();
 }
