@@ -22,10 +22,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author tuyen
@@ -2422,8 +2419,9 @@ public class UserService implements IUserService {
             ms = new Message(Cmd.MATERIAL);
             ds = ms.writer();
             ds.writeByte(0);
-            ds.writeByte(user.getSpecialItemChest().size());
-            for (SpecialItemChest item : user.getSpecialItemChest()) {
+            Map<Byte, SpecialItemChest> sortedItems = new TreeMap<>(user.getSpecialItemChest());
+            ds.writeByte(sortedItems.size());
+            for (SpecialItemChest item : sortedItems.values()) {
                 ds.writeByte(item.getItem().getId());
                 ds.writeShort(item.getQuantity());
                 ds.writeUTF(item.getItem().getName());

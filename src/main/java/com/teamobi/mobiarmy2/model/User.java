@@ -26,6 +26,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tuyen
@@ -63,7 +64,7 @@ public class User {
     private byte[] missionLevel;
     private EquipmentChest[][] characterEquips;
     private List<Integer> friends;
-    private List<SpecialItemChest> specialItemChest;
+    private Map<Byte, SpecialItemChest> specialItemChest;
     private List<EquipmentChest> equipmentChest;
     private IFightWait fightWait;
     private ITrainingManager trainingManager;
@@ -330,7 +331,7 @@ public class User {
                     if (existingItem != null) {
                         existingItem.increaseQuantity(newItem.getQuantity());
                     } else {
-                        specialItemChest.add(newItem);
+                        addSpecialItemChest(newItem);
                     }
                     ds.writeByte(newItem.getQuantity() > 1 ? 3 : 1);
                     ds.writeByte(newItem.getItem().getId());
@@ -351,7 +352,7 @@ public class User {
                     if (existingItem != null) {
                         existingItem.decreaseQuantity(itemToRemove.getQuantity());
                         if (existingItem.getQuantity() <= 0) {
-                            specialItemChest.remove(existingItem);
+                            specialItemChest.remove(itemToRemove.getItem().getId());
                         }
                         updateQuantity++;
                         ds.writeByte(0);
@@ -409,10 +410,7 @@ public class User {
     }
 
     public SpecialItemChest getSpecialItemById(byte id) {
-        return specialItemChest.stream()
-                .filter(item -> item.getItem().getId() == id)
-                .findFirst()
-                .orElse(null);
+        return specialItemChest.get(id);
     }
 
     public synchronized void resetPoints() {
@@ -428,15 +426,20 @@ public class User {
         materialsPurchased += quantity;
     }
 
-    public short getInventorySpecialItemCount(byte itemId) {
-        SpecialItemChest specialItemChest = this.specialItemChest.stream()
-                .filter(item -> item.getItem().getId() == itemId)
-                .findFirst()
-                .orElse(null);
+    public short getInventorySpecialItemCount(byte id) {
+        SpecialItemChest specialItemChest = getSpecialItemById(id);
         if (specialItemChest == null) {
             return 0;
         }
         return specialItemChest.getQuantity();
+    }
+
+    public synchronized void addEquipmentChest(EquipmentChest addEquipmentChest) {
+        // equipmentChest.put(addEquipmentChest.getKey(), addEquipmentChest);
+    }
+
+    public synchronized void addSpecialItemChest(SpecialItemChest addSpecialItemChest) {
+        specialItemChest.put(addSpecialItemChest.getItem().getId(), addSpecialItemChest);
     }
 
     public synchronized void addDaysToXpX2Time(int days) {

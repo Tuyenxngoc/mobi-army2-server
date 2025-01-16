@@ -19,10 +19,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -30,19 +27,27 @@ import java.util.stream.Collectors;
  */
 public class UserDAO implements IUserDAO {
 
-    public static String convertSpecialItemChestEntriesToJson(List<SpecialItemChest> specialItemChests) {
-        List<SpecialItemChestJson> specialItemChestJsons = specialItemChests.stream().map(e -> {
+    public static String convertSpecialItemChestEntriesToJson(Map<Byte, SpecialItemChest> specialItemChests) {
+        List<SpecialItemChestJson> specialItemChestJsons = new ArrayList<>();
+
+        for (Map.Entry<Byte, SpecialItemChest> entry : specialItemChests.entrySet()) {
+            Byte id = entry.getKey();
+            SpecialItemChest specialItem = entry.getValue();
+
             SpecialItemChestJson jsonItem = new SpecialItemChestJson();
-            jsonItem.setId(e.getItem().getId());
-            jsonItem.setQuantity(e.getQuantity());
-            return jsonItem;
-        }).toList();
+            jsonItem.setId(id);
+            jsonItem.setQuantity(specialItem.getQuantity());
+
+            specialItemChestJsons.add(jsonItem);
+        }
 
         return GsonUtil.getInstance().toJson(specialItemChestJsons);
     }
 
     public static String convertEquipmentChestEntriesToJson(List<EquipmentChest> equipmentChests) {
-        List<EquipmentChestJson> equipmentChestJsons = equipmentChests.stream().map(e -> {
+        List<EquipmentChestJson> equipmentChestJsons = new ArrayList<>();
+
+        equipmentChests.stream().map(e -> {
             EquipmentChestJson jsonItem = new EquipmentChestJson();
             jsonItem.setKey(e.getKey());
             jsonItem.setEquipmentId(e.getEquipment().getEquipmentId());
@@ -217,7 +222,7 @@ public class UserDAO implements IUserDAO {
                                 continue;
                             }
                             specialItemChest.setQuantity(item.getQuantity());
-                            userDTO.getSpecialItemChest().add(specialItemChest);
+                            userDTO.getSpecialItemChest().put(specialItemChest.getItem().getId(), specialItemChest);
                         }
 
                         //Dữ liệu bạn bè
