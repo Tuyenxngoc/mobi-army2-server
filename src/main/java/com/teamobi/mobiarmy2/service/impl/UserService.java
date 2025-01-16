@@ -22,10 +22,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author tuyen
@@ -970,8 +967,14 @@ public class UserService implements IUserService {
     }
 
     private void sendClanShop() {
+        IMessage ms = CacheManager.cachedClanItemShop;
+        if (ms != null) {
+            sendMessage(ms);
+            return;
+        }
+
         try {
-            IMessage ms = new Message(Cmd.SHOP_BIETDOI);
+            ms = new Message(Cmd.SHOP_BIETDOI);
             DataOutputStream ds = ms.writer();
             ds.writeByte(ClanItemManager.CLAN_ITEM_MAP.size());
             for (ClanItemShop clanItemShop : ClanItemManager.CLAN_ITEM_MAP.values()) {
@@ -983,6 +986,9 @@ public class UserService implements IUserService {
                 ds.writeByte(clanItemShop.getLevel());
             }
             ds.flush();
+
+            CacheManager.cachedClanItemShop = ms;
+
             sendMessage(ms);
         } catch (IOException ignored) {
         }
@@ -1101,11 +1107,17 @@ public class UserService implements IUserService {
     }
 
     private void sendSpecialItem() {
+        IMessage ms = CacheManager.cachedSpecialItemShop;
+        if (ms != null) {
+            sendMessage(ms);
+            return;
+        }
+
         try {
-            IMessage ms = new Message(Cmd.SHOP_LINHTINH);
+            ms = new Message(Cmd.SHOP_LINHTINH);
             DataOutputStream ds = ms.writer();
-            for (Map.Entry<Byte, SpecialItem> entry : SpecialItemManager.SPECIAL_ITEMS.entrySet()) {
-                SpecialItem specialItem = entry.getValue();
+            Map<Byte, SpecialItem> sorted = new TreeMap<>(SpecialItemManager.SPECIAL_ITEMS);
+            for (SpecialItem specialItem : sorted.values()) {
                 if (!specialItem.isOnSale()) {
                     continue;
                 }
@@ -1118,6 +1130,9 @@ public class UserService implements IUserService {
                 ds.writeByte(specialItem.isShowSelection() ? 0 : 1);
             }
             ds.flush();
+
+            CacheManager.cachedSpecialItemShop = ms;
+
             sendMessage(ms);
         } catch (IOException ignored) {
         }
@@ -2513,8 +2528,14 @@ public class UserService implements IUserService {
 
     @Override
     public void handleSendShopEquipments() {
+        IMessage ms = CacheManager.cachedShopEquipments;
+        if (ms != null) {
+            sendMessage(ms);
+            return;
+        }
+
         try {
-            IMessage ms = new Message(Cmd.SHOP_EQUIP);
+            ms = new Message(Cmd.SHOP_EQUIP);
             DataOutputStream ds = ms.writer();
             List<Short> equipIds = EquipmentManager.SALE_INDEX_TO_ID;
             ds.writeShort(equipIds.size());
@@ -2530,6 +2551,9 @@ public class UserService implements IUserService {
                 ds.writeByte(equip.getLevelRequirement());
             }
             ds.flush();
+
+            CacheManager.cachedShopEquipments = ms;
+
             sendMessage(ms);
         } catch (IOException ignored) {
         }
