@@ -13,9 +13,11 @@ import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.IClanService;
 import com.teamobi.mobiarmy2.service.IGameDataService;
 import com.teamobi.mobiarmy2.service.ILeaderboardService;
+import com.teamobi.mobiarmy2.service.ILoginRateLimiterService;
 import com.teamobi.mobiarmy2.service.impl.ClanService;
 import com.teamobi.mobiarmy2.service.impl.GameDataService;
 import com.teamobi.mobiarmy2.service.impl.LeaderboardService;
+import com.teamobi.mobiarmy2.service.impl.LoginRateLimiterService;
 import com.teamobi.mobiarmy2.ui.ServerUI;
 
 /**
@@ -70,6 +72,7 @@ public class MobiArmy2 {
         context.registerBean(IClanService.class, new ClanService(
                 context.getBean(IClanDAO.class)
         ));
+        context.registerBean(ILoginRateLimiterService.class, new LoginRateLimiterService());
 
         ServerManager serverManager = ServerManager.getInstance();
         Runtime.getRuntime().addShutdownHook(new Thread(serverManager::stop, "ServerShutdownHook"));

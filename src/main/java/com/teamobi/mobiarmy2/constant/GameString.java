@@ -199,4 +199,8 @@ public class GameString {
     public static String createMaterialPurchaseLimitMessage(int quantity) {
         return String.format("Bạn chỉ có thể mua thêm %d nguyên liệu", quantity);
     }
+
+    public static String createLoginCooldownMessage(long seconds) {
+        return String.format("Vui lòng đăng nhập lại sau %d giây", seconds);
+    }
 }

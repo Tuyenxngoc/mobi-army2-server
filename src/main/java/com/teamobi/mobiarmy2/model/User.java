@@ -11,10 +11,7 @@ import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.server.*;
-import com.teamobi.mobiarmy2.service.IClanService;
-import com.teamobi.mobiarmy2.service.IGiftBoxService;
-import com.teamobi.mobiarmy2.service.ILeaderboardService;
-import com.teamobi.mobiarmy2.service.IUserService;
+import com.teamobi.mobiarmy2.service.*;
 import com.teamobi.mobiarmy2.service.impl.GiftBoxService;
 import com.teamobi.mobiarmy2.service.impl.UserService;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -82,6 +79,7 @@ public class User {
                 context.getBean(IServerConfig.class),
                 context.getBean(IClanService.class),
                 context.getBean(ILeaderboardService.class),
+                context.getBean(ILoginRateLimiterService.class),
                 context.getBean(IUserDAO.class),
                 context.getBean(IAccountDAO.class),
                 context.getBean(IGiftCodeDAO.class),

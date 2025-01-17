@@ -15,6 +15,7 @@ import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.server.*;
 import com.teamobi.mobiarmy2.service.IClanService;
 import com.teamobi.mobiarmy2.service.ILeaderboardService;
+import com.teamobi.mobiarmy2.service.ILoginRateLimiterService;
 import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -35,6 +36,7 @@ public class UserService implements IUserService {
     private final IServerConfig serverConfig;
     private final IClanService clanService;
     private final ILeaderboardService leaderboardService;
+    private final ILoginRateLimiterService loginRateLimiterService;
 
     private final IUserDAO userDAO;
     private final IAccountDAO accountDAO;
@@ -51,11 +53,12 @@ public class UserService implements IUserService {
     private long timeSinceLeftRoom;
     private long lastSpinTime;
 
-    public UserService(User user, IServerConfig serverConfig, IClanService clanService, ILeaderboardService leaderboardService, IUserDAO userDAO, IAccountDAO accountDAO, IGiftCodeDAO giftCodeDAO, IUserGiftCodeDAO userGiftCodeDAO, IUserCharacterDAO userCharacterDAO) {
+    public UserService(User user, IServerConfig serverConfig, IClanService clanService, ILeaderboardService leaderboardService, ILoginRateLimiterService loginRateLimiterService, IUserDAO userDAO, IAccountDAO accountDAO, IGiftCodeDAO giftCodeDAO, IUserGiftCodeDAO userGiftCodeDAO, IUserCharacterDAO userCharacterDAO) {
         this.user = user;
         this.serverConfig = serverConfig;
         this.clanService = clanService;
         this.leaderboardService = leaderboardService;
+        this.loginRateLimiterService = loginRateLimiterService;
         this.userDAO = userDAO;
         this.accountDAO = accountDAO;
         this.giftCodeDAO = giftCodeDAO;
@@ -131,6 +134,13 @@ public class UserService implements IUserService {
 
             if (isInvalidInput(username) || isInvalidInput(password)) {
                 sendMessageLoginFail(GameString.INVALID_ACCOUNT_PASSWORD);
+                return;
+            }
+
+            //Kiểm tra thời gian đăng xuất gần nhất
+            long remainingTime = loginRateLimiterService.getRemainingLoginTime(username);
+            if (remainingTime > 0) {
+                sendMessageLoginFail(GameString.createLoginCooldownMessage(remainingTime));
                 return;
             }
 
@@ -330,6 +340,9 @@ public class UserService implements IUserService {
         userCharacterDAO.updateAll(userCharacterDTOS);
 
         user.setLogged(false);
+
+        //Lưu thời gian đăng xuất gần nhất
+        loginRateLimiterService.saveLogoutTime(user.getUsername());
     }
 
     public void sendCharacterData(IServerConfig config) {

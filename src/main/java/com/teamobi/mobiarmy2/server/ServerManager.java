@@ -105,6 +105,7 @@ public class ServerManager {
                 server.close();
             }
             HikariCPManager.getInstance().closeDataSource();
+            RedisConnectionManager.getInstance().close();
             ApplicationContext.getInstance().clearDependencies();
         } catch (IOException e) {
             e.printStackTrace();
