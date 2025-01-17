@@ -1,6 +1,5 @@
 package com.teamobi.mobiarmy2.server;
 
-import com.teamobi.mobiarmy2.ApplicationContext;
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.database.HikariCPManager;

@@ -1,5 +1,6 @@
-package com.teamobi.mobiarmy2.model;
+package com.teamobi.mobiarmy2.json;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +12,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class EquipmentChestJson {
+
+    @SerializedName("k")
     private int key;
 
     @SerializedName("i")
@@ -24,6 +27,8 @@ public class EquipmentChestJson {
 
     @SerializedName("u")
     private byte inUse;
+
+    @SerializedName("s")
     private byte[] slots;
 
     @SerializedName("p")
@@ -31,4 +36,5 @@ public class EquipmentChestJson {
 
     @SerializedName("c")
     private byte[] addPercents;
+
 }

@@ -6,6 +6,8 @@ import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.dto.*;
 import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.fight.impl.TrainingManager;
+import com.teamobi.mobiarmy2.json.EquipmentChestJson;
+import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.Character;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.network.IMessage;
@@ -16,7 +18,6 @@ import com.teamobi.mobiarmy2.service.ILeaderboardService;
 import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.util.Utils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -139,21 +140,6 @@ public class UserService implements IUserService {
             user.setAccountId(accountDTO.getAccountId());
 
             UserDTO userDTO = userDAO.findByAccountId(user.getAccountId());
-            if (userDTO == null) {
-                // Tạo mới người dùng
-                Optional<Integer> result = userDAO.create(accountDTO.getAccountId(), 1000, 0);
-
-                if (result.isPresent()) {
-                    userDTO = userDAO.findByAccountId(accountDTO.getAccountId());
-                }
-
-                if (userDTO == null) {
-                    sendMessageLoginFail(GameString.LOGIN_FAILED);
-                    return;
-                }
-            }
-
-            UserDTO userDTO = userDAO.findByAccountId(accountDTO.getAccountId());
             if (userDTO == null) {
                 // Tạo mới người dùng
                 Optional<Integer> result = userDAO.create(accountDTO.getAccountId(), 1000, 0);
@@ -490,7 +476,7 @@ public class UserService implements IUserService {
                 }
                 user.updateXu(-gia);
                 equip.setPurchaseDate(LocalDateTime.now());
-                updateInventory(equip, null, null, null);
+                user.updateInventory(equip, null, null, null);
                 sendServerMessage(GameString.EXTEND_SUCCESS);
             }
         } catch (IOException ignored) {
@@ -504,9 +490,10 @@ public class UserService implements IUserService {
         }
         try {
             byte action = ms.reader().readByte();
+
             if (action == 0) {
                 sendMissionInfo();
-            } else {
+            } else if (action == 1) {
                 byte missionId = ms.reader().readByte();
                 missionComplete(missionId);
             }
@@ -586,7 +573,7 @@ public class UserService implements IUserService {
             ds.writeShort(user.getClanId() != null ? user.getClanId() : 0);
             ds.writeByte(0);//clan rights
 
-            for (int i = 0; i < CharacterManager.CHARACTERS.size(); i++) {
+            for (int i = 0; i < 10; i++) {
                 EquipmentChest equip = user.getCharacterEquips()[i][5];
                 if (equip != null) {
                     ds.writeBoolean(true);
@@ -615,11 +602,13 @@ public class UserService implements IUserService {
                 ds.writeInt(fightItem.getBuyLuong());
             }
 
-            for (int i = 3; i < CharacterManager.CHARACTERS.size(); i++) {
-                ds.writeByte(user.getOwnedCharacters()[i] ? 1 : 0);
-                Character character = CharacterManager.CHARACTERS.get(i);
-                ds.writeShort(character.getPriceXu() / 1000);
-                ds.writeShort(character.getPriceLuong());
+            for (int i = 0; i < 10; i++) {
+                if (i > 2) {
+                    ds.writeByte(user.getOwnedCharacters()[i] ? 1 : 0);
+                    Character character = CharacterManager.CHARACTERS.get(i);
+                    ds.writeShort(character.getPriceXu() / 1000);
+                    ds.writeShort(character.getPriceLuong());
+                }
             }
 
             ds.writeUTF(serverConfig.getAddInfo());
@@ -766,7 +755,7 @@ public class UserService implements IUserService {
         }
 
         //Xoá trang bị và item yêu cầu
-        updateInventory(null, requiredEquip, null, itemsToRemove);
+        user.updateInventory(null, requiredEquip, null, itemsToRemove);
 
         //Random chỉ số
         byte[] addPoints = new byte[5];
@@ -784,7 +773,7 @@ public class UserService implements IUserService {
         newEquip.setAddPercents(addPercents);
 
         //Thêm trang bị vào rương
-        addEquipment(newEquip);
+        user.addEquipment(newEquip);
 
         //Gửi thông báo
         sendFormulaProcessingResult(GameString.ITEM_CRAFT_SUCCESS);
@@ -910,7 +899,6 @@ public class UserService implements IUserService {
                         }
                         ds.writeUTF(pl.getDetail());
                     }
-                    ds.writeUTF(us.getDetail());
                 }
             }
             ds.flush();
@@ -1096,7 +1084,7 @@ public class UserService implements IUserService {
             SpecialItemChest newItem = new SpecialItemChest(quantity, item);
 
             //Thêm vào rương đồ
-            updateInventory(null, null, List.of(newItem), null);
+            user.updateInventory(null, null, List.of(newItem), null);
         }
 
         //Cập nhật số lượng mua nếu là vật liệu
@@ -1173,9 +1161,11 @@ public class UserService implements IUserService {
             DataOutputStream ds = ms.writer();
             ds.writeByte(action);
             if (action == 0) {
+                user.getEquipData()[user.getActiveCharacterId()][5] = -1;
                 user.getCharacterEquips()[user.getActiveCharacterId()][5] = null;
             } else {
                 equip.setInUse(true);
+                user.getEquipData()[user.getActiveCharacterId()][5] = equip.getKey();
                 user.getCharacterEquips()[user.getActiveCharacterId()][5] = equip;
                 for (short a : equip.getEquipment().getDisguiseEquippedIndexes()) {
                     ds.writeShort(a);
@@ -1509,7 +1499,7 @@ public class UserService implements IUserService {
                                 equip.decrementEmptySlot();
                                 equip.addPoints(specialItem.getItem().getAbility());
                             }
-                            updateInventory(equip, null, null, specialItemList);
+                            user.updateInventory(equip, null, null, specialItemList);
                             sendServerMessage(GameString.GEM_COMBINE_SUCCESS);
                         } else {
                             sendServerMessage(GameString.GEM_COMBINE_NO_SLOT);
@@ -1524,11 +1514,11 @@ public class UserService implements IUserService {
                             newItem.setQuantity((short) 1);
                             newItem.setItem(SpecialItemManager.getSpecialItemById((byte) (specialItemChest.getItem().getId() + 1)));
 
-                            updateInventory(null, null, List.of(newItem), List.of(specialItemChest));
+                            user.updateInventory(null, null, List.of(newItem), List.of(specialItemChest));
                             sendServerMessage(GameString.createGemUpgradeSuccessMessage(newItem.getQuantity(), newItem.getItem().getName()));
                         } else {
                             specialItemChest.setQuantity((short) 1);
-                            updateInventory(null, null, null, List.of(specialItemChest));
+                            user.updateInventory(null, null, null, List.of(specialItemChest));
                             sendServerMessage(GameString.COMBINE_FAILURE);
                         }
                     }
@@ -1538,7 +1528,7 @@ public class UserService implements IUserService {
                             sendServerMessage(GameString.CHEST_LOCKED_NO_SELL);
                             return;
                         }
-                        updateInventory(null, null, null, specialItemList);
+                        user.updateInventory(null, null, null, specialItemList);
                         user.updateXu(totalTransactionAmount);
                         sendServerMessage(GameString.PURCHASE_SUCCESS);
                     }
@@ -1564,7 +1554,7 @@ public class UserService implements IUserService {
                                 .map(SpecialItemChest::new)
                                 .toList();
 
-                        updateInventory(null, null, addItems, specialItemList);
+                        user.updateInventory(null, null, addItems, specialItemList);
 
                         if (!fabricateItem.getCompletionMessage().isEmpty()) {
                             sendServerMessage(fabricateItem.getCompletionMessage());
@@ -1745,7 +1735,7 @@ public class UserService implements IUserService {
                     return;
                 }
 
-                if (user.getFightItemQuantity(itemIndex) < 1) {
+                if (user.getItemFightQuantity(itemIndex) < 1) {
                     return;
                 }
             }
@@ -2019,7 +2009,7 @@ public class UserService implements IUserService {
         try {
             for (int i = 0; i < items.length; i++) {
                 byte index = dis.readByte();
-                if (user.getFightItemQuantity(index) > 0) {
+                if (user.getItemFightQuantity(index) > 0) {
                     items[i] = index;
                 } else {
                     items[i] = -1;
@@ -2057,8 +2047,7 @@ public class UserService implements IUserService {
             IMessage ms = new Message(Cmd.CURR_EQUIP_DBKEY);
             DataOutputStream ds = ms.writer();
             for (int i = 0; i < 5; i++) {
-                EquipmentChest equip = user.getCharacterEquips()[user.getActiveCharacterId()][i];
-                ds.writeInt(equip != null ? equip.getKey() : -1);
+                ds.writeInt(user.getEquipData()[user.getActiveCharacterId()][i]);
             }
             ds.flush();
             sendMessage(ms);
@@ -2120,11 +2109,11 @@ public class UserService implements IUserService {
         try {
             DataInputStream dis = ms.reader();
             byte index = dis.readByte();
-            index += 3;
             byte unit = dis.readByte();
-            if (index < 3 || index >= user.getOwnedCharacters().length) {
+            if (index < 0 || index >= user.getOwnedCharacters().length - 3) {
                 return;
             }
+            index += 3;
             if (user.getOwnedCharacters()[index]) {
                 return;
             }
@@ -2441,8 +2430,7 @@ public class UserService implements IUserService {
                 ds.writeByte(equipment.getVipLevel());
             }
             for (int i = 0; i < 5; i++) {
-                EquipmentChest equip = user.getCharacterEquips()[user.getActiveCharacterId()][i];
-                ds.writeInt(equip != null ? equip.getKey() : -1);
+                ds.writeInt(user.getEquipData()[user.getActiveCharacterId()][i]);
             }
             ds.flush();
             sendMessage(ms);
@@ -2526,6 +2514,7 @@ public class UserService implements IUserService {
                 }
                 equip.setInUse(true);
                 user.getCharacterEquips()[user.getActiveCharacterId()][i] = equip;
+                user.getEquipData()[user.getActiveCharacterId()][i] = equip.getKey();
                 changeSuccessful = true;
             }
             ms = new Message(Cmd.CHANGE_EQUIP);
@@ -2669,7 +2658,7 @@ public class UserService implements IUserService {
                         selectedEquipment.setEmptySlot((byte) 3);
 
                         //Cập nhật rương
-                        updateInventory(selectedEquipment, null, recoveredGems, null);
+                        user.updateInventory(selectedEquipment, null, recoveredGems, null);
 
                         //Gửi thông báo thành công
                         sendServerMessage(GameString.GEM_REMOVAL_SUCCESS);
@@ -2691,7 +2680,7 @@ public class UserService implements IUserService {
                             }
                         }
                         for (EquipmentChest validEquipment : equipList) {
-                            updateInventory(null, validEquipment, null, null);
+                            user.updateInventory(null, validEquipment, null, null);
                         }
                         user.updateXu(totalTransactionAmount);
                         sendServerMessage(GameString.PURCHASE_SUCCESS);
@@ -2725,152 +2714,10 @@ public class UserService implements IUserService {
             }
             user.updateLuong(-equipment.getPriceLuong());
         }
-
-        //Tạo trang bị
         EquipmentChest newEquip = new EquipmentChest();
         newEquip.setEquipment(equipment);
-
-        //Thêm vào rương
-        addEquipment(newEquip);
-
-        //Gửi thông báo
+        user.addEquipment(newEquip);
         sendServerMessage(GameString.PURCHASE_SUCCESS);
-    }
-
-    @Override
-    public void addEquipment(EquipmentChest equipmentChest) {
-        equipmentChest.setPurchaseDate(LocalDateTime.now());
-        equipmentChest.setInUse(false);
-        if (equipmentChest.getAddPoints() == null) {
-            equipmentChest.setAddPoints(equipmentChest.getEquipment().getAddPoints());
-        }
-        if (equipmentChest.getAddPercents() == null) {
-            equipmentChest.setAddPercents(equipmentChest.getEquipment().getAddPercents());
-        }
-        equipmentChest.setEmptySlot((byte) 3);
-        equipmentChest.setSlots(new byte[]{-1, -1, -1});
-
-        Optional<Integer> result = userEquipmentDAO.create(user.getUserId(), equipmentChest);
-        if (result.isEmpty()) {
-            return;
-        }
-        equipmentChest.setKey(result.get());
-        user.addEquipmentChest(equipmentChest);
-
-        try {
-            IMessage ms = new Message(Cmd.BUY_EQUIP);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(0);
-            ds.writeInt(equipmentChest.getKey());
-            ds.writeByte(equipmentChest.getEquipment().getCharacterId());
-            ds.writeByte(equipmentChest.getEquipment().getEquipType());
-            ds.writeShort(equipmentChest.getEquipment().getEquipIndex());
-            ds.writeUTF(equipmentChest.getEquipment().getName());
-            ds.writeByte(equipmentChest.getAddPoints().length * 2);
-            for (int i = 0; i < equipmentChest.getAddPoints().length; i++) {
-                ds.writeByte(equipmentChest.getAddPoints()[i]);
-                ds.writeByte(equipmentChest.getAddPercents()[i]);
-            }
-            ds.writeByte(equipmentChest.getEquipment().getExpirationDays());
-            ds.writeByte(equipmentChest.getEquipment().isDisguise() ? 1 : 0);
-            ds.writeByte(equipmentChest.getVipLevel());
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void updateInventory(
-            EquipmentChest updateEquip,
-            EquipmentChest removeEquip,
-            List<SpecialItemChest> addItems,
-            List<SpecialItemChest> removeItems
-    ) {
-        try {
-            ByteArrayOutputStream bas = new ByteArrayOutputStream();
-            DataOutputStream ds = new DataOutputStream(bas);
-            int updateQuantity = 0;
-
-            if (updateEquip != null) {
-                updateQuantity++;
-                ds.writeByte(2);
-                ds.writeInt(updateEquip.getKey());
-                ds.writeByte(updateEquip.getAddPoints().length * 2);
-                for (int i = 0; i < updateEquip.getAddPoints().length; i++) {
-                    ds.writeByte(updateEquip.getAddPoints()[i]);
-                    ds.writeByte(updateEquip.getAddPercents()[i]);
-                }
-                ds.writeByte(updateEquip.getEmptySlot());
-                ds.writeByte(updateEquip.getRemainingDays());
-            }
-
-            if (addItems != null && !addItems.isEmpty()) {
-                for (SpecialItemChest newItem : addItems) {
-                    if (newItem.getQuantity() <= 0) {
-                        continue;
-                    }
-                    updateQuantity++;
-                    SpecialItemChest existingItem = user.getSpecialItemById(newItem.getItem().getId());
-                    if (existingItem != null) {
-                        existingItem.increaseQuantity(newItem.getQuantity());
-                    } else {
-                        user.addSpecialItemChest(newItem);
-                    }
-                    ds.writeByte(newItem.getQuantity() > 1 ? 3 : 1);
-                    ds.writeByte(newItem.getItem().getId());
-                    if (newItem.getQuantity() > 1) {
-                        ds.writeByte(newItem.getQuantity());
-                    }
-                    ds.writeUTF(newItem.getItem().getName());
-                    ds.writeUTF(newItem.getItem().getDetail());
-                }
-            }
-
-            if (removeItems != null && !removeItems.isEmpty()) {
-                for (SpecialItemChest itemToRemove : removeItems) {
-                    if (itemToRemove.getQuantity() <= 0) {
-                        continue;
-                    }
-                    SpecialItemChest existingItem = user.getSpecialItemById(itemToRemove.getItem().getId());
-                    if (existingItem != null) {
-                        existingItem.decreaseQuantity(itemToRemove.getQuantity());
-                        if (existingItem.getQuantity() <= 0) {
-                            user.getSpecialItemChest().remove(itemToRemove.getItem().getId());
-                        }
-                        updateQuantity++;
-                        ds.writeByte(0);
-                        ds.writeInt(itemToRemove.getItem().getId());
-                        ds.writeByte(itemToRemove.getQuantity());
-                    }
-                }
-            }
-
-            if (removeEquip != null) {
-                updateQuantity++;
-                user.getEquipmentChest().remove(removeEquip.getKey());
-                ds.writeByte(0);
-                ds.writeInt(removeEquip.getKey());
-                ds.writeByte(1);
-            }
-
-            ds.flush();
-            bas.flush();
-
-            if (updateQuantity == 0) {
-                return;
-            }
-
-            IMessage ms = new Message(Cmd.INVENTORY_UPDATE);
-            ds = ms.writer();
-            ds.writeByte(updateQuantity);
-            ds.write(bas.toByteArray());
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

@@ -189,11 +189,6 @@ public class Utils {
         return (timestamp != null) ? timestamp.toLocalDateTime() : null;
     }
 
-    public static LocalDateTime getLocalDateTimeFromTimestamp(ResultSet resultSet, String columnName) throws SQLException {
-        Timestamp timestamp = resultSet.getTimestamp(columnName);
-        return (timestamp != null) ? timestamp.toLocalDateTime() : null;
-    }
-
     public static float getArgXY(float Ax, float Ay, float Bx, float By) {
         float K = Math.abs(Ay - By);
         float D = Math.abs(Ax - Bx);

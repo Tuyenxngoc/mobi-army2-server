@@ -13,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Character {
-    private byte characterId;
+    private byte id;
     private String name;
     private int priceXu;
     private int priceLuong;

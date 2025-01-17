@@ -62,7 +62,6 @@ public class FightManager implements IFightManager {
     private final ICountdownTimer countdownTimer;
     private final ExecutorService executorNextTurn;
     private final ExecutorService executorEndGame;
-    private final IClanService clanService;
 
     private final IClanService clanService;
 
@@ -878,7 +877,7 @@ public class FightManager implements IFightManager {
                             byte id = getRewardMaterialId();
 
                             SpecialItemChest newItem = new SpecialItemChest(quantity, SpecialItemManager.getSpecialItemById(id));
-                            user.getUserService().updateInventory(null, null, List.of(newItem), null);
+                            user.updateInventory(null, null, List.of(newItem), null);
 
                             String reward = String.format("Phần thưởng diệt trùm của bạn là %dx %s", newItem.getQuantity(), newItem.getItem().getName());
                             user.getUserService().sendServerMessage(reward);

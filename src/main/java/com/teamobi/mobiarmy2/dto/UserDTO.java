@@ -1,11 +1,14 @@
 package com.teamobi.mobiarmy2.dto;
 
+import com.teamobi.mobiarmy2.model.EquipmentChest;
+import com.teamobi.mobiarmy2.model.SpecialItemChest;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tuyen
@@ -15,8 +18,6 @@ import java.util.List;
 public class UserDTO {
     private int userId;
     private Short clanId;
-    private LocalDateTime x2XpTime;
-    private LocalDateTime lastOnline;
     private int xu;
     private int luong;
     private int cup;

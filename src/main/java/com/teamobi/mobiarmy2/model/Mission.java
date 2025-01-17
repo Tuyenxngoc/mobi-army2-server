@@ -13,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Mission {
-    private byte missionId;
+    private byte id;
     private byte type;
     private byte level;
     private String name;

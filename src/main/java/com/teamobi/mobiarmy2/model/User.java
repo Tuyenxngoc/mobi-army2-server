@@ -21,6 +21,9 @@ import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +49,7 @@ public class User {
     private byte activeCharacterId;
     private int pointEvent;
     private byte materialsPurchased;
+    private short equipmentPurchased;
     private LocalDateTime xpX2Time;
     private int topEarningsXu;
     private long[] userCharacterIds;
@@ -382,7 +386,6 @@ public class User {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        fightItems[0] = fightItems[1] = maxItem;
     }
 
     public synchronized void updatePoints(short[] pointsToAdd, int totalPointsToSubtract) {
@@ -554,6 +557,6 @@ public class User {
             return;
         }
         SpecialItemChest newItem = new SpecialItemChest(quantity, specialItem);
-        userService.updateInventory(null, null, List.of(newItem), null);
+        updateInventory(null, null, List.of(newItem), null);
     }
 }

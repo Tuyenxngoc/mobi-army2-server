@@ -89,7 +89,7 @@ public class ClanService implements IClanService {
         LocalDateTime now = LocalDateTime.now();
         ClanItemJson[] items = clanDAO.getClanItems(clanId);
 
-        for (ClanItem item : items) {
+        for (ClanItemJson item : items) {
             if (item.getTime().isAfter(now)) {
                 result[item.getId() - 1] = true;
             }
@@ -130,7 +130,7 @@ public class ClanService implements IClanService {
                 newItem.setId(clanItemShop.getId());
                 newItem.setTime(now.plusHours(clanItemShop.getTime()));
                 updatedItems.add(newItem);
-                items = updatedItems.toArray(new ClanItem[0]);
+                items = updatedItems.toArray(new ClanItemJson[0]);
             }
             clanDAO.updateClanItems(clanId, items);
         }

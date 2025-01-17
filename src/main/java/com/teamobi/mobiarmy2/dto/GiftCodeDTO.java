@@ -1,5 +1,7 @@
 package com.teamobi.mobiarmy2.dto;
 
+import com.teamobi.mobiarmy2.json.EquipmentChestJson;
+import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,4 +19,6 @@ public class GiftCodeDTO {
     private int xu;
     private int luong;
     private int exp;
+    private SpecialItemChestJson[] items;
+    private EquipmentChestJson[] equips;
 }
