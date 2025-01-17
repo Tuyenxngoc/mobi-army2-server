@@ -2,12 +2,10 @@ package com.teamobi.mobiarmy2.service.impl;
 
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.dao.IClanDAO;
-import com.teamobi.mobiarmy2.dao.IClanItemDAO;
-import com.teamobi.mobiarmy2.dao.IClanMemberDAO;
 import com.teamobi.mobiarmy2.dto.ClanDTO;
 import com.teamobi.mobiarmy2.dto.ClanInfoDTO;
 import com.teamobi.mobiarmy2.dto.ClanMemDTO;
-import com.teamobi.mobiarmy2.model.ClanItem;
+import com.teamobi.mobiarmy2.json.ClanItemJson;
 import com.teamobi.mobiarmy2.model.ClanItemShop;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.server.ClanXpManager;
@@ -26,13 +24,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClanService implements IClanService {
     private final ConcurrentHashMap<Short, Object> clanLocks = new ConcurrentHashMap<>();
     private final IClanDAO clanDAO;
-    private final IClanItemDAO clanItemDAO;
-    private final IClanMemberDAO clanMemberDAO;
 
-    public ClanService(IClanDAO clanDAO, IClanItemDAO clanItemDAO, IClanMemberDAO clanMemberDAO) {
+    public ClanService(IClanDAO clanDAO) {
         this.clanDAO = clanDAO;
-        this.clanItemDAO = clanItemDAO;
-        this.clanMemberDAO = clanMemberDAO;
     }
 
     private Object getClanLock(short clanId) {
@@ -61,7 +55,7 @@ public class ClanService implements IClanService {
 
     @Override
     public byte getTotalPage(short clanId) {
-        Byte mem = clanMemberDAO.count(clanId);
+        Byte mem = clanDAO.getMembersOfClan(clanId);
         if (mem == null) {
             return -1;
         }
@@ -81,7 +75,7 @@ public class ClanService implements IClanService {
 
     @Override
     public List<ClanMemDTO> getMemberClan(short clanId, byte page) {
-        return clanMemberDAO.getClanMember(clanId, page);
+        return clanDAO.getClanMember(clanId, page);
     }
 
     @Override
@@ -93,7 +87,7 @@ public class ClanService implements IClanService {
     public boolean[] getClanItems(short clanId) {
         boolean[] result = new boolean[ClanItemManager.CLAN_ITEM_MAP.size()];
         LocalDateTime now = LocalDateTime.now();
-        ClanItem[] items = clanItemDAO.getClanItems(clanId);
+        ClanItemJson[] items = clanDAO.getClanItems(clanId);
 
         for (ClanItem item : items) {
             if (item.getTime().isAfter(now)) {
@@ -105,21 +99,21 @@ public class ClanService implements IClanService {
     }
 
     @Override
-    public void updateItemClan(short clanId, int playerId, ClanItemShop clanItemShop, boolean isBuyXu) {
+    public void updateItemClan(short clanId, int userId, ClanItemShop clanItemShop, boolean isBuyXu) {
         synchronized (getClanLock(clanId)) {
             if (isBuyXu) {
                 clanDAO.updateXu(clanId, -clanItemShop.getXu());
-                clanDAO.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItemShop.getXu()) + " xu", playerId, -clanItemShop.getXu(), 0);
+                clanDAO.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItemShop.getXu()) + " xu", userId, -clanItemShop.getXu(), 0);
             } else {
                 clanDAO.updateLuong(clanId, -clanItemShop.getLuong());
-                clanDAO.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItemShop.getLuong()) + " lượng", playerId, 0, -clanItemShop.getLuong());
+                clanDAO.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItemShop.getLuong()) + " lượng", userId, 0, -clanItemShop.getLuong());
             }
 
-            ClanItem[] items = clanItemDAO.getClanItems(clanId);
+            ClanItemJson[] items = clanDAO.getClanItems(clanId);
             boolean found = false;
             LocalDateTime now = LocalDateTime.now();
 
-            for (ClanItem item : items) {
+            for (ClanItemJson item : items) {
                 if (item.getId() == clanItemShop.getId()) {
                     if (item.getTime().isBefore(now)) {
                         item.setTime(now);
@@ -131,32 +125,32 @@ public class ClanService implements IClanService {
             }
 
             if (!found) {
-                List<ClanItem> updatedItems = new ArrayList<>(Arrays.asList(items));
-                ClanItem newItem = new ClanItem();
+                List<ClanItemJson> updatedItems = new ArrayList<>(Arrays.asList(items));
+                ClanItemJson newItem = new ClanItemJson();
                 newItem.setId(clanItemShop.getId());
                 newItem.setTime(now.plusHours(clanItemShop.getTime()));
                 updatedItems.add(newItem);
                 items = updatedItems.toArray(new ClanItem[0]);
             }
-            clanItemDAO.updateClanItems(clanId, items);
+            clanDAO.updateClanItems(clanId, items);
         }
     }
 
     @Override
-    public void contributeClan(short clanId, int playerId, int quantity, boolean isXu) {
+    public void contributeClan(short clanId, int userId, int quantity, boolean isXu) {
         synchronized (getClanLock(clanId)) {
             if (isXu) {
                 clanDAO.updateXu(clanId, quantity);
-                clanDAO.gopClanContribute("Góp " + Utils.getStringNumber(quantity) + " xu", playerId, quantity, 0);
+                clanDAO.gopClanContribute("Góp " + Utils.getStringNumber(quantity) + " xu", userId, quantity, 0);
             } else {
                 clanDAO.updateLuong(clanId, quantity);
-                clanDAO.gopClanContribute("Góp " + Utils.getStringNumber(quantity) + " lượng", playerId, 0, quantity);
+                clanDAO.gopClanContribute("Góp " + Utils.getStringNumber(quantity) + " lượng", userId, 0, quantity);
             }
         }
     }
 
     @Override
-    public void updateXp(short clanId, int playerId, int xpUp) {
+    public void updateXp(short clanId, int userId, int xpUp) {
         if (xpUp == 0) {
             return;
         }
@@ -170,13 +164,13 @@ public class ClanService implements IClanService {
             }
 
             int level = ClanXpManager.getLevelByXP((int) newXp);
-            clanDAO.updateXp(clanId, playerId, (int) newXp, level);
-            clanDAO.updateClanMemberPoints(playerId, xpUp);
+            clanDAO.updateXp(clanId, userId, (int) newXp, level);
+            clanDAO.updateClanMemberPoints(userId, xpUp);
         }
     }
 
     @Override
-    public void updateCup(short clanId, int playerId, int cupUp) {
+    public void updateCup(short clanId, int userId, int cupUp) {
         if (cupUp == 0) {
             return;
         }
@@ -189,8 +183,8 @@ public class ClanService implements IClanService {
                 newCup = GameConstants.MIN_CUP;
             }
 
-            clanDAO.updateCup(clanId, playerId, (int) newCup);
-            clanDAO.updateClanMemberPoints(playerId, cupUp * 2);
+            clanDAO.updateCup(clanId, userId, (int) newCup);
+            clanDAO.updateClanMemberPoints(userId, cupUp * 2);
         }
     }
 

@@ -174,17 +174,17 @@ public class Session implements ISession {
         return "Client " + sessionId;
     }
 
-    protected synchronized void doSendMessage(IMessage m) {
-        byte[] data = m.getData();
+    protected synchronized void doSendMessage(IMessage message) {
+        byte[] data = message.getData();
         try {
             if (sendKeyComplete) {
-                dos.writeByte(writeKey(m.getCommand()));
+                dos.writeByte(writeKey(message.getCommand()));
             } else {
-                dos.writeByte(m.getCommand());
+                dos.writeByte(message.getCommand());
             }
             if (data != null) {
                 int size = data.length;
-                if (m.getCommand() == 90) {
+                if (message.getCommand() == 90) {
                     dos.writeInt(size);
                 } else {
                     if (sendKeyComplete) {
@@ -204,7 +204,7 @@ public class Session implements ISession {
                 dos.writeShort(0);
             }
             dos.flush();
-            m.cleanup();
+            message.cleanup();
         } catch (Exception e) {
             closeMessage();
         }

@@ -12,17 +12,19 @@ import java.util.Optional;
  * @author tuyen
  */
 public interface IUserDAO {
+
     Optional<Integer> create(String accountId, int xu, int luong);
 
     void update(User user);
 
     UserDTO findByAccountId(String accountId);
 
-    void updateOnline(boolean flag, int userId);
+    void setOnline(int userId, boolean online);
+
+    void setDailyRewardTime(int userId, LocalDateTime now);
 
     List<FriendDTO> getFriendsList(int userId, List<Integer> friends);
 
-    Integer findUserIdByUsername(String username);
+    Optional<Integer> findUserIdByUsername(String username);
 
-    void updateLastOnline(LocalDateTime time, int userId);
 }

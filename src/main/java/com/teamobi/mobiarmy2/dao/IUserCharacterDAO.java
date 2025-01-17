@@ -10,5 +10,9 @@ public interface IUserCharacterDAO {
 
     UserCharacterDTO findByUserIdAndCharacterId(int userId, byte characterId);
 
-    Optional<Integer> create(int userId, byte characterId, boolean isActive);
+    Optional<Integer> create(int userId, byte characterId);
+
+    void update(UserCharacterDTO userCharacterDTO);
+
+    void updateAll(List<UserCharacterDTO> userCharacterDTOs);
 }

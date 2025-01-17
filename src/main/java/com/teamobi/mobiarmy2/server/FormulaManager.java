@@ -13,16 +13,10 @@ import java.util.Map;
 public class FormulaManager {
     public static final Map<Byte, Map<Byte, List<Formula>>> FORMULAS = new HashMap<>();
 
-    /**
-     * Adds a FormulaEntry to the FORMULA map. The entry is organized using its MaterialId and CharacterId values.
-     *
-     * @param entry The FormulaEntry to be added.
-     */
-    public static void addFormulaEntry(Formula entry) {
-        Map<Byte, List<Formula>> innerMap = FORMULAS.computeIfAbsent(entry.getMaterial().getId(), k -> new HashMap<>());
-        List<Formula> formulaList = innerMap.computeIfAbsent(entry.getCharacterId(), k -> new ArrayList<>());
+    public static void addFormula(Formula formula) {
+        Map<Byte, List<Formula>> innerMap = FORMULAS.computeIfAbsent(formula.getMaterial().getId(), k -> new HashMap<>());
+        List<Formula> formulaList = innerMap.computeIfAbsent(formula.getCharacterId(), k -> new ArrayList<>());
 
-        //Add the entry to the list
-        formulaList.add(entry);
+        formulaList.add(formula);
     }
 }

@@ -1,10 +1,18 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
+import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.dao.IGiftCodeDAO;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.dto.GiftCodeDTO;
+import com.teamobi.mobiarmy2.json.EquipmentChestJson;
+import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
+import com.teamobi.mobiarmy2.util.GsonUtil;
+import com.teamobi.mobiarmy2.util.Utils;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * @author tuyen
@@ -18,17 +26,16 @@ public class GiftCodeDAO implements IGiftCodeDAO {
             statement.setString(1, code);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
+                    Gson gson = GsonUtil.getInstance();
                     GiftCodeDTO giftCode = new GiftCodeDTO();
-                    giftCode.setId(resultSet.getLong("gift_code_id"));
+                    giftCode.setGiftCodeId(resultSet.getLong("gift_code_id"));
                     giftCode.setLimit(resultSet.getShort("usage_limit"));
-                    Timestamp expirationTimestamp = resultSet.getTimestamp("expiration_date");
-                    if (expirationTimestamp != null) {
-                        giftCode.setExpiryDate(expirationTimestamp.toLocalDateTime());
-                    }
+                    giftCode.setExpiryDate(Utils.getLocalDateTimeFromTimestamp(resultSet, "expiration_date"));
                     giftCode.setXu(resultSet.getInt("xu"));
                     giftCode.setLuong(resultSet.getInt("luong"));
                     giftCode.setExp(resultSet.getInt("exp"));
-
+                    giftCode.setItems(gson.fromJson(resultSet.getString("items"), SpecialItemChestJson[].class));
+                    giftCode.setEquips(gson.fromJson(resultSet.getString("equips"), EquipmentChestJson[].class));
                     return giftCode;
                 }
             }

@@ -10,19 +10,22 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * @author tuyen
+ */
 public class MissionDAO implements IMissionDAO {
 
     @Override
     public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-
-            MissionManager.clear();
-
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `missions` ORDER BY mission_type, level")) {
+
+                MissionManager.clear();
+
                 while (resultSet.next()) {
                     Mission mission = new Mission();
-                    mission.setMissionId(resultSet.getByte("mission_id"));
+                    mission.setId(resultSet.getByte("mission_id"));
                     mission.setType(resultSet.getByte("mission_type"));
                     mission.setLevel(resultSet.getByte("level"));
                     mission.setName(resultSet.getString("mission_name"));

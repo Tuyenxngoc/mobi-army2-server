@@ -85,9 +85,9 @@ public class FightMapManager implements IFightMapManager {
         offset += 2;
         height = Utils.getShort(mapData, offset);
         offset += 2;
-        byte entryCount = mapData[offset++];
+        byte count = mapData[offset++];
 
-        for (int i = 0; i < entryCount; i++) {
+        for (int i = 0; i < count; i++) {
             int brickId = mapData[offset];
 
             MapBrick mapBrick = MapManager.loadMapBrick(brickId);

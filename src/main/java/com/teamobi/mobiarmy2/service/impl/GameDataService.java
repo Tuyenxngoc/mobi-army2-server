@@ -31,51 +31,54 @@ public class GameDataService implements IGameDataService {
     private static final Logger logger = LoggerFactory.getLogger(GameDataService.class);
 
     private final IMapDAO mapDAO;
-    private final ICaptionLevelDAO captionLevelDAO;
     private final ICharacterDAO characterDAO;
+    private final IEquipmentDAO equipmentDAO;
+    private final ICaptionLevelDAO captionLevelDAO;
+    private final IFightItemDAO fightItemDAO;
     private final IClanShopDAO clanShopDAO;
+    private final ISpecialItemDAO specialItemDAO;
+    private final IFormulaDAO formulaDAO;
+    private final IPaymentDAO paymentDAO;
+    private final IMissionDAO missionDAO;
     private final IExperienceLevelDAO experienceLevelDAO;
     private final IFabricateItemDAO fabricateItemDAO;
-    private final IFightItemDAO fightItemDAO;
-    private final IFormulaDAO formulaDAO;
-    private final IMissionDAO missionDAO;
-    private final IPaymentDAO paymentDAO;
-    private final ISpecialItemDAO specialItemDAO;
-    private final IEquipmentDAO equipmentDAO;
 
-    public GameDataService(IMapDAO mapDAO, ICaptionLevelDAO captionLevelDAO, ICharacterDAO characterDAO, IClanShopDAO clanShopDAO, IExperienceLevelDAO experienceLevelDAO, IFabricateItemDAO fabricateItemDAO, IFightItemDAO fightItemDAO, IFormulaDAO formulaDAO, IMissionDAO missionDAO, IPaymentDAO paymentDAO, ISpecialItemDAO specialItemDAO, IEquipmentDAO equipmentDAO) {
+    public GameDataService(IMapDAO mapDAO, ICharacterDAO characterDAO, IEquipmentDAO equipmentDAO, ICaptionLevelDAO captionLevelDAO, IFightItemDAO fightItemDAO, IClanShopDAO clanShopDAO, ISpecialItemDAO specialItemDAO, IFormulaDAO formulaDAO, IPaymentDAO paymentDAO, IMissionDAO missionDAO, IExperienceLevelDAO experienceLevelDAO, IFabricateItemDAO fabricateItemDAO) {
         this.mapDAO = mapDAO;
-        this.captionLevelDAO = captionLevelDAO;
         this.characterDAO = characterDAO;
+        this.equipmentDAO = equipmentDAO;
+        this.captionLevelDAO = captionLevelDAO;
+        this.fightItemDAO = fightItemDAO;
         this.clanShopDAO = clanShopDAO;
+        this.specialItemDAO = specialItemDAO;
+        this.formulaDAO = formulaDAO;
+        this.paymentDAO = paymentDAO;
+        this.missionDAO = missionDAO;
         this.experienceLevelDAO = experienceLevelDAO;
         this.fabricateItemDAO = fabricateItemDAO;
-        this.fightItemDAO = fightItemDAO;
-        this.formulaDAO = formulaDAO;
-        this.missionDAO = missionDAO;
-        this.paymentDAO = paymentDAO;
-        this.specialItemDAO = specialItemDAO;
-        this.equipmentDAO = equipmentDAO;
     }
 
-    private void setCacheMaps() {
-        Map<Byte, ArmyMap> sortedMap = new TreeMap<>(MapManager.ARMY_MAPS);
+    public void setCacheMaps() {
+        Map<Byte, ArmyMap> sortedMaps = new TreeMap<>(MapManager.ARMY_MAPS);
 
         try (ByteArrayOutputStream bas = new ByteArrayOutputStream();
              DataOutputStream ds = new DataOutputStream(bas)) {
-            ds.writeByte(sortedMap.size());
-            for (ArmyMap map : sortedMap.values()) {
-                ds.writeByte(map.getId());
-                ds.writeShort(map.getData().length);
-                ds.write(map.getData());
-                ds.writeShort(map.getBg());
-                ds.writeShort(map.getMapAddY());
-                ds.writeShort(map.getBullEffShower());
-                ds.writeShort(map.getInWaterAddY());
-                ds.writeShort(map.getCl2AddY());
-                ds.writeUTF(map.getName());
-                ds.writeUTF(map.getFileName());
+
+            ds.writeByte(sortedMaps.size());
+
+            for (ArmyMap armyMap : sortedMaps.values()) {
+                ds.writeByte(armyMap.getId());
+                ds.writeShort(armyMap.getData().length);
+                ds.write(armyMap.getData());
+                ds.writeShort(armyMap.getBg());
+                ds.writeShort(armyMap.getMapAddY());
+                ds.writeShort(armyMap.getBullEffShower());
+                ds.writeShort(armyMap.getInWaterAddY());
+                ds.writeShort(armyMap.getCl2AddY());
+                ds.writeUTF(armyMap.getName());
+                ds.writeUTF(armyMap.getFileName());
             }
+
             byte[] ab = bas.toByteArray();
             Utils.saveFile(GameConstants.MAP_CACHE_NAME, ab);
         } catch (IOException e) {
@@ -83,29 +86,31 @@ public class GameDataService implements IGameDataService {
         }
     }
 
-    private void setCacheCharacters() {
+    public void setCacheEquipments() {
         try (ByteArrayOutputStream bas = new ByteArrayOutputStream();
              DataOutputStream ds = new DataOutputStream(bas)) {
 
             ds.writeByte(CharacterManager.CHARACTERS.size());
 
             for (Character character : CharacterManager.CHARACTERS) {
-                Map<Byte, List<Short>> equipmentByCharacter = EquipmentManager.getEquipmentByCharacterId(character.getCharacterId());
+                Map<Byte, List<Short>> equipmentByCharacter = new TreeMap<>(EquipmentManager.getEquipmentByCharacterId(character.getId()));
 
-                ds.writeByte(character.getCharacterId());
+                ds.writeByte(character.getId());
                 ds.writeShort(character.getDamage());
                 ds.writeByte(equipmentByCharacter.size());
 
-                for (byte i = 0; i < equipmentByCharacter.size(); i++) {
-                    List<Short> equipmentIds = equipmentByCharacter.get(i);
-                    ds.writeByte(i);
+                for (Map.Entry<Byte, List<Short>> entry : equipmentByCharacter.entrySet()) {
+                    Byte equipType = entry.getKey();
+                    List<Short> equipmentIds = entry.getValue();
+
+                    ds.writeByte(equipType);
                     ds.writeByte(equipmentIds.size());
 
                     for (Short equipmentId : equipmentIds) {
                         Equipment equipment = EquipmentManager.getEquipment(equipmentId);
 
                         ds.writeShort(equipment.getEquipIndex());
-                        if (i == 0) {
+                        if (equipType == 0) {
                             ds.writeByte(equipment.getBulletId());
                         }
                         ds.writeShort(equipment.getFrameCount());
@@ -150,11 +155,13 @@ public class GameDataService implements IGameDataService {
         }
     }
 
-    private void setCacheCaptionLevels() {
+    public void setCacheCaptionLevels() {
         try (ByteArrayOutputStream bas = new ByteArrayOutputStream();
              DataOutputStream ds = new DataOutputStream(bas)) {
-            ds.writeByte(CaptionManager.CAPTIONS.size());
-            for (Caption caption : CaptionManager.CAPTIONS) {
+            int size = CaptionManager.CAPTIONS.size();
+            ds.writeByte(size);
+            for (int i = size - 1; i >= 0; i--) {
+                Caption caption = CaptionManager.CAPTIONS.get(i);
                 ds.writeUTF(caption.getCaption());
                 ds.writeByte(caption.getLevel());
             }
@@ -165,7 +172,7 @@ public class GameDataService implements IGameDataService {
         }
     }
 
-    private void setCachePlayerImages() {
+    public void setCachePlayerImages() {
         try {
             TeamImageOutput tio = new TeamImageOutput();
             File playerDir = new File(GameConstants.PLAYER_PATH);
@@ -186,7 +193,7 @@ public class GameDataService implements IGameDataService {
         }
     }
 
-    private void setCacheMapIcons() {
+    public void setCacheMapIcons() {
         try {
             TeamImageOutput tio = new TeamImageOutput();
             File mapDir = new File(GameConstants.MAP_LOGO_PATH);
@@ -226,10 +233,9 @@ public class GameDataService implements IGameDataService {
     @Override
     public void setCache() {
         setCacheMaps();
-        setCacheCharacters();
+        setCacheEquipments();
         setCacheCaptionLevels();
         setCachePlayerImages();
         setCacheMapIcons();
     }
-
 }

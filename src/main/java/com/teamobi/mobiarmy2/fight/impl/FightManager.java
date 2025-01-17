@@ -64,6 +64,8 @@ public class FightManager implements IFightManager {
     private final ExecutorService executorEndGame;
     private final IClanService clanService;
 
+    private final IClanService clanService;
+
     public FightManager(IFightWait fightWait, IClanService clanService) {
         this.fightWait = fightWait;
         this.clanService = clanService;
@@ -266,11 +268,11 @@ public class FightManager implements IFightManager {
         }
     }
 
-    private int getPlayerIndexByPlayerId(int playerId) {
+    private int getPlayerIndexByUserId(int userId) {
         for (int i = 0; i < MAX_USER_FIGHT; i++) {
             if (players[i] != null
                     && players[i].getUser() != null
-                    && players[i].getUser().getUserId() == playerId) {
+                    && players[i].getUser().getUserId() == userId) {
                 return i;
             }
         }
@@ -716,8 +718,8 @@ public class FightManager implements IFightManager {
     }
 
     @Override
-    public void leave(int playerId) {
-        int index = getPlayerIndexByPlayerId(playerId);
+    public void leave(int userId) {
+        int index = getPlayerIndexByUserId(userId);
         if (index == -1) {
             return;
         }
@@ -729,7 +731,7 @@ public class FightManager implements IFightManager {
         player.setUser(null);
 
         //Gửi thông báo đến ván chơi
-        fightWait.chatMessage(playerId, GameString.ESCAPED_GAME);
+        fightWait.chatMessage(userId, GameString.ESCAPED_GAME);
 
         //Kiểm tra chưa kết thúc ván thì chuyển lượt
         if (!checkWin()) {
@@ -1034,7 +1036,6 @@ public class FightManager implements IFightManager {
 
         //Sử dụng cache để lưu trữ kết quả clan items
         Map<Short, boolean[]> clanItemsCache = new HashMap<>();
-
         for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             User user = fightWait.getUsers()[i];
             if (user == null) {
@@ -1133,8 +1134,8 @@ public class FightManager implements IFightManager {
     }
 
     @Override
-    public synchronized void addShoot(int playerId, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
-        int index = getPlayerIndexByPlayerId(playerId);
+    public synchronized void addShoot(int userId, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
+        int index = getPlayerIndexByUserId(userId);
         if (index == -1 || index != playerTurn || isBossTurn || !fightWait.isStarted()) {
             return;
         }
@@ -1248,8 +1249,8 @@ public class FightManager implements IFightManager {
     }
 
     @Override
-    public void changeLocation(int playerId, short x, short y) {
-        int index = getPlayerIndexByPlayerId(playerId);
+    public void changeLocation(int userId, short x, short y) {
+        int index = getPlayerIndexByUserId(userId);
         if (index == -1) {
             return;
         }
@@ -1286,8 +1287,8 @@ public class FightManager implements IFightManager {
     }
 
     @Override
-    public synchronized void skipTurn(int playerId) {
-        int index = getPlayerIndexByPlayerId(playerId);
+    public synchronized void skipTurn(int userId) {
+        int index = getPlayerIndexByUserId(userId);
         if (index == -1 || index != playerTurn || isBossTurn) {
             return;
         }
@@ -1299,8 +1300,8 @@ public class FightManager implements IFightManager {
     }
 
     @Override
-    public synchronized void useItem(int playerId, byte itemIndex) {
-        int index = getPlayerIndexByPlayerId(playerId);
+    public synchronized void useItem(int userId, byte itemIndex) {
+        int index = getPlayerIndexByUserId(userId);
         if (index == -1 || index != playerTurn) {
             return;
         }

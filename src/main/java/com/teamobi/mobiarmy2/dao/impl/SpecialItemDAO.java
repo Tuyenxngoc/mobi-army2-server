@@ -12,17 +12,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * @author tuyen
+ */
 public class SpecialItemDAO implements ISpecialItemDAO {
 
     @Override
     public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-
-            SpecialItemManager.SPECIAL_ITEMS.clear();
-
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `special_items`")) {
+
                 Gson gson = GsonUtil.getInstance();
+                SpecialItemManager.SPECIAL_ITEMS.clear();
+
                 while (resultSet.next()) {
                     SpecialItem specialItem = new SpecialItem();
                     specialItem.setId(resultSet.getByte("special_item_id"));

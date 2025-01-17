@@ -2,7 +2,6 @@ package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.ApplicationContext;
 import com.teamobi.mobiarmy2.config.IServerConfig;
-import com.teamobi.mobiarmy2.config.impl.ServerConfig;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.User;
@@ -27,9 +26,10 @@ import java.util.List;
 public class ServerManager {
     private static final Logger logger = LoggerFactory.getLogger(ServerManager.class);
 
-    private final IGameDataService gameService;
+    private final IGameDataService gameDataService;
     private final ILeaderboardService leaderboardService;
-    private final IServerConfig config;
+    private final IServerConfig serverConfig;
+
     private ServerSocket server;
     private long countClients;
     private boolean isStart;
@@ -39,25 +39,13 @@ public class ServerManager {
 
     public ServerManager() {
         ApplicationContext context = ApplicationContext.getInstance();
-        this.gameService = context.getBean(IGameDataService.class);
+        this.gameDataService = context.getBean(IGameDataService.class);
         this.leaderboardService = context.getBean(ILeaderboardService.class);
+        this.serverConfig = context.getBean(IServerConfig.class);
 
         this.isMaintenanceMode = false;
-        this.config = new ServerConfig();
         this.sessions = new ArrayList<>();
         this.listeners = new ArrayList<>();
-    }
-
-    public IServerConfig getConfig() {
-        return config;
-    }
-
-    public boolean isMaintenanceMode() {
-        return isMaintenanceMode;
-    }
-
-    public void setMaintenanceMode(boolean maintenanceMode) {
-        isMaintenanceMode = maintenanceMode;
     }
 
     private static class SingletonHelper {
@@ -68,9 +56,17 @@ public class ServerManager {
         return SingletonHelper.INSTANCE;
     }
 
+    public boolean isMaintenanceMode() {
+        return isMaintenanceMode;
+    }
+
+    public void setMaintenanceMode(boolean maintenanceMode) {
+        isMaintenanceMode = maintenanceMode;
+    }
+
     public void init() {
-        gameService.loadServerData();
-        gameService.setCache();
+        gameDataService.loadServerData();
+        gameDataService.setCache();
         leaderboardService.init();
         RoomManager.getInstance().init();
     }
@@ -79,10 +75,10 @@ public class ServerManager {
         logger.info("Start server!");
         isStart = true;
         try {
-            server = new ServerSocket(config.getPort());
-            logger.info("Server start at port: {}", config.getPort());
+            server = new ServerSocket(serverConfig.getPort());
+            logger.info("Server start at port: {}", serverConfig.getPort());
             while (isStart) {
-                if (sessions.size() < config.getMaxClients()) {
+                if (sessions.size() < serverConfig.getMaxClients()) {
                     try {
                         Socket socket = server.accept();
                         ISession session = new Session(++countClients, socket);
@@ -116,6 +112,7 @@ public class ServerManager {
                 server.close();
             }
             HikariCPManager.getInstance().closeDataSource();
+            ApplicationContext.getInstance().clearDependencies();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -174,11 +174,19 @@ public class Utils {
         return (byte) percentage;
     }
 
-    public static boolean hasLoggedInOnNewDay(LocalDateTime lastOnline, LocalDateTime now) {
-        if (lastOnline == null || lastOnline.isAfter(now)) {
-            return false;
+    public static boolean canReceiveDailyReward(LocalDateTime lastRewardTime) {
+        LocalDateTime now = LocalDateTime.now();
+
+        if (lastRewardTime == null) {
+            return true;
         }
-        return !lastOnline.toLocalDate().isEqual(now.toLocalDate());
+
+        return !lastRewardTime.toLocalDate().equals(now.toLocalDate());
+    }
+
+    public static LocalDateTime getLocalDateTimeFromTimestamp(ResultSet resultSet, String columnName) throws SQLException {
+        Timestamp timestamp = resultSet.getTimestamp(columnName);
+        return (timestamp != null) ? timestamp.toLocalDateTime() : null;
     }
 
     public static LocalDateTime getLocalDateTimeFromTimestamp(ResultSet resultSet, String columnName) throws SQLException {

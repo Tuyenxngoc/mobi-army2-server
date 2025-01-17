@@ -14,4 +14,8 @@ public class ClanItemManager {
     public static ClanItemShop getItemClanById(byte id) {
         return CLAN_ITEM_MAP.get(id);
     }
+
+    public static void addClanItemShop(ClanItemShop item) {
+        CLAN_ITEM_MAP.put(item.getId(), item);
+    }
 }

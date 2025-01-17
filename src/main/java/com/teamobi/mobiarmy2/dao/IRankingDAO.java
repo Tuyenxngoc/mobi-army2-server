@@ -17,7 +17,7 @@ public interface IRankingDAO {
 
     List<UserLeaderboardDTO> getTopRichestLuong();
 
-    List<UserLeaderboardDTO> getWeeklyTopHonor();
+    List<UserLeaderboardDTO> getWeeklyTopCup();
 
     List<UserLeaderboardDTO> getWeeklyTopRichest();
 

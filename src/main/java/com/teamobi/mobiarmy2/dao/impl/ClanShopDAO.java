@@ -10,16 +10,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * @author tuyen
+ */
 public class ClanShopDAO implements IClanShopDAO {
 
     @Override
     public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT clan_shop_id, level, name, time, on_sale, xu, luong FROM `clan_shops`")) {
 
-            ClanItemManager.CLAN_ITEM_MAP.clear();
+                ClanItemManager.CLAN_ITEM_MAP.clear();
 
-            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `clan_shops`")) {
                 while (resultSet.next()) {
                     ClanItemShop item = new ClanItemShop();
                     item.setId(resultSet.getByte("clan_shop_id"));
@@ -30,7 +33,7 @@ public class ClanShopDAO implements IClanShopDAO {
                     item.setXu(resultSet.getInt("xu"));
                     item.setLuong(resultSet.getInt("luong"));
 
-                    ClanItemManager.CLAN_ITEM_MAP.put(item.getId(), item);
+                    ClanItemManager.addClanItemShop(item);
                 }
             }
         } catch (SQLException e) {

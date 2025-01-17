@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author tuyen
  */
-public class PlayerXpManager {
+public class UserXpManager {
     public static final List<LevelXpRequired> LEVEL_XP_REQUIRED_LIST = new ArrayList<>();
 
     public static int getRequiredXpLevel(int level) {
@@ -26,9 +26,9 @@ public class PlayerXpManager {
 
         while (left <= right) {
             int mid = (left + right) / 2;
-            LevelXpRequired midEntry = LEVEL_XP_REQUIRED_LIST.get(mid);
+            LevelXpRequired levelXpRequired = LEVEL_XP_REQUIRED_LIST.get(mid);
 
-            if (xp < midEntry.getXp()) {
+            if (xp < levelXpRequired.getXp()) {
                 right = mid - 1;
             } else {
                 left = mid + 1;

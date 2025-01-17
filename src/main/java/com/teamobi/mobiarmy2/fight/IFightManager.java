@@ -16,7 +16,7 @@ public interface IFightManager {
 
     void addBoss(Boss boss);
 
-    void leave(int playerId);
+    void leave(int userId);
 
     boolean checkWin();
 
@@ -24,15 +24,15 @@ public interface IFightManager {
 
     void newShoot(int index, byte bullId, short angle, byte force, byte force2, byte numShoot, boolean isNextTurn);
 
-    void changeLocation(int playerId, short x, short y);
+    void changeLocation(int userId, short x, short y);
 
-    void addShoot(int playerId, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot);
+    void addShoot(int userId, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot);
 
     void sendMessageUpdateXY(int index);
 
-    void skipTurn(int playerId);
+    void skipTurn(int userId);
 
-    void useItem(int playerId, byte itemIndex);
+    void useItem(int userId, byte itemIndex);
 
     IFightMapManager getMapManger();
 

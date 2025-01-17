@@ -14,16 +14,16 @@
 
     <center>
         <TabPane>
-            <Tab text="Players" closable="false">
+            <Tab text="Users" closable="false">
                 <VBox spacing="10">
                     <HBox spacing="10" alignment="CENTER_LEFT" styleClass="search-box">
-                        <Label text="Search Player:"/>
-                        <TextField fx:id="searchPlayerField" promptText="Enter username or ID"/>
-                        <Button text="Search" onAction="#searchPlayer"/>
+                        <Label text="Search User:"/>
+                        <TextField fx:id="searchUserField" promptText="Enter username or ID"/>
+                        <Button text="Search" onAction="#searchUser"/>
                     </HBox>
-                    <TableView fx:id="playerTable">
+                    <TableView fx:id="userTable">
                         <columns>
-                            <TableColumn text="Player ID" fx:id="playerIdColumn"/>
+                            <TableColumn text="User ID" fx:id="userIdColumn"/>
                             <TableColumn text="Username" fx:id="usernameColumn"/>
                             <TableColumn text="IP Address" fx:id="ipAddressColumn"/>
                         </columns>

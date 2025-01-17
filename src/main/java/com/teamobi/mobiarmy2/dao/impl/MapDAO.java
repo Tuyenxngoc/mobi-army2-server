@@ -12,16 +12,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * @author tuyen
+ */
 public class MapDAO implements IMapDAO {
 
     @Override
     public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-
-            MapManager.ARMY_MAPS.clear();
-
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `maps`")) {
+
+                MapManager.ARMY_MAPS.clear();
+
                 while (resultSet.next()) {
                     ArmyMap armyMap = new ArmyMap();
                     armyMap.setId(resultSet.getByte("map_id"));

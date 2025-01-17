@@ -15,10 +15,10 @@ public class MissionManager {
     public static final Map<Byte, List<Byte>> MISSIONS_BY_TYPE = new HashMap<>();
 
     public static void addMission(Mission mission) {
-        MISSIONS.put(mission.getMissionId(), mission);
+        MISSIONS.put(mission.getId(), mission);
 
         MISSIONS_BY_TYPE.computeIfAbsent(mission.getType(), k -> new ArrayList<>())
-                .add(mission.getMissionId());
+                .add(mission.getId());
     }
 
     public static Mission getMissionById(byte missionId) {

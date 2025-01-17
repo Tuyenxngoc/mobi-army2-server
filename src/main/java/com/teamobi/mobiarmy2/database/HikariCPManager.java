@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.database;
 
 import com.teamobi.mobiarmy2.config.IDatabaseConfig;
-import com.teamobi.mobiarmy2.config.impl.HikariCPConfig;
+import com.teamobi.mobiarmy2.server.ApplicationContext;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * @author tuyen
@@ -22,7 +23,7 @@ public class HikariCPManager {
     private HikariDataSource dataSource;
 
     private HikariCPManager() {
-        this.config = new HikariCPConfig();
+        this.config = ApplicationContext.getInstance().getBean(IDatabaseConfig.class);
         initDataSource();
     }
 
@@ -58,6 +59,17 @@ public class HikariCPManager {
     }
 
     public Optional<Integer> update(String sql, Object... params) {
+        if (config.isShowSql()) {
+            StringBuilder logMessage = new StringBuilder();
+            logMessage.append(sql).append(" [Parameters: ");
+            for (Object param : params) {
+                logMessage.append(param).append(", ");
+            }
+            logMessage.delete(logMessage.length() - 2, logMessage.length());
+            logMessage.append("]");
+            logger.info(logMessage.toString());
+        }
+
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {
@@ -66,9 +78,24 @@ public class HikariCPManager {
             int rowsUpdated = statement.executeUpdate();
             return Optional.of(rowsUpdated);
         } catch (SQLException e) {
-            logger.error("SQL Update failed: {}", e.getMessage());
+            logger.error("SQL Update failed: {}", e.getMessage(), e);
             return Optional.empty();
         }
+    }
+
+    public int[] executeBatch(String sql, Consumer<PreparedStatement> batchConsumer) {
+        if (config.isShowSql()) {
+            logger.info("Executing batch for SQL: {}", sql);
+        }
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            batchConsumer.accept(statement);
+            return statement.executeBatch();
+        } catch (SQLException e) {
+            logger.error("Batch execution failed: {}", e.getMessage(), e);
+        }
+        return new int[0];
     }
 
     public void closeDataSource() {

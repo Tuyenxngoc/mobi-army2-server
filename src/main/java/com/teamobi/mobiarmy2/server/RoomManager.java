@@ -2,9 +2,17 @@ package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.model.Room;
+import lombok.Getter;
 
 public class RoomManager {
+
+    private final IServerConfig serverConfig;
+    @Getter
     private Room[] rooms;
+
+    public RoomManager() {
+        this.serverConfig = ApplicationContext.getInstance().getBean(IServerConfig.class);
+    }
 
     private static class SingletonHelper {
         private static final RoomManager INSTANCE = new RoomManager();
@@ -14,13 +22,8 @@ public class RoomManager {
         return RoomManager.SingletonHelper.INSTANCE;
     }
 
-    public Room[] getRooms() {
-        return rooms;
-    }
-
     public void init() {
-        IServerConfig config = ServerManager.getInstance().getConfig();
-        byte[] roomQuantities = config.getRoomQuantity();
+        byte[] roomQuantities = serverConfig.getRoomQuantity();
         int totalRooms = 0;
 
         for (int quantity : roomQuantities) {
@@ -31,20 +34,20 @@ public class RoomManager {
         byte index = 0;
 
         for (byte type = 0; type < roomQuantities.length; type++) {
-            int minXu = config.getRoomMinXu()[type];
-            int maxXu = config.getRoomMaxXu()[type];
-            byte minMap = config.getRoomMinMap()[type];
-            byte maxMap = config.getRoomMaxMap()[type];
-            byte numArea = config.getNumArea();
-            byte maxPlayerFight = config.getMaxPlayerFight();
-            byte numPlayerInitRoom = config.getNumPlayerInitRoom();
-            byte roomIconType = config.getRoomIconType();
+            int minXu = serverConfig.getRoomMinXu()[type];
+            int maxXu = serverConfig.getRoomMaxXu()[type];
+            byte minMap = serverConfig.getRoomMinMap()[type];
+            byte maxMap = serverConfig.getRoomMaxMap()[type];
+            byte numArea = serverConfig.getNumArea();
+            byte maxPlayerFight = serverConfig.getMaxPlayerFight();
+            byte numPlayerInitRoom = serverConfig.getNumPlayerInitRoom();
+            byte roomIconType = serverConfig.getRoomIconType();
 
             for (byte roomCount = 0; roomCount < roomQuantities[type]; roomCount++) {
                 byte[] mapCanSelected = null;
                 boolean isContinuous = false;
                 if (type == 5) {
-                    mapCanSelected = config.getBossRoomMapLimit()[roomCount];
+                    mapCanSelected = serverConfig.getBossRoomMapLimit()[roomCount];
                     if (roomCount == 9) {
                         isContinuous = true;
                     }

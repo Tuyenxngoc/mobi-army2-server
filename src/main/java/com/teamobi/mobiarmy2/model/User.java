@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.model;
 
-import com.teamobi.mobiarmy2.ApplicationContext;
+import com.teamobi.mobiarmy2.config.IServerConfig;
+import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.dao.*;
@@ -8,6 +9,7 @@ import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.fight.ITrainingManager;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.ISession;
+import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.server.*;
 import com.teamobi.mobiarmy2.service.IClanService;
 import com.teamobi.mobiarmy2.service.IGiftBoxService;
@@ -45,13 +47,15 @@ public class User {
     private int pointEvent;
     private byte materialsPurchased;
     private LocalDateTime xpX2Time;
-    private LocalDateTime lastOnline;
+    private int topEarningsXu;
+    private long[] userCharacterIds;
     private boolean[] ownedCharacters;
     private int[] levels;
     private int[] xps;
     private int[] points;
     private short[][] addedPoints;
     private byte[] fightItems;
+    private int[][] equipData;
     private int[] mission;
     private byte[] missionLevel;
     private EquipmentChest[][] characterEquips;
@@ -61,8 +65,8 @@ public class User {
     private IFightWait fightWait;
     private ITrainingManager trainingManager;
     private final IUserService userService;
+    private final IServerConfig serverConfig;
     private final IGiftBoxService giftBoxService;
-    private int topEarningsXu;
 
     public User(ISession session) {
         this.session = session;
@@ -70,16 +74,16 @@ public class User {
         ApplicationContext context = ApplicationContext.getInstance();
         this.userService = new UserService(
                 this,
+                context.getBean(IServerConfig.class),
                 context.getBean(IClanService.class),
                 context.getBean(ILeaderboardService.class),
                 context.getBean(IUserDAO.class),
                 context.getBean(IAccountDAO.class),
                 context.getBean(IGiftCodeDAO.class),
                 context.getBean(IUserGiftCodeDAO.class),
-                context.getBean(IUserCharacterDAO.class),
-                context.getBean(IUserEquipmentDAO.class),
-                context.getBean(IUserSpecialItemDAO.class)
+                context.getBean(IUserCharacterDAO.class)
         );
+        this.serverConfig = context.getBean(IServerConfig.class);
         this.giftBoxService = new GiftBoxService(this);
     }
 
@@ -99,8 +103,8 @@ public class User {
         int currentXp = getCurrentXp();
         int currentLevel = getCurrentLevel();
 
-        int requiredXpCurrentLevel = PlayerXpManager.getRequiredXpLevel(currentLevel - 1);
-        int requiredXpNextLevel = PlayerXpManager.getRequiredXpLevel(currentLevel);
+        int requiredXpCurrentLevel = UserXpManager.getRequiredXpLevel(currentLevel - 1);
+        int requiredXpNextLevel = UserXpManager.getRequiredXpLevel(currentLevel);
 
         int currentXpInLevel = currentXp - requiredXpCurrentLevel;
         int xpNeededForNextLevel = requiredXpNextLevel - requiredXpCurrentLevel;
@@ -109,7 +113,7 @@ public class User {
     }
 
     public int getCurrentRequiredXp() {
-        return PlayerXpManager.getRequiredXpLevel(getCurrentLevel());
+        return UserXpManager.getRequiredXpLevel(getCurrentLevel());
     }
 
     public int getCurrentLevel() {
@@ -195,7 +199,7 @@ public class User {
         }
 
         int currentLevel = getCurrentLevel();
-        int newLevel = PlayerXpManager.getLevelByXP(totalXp);
+        int newLevel = UserXpManager.getLevelByXP(totalXp);
 
         int levelDiff = newLevel - currentLevel;
         if (levelDiff > 0) {
@@ -237,10 +241,146 @@ public class User {
         if (fightItems[itemIndex] < 0) {
             fightItems[itemIndex] = 0;
         }
-
-        byte maxItem = ServerManager.getInstance().getConfig().getMaxItem();
+        byte maxItem = serverConfig.getMaxItem();
         if (fightItems[itemIndex] > maxItem) {
             fightItems[itemIndex] = maxItem;
+        }
+        fightItems[0] = fightItems[1] = maxItem;
+    }
+
+    public synchronized void addEquipment(EquipmentChest addEquipment) {
+        if (addEquipment == null) {
+            return;
+        }
+
+        addEquipment.setPurchaseDate(LocalDateTime.now());
+        addEquipment.setInUse(false);
+        if (addEquipment.getAddPoints() == null) {
+            addEquipment.setAddPoints(addEquipment.getEquipment().getAddPoints());
+        }
+        if (addEquipment.getAddPercents() == null) {
+            addEquipment.setAddPercents(addEquipment.getEquipment().getAddPercents());
+        }
+        addEquipment.setEmptySlot((byte) 3);
+        addEquipment.setSlots(new byte[]{-1, -1, -1});
+        addEquipment.setKey(equipmentPurchased | 0x10000);
+        addEquipmentChest(addEquipment);
+
+        //Tăng số lượng trang bị mua
+        equipmentPurchased++;
+
+        try {
+            IMessage ms = new Message(Cmd.BUY_EQUIP);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(0);
+            ds.writeInt(addEquipment.getKey());
+            ds.writeByte(addEquipment.getEquipment().getCharacterId());
+            ds.writeByte(addEquipment.getEquipment().getEquipType());
+            ds.writeShort(addEquipment.getEquipment().getEquipIndex());
+            ds.writeUTF(addEquipment.getEquipment().getName());
+            ds.writeByte(addEquipment.getAddPoints().length * 2);
+            for (int i = 0; i < addEquipment.getAddPoints().length; i++) {
+                ds.writeByte(addEquipment.getAddPoints()[i]);
+                ds.writeByte(addEquipment.getAddPercents()[i]);
+            }
+            ds.writeByte(addEquipment.getEquipment().getExpirationDays());
+            ds.writeByte(addEquipment.getEquipment().isDisguise() ? 1 : 0);
+            ds.writeByte(addEquipment.getVipLevel());
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public synchronized void updateInventory(
+            EquipmentChest updateEquip,
+            EquipmentChest removeEquip,
+            List<SpecialItemChest> addItems,
+            List<SpecialItemChest> removeItems
+    ) {
+        try {
+            ByteArrayOutputStream bas = new ByteArrayOutputStream();
+            DataOutputStream ds = new DataOutputStream(bas);
+            int updateQuantity = 0;
+
+            if (updateEquip != null) {
+                updateQuantity++;
+                ds.writeByte(2);
+                ds.writeInt(updateEquip.getKey());
+                ds.writeByte(updateEquip.getAddPoints().length * 2);
+                for (int i = 0; i < updateEquip.getAddPoints().length; i++) {
+                    ds.writeByte(updateEquip.getAddPoints()[i]);
+                    ds.writeByte(updateEquip.getAddPercents()[i]);
+                }
+                ds.writeByte(updateEquip.getEmptySlot());
+                ds.writeByte(updateEquip.getRemainingDays());
+            }
+
+            if (addItems != null && !addItems.isEmpty()) {
+                for (SpecialItemChest newItem : addItems) {
+                    if (newItem.getQuantity() <= 0) {
+                        continue;
+                    }
+                    updateQuantity++;
+                    SpecialItemChest existingItem = getSpecialItemById(newItem.getItem().getId());
+                    if (existingItem != null) {
+                        existingItem.increaseQuantity(newItem.getQuantity());
+                    } else {
+                        addSpecialItemChest(newItem);
+                    }
+                    ds.writeByte(newItem.getQuantity() > 1 ? 3 : 1);
+                    ds.writeByte(newItem.getItem().getId());
+                    if (newItem.getQuantity() > 1) {
+                        ds.writeByte(newItem.getQuantity());
+                    }
+                    ds.writeUTF(newItem.getItem().getName());
+                    ds.writeUTF(newItem.getItem().getDetail());
+                }
+            }
+
+            if (removeItems != null && !removeItems.isEmpty()) {
+                for (SpecialItemChest itemToRemove : removeItems) {
+                    if (itemToRemove.getQuantity() <= 0) {
+                        continue;
+                    }
+                    SpecialItemChest existingItem = getSpecialItemById(itemToRemove.getItem().getId());
+                    if (existingItem != null) {
+                        existingItem.decreaseQuantity(itemToRemove.getQuantity());
+                        if (existingItem.getQuantity() <= 0) {
+                            specialItemChest.remove(itemToRemove.getItem().getId());
+                        }
+                        updateQuantity++;
+                        ds.writeByte(0);
+                        ds.writeInt(itemToRemove.getItem().getId());
+                        ds.writeByte(itemToRemove.getQuantity());
+                    }
+                }
+            }
+
+            if (removeEquip != null) {
+                updateQuantity++;
+                equipmentChest.remove(removeEquip.getKey());
+                ds.writeByte(0);
+                ds.writeInt(removeEquip.getKey());
+                ds.writeByte(1);
+            }
+
+            ds.flush();
+            bas.flush();
+
+            if (updateQuantity == 0) {
+                return;
+            }
+
+            IMessage ms = new Message(Cmd.INVENTORY_UPDATE);
+            ds = ms.writer();
+            ds.writeByte(updateQuantity);
+            ds.write(bas.toByteArray());
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         fightItems[0] = fightItems[1] = maxItem;
     }
@@ -280,8 +420,8 @@ public class User {
         materialsPurchased += quantity;
     }
 
-    public short getInventorySpecialItemCount(byte itemId) {
-        SpecialItemChest specialItemChest = getSpecialItemById(itemId);
+    public short getInventorySpecialItemCount(byte id) {
+        SpecialItemChest specialItemChest = getSpecialItemById(id);
         if (specialItemChest == null) {
             return 0;
         }
@@ -328,7 +468,7 @@ public class User {
                 .orElse(null);
     }
 
-    public byte getFightItemQuantity(int index) {
+    public byte getItemFightQuantity(int index) {
         if (index >= 0 && index < fightItems.length) {
             return fightItems[index];
         }

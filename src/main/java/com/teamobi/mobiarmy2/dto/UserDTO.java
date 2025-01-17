@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -19,12 +20,19 @@ public class UserDTO {
     private int xu;
     private int luong;
     private int cup;
-    private int pointEvent;
-    private byte materialsPurchased;
     private boolean isChestLocked;
     private boolean isInvitationLocked;
-    private byte[] fightItems;
+    private byte activeCharacterId;
+    private int pointEvent;
+    private byte materialsPurchased;
+    private short equipmentPurchased;
+    private LocalDateTime xpX2Time;
+    private LocalDateTime dailyRewardTime;
+    private int topEarningsXu;
+    private byte[] items;
+    private int[] mission;
+    private byte[] missionLevel;
     private List<Integer> friends;
-    private int[] missions;
-    private byte[] missionLevels;
+    private Map<Byte, SpecialItemChest> specialItemChest = new HashMap<>();
+    private Map<Integer, EquipmentChest> equipmentChest = new HashMap<>();
 }

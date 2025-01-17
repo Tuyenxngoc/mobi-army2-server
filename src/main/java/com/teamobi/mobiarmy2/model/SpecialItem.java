@@ -41,7 +41,7 @@ public class SpecialItem {
 
     @Override
     public String toString() {
-        return "SpecialItemEntry{" +
+        return "SpecialItem{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 '}';

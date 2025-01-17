@@ -18,5 +18,4 @@ public class SpecialItemManager {
     public static SpecialItem getSpecialItemById(byte id) {
         return SPECIAL_ITEMS.get(id);
     }
-
 }
