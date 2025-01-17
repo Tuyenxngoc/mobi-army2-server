@@ -1,7 +1,6 @@
-package com.teamobi.mobiarmy2.database;
+package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.config.IDatabaseConfig;
-import com.teamobi.mobiarmy2.server.ApplicationContext;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;

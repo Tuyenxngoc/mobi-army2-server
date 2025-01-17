@@ -1,9 +1,9 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
 import com.teamobi.mobiarmy2.dao.IExperienceLevelDAO;
-import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.LevelXpRequired;
 import com.teamobi.mobiarmy2.server.ClanXpManager;
+import com.teamobi.mobiarmy2.server.HikariCPManager;
 import com.teamobi.mobiarmy2.server.UserXpManager;
 
 import java.sql.Connection;

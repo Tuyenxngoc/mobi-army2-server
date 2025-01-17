@@ -2,8 +2,8 @@ package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.dao.IUserCharacterDAO;
-import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.dto.UserCharacterDTO;
+import com.teamobi.mobiarmy2.server.HikariCPManager;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 
 import java.sql.Connection;
@@ -16,7 +16,7 @@ import java.util.Optional;
 
 public class UserCharacterDAO implements IUserCharacterDAO {
 
-    private UserCharacterDTO mapToUserCharacterDTO(ResultSet resultSet) throws SQLException {
+    private static UserCharacterDTO mapToUserCharacterDTO(ResultSet resultSet) throws SQLException {
         Gson gson = GsonUtil.getInstance();
         UserCharacterDTO userCharacterDTO = new UserCharacterDTO();
         userCharacterDTO.setUserCharacterId(resultSet.getLong("user_character_id"));

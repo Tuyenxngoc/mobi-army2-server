@@ -1,8 +1,10 @@
 package com.teamobi.mobiarmy2;
 
 import com.teamobi.mobiarmy2.config.IDatabaseConfig;
+import com.teamobi.mobiarmy2.config.IRedisConfig;
 import com.teamobi.mobiarmy2.config.IServerConfig;
 import com.teamobi.mobiarmy2.config.impl.HikariCPConfig;
+import com.teamobi.mobiarmy2.config.impl.RedisConfig;
 import com.teamobi.mobiarmy2.config.impl.ServerConfig;
 import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.dao.impl.*;
@@ -25,6 +27,7 @@ public class MobiArmy2 {
         ApplicationContext context = ApplicationContext.getInstance();
         context.registerBean(IServerConfig.class, new ServerConfig());
         context.registerBean(IDatabaseConfig.class, new HikariCPConfig());
+        context.registerBean(IRedisConfig.class, new RedisConfig());
 
         context.registerBean(IAccountDAO.class, new AccountDAO());
         context.registerBean(ICaptionLevelDAO.class, new CaptionLevelDAO());
@@ -44,6 +47,7 @@ public class MobiArmy2 {
         context.registerBean(ISpecialItemDAO.class, new SpecialItemDAO());
         context.registerBean(IUserCharacterDAO.class, new UserCharacterDAO());
         context.registerBean(IUserDAO.class, new UserDAO());
+        context.registerBean(IUserGiftCodeDAO.class, new UserGiftCodeDAO());
 
         context.registerBean(IGameDataService.class, new GameDataService(
                 context.getBean(IMapDAO.class),

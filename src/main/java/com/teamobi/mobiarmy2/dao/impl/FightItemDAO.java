@@ -1,9 +1,9 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
 import com.teamobi.mobiarmy2.dao.IFightItemDAO;
-import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.FightItem;
 import com.teamobi.mobiarmy2.server.FightItemManager;
+import com.teamobi.mobiarmy2.server.HikariCPManager;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

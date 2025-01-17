@@ -1,9 +1,9 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
 import com.teamobi.mobiarmy2.dao.ICharacterDAO;
-import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.Character;
 import com.teamobi.mobiarmy2.server.CharacterManager;
+import com.teamobi.mobiarmy2.server.HikariCPManager;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

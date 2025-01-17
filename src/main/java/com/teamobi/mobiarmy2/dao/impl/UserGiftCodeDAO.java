@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
 import com.teamobi.mobiarmy2.dao.IUserGiftCodeDAO;
-import com.teamobi.mobiarmy2.database.HikariCPManager;
+import com.teamobi.mobiarmy2.server.HikariCPManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

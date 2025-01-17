@@ -1,9 +1,9 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
 import com.teamobi.mobiarmy2.dao.ICaptionLevelDAO;
-import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.model.Caption;
 import com.teamobi.mobiarmy2.server.CaptionManager;
+import com.teamobi.mobiarmy2.server.HikariCPManager;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

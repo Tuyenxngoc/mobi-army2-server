@@ -1,8 +1,8 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
 import com.teamobi.mobiarmy2.dao.IAccountDAO;
-import com.teamobi.mobiarmy2.database.HikariCPManager;
 import com.teamobi.mobiarmy2.dto.AccountDTO;
+import com.teamobi.mobiarmy2.server.HikariCPManager;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
