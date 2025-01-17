@@ -18,6 +18,53 @@ import java.sql.Statement;
  */
 public class EquipmentDAO implements IEquipmentDAO {
 
+    private static void validateEquipment(Equipment equipment) throws SQLException {
+        if (equipment.isDisguise() && equipment.getDisguiseEquippedIndexes().length != 5) {
+            throw new SQLException("Invalid disguise configuration for Equipment with ID: " +
+                    equipment.getEquipIndex() +
+                    ". Expected 5 disguise equipped indexes, but found " +
+                    equipment.getDisguiseEquippedIndexes().length);
+        }
+
+        if (equipment.getBigImageCutX().length != 6 ||
+                equipment.getBigImageCutY().length != 6 ||
+                equipment.getBigImageSizeX().length != 6 ||
+                equipment.getBigImageSizeY().length != 6 ||
+                equipment.getBigImageAlignX().length != 6 ||
+                equipment.getBigImageAlignY().length != 6) {
+            StringBuilder errorMessage = new StringBuilder("Invalid image configuration for Equipment with ID: ");
+            errorMessage.append(equipment.getEquipIndex());
+            errorMessage.append(". Expected arrays of length 6 for all image properties but found:\n");
+
+            if (equipment.getBigImageCutX().length != 6) {
+                errorMessage.append("  - bigImageCutX length: ").append(equipment.getBigImageCutX().length).append("\n");
+            }
+            if (equipment.getBigImageCutY().length != 6) {
+                errorMessage.append("  - bigImageCutY length: ").append(equipment.getBigImageCutY().length).append("\n");
+            }
+            if (equipment.getBigImageSizeX().length != 6) {
+                errorMessage.append("  - bigImageSizeX length: ").append(equipment.getBigImageSizeX().length).append("\n");
+            }
+            if (equipment.getBigImageSizeY().length != 6) {
+                errorMessage.append("  - bigImageSizeY length: ").append(equipment.getBigImageSizeY().length).append("\n");
+            }
+            if (equipment.getBigImageAlignX().length != 6) {
+                errorMessage.append("  - bigImageAlignX length: ").append(equipment.getBigImageAlignX().length).append("\n");
+            }
+            if (equipment.getBigImageAlignY().length != 6) {
+                errorMessage.append("  - bigImageAlignY length: ").append(equipment.getBigImageAlignY().length).append("\n");
+            }
+
+            throw new SQLException(errorMessage.toString());
+        }
+
+        if (equipment.getAddPoints().length != 5 || equipment.getAddPercents().length != 5) {
+            throw new SQLException("Invalid additional points or percents configuration for Equipment with ID: " +
+                    equipment.getEquipIndex() +
+                    ". Expected arrays of length 5 but found:\n");
+        }
+    }
+
     @Override
     public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
@@ -69,53 +116,6 @@ public class EquipmentDAO implements IEquipmentDAO {
         } catch (SQLException e) {
             e.printStackTrace();
             System.exit(1);
-        }
-    }
-
-    private static void validateEquipment(Equipment equipment) throws SQLException {
-        if (equipment.isDisguise() && equipment.getDisguiseEquippedIndexes().length != 5) {
-            throw new SQLException("Invalid disguise configuration for Equipment with ID: " +
-                    equipment.getEquipIndex() +
-                    ". Expected 5 disguise equipped indexes, but found " +
-                    equipment.getDisguiseEquippedIndexes().length);
-        }
-
-        if (equipment.getBigImageCutX().length != 6 ||
-                equipment.getBigImageCutY().length != 6 ||
-                equipment.getBigImageSizeX().length != 6 ||
-                equipment.getBigImageSizeY().length != 6 ||
-                equipment.getBigImageAlignX().length != 6 ||
-                equipment.getBigImageAlignY().length != 6) {
-            StringBuilder errorMessage = new StringBuilder("Invalid image configuration for Equipment with ID: ");
-            errorMessage.append(equipment.getEquipIndex());
-            errorMessage.append(". Expected arrays of length 6 for all image properties but found:\n");
-
-            if (equipment.getBigImageCutX().length != 6) {
-                errorMessage.append("  - bigImageCutX length: ").append(equipment.getBigImageCutX().length).append("\n");
-            }
-            if (equipment.getBigImageCutY().length != 6) {
-                errorMessage.append("  - bigImageCutY length: ").append(equipment.getBigImageCutY().length).append("\n");
-            }
-            if (equipment.getBigImageSizeX().length != 6) {
-                errorMessage.append("  - bigImageSizeX length: ").append(equipment.getBigImageSizeX().length).append("\n");
-            }
-            if (equipment.getBigImageSizeY().length != 6) {
-                errorMessage.append("  - bigImageSizeY length: ").append(equipment.getBigImageSizeY().length).append("\n");
-            }
-            if (equipment.getBigImageAlignX().length != 6) {
-                errorMessage.append("  - bigImageAlignX length: ").append(equipment.getBigImageAlignX().length).append("\n");
-            }
-            if (equipment.getBigImageAlignY().length != 6) {
-                errorMessage.append("  - bigImageAlignY length: ").append(equipment.getBigImageAlignY().length).append("\n");
-            }
-
-            throw new SQLException(errorMessage.toString());
-        }
-
-        if (equipment.getAddPoints().length != 5 || equipment.getAddPercents().length != 5) {
-            throw new SQLException("Invalid additional points or percents configuration for Equipment with ID: " +
-                    equipment.getEquipIndex() +
-                    ". Expected arrays of length 5 but found:\n");
         }
     }
 

@@ -11,6 +11,18 @@ import java.time.ZoneOffset;
  */
 public class GsonUtil {
 
+    private static final Gson INSTANCE = createGson();
+
+    private static Gson createGson() {
+        return new GsonBuilder()
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                .create();
+    }
+
+    public static Gson getInstance() {
+        return INSTANCE;
+    }
+
     private static class LocalDateTimeAdapter implements JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDateTime> {
         @Override
         public JsonElement serialize(LocalDateTime localDateTime, Type type, JsonSerializationContext jsonSerializationContext) {
@@ -24,17 +36,5 @@ public class GsonUtil {
             long epochMilli = json.getAsLong();
             return LocalDateTime.ofEpochSecond(epochMilli / 1000, (int) (epochMilli % 1000) * 1_000_000, ZoneOffset.UTC);
         }
-    }
-
-    private static final Gson INSTANCE = createGson();
-
-    private static Gson createGson() {
-        return new GsonBuilder()
-                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-                .create();
-    }
-
-    public static Gson getInstance() {
-        return INSTANCE;
     }
 }

@@ -9,10 +9,10 @@ import java.util.TimerTask;
  * @author tuyen
  */
 public class CountdownTimer implements ICountdownTimer {
-    private Timer timer;
-    private int remainingTime;
     private final int countdownTime;
     private final Runnable onTimeUpCallback;
+    private Timer timer;
+    private int remainingTime;
 
     public CountdownTimer(int countdownTime, Runnable onTimeUpCallback) {
         this.countdownTime = countdownTime;

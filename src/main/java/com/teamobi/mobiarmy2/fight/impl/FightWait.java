@@ -33,6 +33,7 @@ public class FightWait implements IFightWait {
     private final IFightManager fightManager;
     private final Room room;
     private final byte id;
+    private final ICountdownTimer countdownTimer;
     private User[] users;
     private boolean[] readies;
     private byte[][] items;
@@ -49,7 +50,6 @@ public class FightWait implements IFightWait {
     private byte continuousLevel;
     private long endTime;
     private long lastPlayerJoinTime;
-    private final ICountdownTimer countdownTimer;
 
     public FightWait(Room room, byte id) {
         this.room = room;

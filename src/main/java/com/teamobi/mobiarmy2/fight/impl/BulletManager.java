@@ -20,48 +20,6 @@ import java.util.List;
 @Setter
 public class BulletManager implements IBulletManager {
     public static final boolean MGT_BULL_NEW = true;
-
-    public static class VoiRong {
-
-        public int X;
-        public int Y;
-        public int count;
-
-        public VoiRong(int X, int Y, int count) {
-            this.X = X;
-            this.Y = Y;
-            this.count = count;
-        }
-
-    }
-
-    public static class BomHenGio {
-
-        public int id;
-        public int X;
-        public int Y;
-        public int count;
-        public Bullet bull;
-
-        public BomHenGio(int id, Bullet bull, int count) {
-            this.id = id;
-            this.X = bull.getX();
-            this.Y = bull.getY();
-            this.count = count;
-            this.bull = bull;
-        }
-
-    }
-
-    public static class Bullets {
-
-        public Bullet bull;
-
-        public Bullets(Bullet bull) {
-            this.bull = bull;
-        }
-    }
-
     private IFightManager fightManager;
     private ArrayList<Bullet> bullets;
     private byte force2;
@@ -390,7 +348,7 @@ public class BulletManager implements IBulletManager {
                     bullets.add(new Jump(this, (byte) 35, 1200, pl));
                 }
 
-                //Jump Fly 
+                //Jump Fly
                 case 36 -> {
                     if (idGun != 14 && idGun != 13) {
                         return;
@@ -652,5 +610,46 @@ public class BulletManager implements IBulletManager {
             }
         }
         return null;
+    }
+
+    public static class VoiRong {
+
+        public int X;
+        public int Y;
+        public int count;
+
+        public VoiRong(int X, int Y, int count) {
+            this.X = X;
+            this.Y = Y;
+            this.count = count;
+        }
+
+    }
+
+    public static class BomHenGio {
+
+        public int id;
+        public int X;
+        public int Y;
+        public int count;
+        public Bullet bull;
+
+        public BomHenGio(int id, Bullet bull, int count) {
+            this.id = id;
+            this.X = bull.getX();
+            this.Y = bull.getY();
+            this.count = count;
+            this.bull = bull;
+        }
+
+    }
+
+    public static class Bullets {
+
+        public Bullet bull;
+
+        public Bullets(Bullet bull) {
+            this.bull = bull;
+        }
     }
 }

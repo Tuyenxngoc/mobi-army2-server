@@ -34,6 +34,9 @@ import java.util.Map;
 @Getter
 @Setter
 public class User {
+    private final IUserService userService;
+    private final IServerConfig serverConfig;
+    private final IGiftBoxService giftBoxService;
     private ISession session;
     private UserState state;
     private String accountId;
@@ -68,9 +71,6 @@ public class User {
     private Map<Integer, EquipmentChest> equipmentChest;
     private IFightWait fightWait;
     private ITrainingManager trainingManager;
-    private final IUserService userService;
-    private final IServerConfig serverConfig;
-    private final IGiftBoxService giftBoxService;
 
     public User(ISession session) {
         this.session = session;

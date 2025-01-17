@@ -13,10 +13,10 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 public class EquipmentManager {
-    public static Equipment[][] equipDefault;
     public static final Map<Short, Equipment> EQUIPMENTS = new HashMap<>();
     public static final List<Short> SALE_INDEX_TO_ID = new ArrayList<>();
     public static final Map<Byte, Map<Byte, List<Short>>> EQUIPMENTS_BY_CHARACTER_AND_TYPE = new HashMap<>();
+    public static Equipment[][] equipDefault;
 
     public static void addEquipment(Equipment equipment) {
         // Thêm vào danh sách trang bị đang bán

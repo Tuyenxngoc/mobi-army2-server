@@ -74,6 +74,31 @@ public class Bullet {
         this.isCanCollision = true;
     }
 
+    public static int getImpactRadiusByBullId(int bullId) {
+        return switch (bullId) {
+            case 0 -> 21;
+            case 1, 11, 17, 18, 19, 21, 26 -> 13;
+            case 2, 9, 20, 24, 48, 49 -> 18;
+            case 3 -> 100;
+            case 6, 8 -> 22;
+            case 7, 14, 22, 40, 41, 50, 51, 54, 55 -> 30;
+            case 10, 16, 23 -> 19;
+            case 12, 29, 52 -> 20;
+            case 15, 45 -> 28;
+            case 25 -> 8;
+            case 27, 44 -> 11;
+            case 30, 59 -> 16;
+            case 31 -> 40;
+            case 32, 35 -> 50;
+            case 33 -> 25;
+            case 37 -> 150;
+            case 42, 43 -> 32;
+            case 47 -> 7;
+            case 57 -> 70;
+            default -> 0;
+        };
+    }
+
     public void nextXY() {
         IFightManager fightManager = bulletManager.getFightManager();
         IFightMapManager mapManager = fightManager.getMapManger();
@@ -151,30 +176,5 @@ public class Bullet {
                 }
             }
         }
-    }
-
-    public static int getImpactRadiusByBullId(int bullId) {
-        return switch (bullId) {
-            case 0 -> 21;
-            case 1, 11, 17, 18, 19, 21, 26 -> 13;
-            case 2, 9, 20, 24, 48, 49 -> 18;
-            case 3 -> 100;
-            case 6, 8 -> 22;
-            case 7, 14, 22, 40, 41, 50, 51, 54, 55 -> 30;
-            case 10, 16, 23 -> 19;
-            case 12, 29, 52 -> 20;
-            case 15, 45 -> 28;
-            case 25 -> 8;
-            case 27, 44 -> 11;
-            case 30, 59 -> 16;
-            case 31 -> 40;
-            case 32, 35 -> 50;
-            case 33 -> 25;
-            case 37 -> 150;
-            case 42, 43 -> 32;
-            case 47 -> 7;
-            case 57 -> 70;
-            default -> 0;
-        };
     }
 }

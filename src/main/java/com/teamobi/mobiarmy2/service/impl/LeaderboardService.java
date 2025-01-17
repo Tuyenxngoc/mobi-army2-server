@@ -16,12 +16,11 @@ public class LeaderboardService implements ILeaderboardService {
     private static final Logger logger = LoggerFactory.getLogger(LeaderboardService.class);
     private static final String[] CATEGORIES = {"DANH DỰ", "CAO THỦ", "ĐẠI GIA XU", "ĐẠI GIA LƯỢNG", "DANH DỰ TUẦN", "ĐẠI GIA TUẦN"};
     private static final String[] LABELS = {"Danh dự", "XP", "Xu", "Lượng", "Danh dự", "Xu"};
-
-    private boolean isComplete;
     private final IRankingDAO rankingDAO;
     private final IServerConfig serverConfig;
     private final Timer timer;
     private final List<List<UserLeaderboardDTO>> leaderboardEntries;
+    private boolean isComplete;
 
     public LeaderboardService(IRankingDAO rankingDAO, IServerConfig serverConfig) {
         this.rankingDAO = rankingDAO;

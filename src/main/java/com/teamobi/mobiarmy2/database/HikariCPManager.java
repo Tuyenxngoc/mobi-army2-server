@@ -27,10 +27,6 @@ public class HikariCPManager {
         initDataSource();
     }
 
-    private static class SingletonHelper {
-        private static final HikariCPManager INSTANCE = new HikariCPManager();
-    }
-
     public static HikariCPManager getInstance() {
         return SingletonHelper.INSTANCE;
     }
@@ -103,5 +99,9 @@ public class HikariCPManager {
             dataSource.close();
             logger.info("HikariCP DataSource closed.");
         }
+    }
+
+    private static class SingletonHelper {
+        private static final HikariCPManager INSTANCE = new HikariCPManager();
     }
 }

@@ -17,13 +17,13 @@ public interface ISession {
 
     String getPlatform();
 
-    String getVersion();
+    void setPlatform(String platform);
 
-    byte getProvider();
+    String getVersion();
 
     void setVersion(String version);
 
-    void setPlatform(String platform);
+    byte getProvider();
 
     void setProvider(byte provider);
 

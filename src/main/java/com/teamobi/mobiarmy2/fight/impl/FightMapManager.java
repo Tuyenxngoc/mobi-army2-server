@@ -18,12 +18,12 @@ import java.util.List;
  */
 public class FightMapManager implements IFightMapManager {
 
+    private final List<MapTile> mapTiles = new ArrayList<>();
+    private final IFightManager fightManager;
     private short width;
     private short height;
     private short[] playerInitXPositions;
     private short[] playerInitYPositions;
-    private final List<MapTile> mapTiles = new ArrayList<>();
-    private final IFightManager fightManager;
 
     public FightMapManager(IFightManager fightManager) {
         this.fightManager = fightManager;

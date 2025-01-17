@@ -5,15 +5,11 @@ import java.util.Map;
 
 public class ApplicationContext {
 
-    private static class SingletonHelper {
-        private static final ApplicationContext INSTANCE = new ApplicationContext();
-    }
+    private final Map<Class<?>, Object> beans = new HashMap<>();
 
     public static ApplicationContext getInstance() {
         return ApplicationContext.SingletonHelper.INSTANCE;
     }
-
-    private final Map<Class<?>, Object> beans = new HashMap<>();
 
     public <T> void registerBean(Class<T> type, T instance) {
         beans.put(type, instance);
@@ -26,6 +22,10 @@ public class ApplicationContext {
 
     public void clearDependencies() {
         beans.clear();
+    }
+
+    private static class SingletonHelper {
+        private static final ApplicationContext INSTANCE = new ApplicationContext();
     }
 
 }

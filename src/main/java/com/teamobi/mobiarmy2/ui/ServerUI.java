@@ -17,6 +17,10 @@ import java.util.Optional;
  */
 public class ServerUI extends Application {
 
+    public static void launchUI(String[] args) {
+        launch(args);
+    }
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/fxml/ServerView.fxml"));
@@ -38,9 +42,5 @@ public class ServerUI extends Application {
             }
         });
         primaryStage.show();
-    }
-
-    public static void launchUI(String[] args) {
-        launch(args);
     }
 }

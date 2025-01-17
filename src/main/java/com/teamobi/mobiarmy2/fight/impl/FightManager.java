@@ -48,6 +48,12 @@ public class FightManager implements IFightManager {
     private static final Set<Byte> UNAUTHORIZED_ITEMS = Set.of((byte) 9, (byte) 23, (byte) 26, (byte) 28, (byte) 30, (byte) 31);
 
     private final IFightWait fightWait;
+    private final IFightMapManager mapManager;
+    private final IBulletManager bulletManager;
+    private final ICountdownTimer countdownTimer;
+    private final ExecutorService executorNextTurn;
+    private final ExecutorService executorEndGame;
+    private final IClanService clanService;
     private Player[] players;
     private int totalPlayers;
     private int turnCount;
@@ -57,13 +63,6 @@ public class FightManager implements IFightManager {
     private byte windX;
     private byte windY;
     private long startTime;
-    private final IFightMapManager mapManager;
-    private final IBulletManager bulletManager;
-    private final ICountdownTimer countdownTimer;
-    private final ExecutorService executorNextTurn;
-    private final ExecutorService executorEndGame;
-
-    private final IClanService clanService;
 
     public FightManager(IFightWait fightWait, IClanService clanService) {
         this.fightWait = fightWait;

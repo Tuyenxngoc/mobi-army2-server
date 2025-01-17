@@ -28,13 +28,12 @@ public class ServerManager {
     private final IGameDataService gameDataService;
     private final ILeaderboardService leaderboardService;
     private final IServerConfig serverConfig;
-
+    private final ArrayList<ISession> sessions;
+    private final List<ServerListener> listeners;
     private ServerSocket server;
     private long countClients;
     private boolean isStart;
     private boolean isMaintenanceMode;
-    private final ArrayList<ISession> sessions;
-    private final List<ServerListener> listeners;
 
     public ServerManager() {
         ApplicationContext context = ApplicationContext.getInstance();
@@ -45,10 +44,6 @@ public class ServerManager {
         this.isMaintenanceMode = false;
         this.sessions = new ArrayList<>();
         this.listeners = new ArrayList<>();
-    }
-
-    private static class SingletonHelper {
-        private static final ServerManager INSTANCE = new ServerManager();
     }
 
     public static ServerManager getInstance() {
@@ -154,5 +149,9 @@ public class ServerManager {
         for (ServerListener listener : listeners) {
             listener.onUsersUpdated(sessions);
         }
+    }
+
+    private static class SingletonHelper {
+        private static final ServerManager INSTANCE = new ServerManager();
     }
 }

@@ -20,20 +20,16 @@ import java.util.concurrent.TimeUnit;
  * @author tuyen
  */
 public class GiftBoxService implements IGiftBoxService {
-    private record Reward(byte id, byte type, String str) {
-    }
-
     private static final int MAX_GIFTS = 12;          // Số quà tối đa
     private static final int MAX_OPENED_GIFTS = 6;    // Số quà có thể mở tối đa
     private static final int XU_COST_PER_GIFT = 1000; // Chi phí mở mỗi quà khi hết lượt
-
+    private final User user;
+    private final ScheduledExecutorService executorService;
     private int availableGifts;    // Số quà hiện có
     private int giftOpenTime;      // Thời gian mở quà
     private boolean openingGift;   // Trạng thái mở quà
     private boolean[] giftOpened;  // Mảng kiểm tra quà đã mở hay chưa
     private int openedGiftCount;
-    private final User user;
-    private final ScheduledExecutorService executorService;
     private ScheduledFuture<?> giftBoxTask;
 
     public GiftBoxService(User user) {
@@ -228,5 +224,8 @@ public class GiftBoxService implements IGiftBoxService {
             user.sendMessage(ms);
         } catch (IOException ignored) {
         }
+    }
+
+    private record Reward(byte id, byte type, String str) {
     }
 }

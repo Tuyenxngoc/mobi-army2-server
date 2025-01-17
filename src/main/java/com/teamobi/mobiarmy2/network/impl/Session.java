@@ -34,26 +34,22 @@ public class Session implements ISession {
     );
 
     private final byte[] sessionKey;
+    private final Sender sender = new Sender();
+    private final IMessageHandler messageHandler;
+    private final long sessionId;
+    private final String IPAddress;
+    private final User user;
     private Socket socket;
     private DataInputStream dis;
     private DataOutputStream dos;
-
     private boolean sendKeyComplete;
     private byte curR;
     private byte curW;
-
-    private final Sender sender = new Sender();
-    private final IMessageHandler messageHandler;
-
     private Thread collectorThread;
     private Thread sendThread;
-
-    private final long sessionId;
-    private final String IPAddress;
     private String platform;
     private String version;
     private byte provider;
-    private final User user;
 
     public Session(long sessionId, Socket socket) throws IOException {
         this.sessionId = sessionId;
@@ -118,13 +114,13 @@ public class Session implements ISession {
     }
 
     @Override
-    public String getVersion() {
-        return version;
+    public void setPlatform(String platform) {
+        this.platform = platform;
     }
 
     @Override
-    public byte getProvider() {
-        return provider;
+    public String getVersion() {
+        return version;
     }
 
     @Override
@@ -133,8 +129,8 @@ public class Session implements ISession {
     }
 
     @Override
-    public void setPlatform(String platform) {
-        this.platform = platform;
+    public byte getProvider() {
+        return provider;
     }
 
     @Override

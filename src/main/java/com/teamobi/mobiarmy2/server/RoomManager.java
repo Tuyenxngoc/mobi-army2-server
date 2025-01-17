@@ -14,10 +14,6 @@ public class RoomManager {
         this.serverConfig = ApplicationContext.getInstance().getBean(IServerConfig.class);
     }
 
-    private static class SingletonHelper {
-        private static final RoomManager INSTANCE = new RoomManager();
-    }
-
     public static RoomManager getInstance() {
         return RoomManager.SingletonHelper.INSTANCE;
     }
@@ -57,6 +53,10 @@ public class RoomManager {
                 index++;
             }
         }
+    }
+
+    private static class SingletonHelper {
+        private static final RoomManager INSTANCE = new RoomManager();
     }
 
 }

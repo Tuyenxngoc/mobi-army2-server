@@ -19,19 +19,22 @@ import java.util.List;
 @Setter
 public class Player {
     protected IFightManager fightManager;
-    private User user;
-    private short gunId;
     protected byte characterId;
     protected byte index;
-    private byte pixel;
-    private byte angry;
-    private short steps;
     protected byte stamina;
     protected short x;
     protected short y;
+    protected short damage;
+    protected boolean isFlying;
+    protected boolean isDead;
+    protected byte usedItemId;
+    private User user;
+    private short gunId;
+    private byte pixel;
+    private byte angry;
+    private short steps;
     private short maxHp;
     private short hp;
-    protected short damage;
     private short defense;
     private short luck;
     private short teamPoints;
@@ -42,7 +45,6 @@ public class Player {
     private boolean isUpdateCup;
     private boolean isLucky;
     private boolean isPoisoned;
-    protected boolean isFlying;
     private byte eyeSmokeCount;
     private byte invisibleCount; // Số lần vô hình
     private byte vanishCount; // Số lần tàn hình
@@ -55,9 +57,7 @@ public class Player {
     private boolean isDoubleShoot;
     private boolean isDoubleSpeed;
     private boolean isUsePow;
-    protected boolean isDead;
     private boolean isTeamBlue;
-    protected byte usedItemId;
     private short width;
     private short height;
     private int xpUp;
