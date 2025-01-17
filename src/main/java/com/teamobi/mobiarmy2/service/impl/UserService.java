@@ -63,6 +63,16 @@ public class UserService implements IUserService {
         this.userCharacterDAO = userCharacterDAO;
     }
 
+    private static String getFormattedRankDisplay(int rank) {
+        if (rank < 10_000) {
+            return String.format("Top %s", rank);
+        } else if (rank < 100_000) {
+            return String.format("Top %s+", Utils.getStringNumber(rank));
+        } else {
+            return "Top 100k+";
+        }
+    }
+
     private List<EquipmentChest> getSelectedEquips() {
         if (selectedEquips == null) {
             selectedEquips = new ArrayList<>();
@@ -1926,6 +1936,18 @@ public class UserService implements IUserService {
             if (us == null) {
                 ds.writeInt(-1);
             } else {
+                String rankDisplayText = GameString.NO_RANKING;
+                if (us.getRank() == 0) {
+                    Optional<Integer> userRankOptional = userDAO.getUserRankByCup(us.getCup());
+                    if (userRankOptional.isPresent()) {
+                        us.setRank(userRankOptional.get());
+
+                        rankDisplayText = getFormattedRankDisplay(us.getRank());
+                    }
+                } else {
+                    rankDisplayText = getFormattedRankDisplay(us.getRank());
+                }
+
                 ds.writeInt(us.getUserId());
                 ds.writeUTF(us.getUsername());
                 ds.writeInt(us.getXu());
@@ -1935,7 +1957,7 @@ public class UserService implements IUserService {
                 ds.writeInt(us.getCurrentXp());
                 ds.writeInt(us.getCurrentRequiredXp());
                 ds.writeInt(us.getCup());
-                ds.writeUTF(GameString.NO_RANKING);
+                ds.writeUTF(rankDisplayText);
             }
             ds.flush();
             sendMessage(ms);

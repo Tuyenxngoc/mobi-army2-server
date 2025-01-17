@@ -27,4 +27,5 @@ public interface IUserDAO {
 
     Optional<Integer> findUserIdByUsername(String username);
 
+    Optional<Integer> getUserRankByCup(int cup);
 }

@@ -37,7 +37,7 @@ public class User {
     private final IUserService userService;
     private final IServerConfig serverConfig;
     private final IGiftBoxService giftBoxService;
-    private ISession session;
+    private final ISession session;
     private UserState state;
     private String accountId;
     private int userId;
@@ -46,6 +46,7 @@ public class User {
     private int xu;
     private int luong;
     private int cup;
+    private int rank;
     private boolean isLogged;
     private boolean isChestLocked;
     private boolean isInvitationLocked;

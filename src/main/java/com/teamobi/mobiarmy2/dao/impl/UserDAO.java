@@ -371,4 +371,20 @@ public class UserDAO implements IUserDAO {
         return Optional.empty();
     }
 
+    @Override
+    public Optional<Integer> getUserRankByCup(int cup) {
+        try (Connection connection = HikariCPManager.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT COUNT(user_id) AS top FROM users WHERE cup > ?")) {
+            statement.setInt(1, cup);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return Optional.of(resultSet.getInt("top") + 1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    }
+
 }
