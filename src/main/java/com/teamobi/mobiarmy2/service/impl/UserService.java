@@ -513,10 +513,9 @@ public class UserService implements IUserService {
         }
         try {
             byte action = ms.reader().readByte();
-
             if (action == 0) {
                 sendMissionInfo();
-            } else if (action == 1) {
+            } else {
                 byte missionId = ms.reader().readByte();
                 missionComplete(missionId);
             }
@@ -671,17 +670,21 @@ public class UserService implements IUserService {
                     sendServerMessage(GameString.createClanContributionMinXuMessage(minXuContributeClan));
                     return;
                 }
+
                 //Update xu user
                 user.updateXu(-quantity);
+
                 //Update xu clan
                 clanService.contributeClan(user.getClanId(), user.getUserId(), quantity, Boolean.TRUE);
                 sendServerMessage(GameString.CONTRIBUTION_SUCCESS);
-            } else if (type == 1) {
+            } else {
                 if (quantity > user.getLuong()) {
                     return;
                 }
+
                 //Update lg user
                 user.updateLuong(-quantity);
+
                 //Update lg clan
                 clanService.contributeClan(user.getClanId(), user.getUserId(), quantity, Boolean.FALSE);
                 sendServerMessage(GameString.CONTRIBUTION_SUCCESS);
@@ -941,7 +944,7 @@ public class UserService implements IUserService {
             byte type = dis.readByte();
             if (type == 0) {
                 sendClanShop();
-            } else if (type == 1) {
+            } else {
                 byte unit = dis.readByte();
                 byte itemId = dis.readByte();
                 buyClanShop(unit, itemId);
@@ -974,7 +977,7 @@ public class UserService implements IUserService {
             }
 
             clanService.updateItemClan(user.getClanId(), user.getUserId(), clanItemShop, true);
-        } else if (unit == 1) {//Luong
+        } else {//Luong
             if (clanItemShop.getLuong() < 0) {
                 return;
             }
@@ -1045,7 +1048,7 @@ public class UserService implements IUserService {
             byte type = dis.readByte();
             if (type == 0) {
                 sendSpecialItem();
-            } else if (type == 1) {
+            } else {
                 byte unit = dis.readByte();
                 byte itemId = dis.readByte();
                 byte quantity = dis.readByte();
@@ -1427,7 +1430,6 @@ public class UserService implements IUserService {
             DataInputStream dis = ms.reader();
             byte action = dis.readByte();
             if (action == 0) {
-
                 //Đặt lại dữ liệu
                 userAction = null;
                 fabricateItem = null;
@@ -1511,7 +1513,7 @@ public class UserService implements IUserService {
                     }
                 }
                 sendServerMessage(GameString.COMBINE_ERROR);
-            } else if (action == 1) {
+            } else {
                 switch (userAction) {
                     case INSERT_GEM_INTO_EQUIPMENT -> {
                         EquipmentChest equip = equipList.getFirst();

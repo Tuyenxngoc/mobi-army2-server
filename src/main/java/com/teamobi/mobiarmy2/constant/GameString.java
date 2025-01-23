@@ -6,7 +6,7 @@ import com.teamobi.mobiarmy2.util.Utils;
  * @author tuyen
  */
 public class GameString {
-    public static final String MAINTENANCE_MODE = "Server đang bảo trì. Vui lòng quay lại sau khi hoàn tất.";
+    public static final String MAINTENANCE_MODE = "Server đang bảo trì. Vui lòng quay lại sau khi hoàn tất";
     public static final String RANKING_NOT_LOADED = "Chưa tải xong bảng xếp hạng";
     public static final String NO_RANKING = "Chưa có hạng";
 
