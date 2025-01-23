@@ -298,15 +298,15 @@ public class UserService implements IUserService {
 
             int[] data = userCharacterDTO.getData();
             for (int j = 0; j < data.length; j++) {
-                int key = data[j];
-                EquipmentChest equip = user.getEquipmentByKey(key);
-                if (equip != null) {
-                    if (equip.isExpired()) {
-                        equip.setInUse(false);
-                    } else {
-                        user.getCharacterEquips()[characterId][j] = equip;
-                        user.getEquipData()[characterId][j] = equip.getKey();
-                    }
+                EquipmentChest equip = user.getEquipmentByKey(data[j]);
+                if (equip == null) {
+                    continue;
+                }
+                if (equip.isExpired()) {
+                    equip.setInUse(false);
+                } else {
+                    user.getCharacterEquips()[characterId][j] = equip;
+                    user.getEquipData()[characterId][j] = equip.getKey();
                 }
             }
         }

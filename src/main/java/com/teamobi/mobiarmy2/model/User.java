@@ -454,7 +454,7 @@ public class User {
                         equip.getVipLevel() == vipLevel &&
                         equip.getEmptySlot() == 3 &&
                         !equip.isInUse() &&
-                        equip.getRemainingDays() > 0
+                        !equip.isExpired()
                 );
     }
 
@@ -466,7 +466,7 @@ public class User {
                         equip.getVipLevel() == vipLevel &&
                         equip.getEmptySlot() == 3 &&
                         !equip.isInUse() &&
-                        equip.getRemainingDays() > 0)
+                        !equip.isExpired())
                 .findFirst()
                 .orElse(null);
     }
