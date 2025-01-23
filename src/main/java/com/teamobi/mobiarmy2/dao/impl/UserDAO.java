@@ -230,8 +230,8 @@ public class UserDAO implements IUserDAO {
 
                         //Dữ liệu bạn bè
                         int[] friendsArray = gson.fromJson(resultSet.getString("friends"), int[].class);
-                        List<Integer> friendsList = Arrays.stream(friendsArray)
-                                .boxed().collect(Collectors.toList());
+                        Set<Integer> friendsList = Arrays.stream(friendsArray)
+                                .boxed().collect(Collectors.toSet());
                         userDTO.setFriends(friendsList);
 
                         //Đọc dữ liệu item chiến đấu
@@ -289,7 +289,7 @@ public class UserDAO implements IUserDAO {
     }
 
     @Override
-    public List<FriendDTO> getFriendsList(int userId, List<Integer> friendIds) {
+    public List<FriendDTO> getFriendsList(int userId, Set<Integer> friendIds) {
         List<FriendDTO> friendsList = new ArrayList<>();
 
         StringBuilder queryBuilder = new StringBuilder(
@@ -315,8 +315,9 @@ public class UserDAO implements IUserDAO {
 
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(queryBuilder.toString())) {
-            for (int i = 0; i < friendIds.size(); i++) {
-                statement.setInt(i + 1, friendIds.get(i));
+            int parameterIndex = 1;
+            for (int friendId : friendIds) {
+                statement.setInt(parameterIndex++, friendId);
             }
             try (ResultSet resultSet = statement.executeQuery()) {
                 Gson gson = GsonUtil.getInstance();

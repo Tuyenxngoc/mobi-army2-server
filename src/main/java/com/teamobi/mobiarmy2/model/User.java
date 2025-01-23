@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author tuyen
@@ -64,7 +65,7 @@ public class User {
     private int[] mission;
     private byte[] missionLevel;
     private EquipmentChest[][] characterEquips;
-    private List<Integer> friends;
+    private Set<Integer> friends;
     private Map<Byte, SpecialItemChest> specialItemChest;
     private Map<Integer, EquipmentChest> equipmentChest;
     private IFightWait fightWait;

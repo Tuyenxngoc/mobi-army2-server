@@ -1867,7 +1867,6 @@ public class UserService implements IUserService {
         try {
             IMessage ms = new Message(Cmd.FRIENDLIST);
             DataOutputStream ds = ms.writer();
-
             if (!user.getFriends().isEmpty()) {
                 List<FriendDTO> friends = userDAO.getFriendsList(user.getUserId(), user.getFriends());
                 for (FriendDTO friend : friends) {
@@ -1892,20 +1891,26 @@ public class UserService implements IUserService {
 
     @Override
     public void handleAddFriend(IMessage ms) {
+        int maxFriends = serverConfig.getMaxFriends();
+        Set<Integer> friends = user.getFriends();
         try {
-            Integer id = ms.reader().readInt();
-            if (user.getFriends().size() > serverConfig.getMaxFriends()) {
-                sendMessageUpdateFriends(Boolean.FALSE, 2);
+            int id = ms.reader().readInt();
+
+            // Kiểm tra số lượng bạn bè đã đạt giới hạn
+            if (friends.size() >= maxFriends) {
+                sendAddFriendMessage(2);
                 return;
             }
-            if (user.getFriends().contains(id)) {
-                sendMessageUpdateFriends(Boolean.FALSE, 1);
-            } else {
-                user.getFriends().add(id);
-                sendMessageUpdateFriends(Boolean.FALSE, 0);
+
+            // Kiểm tra nếu bạn bè đã tồn tại
+            if (!friends.add(id)) {
+                sendAddFriendMessage(1);
+                return;
             }
+
+            sendAddFriendMessage(0);
         } catch (IOException e) {
-            sendMessageUpdateFriends(Boolean.FALSE, 1);
+            sendAddFriendMessage(1);
         }
     }
 
@@ -1914,20 +1919,26 @@ public class UserService implements IUserService {
         try {
             Integer id = ms.reader().readInt();
             user.getFriends().remove(id);
-            sendMessageUpdateFriends(Boolean.TRUE, 0);
+            sendDeleteFriendMessage(0);
         } catch (IOException e) {
-            sendMessageUpdateFriends(Boolean.TRUE, 1);
+            sendDeleteFriendMessage(1);
         }
     }
 
-    private void sendMessageUpdateFriends(boolean isDelete, int status) {
+    private void sendDeleteFriendMessage(int status) {
         try {
-            IMessage ms;
-            if (isDelete) {
-                ms = new Message(Cmd.DELETE_FRIEND_RESULT);
-            } else {
-                ms = new Message(Cmd.ADD_FRIEND_RESULT);
-            }
+            IMessage ms = new Message(Cmd.DELETE_FRIEND_RESULT);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(status);
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException ignored) {
+        }
+    }
+
+    private void sendAddFriendMessage(int status) {
+        try {
+            IMessage ms = new Message(Cmd.ADD_FRIEND_RESULT);
             DataOutputStream ds = ms.writer();
             ds.writeByte(status);
             ds.flush();

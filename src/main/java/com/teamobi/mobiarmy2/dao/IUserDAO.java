@@ -7,6 +7,7 @@ import com.teamobi.mobiarmy2.model.User;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author tuyen
@@ -23,7 +24,7 @@ public interface IUserDAO {
 
     void setDailyRewardTime(int userId, LocalDateTime now);
 
-    List<FriendDTO> getFriendsList(int userId, List<Integer> friends);
+    List<FriendDTO> getFriendsList(int userId, Set<Integer> friends);
 
     Optional<Integer> findUserIdByUsername(String username);
 
