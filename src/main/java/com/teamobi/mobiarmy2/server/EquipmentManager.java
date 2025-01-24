@@ -22,7 +22,7 @@ public class EquipmentManager {
         // Thêm vào danh sách trang bị đang bán
         if (equipment.isOnSale()) {
             SALE_INDEX_TO_ID.add(equipment.getEquipmentId());
-            equipment.setSaleIndex((short) (SALE_INDEX_TO_ID.size() - 1));
+            equipment.setSaleIndex(SALE_INDEX_TO_ID.size() - 1);
         } else {
             equipment.setSaleIndex(-1);
         }

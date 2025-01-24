@@ -2610,11 +2610,10 @@ public class UserService implements IUserService {
     @Override
     public void handleEquipmentTransactions(IMessage ms) {
         List<EquipmentChest> equipList = getSelectedEquips();
-        DataInputStream dis = ms.reader();
-
         try {
-            byte type = dis.readByte();
-            switch (type) {
+            DataInputStream dis = ms.reader();
+            byte action = dis.readByte();
+            switch (action) {
                 case 0 -> {//Mua trang bị
                     short saleIndex = dis.readShort();
                     byte unit = dis.readByte();
@@ -2628,6 +2627,9 @@ public class UserService implements IUserService {
 
                     //Lấy dữ liệu và tính tiền
                     byte size = dis.readByte();
+                    if (size <= 0 || size > 100) {
+                        return;
+                    }
                     for (int i = 0; i < size; i++) {
                         int key = dis.readInt();
                         EquipmentChest equip = user.getEquipmentByKey(key);
