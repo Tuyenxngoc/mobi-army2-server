@@ -28,10 +28,10 @@ import java.util.stream.Collectors;
 public class ClanDAO implements IClanDAO {
 
     @Override
-    public Short getClanIcon(int clanId) {
+    public short getClanIcon(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT icon FROM clans WHERE clan_id = ?")) {
-            statement.setInt(1, clanId);
+            statement.setShort(1, clanId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     return resultSet.getShort("icon");
@@ -40,14 +40,14 @@ public class ClanDAO implements IClanDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return 0;
     }
 
     @Override
     public Byte getMembersOfClan(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) AS member_count FROM clan_members cm WHERE cm.clan_id = ?")) {
-            statement.setInt(1, clanId);
+            statement.setShort(1, clanId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     return resultSet.getByte("member_count");
@@ -63,7 +63,7 @@ public class ClanDAO implements IClanDAO {
     public int getXu(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT xu FROM clans WHERE clan_id = ?")) {
-            statement.setInt(1, clanId);
+            statement.setShort(1, clanId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     return resultSet.getInt("xu");
@@ -79,7 +79,7 @@ public class ClanDAO implements IClanDAO {
     public int getLuong(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT luong FROM clans WHERE clan_id = ?")) {
-            statement.setInt(1, clanId);
+            statement.setShort(1, clanId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     return resultSet.getInt("luong");
@@ -95,7 +95,7 @@ public class ClanDAO implements IClanDAO {
     public int getXp(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT xp FROM clans WHERE clan_id = ?")) {
-            statement.setInt(1, clanId);
+            statement.setShort(1, clanId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     return resultSet.getInt("xp");
@@ -111,7 +111,7 @@ public class ClanDAO implements IClanDAO {
     public int getLevel(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT level FROM clans WHERE clan_id = ?")) {
-            statement.setInt(1, clanId);
+            statement.setShort(1, clanId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     return resultSet.getInt("level");
@@ -127,7 +127,7 @@ public class ClanDAO implements IClanDAO {
     public int getCup(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT cup FROM clans WHERE clan_id = ?")) {
-            statement.setInt(1, clanId);
+            statement.setShort(1, clanId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     return resultSet.getInt("cup");
@@ -140,14 +140,14 @@ public class ClanDAO implements IClanDAO {
     }
 
     @Override
-    public void updateXu(int clanId, int xu) {
+    public void updateXu(short clanId, int xu) {
         // language=SQL
         String sql = "UPDATE clans SET xu = xu + ? WHERE clan_id = ?";
         HikariCPManager.getInstance().update(sql, xu, clanId);
     }
 
     @Override
-    public void updateLuong(int clanId, int luong) {
+    public void updateLuong(short clanId, int luong) {
         // language=SQL
         String sql = "UPDATE clans SET luong = luong + ? WHERE clan_id = ?";
         HikariCPManager.getInstance().update(sql, luong, clanId);
@@ -327,7 +327,7 @@ public class ClanDAO implements IClanDAO {
     public ClanItemJson[] getClanItems(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT item FROM clans WHERE clan_id = ?")) {
-            statement.setInt(1, clanId);
+            statement.setShort(1, clanId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     return GsonUtil.getInstance().fromJson(resultSet.getString("item"), ClanItemJson[].class);
@@ -351,7 +351,7 @@ public class ClanDAO implements IClanDAO {
     public short getCountClan() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            try (ResultSet resultSet = statement.executeQuery("SELECT COUNT(clan_id) as `count` FROM clans")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) as `count` FROM clans")) {
                 if (resultSet.next()) {
                     return resultSet.getShort("count");
                 }

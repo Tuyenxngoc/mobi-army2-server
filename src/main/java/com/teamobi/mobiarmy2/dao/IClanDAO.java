@@ -12,7 +12,7 @@ import java.util.List;
  */
 public interface IClanDAO {
 
-    Short getClanIcon(int clanId);
+    short getClanIcon(short clanId);
 
     Byte getMembersOfClan(short clanId);
 
@@ -26,9 +26,9 @@ public interface IClanDAO {
 
     int getCup(short clanId);
 
-    void updateXu(int clanId, int xu);
+    void updateXu(short clanId, int xu);
 
-    void updateLuong(int clanId, int luong);
+    void updateLuong(short clanId, int luong);
 
     void gopClanContribute(String txtContribute, int userId, int xu, int luong);
 
