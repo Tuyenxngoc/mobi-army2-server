@@ -19,7 +19,7 @@ public class ChickyBullet extends Bullet {
     public void nextXY() {
         super.nextXY();
         if (this.force2 == super.frame) {
-            bulletManager.addBullet(new ChickyTrung(bulletManager, (byte) 20, (int) this.satThuongGoc, super.pl, super.lastX, super.lastY, 0, 0, 20, 50));
+            bulletManager.addBullet(new ChickyEggs(bulletManager, (byte) 20, (int) this.satThuongGoc, super.pl, super.lastX, super.lastY, 0, 0, 20, 50));
         }
         if (this.isCollect()) {
             return;

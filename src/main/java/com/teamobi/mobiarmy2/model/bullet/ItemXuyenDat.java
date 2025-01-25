@@ -28,24 +28,24 @@ public class ItemXuyenDat extends Bullet {
             collect = true;
             X = XYVC[0];
             Y = XYVC[1];
-            XArray.add((short) X);
-            YArray.add((short) Y);
+            XArray.add(X);
+            YArray.add(Y);
             if (this.isCanCollision) {
                 bulletManager.getFightManager().getMapManger().collision(X, Y, this);
             }
             return;
         }
-        XArray.add((short) X);
-        YArray.add((short) Y);
+        XArray.add(X);
+        YArray.add(Y);
         if ((X < -100) || (X > bulletManager.getFightManager().getMapManger().getWidth() + 100) || (Y > bulletManager.getFightManager().getMapManger().getHeight() + 200)) {
-            XArray.add((short) X);
-            YArray.add((short) Y);
+            XArray.add(X);
+            YArray.add(Y);
             collect = true;
             return;
         }
         if (this.frame == force - 1) {
-            XArray.add((short) X);
-            YArray.add((short) Y);
+            XArray.add(X);
+            YArray.add(Y);
             this.collect = true;
             return;
         }

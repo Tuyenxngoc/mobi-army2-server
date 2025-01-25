@@ -48,13 +48,13 @@ public class ItemChuotGanBom extends Bullet {
             }
         }
         if (this.Y > bulletManager.getFightManager().getMapManger().getHeight() + 100) {
-            XArray.add((short) X);
-            YArray.add((short) Y);
+            XArray.add(X);
+            YArray.add(Y);
             this.collect = true;
             return;
         }
-        XArray.add((short) X);
-        YArray.add((short) Y);
+        XArray.add(X);
+        YArray.add(Y);
         if (super.frame == nStep) {
             super.collect = true;
             bulletManager.getFightManager().getMapManger().collision(X, Y, this);

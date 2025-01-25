@@ -17,8 +17,8 @@ public class ItemMuaDan extends Bullet {
         if (super.isMaxY || this.collect) {
             this.collect = true;
             for (int i = 0; i < 10; i++) {
-                XArray.add((short) X);
-                YArray.add((short) Y);
+                XArray.add(X);
+                YArray.add(Y);
             }
             this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 29, this.damage, pl, this.X + 18, this.Y - 20, 2, -1, 15, 60));
             this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 29, this.damage, pl, this.X - 19, this.Y - 20, -3, -1, 15, 60));

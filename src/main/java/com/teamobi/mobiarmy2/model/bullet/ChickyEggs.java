@@ -4,9 +4,9 @@ import com.teamobi.mobiarmy2.fight.impl.BulletManager;
 import com.teamobi.mobiarmy2.model.Bullet;
 import com.teamobi.mobiarmy2.model.Player;
 
-public class ChickyTrung extends Bullet {
+public class ChickyEggs extends Bullet {
 
-    public ChickyTrung(BulletManager bullMNG, byte bullId, int satThuong, Player pl, int X, int Y, int vx, int vy, int msg, int g100) {
+    public ChickyEggs(BulletManager bullMNG, byte bullId, int satThuong, Player pl, int X, int Y, int vx, int vy, int msg, int g100) {
         super(bullMNG, bullId, satThuong, pl, X, Y, vx, vy, msg, g100);
     }
 
@@ -18,10 +18,10 @@ public class ChickyTrung extends Bullet {
                 collect = true;
                 X = XYVC[0];
                 Y = XYVC[1];
-                XArray.add((short) X);
-                YArray.add((short) Y);
-                XArray.add((short) X);
-                YArray.add((short) Y);
+                XArray.add(X);
+                YArray.add(Y);
+                XArray.add(X);
+                YArray.add(Y);
                 if (this.isCanCollision) {
                     bulletManager.getFightManager().getMapManger().collision(X, Y, this);
                 }

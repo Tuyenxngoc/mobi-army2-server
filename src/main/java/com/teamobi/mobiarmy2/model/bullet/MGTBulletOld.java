@@ -16,13 +16,13 @@ public class MGTBulletOld extends Bullet {
     @Override
     public void nextXY() {
         frame++;
-        XArray.add((short) X);
-        YArray.add((short) Y);
+        XArray.add(X);
+        YArray.add(Y);
         if ((X < -200) || (X > bulletManager.getFightManager().getMapManger().getWidth() + 200) || (Y > bulletManager.getFightManager().getMapManger().getHeight() + 200)) {
             collect = true;
             return;
         }
-        short preX = (short) X, preY = (short) Y;
+        short preX = X, preY = Y;
         vxTemp += Math.abs(vx);
         vyTemp += Math.abs(vy);
         if (Math.abs(vxTemp) >= 100) {
@@ -41,15 +41,15 @@ public class MGTBulletOld extends Bullet {
             }
             vyTemp %= 100;
         }
-        short[] XYVC = bulletManager.getCollisionPoint(preX, preY, (short) X, (short) Y, isXuyenPlayer, isXuyenMap);
+        short[] XYVC = bulletManager.getCollisionPoint(preX, preY, X, Y, isXuyenPlayer, isXuyenMap);
         if (XYVC != null) {
             collect = true;
             X = XYVC[0];
             Y = XYVC[1];
-            XArray.add((short) X);
-            YArray.add((short) Y);
+            XArray.add(X);
+            YArray.add(Y);
             if (this.isCanCollision) {
-                bulletManager.getFightManager().getMapManger().collision((short) X, (short) Y, this);
+                bulletManager.getFightManager().getMapManger().collision(X, Y, this);
             }
             return;
         }

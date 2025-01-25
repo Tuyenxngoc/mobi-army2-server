@@ -20,8 +20,8 @@ public class BalloonLazer extends Bullet {
         Player pl2 = bulletManager.getFightManager().findClosestPlayer(X, Y);
         X = pl2.getX();
         Y = pl2.getY();
-        this.XArray.add((short) X);
-        this.YArray.add((short) Y);
+        this.XArray.add(X);
+        this.YArray.add(Y);
         if ((X < -200) || (X > bulletManager.getFightManager().getMapManger().getWidth() + 200) || (Y > bulletManager.getFightManager().getMapManger().getHeight() + 200)) {
             collect = true;
             return;
@@ -35,8 +35,8 @@ public class BalloonLazer extends Bullet {
             collect = true;
             X = XYVC[0];
             Y = XYVC[1];
-            XArray.add((short) X);
-            YArray.add((short) Y);
+            XArray.add(X);
+            YArray.add(Y);
             if (this.isCanCollision) {
                 bulletManager.getFightManager().getMapManger().collision(X, Y, this);
             }

@@ -13,11 +13,11 @@ public class Jump extends Bullet {
     @Override
     public void nextXY() {
         this.collect = true;
-        this.XArray.add((short) X);
-        this.YArray.add((short) Y);
+        this.XArray.add(X);
+        this.YArray.add(Y);
         this.Y += 2;
-        this.XArray.add((short) X);
-        this.YArray.add((short) Y);
+        this.XArray.add(X);
+        this.YArray.add(Y);
         if (this.isCanCollision) {
             bulletManager.getFightManager().getMapManger().collision(X, Y, this);
         }
