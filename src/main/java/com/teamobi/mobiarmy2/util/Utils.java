@@ -15,6 +15,7 @@ import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Random;
 
 /**
@@ -24,6 +25,7 @@ public class Utils {
 
     private static final Random RANDOM;
     private static final DateTimeFormatter DATE_TIME_FORMATTER;
+    private static final NumberFormat NUMBER_FORMAT;
     private static final short[] SIN_DATA;
     private static final short[] COS_DATA;
     private static final int[] TAN_DATA;
@@ -31,6 +33,11 @@ public class Utils {
     static {
         RANDOM = new Random();
         DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(CommonConstant.PATTERN_DATE_TIME);
+        Locale locale = new Locale.Builder()
+                .setLanguage("vi")
+                .setRegion("VN")
+                .build();
+        NUMBER_FORMAT = NumberFormat.getNumberInstance(locale);
         SIN_DATA = new short[]{
                 0, 18, 36, 54, 71, 89, 107, 125, 143, 160, 178, 195, 213, 230, 248, 265, 282, 299, 316, 333, 350, 367, 384, 400,
                 416, 433, 449, 465, 481, 496, 512, 527, 543, 558, 573, 587, 602, 616, 630, 644, 658, 672, 685, 698, 711, 724, 737,
@@ -99,8 +106,7 @@ public class Utils {
     }
 
     public static String formatThousands(int number) {
-        NumberFormat numberFormat = NumberFormat.getNumberInstance();
-        return numberFormat.format(number);
+        return NUMBER_FORMAT.format(number);
     }
 
     public static String getStringNumber(float num) {

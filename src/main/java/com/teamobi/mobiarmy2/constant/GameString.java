@@ -109,6 +109,10 @@ public class GameString {
         return String.format("Hôm nay bạn được tặng %dx item %s. Chúc bạn chơi game vui vẻ", quantity, name);
     }
 
+    public static String createDailyRewardMessage(int quantity) {
+        return String.format("Chúc mừng năm mới! Teamobi lì xì bạn %s xu. (Bạn có cơ hội nhận lì xì may mắn từ 1.000 xu đến 50.000 xu trong 3 ngày Tết!)", Utils.formatThousands(quantity));
+    }
+
     public static String createDailyTopRewardMessage(int quantity) {
         return String.format("Chúc mừng bạn nhận được phần thưởng top là %s xu", Utils.getStringNumber(quantity));
     }

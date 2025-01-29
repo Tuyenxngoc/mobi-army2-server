@@ -224,6 +224,15 @@ public class UserService implements IUserService {
                     user.setTopEarningsXu(0);
                 }
 
+                //Tặng quà tết
+                LocalDateTime now = LocalDateTime.now();
+                if (now.isAfter(serverConfig.getTetStartTime()) && now.isBefore(serverConfig.getTetEndTime())) {
+                    int luckyXu = Utils.getNonLinearRandom(1000, 50999);
+                    int xuUp = (luckyXu / 1000) * 1000;
+                    user.updateXu(xuUp);
+                    sendMessageToUser(GameString.createDailyRewardMessage(xuUp));
+                }
+
                 //Đặt lại số lần mua nguyên liệu
                 user.setMaterialsPurchased((byte) 0);
 

@@ -8,6 +8,8 @@ import com.teamobi.mobiarmy2.util.GsonUtil;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
 /**
@@ -64,6 +66,8 @@ public class ServerConfig implements IServerConfig {
     private int[][] spinXuCounts;
     private int[][] spinXpCounts;
     private int[] spinTypeProbabilities;
+    private LocalDateTime tetStartTime;
+    private LocalDateTime tetEndTime;
 
     public ServerConfig() {
         configMap = new Properties();
@@ -143,6 +147,9 @@ public class ServerConfig implements IServerConfig {
             spinXuCounts = gson.fromJson(configMap.getProperty("spin_xu_counts", "[]"), int[][].class);
             spinXpCounts = gson.fromJson(configMap.getProperty("spin_xp_counts", "[]"), int[][].class);
             spinTypeProbabilities = gson.fromJson(configMap.getProperty("spin_type_probabilities", "[]"), int[].class);
+
+            tetStartTime = LocalDateTime.parse(configMap.getProperty("tet.start"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            tetEndTime = LocalDateTime.parse(configMap.getProperty("tet.end"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
@@ -476,5 +483,15 @@ public class ServerConfig implements IServerConfig {
     @Override
     public int[] getSpinTypeProbabilities() {
         return spinTypeProbabilities;
+    }
+
+    @Override
+    public LocalDateTime getTetStartTime() {
+        return tetStartTime;
+    }
+
+    @Override
+    public LocalDateTime getTetEndTime() {
+        return tetEndTime;
     }
 }
