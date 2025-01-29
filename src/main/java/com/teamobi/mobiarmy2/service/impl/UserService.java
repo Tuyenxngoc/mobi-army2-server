@@ -177,7 +177,7 @@ public class UserService implements IUserService {
             //Kiểm tra có đang đăng nhập hay không
             User userLogin = serverManager.getUserByUserId(userDTO.getUserId());
             if (userLogin != null) {
-                userLogin.getUserService().sendServerMessage2(GameString.ACCOUNT_OTHER_LOGIN);
+                userLogin.getUserService().sendMoneyErrorMessage(GameString.ACCOUNT_OTHER_LOGIN);
                 userLogin.getSession().close();
 
                 sendMessageLoginFail(GameString.LOGIN_ANOTHER_DEVICE);
@@ -456,7 +456,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void sendServerMessage2(String message) {
+    public void sendMoneyErrorMessage(String message) {
         try {
             IMessage ms = new Message(Cmd.SET_MONEY_ERROR);
             DataOutputStream ds = ms.writer();
@@ -570,7 +570,7 @@ public class UserService implements IUserService {
                 message = GameString.MISSION_COMPLETED;
             }
         }
-        sendServerMessage2(message);
+        sendMoneyErrorMessage(message);
     }
 
     private void sendMissionInfo() throws IOException {
@@ -1878,7 +1878,7 @@ public class UserService implements IUserService {
             }
 
             if (fightWait == null) {
-                sendServerMessage2(GameString.AREA_NOT_FOUND);
+                sendMoneyErrorMessage(GameString.AREA_NOT_FOUND);
             } else {
                 fightWait.sendInfo(user);
                 fightWait.addUser(user);

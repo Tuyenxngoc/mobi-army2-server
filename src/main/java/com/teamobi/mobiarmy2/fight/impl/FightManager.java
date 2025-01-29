@@ -826,7 +826,7 @@ public class FightManager implements IFightManager {
                 if (player == null || player.getUser() == null) {
                     continue;
                 }
-                player.getUser().getUserService().sendServerMessage2(GameString.MATCH_NOT_COUNTED);
+                player.getUser().getUserService().sendMoneyErrorMessage(GameString.MATCH_NOT_COUNTED);
             }
         }
 
@@ -1311,7 +1311,7 @@ public class FightManager implements IFightManager {
 
         //Khi đấu boss thì cấm dùng 1 số item
         if (fightWait.getRoomType() == 5 && UNAUTHORIZED_ITEMS.contains(itemIndex)) {
-            player.getUser().getUserService().sendServerMessage2(GameString.ITEM_UNAUTHORIZED);
+            player.getUser().getUserService().sendMoneyErrorMessage(GameString.ITEM_UNAUTHORIZED);
             return;
         }
 

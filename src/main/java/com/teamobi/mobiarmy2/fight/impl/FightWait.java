@@ -358,7 +358,7 @@ public class FightWait implements IFightWait {
         //Kiểm tra thời gian người chơi vào phòng gần nhất
         remainingTime = 5000 - (System.currentTimeMillis() - lastPlayerJoinTime);
         if (remainingTime > 0) {
-            roomOwner.getUserService().sendServerMessage2(GameString.createWaitClickMessage(remainingTime / 1000 + 1));
+            roomOwner.getUserService().sendMoneyErrorMessage(GameString.createWaitClickMessage(remainingTime / 1000 + 1));
             return;
         }
 

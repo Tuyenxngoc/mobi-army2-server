@@ -15,7 +15,7 @@ public interface IUserService {
 
     void sendServerMessage(String message);
 
-    void sendServerMessage2(String message);
+    void sendMoneyErrorMessage(String message);
 
     void handleHandshakeMessage();
 
