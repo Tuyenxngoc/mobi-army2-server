@@ -52,7 +52,6 @@ public class GameString {
     public static final String ITEM_X2_XP_USAGE_REQUEST = "Bạn có muốn sử dụng item này không? Hiệu lực 1 ngày!";
     public static final String ITEM_X2_XP_USAGE_SUCCESS = "Sử dụng thành công. Bạn có 1 ngày x2 kinh nghiệm!";
 
-    public static final String BLACK_FRIDAY_GIFT_BOX_REQUEST = "Bạn có muốn mở 1 Hộp quà Black Friday?";
     public static final String USE_BANH_TRUNG_REQUEST = "Bạn có muốn dùng bánh trưng không?";
     public static final String USE_BANH_TRUNG_SUCCESS = "Dùng bánh trưng thành công";
     public static final String USE_BANH_TET_REQUEST = "Bạn có muốn dùng bánh tét không?";
@@ -207,5 +206,9 @@ public class GameString {
 
     public static String createLoginCooldownMessage(long seconds) {
         return String.format("Vui lòng đăng nhập lại sau %d giây", seconds);
+    }
+
+    public static String createBlackFridayGiftBoxConfirmation(int quantity) {
+        return String.format("Bạn có muốn mở %d Hộp quà Black Friday?", quantity);
     }
 }

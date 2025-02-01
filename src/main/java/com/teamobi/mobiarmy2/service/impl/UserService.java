@@ -1646,7 +1646,36 @@ public class UserService implements IUserService {
             }
 
             case 93 -> {
-                System.out.println("Tobe continue...");
+                List<SpecialItemChest> generatedItems = new ArrayList<>();
+                StringBuilder rewardMessage = new StringBuilder("Sử dụng thành công, bạn nhận được: ");
+
+                Map<Byte, Short> itemQuantityMap = new HashMap<>();
+                for (int i = 0; i < specialItemChest.getQuantity(); i++) {
+                    short randomQuantity = (short) Utils.nextInt(1, 5);
+                    byte randomItemId = (byte) Utils.nextInt(62, 68);
+
+                    if (itemQuantityMap.containsKey(randomItemId)) {
+                        itemQuantityMap.put(randomItemId, (short) (itemQuantityMap.get(randomItemId) + randomQuantity));
+                    } else {
+                        itemQuantityMap.put(randomItemId, randomQuantity);
+                    }
+                }
+
+                for (Map.Entry<Byte, Short> entry : itemQuantityMap.entrySet()) {
+                    byte itemId = entry.getKey();
+                    short totalQuantity = entry.getValue();
+                    SpecialItemChest generatedItem = new SpecialItemChest(totalQuantity, SpecialItemManager.getSpecialItemById(itemId));
+                    generatedItems.add(generatedItem);
+
+                    rewardMessage.append(totalQuantity).append(" ").append(generatedItem.getItem().getName()).append(", ");
+                }
+
+                if (!rewardMessage.isEmpty()) {
+                    rewardMessage.setLength(rewardMessage.length() - 2);
+                }
+
+                user.updateInventory(null, null, generatedItems, List.of(specialItemChest));
+                sendServerMessage(rewardMessage.toString());
             }
         }
     }
@@ -1683,7 +1712,8 @@ public class UserService implements IUserService {
                 }
             }
 
-            case 93 -> sendMessageConfirm(GameString.BLACK_FRIDAY_GIFT_BOX_REQUEST);
+            case 93 ->
+                    sendMessageConfirm(GameString.createBlackFridayGiftBoxConfirmation(specialItemChest.getQuantity()));
 
             default -> sendServerMessage(GameString.COMBINE_ERROR);
         }
