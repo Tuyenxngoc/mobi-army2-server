@@ -321,7 +321,7 @@ public class User {
                 ds.writeByte(updateEquip.getRemainingDays());
             }
 
-            if (removeEquip != null && equipmentChest.containsKey(removeEquip.getKey())) {
+            if (removeEquip != null) {
                 equipmentChest.remove(removeEquip.getKey());
 
                 updateQuantity++;
