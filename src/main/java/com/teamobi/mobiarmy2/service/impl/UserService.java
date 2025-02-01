@@ -1229,11 +1229,11 @@ public class UserService implements IUserService {
             if (userId == 1) {
                 return;
             }
-            //Neu la nguoi dua tin -> send Mss 46-> chat The gioi
+            //Neu la nguoi dua tin -> chat The gioi
             if (userId == 2) {
                 int priceChatServer = serverConfig.getPriceChatServer();
-
                 if (user.getXu() < priceChatServer) {
+                    sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                     return;
                 }
                 user.updateXu(-priceChatServer);
@@ -1242,9 +1242,10 @@ public class UserService implements IUserService {
             }
             User receiver = ServerManager.getInstance().getUserByUserId(userId);
             if (receiver == null) {
+                sendServerMessage(GameString.INVITE_OFFLINE);
                 return;
             }
-            sendMessageToUser(receiver, content);
+            sendMessageToUser(false, receiver, content);
         } catch (IOException ignored) {
         }
     }
@@ -1277,26 +1278,23 @@ public class UserService implements IUserService {
     }
 
     public void sendMessageToUser(String message) {
-        sendMessageToUser(null, message);
+        sendMessageToUser(true, user, message);
     }
 
-    private void sendMessageToUser(User userSend, String message) {
-        if (message.isEmpty()) {
-            return;
-        }
+    private void sendMessageToUser(boolean isAdminSender, User recipient, String message) {
         try {
             IMessage ms = new Message(Cmd.CHAT_TO);
             DataOutputStream ds = ms.writer();
-            if (userSend != null) {
-                ds.writeInt(userSend.getUserId());
-                ds.writeUTF(userSend.getUsername());
-            } else {
+            if (isAdminSender) {
                 ds.writeInt(1);
                 ds.writeUTF("ADMIN");
+            } else {
+                ds.writeInt(user.getUserId());
+                ds.writeUTF(user.getUsername());
             }
             ds.writeUTF(message);
             ds.flush();
-            sendMessage(ms);
+            recipient.sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
