@@ -150,12 +150,54 @@ public class RankingDAO implements IRankingDAO {
 
     @Override
     public List<UserLeaderboardDTO> getWeeklyTopCup() {
-        return List.of();
+        // language=SQL
+        String query = "SELECT " +
+                "u.user_id, " +
+                "u.equipment_chest, " +
+                "SUM(t.amount) AS points, " +
+                "uc.data, " +
+                "uc.character_id, " +
+                "uc.level, " +
+                "uc.xp, " +
+                "cm.clan_id, " +
+                "a.username " +
+                "FROM transactions t " +
+                "INNER JOIN users u ON t.user_id = u.user_id " +
+                "INNER JOIN accounts a ON u.account_id = a.account_id " +
+                "INNER JOIN user_characters uc ON uc.user_character_id = u.active_user_character_id " +
+                "LEFT JOIN clan_members cm ON u.user_id = cm.user_id " +
+                "WHERE t.transaction_type = 'CUP' AND t.transaction_date >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) " +
+                "GROUP BY u.user_id, u.equipment_chest, uc.data, uc.character_id, uc.level, uc.xp, cm.clan_id, a.username " +
+                "HAVING SUM(t.amount) > 0 " +
+                "ORDER BY points DESC " +
+                "LIMIT 100;";
+        return getTopFromQuery(query, false);
     }
 
     @Override
     public List<UserLeaderboardDTO> getWeeklyTopRichest() {
-        return List.of();
+        // language=SQL
+        String query = "SELECT " +
+                "u.user_id, " +
+                "u.equipment_chest, " +
+                "SUM(t.amount) AS points, " +
+                "uc.data, " +
+                "uc.character_id, " +
+                "uc.level, " +
+                "uc.xp, " +
+                "cm.clan_id, " +
+                "a.username " +
+                "FROM transactions t " +
+                "INNER JOIN users u ON t.user_id = u.user_id " +
+                "INNER JOIN accounts a ON u.account_id = a.account_id " +
+                "INNER JOIN user_characters uc ON uc.user_character_id = u.active_user_character_id " +
+                "LEFT JOIN clan_members cm ON u.user_id = cm.user_id " +
+                "WHERE t.transaction_type = 'XU' AND t.transaction_date >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) " +
+                "GROUP BY u.user_id, u.equipment_chest, uc.data, uc.character_id, uc.level, uc.xp, cm.clan_id, a.username " +
+                "HAVING SUM(t.amount) > 0 " +
+                "ORDER BY points DESC " +
+                "LIMIT 100;";
+        return getTopFromQuery(query, false);
     }
 
     @Override
