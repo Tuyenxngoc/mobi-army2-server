@@ -111,7 +111,7 @@ public class Utils {
 
     public static String getStringNumber(float num) {
         NumberFormat format = NumberFormat.getNumberInstance();
-        format.setMaximumFractionDigits(2);
+        format.setMaximumFractionDigits(1);
         format.setMinimumFractionDigits(0);
         format.setRoundingMode(RoundingMode.DOWN);
         if (num >= 1000000000) {
