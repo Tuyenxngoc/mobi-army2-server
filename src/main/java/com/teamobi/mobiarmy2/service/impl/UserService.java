@@ -3049,9 +3049,10 @@ public class UserService implements IUserService {
             ms = new Message(Cmd.TOP_CLAN);
             DataOutputStream ds = ms.writer();
             ds.writeByte(page);
-            for (ClanDTO clan : topClan) {
+            for (int i = 0; i < topClan.size(); i++) {
+                ClanDTO clan = topClan.get(i);
                 ds.writeShort(clan.getClanId());
-                ds.writeUTF(clan.getName());
+                ds.writeUTF(String.format("#%d: %s", i + 1, clan.getName()));
                 ds.writeByte(clan.getMemberCount());
                 ds.writeByte(clan.getMaxMemberCount());
                 ds.writeUTF(clan.getMasterName());
