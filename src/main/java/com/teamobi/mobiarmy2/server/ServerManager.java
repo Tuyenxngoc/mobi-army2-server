@@ -7,6 +7,7 @@ import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.impl.Session;
 import com.teamobi.mobiarmy2.service.IGameDataService;
+import com.teamobi.mobiarmy2.service.IConnectionBlockerService;
 import com.teamobi.mobiarmy2.service.ILeaderboardService;
 import com.teamobi.mobiarmy2.ui.controllers.ServerListener;
 import org.slf4j.Logger;
@@ -27,6 +28,7 @@ public class ServerManager {
     private final IGameDataService gameDataService;
     private final ILeaderboardService leaderboardService;
     private final IServerConfig serverConfig;
+    private final IConnectionBlockerService connectionBlockerService;
     private final ArrayList<ISession> sessions;
     private final List<ServerListener> listeners;
     private ServerSocket server;
@@ -39,6 +41,7 @@ public class ServerManager {
         this.gameDataService = context.getBean(IGameDataService.class);
         this.leaderboardService = context.getBean(ILeaderboardService.class);
         this.serverConfig = context.getBean(IServerConfig.class);
+        this.connectionBlockerService = context.getBean(IConnectionBlockerService.class);
 
         this.isMaintenanceMode = false;
         this.sessions = new ArrayList<>();
@@ -74,8 +77,19 @@ public class ServerManager {
                 if (sessions.size() < serverConfig.getMaxClients()) {
                     try {
                         Socket socket = server.accept();
+
+                        String ipAddress = socket.getInetAddress().getHostAddress();
+                        if (connectionBlockerService.isIpBlocked(ipAddress)) {
+                            logger.warn("IP {} is blocked due to too many connections.", ipAddress);
+                            socket.close();
+                            continue;
+                        }
+
                         ISession session = new Session(++countClients, socket);
                         sessions.add(session);
+
+                        connectionBlockerService.incrementIpConnectionCount(ipAddress);
+
                         logger.info("Accept socket client {} done!", countClients);
                     } catch (Exception ignored) {
                     }
@@ -113,7 +127,9 @@ public class ServerManager {
     }
 
     public synchronized void disconnect(Session session) {
+        String ipAddress = session.getIPAddress();
         sessions.remove(session);
+        connectionBlockerService.decrementIpConnectionCount(ipAddress);
         notifyListeners();
     }
 

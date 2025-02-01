@@ -10,14 +10,9 @@ import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.dao.impl.*;
 import com.teamobi.mobiarmy2.server.ApplicationContext;
 import com.teamobi.mobiarmy2.server.ServerManager;
-import com.teamobi.mobiarmy2.service.IClanService;
-import com.teamobi.mobiarmy2.service.IGameDataService;
-import com.teamobi.mobiarmy2.service.ILeaderboardService;
-import com.teamobi.mobiarmy2.service.ILoginRateLimiterService;
-import com.teamobi.mobiarmy2.service.impl.ClanService;
-import com.teamobi.mobiarmy2.service.impl.GameDataService;
-import com.teamobi.mobiarmy2.service.impl.LeaderboardService;
-import com.teamobi.mobiarmy2.service.impl.LoginRateLimiterService;
+import com.teamobi.mobiarmy2.service.*;
+import com.teamobi.mobiarmy2.service.impl.*;
+import com.teamobi.mobiarmy2.service.impl.ConnectionBlockerService;
 import com.teamobi.mobiarmy2.ui.ServerUI;
 
 /**
@@ -73,6 +68,7 @@ public class MobiArmy2 {
                 context.getBean(IClanDAO.class)
         ));
         context.registerBean(ILoginRateLimiterService.class, new LoginRateLimiterService());
+        context.registerBean(IConnectionBlockerService.class, new ConnectionBlockerService());
 
         ServerManager serverManager = ServerManager.getInstance();
         Runtime.getRuntime().addShutdownHook(new Thread(serverManager::stop, "ServerShutdownHook"));
