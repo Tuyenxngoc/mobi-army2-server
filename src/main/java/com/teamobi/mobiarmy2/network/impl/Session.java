@@ -56,7 +56,7 @@ public class Session implements ISession {
         this.socket = socket;
         this.dis = new DataInputStream(socket.getInputStream());
         this.dos = new DataOutputStream(socket.getOutputStream());
-        this.IPAddress = socket.getInetAddress().getHostName();
+        this.IPAddress = socket.getInetAddress().getHostAddress();
 
         this.user = new User(this);
         this.messageHandler = new MessageHandler(user.getUserService());
