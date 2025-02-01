@@ -313,7 +313,7 @@ public class User {
                 ds.writeByte(2);
                 ds.writeInt(updateEquip.getKey());
                 ds.writeByte(updateEquip.getAddPoints().length * 2);
-                for (int i = 0; i < updateEquip.getAddPoints().length; i++) {
+                for (byte i = 0; i < updateEquip.getAddPoints().length; i++) {
                     ds.writeByte(updateEquip.getAddPoints()[i]);
                     ds.writeByte(updateEquip.getAddPercents()[i]);
                 }
@@ -321,18 +321,28 @@ public class User {
                 ds.writeByte(updateEquip.getRemainingDays());
             }
 
-            if (addItems != null && !addItems.isEmpty()) {
+            if (removeEquip != null && equipmentChest.containsKey(removeEquip.getKey())) {
+                equipmentChest.remove(removeEquip.getKey());
+
+                updateQuantity++;
+                ds.writeByte(0);
+                ds.writeInt(removeEquip.getKey());
+                ds.writeByte(1);
+            }
+
+            if (addItems != null) {
                 for (SpecialItemChest newItem : addItems) {
                     if (newItem.getQuantity() <= 0) {
                         continue;
                     }
-                    updateQuantity++;
                     SpecialItemChest existingItem = getSpecialItemById(newItem.getItem().getId());
                     if (existingItem != null) {
                         existingItem.increaseQuantity(newItem.getQuantity());
                     } else {
                         addSpecialItemChest(newItem);
                     }
+
+                    updateQuantity++;
                     ds.writeByte(newItem.getQuantity() > 1 ? 3 : 1);
                     ds.writeByte(newItem.getItem().getId());
                     if (newItem.getQuantity() > 1) {
@@ -343,31 +353,25 @@ public class User {
                 }
             }
 
-            if (removeItems != null && !removeItems.isEmpty()) {
+            if (removeItems != null) {
                 for (SpecialItemChest itemToRemove : removeItems) {
                     if (itemToRemove.getQuantity() <= 0) {
                         continue;
                     }
                     SpecialItemChest existingItem = getSpecialItemById(itemToRemove.getItem().getId());
-                    if (existingItem != null) {
-                        existingItem.decreaseQuantity(itemToRemove.getQuantity());
-                        if (existingItem.getQuantity() <= 0) {
-                            specialItemChest.remove(itemToRemove.getItem().getId());
-                        }
-                        updateQuantity++;
-                        ds.writeByte(0);
-                        ds.writeInt(itemToRemove.getItem().getId());
-                        ds.writeByte(itemToRemove.getQuantity());
+                    if (existingItem == null) {
+                        continue;
                     }
-                }
-            }
+                    existingItem.decreaseQuantity(itemToRemove.getQuantity());
+                    if (existingItem.getQuantity() <= 0) {
+                        specialItemChest.remove(itemToRemove.getItem().getId());
+                    }
 
-            if (removeEquip != null) {
-                updateQuantity++;
-                equipmentChest.remove(removeEquip.getKey());
-                ds.writeByte(0);
-                ds.writeInt(removeEquip.getKey());
-                ds.writeByte(1);
+                    updateQuantity++;
+                    ds.writeByte(0);
+                    ds.writeInt(itemToRemove.getItem().getId());
+                    ds.writeByte(itemToRemove.getQuantity());
+                }
             }
 
             ds.flush();

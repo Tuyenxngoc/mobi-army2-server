@@ -1617,11 +1617,59 @@ public class UserService implements IUserService {
 
             case 86 -> {
                 if (specialItemChest.getQuantity() == 50) {
-                    System.out.println("Cong trang bi vang 1");
+                    for (byte i = 0; i < 5; i++) {
+                        byte[] addPoints = new byte[5];
+                        byte[] addPercents = new byte[5];
+                        for (byte n = 0; n < 5; n++) {
+                            addPoints[n] = (byte) Utils.nextInt(15, 20);
+                            addPercents[n] = (byte) Utils.nextInt(8, 10);
+                        }
+                        EquipmentChest newEquip = new EquipmentChest();
+                        newEquip.setEquipment(EquipmentManager.getEquipment(user.getActiveCharacterId(), i, (short) (30 + i)));
+                        newEquip.setVipLevel((byte) 1);
+                        newEquip.setAddPoints(addPoints);
+                        newEquip.setAddPercents(addPercents);
+
+                        user.addEquipment(newEquip);
+                    }
+                    user.updateInventory(null, null, null, List.of(specialItemChest));
+                    sendServerMessage(GameString.USE_BANH_TRUNG_SUCCESS);
                 } else if (specialItemChest.getQuantity() == 100) {
-                    System.out.println("Cong trang bi vang 2");
+                    for (byte i = 0; i < 5; i++) {
+                        byte[] addPoints = new byte[5];
+                        byte[] addPercents = new byte[5];
+                        for (byte n = 0; n < 5; n++) {
+                            addPoints[n] = (byte) Utils.nextInt(20, 25);
+                            addPercents[n] = (byte) Utils.nextInt(10, 12);
+                        }
+                        EquipmentChest newEquip = new EquipmentChest();
+                        newEquip.setEquipment(EquipmentManager.getEquipment(user.getActiveCharacterId(), i, (short) (30 + i)));
+                        newEquip.setVipLevel((byte) 2);
+                        newEquip.setAddPoints(addPoints);
+                        newEquip.setAddPercents(addPercents);
+
+                        user.addEquipment(newEquip);
+                    }
+                    user.updateInventory(null, null, null, List.of(specialItemChest));
+                    sendServerMessage(GameString.USE_BANH_TRUNG_SUCCESS);
                 } else if (specialItemChest.getQuantity() == 150) {
-                    System.out.println("Cong trang bi vang 3");
+                    for (byte i = 0; i < 5; i++) {
+                        byte[] addPoints = new byte[5];
+                        byte[] addPercents = new byte[5];
+                        for (byte n = 0; n < 5; n++) {
+                            addPoints[n] = (byte) Utils.nextInt(25, 30);
+                            addPercents[n] = (byte) Utils.nextInt(12, 14);
+                        }
+                        EquipmentChest newEquip = new EquipmentChest();
+                        newEquip.setEquipment(EquipmentManager.getEquipment(user.getActiveCharacterId(), i, (short) (30 + i)));
+                        newEquip.setVipLevel((byte) 3);
+                        newEquip.setAddPoints(addPoints);
+                        newEquip.setAddPercents(addPercents);
+
+                        user.addEquipment(newEquip);
+                    }
+                    user.updateInventory(null, null, null, List.of(specialItemChest));
+                    sendServerMessage(GameString.USE_BANH_TRUNG_SUCCESS);
                 } else {
                     user.updateXp(1000 * specialItemChest.getQuantity());
                     user.updateInventory(null, null, null, List.of(specialItemChest));
@@ -1631,11 +1679,92 @@ public class UserService implements IUserService {
 
             case 87 -> {
                 if (specialItemChest.getQuantity() == 50) {
-                    System.out.println("Cong trang bi bac 1");
+                    byte[][] maxPoints = {{5, 15, 5, 5, 5}, {15, 5, 5, 5, 5}, {5, 5, 15, 5, 5}, {5, 5, 5, 15, 5}, {5, 5, 5, 5, 15}};
+                    byte[][] minPoints = {{5, 10, 5, 5, 5}, {10, 5, 5, 5, 5}, {5, 5, 10, 5, 5}, {5, 5, 5, 10, 5}, {5, 5, 5, 5, 10}};
+                    byte[][] maxPercents = {{0, 4, 0, 0, 4}, {4, 0, 0, 4, 0}, {0, 0, 4, 0, 4}, {4, 4, 0, 0, 0}, {0, 0, 4, 4, 0}};
+                    byte[][] minPercents = {{0, 2, 0, 0, 2}, {2, 0, 0, 2, 0}, {0, 0, 2, 0, 2}, {2, 2, 0, 0, 0}, {0, 0, 2, 2, 0}};
+                    for (byte i = 0; i < 5; i++) {
+                        byte[] generatedPoints = new byte[5];
+                        byte[] generatedPercents = new byte[5];
+
+                        byte[] currentMaxPoints = maxPoints[i];
+                        byte[] currentMinPoints = minPoints[i];
+                        byte[] currentMaxPercents = maxPercents[i];
+                        byte[] currentMinPercents = minPercents[i];
+
+                        for (byte n = 0; n < 5; n++) {
+                            generatedPoints[n] = (byte) Utils.nextInt(currentMinPoints[n], currentMaxPoints[n]);
+                            generatedPercents[n] = (byte) Utils.nextInt(currentMinPercents[n], currentMaxPercents[n]);
+                        }
+
+                        EquipmentChest newEquipment = new EquipmentChest();
+                        newEquipment.setEquipment(EquipmentManager.getEquipment(user.getActiveCharacterId(), i, (short) (25 + i)));
+                        newEquipment.setVipLevel((byte) 1);
+                        newEquipment.setAddPoints(generatedPoints);
+                        newEquipment.setAddPercents(generatedPercents);
+
+                        user.addEquipment(newEquipment);
+                    }
+                    user.updateInventory(null, null, null, List.of(specialItemChest));
+                    sendServerMessage(GameString.USE_BANH_TET_SUCCESS);
                 } else if (specialItemChest.getQuantity() == 100) {
-                    System.out.println("Cong trang bi bac 2");
+                    byte[][] maxPoints = {{7, 20, 7, 7, 7}, {20, 7, 7, 7, 7}, {7, 7, 20, 7, 7}, {7, 7, 7, 20, 7}, {7, 7, 7, 7, 20}};
+                    byte[][] minPoints = {{7, 15, 7, 7, 7}, {15, 7, 7, 7, 7}, {7, 7, 15, 7, 7}, {7, 7, 7, 15, 7}, {7, 7, 7, 7, 15}};
+                    byte[][] maxPercents = {{0, 6, 0, 0, 6}, {6, 0, 0, 6, 0}, {0, 0, 6, 0, 6}, {6, 6, 0, 0, 0}, {0, 0, 6, 6, 0}};
+                    byte[][] minPercents = {{0, 4, 0, 0, 4}, {4, 0, 0, 4, 0}, {0, 0, 4, 0, 4}, {4, 4, 0, 0, 0}, {0, 0, 4, 4, 0}};
+                    for (byte i = 0; i < 5; i++) {
+                        byte[] generatedPoints = new byte[5];
+                        byte[] generatedPercents = new byte[5];
+
+                        byte[] currentMaxPoints = maxPoints[i];
+                        byte[] currentMinPoints = minPoints[i];
+                        byte[] currentMaxPercents = maxPercents[i];
+                        byte[] currentMinPercents = minPercents[i];
+
+                        for (byte n = 0; n < 5; n++) {
+                            generatedPoints[n] = (byte) Utils.nextInt(currentMinPoints[n], currentMaxPoints[n]);
+                            generatedPercents[n] = (byte) Utils.nextInt(currentMinPercents[n], currentMaxPercents[n]);
+                        }
+
+                        EquipmentChest newEquipment = new EquipmentChest();
+                        newEquipment.setEquipment(EquipmentManager.getEquipment(user.getActiveCharacterId(), i, (short) (25 + i)));
+                        newEquipment.setVipLevel((byte) 2);
+                        newEquipment.setAddPoints(generatedPoints);
+                        newEquipment.setAddPercents(generatedPercents);
+
+                        user.addEquipment(newEquipment);
+                    }
+                    user.updateInventory(null, null, null, List.of(specialItemChest));
+                    sendServerMessage(GameString.USE_BANH_TET_SUCCESS);
                 } else if (specialItemChest.getQuantity() == 150) {
-                    System.out.println("Cong trang bi bac 3");
+                    byte[][] maxPoints = {{9, 25, 9, 9, 9}, {25, 9, 9, 9, 9}, {9, 9, 25, 9, 9}, {9, 9, 9, 25, 9}, {9, 9, 9, 9, 25}};
+                    byte[][] minPoints = {{9, 20, 9, 9, 9}, {20, 9, 9, 9, 9}, {9, 9, 20, 9, 9}, {9, 9, 9, 20, 9}, {9, 9, 9, 9, 20}};
+                    byte[][] maxPercents = {{0, 8, 0, 0, 8}, {8, 0, 0, 8, 0}, {0, 0, 8, 0, 8}, {8, 8, 0, 0, 0}, {0, 0, 8, 8, 0}};
+                    byte[][] minPercents = {{0, 6, 0, 0, 6}, {6, 0, 0, 6, 0}, {0, 0, 6, 0, 6}, {6, 6, 0, 0, 0}, {0, 0, 6, 6, 0}};
+                    for (byte i = 0; i < 5; i++) {
+                        byte[] generatedPoints = new byte[5];
+                        byte[] generatedPercents = new byte[5];
+
+                        byte[] currentMaxPoints = maxPoints[i];
+                        byte[] currentMinPoints = minPoints[i];
+                        byte[] currentMaxPercents = maxPercents[i];
+                        byte[] currentMinPercents = minPercents[i];
+
+                        for (byte n = 0; n < 5; n++) {
+                            generatedPoints[n] = (byte) Utils.nextInt(currentMinPoints[n], currentMaxPoints[n]);
+                            generatedPercents[n] = (byte) Utils.nextInt(currentMinPercents[n], currentMaxPercents[n]);
+                        }
+
+                        EquipmentChest newEquipment = new EquipmentChest();
+                        newEquipment.setEquipment(EquipmentManager.getEquipment(user.getActiveCharacterId(), i, (short) (25 + i)));
+                        newEquipment.setVipLevel((byte) 3);
+                        newEquipment.setAddPoints(generatedPoints);
+                        newEquipment.setAddPercents(generatedPercents);
+
+                        user.addEquipment(newEquipment);
+                    }
+                    user.updateInventory(null, null, null, List.of(specialItemChest));
+                    sendServerMessage(GameString.USE_BANH_TET_SUCCESS);
                 } else {
                     user.updateXp(500 * specialItemChest.getQuantity());
                     user.updateInventory(null, null, null, List.of(specialItemChest));
