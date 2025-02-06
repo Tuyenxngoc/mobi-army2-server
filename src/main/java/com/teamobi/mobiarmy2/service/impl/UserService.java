@@ -1617,6 +1617,11 @@ public class UserService implements IUserService {
 
             case 86 -> {
                 if (specialItemChest.getQuantity() == 50) {
+                    if (ExchangeLimitManager.isGoldLimitReached(0)) {
+                        sendServerMessage("Đã hết số lượng trang bị vàng cấp 1");
+                        return;
+                    }
+
                     for (byte i = 0; i < 5; i++) {
                         byte[] addPoints = new byte[5];
                         byte[] addPercents = new byte[5];
@@ -1632,9 +1637,17 @@ public class UserService implements IUserService {
 
                         user.addEquipment(newEquip);
                     }
+
+                    ExchangeLimitManager.incrementGoldCount(0);
+
                     user.updateInventory(null, null, null, List.of(specialItemChest));
                     sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 } else if (specialItemChest.getQuantity() == 100) {
+                    if (ExchangeLimitManager.isGoldLimitReached(1)) {
+                        sendServerMessage("Đã hết số lượng trang bị vàng cấp 2");
+                        return;
+                    }
+
                     for (byte i = 0; i < 5; i++) {
                         byte[] addPoints = new byte[5];
                         byte[] addPercents = new byte[5];
@@ -1650,9 +1663,17 @@ public class UserService implements IUserService {
 
                         user.addEquipment(newEquip);
                     }
+
+                    ExchangeLimitManager.incrementGoldCount(1);
+
                     user.updateInventory(null, null, null, List.of(specialItemChest));
                     sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 } else if (specialItemChest.getQuantity() == 150) {
+                    if (ExchangeLimitManager.isGoldLimitReached(2)) {
+                        sendServerMessage("Đã hết số lượng trang bị vàng cấp 3");
+                        return;
+                    }
+
                     for (byte i = 0; i < 5; i++) {
                         byte[] addPoints = new byte[5];
                         byte[] addPercents = new byte[5];
@@ -1668,6 +1689,9 @@ public class UserService implements IUserService {
 
                         user.addEquipment(newEquip);
                     }
+
+                    ExchangeLimitManager.incrementGoldCount(2);
+
                     user.updateInventory(null, null, null, List.of(specialItemChest));
                     sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 } else {
@@ -1679,6 +1703,11 @@ public class UserService implements IUserService {
 
             case 87 -> {
                 if (specialItemChest.getQuantity() == 50) {
+                    if (ExchangeLimitManager.isSilverLimitReached(0)) {
+                        sendServerMessage("Đã hết số lượng trang bị bạc cấp 1");
+                        return;
+                    }
+
                     byte[][] maxPoints = {{5, 15, 5, 5, 5}, {15, 5, 5, 5, 5}, {5, 5, 15, 5, 5}, {5, 5, 5, 15, 5}, {5, 5, 5, 5, 15}};
                     byte[][] minPoints = {{5, 10, 5, 5, 5}, {10, 5, 5, 5, 5}, {5, 5, 10, 5, 5}, {5, 5, 5, 10, 5}, {5, 5, 5, 5, 10}};
                     byte[][] maxPercents = {{0, 4, 0, 0, 4}, {4, 0, 0, 4, 0}, {0, 0, 4, 0, 4}, {4, 4, 0, 0, 0}, {0, 0, 4, 4, 0}};
@@ -1705,9 +1734,17 @@ public class UserService implements IUserService {
 
                         user.addEquipment(newEquipment);
                     }
+
+                    ExchangeLimitManager.incrementSilverCount(0);
+
                     user.updateInventory(null, null, null, List.of(specialItemChest));
                     sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 } else if (specialItemChest.getQuantity() == 100) {
+                    if (ExchangeLimitManager.isSilverLimitReached(1)) {
+                        sendServerMessage("Đã hết số lượng trang bị bạc cấp 2");
+                        return;
+                    }
+
                     byte[][] maxPoints = {{7, 20, 7, 7, 7}, {20, 7, 7, 7, 7}, {7, 7, 20, 7, 7}, {7, 7, 7, 20, 7}, {7, 7, 7, 7, 20}};
                     byte[][] minPoints = {{7, 15, 7, 7, 7}, {15, 7, 7, 7, 7}, {7, 7, 15, 7, 7}, {7, 7, 7, 15, 7}, {7, 7, 7, 7, 15}};
                     byte[][] maxPercents = {{0, 6, 0, 0, 6}, {6, 0, 0, 6, 0}, {0, 0, 6, 0, 6}, {6, 6, 0, 0, 0}, {0, 0, 6, 6, 0}};
@@ -1734,9 +1771,17 @@ public class UserService implements IUserService {
 
                         user.addEquipment(newEquipment);
                     }
+
+                    ExchangeLimitManager.incrementSilverCount(1);
+
                     user.updateInventory(null, null, null, List.of(specialItemChest));
                     sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 } else if (specialItemChest.getQuantity() == 150) {
+                    if (ExchangeLimitManager.isSilverLimitReached(2)) {
+                        sendServerMessage("Đã hết số lượng trang bị bạc cấp 3");
+                        return;
+                    }
+
                     byte[][] maxPoints = {{9, 25, 9, 9, 9}, {25, 9, 9, 9, 9}, {9, 9, 25, 9, 9}, {9, 9, 9, 25, 9}, {9, 9, 9, 9, 25}};
                     byte[][] minPoints = {{9, 20, 9, 9, 9}, {20, 9, 9, 9, 9}, {9, 9, 20, 9, 9}, {9, 9, 9, 20, 9}, {9, 9, 9, 9, 20}};
                     byte[][] maxPercents = {{0, 8, 0, 0, 8}, {8, 0, 0, 8, 0}, {0, 0, 8, 0, 8}, {8, 8, 0, 0, 0}, {0, 0, 8, 8, 0}};
@@ -1763,6 +1808,9 @@ public class UserService implements IUserService {
 
                         user.addEquipment(newEquipment);
                     }
+
+                    ExchangeLimitManager.incrementSilverCount(2);
+
                     user.updateInventory(null, null, null, List.of(specialItemChest));
                     sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 } else {
