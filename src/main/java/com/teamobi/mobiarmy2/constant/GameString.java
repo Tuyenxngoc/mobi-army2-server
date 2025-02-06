@@ -53,15 +53,16 @@ public class GameString {
     public static final String ITEM_X2_XP_USAGE_SUCCESS = "Sử dụng thành công. Bạn có 1 ngày x2 kinh nghiệm!";
 
     public static final String USE_BANH_TRUNG_REQUEST = "Bạn có muốn dùng bánh trưng không?";
-    public static final String USE_BANH_TRUNG_SUCCESS = "Dùng bánh trưng thành công";
     public static final String USE_BANH_TET_REQUEST = "Bạn có muốn dùng bánh tét không?";
+    public static final String USE_BANH_TRUNG_SUCCESS = "Dùng bánh trưng thành công";
     public static final String USE_BANH_TET_SUCCESS = "Dùng bánh tét thành công";
-    public static final String EXCHANGE_BANH_TET_TO_SILVER_EQUIP_1 = "Bạn có muốn đổi 50 bánh tét để lấy một bộ trang bị bạc cấp 1 không?";
-    public static final String EXCHANGE_BANH_TET_TO_SILVER_EQUIP_2 = "Bạn có muốn đổi 100 bánh tét để lấy một bộ trang bị bạc cấp 2 không?";
-    public static final String EXCHANGE_BANH_TET_TO_SILVER_EQUIP_3 = "Bạn có muốn đổi 150 bánh tét để lấy một bộ trang bị bạc cấp 3 không?";
-    public static final String EXCHANGE_BANH_TRUNG_TO_GOLD_EQUIP_1 = "Bạn có muốn đổi 50 bánh trưng để lấy một bộ trang bị vàng cấp 1 không?";
-    public static final String EXCHANGE_BANH_TRUNG_TO_GOLD_EQUIP_2 = "Bạn có muốn đổi 100 bánh trưng để lấy một bộ trang bị vàng cấp 2 không?";
-    public static final String EXCHANGE_BANH_TRUNG_TO_GOLD_EQUIP_3 = "Bạn có muốn đổi 150 bánh trưng để lấy một bộ trang bị vàng cấp 3 không?";
+    public static final String NEW_YEAR_EVENT_GIFT_MESSAGE = "Chúc mừng bạn đã nhận được quà của sự kiện Vui Xuân Đón Tết";
+    public static final String EXCHANGE_BANH_TET_TO_SILVER_EQUIP_1 = "Bạn có muốn đổi 50 bánh tét hoàn thiện để lấy một bộ trang bị bạc cấp 1 không?";
+    public static final String EXCHANGE_BANH_TET_TO_SILVER_EQUIP_2 = "Bạn có muốn đổi 100 bánh tét hoàn thiện để lấy một bộ trang bị bạc cấp 2 không?";
+    public static final String EXCHANGE_BANH_TET_TO_SILVER_EQUIP_3 = "Bạn có muốn đổi 150 bánh tét hoàn thiện để lấy một bộ trang bị bạc cấp 3 không?";
+    public static final String EXCHANGE_BANH_TRUNG_TO_GOLD_EQUIP_1 = "Bạn có muốn đổi 50 bánh trưng hoàn thiện để lấy một bộ trang bị vàng cấp 1 không?";
+    public static final String EXCHANGE_BANH_TRUNG_TO_GOLD_EQUIP_2 = "Bạn có muốn đổi 100 bánh trưng hoàn thiện để lấy một bộ trang bị vàng cấp 2 không?";
+    public static final String EXCHANGE_BANH_TRUNG_TO_GOLD_EQUIP_3 = "Bạn có muốn đổi 150 bánh trưng hoàn thiện để lấy một bộ trang bị vàng cấp 3 không?";
 
     public static final String AREA_NOT_FOUND = "Không tìm thấy khu vực yêu cầu!";
     public static final String AREA_JOIN_IN_PROGRESS = "Không thể vào do còn đang chơi";

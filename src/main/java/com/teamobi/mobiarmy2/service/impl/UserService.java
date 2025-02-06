@@ -1633,7 +1633,7 @@ public class UserService implements IUserService {
                         user.addEquipment(newEquip);
                     }
                     user.updateInventory(null, null, null, List.of(specialItemChest));
-                    sendServerMessage(GameString.USE_BANH_TRUNG_SUCCESS);
+                    sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 } else if (specialItemChest.getQuantity() == 100) {
                     for (byte i = 0; i < 5; i++) {
                         byte[] addPoints = new byte[5];
@@ -1651,7 +1651,7 @@ public class UserService implements IUserService {
                         user.addEquipment(newEquip);
                     }
                     user.updateInventory(null, null, null, List.of(specialItemChest));
-                    sendServerMessage(GameString.USE_BANH_TRUNG_SUCCESS);
+                    sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 } else if (specialItemChest.getQuantity() == 150) {
                     for (byte i = 0; i < 5; i++) {
                         byte[] addPoints = new byte[5];
@@ -1669,7 +1669,7 @@ public class UserService implements IUserService {
                         user.addEquipment(newEquip);
                     }
                     user.updateInventory(null, null, null, List.of(specialItemChest));
-                    sendServerMessage(GameString.USE_BANH_TRUNG_SUCCESS);
+                    sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 } else {
                     user.updateXp(1000 * specialItemChest.getQuantity());
                     user.updateInventory(null, null, null, List.of(specialItemChest));
@@ -1706,7 +1706,7 @@ public class UserService implements IUserService {
                         user.addEquipment(newEquipment);
                     }
                     user.updateInventory(null, null, null, List.of(specialItemChest));
-                    sendServerMessage(GameString.USE_BANH_TET_SUCCESS);
+                    sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 } else if (specialItemChest.getQuantity() == 100) {
                     byte[][] maxPoints = {{7, 20, 7, 7, 7}, {20, 7, 7, 7, 7}, {7, 7, 20, 7, 7}, {7, 7, 7, 20, 7}, {7, 7, 7, 7, 20}};
                     byte[][] minPoints = {{7, 15, 7, 7, 7}, {15, 7, 7, 7, 7}, {7, 7, 15, 7, 7}, {7, 7, 7, 15, 7}, {7, 7, 7, 7, 15}};
@@ -1735,7 +1735,7 @@ public class UserService implements IUserService {
                         user.addEquipment(newEquipment);
                     }
                     user.updateInventory(null, null, null, List.of(specialItemChest));
-                    sendServerMessage(GameString.USE_BANH_TET_SUCCESS);
+                    sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 } else if (specialItemChest.getQuantity() == 150) {
                     byte[][] maxPoints = {{9, 25, 9, 9, 9}, {25, 9, 9, 9, 9}, {9, 9, 25, 9, 9}, {9, 9, 9, 25, 9}, {9, 9, 9, 9, 25}};
                     byte[][] minPoints = {{9, 20, 9, 9, 9}, {20, 9, 9, 9, 9}, {9, 9, 20, 9, 9}, {9, 9, 9, 20, 9}, {9, 9, 9, 9, 20}};
@@ -1764,7 +1764,7 @@ public class UserService implements IUserService {
                         user.addEquipment(newEquipment);
                     }
                     user.updateInventory(null, null, null, List.of(specialItemChest));
-                    sendServerMessage(GameString.USE_BANH_TET_SUCCESS);
+                    sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 } else {
                     user.updateXp(500 * specialItemChest.getQuantity());
                     user.updateInventory(null, null, null, List.of(specialItemChest));

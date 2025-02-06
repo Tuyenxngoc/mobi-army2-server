@@ -42,8 +42,8 @@ public class FabricateItemDAO implements IFabricateItemDAO {
                     fabricateItem.setConfirmationMessage(resultSet.getString("confirmation_message"));
                     fabricateItem.setCompletionMessage(resultSet.getString("completion_message"));
 
-                    SpecialItemChestJson[] jsonArray = gson.fromJson(resultSet.getString("item_require"), SpecialItemChestJson[].class);
-                    for (SpecialItemChestJson specialItemChestJson : jsonArray) {
+                    SpecialItemChestJson[] itemRequires = gson.fromJson(resultSet.getString("item_require"), SpecialItemChestJson[].class);
+                    for (SpecialItemChestJson specialItemChestJson : itemRequires) {
                         SpecialItem specialItem = SpecialItemManager.getSpecialItemById(specialItemChestJson.getId());
                         if (specialItem == null) {
                             continue;
@@ -51,18 +51,19 @@ public class FabricateItemDAO implements IFabricateItemDAO {
                         fabricateItem.getItemRequire().add(new SpecialItemChest(specialItemChestJson.getQuantity(), specialItem));
                     }
 
-                    jsonArray = gson.fromJson(resultSet.getString("reward_item"), SpecialItemChestJson[].class);
-                    for (SpecialItemChestJson specialItemChestJson : jsonArray) {
-                        SpecialItem specialItem = SpecialItemManager.getSpecialItemById(specialItemChestJson.getId());
-                        if (specialItem == null) {
-                            continue;
+                    String rewardItemJson = resultSet.getString("reward_item");
+                    if (rewardItemJson != null) {
+                        SpecialItemChestJson[] rewardItems = gson.fromJson(resultSet.getString("reward_item"), SpecialItemChestJson[].class);
+                        for (SpecialItemChestJson specialItemChestJson : rewardItems) {
+                            SpecialItem specialItem = SpecialItemManager.getSpecialItemById(specialItemChestJson.getId());
+                            if (specialItem == null) {
+                                continue;
+                            }
+                            fabricateItem.getRewardItem().add(new SpecialItemChest(specialItemChestJson.getQuantity(), specialItem));
                         }
-                        fabricateItem.getRewardItem().add(new SpecialItemChest(specialItemChestJson.getQuantity(), specialItem));
                     }
 
-                    if (!fabricateItem.getItemRequire().isEmpty() && !fabricateItem.getRewardItem().isEmpty()) {
-                        FabricateItemManager.FABRICATE_ITEMS.add(fabricateItem);
-                    }
+                    FabricateItemManager.FABRICATE_ITEMS.add(fabricateItem);
                 }
             }
         } catch (SQLException e) {
