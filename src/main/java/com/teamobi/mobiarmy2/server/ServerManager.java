@@ -65,6 +65,7 @@ public class ServerManager {
         gameDataService.setCache();
         leaderboardService.init();
         RoomManager.getInstance().init();
+        ExchangeLimitManager.init();
     }
 
     public void start() {
