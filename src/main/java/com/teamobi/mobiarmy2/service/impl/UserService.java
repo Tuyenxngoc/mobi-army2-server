@@ -255,7 +255,7 @@ public class UserService implements IUserService {
             sendCharacterData(serverConfig);
             sendRoomCaption(serverConfig);
             sendMapCollisionInfo();
-            sendServerInfoToUser(serverConfig.getMessageLogin());
+            sendServerInfo(serverConfig.getMessageLogin(), false);
 
             serverManager.notifyListeners();
         } catch (IOException ignored) {
@@ -1237,7 +1237,7 @@ public class UserService implements IUserService {
                     return;
                 }
                 user.updateXu(-priceChatServer);
-                sendServerInfoToServer(GameString.createMessageFromSender(user.getUsername(), content));
+                sendServerInfo(GameString.createMessageFromSender(user.getUsername(), content), true);
                 return;
             }
             User receiver = ServerManager.getInstance().getUserByUserId(userId);
@@ -1267,14 +1267,6 @@ public class UserService implements IUserService {
             }
         } catch (IOException ignored) {
         }
-    }
-
-    private void sendServerInfoToServer(String message) {
-        sendServerInfo(message, true);
-    }
-
-    private void sendServerInfoToUser(String message) {
-        sendServerInfo(message, false);
     }
 
     public void sendMessageToUser(String message) {
