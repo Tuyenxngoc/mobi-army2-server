@@ -14,8 +14,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * @author tuyen
@@ -254,29 +255,26 @@ public class Session implements ISession {
 
     class Sender implements Runnable {
 
-        private final ArrayList<IMessage> sendingMessage = new ArrayList<>();
+        private final BlockingQueue<IMessage> messageQueue = new LinkedBlockingQueue<>();
 
         public void addMessage(IMessage message) {
-            sendingMessage.add(message);
+            if (message != null) {
+                messageQueue.add(message);
+            }
         }
 
         @Override
         public void run() {
             try {
                 while (Session.this.isSendKeyComplete()) {
-                    while (!sendingMessage.isEmpty() && Session.this.dis != null) {
-                        IMessage message = sendingMessage.removeFirst();
-                        logger.info("   Send mss {} to {}", Cmd.getCmdNameByValue(message.getCommand()), Session.this);
-                        Session.this.doSendMessage(message);
-                    }
-                    try {
-                        Thread.sleep(10L);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    IMessage message = messageQueue.take();
+                    logger.info("   Send mss {} to {}", Cmd.getCmdNameByValue(message.getCommand()), Session.this);
+                    Session.this.doSendMessage(message);
                 }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
         }
     }
