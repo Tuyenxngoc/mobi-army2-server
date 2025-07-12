@@ -21,6 +21,20 @@ public class MobiArmy2 {
 
     public static void main(String[] args) {
         ApplicationContext context = ApplicationContext.getInstance();
+        registerBeans(context);
+
+        ServerManager serverManager = ServerManager.getInstance();
+        Runtime.getRuntime().addShutdownHook(new Thread(serverManager::stop, "ServerShutdownHook"));
+
+        new Thread(() -> {
+            serverManager.init();
+            serverManager.start();
+        }, "Main").start();
+
+        new Thread(() -> ServerUI.launchUI(args), "ServerUI").start();
+    }
+
+    private static void registerBeans(ApplicationContext context) {
         context.registerBean(IServerConfig.class, new ServerConfig());
         context.registerBean(IDatabaseConfig.class, new HikariCPConfig());
         context.registerBean(IRedisConfig.class, new RedisConfig());
@@ -68,15 +82,5 @@ public class MobiArmy2 {
         ));
         context.registerBean(ILoginRateLimiterService.class, new LoginRateLimiterService());
         context.registerBean(IConnectionBlockerService.class, new ConnectionBlockerService());
-
-        ServerManager serverManager = ServerManager.getInstance();
-        Runtime.getRuntime().addShutdownHook(new Thread(serverManager::stop, "ServerShutdownHook"));
-
-        new Thread(() -> {
-            serverManager.init();
-            serverManager.start();
-        }, "Main").start();
-
-        new Thread(() -> ServerUI.launchUI(args), "ServerUI").start();
     }
 }
