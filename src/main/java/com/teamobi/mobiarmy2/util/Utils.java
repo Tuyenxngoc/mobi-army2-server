@@ -18,9 +18,6 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Random;
 
-/**
- * @author tuyen
- */
 public class Utils {
 
     private static final Random RANDOM;

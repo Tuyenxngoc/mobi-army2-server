@@ -1,8 +1,5 @@
 package com.teamobi.mobiarmy2.constant;
 
-/**
- * @author tuyen
- */
 public enum UserAction {
     INSERT_GEM_INTO_EQUIPMENT("Ghép ngọc vào trang bị"),
     REMOVE_GEM_FROM_EQUIPMENT("Tháo ngọc khỏi trang bị"),

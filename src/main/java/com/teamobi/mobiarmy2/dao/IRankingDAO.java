@@ -4,9 +4,6 @@ import com.teamobi.mobiarmy2.dto.UserLeaderboardDTO;
 
 import java.util.List;
 
-/**
- * @author tuyen
- */
 public interface IRankingDAO {
 
     List<UserLeaderboardDTO> getTopCup();

@@ -13,9 +13,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-/**
- * @author tuyen
- */
 public class EquipmentDAO implements IEquipmentDAO {
 
     private static void validateEquipment(Equipment equipment) throws SQLException {

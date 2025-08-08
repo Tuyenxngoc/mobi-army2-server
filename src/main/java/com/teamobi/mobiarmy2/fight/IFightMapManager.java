@@ -5,9 +5,6 @@ import com.teamobi.mobiarmy2.model.MapTile;
 
 import java.util.List;
 
-/**
- * @author tuyen
- */
 public interface IFightMapManager {
 
     short getWidth();

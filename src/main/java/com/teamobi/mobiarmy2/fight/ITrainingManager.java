@@ -2,9 +2,6 @@ package com.teamobi.mobiarmy2.fight;
 
 import com.teamobi.mobiarmy2.model.User;
 
-/**
- * @author tuyen
- */
 public interface ITrainingManager {
 
     void startTraining();

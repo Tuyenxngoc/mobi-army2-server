@@ -18,9 +18,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * @author tuyen
- */
 public class ClanService implements IClanService {
     private final ConcurrentHashMap<Short, Object> clanLocks = new ConcurrentHashMap<>();
     private final IClanDAO clanDAO;

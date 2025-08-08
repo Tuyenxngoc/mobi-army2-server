@@ -6,9 +6,6 @@ import com.teamobi.mobiarmy2.network.IMessage;
 
 import java.io.IOException;
 
-/**
- * @author tuyen
- */
 public interface IFightWait {
 
     int getMaxSetPlayers();

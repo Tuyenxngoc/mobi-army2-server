@@ -13,9 +13,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * @author tuyen
- */
 public class FightMapManager implements IFightMapManager {
 
     private final List<MapTile> mapTiles = new ArrayList<>();

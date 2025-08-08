@@ -4,9 +4,6 @@ import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.fight.impl.FightWait;
 import lombok.Getter;
 
-/**
- * @author tuyen
- */
 @Getter
 public class Room {
     private final byte index;

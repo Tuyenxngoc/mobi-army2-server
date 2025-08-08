@@ -4,9 +4,6 @@ import com.teamobi.mobiarmy2.fight.IFightManager;
 import com.teamobi.mobiarmy2.model.Boss;
 import com.teamobi.mobiarmy2.model.Player;
 
-/**
- * @author tuyen
- */
 public class SmallBoom extends Boss {
 
     public SmallBoom(IFightManager fightManager, byte index, short x, short y, short maxHp) {

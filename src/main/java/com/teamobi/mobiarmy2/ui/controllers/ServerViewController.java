@@ -19,9 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author tuyen
- */
 public class ServerViewController implements ServerListener {
 
     @FXML

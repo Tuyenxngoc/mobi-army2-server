@@ -14,9 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * @author tuyen
- */
 public class MapManager {
     public static final Map<Byte, ArmyMap> ARMY_MAPS = new HashMap<>();
     public static final Map<Integer, MapBrick> MAP_BRICKS = new HashMap<>();

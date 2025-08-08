@@ -7,9 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author tuyen
- */
 public class FormulaManager {
     public static final Map<Byte, Map<Byte, List<Formula>>> FORMULAS = new HashMap<>();
 

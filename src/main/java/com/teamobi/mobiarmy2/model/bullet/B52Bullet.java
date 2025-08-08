@@ -4,9 +4,6 @@ import com.teamobi.mobiarmy2.fight.impl.BulletManager;
 import com.teamobi.mobiarmy2.model.Bullet;
 import com.teamobi.mobiarmy2.model.Player;
 
-/**
- * @author tuyen
- */
 public class B52Bullet extends Bullet {
 
     private final short toX;

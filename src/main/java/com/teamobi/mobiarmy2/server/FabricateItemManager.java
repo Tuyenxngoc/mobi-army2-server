@@ -8,9 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * @author tuyen
- */
 public class FabricateItemManager {
     public static final List<FabricateItem> FABRICATE_ITEMS = new ArrayList<>();
 

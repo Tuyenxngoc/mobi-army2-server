@@ -2,9 +2,6 @@ package com.teamobi.mobiarmy2.config;
 
 import java.time.LocalDateTime;
 
-/**
- * @author tuyen
- */
 public interface IServerConfig {
 
     byte[][] getBossRoomMapLimit();

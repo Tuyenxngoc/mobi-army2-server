@@ -6,9 +6,6 @@ import com.teamobi.mobiarmy2.model.Player;
 
 import java.util.List;
 
-/**
- * @author tuyen
- */
 public interface IBulletManager {
 
     List<Boss> getAddBosses();

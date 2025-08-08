@@ -8,9 +8,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-/**
- * @author tuyen
- */
 public class EffectManager {
     public static final int HOLE_COUNT = 10;
     public static final ImageData[] holeData = new ImageData[HOLE_COUNT];

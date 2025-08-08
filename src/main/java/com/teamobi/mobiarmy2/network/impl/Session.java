@@ -17,9 +17,6 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author tuyen
- */
 public class Session implements ISession {
     private static final Logger logger = LoggerFactory.getLogger(Session.class);
 

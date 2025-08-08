@@ -22,9 +22,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-/**
- * @author tuyen
- */
 public class FightWait implements IFightWait {
     public static final byte MAX_ITEMS_SLOT = 8;
     public static final int KICK_BOSS_TIME = 90;

@@ -5,9 +5,6 @@ import com.teamobi.mobiarmy2.model.Boss;
 import com.teamobi.mobiarmy2.model.Reward;
 import com.teamobi.mobiarmy2.util.Utils;
 
-/**
- * @author tuyen
- */
 public class GiftBox extends Boss {
 
     private static final short[] COINS_BONUS = {1000, 5000, 10000, 15000, 20000, 25000, 30000};

@@ -5,9 +5,6 @@ import lombok.Setter;
 
 import java.util.List;
 
-/**
- * @author tuyen
- */
 @Getter
 @Setter
 public class ClanInfoDTO extends ClanDTO {

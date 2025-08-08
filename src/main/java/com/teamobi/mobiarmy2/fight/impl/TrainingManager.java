@@ -10,9 +10,6 @@ import com.teamobi.mobiarmy2.network.impl.Message;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-/**
- * @author tuyen
- */
 public class TrainingManager implements ITrainingManager {
 
     private final User trainingUser;

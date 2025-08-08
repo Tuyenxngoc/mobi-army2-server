@@ -9,9 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-/**
- * @author tuyen
- */
 public class LeaderboardService implements ILeaderboardService {
     private static final Logger logger = LoggerFactory.getLogger(LeaderboardService.class);
     private static final String[] CATEGORIES = {"DANH DỰ", "CAO THỦ", "ĐẠI GIA XU", "ĐẠI GIA LƯỢNG", "DANH DỰ TUẦN", "ĐẠI GIA TUẦN"};

@@ -12,9 +12,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
-/**
- * @author tuyen
- */
 public class ServerConfig implements IServerConfig {
 
     private final Properties configMap;

@@ -16,9 +16,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author tuyen
- */
 public class GiftBoxService implements IGiftBoxService {
     private static final int MAX_GIFTS = 12;          // Số quà tối đa
     private static final int MAX_OPENED_GIFTS = 6;    // Số quà có thể mở tối đa

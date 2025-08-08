@@ -4,9 +4,6 @@ import com.teamobi.mobiarmy2.fight.IFightManager;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * @author tuyen
- */
 @Getter
 @Setter
 public abstract class Boss extends Player {

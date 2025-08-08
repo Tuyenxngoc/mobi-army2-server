@@ -6,9 +6,6 @@ import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-/**
- * @author tuyen
- */
 public class GsonUtil {
 
     private static final Gson INSTANCE = createGson();

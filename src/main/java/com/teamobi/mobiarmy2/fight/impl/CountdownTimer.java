@@ -5,9 +5,6 @@ import com.teamobi.mobiarmy2.fight.ICountdownTimer;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/**
- * @author tuyen
- */
 public class CountdownTimer implements ICountdownTimer {
     private final int countdownTime;
     private final Runnable onTimeUpCallback;

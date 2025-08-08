@@ -12,9 +12,6 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author tuyen
- */
 @Getter
 @Setter
 public class Player {

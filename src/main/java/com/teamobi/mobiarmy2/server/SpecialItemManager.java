@@ -5,9 +5,6 @@ import com.teamobi.mobiarmy2.model.SpecialItem;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author tuyen
- */
 public class SpecialItemManager {
     public static final Map<Byte, SpecialItem> SPECIAL_ITEMS = new HashMap<>();
 

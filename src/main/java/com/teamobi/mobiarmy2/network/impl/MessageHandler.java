@@ -7,9 +7,6 @@ import com.teamobi.mobiarmy2.service.IUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author tuyen
- */
 public class MessageHandler implements IMessageHandler {
     private static final Logger logger = LoggerFactory.getLogger(MessageHandler.class);
 

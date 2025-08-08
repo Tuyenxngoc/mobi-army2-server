@@ -5,9 +5,6 @@ import lombok.Setter;
 
 import java.util.Objects;
 
-/**
- * @author tuyen
- */
 @Getter
 @Setter
 public class SpecialItem {

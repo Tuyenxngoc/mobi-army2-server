@@ -5,9 +5,6 @@ import com.teamobi.mobiarmy2.model.Player;
 
 import java.util.function.Predicate;
 
-/**
- * @author tuyen
- */
 public interface IFightManager {
 
     short[] getForceArgXY(int idGun, boolean isXuyenMap, short X, short Y, short toX, short toY, short Mx, short My, int arg, int force, int msg, int g100);

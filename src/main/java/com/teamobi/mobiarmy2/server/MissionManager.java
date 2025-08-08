@@ -7,9 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author tuyen
- */
 public class MissionManager {
     public static final Map<Byte, Mission> MISSIONS = new HashMap<>();
     public static final Map<Byte, List<Byte>> MISSIONS_BY_TYPE = new HashMap<>();

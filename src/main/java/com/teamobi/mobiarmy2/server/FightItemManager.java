@@ -6,9 +6,6 @@ import com.teamobi.mobiarmy2.util.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author tuyen
- */
 public class FightItemManager {
     public static final List<FightItem> FIGHT_ITEMS = new ArrayList<>();
 

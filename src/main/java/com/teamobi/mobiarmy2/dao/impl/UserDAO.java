@@ -21,9 +21,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * @author tuyen
- */
 public class UserDAO implements IUserDAO {
 
     public static String convertSpecialItemChestEntriesToJson(Map<Byte, SpecialItemChest> specialItemChests) {

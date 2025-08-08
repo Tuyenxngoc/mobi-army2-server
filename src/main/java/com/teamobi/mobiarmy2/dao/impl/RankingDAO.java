@@ -19,9 +19,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author tuyen
- */
 public class RankingDAO implements IRankingDAO {
 
     private final IServerConfig serverConfig;

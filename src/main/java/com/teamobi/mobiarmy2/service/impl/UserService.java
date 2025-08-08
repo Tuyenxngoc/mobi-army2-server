@@ -25,9 +25,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
-/**
- * @author tuyen
- */
 public class UserService implements IUserService {
     private static final int minimumWaitTime = 5000;
 

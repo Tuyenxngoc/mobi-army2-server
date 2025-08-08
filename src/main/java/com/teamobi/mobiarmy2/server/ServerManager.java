@@ -19,9 +19,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author tuyen
- */
 public class ServerManager {
     private static final Logger logger = LoggerFactory.getLogger(ServerManager.class);
 

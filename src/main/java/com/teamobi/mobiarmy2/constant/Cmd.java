@@ -4,9 +4,6 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author tuyen
- */
 public class Cmd {
     public static final byte GET_BIG_EQUIP_HD = -120;
     public static final byte DELETE_ACC = -106;

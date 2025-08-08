@@ -10,9 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-/**
- * @author tuyen
- */
 public class PaymentDAO implements IPaymentDAO {
 
     @Override

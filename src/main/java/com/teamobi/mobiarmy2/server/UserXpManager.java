@@ -6,9 +6,6 @@ import com.teamobi.mobiarmy2.model.LevelXpRequired;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author tuyen
- */
 public class UserXpManager {
     public static final List<LevelXpRequired> LEVEL_XP_REQUIRED_LIST = new ArrayList<>();
 

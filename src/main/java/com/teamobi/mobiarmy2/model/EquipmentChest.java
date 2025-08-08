@@ -9,9 +9,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
-/**
- * @author tuyen
- */
 @Getter
 @Setter
 @NoArgsConstructor

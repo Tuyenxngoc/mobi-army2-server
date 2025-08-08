@@ -6,9 +6,6 @@ import com.teamobi.mobiarmy2.model.Boss;
 import com.teamobi.mobiarmy2.model.Player;
 import com.teamobi.mobiarmy2.util.Utils;
 
-/**
- * @author tuyen
- */
 public class UFO extends Boss {
 
     private boolean turnShoot;

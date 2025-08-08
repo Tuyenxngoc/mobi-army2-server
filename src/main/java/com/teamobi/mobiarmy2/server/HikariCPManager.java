@@ -12,9 +12,6 @@ import java.sql.SQLException;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-/**
- * @author tuyen
- */
 public class HikariCPManager {
     private static final Logger logger = LoggerFactory.getLogger(HikariCPManager.class);
 

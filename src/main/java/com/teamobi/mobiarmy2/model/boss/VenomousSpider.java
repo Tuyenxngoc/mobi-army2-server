@@ -6,9 +6,6 @@ import com.teamobi.mobiarmy2.model.Player;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 
-/**
- * @author tuyen
- */
 public class VenomousSpider extends Boss {
 
     @Getter

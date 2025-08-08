@@ -7,9 +7,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-/**
- * @author tuyen
- */
 public class HikariCPConfig implements IDatabaseConfig {
 
     private final Properties properties;

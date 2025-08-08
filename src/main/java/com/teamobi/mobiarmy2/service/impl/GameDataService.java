@@ -24,9 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-/**
- * @author tuyen
- */
 public class GameDataService implements IGameDataService {
     private static final Logger logger = LoggerFactory.getLogger(GameDataService.class);
 

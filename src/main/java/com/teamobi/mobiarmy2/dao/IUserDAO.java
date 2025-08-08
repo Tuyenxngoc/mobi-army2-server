@@ -9,9 +9,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- * @author tuyen
- */
 public interface IUserDAO {
 
     Optional<Integer> create(String accountId, int xu, int luong);
