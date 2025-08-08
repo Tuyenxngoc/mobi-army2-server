@@ -1,13 +1,16 @@
-package com.teamobi.mobiarmy2.config.impl;
+package com.teamobi.mobiarmy2.config;
 
-import com.teamobi.mobiarmy2.config.IRedisConfig;
 import com.teamobi.mobiarmy2.constant.GameConstants;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-public class RedisConfig implements IRedisConfig {
+@Getter
+@Setter
+public class RedisConfig {
 
     private final Properties properties;
     private String host;
@@ -68,35 +71,5 @@ public class RedisConfig implements IRedisConfig {
             System.err.println("Lỗi: 'redis.minIdle' không được âm.");
             System.exit(1);
         }
-    }
-
-    @Override
-    public String getHost() {
-        return host;
-    }
-
-    @Override
-    public int getPort() {
-        return port;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public int getMaxTotal() {
-        return maxTotal;
-    }
-
-    @Override
-    public int getMaxIdle() {
-        return maxIdle;
-    }
-
-    @Override
-    public int getMinIdle() {
-        return minIdle;
     }
 }

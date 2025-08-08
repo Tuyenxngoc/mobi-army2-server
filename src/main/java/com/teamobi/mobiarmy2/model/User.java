@@ -1,17 +1,20 @@
 package com.teamobi.mobiarmy2.model;
 
-import com.teamobi.mobiarmy2.config.IServerConfig;
+import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.constant.UserState;
-import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.fight.ITrainingManager;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.impl.Message;
-import com.teamobi.mobiarmy2.server.*;
-import com.teamobi.mobiarmy2.service.*;
+import com.teamobi.mobiarmy2.server.CharacterManager;
+import com.teamobi.mobiarmy2.server.EquipmentManager;
+import com.teamobi.mobiarmy2.server.SpecialItemManager;
+import com.teamobi.mobiarmy2.server.UserXpManager;
+import com.teamobi.mobiarmy2.service.IGiftBoxService;
+import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.service.impl.GiftBoxService;
 import com.teamobi.mobiarmy2.service.impl.UserService;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -30,7 +33,7 @@ import java.util.Set;
 @Setter
 public class User {
     private final IUserService userService;
-    private final IServerConfig serverConfig;
+    private final ServerConfig serverConfig;
     private final IGiftBoxService giftBoxService;
     private final ISession session;
     private UserState state;
@@ -71,20 +74,19 @@ public class User {
     public User(ISession session) {
         this.session = session;
         this.state = UserState.WAITING;
-        ApplicationContext context = ApplicationContext.getInstance();
         this.userService = new UserService(
                 this,
-                context.getBean(IServerConfig.class),
-                context.getBean(IClanService.class),
-                context.getBean(ILeaderboardService.class),
-                context.getBean(ILoginRateLimiterService.class),
-                context.getBean(IUserDAO.class),
-                context.getBean(IAccountDAO.class),
-                context.getBean(IGiftCodeDAO.class),
-                context.getBean(IUserGiftCodeDAO.class),
-                context.getBean(IUserCharacterDAO.class)
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
         );
-        this.serverConfig = context.getBean(IServerConfig.class);
+        this.serverConfig = null;
         this.giftBoxService = new GiftBoxService(this);
     }
 

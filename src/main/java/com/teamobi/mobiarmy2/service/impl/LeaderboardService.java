@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.service.impl;
 
-import com.teamobi.mobiarmy2.config.IServerConfig;
+import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.dao.IRankingDAO;
 import com.teamobi.mobiarmy2.dto.UserLeaderboardDTO;
 import com.teamobi.mobiarmy2.service.ILeaderboardService;
@@ -14,12 +14,12 @@ public class LeaderboardService implements ILeaderboardService {
     private static final String[] CATEGORIES = {"DANH DỰ", "CAO THỦ", "ĐẠI GIA XU", "ĐẠI GIA LƯỢNG", "DANH DỰ TUẦN", "ĐẠI GIA TUẦN"};
     private static final String[] LABELS = {"Danh dự", "XP", "Xu", "Lượng", "Danh dự", "Xu"};
     private final IRankingDAO rankingDAO;
-    private final IServerConfig serverConfig;
+    private final ServerConfig serverConfig;
     private final Timer timer;
     private final List<List<UserLeaderboardDTO>> leaderboardEntries;
     private boolean isComplete;
 
-    public LeaderboardService(IRankingDAO rankingDAO, IServerConfig serverConfig) {
+    public LeaderboardService(IRankingDAO rankingDAO, ServerConfig serverConfig) {
         this.rankingDAO = rankingDAO;
         this.serverConfig = serverConfig;
         this.timer = new Timer(true);

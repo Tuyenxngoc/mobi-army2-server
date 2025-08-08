@@ -354,4 +354,8 @@ public class Utils {
         }
         return adjustedArray;
     }
+
+    public static boolean isNullOrEmpty(String s) {
+        return s == null || s.trim().isEmpty();
+    }
 }

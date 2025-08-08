@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.server;
 
-import com.teamobi.mobiarmy2.config.IDatabaseConfig;
+import com.teamobi.mobiarmy2.config.HikariCPConfig;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
@@ -15,11 +15,11 @@ import java.util.function.Consumer;
 public class HikariCPManager {
     private static final Logger logger = LoggerFactory.getLogger(HikariCPManager.class);
 
-    private final IDatabaseConfig config;
+    private final HikariCPConfig config;
     private HikariDataSource dataSource;
 
     private HikariCPManager() {
-        this.config = ApplicationContext.getInstance().getBean(IDatabaseConfig.class);
+        this.config = new HikariCPConfig();
         initDataSource();
     }
 

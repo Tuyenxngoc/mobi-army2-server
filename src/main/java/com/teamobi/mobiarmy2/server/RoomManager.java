@@ -1,17 +1,17 @@
 package com.teamobi.mobiarmy2.server;
 
-import com.teamobi.mobiarmy2.config.IServerConfig;
+import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.model.Room;
 import lombok.Getter;
 
 public class RoomManager {
 
-    private final IServerConfig serverConfig;
+    private final ServerConfig serverConfig;
     @Getter
     private Room[] rooms;
 
     public RoomManager() {
-        this.serverConfig = ApplicationContext.getInstance().getBean(IServerConfig.class);
+        this.serverConfig = null;// ApplicationContext.getInstance().getBean(ServerConfig.class);
     }
 
     public static RoomManager getInstance() {

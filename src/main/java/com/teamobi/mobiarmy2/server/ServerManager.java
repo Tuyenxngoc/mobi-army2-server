@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.server;
 
-import com.teamobi.mobiarmy2.config.IServerConfig;
+import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
@@ -24,7 +24,7 @@ public class ServerManager {
 
     private final IGameDataService gameDataService;
     private final ILeaderboardService leaderboardService;
-    private final IServerConfig serverConfig;
+    private final ServerConfig serverConfig;
     private final IConnectionBlockerService connectionBlockerService;
     private final ArrayList<ISession> sessions;
     private final List<ServerListener> listeners;
@@ -34,11 +34,10 @@ public class ServerManager {
     private boolean isMaintenanceMode;
 
     public ServerManager() {
-        ApplicationContext context = ApplicationContext.getInstance();
-        this.gameDataService = context.getBean(IGameDataService.class);
-        this.leaderboardService = context.getBean(ILeaderboardService.class);
-        this.serverConfig = context.getBean(IServerConfig.class);
-        this.connectionBlockerService = context.getBean(IConnectionBlockerService.class);
+        this.gameDataService = null; //context.getBean(IGameDataService.class);
+        this.leaderboardService = null;// context.getBean(ILeaderboardService.class);
+        this.serverConfig = null; //context.getBean(ServerConfig.class);
+        this.connectionBlockerService = null;// context.getBean(IConnectionBlockerService.class);
 
         this.isMaintenanceMode = false;
         this.sessions = new ArrayList<>();
@@ -118,7 +117,6 @@ public class ServerManager {
             }
             HikariCPManager.getInstance().closeDataSource();
             RedisConnectionManager.getInstance().close();
-            ApplicationContext.getInstance().clearDependencies();
         } catch (IOException e) {
             e.printStackTrace();
         }

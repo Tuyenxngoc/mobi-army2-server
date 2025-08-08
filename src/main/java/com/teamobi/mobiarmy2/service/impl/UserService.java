@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.service.impl;
 
-import com.teamobi.mobiarmy2.config.IServerConfig;
+import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.*;
 import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.dto.*;
@@ -8,8 +8,8 @@ import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.fight.impl.TrainingManager;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
-import com.teamobi.mobiarmy2.model.Character;
 import com.teamobi.mobiarmy2.model.*;
+import com.teamobi.mobiarmy2.model.Character;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.impl.Message;
 import com.teamobi.mobiarmy2.server.*;
@@ -30,7 +30,7 @@ public class UserService implements IUserService {
 
     private final User user;
 
-    private final IServerConfig serverConfig;
+    private final ServerConfig serverConfig;
     private final IClanService clanService;
     private final ILeaderboardService leaderboardService;
     private final ILoginRateLimiterService loginRateLimiterService;
@@ -50,7 +50,7 @@ public class UserService implements IUserService {
     private long timeSinceLeftRoom;
     private long lastSpinTime;
 
-    public UserService(User user, IServerConfig serverConfig, IClanService clanService, ILeaderboardService leaderboardService, ILoginRateLimiterService loginRateLimiterService, IUserDAO userDAO, IAccountDAO accountDAO, IGiftCodeDAO giftCodeDAO, IUserGiftCodeDAO userGiftCodeDAO, IUserCharacterDAO userCharacterDAO) {
+    public UserService(User user, ServerConfig serverConfig, IClanService clanService, ILeaderboardService leaderboardService, ILoginRateLimiterService loginRateLimiterService, IUserDAO userDAO, IAccountDAO accountDAO, IGiftCodeDAO giftCodeDAO, IUserGiftCodeDAO userGiftCodeDAO, IUserCharacterDAO userCharacterDAO) {
         this.user = user;
         this.serverConfig = serverConfig;
         this.clanService = clanService;
@@ -355,7 +355,7 @@ public class UserService implements IUserService {
         return userCharacterDTO;
     }
 
-    public void sendCharacterData(IServerConfig config) {
+    public void sendCharacterData(ServerConfig config) {
         try {
             List<Character> characterEntries = CharacterManager.CHARACTERS;
             int characterCount = characterEntries.size();
@@ -410,7 +410,7 @@ public class UserService implements IUserService {
         }
     }
 
-    private void sendRoomCaption(IServerConfig config) {
+    private void sendRoomCaption(ServerConfig config) {
         String[] names = config.getRoomNameVi();
         try {
             IMessage ms = new Message(Cmd.ROOM_CAPTION);

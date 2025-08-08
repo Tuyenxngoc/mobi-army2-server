@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.server;
 
-import com.teamobi.mobiarmy2.config.IRedisConfig;
+import com.teamobi.mobiarmy2.config.RedisConfig;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -10,7 +10,7 @@ public class RedisConnectionManager {
     private final JedisPool jedisPool;
 
     private RedisConnectionManager() {
-        IRedisConfig redisConfig = ApplicationContext.getInstance().getBean(IRedisConfig.class);
+        RedisConfig redisConfig = new RedisConfig();
 
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxTotal(redisConfig.getMaxTotal());

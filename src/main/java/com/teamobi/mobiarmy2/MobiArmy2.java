@@ -1,14 +1,11 @@
 package com.teamobi.mobiarmy2;
 
-import com.teamobi.mobiarmy2.server.BeanRegistry;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.ui.ServerUI;
 
 public class MobiArmy2 {
 
     public static void main(String[] args) {
-        BeanRegistry.registerBeans();
-
         ServerManager serverManager = ServerManager.getInstance();
         Runtime.getRuntime().addShutdownHook(new Thread(serverManager::stop, "ServerShutdownHook"));
 

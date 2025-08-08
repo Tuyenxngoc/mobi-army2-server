@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.dao.impl;
 
 import com.google.gson.Gson;
-import com.teamobi.mobiarmy2.config.IServerConfig;
+import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dao.IRankingDAO;
 import com.teamobi.mobiarmy2.dto.UserLeaderboardDTO;
@@ -21,9 +21,9 @@ import java.util.List;
 
 public class RankingDAO implements IRankingDAO {
 
-    private final IServerConfig serverConfig;
+    private final ServerConfig serverConfig;
 
-    public RankingDAO(IServerConfig serverConfig) {
+    public RankingDAO(ServerConfig serverConfig) {
         this.serverConfig = serverConfig;
     }
 
