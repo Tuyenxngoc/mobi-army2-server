@@ -3,13 +3,12 @@ package com.teamobi.mobiarmy2.service;
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.dao.RankingDAO;
 import com.teamobi.mobiarmy2.dto.UserLeaderboardDTO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 
+@Slf4j
 public class LeaderboardService {
-    private static final Logger logger = LoggerFactory.getLogger(LeaderboardService.class);
     private static final String[] CATEGORIES = {"DANH DỰ", "CAO THỦ", "ĐẠI GIA XU", "ĐẠI GIA LƯỢNG", "DANH DỰ TUẦN", "ĐẠI GIA TUẦN"};
     private static final String[] LABELS = {"Danh dự", "XP", "Xu", "Lượng", "Danh dự", "Xu"};
     private final RankingDAO rankingDAO;
@@ -56,7 +55,7 @@ public class LeaderboardService {
                 }
                 addBonusGiftsForPlayers();
                 isComplete = true;
-                logger.info("Refresh BXH");
+                log.info("Refresh BXH");
             }
         }, calendar.getTime(), 86_400_000L);
     }

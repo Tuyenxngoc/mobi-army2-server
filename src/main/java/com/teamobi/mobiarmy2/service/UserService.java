@@ -247,8 +247,6 @@ public class UserService {
             sendRoomCaption(serverConfig);
             sendMapCollisionInfo();
             sendServerInfo(serverConfig.getMessageLogin(), false);
-
-            serverManager.notifyListeners();
         } catch (IOException ignored) {
         }
     }

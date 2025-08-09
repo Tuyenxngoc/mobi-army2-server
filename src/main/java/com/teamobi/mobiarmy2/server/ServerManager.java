@@ -8,9 +8,9 @@ import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.service.ConnectionBlockerService;
 import com.teamobi.mobiarmy2.service.GameDataService;
 import com.teamobi.mobiarmy2.service.LeaderboardService;
-import com.teamobi.mobiarmy2.ui.controllers.ServerListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -18,41 +18,29 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class ServerManager {
-    private static final Logger logger = LoggerFactory.getLogger(ServerManager.class);
-
     private final GameDataService gameDataService;
     private final LeaderboardService leaderboardService;
     private final ServerConfig serverConfig;
     private final ConnectionBlockerService connectionBlockerService;
-    private final ArrayList<Session> sessions;
-    private final List<ServerListener> listeners;
+    private final ArrayList<Session> sessions = new ArrayList<>();
     private ServerSocket server;
     private long countClients;
     private boolean isStart;
-    private boolean isMaintenanceMode;
+    @Setter
+    @Getter
+    private boolean isMaintenanceMode = false;
 
     public ServerManager() {
         this.gameDataService = null; //context.getBean(IGameDataService.class);
         this.leaderboardService = null;// context.getBean(ILeaderboardService.class);
         this.serverConfig = null; //context.getBean(ServerConfig.class);
         this.connectionBlockerService = null;// context.getBean(IConnectionBlockerService.class);
-
-        this.isMaintenanceMode = false;
-        this.sessions = new ArrayList<>();
-        this.listeners = new ArrayList<>();
     }
 
     public static ServerManager getInstance() {
         return SingletonHelper.INSTANCE;
-    }
-
-    public boolean isMaintenanceMode() {
-        return isMaintenanceMode;
-    }
-
-    public void setMaintenanceMode(boolean maintenanceMode) {
-        isMaintenanceMode = maintenanceMode;
     }
 
     public void init() {
@@ -64,11 +52,11 @@ public class ServerManager {
     }
 
     public void start() {
-        logger.info("Start server!");
+        log.info("Start server!");
         isStart = true;
         try {
             server = new ServerSocket(serverConfig.getPort());
-            logger.info("Server start at port: {}", serverConfig.getPort());
+            log.info("Server start at port: {}", serverConfig.getPort());
             while (isStart) {
                 if (sessions.size() < serverConfig.getMaxClients()) {
                     try {
@@ -76,7 +64,7 @@ public class ServerManager {
 
                         String ipAddress = socket.getInetAddress().getHostAddress();
                         if (connectionBlockerService.isIpBlocked(ipAddress)) {
-                            logger.warn("IP {} is blocked due to too many connections.", ipAddress);
+                            log.warn("IP {} is blocked due to too many connections.", ipAddress);
                             socket.close();
                             continue;
                         }
@@ -86,15 +74,15 @@ public class ServerManager {
 
                         connectionBlockerService.incrementIpConnectionCount(ipAddress);
 
-                        logger.info("Accept socket client {} done!", countClients);
+                        log.info("Accept socket client {} done!", countClients);
                     } catch (Exception ignored) {
                     }
                 } else {
                     try {
-                        logger.warn("Maximum number of players reached. Waiting for a slot to be free.");
+                        log.warn("Maximum number of players reached. Waiting for a slot to be free.");
                         Thread.sleep(1000L);
                     } catch (InterruptedException e) {
-                        logger.error(e.getMessage());
+                        log.error(e.getMessage());
                     }
                 }
             }
@@ -104,7 +92,7 @@ public class ServerManager {
     }
 
     public void stop() {
-        logger.info("Stop server!");
+        log.info("Stop server!");
         isStart = false;
         try {
             while (!sessions.isEmpty()) {
@@ -125,7 +113,6 @@ public class ServerManager {
         String ipAddress = session.getIPAddress();
         sessions.remove(session);
         connectionBlockerService.decrementIpConnectionCount(ipAddress);
-        notifyListeners();
     }
 
     public void sendToServer(Message ms) {
@@ -150,16 +137,6 @@ public class ServerManager {
                 .map(Session::getUser)
                 .limit(10)
                 .toList();
-    }
-
-    public void addServerListener(ServerListener listener) {
-        listeners.add(listener);
-    }
-
-    public void notifyListeners() {
-        for (ServerListener listener : listeners) {
-            listener.onUsersUpdated(sessions);
-        }
     }
 
     private static class SingletonHelper {

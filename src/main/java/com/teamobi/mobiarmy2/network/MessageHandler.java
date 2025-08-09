@@ -2,11 +2,10 @@ package com.teamobi.mobiarmy2.network;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.service.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class MessageHandler {
-    private static final Logger logger = LoggerFactory.getLogger(MessageHandler.class);
 
     private final UserService userService;
 
@@ -163,7 +162,7 @@ public class MessageHandler {
 
                 case Cmd.GETSTRING -> userService.getStringMessage(ms);
 
-                default -> logger.warn("Command {} is not supported", ms.getCommand());
+                default -> log.warn("Command {} is not supported", ms.getCommand());
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -3,8 +3,7 @@ package com.teamobi.mobiarmy2.network;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.server.ServerManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -14,8 +13,8 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class Session {
-    private static final Logger logger = LoggerFactory.getLogger(Session.class);
 
     private static final int TIMEOUT_DURATION = 180_000;
     private static final List<Byte> WHITE_LIST_CMD = List.of(
@@ -89,7 +88,7 @@ public class Session {
             ServerManager.getInstance().disconnect(this);
             cleanNetwork();
 
-            logger.info("Close {}", this);
+            log.info("Close {}", this);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -249,7 +248,7 @@ public class Session {
                 while (Session.this.isSendKeyComplete()) {
                     while (!sendingMessage.isEmpty() && Session.this.dis != null) {
                         Message message = sendingMessage.removeFirst();
-                        logger.info("   Send mss {} to {}", Cmd.getCmdNameByValue(message.getCommand()), Session.this);
+                        log.info("   Send mss {} to {}", Cmd.getCmdNameByValue(message.getCommand()), Session.this);
                         Session.this.doSendMessage(message);
                     }
                     try {
@@ -275,7 +274,7 @@ public class Session {
                     if (message == null) {
                         break;
                     }
-                    logger.info("{} send mss {}", Session.this, Cmd.getCmdNameByValue(message.getCommand()));
+                    log.info("{} send mss {}", Session.this, Cmd.getCmdNameByValue(message.getCommand()));
                     if (!Session.this.user.isLogged() && requiresAuthentication(message)) {
                         message.cleanup();
                         break;

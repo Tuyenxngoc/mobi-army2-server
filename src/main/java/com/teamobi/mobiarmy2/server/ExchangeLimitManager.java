@@ -1,7 +1,6 @@
 package com.teamobi.mobiarmy2.server;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -16,8 +15,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Slf4j
 public class ExchangeLimitManager {
-    private static final Logger logger = LoggerFactory.getLogger(ExchangeLimitManager.class);
 
     private static final int NUM_DAILY_RESETS = 3;
     private static final int[] MAX_GOLD_PER_VIP = {10, 5, 2};
@@ -59,7 +58,7 @@ public class ExchangeLimitManager {
     public static void resetCounters() {
         resetCounterArray(goldCounters);
         resetCounterArray(silverCounters);
-        logger.info("Transaction counters have been reset.");
+        log.info("Transaction counters have been reset.");
     }
 
     private static void resetCounterArray(AtomicInteger[] counters) {
@@ -81,7 +80,7 @@ public class ExchangeLimitManager {
                 86400,
                 TimeUnit.SECONDS
         );
-        logger.info("Scheduling daily reset task with delay of {} seconds until midnight.", delayUntilMidnight);
+        log.info("Scheduling daily reset task with delay of {} seconds until midnight.", delayUntilMidnight);
     }
 
     private static long calculateDelayUntilMidnight() {
@@ -121,6 +120,6 @@ public class ExchangeLimitManager {
             );
         }
 
-        logger.info("Transaction counters will reset at the following times: {}", resetTimes);
+        log.info("Transaction counters will reset at the following times: {}", resetTimes);
     }
 }

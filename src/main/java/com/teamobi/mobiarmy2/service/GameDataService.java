@@ -12,8 +12,7 @@ import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.MapManager;
 import com.teamobi.mobiarmy2.util.TeamImageOutput;
 import com.teamobi.mobiarmy2.util.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -23,8 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+@Slf4j
 public class GameDataService {
-    private static final Logger logger = LoggerFactory.getLogger(GameDataService.class);
 
     private final MapDAO mapDAO;
     private final CharacterDAO characterDAO;
@@ -78,7 +77,7 @@ public class GameDataService {
             byte[] ab = bas.toByteArray();
             Utils.saveFile(GameConstants.MAP_CACHE_NAME, ab);
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
         }
     }
 
@@ -147,7 +146,7 @@ public class GameDataService {
             byte[] data = bas.toByteArray();
             Utils.saveFile(GameConstants.EQUIP_CACHE_NAME, data);
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
         }
     }
 
@@ -164,7 +163,7 @@ public class GameDataService {
             byte[] data = bas.toByteArray();
             Utils.saveFile(GameConstants.LEVEL_CACHE_NAME, data);
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
         }
     }
 
@@ -185,7 +184,7 @@ public class GameDataService {
             byte[] data = tio.output();
             Utils.saveFile(GameConstants.PLAYER_CACHE_NAME, data);
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
         }
     }
 
@@ -206,7 +205,7 @@ public class GameDataService {
             byte[] data = tio.output();
             Utils.saveFile(GameConstants.ICON_CACHE_NAME, data);
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
         }
     }
 

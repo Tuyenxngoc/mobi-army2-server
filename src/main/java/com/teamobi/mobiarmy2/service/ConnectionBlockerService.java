@@ -1,12 +1,11 @@
 package com.teamobi.mobiarmy2.service;
 
 import com.teamobi.mobiarmy2.server.RedisConnectionManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import redis.clients.jedis.Jedis;
 
+@Slf4j
 public class ConnectionBlockerService {
-    private static final Logger logger = LoggerFactory.getLogger(ConnectionBlockerService.class);
     private static final int MAX_CONNECTIONS_PER_IP = 10;
     private static final int IP_BLOCK_DURATION = 3600;
 
@@ -23,7 +22,7 @@ public class ConnectionBlockerService {
                 return count >= MAX_CONNECTIONS_PER_IP;
             }
         } catch (Exception e) {
-            logger.error("Error checking IP connection count in Redis", e);
+            log.error("Error checking IP connection count in Redis", e);
         }
         return false;
     }
@@ -34,7 +33,7 @@ public class ConnectionBlockerService {
             jedis.incr(key);
             jedis.expire(key, IP_BLOCK_DURATION);
         } catch (Exception e) {
-            logger.error("Error incrementing IP connection count in Redis", e);
+            log.error("Error incrementing IP connection count in Redis", e);
         }
     }
 
@@ -46,7 +45,7 @@ public class ConnectionBlockerService {
                 jedis.del(key);
             }
         } catch (Exception e) {
-            logger.error("Error decrementing IP connection count in Redis", e);
+            log.error("Error decrementing IP connection count in Redis", e);
         }
     }
 }
