@@ -64,6 +64,13 @@ public class ApplicationContext {
         ));
         registerBean(LoginRateLimiterService.class, new LoginRateLimiterService(getBean(RedisConnectionManager.class)));
         registerBean(ConnectionBlockerService.class, new ConnectionBlockerService(getBean(RedisConnectionManager.class)));
+
+        registerBean(ServerManager.class, new ServerManager(
+                getBean(GameDataService.class),
+                getBean(LeaderboardService.class),
+                getBean(ServerConfig.class),
+                getBean(ConnectionBlockerService.class)
+        ));
     }
 
     public static ApplicationContext getInstance() {

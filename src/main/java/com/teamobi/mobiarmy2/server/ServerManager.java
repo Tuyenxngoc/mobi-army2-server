@@ -32,11 +32,11 @@ public class ServerManager {
     @Getter
     private boolean isMaintenanceMode = false;
 
-    public ServerManager() {
-        this.gameDataService = null; //context.getBean(IGameDataService.class);
-        this.leaderboardService = null;// context.getBean(ILeaderboardService.class);
-        this.serverConfig = null; //context.getBean(ServerConfig.class);
-        this.connectionBlockerService = null;// context.getBean(IConnectionBlockerService.class);
+    public ServerManager(GameDataService gameDataService, LeaderboardService leaderboardService, ServerConfig serverConfig, ConnectionBlockerService connectionBlockerService) {
+        this.gameDataService = gameDataService;
+        this.leaderboardService = leaderboardService;
+        this.serverConfig = serverConfig;
+        this.connectionBlockerService = connectionBlockerService;
     }
 
     public void init() {
@@ -99,8 +99,14 @@ public class ServerManager {
             if (server != null) {
                 server.close();
             }
-            //   HikariCPManager.getInstance().closeDataSource();
-            //  RedisConnectionManager.getInstance().close();
+
+            ApplicationContext.getInstance()
+                    .getBean(HikariCPManager.class)
+                    .closeDataSource();
+
+            ApplicationContext.getInstance()
+                    .getBean(RedisConnectionManager.class)
+                    .close();
         } catch (IOException e) {
             e.printStackTrace();
         }
