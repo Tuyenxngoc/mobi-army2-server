@@ -6,6 +6,8 @@ import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.util.Utils;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -18,28 +20,17 @@ public class GiftBoxService {
     private static final int MAX_GIFTS = 12;          // Số quà tối đa
     private static final int MAX_OPENED_GIFTS = 6;    // Số quà có thể mở tối đa
     private static final int XU_COST_PER_GIFT = 1000; // Chi phí mở mỗi quà khi hết lượt
-    private final User user;
-    private final ScheduledExecutorService executorService;
-    private int availableGifts;    // Số quà hiện có
-    private int giftOpenTime;      // Thời gian mở quà
-    private boolean openingGift;   // Trạng thái mở quà
-    private boolean[] giftOpened;  // Mảng kiểm tra quà đã mở hay chưa
-    private int openedGiftCount;
+
+    @Setter
+    private User user;
+    private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    private int availableGifts = 0;    // Số quà hiện có
+    private int giftOpenTime = 0;      // Thời gian mở quà
+    @Getter
+    private boolean openingGift = false;   // Trạng thái mở quà
+    private boolean[] giftOpened = new boolean[MAX_GIFTS];  // Mảng kiểm tra quà đã mở hay chưa
+    private int openedGiftCount = 0;
     private ScheduledFuture<?> giftBoxTask;
-
-    public GiftBoxService(User user) {
-        this.user = user;
-        this.availableGifts = 0;
-        this.giftOpenTime = 0;
-        this.openingGift = false;
-        this.giftOpened = new boolean[MAX_GIFTS];
-        this.openedGiftCount = 0;
-        this.executorService = Executors.newSingleThreadScheduledExecutor();
-    }
-
-    public boolean isOpeningGift() {
-        return openingGift;
-    }
 
     private void sendStartMessage(int availableGifts, int giftOpenTime) {
         try {

@@ -1,9 +1,12 @@
 package com.teamobi.mobiarmy2.network;
 
+import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
+import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.server.ApplicationContext;
 import com.teamobi.mobiarmy2.server.ServerManager;
+import com.teamobi.mobiarmy2.service.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.DataInputStream;
@@ -51,8 +54,24 @@ public class Session {
         this.dos = new DataOutputStream(socket.getOutputStream());
         this.IPAddress = socket.getInetAddress().getHostAddress();
 
-        this.user = new User(this);
-        this.messageHandler = new MessageHandler(user.getUserService());
+        ApplicationContext applicationContext = ApplicationContext.getInstance();
+        UserService userService = new UserService(
+                applicationContext.getBean(ServerConfig.class),
+                applicationContext.getBean(ClanService.class),
+                applicationContext.getBean(LeaderboardService.class),
+                applicationContext.getBean(LoginRateLimiterService.class),
+                applicationContext.getBean(UserDAO.class),
+                applicationContext.getBean(AccountDAO.class),
+                applicationContext.getBean(GiftCodeDAO.class),
+                applicationContext.getBean(UserGiftCodeDAO.class),
+                applicationContext.getBean(UserCharacterDAO.class),
+                applicationContext.getBean(ServerManager.class)
+        );
+        GiftBoxService giftBoxService = new GiftBoxService();
+        this.user = new User(this, userService, giftBoxService);
+        userService.setUser(this.user);
+        giftBoxService.setUser(this.user);
+        this.messageHandler = new MessageHandler(userService);
 
         this.sessionKey = generateSessionKey();
         initializeThreads();

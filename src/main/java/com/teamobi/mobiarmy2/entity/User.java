@@ -8,10 +8,7 @@ import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.fight.TrainingManager;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
-import com.teamobi.mobiarmy2.server.CharacterManager;
-import com.teamobi.mobiarmy2.server.EquipmentManager;
-import com.teamobi.mobiarmy2.server.SpecialItemManager;
-import com.teamobi.mobiarmy2.server.UserXpManager;
+import com.teamobi.mobiarmy2.server.*;
 import com.teamobi.mobiarmy2.service.GiftBoxService;
 import com.teamobi.mobiarmy2.service.UserService;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -30,10 +27,9 @@ import java.util.Set;
 @Setter
 public class User {
     private final UserService userService;
-    private final ServerConfig serverConfig;
     private final GiftBoxService giftBoxService;
     private final Session session;
-    private UserState state;
+    private UserState state = UserState.WAITING;
     private String accountId;
     private int userId;
     private String username;
@@ -68,24 +64,10 @@ public class User {
     private FightWait fightWait;
     private TrainingManager trainingManager;
 
-    public User(Session session) {
+    public User(Session session, UserService userService, GiftBoxService giftBoxService) {
         this.session = session;
-        this.state = UserState.WAITING;
-        this.userService = new UserService(
-                this,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
-        );
-        this.serverConfig = null;
-        this.giftBoxService = new GiftBoxService(this);
+        this.userService = userService;
+        this.giftBoxService = giftBoxService;
     }
 
     public boolean isNotWaiting() {
@@ -242,7 +224,7 @@ public class User {
         if (fightItems[itemIndex] < 0) {
             fightItems[itemIndex] = 0;
         }
-        byte maxItem = serverConfig.getMaxItem();
+        byte maxItem = ApplicationContext.getInstance().getBean(ServerConfig.class).getMaxItem();
         if (fightItems[itemIndex] > maxItem) {
             fightItems[itemIndex] = maxItem;
         }

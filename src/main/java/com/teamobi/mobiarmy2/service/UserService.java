@@ -13,6 +13,7 @@ import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.server.*;
 import com.teamobi.mobiarmy2.util.Utils;
+import lombok.Setter;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -23,7 +24,8 @@ import java.util.*;
 public class UserService {
     private static final int minimumWaitTime = 5000;
 
-    private final User user;
+    @Setter
+    private User user;
 
     private final ServerConfig serverConfig;
     private final ClanService clanService;
@@ -47,8 +49,7 @@ public class UserService {
     private long timeSinceLeftRoom;
     private long lastSpinTime;
 
-    public UserService(User user, ServerConfig serverConfig, ClanService clanService, LeaderboardService leaderboardService, LoginRateLimiterService loginRateLimiterService, UserDAO userDAO, AccountDAO accountDAO, GiftCodeDAO giftCodeDAO, UserGiftCodeDAO userGiftCodeDAO, UserCharacterDAO userCharacterDAO, ServerManager serverManager) {
-        this.user = user;
+    public UserService(ServerConfig serverConfig, ClanService clanService, LeaderboardService leaderboardService, LoginRateLimiterService loginRateLimiterService, UserDAO userDAO, AccountDAO accountDAO, GiftCodeDAO giftCodeDAO, UserGiftCodeDAO userGiftCodeDAO, UserCharacterDAO userCharacterDAO, ServerManager serverManager) {
         this.serverConfig = serverConfig;
         this.clanService = clanService;
         this.leaderboardService = leaderboardService;
