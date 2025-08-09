@@ -10,7 +10,7 @@ import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
-import com.teamobi.mobiarmy2.service.IClanService;
+import com.teamobi.mobiarmy2.service.ClanService;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.DataOutputStream;
@@ -48,7 +48,7 @@ public class FightManager {
     private final com.teamobi.mobiarmy2.fight.CountdownTimer countdownTimer;
     private final ExecutorService executorNextTurn;
     private final ExecutorService executorEndGame;
-    private final IClanService clanService;
+    private final ClanService clanService;
     private Player[] players;
     private int totalPlayers;
     private int turnCount;
@@ -59,7 +59,7 @@ public class FightManager {
     private byte windY;
     private long startTime;
 
-    public FightManager(FightWait fightWait, IClanService clanService) {
+    public FightManager(FightWait fightWait, ClanService clanService) {
         this.fightWait = fightWait;
         this.clanService = clanService;
         this.players = new Player[MAX_ELEMENT_FIGHT];

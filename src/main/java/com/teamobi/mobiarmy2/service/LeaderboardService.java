@@ -1,15 +1,14 @@
-package com.teamobi.mobiarmy2.service.impl;
+package com.teamobi.mobiarmy2.service;
 
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.dao.RankingDAO;
 import com.teamobi.mobiarmy2.dto.UserLeaderboardDTO;
-import com.teamobi.mobiarmy2.service.ILeaderboardService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class LeaderboardService implements ILeaderboardService {
+public class LeaderboardService {
     private static final Logger logger = LoggerFactory.getLogger(LeaderboardService.class);
     private static final String[] CATEGORIES = {"DANH DỰ", "CAO THỦ", "ĐẠI GIA XU", "ĐẠI GIA LƯỢNG", "DANH DỰ TUẦN", "ĐẠI GIA TUẦN"};
     private static final String[] LABELS = {"Danh dự", "XP", "Xu", "Lượng", "Danh dự", "Xu"};
@@ -29,22 +28,18 @@ public class LeaderboardService implements ILeaderboardService {
         }
     }
 
-    @Override
     public boolean isComplete() {
         return isComplete;
     }
 
-    @Override
     public String[] getCategories() {
         return CATEGORIES;
     }
 
-    @Override
     public String[] getLabels() {
         return LABELS;
     }
 
-    @Override
     public void init() {
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
@@ -79,12 +74,10 @@ public class LeaderboardService implements ILeaderboardService {
         }
     }
 
-    @Override
     public int getTotalPageByType(byte type) {
         return leaderboardEntries.get(type).size() / 10;
     }
 
-    @Override
     public List<UserLeaderboardDTO> getUsers(int type, int page, int pageSize) {
         List<UserLeaderboardDTO> list = leaderboardEntries.get(type);
         int startIndex = page * pageSize;

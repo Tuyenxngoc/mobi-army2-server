@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.service.impl;
+package com.teamobi.mobiarmy2.service;
 
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.dao.*;
@@ -10,7 +10,6 @@ import com.teamobi.mobiarmy2.server.CaptionManager;
 import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.MapManager;
-import com.teamobi.mobiarmy2.service.IGameDataService;
 import com.teamobi.mobiarmy2.util.TeamImageOutput;
 import com.teamobi.mobiarmy2.util.Utils;
 import org.slf4j.Logger;
@@ -24,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class GameDataService implements IGameDataService {
+public class GameDataService {
     private static final Logger logger = LoggerFactory.getLogger(GameDataService.class);
 
     private final MapDAO mapDAO;
@@ -211,7 +210,6 @@ public class GameDataService implements IGameDataService {
         }
     }
 
-    @Override
     public void loadServerData() {
         mapDAO.loadAll();
         characterDAO.loadAll();
@@ -227,7 +225,6 @@ public class GameDataService implements IGameDataService {
         fabricateItemDAO.loadAll();
     }
 
-    @Override
     public void setCache() {
         setCacheMaps();
         setCacheEquipments();

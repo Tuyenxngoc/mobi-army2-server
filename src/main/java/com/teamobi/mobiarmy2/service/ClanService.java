@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.service.impl;
+package com.teamobi.mobiarmy2.service;
 
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.dao.ClanDAO;
@@ -9,7 +9,6 @@ import com.teamobi.mobiarmy2.json.ClanItemJson;
 import com.teamobi.mobiarmy2.model.ClanItemShop;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.server.ClanXpManager;
-import com.teamobi.mobiarmy2.service.IClanService;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.time.LocalDateTime;
@@ -18,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ClanService implements IClanService {
+public class ClanService {
     private final ConcurrentHashMap<Short, Object> clanLocks = new ConcurrentHashMap<>();
     private final ClanDAO clanDAO;
 
@@ -30,27 +29,22 @@ public class ClanService implements IClanService {
         return clanLocks.computeIfAbsent(clanId, k -> new Object());
     }
 
-    @Override
     public int getClanLevel(short clanId) {
         return clanDAO.getLevel(clanId);
     }
 
-    @Override
     public int getClanXu(short clanId) {
         return clanDAO.getXu(clanId);
     }
 
-    @Override
     public int getClanLuong(short clanId) {
         return clanDAO.getLuong(clanId);
     }
 
-    @Override
     public byte[] getClanIcon(short clanId) {
         return Utils.getFile(String.format(GameConstants.CLAN_ICON_PATH, clanDAO.getClanIcon(clanId)));
     }
 
-    @Override
     public byte getTotalPage(short clanId) {
         Byte mem = clanDAO.getMembersOfClan(clanId);
         if (mem == null) {
@@ -59,28 +53,23 @@ public class ClanService implements IClanService {
         return (byte) Math.ceil((double) mem / 10);
     }
 
-    @Override
     public byte getTotalPagesClan() {
         double count = clanDAO.getCountClan();
         return (byte) Math.ceil(count / 10);
     }
 
-    @Override
     public ClanInfoDTO getClanInfo(short clanId) {
         return clanDAO.getClanInfo(clanId);
     }
 
-    @Override
     public List<ClanMemDTO> getMemberClan(short clanId, byte page) {
         return clanDAO.getClanMember(clanId, page);
     }
 
-    @Override
     public List<ClanDTO> getTopTeams(byte page) {
         return clanDAO.getTopTeams(page);
     }
 
-    @Override
     public boolean[] getClanItems(short clanId) {
         boolean[] result = new boolean[ClanItemManager.CLAN_ITEM_MAP.size()];
         LocalDateTime now = LocalDateTime.now();
@@ -95,7 +84,6 @@ public class ClanService implements IClanService {
         return result;
     }
 
-    @Override
     public void updateItemClan(short clanId, int userId, ClanItemShop clanItemShop, boolean isBuyXu) {
         synchronized (getClanLock(clanId)) {
             if (isBuyXu) {
@@ -133,7 +121,6 @@ public class ClanService implements IClanService {
         }
     }
 
-    @Override
     public void contributeClan(short clanId, int userId, int quantity, boolean isXu) {
         synchronized (getClanLock(clanId)) {
             if (isXu) {
@@ -146,7 +133,6 @@ public class ClanService implements IClanService {
         }
     }
 
-    @Override
     public void updateXp(short clanId, int userId, int xpUp) {
         if (xpUp == 0) {
             return;
@@ -166,7 +152,6 @@ public class ClanService implements IClanService {
         }
     }
 
-    @Override
     public void updateCup(short clanId, int userId, int cupUp) {
         if (cupUp == 0) {
             return;

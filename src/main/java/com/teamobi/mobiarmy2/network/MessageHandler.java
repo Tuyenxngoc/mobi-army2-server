@@ -1,16 +1,16 @@
 package com.teamobi.mobiarmy2.network;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
-import com.teamobi.mobiarmy2.service.IUserService;
+import com.teamobi.mobiarmy2.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MessageHandler {
     private static final Logger logger = LoggerFactory.getLogger(MessageHandler.class);
 
-    private final IUserService userService;
+    private final UserService userService;
 
-    public MessageHandler(IUserService userService) {
+    public MessageHandler(UserService userService) {
         this.userService = userService;
     }
 

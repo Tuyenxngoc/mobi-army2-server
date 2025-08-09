@@ -1,11 +1,10 @@
-package com.teamobi.mobiarmy2.service.impl;
+package com.teamobi.mobiarmy2.service;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.server.FightItemManager;
-import com.teamobi.mobiarmy2.service.IGiftBoxService;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.DataOutputStream;
@@ -15,7 +14,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-public class GiftBoxService implements IGiftBoxService {
+public class GiftBoxService {
     private static final int MAX_GIFTS = 12;          // Số quà tối đa
     private static final int MAX_OPENED_GIFTS = 6;    // Số quà có thể mở tối đa
     private static final int XU_COST_PER_GIFT = 1000; // Chi phí mở mỗi quà khi hết lượt
@@ -38,7 +37,6 @@ public class GiftBoxService implements IGiftBoxService {
         this.executorService = Executors.newSingleThreadScheduledExecutor();
     }
 
-    @Override
     public boolean isOpeningGift() {
         return openingGift;
     }
@@ -177,7 +175,6 @@ public class GiftBoxService implements IGiftBoxService {
         this.openedGiftCount = 0;
     }
 
-    @Override
     public void startGiftBoxOpening(int availableGifts, int giftOpenTime) {
         this.availableGifts = availableGifts;
         this.giftOpenTime = giftOpenTime;
@@ -186,7 +183,6 @@ public class GiftBoxService implements IGiftBoxService {
         startGiftBoxThread();
     }
 
-    @Override
     public void openGiftBoxAfterFight(byte boxIndex) {
         if (boxIndex == -2) {
             openingGift = false;

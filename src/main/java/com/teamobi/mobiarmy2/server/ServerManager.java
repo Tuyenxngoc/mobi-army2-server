@@ -5,9 +5,9 @@ import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
-import com.teamobi.mobiarmy2.service.IConnectionBlockerService;
-import com.teamobi.mobiarmy2.service.IGameDataService;
-import com.teamobi.mobiarmy2.service.ILeaderboardService;
+import com.teamobi.mobiarmy2.service.ConnectionBlockerService;
+import com.teamobi.mobiarmy2.service.GameDataService;
+import com.teamobi.mobiarmy2.service.LeaderboardService;
 import com.teamobi.mobiarmy2.ui.controllers.ServerListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +21,10 @@ import java.util.List;
 public class ServerManager {
     private static final Logger logger = LoggerFactory.getLogger(ServerManager.class);
 
-    private final IGameDataService gameDataService;
-    private final ILeaderboardService leaderboardService;
+    private final GameDataService gameDataService;
+    private final LeaderboardService leaderboardService;
     private final ServerConfig serverConfig;
-    private final IConnectionBlockerService connectionBlockerService;
+    private final ConnectionBlockerService connectionBlockerService;
     private final ArrayList<Session> sessions;
     private final List<ServerListener> listeners;
     private ServerSocket server;

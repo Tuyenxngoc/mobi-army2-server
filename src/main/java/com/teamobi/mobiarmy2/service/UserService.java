@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.service.impl;
+package com.teamobi.mobiarmy2.service;
 
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.*;
@@ -12,10 +12,6 @@ import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.Character;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.server.*;
-import com.teamobi.mobiarmy2.service.IClanService;
-import com.teamobi.mobiarmy2.service.ILeaderboardService;
-import com.teamobi.mobiarmy2.service.ILoginRateLimiterService;
-import com.teamobi.mobiarmy2.service.IUserService;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.DataInputStream;
@@ -24,15 +20,15 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class UserService implements IUserService {
+public class UserService {
     private static final int minimumWaitTime = 5000;
 
     private final User user;
 
     private final ServerConfig serverConfig;
-    private final IClanService clanService;
-    private final ILeaderboardService leaderboardService;
-    private final ILoginRateLimiterService loginRateLimiterService;
+    private final ClanService clanService;
+    private final LeaderboardService leaderboardService;
+    private final LoginRateLimiterService loginRateLimiterService;
 
     private final UserDAO userDAO;
     private final AccountDAO accountDAO;
@@ -49,7 +45,7 @@ public class UserService implements IUserService {
     private long timeSinceLeftRoom;
     private long lastSpinTime;
 
-    public UserService(User user, ServerConfig serverConfig, IClanService clanService, ILeaderboardService leaderboardService, ILoginRateLimiterService loginRateLimiterService, UserDAO userDAO, AccountDAO accountDAO, GiftCodeDAO giftCodeDAO, UserGiftCodeDAO userGiftCodeDAO, UserCharacterDAO userCharacterDAO) {
+    public UserService(User user, ServerConfig serverConfig, ClanService clanService, LeaderboardService leaderboardService, LoginRateLimiterService loginRateLimiterService, UserDAO userDAO, AccountDAO accountDAO, GiftCodeDAO giftCodeDAO, UserGiftCodeDAO userGiftCodeDAO, UserCharacterDAO userCharacterDAO) {
         this.user = user;
         this.serverConfig = serverConfig;
         this.clanService = clanService;
@@ -105,7 +101,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleLogin(Message ms) {
         if (user.isLogged()) {
             return;
@@ -317,7 +312,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleLogout() {
         if (user.getState() == UserState.FIGHTING || user.getState() == UserState.WAIT_FIGHT) {
             user.getFightWait().leaveTeam(user.getUserId());
@@ -439,7 +433,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void sendServerMessage(String message) {
         try {
             Message ms = new Message(Cmd.SERVER_MESSAGE);
@@ -451,7 +444,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void sendMoneyErrorMessage(String message) {
         try {
             Message ms = new Message(Cmd.SET_MONEY_ERROR);
@@ -463,12 +455,10 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleHandshakeMessage() {
         user.getSession().sendKeys();
     }
 
-    @Override
     public void extendItemDuration(Message ms) {
         try {
             DataInputStream dis = ms.reader();
@@ -515,7 +505,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleGetMissions(Message ms) {
         if (user.isNotWaiting()) {
             return;
@@ -592,7 +581,6 @@ public class UserService implements IUserService {
         sendMessage(ms);
     }
 
-    @Override
     public void sendLoginSuccess() {
         try {
             Message ms = new Message(Cmd.LOGIN_SUCESS);
@@ -651,7 +639,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void contributeToClan(Message ms) {
         if (user.isNotWaiting()) {
             return;
@@ -702,7 +689,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void getVersionCode(Message ms) {
         try {
             String platform = ms.reader().readUTF();
@@ -711,7 +697,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void getProvider(Message ms) {
         try {
             byte provider = ms.reader().readByte();
@@ -720,7 +705,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleMergeEquipments(Message ms) {
         try {
             DataInputStream dis = ms.reader();
@@ -880,7 +864,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void openLuckyGift(Message ms) {
         try {
             byte index = ms.reader().readByte();
@@ -889,7 +872,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void viewLeaderboard(Message ms) {
         try {
             DataInputStream dis = ms.reader();
@@ -942,7 +924,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handlePurchaseClanItem(Message ms) {
         if (user.getClanId() == null) {
             sendServerMessage(GameString.NO_CLAN_MEMBERSHIP);
@@ -1029,7 +1010,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void enterTrainingMap() {
         try {
             initializeTrainingManager();
@@ -1042,12 +1022,10 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleLogout(Message ms) {
         user.getSession().close();
     }
 
-    @Override
     public void handleSpecialItemShop(Message ms) {
         if (user.isNotWaiting()) {
             return;
@@ -1173,7 +1151,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void equipVipItems(Message ms) {
         try {
             DataInputStream dis = ms.reader();
@@ -1212,7 +1189,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleSendMessage(Message ms) {
         try {
             DataInputStream dis = ms.reader();
@@ -1287,7 +1263,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleSendRoomList() {
         if (user.isNotWaiting()) {
             return;
@@ -1308,7 +1283,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleEnteringRoom(Message ms) {
         if (user.isNotWaiting()) {
             return;
@@ -1346,7 +1320,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleJoinBoard(Message ms) {
         if (user.isNotWaiting()) {
             return;
@@ -1381,7 +1354,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleChatMessage(Message ms) {
         try {
             String message = ms.reader().readUTF().trim();
@@ -1393,7 +1365,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleKickPlayer(Message ms) {
         try {
             int userId = ms.reader().readInt();
@@ -1402,7 +1373,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleLeaveBoard(Message ms) {
         if (user.getState() == UserState.WAITING) {
             return;
@@ -1411,7 +1381,6 @@ public class UserService implements IUserService {
         timeSinceLeftRoom = System.currentTimeMillis();
     }
 
-    @Override
     public void setReady(Message ms) {
         try {
             boolean ready = ms.reader().readBoolean();
@@ -1420,7 +1389,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void imbueGem(Message ms) {
         List<EquipmentChest> equipList = getSelectedEquips();
         List<SpecialItemChest> specialItemList = getSelectedSpecialItems();
@@ -1894,7 +1862,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleSetPasswordFightWait(Message ms) {
         try {
             String password = ms.reader().readUTF().trim();
@@ -1906,7 +1873,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleSetMoneyFightWait(Message ms) {
         try {
             int xu = ms.reader().readInt();
@@ -1918,7 +1884,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleStartGame() {
         if (user.getState() != UserState.WAIT_FIGHT) {
             return;
@@ -1926,7 +1891,6 @@ public class UserService implements IUserService {
         user.getFightWait().startGame(user.getUserId());
     }
 
-    @Override
     public void movePlayer(Message ms) {
         DataInputStream dis = ms.reader();
         try {
@@ -1942,7 +1906,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void shoot(Message ms) {
         if (user.getState() != UserState.FIGHTING) {
             return;
@@ -1965,12 +1928,10 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void processShootingResult(Message ms) {
         //todo
     }
 
-    @Override
     public void handleUseItem(Message ms) {
         try {
             byte itemIndex = ms.reader().readByte();
@@ -1988,7 +1949,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleJoinAnyBoard(Message ms) {
         Room[] rooms = RoomManager.getInstance().getRooms();
         FightWait fightWait = null;
@@ -2080,7 +2040,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleViewFriendList() {
         try {
             Message ms = new Message(Cmd.FRIENDLIST);
@@ -2107,7 +2066,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleAddFriend(Message ms) {
         int maxFriends = serverConfig.getMaxFriends();
         Set<Integer> friends = user.getFriends();
@@ -2132,7 +2090,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleRemoveFriend(Message ms) {
         try {
             Integer id = ms.reader().readInt();
@@ -2165,7 +2122,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleGetFlayerDetail(Message ms) {
         try {
             int userId = ms.reader().readInt();
@@ -2209,7 +2165,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleFindPlayer(Message ms) {
         try {
             String username = ms.reader().readUTF().trim();
@@ -2234,12 +2189,10 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void skipTurn() {
         user.getFightWait().getFightManager().skipTurn(user.getUserId());
     }
 
-    @Override
     public void updateCoordinates(Message ms) {
         try {
             DataInputStream dis = ms.reader();
@@ -2249,7 +2202,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleSetFightWaitName(Message ms) {
         try {
             String name = ms.reader().readUTF().trim();
@@ -2258,7 +2210,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleSetMaxPlayerFightWait(Message ms) {
         try {
             byte maxPlayers = ms.reader().readByte();
@@ -2267,7 +2218,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleChoseItemFight(Message ms) {
         DataInputStream dis = ms.reader();
         byte[] items = new byte[8];
@@ -2286,7 +2236,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleChoseCharacter(Message ms) {
         try {
             byte characterId = ms.reader().readByte();
@@ -2321,7 +2270,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleChangeTeam(Message ms) {
         if (user.getState() != UserState.WAIT_FIGHT) {
             return;
@@ -2329,7 +2277,6 @@ public class UserService implements IUserService {
         user.getFightWait().changeTeam(user);
     }
 
-    @Override
     public void handlePurchaseItem(Message ms) {
         try {
             DataInputStream dis = ms.reader();
@@ -2370,7 +2317,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleBuyCharacter(Message ms) {
         try {
             DataInputStream dis = ms.reader();
@@ -2427,7 +2373,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleSelectMap(Message ms) {
         try {
             byte mapId = ms.reader().readByte();
@@ -2436,7 +2381,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleCardRecharge(Message ms) {
         try {
             DataInputStream dis = ms.reader();
@@ -2521,7 +2465,6 @@ public class UserService implements IUserService {
         sendServerMessage(GameString.GIFT_CODE_SUCCESS);
     }
 
-    @Override
     public void handleFindPlayerWait(Message ms) {
         try {
             DataInputStream dis = ms.reader();
@@ -2536,7 +2479,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void clearBullet(Message ms) {
         DataInputStream dis = ms.reader();
         try {
@@ -2552,7 +2494,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleChangePassword(Message ms) {
         DataInputStream dis = ms.reader();
         try {
@@ -2575,7 +2516,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void getFilePack(Message ms) {
         try {
             DataInputStream dis = ms.reader();
@@ -2718,7 +2658,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleAddPoints(Message ms) {
         try {
             short[] points = new short[5];
@@ -2738,7 +2677,6 @@ public class UserService implements IUserService {
         sendCharacterInfo();
     }
 
-    @Override
     public void sendCharacterInfo() {
         try {
             Message ms = new Message(Cmd.CHARACTOR_INFO);
@@ -2758,7 +2696,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleChangeEquipment(Message ms) {
         try {
             boolean changeSuccessful = false;
@@ -2792,7 +2729,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleSendShopEquipments() {
         Message ms = CacheManager.cachedShopEquipments;
         if (ms != null) {
@@ -2825,7 +2761,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleEquipmentTransactions(Message ms) {
         List<EquipmentChest> equipList = getSelectedEquips();
         try {
@@ -2988,7 +2923,6 @@ public class UserService implements IUserService {
         sendServerMessage(GameString.PURCHASE_SUCCESS);
     }
 
-    @Override
     public void handleSpinWheel(Message ms) {
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastSpinTime < 5000) {
@@ -3052,7 +2986,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void getClanIcon(Message ms) {
         try {
             short clanId = ms.reader().readShort();
@@ -3071,7 +3004,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void getTopClan(Message ms) {
         try {
             byte page = ms.reader().readByte();
@@ -3105,7 +3037,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void getInfoClan(Message ms) {
         try {
             short clanId = ms.reader().readShort();
@@ -3141,7 +3072,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void getClanMember(Message ms) {
         try {
             DataInputStream dis = ms.reader();
@@ -3187,7 +3117,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void getBigImage(Message ms) {
         try {
             int id = ms.reader().readByte();
@@ -3207,12 +3136,10 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleRegister(Message ms) {
         sendMessageLoginFail(GameString.REGISTRATION_REQUIRED);
     }
 
-    @Override
     public void rechargeMoney(Message ms) {
         try {
             DataInputStream dis = ms.reader();
@@ -3248,7 +3175,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void getMaterialIconMessage(Message ms) {
         try {
             DataInputStream dis = ms.reader();
@@ -3284,7 +3210,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void startTraining(Message ms) {
         try {
             byte type = ms.reader().readByte();
@@ -3322,7 +3247,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void trainShooting(Message ms) {
         if (user.getState() != UserState.TRAINING) {
             return;
@@ -3346,7 +3270,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void sendUpdateMoney() {
         try {
             Message ms = new Message(Cmd.UPDATE_MONEY);
@@ -3359,7 +3282,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void sendUpdateCup(int cupUp) {
         try {
             Message ms = new Message(Cmd.CUP);
@@ -3372,7 +3294,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void sendUpdateXp(int xpUp, boolean updateLevel) {
         try {
             Message ms = new Message(Cmd.UPDATE_EXP);
@@ -3395,11 +3316,9 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void ping(Message ms) {
     }
 
-    @Override
     public void getMoreGame() {
         try {
             Message ms = new Message(Cmd.MORE_GAME);
@@ -3413,7 +3332,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void handleSendAgentAndProviders() {
         try {
             Message ms = new Message(Cmd.GET_AGENT_PROVIDER);
@@ -3426,7 +3344,6 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
     public void getStringMessage(Message ms) {
         DataInputStream dis = ms.reader();
         try {

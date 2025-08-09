@@ -1,10 +1,9 @@
-package com.teamobi.mobiarmy2.service.impl;
+package com.teamobi.mobiarmy2.service;
 
 import com.teamobi.mobiarmy2.server.RedisConnectionManager;
-import com.teamobi.mobiarmy2.service.ILoginRateLimiterService;
 import redis.clients.jedis.Jedis;
 
-public class LoginRateLimiterService implements ILoginRateLimiterService {
+public class LoginRateLimiterService {
 
     private static final int LOGIN_BLOCK_DURATION = 20;
 
@@ -12,7 +11,6 @@ public class LoginRateLimiterService implements ILoginRateLimiterService {
         return "user:logout:" + username;
     }
 
-    @Override
     public long getRemainingLoginTime(String username) {
         try (Jedis jedis = RedisConnectionManager.getInstance().getConnection()) {
             String logoutKey = generateKey(username);
@@ -25,7 +23,6 @@ public class LoginRateLimiterService implements ILoginRateLimiterService {
         return 0;
     }
 
-    @Override
     public void saveLogoutTime(String username) {
         try (Jedis jedis = RedisConnectionManager.getInstance().getConnection()) {
             String logoutKey = generateKey(username);

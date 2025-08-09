@@ -1,12 +1,11 @@
-package com.teamobi.mobiarmy2.service.impl;
+package com.teamobi.mobiarmy2.service;
 
 import com.teamobi.mobiarmy2.server.RedisConnectionManager;
-import com.teamobi.mobiarmy2.service.IConnectionBlockerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 
-public class ConnectionBlockerService implements IConnectionBlockerService {
+public class ConnectionBlockerService {
     private static final Logger logger = LoggerFactory.getLogger(ConnectionBlockerService.class);
     private static final int MAX_CONNECTIONS_PER_IP = 10;
     private static final int IP_BLOCK_DURATION = 3600;
@@ -15,7 +14,6 @@ public class ConnectionBlockerService implements IConnectionBlockerService {
         return "ip:" + ipAddress;
     }
 
-    @Override
     public boolean isIpBlocked(String ipAddress) {
         try (Jedis jedis = RedisConnectionManager.getInstance().getConnection()) {
             String key = getKey(ipAddress);
@@ -30,7 +28,6 @@ public class ConnectionBlockerService implements IConnectionBlockerService {
         return false;
     }
 
-    @Override
     public void incrementIpConnectionCount(String ipAddress) {
         try (Jedis jedis = RedisConnectionManager.getInstance().getConnection()) {
             String key = getKey(ipAddress);
@@ -41,7 +38,6 @@ public class ConnectionBlockerService implements IConnectionBlockerService {
         }
     }
 
-    @Override
     public void decrementIpConnectionCount(String ipAddress) {
         try (Jedis jedis = RedisConnectionManager.getInstance().getConnection()) {
             String key = getKey(ipAddress);

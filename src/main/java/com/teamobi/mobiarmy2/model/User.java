@@ -12,10 +12,8 @@ import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
 import com.teamobi.mobiarmy2.server.UserXpManager;
-import com.teamobi.mobiarmy2.service.IGiftBoxService;
-import com.teamobi.mobiarmy2.service.IUserService;
-import com.teamobi.mobiarmy2.service.impl.GiftBoxService;
-import com.teamobi.mobiarmy2.service.impl.UserService;
+import com.teamobi.mobiarmy2.service.GiftBoxService;
+import com.teamobi.mobiarmy2.service.UserService;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,9 +29,9 @@ import java.util.Set;
 @Getter
 @Setter
 public class User {
-    private final IUserService userService;
+    private final UserService userService;
     private final ServerConfig serverConfig;
-    private final IGiftBoxService giftBoxService;
+    private final GiftBoxService giftBoxService;
     private final Session session;
     private UserState state;
     private String accountId;
