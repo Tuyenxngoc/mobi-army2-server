@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class FightMapManager {
-
     private final List<MapTile> mapTiles = new ArrayList<>();
     private final FightManager fightManager;
     private short width;
@@ -139,5 +138,4 @@ public class FightMapManager {
         short y = (short) Utils.nextInt(topMargin, (height - bottomMargin));
         return new short[]{x, y};
     }
-
 }

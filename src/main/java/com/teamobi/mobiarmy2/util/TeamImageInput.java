@@ -4,8 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public final class TeamImageInput {
-
+public class TeamImageInput {
     private String[] names;
     private int[] dataStarts;
     private int[] dataLents;
@@ -49,5 +48,4 @@ public final class TeamImageInput {
         }
         return null;
     }
-
 }

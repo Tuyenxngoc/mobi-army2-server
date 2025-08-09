@@ -202,5 +202,4 @@ public class Cmd {
     public static String getCmdNameByValue(byte value) {
         return cmdMap.getOrDefault(value, String.valueOf(value));
     }
-
 }

@@ -8,13 +8,18 @@ import redis.clients.jedis.Jedis;
 public class ConnectionBlockerService {
     private static final int MAX_CONNECTIONS_PER_IP = 10;
     private static final int IP_BLOCK_DURATION = 3600;
+    private final RedisConnectionManager redisConnectionManager;
+
+    public ConnectionBlockerService(RedisConnectionManager redisConnectionManager) {
+        this.redisConnectionManager = redisConnectionManager;
+    }
 
     private String getKey(String ipAddress) {
         return "ip:" + ipAddress;
     }
 
     public boolean isIpBlocked(String ipAddress) {
-        try (Jedis jedis = RedisConnectionManager.getInstance().getConnection()) {
+        try (Jedis jedis = redisConnectionManager.getConnection()) {
             String key = getKey(ipAddress);
             String countStr = jedis.get(key);
             if (countStr != null) {
@@ -28,7 +33,7 @@ public class ConnectionBlockerService {
     }
 
     public void incrementIpConnectionCount(String ipAddress) {
-        try (Jedis jedis = RedisConnectionManager.getInstance().getConnection()) {
+        try (Jedis jedis = redisConnectionManager.getConnection()) {
             String key = getKey(ipAddress);
             jedis.incr(key);
             jedis.expire(key, IP_BLOCK_DURATION);
@@ -38,7 +43,7 @@ public class ConnectionBlockerService {
     }
 
     public void decrementIpConnectionCount(String ipAddress) {
-        try (Jedis jedis = RedisConnectionManager.getInstance().getConnection()) {
+        try (Jedis jedis = redisConnectionManager.getConnection()) {
             String key = getKey(ipAddress);
             long count = jedis.decr(key);
             if (count <= 0) {

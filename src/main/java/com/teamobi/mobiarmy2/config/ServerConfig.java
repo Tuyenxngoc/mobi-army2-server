@@ -16,7 +16,6 @@ import java.util.Properties;
 @Getter
 @Setter
 public class ServerConfig {
-
     private final Properties configMap;
     private boolean debug;
     private short port;

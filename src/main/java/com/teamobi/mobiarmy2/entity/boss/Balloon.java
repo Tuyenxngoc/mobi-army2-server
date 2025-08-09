@@ -7,7 +7,6 @@ import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 
 public class Balloon extends Boss {
-
     @Getter
     private final Player[] bodyParts = new Player[5];
     private int currentTurn = -1;

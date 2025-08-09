@@ -5,7 +5,6 @@ import com.teamobi.mobiarmy2.entity.Player;
 import com.teamobi.mobiarmy2.fight.BulletManager;
 
 public class ItemMuaDan extends Bullet {
-
     public ItemMuaDan(BulletManager bullMNG, byte bullId, int satThuong, Player pl, int X, int Y, int vx, int vy, int msg, int g100) {
         super(bullMNG, bullId, satThuong, pl, X, Y, vx, vy, msg, g100);
         super.isCanCollision = false;
@@ -35,5 +34,4 @@ public class ItemMuaDan extends Bullet {
             this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 29, this.damage, pl, this.X - 2, this.Y - 31, 1, -7, 15, 60));
         }
     }
-
 }

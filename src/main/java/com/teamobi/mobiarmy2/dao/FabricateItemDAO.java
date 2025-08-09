@@ -16,12 +16,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class FabricateItemDAO {
+    private final HikariCPManager hikariCPManager;
+
+    public FabricateItemDAO(HikariCPManager hikariCPManager) {
+        this.hikariCPManager = hikariCPManager;
+    }
 
     public void loadAll() {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `fabricate_items`")) {
-
                 Gson gson = GsonUtil.getInstance();
                 FabricateItemManager.FABRICATE_ITEMS.clear();
 
@@ -66,5 +70,4 @@ public class FabricateItemDAO {
             System.exit(1);
         }
     }
-
 }

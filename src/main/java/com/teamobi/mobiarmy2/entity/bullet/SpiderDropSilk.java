@@ -8,7 +8,6 @@ import com.teamobi.mobiarmy2.fight.BulletManager;
 import com.teamobi.mobiarmy2.server.EffectManager;
 
 public class SpiderDropSilk extends Bullet {
-
     public SpiderDropSilk(BulletManager bulletManager, byte bullId, int damage, Player pl) {
         super(bulletManager, bullId, damage, pl, pl.getX(), pl.getY() - 12, 0, 0, 0, 0);
     }

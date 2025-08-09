@@ -169,5 +169,4 @@ public class ClanService {
             clanDAO.updateClanMemberPoints(userId, cupUp * 2);
         }
     }
-
 }

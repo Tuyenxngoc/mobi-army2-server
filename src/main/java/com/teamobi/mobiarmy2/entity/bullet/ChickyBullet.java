@@ -5,7 +5,6 @@ import com.teamobi.mobiarmy2.entity.Player;
 import com.teamobi.mobiarmy2.fight.BulletManager;
 
 public class ChickyBullet extends Bullet {
-
     protected byte force2;
     private long satThuongGoc;
 
@@ -25,5 +24,4 @@ public class ChickyBullet extends Bullet {
             return;
         }
     }
-
 }

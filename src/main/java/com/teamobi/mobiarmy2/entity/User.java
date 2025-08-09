@@ -81,6 +81,7 @@ public class User {
                 null,
                 null,
                 null,
+                null,
                 null
         );
         this.serverConfig = null;

@@ -22,9 +22,14 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ClanDAO {
+    private final HikariCPManager hikariCPManager;
+
+    public ClanDAO(HikariCPManager hikariCPManager) {
+        this.hikariCPManager = hikariCPManager;
+    }
 
     public short getClanIcon(short clanId) {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT icon FROM clans WHERE clan_id = ?")) {
             statement.setShort(1, clanId);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -39,7 +44,7 @@ public class ClanDAO {
     }
 
     public Byte getMembersOfClan(short clanId) {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) AS member_count FROM clan_members cm WHERE cm.clan_id = ?")) {
             statement.setShort(1, clanId);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -54,7 +59,7 @@ public class ClanDAO {
     }
 
     public int getXu(short clanId) {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT xu FROM clans WHERE clan_id = ?")) {
             statement.setShort(1, clanId);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -69,7 +74,7 @@ public class ClanDAO {
     }
 
     public int getLuong(short clanId) {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT luong FROM clans WHERE clan_id = ?")) {
             statement.setShort(1, clanId);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -84,7 +89,7 @@ public class ClanDAO {
     }
 
     public int getXp(short clanId) {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT xp FROM clans WHERE clan_id = ?")) {
             statement.setShort(1, clanId);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -99,7 +104,7 @@ public class ClanDAO {
     }
 
     public int getLevel(short clanId) {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT level FROM clans WHERE clan_id = ?")) {
             statement.setShort(1, clanId);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -114,7 +119,7 @@ public class ClanDAO {
     }
 
     public int getCup(short clanId) {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT cup FROM clans WHERE clan_id = ?")) {
             statement.setShort(1, clanId);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -131,13 +136,13 @@ public class ClanDAO {
     public void updateXu(short clanId, int xu) {
         // language=SQL
         String sql = "UPDATE clans SET xu = xu + ? WHERE clan_id = ?";
-        HikariCPManager.getInstance().update(sql, xu, clanId);
+        hikariCPManager.update(sql, xu, clanId);
     }
 
     public void updateLuong(short clanId, int luong) {
         // language=SQL
         String sql = "UPDATE clans SET luong = luong + ? WHERE clan_id = ?";
-        HikariCPManager.getInstance().update(sql, luong, clanId);
+        hikariCPManager.update(sql, luong, clanId);
     }
 
     public void gopClanContribute(String txtContribute, int userId, int xu, int luong) {
@@ -149,11 +154,11 @@ public class ClanDAO {
                 "`xu` = `xu` + ?, " +
                 "`luong` = `luong` + ? " +
                 "WHERE `user_id` = ?";
-        HikariCPManager.getInstance().update(sql, LocalDateTime.now(), txtContribute, xu, luong, userId);
+        hikariCPManager.update(sql, LocalDateTime.now(), txtContribute, xu, luong, userId);
     }
 
     public ClanInfoDTO getClanInfo(short clanId) {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT " +
                              "c.clan_id, c.name, c.mem_max, c.xu, c.luong, c.cup, c.xp, c.level, c.description, c.created_date, c.item, " +
@@ -227,7 +232,7 @@ public class ClanDAO {
 
     public List<ClanMemDTO> getClanMember(short clanId, byte page) {
         List<ClanMemDTO> entries = new ArrayList<>();
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT " +
                              "c.rights, c.clan_point, c.contribute_count, c.contribute_text, c.contribute_time, c.xu, c.luong, " +
@@ -308,7 +313,7 @@ public class ClanDAO {
     }
 
     public ClanItemJson[] getClanItems(short clanId) {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT item FROM clans WHERE clan_id = ?")) {
             statement.setShort(1, clanId);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -326,11 +331,11 @@ public class ClanDAO {
     public void updateClanItems(short clanId, ClanItemJson[] items) {
         // language=SQL
         String sql = "UPDATE clans SET item = ? WHERE clan_id = ?";
-        HikariCPManager.getInstance().update(sql, GsonUtil.getInstance().toJson(items), clanId);
+        hikariCPManager.update(sql, GsonUtil.getInstance().toJson(items), clanId);
     }
 
     public short getCountClan() {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) as `count` FROM clans")) {
                 if (resultSet.next()) {
@@ -345,7 +350,7 @@ public class ClanDAO {
 
     public List<ClanDTO> getTopTeams(byte page) {
         List<ClanDTO> top = new ArrayList<>(10);
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT " +
                              "c.clan_id, c.name, c.mem_max, c.xu, c.luong, c.cup, c.xp, c.level, c.description, " +
@@ -398,7 +403,7 @@ public class ClanDAO {
                 "JOIN clan_members cm ON c.clan_id = cm.clan_id " +
                 "SET c.xp = ?, c.level = ? " +
                 "WHERE c.clan_id = ? AND cm.user_id = ?";
-        HikariCPManager.getInstance().update(sql, xp, level, clanId, userId);
+        hikariCPManager.update(sql, xp, level, clanId, userId);
     }
 
     public void updateCup(short clanId, int userId, int cup) {
@@ -407,12 +412,12 @@ public class ClanDAO {
                 "JOIN clan_members cm ON c.clan_id = cm.clan_id " +
                 "SET c.cup = ? " +
                 "WHERE c.clan_id = ? AND cm.user_id = ?";
-        HikariCPManager.getInstance().update(sql, cup, clanId, userId);
+        hikariCPManager.update(sql, cup, clanId, userId);
     }
 
     public void updateClanMemberPoints(int userId, int point) {
         // language=SQL
         String sql = "UPDATE clan_members SET clan_point = clan_point + ? WHERE user_id = ?";
-        HikariCPManager.getInstance().update(sql, point, userId);
+        hikariCPManager.update(sql, point, userId);
     }
 }

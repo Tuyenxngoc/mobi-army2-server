@@ -7,7 +7,6 @@ import com.teamobi.mobiarmy2.fight.FightMapManager;
 import com.teamobi.mobiarmy2.util.Utils;
 
 public class UFO extends Boss {
-
     private boolean turnShoot;
 
     public UFO(FightManager fightManager, byte index, short x, short y, short maxHp) {

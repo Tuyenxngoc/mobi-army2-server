@@ -13,5 +13,4 @@ public class ItemLaserDelay extends Bullet {
     public void nextXY() {
         super.nextXY();
     }
-
 }

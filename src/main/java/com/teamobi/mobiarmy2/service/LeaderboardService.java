@@ -96,5 +96,4 @@ public class LeaderboardService {
             case 5 -> list.addAll(rankingDAO.getWeeklyTopRichest());
         }
     }
-
 }

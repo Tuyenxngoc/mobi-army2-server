@@ -5,7 +5,6 @@ import com.teamobi.mobiarmy2.entity.Player;
 import com.teamobi.mobiarmy2.fight.FightManager;
 
 public class SmallBoom extends Boss {
-
     public SmallBoom(FightManager fightManager, byte index, short x, short y, short maxHp) {
         super(fightManager, index, (byte) 11, "Small Boom", x, y, (short) 18, (short) 18, maxHp, 2);
     }
@@ -28,5 +27,4 @@ public class SmallBoom extends Boss {
             fightManager.nextTurn();
         }
     }
-
 }

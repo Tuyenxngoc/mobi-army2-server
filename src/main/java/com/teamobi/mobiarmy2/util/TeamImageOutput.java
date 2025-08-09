@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class TeamImageOutput {
-
     private final ArrayList<String> names;
     private final ArrayList<String> files;
 
@@ -53,5 +52,4 @@ public class TeamImageOutput {
         }
         return output;
     }
-
 }

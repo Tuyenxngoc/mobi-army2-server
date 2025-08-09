@@ -9,9 +9,14 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 public class UserGiftCodeDAO {
+    private final HikariCPManager hikariCPManager;
+
+    public UserGiftCodeDAO(HikariCPManager hikariCPManager) {
+        this.hikariCPManager = hikariCPManager;
+    }
 
     public boolean existsByUserId(int userId) {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT * FROM user_gift_codes WHERE user_id = ?")) {
             statement.setInt(1, userId);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -28,7 +33,6 @@ public class UserGiftCodeDAO {
     public void create(long giftCodeId, int userId) {
         // language=SQL
         String sql = "INSERT INTO user_gift_codes (created_date, gift_code_id, user_id) VALUES (?, ?, ?)";
-        HikariCPManager.getInstance().update(sql, LocalDateTime.now(), giftCodeId, userId);
+        hikariCPManager.update(sql, LocalDateTime.now(), giftCodeId, userId);
     }
-
 }

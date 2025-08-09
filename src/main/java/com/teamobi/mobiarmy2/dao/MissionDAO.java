@@ -10,12 +10,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class MissionDAO {
+    private final HikariCPManager hikariCPManager;
+
+    public MissionDAO(HikariCPManager hikariCPManager) {
+        this.hikariCPManager = hikariCPManager;
+    }
 
     public void loadAll() {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `missions` ORDER BY mission_type, level")) {
-
                 MissionManager.clear();
 
                 while (resultSet.next()) {
@@ -39,5 +43,4 @@ public class MissionDAO {
             System.exit(1);
         }
     }
-
 }

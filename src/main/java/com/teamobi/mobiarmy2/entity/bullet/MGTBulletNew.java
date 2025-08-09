@@ -6,7 +6,6 @@ import com.teamobi.mobiarmy2.fight.BulletManager;
 import com.teamobi.mobiarmy2.util.Utils;
 
 public class MGTBulletNew extends Bullet {
-
     protected byte force;
 
     public MGTBulletNew(BulletManager bullMNG, byte bullId, int satThuong, Player pl, int X, int Y, int vx, int vy, int msg, int g100, byte force) {
@@ -49,5 +48,4 @@ public class MGTBulletNew extends Bullet {
             bulletManager.setMgtAddY((byte) nextY);
         }
     }
-
 }

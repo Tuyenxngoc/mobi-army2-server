@@ -21,6 +21,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class UserDAO {
+    private final HikariCPManager hikariCPManager;
+
+    public UserDAO(HikariCPManager hikariCPManager) {
+        this.hikariCPManager = hikariCPManager;
+    }
 
     public static String convertSpecialItemChestEntriesToJson(Map<Byte, SpecialItemChest> specialItemChests) {
         List<SpecialItemChestJson> specialItemChestJsons = new ArrayList<>();
@@ -81,7 +86,7 @@ public class UserDAO {
                 "fight_items, missions, mission_levels, friends, equipment_chest, special_item_chest) " +
                 "VALUES (?,?,?,?,?,?,?,?,?,?)";
 
-        return HikariCPManager.getInstance().update(
+        return hikariCPManager.update(
                 sql,
                 accountId,
                 xu,
@@ -122,7 +127,7 @@ public class UserDAO {
                 "`last_online` = ?, " +
                 "`point_event` = ? " +
                 " WHERE user_id = ?";
-        HikariCPManager.getInstance().update(sql,
+        hikariCPManager.update(sql,
                 gson.toJson(user.getFriends()),
                 user.getXu(),
                 user.getLuong(),
@@ -145,7 +150,7 @@ public class UserDAO {
     }
 
     public UserDTO findByAccountId(String accountId) {
-        try (Connection connection = HikariCPManager.getInstance().getConnection()) {
+        try (Connection connection = hikariCPManager.getConnection()) {
             String playerQuery = "SELECT " +
                     "u.user_id, u.xu, u.luong, u.cup, u.point_event, " +
                     "u.materials_purchased, u.equipment_purchased, " +
@@ -270,13 +275,13 @@ public class UserDAO {
     public void setOnline(int userId, boolean online) {
         // language=SQL
         String sql = "UPDATE `users` SET `is_online` = ? WHERE user_id = ?";
-        HikariCPManager.getInstance().update(sql, online, userId);
+        hikariCPManager.update(sql, online, userId);
     }
 
     public void setDailyRewardTime(int userId, LocalDateTime now) {
         // language=SQL
         String sql = "UPDATE `users` SET `daily_reward_time` = ? WHERE user_id = ?";
-        HikariCPManager.getInstance().update(sql, now, userId);
+        hikariCPManager.update(sql, now, userId);
     }
 
     public List<FriendDTO> getFriendsList(int userId, Set<Integer> friendIds) {
@@ -303,7 +308,7 @@ public class UserDAO {
         }
         queryBuilder.append(")");
 
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(queryBuilder.toString())) {
             int parameterIndex = 1;
             for (int friendId : friendIds) {
@@ -346,7 +351,7 @@ public class UserDAO {
     }
 
     public Optional<Integer> findUserIdByUsername(String username) {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT u.user_id FROM accounts a LEFT JOIN users u ON a.account_id = u.account_id WHERE a.username = ?")) {
             statement.setString(1, username);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -361,7 +366,7 @@ public class UserDAO {
     }
 
     public Optional<Integer> getUserRankByCup(int cup) {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) AS top FROM users WHERE cup > ?")) {
             statement.setInt(1, cup);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -374,5 +379,4 @@ public class UserDAO {
         }
         return Optional.empty();
     }
-
 }

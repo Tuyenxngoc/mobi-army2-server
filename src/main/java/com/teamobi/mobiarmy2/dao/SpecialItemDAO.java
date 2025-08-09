@@ -12,12 +12,17 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class SpecialItemDAO {
+    private final HikariCPManager hikariCPManager;
+
+    public SpecialItemDAO(HikariCPManager hikariCPManager) {
+        this.hikariCPManager = hikariCPManager;
+    }
+
 
     public void loadAll() {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `special_items`")) {
-
                 Gson gson = GsonUtil.getInstance();
                 SpecialItemManager.SPECIAL_ITEMS.clear();
 
@@ -50,5 +55,4 @@ public class SpecialItemDAO {
             System.exit(1);
         }
     }
-
 }

@@ -39,15 +39,12 @@ public class ServerManager {
         this.connectionBlockerService = null;// context.getBean(IConnectionBlockerService.class);
     }
 
-    public static ServerManager getInstance() {
-        return SingletonHelper.INSTANCE;
-    }
-
     public void init() {
         gameDataService.loadServerData();
         gameDataService.setCache();
         leaderboardService.init();
-        RoomManager.getInstance().init();
+        ApplicationContext.getInstance()
+                .getBean(RoomManager.class).init();
         ExchangeLimitManager.init();
     }
 
@@ -102,8 +99,8 @@ public class ServerManager {
             if (server != null) {
                 server.close();
             }
-            HikariCPManager.getInstance().closeDataSource();
-            RedisConnectionManager.getInstance().close();
+            //   HikariCPManager.getInstance().closeDataSource();
+            //  RedisConnectionManager.getInstance().close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -137,9 +134,5 @@ public class ServerManager {
                 .map(Session::getUser)
                 .limit(10)
                 .toList();
-    }
-
-    private static class SingletonHelper {
-        private static final ServerManager INSTANCE = new ServerManager();
     }
 }

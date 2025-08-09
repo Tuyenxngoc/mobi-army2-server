@@ -12,7 +12,6 @@ import java.util.Properties;
 @Getter
 @Setter
 public class HikariCPConfig {
-
     private final Properties properties;
     private String jdbcUrl;
     private String username;

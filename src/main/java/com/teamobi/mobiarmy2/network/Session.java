@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.network;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.entity.User;
+import com.teamobi.mobiarmy2.server.ApplicationContext;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,7 +16,6 @@ import java.util.List;
 
 @Slf4j
 public class Session {
-
     private static final int TIMEOUT_DURATION = 180_000;
     private static final List<Byte> WHITE_LIST_CMD = List.of(
             (byte) -27,
@@ -85,7 +85,9 @@ public class Session {
                 user.getUserService().handleLogout();
             }
 
-            ServerManager.getInstance().disconnect(this);
+            ApplicationContext.getInstance()
+                    .getBean(ServerManager.class)
+                    .disconnect(this);
             cleanNetwork();
 
             log.info("Close {}", this);
@@ -235,7 +237,6 @@ public class Session {
     }
 
     class Sender implements Runnable {
-
         private final ArrayList<Message> sendingMessage = new ArrayList<>();
 
         public void addMessage(Message message) {
@@ -264,7 +265,6 @@ public class Session {
     }
 
     class MessageCollector implements Runnable {
-
         @Override
         public void run() {
             try {

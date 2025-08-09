@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class MessageHandler {
-
     private final UserService userService;
 
     public MessageHandler(UserService userService) {
@@ -168,5 +167,4 @@ public class MessageHandler {
             e.printStackTrace();
         }
     }
-
 }

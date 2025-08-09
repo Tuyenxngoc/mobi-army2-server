@@ -21,7 +21,6 @@ import java.util.concurrent.Executors;
 import java.util.function.Predicate;
 
 public class FightManager {
-
     private static final int MAX_ELEMENT_FIGHT = 100;
     private static final int MAX_USER_FIGHT = 8;
     private static final int MAX_PLAY_TIME = 30;
@@ -637,7 +636,6 @@ public class FightManager {
                 try {
                     Thread.sleep(2000L);
                 } catch (InterruptedException ignored) {
-
                 }
             }
             nextWind();
@@ -1483,7 +1481,6 @@ public class FightManager {
     }
 
     public void updateCantSee(Player pl) {
-
     }
 
     public void sendPlayerFlyPosition(byte index) {

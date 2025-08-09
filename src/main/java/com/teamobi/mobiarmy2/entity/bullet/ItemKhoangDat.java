@@ -5,7 +5,6 @@ import com.teamobi.mobiarmy2.entity.Player;
 import com.teamobi.mobiarmy2.fight.BulletManager;
 
 public class ItemKhoangDat extends Bullet {
-
     private final int nFrame;
 
     public ItemKhoangDat(BulletManager bullMNG, byte bullId, Player pl, int X, int Y, byte force) {
@@ -26,5 +25,4 @@ public class ItemKhoangDat extends Bullet {
             this.collect = true;
         }
     }
-
 }

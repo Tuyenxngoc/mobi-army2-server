@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.util.List;
 
 public class MapTileExporter {
-
     public static void saveMapTilesToFile(List<MapTile> mapTiles, int imageWidth, int imageHeight, Player[] players, String filePath) throws IOException {
         BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = image.createGraphics();
@@ -67,5 +66,4 @@ public class MapTileExporter {
             }
         }
     }
-
 }

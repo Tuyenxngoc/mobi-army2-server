@@ -5,7 +5,6 @@ import com.teamobi.mobiarmy2.entity.Player;
 import com.teamobi.mobiarmy2.fight.BulletManager;
 
 public class ItemChuotGanBom extends Bullet {
-
     private final int nStep;
     private final boolean addX;
     private int nYRoi;
@@ -62,5 +61,4 @@ public class ItemChuotGanBom extends Bullet {
         }
         super.frame++;
     }
-
 }

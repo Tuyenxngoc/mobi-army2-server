@@ -14,9 +14,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class GiftCodeDAO {
+    private final HikariCPManager hikariCPManager;
+
+    public GiftCodeDAO(HikariCPManager hikariCPManager) {
+        this.hikariCPManager = hikariCPManager;
+    }
 
     public GiftCodeDTO findById(String code) {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT * FROM gift_codes WHERE code = ?")) {
             statement.setString(1, code);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -43,7 +48,6 @@ public class GiftCodeDAO {
     public void decrementUsageLimit(long giftCodeId) {
         // language=SQL
         String sql = "UPDATE gift_codes SET usage_limit = usage_limit - 1 WHERE gift_code_id = ?";
-        HikariCPManager.getInstance().update(sql, giftCodeId);
+        hikariCPManager.update(sql, giftCodeId);
     }
-
 }

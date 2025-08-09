@@ -5,7 +5,6 @@ import com.teamobi.mobiarmy2.entity.Player;
 import com.teamobi.mobiarmy2.fight.BulletManager;
 
 public class BigBoomBum extends Bullet {
-
     public BigBoomBum(BulletManager bullMNG, byte bullId, int satThuong, Player pl) {
         super(bullMNG, bullId, satThuong, pl, pl.getX(), pl.getY() - 12, 0, 0, 0, 0);
     }
@@ -23,5 +22,4 @@ public class BigBoomBum extends Bullet {
         pl.setWidth((short) 0);
         pl.setHeight((short) 0);
     }
-
 }

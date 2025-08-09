@@ -13,17 +13,12 @@ import java.util.function.Consumer;
 
 @Slf4j
 public class HikariCPManager {
-
     private final HikariCPConfig config;
     private HikariDataSource dataSource;
 
-    private HikariCPManager() {
-        this.config = new HikariCPConfig();
+    public HikariCPManager(HikariCPConfig config) {
+        this.config = config;
         initDataSource();
-    }
-
-    public static HikariCPManager getInstance() {
-        return SingletonHelper.INSTANCE;
     }
 
     private void initDataSource() {
@@ -94,9 +89,5 @@ public class HikariCPManager {
             dataSource.close();
             log.info("HikariCP DataSource closed.");
         }
-    }
-
-    private static class SingletonHelper {
-        private static final HikariCPManager INSTANCE = new HikariCPManager();
     }
 }

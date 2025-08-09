@@ -5,7 +5,6 @@ import com.teamobi.mobiarmy2.entity.Player;
 import com.teamobi.mobiarmy2.fight.BulletManager;
 
 public class ItemSaoBang extends Bullet {
-
     public ItemSaoBang(BulletManager bullMNG, byte bullId, int satThuong, Player pl, int X, int Y, int vx, int vy, int msg, int g100) {
         super(bullMNG, bullId, satThuong, pl, X, Y, vx, vy, msg, g100);
         super.isCanCollision = false;
@@ -21,5 +20,4 @@ public class ItemSaoBang extends Bullet {
             }
         }
     }
-
 }

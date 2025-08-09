@@ -5,17 +5,12 @@ import com.teamobi.mobiarmy2.entity.Room;
 import lombok.Getter;
 
 public class RoomManager {
-
     private final ServerConfig serverConfig;
     @Getter
     private Room[] rooms;
 
     public RoomManager() {
         this.serverConfig = null;// ApplicationContext.getInstance().getBean(ServerConfig.class);
-    }
-
-    public static RoomManager getInstance() {
-        return RoomManager.SingletonHelper.INSTANCE;
     }
 
     public void init() {
@@ -54,9 +49,4 @@ public class RoomManager {
             }
         }
     }
-
-    private static class SingletonHelper {
-        private static final RoomManager INSTANCE = new RoomManager();
-    }
-
 }

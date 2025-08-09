@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class EquipmentChestJson {
-
     @SerializedName("k")
     private int key;
 
@@ -33,5 +32,4 @@ public class EquipmentChestJson {
 
     @SerializedName("c")
     private byte[] addPercents;
-
 }

@@ -10,9 +10,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class AccountDAO {
+    private final HikariCPManager hikariCPManager;
+
+    public AccountDAO(HikariCPManager hikariCPManager) {
+        this.hikariCPManager = hikariCPManager;
+    }
 
     public AccountDTO findByUsernameAndPassword(String username, String password) {
-        try (Connection connection = HikariCPManager.getInstance().getConnection()) {
+        try (Connection connection = hikariCPManager.getConnection()) {
             String userQuery = "SELECT `account_id`, `password`, `is_enabled`, `is_locked` FROM accounts WHERE username = ?";
             try (PreparedStatement userStatement = connection.prepareStatement(userQuery)) {
                 userStatement.setString(1, username);
@@ -37,7 +42,7 @@ public class AccountDAO {
     }
 
     public boolean existsByAccountIdAndPassword(String accountId, String password) {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT password FROM accounts WHERE account_id = ?")) {
             statement.setString(1, accountId);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -56,7 +61,6 @@ public class AccountDAO {
         String hashedPassword = BCrypt.hashpw(newPass, BCrypt.gensalt());
         // language=SQL
         String sql = "UPDATE `accounts` SET `password` = ? WHERE account_id = ?";
-        HikariCPManager.getInstance().update(sql, hashedPassword, accountId);
+        hikariCPManager.update(sql, hashedPassword, accountId);
     }
-
 }

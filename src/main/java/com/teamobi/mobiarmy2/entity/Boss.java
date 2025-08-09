@@ -7,7 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public abstract class Boss extends Player {
-
     private String name;
 
     public Boss(FightManager fightManager, byte index, byte characterId, String name, short x, short y, short width, short height, short maxHp, int xpExist) {

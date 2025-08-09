@@ -10,12 +10,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class CharacterDAO {
+    private final HikariCPManager hikariCPManager;
+
+    public CharacterDAO(HikariCPManager hikariCPManager) {
+        this.hikariCPManager = hikariCPManager;
+    }
 
     public void loadAll() {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT character_id, name, xu, luong, wind_resistance, min_angle, damage, bullet_damage, bullet_count FROM `characters`")) {
-
                 CharacterManager.CHARACTERS.clear();
 
                 while (resultSet.next()) {
@@ -38,5 +42,4 @@ public class CharacterDAO {
             System.exit(1);
         }
     }
-
 }

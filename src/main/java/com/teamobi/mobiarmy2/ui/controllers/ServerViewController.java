@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.ui.controllers;
 
 import com.sun.management.OperatingSystemMXBean;
+import com.teamobi.mobiarmy2.server.ApplicationContext;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -13,7 +14,6 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class ServerViewController {
-
     @FXML
     public Tab serverInfoTab;
     @FXML
@@ -100,7 +100,9 @@ public class ServerViewController {
         maintainButton.setDisable(false);
         serverStatus.setText("Maintenance Mode");
 
-        ServerManager.getInstance().setMaintenanceMode(true);
+        ApplicationContext.getInstance()
+                .getBean(ServerManager.class)
+                .setMaintenanceMode(true);
     }
 
     @FXML

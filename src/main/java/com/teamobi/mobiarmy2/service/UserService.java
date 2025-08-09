@@ -36,6 +36,8 @@ public class UserService {
     private final UserGiftCodeDAO userGiftCodeDAO;
     private final UserCharacterDAO userCharacterDAO;
 
+    private final ServerManager serverManager;
+
     private UserAction userAction;
     private int totalTransactionAmount;
     private List<EquipmentChest> selectedEquips;
@@ -45,7 +47,7 @@ public class UserService {
     private long timeSinceLeftRoom;
     private long lastSpinTime;
 
-    public UserService(User user, ServerConfig serverConfig, ClanService clanService, LeaderboardService leaderboardService, LoginRateLimiterService loginRateLimiterService, UserDAO userDAO, AccountDAO accountDAO, GiftCodeDAO giftCodeDAO, UserGiftCodeDAO userGiftCodeDAO, UserCharacterDAO userCharacterDAO) {
+    public UserService(User user, ServerConfig serverConfig, ClanService clanService, LeaderboardService leaderboardService, LoginRateLimiterService loginRateLimiterService, UserDAO userDAO, AccountDAO accountDAO, GiftCodeDAO giftCodeDAO, UserGiftCodeDAO userGiftCodeDAO, UserCharacterDAO userCharacterDAO, ServerManager serverManager) {
         this.user = user;
         this.serverConfig = serverConfig;
         this.clanService = clanService;
@@ -56,6 +58,7 @@ public class UserService {
         this.giftCodeDAO = giftCodeDAO;
         this.userGiftCodeDAO = userGiftCodeDAO;
         this.userCharacterDAO = userCharacterDAO;
+        this.serverManager = serverManager;
     }
 
     private static String getFormattedRankDisplay(int rank) {
@@ -111,7 +114,6 @@ public class UserService {
             return;
         }
 
-        ServerManager serverManager = ServerManager.getInstance();
         if (serverManager.isMaintenanceMode()) {
             sendMessageLoginFail(GameString.MAINTENANCE_MODE);
             return;
@@ -1210,7 +1212,7 @@ public class UserService {
                 sendServerInfo(GameString.createMessageFromSender(user.getUsername(), content), true);
                 return;
             }
-            User receiver = ServerManager.getInstance().getUserByUserId(userId);
+            User receiver = serverManager.getUserByUserId(userId);
             if (receiver == null) {
                 sendServerMessage(GameString.INVITE_OFFLINE);
                 return;
@@ -1231,7 +1233,7 @@ public class UserService {
             ds.flush();
 
             if (toServer) {
-                ServerManager.getInstance().sendToServer(ms);
+                serverManager.sendToServer(ms);
             } else {
                 sendMessage(ms);
             }
@@ -1265,7 +1267,8 @@ public class UserService {
         if (user.isNotWaiting()) {
             return;
         }
-        RoomManager roomManager = RoomManager.getInstance();
+        RoomManager roomManager = ApplicationContext.getInstance()
+                .getBean(RoomManager.class);
         try {
             Message ms = new Message(Cmd.ROOM_LIST);
             DataOutputStream ds = ms.writer();
@@ -1285,7 +1288,8 @@ public class UserService {
         if (user.isNotWaiting()) {
             return;
         }
-        Room[] rooms = RoomManager.getInstance().getRooms();
+        Room[] rooms = ApplicationContext.getInstance()
+                .getBean(RoomManager.class).getRooms();
         try {
             byte roomNumber = ms.reader().readByte();
             if (roomNumber < 0 || roomNumber >= rooms.length) {
@@ -1329,7 +1333,8 @@ public class UserService {
             return;
         }
 
-        Room[] rooms = RoomManager.getInstance().getRooms();
+        Room[] rooms = ApplicationContext.getInstance()
+                .getBean(RoomManager.class).getRooms();
         try {
             DataInputStream dis = ms.reader();
             byte roomNumber = dis.readByte();
@@ -1948,7 +1953,8 @@ public class UserService {
     }
 
     public void handleJoinAnyBoard(Message ms) {
-        Room[] rooms = RoomManager.getInstance().getRooms();
+        Room[] rooms = ApplicationContext.getInstance()
+                .getBean(RoomManager.class).getRooms();
         FightWait fightWait = null;
         try {
             int type = ms.reader().readByte();

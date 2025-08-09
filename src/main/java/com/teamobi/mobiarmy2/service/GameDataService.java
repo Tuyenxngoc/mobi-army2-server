@@ -24,7 +24,6 @@ import java.util.TreeMap;
 
 @Slf4j
 public class GameDataService {
-
     private final MapDAO mapDAO;
     private final CharacterDAO characterDAO;
     private final EquipmentDAO equipmentDAO;
@@ -58,7 +57,6 @@ public class GameDataService {
 
         try (ByteArrayOutputStream bas = new ByteArrayOutputStream();
              DataOutputStream ds = new DataOutputStream(bas)) {
-
             ds.writeByte(sortedMaps.size());
 
             for (ArmyMap armyMap : sortedMaps.values()) {
@@ -84,7 +82,6 @@ public class GameDataService {
     public void setCacheEquipments() {
         try (ByteArrayOutputStream bas = new ByteArrayOutputStream();
              DataOutputStream ds = new DataOutputStream(bas)) {
-
             ds.writeByte(CharacterManager.CHARACTERS.size());
 
             for (Character character : CharacterManager.CHARACTERS) {

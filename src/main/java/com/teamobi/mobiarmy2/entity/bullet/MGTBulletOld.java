@@ -5,7 +5,6 @@ import com.teamobi.mobiarmy2.entity.Player;
 import com.teamobi.mobiarmy2.fight.BulletManager;
 
 public class MGTBulletOld extends Bullet {
-
     private final int force;
 
     public MGTBulletOld(BulletManager bullMNG, byte bullId, int satThuong, Player pl, int X, int Y, int vx100, int vy100, int force) {
@@ -59,5 +58,4 @@ public class MGTBulletOld extends Bullet {
             vyTemp = 0;
         }
     }
-
 }

@@ -43,5 +43,4 @@ public class SpecialItem {
                 ", name='" + name + '\'' +
                 '}';
     }
-
 }

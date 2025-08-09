@@ -3,7 +3,6 @@ package com.teamobi.mobiarmy2.network;
 import java.io.*;
 
 public class Message {
-
     private final byte command;
     private ByteArrayOutputStream os;
     private DataOutputStream dos;
@@ -47,5 +46,4 @@ public class Message {
         } catch (IOException ignored) {
         }
     }
-
 }

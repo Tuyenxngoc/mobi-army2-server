@@ -5,7 +5,6 @@ import com.teamobi.mobiarmy2.entity.Player;
 import com.teamobi.mobiarmy2.fight.BulletManager;
 
 public class ItemTuSat extends Bullet {
-
     public ItemTuSat(BulletManager bullMNG, byte bullId, int satThuong, Player pl) {
         super(bullMNG, bullId, satThuong, pl, pl.getX(), pl.getY() - 12, 0, 0, 0, 0);
     }
@@ -22,5 +21,4 @@ public class ItemTuSat extends Bullet {
             bulletManager.getFightManager().getMapManger().collision(X, Y, this);
         }
     }
-
 }

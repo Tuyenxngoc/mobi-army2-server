@@ -9,7 +9,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class TrainingManager {
-
     private final User trainingUser;
     private final Player[] players;
     private final byte mapId;
@@ -50,7 +49,6 @@ public class TrainingManager {
     }
 
     public void stopTraining() {
-
     }
 
     public void addShoot(User user, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
@@ -62,7 +60,5 @@ public class TrainingManager {
     }
 
     public void changeLocation(short x, short y) {
-
     }
-
 }

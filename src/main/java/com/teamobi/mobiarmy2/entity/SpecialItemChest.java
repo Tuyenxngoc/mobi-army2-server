@@ -81,5 +81,4 @@ public class SpecialItemChest {
                 ", item=" + item +
                 '}';
     }
-
 }

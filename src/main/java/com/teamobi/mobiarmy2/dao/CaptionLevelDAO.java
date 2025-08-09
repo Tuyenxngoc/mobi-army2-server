@@ -10,12 +10,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class CaptionLevelDAO {
+    private final HikariCPManager hikariCPManager;
+
+    public CaptionLevelDAO(HikariCPManager hikariCPManager) {
+        this.hikariCPManager = hikariCPManager;
+    }
 
     public void loadAll() {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT level, caption FROM `caption_levels`")) {
-
                 CaptionManager.CAPTIONS.clear();
 
                 while (resultSet.next()) {
@@ -31,5 +35,4 @@ public class CaptionLevelDAO {
             System.exit(1);
         }
     }
-
 }

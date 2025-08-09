@@ -14,6 +14,11 @@ import java.util.List;
 import java.util.Optional;
 
 public class UserCharacterDAO {
+    private final HikariCPManager hikariCPManager;
+
+    public UserCharacterDAO(HikariCPManager hikariCPManager) {
+        this.hikariCPManager = hikariCPManager;
+    }
 
     private static UserCharacterDTO mapToUserCharacterDTO(ResultSet resultSet) throws SQLException {
         Gson gson = GsonUtil.getInstance();
@@ -32,7 +37,7 @@ public class UserCharacterDAO {
     public List<UserCharacterDTO> findAllByUserId(int userId) {
         List<UserCharacterDTO> result = new ArrayList<>();
 
-        try (Connection connection = HikariCPManager.getInstance().getConnection()) {
+        try (Connection connection = hikariCPManager.getConnection()) {
             String query = "SELECT * FROM user_characters WHERE user_id = ?";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setInt(1, userId);
@@ -49,7 +54,7 @@ public class UserCharacterDAO {
     }
 
     public UserCharacterDTO findByUserIdAndCharacterId(int userId, byte characterId) {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT * FROM `user_characters` WHERE user_id = ? AND character_id = ?")) {
             statement.setInt(1, userId);
             statement.setByte(2, characterId);
@@ -67,7 +72,7 @@ public class UserCharacterDAO {
     public Optional<Integer> create(int userId, byte characterId) {
         // language=SQL
         String sql = "INSERT INTO `user_characters`(`user_id`, `character_id`) VALUES (?,?)";
-        return HikariCPManager.getInstance().update(sql, userId, characterId);
+        return hikariCPManager.update(sql, userId, characterId);
     }
 
     public void update(UserCharacterDTO userCharacterDTO) {
@@ -75,7 +80,7 @@ public class UserCharacterDAO {
 
         // language=SQL
         String sql = "UPDATE user_characters SET level = ?, points = ?, xp = ?, data = ?, additional_points = ? WHERE user_id = ? AND character_id = ?";
-        HikariCPManager.getInstance().update(
+        hikariCPManager.update(
                 sql,
                 userCharacterDTO.getLevel(),
                 userCharacterDTO.getPoints(),
@@ -93,7 +98,7 @@ public class UserCharacterDAO {
         // language=SQL
         String sql = "UPDATE user_characters SET level = ?, points = ?, xp = ?, data = ?, additional_points = ? WHERE user_id = ? AND character_id = ?";
 
-        HikariCPManager.getInstance().executeBatch(sql, statement -> {
+        hikariCPManager.executeBatch(sql, statement -> {
             for (UserCharacterDTO userCharacterDTO : userCharacterDTOs) {
                 try {
                     statement.setInt(1, userCharacterDTO.getLevel());

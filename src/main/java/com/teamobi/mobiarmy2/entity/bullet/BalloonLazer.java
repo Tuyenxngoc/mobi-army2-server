@@ -5,7 +5,6 @@ import com.teamobi.mobiarmy2.entity.Player;
 import com.teamobi.mobiarmy2.fight.BulletManager;
 
 public class BalloonLazer extends Bullet {
-
     public BalloonLazer(BulletManager bullMNG, byte bullId, int satThuong, Player pl, int x, int y) {
         super(bullMNG, bullId, satThuong, pl, x, y, 0, 0, 0, 100);
     }
@@ -42,5 +41,4 @@ public class BalloonLazer extends Bullet {
             }
         }
     }
-
 }

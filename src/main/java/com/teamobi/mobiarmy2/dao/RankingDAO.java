@@ -19,16 +19,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RankingDAO {
-
+    private final HikariCPManager hikariCPManager;
     private final ServerConfig serverConfig;
 
-    public RankingDAO(ServerConfig serverConfig) {
+    public RankingDAO(HikariCPManager hikariCPManager, ServerConfig serverConfig) {
+        this.hikariCPManager = hikariCPManager;
         this.serverConfig = serverConfig;
     }
 
     private List<UserLeaderboardDTO> getTopFromQuery(String query, boolean applyBonus) {
         List<UserLeaderboardDTO> top = new ArrayList<>();
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             byte index = 1;
@@ -193,7 +194,6 @@ public class RankingDAO {
     public void addBonusGift(int userId, int quantity) {
         // language=SQL
         String sql = "UPDATE users SET top_earnings_xu = ? WHERE user_id = ?";
-        HikariCPManager.getInstance().update(sql, quantity, userId);
+        hikariCPManager.update(sql, quantity, userId);
     }
-
 }

@@ -19,7 +19,6 @@ import java.util.Locale;
 import java.util.Random;
 
 public class Utils {
-
     private static final Random RANDOM;
     private static final DateTimeFormatter DATE_TIME_FORMATTER;
     private static final NumberFormat NUMBER_FORMAT;

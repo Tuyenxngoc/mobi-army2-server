@@ -13,7 +13,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class ServerUI extends Application {
-
     public static void launchUI(String[] args) {
         launch(args);
     }

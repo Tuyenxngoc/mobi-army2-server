@@ -6,12 +6,9 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 public class RedisConnectionManager {
-
     private final JedisPool jedisPool;
 
-    private RedisConnectionManager() {
-        RedisConfig redisConfig = new RedisConfig();
-
+    public RedisConnectionManager(RedisConfig redisConfig) {
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxTotal(redisConfig.getMaxTotal());
         poolConfig.setMaxIdle(redisConfig.getMaxIdle());
@@ -29,10 +26,6 @@ public class RedisConnectionManager {
         );
     }
 
-    public static RedisConnectionManager getInstance() {
-        return SingletonHelper.INSTANCE;
-    }
-
     public Jedis getConnection() {
         return jedisPool.getResource();
     }
@@ -41,9 +34,5 @@ public class RedisConnectionManager {
         if (jedisPool != null) {
             jedisPool.close();
         }
-    }
-
-    private static class SingletonHelper {
-        private static final RedisConnectionManager INSTANCE = new RedisConnectionManager();
     }
 }

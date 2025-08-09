@@ -9,11 +9,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class ClanItemJson {
-
     @SerializedName("i")
     private byte id;
 
     @SerializedName("t")
     private LocalDateTime time;
-
 }

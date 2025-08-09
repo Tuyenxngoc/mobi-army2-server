@@ -17,12 +17,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class FormulaDAO {
+    private final HikariCPManager hikariCPManager;
+
+    public FormulaDAO(HikariCPManager hikariCPManager) {
+        this.hikariCPManager = hikariCPManager;
+    }
 
     public void loadAll() {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM formula_details fd INNER JOIN formulas f on fd.formula_id = f.formula_id ORDER BY f.material_id, fd.character_id, f.level")) {
-
                 Gson gson = GsonUtil.getInstance();
                 FormulaManager.FORMULAS.clear();
 
@@ -56,5 +60,4 @@ public class FormulaDAO {
             System.exit(1);
         }
     }
-
 }

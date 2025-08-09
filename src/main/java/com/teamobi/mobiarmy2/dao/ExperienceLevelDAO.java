@@ -11,12 +11,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class ExperienceLevelDAO {
+    private final HikariCPManager hikariCPManager;
+
+    public ExperienceLevelDAO(HikariCPManager hikariCPManager) {
+        this.hikariCPManager = hikariCPManager;
+    }
 
     public void loadAll() {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT exp_user, exp_clan, level FROM `experience_levels` ORDER BY level")) {
-
                 ClanXpManager.LEVEL_XP_REQUIRED_LIST.clear();
                 UserXpManager.LEVEL_XP_REQUIRED_LIST.clear();
 
@@ -74,5 +78,4 @@ public class ExperienceLevelDAO {
             System.exit(1);
         }
     }
-
 }

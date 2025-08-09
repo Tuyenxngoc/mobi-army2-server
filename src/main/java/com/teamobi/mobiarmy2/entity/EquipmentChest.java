@@ -77,5 +77,4 @@ public class EquipmentChest {
     public int hashCode() {
         return Objects.hash(key);
     }
-
 }

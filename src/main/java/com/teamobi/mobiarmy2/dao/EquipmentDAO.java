@@ -13,6 +13,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class EquipmentDAO {
+    private final HikariCPManager hikariCPManager;
+
+    public EquipmentDAO(HikariCPManager hikariCPManager) {
+        this.hikariCPManager = hikariCPManager;
+    }
 
     private static void validateEquipment(Equipment equipment) throws SQLException {
         if (equipment.isDisguise() && equipment.getDisguiseEquippedIndexes().length != 5) {
@@ -62,7 +67,7 @@ public class EquipmentDAO {
     }
 
     public void loadAll() {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `equips` ORDER BY equip_type, equip_index, character_id")) {
                 EquipmentManager.clear();
@@ -72,7 +77,6 @@ public class EquipmentDAO {
                 Gson gson = GsonUtil.getInstance();
 
                 while (resultSet.next()) {
-
                     Equipment equipment = new Equipment();
                     equipment.setEquipmentId(resultSet.getShort("equip_id"));
                     equipment.setCharacterId(resultSet.getByte("character_id"));
@@ -113,5 +117,4 @@ public class EquipmentDAO {
             System.exit(1);
         }
     }
-
 }

@@ -10,12 +10,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class ClanShopDAO {
+    private final HikariCPManager hikariCPManager;
+
+    public ClanShopDAO(HikariCPManager hikariCPManager) {
+        this.hikariCPManager = hikariCPManager;
+    }
 
     public void loadAll() {
-        try (Connection connection = HikariCPManager.getInstance().getConnection();
+        try (Connection connection = hikariCPManager.getConnection();
              Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT clan_shop_id, level, name, time, on_sale, xu, luong FROM `clan_shops`")) {
-
                 ClanItemManager.CLAN_ITEM_MAP.clear();
 
                 while (resultSet.next()) {
@@ -36,5 +40,4 @@ public class ClanShopDAO {
             System.exit(1);
         }
     }
-
 }

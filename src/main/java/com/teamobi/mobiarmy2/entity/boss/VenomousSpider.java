@@ -7,7 +7,6 @@ import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 
 public class VenomousSpider extends Boss {
-
     @Getter
     private Player targetPlayer;
     private byte actionCountdown;

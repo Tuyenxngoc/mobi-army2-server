@@ -6,6 +6,7 @@ import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.entity.Room;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.server.ApplicationContext;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.MapManager;
 import com.teamobi.mobiarmy2.server.ServerManager;
@@ -816,7 +817,8 @@ public class FightWait {
             return;
         }
 
-        List<User> userList = ServerManager.getInstance().findWaitPlayers(userId);
+        List<User> userList = ApplicationContext.getInstance()
+                .getBean(ServerManager.class).findWaitPlayers(userId);
 
         try {
             Message ms = new Message(Cmd.FIND_PLAYER);
@@ -845,7 +847,8 @@ public class FightWait {
     public void inviteToRoom(int userId) {
         User roomOwner = getRoomOwner();
 
-        User user = ServerManager.getInstance().getUserByUserId(userId);
+        User user = ApplicationContext.getInstance()
+                .getBean(ServerManager.class).getUserByUserId(userId);
         if (user == null) {
             roomOwner.getUserService().sendServerMessage(GameString.INVITE_OFFLINE);
             return;

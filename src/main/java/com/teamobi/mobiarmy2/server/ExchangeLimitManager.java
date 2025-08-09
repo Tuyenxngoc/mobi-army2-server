@@ -17,7 +17,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 public class ExchangeLimitManager {
-
     private static final int NUM_DAILY_RESETS = 3;
     private static final int[] MAX_GOLD_PER_VIP = {10, 5, 2};
     private static final int[] MAX_SILVER_PER_VIP = {15, 10, 5};

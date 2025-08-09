@@ -604,7 +604,6 @@ public class BulletManager {
     }
 
     public static class VoiRong {
-
         public int X;
         public int Y;
         public int count;
@@ -618,7 +617,6 @@ public class BulletManager {
     }
 
     public static class BomHenGio {
-
         public int id;
         public int X;
         public int Y;
@@ -636,7 +634,6 @@ public class BulletManager {
     }
 
     public static class Bullets {
-
         public Bullet bull;
 
         public Bullets(Bullet bull) {

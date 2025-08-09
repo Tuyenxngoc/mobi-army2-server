@@ -11,7 +11,6 @@ import java.util.Properties;
 @Getter
 @Setter
 public class RedisConfig {
-
     private final Properties properties;
     private String host;
     private int port;

@@ -8,7 +8,6 @@ import com.teamobi.mobiarmy2.util.Utils;
 import java.util.ArrayList;
 
 public class BigRocKet extends Bullet {
-
     private short toX;
     private boolean flyshoot;
 
@@ -43,5 +42,4 @@ public class BigRocKet extends Bullet {
         }
         super.nextXY();
     }
-
 }

@@ -5,7 +5,6 @@ import com.teamobi.mobiarmy2.entity.Player;
 import com.teamobi.mobiarmy2.fight.BulletManager;
 
 public class TazranBullet extends Bullet {
-
     protected byte quayLai;
     protected boolean addTZ;
 
@@ -35,5 +34,4 @@ public class TazranBullet extends Bullet {
             quayLai = 0;
         }
     }
-
 }

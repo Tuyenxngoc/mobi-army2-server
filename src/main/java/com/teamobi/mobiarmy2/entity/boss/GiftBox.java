@@ -6,7 +6,6 @@ import com.teamobi.mobiarmy2.fight.FightManager;
 import com.teamobi.mobiarmy2.util.Utils;
 
 public class GiftBox extends Boss {
-
     private static final short[] COINS_BONUS = {1000, 5000, 10000, 15000, 20000, 25000, 30000};
     private static final short[] XP_BONUS = {50, 100, 150, 200, 250};
     private static final byte[] ITEM_IDS = {1, 2, 3, 4, 5};
