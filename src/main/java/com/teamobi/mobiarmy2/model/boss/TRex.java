@@ -1,13 +1,13 @@
 package com.teamobi.mobiarmy2.model.boss;
 
-import com.teamobi.mobiarmy2.fight.IFightManager;
+import com.teamobi.mobiarmy2.fight.FightManager;
 import com.teamobi.mobiarmy2.model.Boss;
 import com.teamobi.mobiarmy2.model.Player;
 import com.teamobi.mobiarmy2.util.Utils;
 
 public class TRex extends Boss {
 
-    public TRex(IFightManager fightManager, byte index, short x, short y, short maxHp) {
+    public TRex(FightManager fightManager, byte index, short x, short y, short maxHp) {
         super(fightManager, index, (byte) 15, "T. rex", x, y, (short) 45, (short) 50, maxHp, 4);
     }
 

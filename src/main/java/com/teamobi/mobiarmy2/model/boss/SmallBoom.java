@@ -1,12 +1,12 @@
 package com.teamobi.mobiarmy2.model.boss;
 
-import com.teamobi.mobiarmy2.fight.IFightManager;
+import com.teamobi.mobiarmy2.fight.FightManager;
 import com.teamobi.mobiarmy2.model.Boss;
 import com.teamobi.mobiarmy2.model.Player;
 
 public class SmallBoom extends Boss {
 
-    public SmallBoom(IFightManager fightManager, byte index, short x, short y, short maxHp) {
+    public SmallBoom(FightManager fightManager, byte index, short x, short y, short maxHp) {
         super(fightManager, index, (byte) 11, "Small Boom", x, y, (short) 18, (short) 18, maxHp, 2);
     }
 

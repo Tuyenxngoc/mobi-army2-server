@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.model;
 
-import com.teamobi.mobiarmy2.fight.IFightManager;
+import com.teamobi.mobiarmy2.fight.FightManager;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +10,7 @@ public abstract class Boss extends Player {
 
     private String name;
 
-    public Boss(IFightManager fightManager, byte index, byte characterId, String name, short x, short y, short width, short height, short maxHp, int xpExist) {
+    public Boss(FightManager fightManager, byte index, byte characterId, String name, short x, short y, short width, short height, short maxHp, int xpExist) {
         super(fightManager, index, characterId, x, y, width, height, maxHp, xpExist);
         this.name = name;
         this.stamina = 100;

@@ -1,11 +1,9 @@
-package com.teamobi.mobiarmy2.fight.impl;
-
-import com.teamobi.mobiarmy2.fight.ICountdownTimer;
+package com.teamobi.mobiarmy2.fight;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class CountdownTimer implements ICountdownTimer {
+public class CountdownTimer {
     private final int countdownTime;
     private final Runnable onTimeUpCallback;
     private Timer timer;
@@ -17,7 +15,6 @@ public class CountdownTimer implements ICountdownTimer {
         this.onTimeUpCallback = onTimeUpCallback;
     }
 
-    @Override
     public void start() {
         if (timer != null) {
             timer.cancel(); //Hủy bỏ bộ đếm trước đó nếu nó đang chạy
@@ -36,14 +33,12 @@ public class CountdownTimer implements ICountdownTimer {
         }, 0, 1000); //Cập nhật mỗi giây
     }
 
-    @Override
     public void stop() {
         if (timer != null) {
             timer.cancel();
         }
     }
 
-    @Override
     public void reset() {
         stop();
         remainingTime = countdownTime;

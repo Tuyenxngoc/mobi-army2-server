@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.model.boss;
 
-import com.teamobi.mobiarmy2.fight.IFightManager;
+import com.teamobi.mobiarmy2.fight.FightManager;
 import com.teamobi.mobiarmy2.model.Boss;
 import com.teamobi.mobiarmy2.model.Reward;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -12,7 +12,7 @@ public class GiftBox extends Boss {
     private static final byte[] ITEM_IDS = {1, 2, 3, 4, 5};
     private static final byte[] SPECIAL_ITEM_IDS = {10, 11, 12, 13};
 
-    public GiftBox(IFightManager fightManager, byte index, short x, short y) {
+    public GiftBox(FightManager fightManager, byte index, short x, short y) {
         super(fightManager, index, (byte) 24, "Gift Box", x, y, (short) 30, (short) 30, (short) 1, 0);
         super.isFlying = true;
     }

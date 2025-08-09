@@ -4,8 +4,8 @@ import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.constant.UserState;
-import com.teamobi.mobiarmy2.fight.IFightWait;
-import com.teamobi.mobiarmy2.fight.ITrainingManager;
+import com.teamobi.mobiarmy2.fight.FightWait;
+import com.teamobi.mobiarmy2.fight.TrainingManager;
 import com.teamobi.mobiarmy2.network.IMessage;
 import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.network.impl.Message;
@@ -68,8 +68,8 @@ public class User {
     private Set<Integer> friends;
     private Map<Byte, SpecialItemChest> specialItemChest;
     private Map<Integer, EquipmentChest> equipmentChest;
-    private IFightWait fightWait;
-    private ITrainingManager trainingManager;
+    private FightWait fightWait;
+    private TrainingManager trainingManager;
 
     public User(ISession session) {
         this.session = session;

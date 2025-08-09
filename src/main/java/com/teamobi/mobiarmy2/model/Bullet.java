@@ -1,8 +1,8 @@
 package com.teamobi.mobiarmy2.model;
 
-import com.teamobi.mobiarmy2.fight.IFightManager;
-import com.teamobi.mobiarmy2.fight.IFightMapManager;
-import com.teamobi.mobiarmy2.fight.impl.BulletManager;
+import com.teamobi.mobiarmy2.fight.BulletManager;
+import com.teamobi.mobiarmy2.fight.FightManager;
+import com.teamobi.mobiarmy2.fight.FightMapManager;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -51,7 +51,7 @@ public class Bullet {
         this.lastY = (short) Y;
         this.vx = (short) vx;
         this.vy = (short) vy;
-        IFightManager fightManager = bulletManager.getFightManager();
+        FightManager fightManager = bulletManager.getFightManager();
         this.ax100 = (short) (fightManager.getWindX() * msg / 100);
         this.ay100 = (short) (fightManager.getWindY() * msg / 100);
         this.g100 = (short) g100;
@@ -97,8 +97,8 @@ public class Bullet {
     }
 
     public void nextXY() {
-        IFightManager fightManager = bulletManager.getFightManager();
-        IFightMapManager mapManager = fightManager.getMapManger();
+        FightManager fightManager = bulletManager.getFightManager();
+        FightMapManager mapManager = fightManager.getMapManger();
 
         frame++;
         this.XArray.add(X);

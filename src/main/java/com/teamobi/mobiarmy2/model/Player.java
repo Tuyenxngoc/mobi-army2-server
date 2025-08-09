@@ -1,8 +1,8 @@
 package com.teamobi.mobiarmy2.model;
 
 import com.teamobi.mobiarmy2.constant.GameConstants;
-import com.teamobi.mobiarmy2.fight.IFightManager;
-import com.teamobi.mobiarmy2.fight.IFightMapManager;
+import com.teamobi.mobiarmy2.fight.FightManager;
+import com.teamobi.mobiarmy2.fight.FightMapManager;
 import com.teamobi.mobiarmy2.model.boss.GiftBox;
 import com.teamobi.mobiarmy2.model.boss.GiftBoxFalling;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 public class Player {
-    protected IFightManager fightManager;
+    protected FightManager fightManager;
     protected byte characterId;
     protected byte index;
     protected byte stamina;
@@ -72,7 +72,7 @@ public class Player {
         this.maxHp = (short) maxHp;
     }
 
-    public Player(IFightManager fightManager, byte index, byte characterId, short x, short y, short width, short height, short maxHp, int xpExist) {
+    public Player(FightManager fightManager, byte index, byte characterId, short x, short y, short width, short height, short maxHp, int xpExist) {
         this.fightManager = fightManager;
         this.index = index;
         this.characterId = characterId;
@@ -85,7 +85,7 @@ public class Player {
         this.xpExist = xpExist;
     }
 
-    public Player(IFightManager fightManager, User user, byte index, boolean isTeamBlue, short x, short y, byte[] items, short[] abilities, short teamPoints, boolean[] clanItems) {
+    public Player(FightManager fightManager, User user, byte index, boolean isTeamBlue, short x, short y, byte[] items, short[] abilities, short teamPoints, boolean[] clanItems) {
         this.fightManager = fightManager;
         this.user = user;
         this.gunId = user.getGunId();
@@ -259,7 +259,7 @@ public class Player {
     }
 
     private void move(boolean addX) {
-        IFightMapManager mapManager = fightManager.getMapManger();
+        FightMapManager mapManager = fightManager.getMapManger();
         if (this.freezeCount > 0) {
             return;
         }
@@ -295,7 +295,7 @@ public class Player {
     }
 
     public synchronized void updateYPosition() {
-        IFightMapManager mapManager = fightManager.getMapManger();
+        FightMapManager mapManager = fightManager.getMapManger();
         while (y < mapManager.getHeight() + 200) {
             if (mapManager.isCollision(x, y) || isFlying) {
                 return;

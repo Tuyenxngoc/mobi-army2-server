@@ -1,7 +1,5 @@
-package com.teamobi.mobiarmy2.fight.impl;
+package com.teamobi.mobiarmy2.fight;
 
-import com.teamobi.mobiarmy2.fight.IFightManager;
-import com.teamobi.mobiarmy2.fight.IFightMapManager;
 import com.teamobi.mobiarmy2.model.Bullet;
 import com.teamobi.mobiarmy2.model.MapBrick;
 import com.teamobi.mobiarmy2.model.MapTile;
@@ -13,35 +11,31 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class FightMapManager implements IFightMapManager {
+public class FightMapManager {
 
     private final List<MapTile> mapTiles = new ArrayList<>();
-    private final IFightManager fightManager;
+    private final FightManager fightManager;
     private short width;
     private short height;
     private short[] playerInitXPositions;
     private short[] playerInitYPositions;
 
-    public FightMapManager(IFightManager fightManager) {
+    public FightMapManager(FightManager fightManager) {
         this.fightManager = fightManager;
     }
 
-    @Override
     public short getHeight() {
         return height;
     }
 
-    @Override
     public short getWidth() {
         return width;
     }
 
-    @Override
     public List<MapTile> getMapTiles() {
         return mapTiles;
     }
 
-    @Override
     public List<short[]> getRandomPlayerPositions(int numPlayers) {
         //Kiểm tra nếu số người chơi lớn hơn số vị trí khả dụng
         if (numPlayers > playerInitXPositions.length || numPlayers > playerInitYPositions.length) {
@@ -68,7 +62,6 @@ public class FightMapManager implements IFightMapManager {
         return randomPositions;
     }
 
-    @Override
     public void loadMapId(byte mapId) {
         mapTiles.clear();
         byte[] mapData = MapManager.getMapData(mapId);
@@ -115,7 +108,6 @@ public class FightMapManager implements IFightMapManager {
         }
     }
 
-    @Override
     public boolean isCollision(short x, short y) {
         for (MapTile tile : mapTiles) {
             if (tile.isCollision(x, y)) {
@@ -125,7 +117,6 @@ public class FightMapManager implements IFightMapManager {
         return false;
     }
 
-    @Override
     public void collision(short X, short Y, Bullet bull) {
         for (MapTile mapTile : mapTiles) {
             mapTile.collision(X, Y, bull);
@@ -139,12 +130,10 @@ public class FightMapManager implements IFightMapManager {
         //Todo: bom hen gio
     }
 
-    @Override
     public void addNewTiles(MapTile mapTile) {
         mapTiles.add(mapTile);
     }
 
-    @Override
     public short[] getRandomPosition(int leftMargin, int rightMargin, int topMargin, int bottomMargin) {
         short x = (short) Utils.nextInt(leftMargin, (width - rightMargin));
         short y = (short) Utils.nextInt(topMargin, (height - bottomMargin));

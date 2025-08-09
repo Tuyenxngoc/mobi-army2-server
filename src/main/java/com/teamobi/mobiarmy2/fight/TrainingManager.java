@@ -1,7 +1,6 @@
-package com.teamobi.mobiarmy2.fight.impl;
+package com.teamobi.mobiarmy2.fight;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
-import com.teamobi.mobiarmy2.fight.ITrainingManager;
 import com.teamobi.mobiarmy2.model.Player;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
@@ -10,7 +9,7 @@ import com.teamobi.mobiarmy2.network.impl.Message;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class TrainingManager implements ITrainingManager {
+public class TrainingManager {
 
     private final User trainingUser;
     private final Player[] players;
@@ -22,7 +21,6 @@ public class TrainingManager implements ITrainingManager {
         this.players = new Player[2];
     }
 
-    @Override
     public void startTraining() {
         players[0] = new Player(0, 230, 200, 70, 1000);
         players[1] = new Player(1, 550, 200, 1000, 1000);
@@ -52,22 +50,18 @@ public class TrainingManager implements ITrainingManager {
         }
     }
 
-    @Override
     public void stopTraining() {
 
     }
 
-    @Override
     public void addShoot(User user, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
         trainingUser.getUserService().sendServerMessage("To be continue...: " + bullId + " " + x + " " + y + " " + angle + " " + force + " " + force2 + " " + numShoot);
     }
 
-    @Override
     public byte getMapId() {
         return mapId;
     }
 
-    @Override
     public void changeLocation(short x, short y) {
 
     }

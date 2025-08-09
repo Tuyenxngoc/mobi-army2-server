@@ -1,10 +1,9 @@
-package com.teamobi.mobiarmy2.fight.impl;
+package com.teamobi.mobiarmy2.fight;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.constant.MatchResult;
 import com.teamobi.mobiarmy2.constant.UserState;
-import com.teamobi.mobiarmy2.fight.*;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.boss.*;
 import com.teamobi.mobiarmy2.network.IMessage;
@@ -22,7 +21,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Predicate;
 
-public class FightManager implements IFightManager {
+public class FightManager {
 
     private static final int MAX_ELEMENT_FIGHT = 100;
     private static final int MAX_USER_FIGHT = 8;
@@ -44,10 +43,10 @@ public class FightManager implements IFightManager {
     private static final Set<Byte> INVALID_CHARACTER_IDS = new HashSet<>(Set.of((byte) 18, (byte) 19, (byte) 20, (byte) 21, (byte) 23, (byte) 24));
     private static final Set<Byte> UNAUTHORIZED_ITEMS = Set.of((byte) 9, (byte) 23, (byte) 26, (byte) 28, (byte) 30, (byte) 31);
 
-    private final IFightWait fightWait;
-    private final IFightMapManager mapManager;
-    private final IBulletManager bulletManager;
-    private final ICountdownTimer countdownTimer;
+    private final FightWait fightWait;
+    private final FightMapManager mapManager;
+    private final com.teamobi.mobiarmy2.fight.BulletManager bulletManager;
+    private final com.teamobi.mobiarmy2.fight.CountdownTimer countdownTimer;
     private final ExecutorService executorNextTurn;
     private final ExecutorService executorEndGame;
     private final IClanService clanService;
@@ -61,7 +60,7 @@ public class FightManager implements IFightManager {
     private byte windY;
     private long startTime;
 
-    public FightManager(IFightWait fightWait, IClanService clanService) {
+    public FightManager(FightWait fightWait, IClanService clanService) {
         this.fightWait = fightWait;
         this.clanService = clanService;
         this.players = new Player[MAX_ELEMENT_FIGHT];
@@ -442,7 +441,6 @@ public class FightManager implements IFightManager {
         sendMssAddBosses(bosses);
     }
 
-    @Override
     public short[] getForceArgXY(int idGun, boolean isXuyenMap, short X, short Y, short toX, short toY, short Mx, short My, int arg, int force, int msg, int g100) {
         byte i = (byte) (Utils.nextInt(2) == 0 ? -1 : 1);
         short argS = (short) (i == 1 ? arg : 180 - arg);
@@ -561,7 +559,6 @@ public class FightManager implements IFightManager {
         return 0;
     }
 
-    @Override
     public synchronized void nextTurn() {
         turnCount++;
         byte roomType = fightWait.getRoomType();
@@ -654,7 +651,6 @@ public class FightManager implements IFightManager {
         });
     }
 
-    @Override
     public void addBoss(Boss boss) {
         if (totalPlayers >= FightManager.MAX_ELEMENT_FIGHT) {
             return;
@@ -712,7 +708,6 @@ public class FightManager implements IFightManager {
         }
     }
 
-    @Override
     public void leave(int userId) {
         int index = getPlayerIndexByUserId(userId);
         if (index == -1) {
@@ -738,7 +733,6 @@ public class FightManager implements IFightManager {
         }
     }
 
-    @Override
     public boolean checkWin() {
         if (!fightWait.isStarted()) {
             return true;
@@ -1021,7 +1015,6 @@ public class FightManager implements IFightManager {
         }
     }
 
-    @Override
     public void startGame(short teamPointsBlue, short teamPointsRed) {
         //Tải dữ liệu bản đồ
         mapManager.loadMapId(fightWait.getMapId());
@@ -1128,7 +1121,6 @@ public class FightManager implements IFightManager {
         }
     }
 
-    @Override
     public synchronized void addShoot(int userId, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
         int index = getPlayerIndexByUserId(userId);
         if (index == -1 || index != playerTurn || isBossTurn || !fightWait.isStarted()) {
@@ -1140,7 +1132,6 @@ public class FightManager implements IFightManager {
         newShoot(index, bullId, angle, force, force2, numShoot, true);
     }
 
-    @Override
     public void newShoot(int index, byte bullId, short angle, byte force, byte force2, byte numShoot, boolean isNextTurn) {
         Player player = players[index];
         if (player.isDoubleShoot()) {
@@ -1243,7 +1234,6 @@ public class FightManager implements IFightManager {
         }
     }
 
-    @Override
     public void changeLocation(int userId, short x, short y) {
         int index = getPlayerIndexByUserId(userId);
         if (index == -1) {
@@ -1265,7 +1255,6 @@ public class FightManager implements IFightManager {
         }
     }
 
-    @Override
     public void sendMessageUpdateXY(int index) {
         try {
             Player player = players[index];
@@ -1281,7 +1270,6 @@ public class FightManager implements IFightManager {
         }
     }
 
-    @Override
     public synchronized void skipTurn(int userId) {
         int index = getPlayerIndexByUserId(userId);
         if (index == -1 || index != playerTurn || isBossTurn) {
@@ -1294,7 +1282,6 @@ public class FightManager implements IFightManager {
         }
     }
 
-    @Override
     public synchronized void useItem(int userId, byte itemIndex) {
         int index = getPlayerIndexByUserId(userId);
         if (index == -1 || index != playerTurn) {
@@ -1417,47 +1404,38 @@ public class FightManager implements IFightManager {
         }
     }
 
-    @Override
-    public IFightMapManager getMapManger() {
+    public FightMapManager getMapManger() {
         return mapManager;
     }
 
-    @Override
     public void onTimeUp() {
         nextTurn();
     }
 
-    @Override
     public int getTotalPlayers() {
         return totalPlayers;
     }
 
-    @Override
     public int getTurnCount() {
         return turnCount;
     }
 
-    @Override
     public byte getWindY() {
         return windY;
     }
 
-    @Override
     public byte getWindX() {
         return windX;
     }
 
-    @Override
     public Player[] getPlayers() {
         return players;
     }
 
-    @Override
     public Player getPlayerTurn() {
         return players[getCurrentTurn()];
     }
 
-    @Override
     public Player getRandomPlayer(Predicate<Player> condition) {
         List<Player> validPlayers = new ArrayList<>(MAX_USER_FIGHT);
 
@@ -1478,7 +1456,6 @@ public class FightManager implements IFightManager {
         return validPlayers.get(Utils.nextInt(validPlayers.size()));
     }
 
-    @Override
     public Player findClosestPlayer(short targetX, short targetY) {
         Player closestPlayer = null;
         int closestDistanceSquared = Integer.MAX_VALUE;
@@ -1502,17 +1479,14 @@ public class FightManager implements IFightManager {
         return closestPlayer;
     }
 
-    @Override
     public void updateCantMove(Player pl) {
         pl.setFreezeCount((byte) 5);
     }
 
-    @Override
     public void updateCantSee(Player pl) {
 
     }
 
-    @Override
     public void sendPlayerFlyPosition(byte index) {
         Player player = players[index];
         try {
@@ -1528,7 +1502,6 @@ public class FightManager implements IFightManager {
         }
     }
 
-    @Override
     public void sendGhostAttackInfo(byte index, byte toIndex) {
         try {
             Message ms = new Message(Cmd.GHOST_BIT);
@@ -1542,7 +1515,6 @@ public class FightManager implements IFightManager {
         }
     }
 
-    @Override
     public void capture(byte index, byte toIndex) {
         try {
             Message ms = new Message(Cmd.CAPTURE);
@@ -1556,7 +1528,6 @@ public class FightManager implements IFightManager {
         }
     }
 
-    @Override
     public void sendBulletHit(byte index, byte toIndex) {
         try {
             Message ms = new Message(Cmd.BIT);
@@ -1570,7 +1541,6 @@ public class FightManager implements IFightManager {
         }
     }
 
-    @Override
     public void giveXpToTeammates(boolean isTeamBlue, int addXP, Player sharer) {
         int i = isTeamBlue ? 0 : 1;
         int step = fightWait.getRoomType() == 5 ? 1 : 2;

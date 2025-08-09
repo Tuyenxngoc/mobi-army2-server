@@ -4,8 +4,8 @@ import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.*;
 import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.dto.*;
-import com.teamobi.mobiarmy2.fight.IFightWait;
-import com.teamobi.mobiarmy2.fight.impl.TrainingManager;
+import com.teamobi.mobiarmy2.fight.FightWait;
+import com.teamobi.mobiarmy2.fight.TrainingManager;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.*;
@@ -1328,7 +1328,7 @@ public class UserService implements IUserService {
             ms = new Message(Cmd.BOARD_LIST);
             DataOutputStream ds = ms.writer();
             ds.writeByte(roomNumber);
-            for (IFightWait fightWait : room.getFightWaits()) {
+            for (FightWait fightWait : room.getFightWaits()) {
                 if (fightWait.isFightWaitInvalid()) {
                     continue;
                 }
@@ -1368,11 +1368,11 @@ public class UserService implements IUserService {
             if (roomNumber < 0 || roomNumber >= rooms.length) {
                 return;
             }
-            IFightWait[] fightWaits = rooms[roomNumber].getFightWaits();
+            FightWait[] fightWaits = rooms[roomNumber].getFightWaits();
             if (areaNumber < 0 || areaNumber >= fightWaits.length) {
                 return;
             }
-            IFightWait fightWait = fightWaits[areaNumber];
+            FightWait fightWait = fightWaits[areaNumber];
             if (fightWait.isPassSet() && !fightWait.getPassword().equals(password)) {
                 sendServerMessage(GameString.AREA_INCORRECT_PASSWORD);
                 return;
@@ -1992,7 +1992,7 @@ public class UserService implements IUserService {
     @Override
     public void handleJoinAnyBoard(IMessage ms) {
         Room[] rooms = RoomManager.getInstance().getRooms();
-        IFightWait fightWait = null;
+        FightWait fightWait = null;
         try {
             int type = ms.reader().readByte();
             switch (type) {
@@ -2004,7 +2004,7 @@ public class UserService implements IUserService {
                     outerLoop:
                     for (int i = start; i < end; i++) {
                         Room room = rooms[i];
-                        for (IFightWait fight : room.getFightWaits()) {
+                        for (FightWait fight : room.getFightWaits()) {
                             if (!fight.isStarted() &&
                                     !fight.isPassSet() &&
                                     !fight.isContinuous() &&
@@ -2023,7 +2023,7 @@ public class UserService implements IUserService {
                     int end = serverConfig.getStartMapBoss();
                     int index = Utils.nextInt(0, end - 1);
                     Room room = rooms[index];
-                    for (IFightWait fight : room.getFightWaits()) {
+                    for (FightWait fight : room.getFightWaits()) {
                         if (!fight.isStarted() &&
                                 !fight.isPassSet() &&
                                 fight.getNumPlayers() < fight.getMaxSetPlayers() &&
@@ -2041,7 +2041,7 @@ public class UserService implements IUserService {
                     int end = serverConfig.getStartMapBoss();
                     int index = Utils.nextInt(0, end - 1);
                     Room room = rooms[index];
-                    for (IFightWait fight : room.getFightWaits()) {
+                    for (FightWait fight : room.getFightWaits()) {
                         if (!fight.isStarted() &&
                                 !fight.isPassSet() &&
                                 fight.getMoney() <= user.getXu() &&
@@ -2058,7 +2058,7 @@ public class UserService implements IUserService {
                     int end = serverConfig.getStartMapBoss();
                     int index = Utils.nextInt(0, end - 1);
                     Room room = rooms[index];
-                    for (IFightWait fight : room.getFightWaits()) {
+                    for (FightWait fight : room.getFightWaits()) {
                         if (!fight.isStarted() &&
                                 !fight.isPassSet() &&
                                 fight.getNumPlayers() < fight.getMaxSetPlayers() &&

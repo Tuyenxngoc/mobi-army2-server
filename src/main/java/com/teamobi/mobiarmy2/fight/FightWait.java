@@ -1,11 +1,8 @@
-package com.teamobi.mobiarmy2.fight.impl;
+package com.teamobi.mobiarmy2.fight;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.constant.UserState;
-import com.teamobi.mobiarmy2.fight.ICountdownTimer;
-import com.teamobi.mobiarmy2.fight.IFightManager;
-import com.teamobi.mobiarmy2.fight.IFightWait;
 import com.teamobi.mobiarmy2.model.Room;
 import com.teamobi.mobiarmy2.model.User;
 import com.teamobi.mobiarmy2.network.IMessage;
@@ -20,15 +17,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public class FightWait implements IFightWait {
+public class FightWait {
     public static final byte MAX_ITEMS_SLOT = 8;
     public static final int KICK_BOSS_TIME = 90;
     public static final byte[] CONTINUOUS_MAPS = {30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
 
-    private final IFightManager fightManager;
+    private final FightManager fightManager;
     private final Room room;
     private final byte id;
-    private final ICountdownTimer countdownTimer;
+    private final CountdownTimer countdownTimer;
     private User[] users;
     private boolean[] readies;
     private byte[][] items;
@@ -224,72 +221,58 @@ public class FightWait implements IFightWait {
         }
     }
 
-    @Override
     public int getMaxSetPlayers() {
         return maxSetPlayers;
     }
 
-    @Override
     public boolean isStarted() {
         return started;
     }
 
-    @Override
     public boolean isContinuous() {
         return room.isContinuous();
     }
 
-    @Override
     public boolean isPassSet() {
         return isPassSet;
     }
 
-    @Override
     public boolean isFightWaitInvalid() {
         return numPlayers == maxSetPlayers || started || (isContinuous() && continuousLevel > 0);
     }
 
-    @Override
     public byte getNumPlayers() {
         return numPlayers;
     }
 
-    @Override
     public byte getId() {
         return id;
     }
 
-    @Override
     public byte getMapId() {
         return mapId;
     }
 
-    @Override
     public byte getRoomType() {
         return room.getType();
     }
 
-    @Override
     public String getName() {
         return name;
     }
 
-    @Override
     public String getPassword() {
         return password;
     }
 
-    @Override
     public int getMoney() {
         return money;
     }
 
-    @Override
     public Room getRoom() {
         return room;
     }
 
-    @Override
     public User getUserByUserId(int userId) {
         int index = getUserIndexByUserId(userId);
         if (index == -1) {
@@ -298,22 +281,18 @@ public class FightWait implements IFightWait {
         return users[index];
     }
 
-    @Override
     public byte[] getItems(byte i) {
         return items[i];
     }
 
-    @Override
     public User[] getUsers() {
         return users;
     }
 
-    @Override
-    public IFightManager getFightManager() {
+    public FightManager getFightManager() {
         return fightManager;
     }
 
-    @Override
     public void fightComplete() {
         resetReadies();
         countdownTimer.reset();
@@ -332,7 +311,6 @@ public class FightWait implements IFightWait {
         started = false;
     }
 
-    @Override
     public synchronized void startGame(int userId) {
         if (started) {
             return;
@@ -480,7 +458,6 @@ public class FightWait implements IFightWait {
         countdownTimer.stop();
     }
 
-    @Override
     public void sendToTeam(IMessage ms) {
         for (User user : users) {
             if (user != null) {
@@ -489,7 +466,6 @@ public class FightWait implements IFightWait {
         }
     }
 
-    @Override
     public synchronized void leaveTeam(int userId) {
         if (started) {
             fightManager.leave(userId);
@@ -512,7 +488,6 @@ public class FightWait implements IFightWait {
         }
     }
 
-    @Override
     public void chatMessage(int userId, String message) {
         int index = getUserIndexByUserId(userId);
         if (index == -1) {
@@ -531,7 +506,6 @@ public class FightWait implements IFightWait {
         }
     }
 
-    @Override
     public synchronized void kickPlayer(int userId, int targetUserId) {
         if (started) {
             return;
@@ -562,7 +536,6 @@ public class FightWait implements IFightWait {
         notifyPlayerLeave(targetUserId);
     }
 
-    @Override
     public void handleKickPlayer(int targetUserId, int index, String message) {
         sendMessageKick(index, message);
         handleUserRemoval(index);
@@ -576,13 +549,11 @@ public class FightWait implements IFightWait {
         }
     }
 
-    @Override
     public void decreaseContinuousLevel() {
         continuousLevel = (byte) ((continuousLevel + 1) % CONTINUOUS_MAPS.length);
         mapId = CONTINUOUS_MAPS[continuousLevel];
     }
 
-    @Override
     public synchronized void setReady(boolean ready, int userId) {
         if (started) {
             return;
@@ -618,7 +589,6 @@ public class FightWait implements IFightWait {
         }
     }
 
-    @Override
     public synchronized void setPassRoom(String password, int userId) {
         if (started) {
             return;
@@ -631,7 +601,6 @@ public class FightWait implements IFightWait {
         this.password = password;
     }
 
-    @Override
     public synchronized void setMoney(int newMoney, int userId) {
         if (started) {
             return;
@@ -670,7 +639,6 @@ public class FightWait implements IFightWait {
         }
     }
 
-    @Override
     public synchronized void setRoomName(int userId, String name) {
         if (started) {
             return;
@@ -683,7 +651,6 @@ public class FightWait implements IFightWait {
         this.name = name;
     }
 
-    @Override
     public synchronized void setMaxPlayers(int userId, byte maxPlayers) {
         if (started) {
             return;
@@ -698,7 +665,6 @@ public class FightWait implements IFightWait {
         }
     }
 
-    @Override
     public synchronized void setItems(int userId, byte[] newItems) {
         if (started) {
             return;
@@ -712,7 +678,6 @@ public class FightWait implements IFightWait {
         items[index] = newItems;
     }
 
-    @Override
     public synchronized void changeTeam(User user) {
         if (started) {
             return;
@@ -754,7 +719,6 @@ public class FightWait implements IFightWait {
         }
     }
 
-    @Override
     public synchronized void setMap(int userId, byte mapIdSet) {
         if (started) {
             return;
@@ -843,7 +807,6 @@ public class FightWait implements IFightWait {
         }
     }
 
-    @Override
     public void findPlayer(int userId) {
         if (started) {
             return;
@@ -880,7 +843,6 @@ public class FightWait implements IFightWait {
         }
     }
 
-    @Override
     public void inviteToRoom(int userId) {
         User roomOwner = getRoomOwner();
 
@@ -915,7 +877,6 @@ public class FightWait implements IFightWait {
         }
     }
 
-    @Override
     public void sendInfo(User user) {
         try {
             Message ms = new Message(Cmd.AUTO_BOARD);
@@ -931,7 +892,6 @@ public class FightWait implements IFightWait {
         }
     }
 
-    @Override
     public synchronized void addUser(User us) throws IOException {
         if (room.getType() == 6 && us.getClanId() == null) {
             us.getUserService().sendServerMessage(GameString.NO_CLAN_MEMBERSHIP);

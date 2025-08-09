@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.model.boss;
 
-import com.teamobi.mobiarmy2.fight.IFightManager;
+import com.teamobi.mobiarmy2.fight.FightManager;
 import com.teamobi.mobiarmy2.model.Boss;
 import com.teamobi.mobiarmy2.model.Player;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -12,7 +12,7 @@ public class Balloon extends Boss {
     private final Player[] bodyParts = new Player[5];
     private int currentTurn = -1;
 
-    public Balloon(IFightManager fightManager, byte index, short x, short y) {
+    public Balloon(FightManager fightManager, byte index, short x, short y) {
         super(fightManager, index, (byte) 17, "Balloon", x, y, (short) 0, (short) 0, (short) 1, 4);
         super.isFlying = true;
     }

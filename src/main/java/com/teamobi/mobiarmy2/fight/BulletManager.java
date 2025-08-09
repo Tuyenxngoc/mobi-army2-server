@@ -1,7 +1,5 @@
-package com.teamobi.mobiarmy2.fight.impl;
+package com.teamobi.mobiarmy2.fight;
 
-import com.teamobi.mobiarmy2.fight.IBulletManager;
-import com.teamobi.mobiarmy2.fight.IFightManager;
 import com.teamobi.mobiarmy2.model.Boss;
 import com.teamobi.mobiarmy2.model.Bullet;
 import com.teamobi.mobiarmy2.model.Player;
@@ -15,9 +13,9 @@ import java.util.List;
 
 @Getter
 @Setter
-public class BulletManager implements IBulletManager {
+public class BulletManager {
     public static final boolean MGT_BULL_NEW = true;
-    private IFightManager fightManager;
+    private FightManager fightManager;
     private ArrayList<Bullet> bullets;
     private byte force2;
     private int mangNhenId;
@@ -35,7 +33,7 @@ public class BulletManager implements IBulletManager {
     private short XPL;
     private short YPL;
 
-    public BulletManager(IFightManager fightManager) {
+    public BulletManager(FightManager fightManager) {
         this.fightManager = fightManager;
         this.bullets = new ArrayList<>();
         this.voiRongs = new ArrayList<>();
@@ -54,17 +52,14 @@ public class BulletManager implements IBulletManager {
         bullets.add(bullet);
     }
 
-    @Override
     public List<Boss> getAddBosses() {
         return addBosses;
     }
 
-    @Override
     public void decreaseSpiderWebCount() {
         mangNhenId++;
     }
 
-    @Override
     public void addShoot(Player pl, byte bull, short angle, byte force, byte force2, byte nshoot) {
         this.XPL = pl.getX();
         this.YPL = pl.getY();
@@ -520,7 +515,6 @@ public class BulletManager implements IBulletManager {
         }
     }
 
-    @Override
     public void fillXY() {
         boolean hasNext;
         do {

@@ -1,13 +1,13 @@
 package com.teamobi.mobiarmy2.model.boss;
 
-import com.teamobi.mobiarmy2.fight.IFightManager;
+import com.teamobi.mobiarmy2.fight.FightManager;
 import com.teamobi.mobiarmy2.model.Boss;
 import com.teamobi.mobiarmy2.model.Player;
 import com.teamobi.mobiarmy2.util.Utils;
 
 public class RobotSpider extends Boss {
 
-    public RobotSpider(IFightManager fightManager, byte index, short x, short y, short maxHp) {
+    public RobotSpider(FightManager fightManager, byte index, short x, short y, short maxHp) {
         super(fightManager, index, (byte) 13, "Robot Spider", x, y, (short) 42, (short) 42, maxHp, 4);
     }
 
