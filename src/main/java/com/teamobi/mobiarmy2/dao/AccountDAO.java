@@ -1,6 +1,5 @@
-package com.teamobi.mobiarmy2.dao.impl;
+package com.teamobi.mobiarmy2.dao;
 
-import com.teamobi.mobiarmy2.dao.IAccountDAO;
 import com.teamobi.mobiarmy2.dto.AccountDTO;
 import com.teamobi.mobiarmy2.server.HikariCPManager;
 import org.mindrot.jbcrypt.BCrypt;
@@ -10,9 +9,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class AccountDAO implements IAccountDAO {
+public class AccountDAO {
 
-    @Override
     public AccountDTO findByUsernameAndPassword(String username, String password) {
         try (Connection connection = HikariCPManager.getInstance().getConnection()) {
             String userQuery = "SELECT `account_id`, `password`, `is_enabled`, `is_locked` FROM accounts WHERE username = ?";
@@ -38,7 +36,6 @@ public class AccountDAO implements IAccountDAO {
         return null;
     }
 
-    @Override
     public boolean existsByAccountIdAndPassword(String accountId, String password) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT password FROM accounts WHERE account_id = ?")) {
@@ -55,7 +52,6 @@ public class AccountDAO implements IAccountDAO {
         return false;
     }
 
-    @Override
     public void changePassword(String accountId, String newPass) {
         String hashedPassword = BCrypt.hashpw(newPass, BCrypt.gensalt());
         // language=SQL

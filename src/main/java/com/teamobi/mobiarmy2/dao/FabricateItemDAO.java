@@ -1,7 +1,6 @@
-package com.teamobi.mobiarmy2.dao.impl;
+package com.teamobi.mobiarmy2.dao;
 
 import com.google.gson.Gson;
-import com.teamobi.mobiarmy2.dao.IFabricateItemDAO;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.model.FabricateItem;
 import com.teamobi.mobiarmy2.model.SpecialItem;
@@ -16,9 +15,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class FabricateItemDAO implements IFabricateItemDAO {
+public class FabricateItemDAO {
 
-    @Override
     public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {

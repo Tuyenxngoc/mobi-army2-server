@@ -1,6 +1,5 @@
-package com.teamobi.mobiarmy2.dao.impl;
+package com.teamobi.mobiarmy2.dao;
 
-import com.teamobi.mobiarmy2.dao.IExperienceLevelDAO;
 import com.teamobi.mobiarmy2.model.LevelXpRequired;
 import com.teamobi.mobiarmy2.server.ClanXpManager;
 import com.teamobi.mobiarmy2.server.HikariCPManager;
@@ -11,9 +10,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class ExperienceLevelDAO implements IExperienceLevelDAO {
+public class ExperienceLevelDAO {
 
-    @Override
     public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {

@@ -1,7 +1,6 @@
-package com.teamobi.mobiarmy2.dao.impl;
+package com.teamobi.mobiarmy2.dao;
 
 import com.teamobi.mobiarmy2.constant.GameConstants;
-import com.teamobi.mobiarmy2.dao.IMapDAO;
 import com.teamobi.mobiarmy2.model.ArmyMap;
 import com.teamobi.mobiarmy2.server.HikariCPManager;
 import com.teamobi.mobiarmy2.server.MapManager;
@@ -12,9 +11,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class MapDAO implements IMapDAO {
+public class MapDAO {
 
-    @Override
     public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {

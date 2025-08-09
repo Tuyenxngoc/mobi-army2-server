@@ -1,6 +1,5 @@
-package com.teamobi.mobiarmy2.dao.impl;
+package com.teamobi.mobiarmy2.dao;
 
-import com.teamobi.mobiarmy2.dao.ICharacterDAO;
 import com.teamobi.mobiarmy2.model.Character;
 import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.HikariCPManager;
@@ -10,9 +9,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class CharacterDAO implements ICharacterDAO {
+public class CharacterDAO {
 
-    @Override
     public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {

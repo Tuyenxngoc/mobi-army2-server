@@ -1,6 +1,5 @@
-package com.teamobi.mobiarmy2.dao.impl;
+package com.teamobi.mobiarmy2.dao;
 
-import com.teamobi.mobiarmy2.dao.ICaptionLevelDAO;
 import com.teamobi.mobiarmy2.model.Caption;
 import com.teamobi.mobiarmy2.server.CaptionManager;
 import com.teamobi.mobiarmy2.server.HikariCPManager;
@@ -10,9 +9,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class CaptionLevelDAO implements ICaptionLevelDAO {
+public class CaptionLevelDAO {
 
-    @Override
     public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {

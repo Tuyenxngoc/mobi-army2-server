@@ -1,7 +1,6 @@
-package com.teamobi.mobiarmy2.dao.impl;
+package com.teamobi.mobiarmy2.dao;
 
 import com.google.gson.Gson;
-import com.teamobi.mobiarmy2.dao.IUserCharacterDAO;
 import com.teamobi.mobiarmy2.dto.UserCharacterDTO;
 import com.teamobi.mobiarmy2.server.HikariCPManager;
 import com.teamobi.mobiarmy2.util.GsonUtil;
@@ -14,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class UserCharacterDAO implements IUserCharacterDAO {
+public class UserCharacterDAO {
 
     private static UserCharacterDTO mapToUserCharacterDTO(ResultSet resultSet) throws SQLException {
         Gson gson = GsonUtil.getInstance();
@@ -30,7 +29,6 @@ public class UserCharacterDAO implements IUserCharacterDAO {
         return userCharacterDTO;
     }
 
-    @Override
     public List<UserCharacterDTO> findAllByUserId(int userId) {
         List<UserCharacterDTO> result = new ArrayList<>();
 
@@ -50,7 +48,6 @@ public class UserCharacterDAO implements IUserCharacterDAO {
         return result;
     }
 
-    @Override
     public UserCharacterDTO findByUserIdAndCharacterId(int userId, byte characterId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT * FROM `user_characters` WHERE user_id = ? AND character_id = ?")) {
@@ -67,14 +64,12 @@ public class UserCharacterDAO implements IUserCharacterDAO {
         return null;
     }
 
-    @Override
     public Optional<Integer> create(int userId, byte characterId) {
         // language=SQL
         String sql = "INSERT INTO `user_characters`(`user_id`, `character_id`) VALUES (?,?)";
         return HikariCPManager.getInstance().update(sql, userId, characterId);
     }
 
-    @Override
     public void update(UserCharacterDTO userCharacterDTO) {
         Gson gson = GsonUtil.getInstance();
 
@@ -92,7 +87,6 @@ public class UserCharacterDAO implements IUserCharacterDAO {
         );
     }
 
-    @Override
     public void updateAll(List<UserCharacterDTO> userCharacterDTOs) {
         Gson gson = GsonUtil.getInstance();
 

@@ -1,6 +1,5 @@
-package com.teamobi.mobiarmy2.dao.impl;
+package com.teamobi.mobiarmy2.dao;
 
-import com.teamobi.mobiarmy2.dao.IUserGiftCodeDAO;
 import com.teamobi.mobiarmy2.server.HikariCPManager;
 
 import java.sql.Connection;
@@ -9,9 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
-public class UserGiftCodeDAO implements IUserGiftCodeDAO {
+public class UserGiftCodeDAO {
 
-    @Override
     public boolean existsByUserId(int userId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT * FROM user_gift_codes WHERE user_id = ?")) {
@@ -27,7 +25,6 @@ public class UserGiftCodeDAO implements IUserGiftCodeDAO {
         return false;
     }
 
-    @Override
     public void create(long giftCodeId, int userId) {
         // language=SQL
         String sql = "INSERT INTO user_gift_codes (created_date, gift_code_id, user_id) VALUES (?, ?, ?)";

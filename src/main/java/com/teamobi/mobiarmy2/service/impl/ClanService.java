@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.service.impl;
 
 import com.teamobi.mobiarmy2.constant.GameConstants;
-import com.teamobi.mobiarmy2.dao.IClanDAO;
+import com.teamobi.mobiarmy2.dao.ClanDAO;
 import com.teamobi.mobiarmy2.dto.ClanDTO;
 import com.teamobi.mobiarmy2.dto.ClanInfoDTO;
 import com.teamobi.mobiarmy2.dto.ClanMemDTO;
@@ -20,9 +20,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ClanService implements IClanService {
     private final ConcurrentHashMap<Short, Object> clanLocks = new ConcurrentHashMap<>();
-    private final IClanDAO clanDAO;
+    private final ClanDAO clanDAO;
 
-    public ClanService(IClanDAO clanDAO) {
+    public ClanService(ClanDAO clanDAO) {
         this.clanDAO = clanDAO;
     }
 

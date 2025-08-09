@@ -1,7 +1,6 @@
-package com.teamobi.mobiarmy2.dao.impl;
+package com.teamobi.mobiarmy2.dao;
 
 import com.google.gson.Gson;
-import com.teamobi.mobiarmy2.dao.IEquipmentDAO;
 import com.teamobi.mobiarmy2.model.Equipment;
 import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
@@ -13,7 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class EquipmentDAO implements IEquipmentDAO {
+public class EquipmentDAO {
 
     private static void validateEquipment(Equipment equipment) throws SQLException {
         if (equipment.isDisguise() && equipment.getDisguiseEquippedIndexes().length != 5) {
@@ -62,7 +61,6 @@ public class EquipmentDAO implements IEquipmentDAO {
         }
     }
 
-    @Override
     public void loadAll() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {

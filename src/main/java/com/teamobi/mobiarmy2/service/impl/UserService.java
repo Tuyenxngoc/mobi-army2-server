@@ -35,11 +35,11 @@ public class UserService implements IUserService {
     private final ILeaderboardService leaderboardService;
     private final ILoginRateLimiterService loginRateLimiterService;
 
-    private final IUserDAO userDAO;
-    private final IAccountDAO accountDAO;
-    private final IGiftCodeDAO giftCodeDAO;
-    private final IUserGiftCodeDAO userGiftCodeDAO;
-    private final IUserCharacterDAO userCharacterDAO;
+    private final UserDAO userDAO;
+    private final AccountDAO accountDAO;
+    private final GiftCodeDAO giftCodeDAO;
+    private final UserGiftCodeDAO userGiftCodeDAO;
+    private final UserCharacterDAO userCharacterDAO;
 
     private UserAction userAction;
     private int totalTransactionAmount;
@@ -50,7 +50,7 @@ public class UserService implements IUserService {
     private long timeSinceLeftRoom;
     private long lastSpinTime;
 
-    public UserService(User user, ServerConfig serverConfig, IClanService clanService, ILeaderboardService leaderboardService, ILoginRateLimiterService loginRateLimiterService, IUserDAO userDAO, IAccountDAO accountDAO, IGiftCodeDAO giftCodeDAO, IUserGiftCodeDAO userGiftCodeDAO, IUserCharacterDAO userCharacterDAO) {
+    public UserService(User user, ServerConfig serverConfig, IClanService clanService, ILeaderboardService leaderboardService, ILoginRateLimiterService loginRateLimiterService, UserDAO userDAO, AccountDAO accountDAO, GiftCodeDAO giftCodeDAO, UserGiftCodeDAO userGiftCodeDAO, UserCharacterDAO userCharacterDAO) {
         this.user = user;
         this.serverConfig = serverConfig;
         this.clanService = clanService;

@@ -1,9 +1,8 @@
-package com.teamobi.mobiarmy2.dao.impl;
+package com.teamobi.mobiarmy2.dao;
 
 import com.google.gson.Gson;
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.GameString;
-import com.teamobi.mobiarmy2.dao.IRankingDAO;
 import com.teamobi.mobiarmy2.dto.UserLeaderboardDTO;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
@@ -19,7 +18,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RankingDAO implements IRankingDAO {
+public class RankingDAO {
 
     private final ServerConfig serverConfig;
 
@@ -73,7 +72,6 @@ public class RankingDAO implements IRankingDAO {
         return top;
     }
 
-    @Override
     public List<UserLeaderboardDTO> getTopCup() {
         // language=SQL
         String query = "SELECT " +
@@ -91,7 +89,6 @@ public class RankingDAO implements IRankingDAO {
         return getTopFromQuery(query, true);
     }
 
-    @Override
     public List<UserLeaderboardDTO> getTopMasters() {
         // language=SQL
         String query = "SELECT " +
@@ -109,7 +106,6 @@ public class RankingDAO implements IRankingDAO {
         return getTopFromQuery(query, false);
     }
 
-    @Override
     public List<UserLeaderboardDTO> getTopRichestXu() {
         // language=SQL
         String query = "SELECT " +
@@ -127,7 +123,6 @@ public class RankingDAO implements IRankingDAO {
         return getTopFromQuery(query, false);
     }
 
-    @Override
     public List<UserLeaderboardDTO> getTopRichestLuong() {
         // language=SQL
         String query = "SELECT " +
@@ -145,7 +140,6 @@ public class RankingDAO implements IRankingDAO {
         return getTopFromQuery(query, false);
     }
 
-    @Override
     public List<UserLeaderboardDTO> getWeeklyTopCup() {
         // language=SQL
         String query = "SELECT " +
@@ -171,7 +165,6 @@ public class RankingDAO implements IRankingDAO {
         return getTopFromQuery(query, false);
     }
 
-    @Override
     public List<UserLeaderboardDTO> getWeeklyTopRichest() {
         // language=SQL
         String query = "SELECT " +
@@ -197,7 +190,6 @@ public class RankingDAO implements IRankingDAO {
         return getTopFromQuery(query, false);
     }
 
-    @Override
     public void addBonusGift(int userId, int quantity) {
         // language=SQL
         String sql = "UPDATE users SET top_earnings_xu = ? WHERE user_id = ?";

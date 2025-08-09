@@ -1,7 +1,6 @@
-package com.teamobi.mobiarmy2.dao.impl;
+package com.teamobi.mobiarmy2.dao;
 
 import com.google.gson.Gson;
-import com.teamobi.mobiarmy2.dao.IGiftCodeDAO;
 import com.teamobi.mobiarmy2.dto.GiftCodeDTO;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
@@ -14,9 +13,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class GiftCodeDAO implements IGiftCodeDAO {
+public class GiftCodeDAO {
 
-    @Override
     public GiftCodeDTO findById(String code) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT * FROM gift_codes WHERE code = ?")) {
@@ -42,7 +40,6 @@ public class GiftCodeDAO implements IGiftCodeDAO {
         return null;
     }
 
-    @Override
     public void decrementUsageLimit(long giftCodeId) {
         // language=SQL
         String sql = "UPDATE gift_codes SET usage_limit = usage_limit - 1 WHERE gift_code_id = ?";

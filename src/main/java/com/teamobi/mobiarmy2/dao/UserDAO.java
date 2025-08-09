@@ -1,7 +1,6 @@
-package com.teamobi.mobiarmy2.dao.impl;
+package com.teamobi.mobiarmy2.dao;
 
 import com.google.gson.Gson;
-import com.teamobi.mobiarmy2.dao.IUserDAO;
 import com.teamobi.mobiarmy2.dto.FriendDTO;
 import com.teamobi.mobiarmy2.dto.UserDTO;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
@@ -21,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class UserDAO implements IUserDAO {
+public class UserDAO {
 
     public static String convertSpecialItemChestEntriesToJson(Map<Byte, SpecialItemChest> specialItemChests) {
         List<SpecialItemChestJson> specialItemChestJsons = new ArrayList<>();
@@ -63,7 +62,6 @@ public class UserDAO implements IUserDAO {
         return GsonUtil.getInstance().toJson(equipmentChestJsons);
     }
 
-    @Override
     public Optional<Integer> create(String accountId, int xu, int luong) {
         Gson gson = GsonUtil.getInstance();
 
@@ -98,7 +96,6 @@ public class UserDAO implements IUserDAO {
         );
     }
 
-    @Override
     public void update(User user) {
         Gson gson = GsonUtil.getInstance();
 
@@ -147,7 +144,6 @@ public class UserDAO implements IUserDAO {
         );
     }
 
-    @Override
     public UserDTO findByAccountId(String accountId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection()) {
             String playerQuery = "SELECT " +
@@ -271,21 +267,18 @@ public class UserDAO implements IUserDAO {
         return null;
     }
 
-    @Override
     public void setOnline(int userId, boolean online) {
         // language=SQL
         String sql = "UPDATE `users` SET `is_online` = ? WHERE user_id = ?";
         HikariCPManager.getInstance().update(sql, online, userId);
     }
 
-    @Override
     public void setDailyRewardTime(int userId, LocalDateTime now) {
         // language=SQL
         String sql = "UPDATE `users` SET `daily_reward_time` = ? WHERE user_id = ?";
         HikariCPManager.getInstance().update(sql, now, userId);
     }
 
-    @Override
     public List<FriendDTO> getFriendsList(int userId, Set<Integer> friendIds) {
         List<FriendDTO> friendsList = new ArrayList<>();
 
@@ -352,7 +345,6 @@ public class UserDAO implements IUserDAO {
         return friendsList;
     }
 
-    @Override
     public Optional<Integer> findUserIdByUsername(String username) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT u.user_id FROM accounts a LEFT JOIN users u ON a.account_id = u.account_id WHERE a.username = ?")) {
@@ -368,7 +360,6 @@ public class UserDAO implements IUserDAO {
         return Optional.empty();
     }
 
-    @Override
     public Optional<Integer> getUserRankByCup(int cup) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) AS top FROM users WHERE cup > ?")) {

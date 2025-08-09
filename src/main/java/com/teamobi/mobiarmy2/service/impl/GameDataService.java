@@ -27,20 +27,20 @@ import java.util.TreeMap;
 public class GameDataService implements IGameDataService {
     private static final Logger logger = LoggerFactory.getLogger(GameDataService.class);
 
-    private final IMapDAO mapDAO;
-    private final ICharacterDAO characterDAO;
-    private final IEquipmentDAO equipmentDAO;
-    private final ICaptionLevelDAO captionLevelDAO;
-    private final IFightItemDAO fightItemDAO;
-    private final IClanShopDAO clanShopDAO;
-    private final ISpecialItemDAO specialItemDAO;
-    private final IFormulaDAO formulaDAO;
-    private final IPaymentDAO paymentDAO;
-    private final IMissionDAO missionDAO;
-    private final IExperienceLevelDAO experienceLevelDAO;
-    private final IFabricateItemDAO fabricateItemDAO;
+    private final MapDAO mapDAO;
+    private final CharacterDAO characterDAO;
+    private final EquipmentDAO equipmentDAO;
+    private final CaptionLevelDAO captionLevelDAO;
+    private final FightItemDAO fightItemDAO;
+    private final ClanShopDAO clanShopDAO;
+    private final SpecialItemDAO specialItemDAO;
+    private final FormulaDAO formulaDAO;
+    private final PaymentDAO paymentDAO;
+    private final MissionDAO missionDAO;
+    private final ExperienceLevelDAO experienceLevelDAO;
+    private final FabricateItemDAO fabricateItemDAO;
 
-    public GameDataService(IMapDAO mapDAO, ICharacterDAO characterDAO, IEquipmentDAO equipmentDAO, ICaptionLevelDAO captionLevelDAO, IFightItemDAO fightItemDAO, IClanShopDAO clanShopDAO, ISpecialItemDAO specialItemDAO, IFormulaDAO formulaDAO, IPaymentDAO paymentDAO, IMissionDAO missionDAO, IExperienceLevelDAO experienceLevelDAO, IFabricateItemDAO fabricateItemDAO) {
+    public GameDataService(MapDAO mapDAO, CharacterDAO characterDAO, EquipmentDAO equipmentDAO, CaptionLevelDAO captionLevelDAO, FightItemDAO fightItemDAO, ClanShopDAO clanShopDAO, SpecialItemDAO specialItemDAO, FormulaDAO formulaDAO, PaymentDAO paymentDAO, MissionDAO missionDAO, ExperienceLevelDAO experienceLevelDAO, FabricateItemDAO fabricateItemDAO) {
         this.mapDAO = mapDAO;
         this.characterDAO = characterDAO;
         this.equipmentDAO = equipmentDAO;

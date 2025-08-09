@@ -1,7 +1,6 @@
-package com.teamobi.mobiarmy2.dao.impl;
+package com.teamobi.mobiarmy2.dao;
 
 import com.google.gson.Gson;
-import com.teamobi.mobiarmy2.dao.IClanDAO;
 import com.teamobi.mobiarmy2.dto.ClanDTO;
 import com.teamobi.mobiarmy2.dto.ClanInfoDTO;
 import com.teamobi.mobiarmy2.dto.ClanItemDTO;
@@ -22,9 +21,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class ClanDAO implements IClanDAO {
+public class ClanDAO {
 
-    @Override
     public short getClanIcon(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT icon FROM clans WHERE clan_id = ?")) {
@@ -40,7 +38,6 @@ public class ClanDAO implements IClanDAO {
         return 0;
     }
 
-    @Override
     public Byte getMembersOfClan(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) AS member_count FROM clan_members cm WHERE cm.clan_id = ?")) {
@@ -56,7 +53,6 @@ public class ClanDAO implements IClanDAO {
         return null;
     }
 
-    @Override
     public int getXu(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT xu FROM clans WHERE clan_id = ?")) {
@@ -72,7 +68,6 @@ public class ClanDAO implements IClanDAO {
         return 0;
     }
 
-    @Override
     public int getLuong(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT luong FROM clans WHERE clan_id = ?")) {
@@ -88,7 +83,6 @@ public class ClanDAO implements IClanDAO {
         return 0;
     }
 
-    @Override
     public int getXp(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT xp FROM clans WHERE clan_id = ?")) {
@@ -104,7 +98,6 @@ public class ClanDAO implements IClanDAO {
         return 0;
     }
 
-    @Override
     public int getLevel(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT level FROM clans WHERE clan_id = ?")) {
@@ -120,7 +113,6 @@ public class ClanDAO implements IClanDAO {
         return 1;
     }
 
-    @Override
     public int getCup(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT cup FROM clans WHERE clan_id = ?")) {
@@ -136,21 +128,18 @@ public class ClanDAO implements IClanDAO {
         return 0;
     }
 
-    @Override
     public void updateXu(short clanId, int xu) {
         // language=SQL
         String sql = "UPDATE clans SET xu = xu + ? WHERE clan_id = ?";
         HikariCPManager.getInstance().update(sql, xu, clanId);
     }
 
-    @Override
     public void updateLuong(short clanId, int luong) {
         // language=SQL
         String sql = "UPDATE clans SET luong = luong + ? WHERE clan_id = ?";
         HikariCPManager.getInstance().update(sql, luong, clanId);
     }
 
-    @Override
     public void gopClanContribute(String txtContribute, int userId, int xu, int luong) {
         // language=SQL
         String sql = "UPDATE `clan_members` SET " +
@@ -163,7 +152,6 @@ public class ClanDAO implements IClanDAO {
         HikariCPManager.getInstance().update(sql, LocalDateTime.now(), txtContribute, xu, luong, userId);
     }
 
-    @Override
     public ClanInfoDTO getClanInfo(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(
@@ -237,7 +225,6 @@ public class ClanDAO implements IClanDAO {
         return null;
     }
 
-    @Override
     public List<ClanMemDTO> getClanMember(short clanId, byte page) {
         List<ClanMemDTO> entries = new ArrayList<>();
         try (Connection connection = HikariCPManager.getInstance().getConnection();
@@ -320,7 +307,6 @@ public class ClanDAO implements IClanDAO {
         return entries;
     }
 
-    @Override
     public ClanItemJson[] getClanItems(short clanId) {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT item FROM clans WHERE clan_id = ?")) {
@@ -337,14 +323,12 @@ public class ClanDAO implements IClanDAO {
         return null;
     }
 
-    @Override
     public void updateClanItems(short clanId, ClanItemJson[] items) {
         // language=SQL
         String sql = "UPDATE clans SET item = ? WHERE clan_id = ?";
         HikariCPManager.getInstance().update(sql, GsonUtil.getInstance().toJson(items), clanId);
     }
 
-    @Override
     public short getCountClan() {
         try (Connection connection = HikariCPManager.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
@@ -359,7 +343,6 @@ public class ClanDAO implements IClanDAO {
         return 0;
     }
 
-    @Override
     public List<ClanDTO> getTopTeams(byte page) {
         List<ClanDTO> top = new ArrayList<>(10);
         try (Connection connection = HikariCPManager.getInstance().getConnection();
@@ -409,7 +392,6 @@ public class ClanDAO implements IClanDAO {
         return top;
     }
 
-    @Override
     public void updateXp(short clanId, int userId, int xp, int level) {
         // language=SQL
         String sql = "UPDATE clans c " +
@@ -419,7 +401,6 @@ public class ClanDAO implements IClanDAO {
         HikariCPManager.getInstance().update(sql, xp, level, clanId, userId);
     }
 
-    @Override
     public void updateCup(short clanId, int userId, int cup) {
         // language=SQL
         String sql = "UPDATE clans c " +
@@ -429,7 +410,6 @@ public class ClanDAO implements IClanDAO {
         HikariCPManager.getInstance().update(sql, cup, clanId, userId);
     }
 
-    @Override
     public void updateClanMemberPoints(int userId, int point) {
         // language=SQL
         String sql = "UPDATE clan_members SET clan_point = clan_point + ? WHERE user_id = ?";
