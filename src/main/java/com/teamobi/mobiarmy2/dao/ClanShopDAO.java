@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.dao;
 
-import com.teamobi.mobiarmy2.model.ClanItemShop;
+import com.teamobi.mobiarmy2.entity.ClanItemShop;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.server.HikariCPManager;
 

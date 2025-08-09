@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.server;
 
+import com.teamobi.mobiarmy2.entity.Equipment;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
-import com.teamobi.mobiarmy2.model.Equipment;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.time.LocalDateTime;

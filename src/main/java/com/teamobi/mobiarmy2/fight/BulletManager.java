@@ -1,9 +1,9 @@
 package com.teamobi.mobiarmy2.fight;
 
-import com.teamobi.mobiarmy2.model.Boss;
-import com.teamobi.mobiarmy2.model.Bullet;
-import com.teamobi.mobiarmy2.model.Player;
-import com.teamobi.mobiarmy2.model.bullet.*;
+import com.teamobi.mobiarmy2.entity.Boss;
+import com.teamobi.mobiarmy2.entity.Bullet;
+import com.teamobi.mobiarmy2.entity.Player;
+import com.teamobi.mobiarmy2.entity.bullet.*;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;

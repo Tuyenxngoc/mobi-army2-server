@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.dao;
 
-import com.teamobi.mobiarmy2.model.Caption;
+import com.teamobi.mobiarmy2.entity.Caption;
 import com.teamobi.mobiarmy2.server.CaptionManager;
 import com.teamobi.mobiarmy2.server.HikariCPManager;
 

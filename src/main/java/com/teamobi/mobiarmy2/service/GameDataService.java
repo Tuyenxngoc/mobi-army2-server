@@ -2,10 +2,10 @@ package com.teamobi.mobiarmy2.service;
 
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.dao.*;
-import com.teamobi.mobiarmy2.model.ArmyMap;
-import com.teamobi.mobiarmy2.model.Caption;
-import com.teamobi.mobiarmy2.model.Character;
-import com.teamobi.mobiarmy2.model.Equipment;
+import com.teamobi.mobiarmy2.entity.ArmyMap;
+import com.teamobi.mobiarmy2.entity.Caption;
+import com.teamobi.mobiarmy2.entity.Character;
+import com.teamobi.mobiarmy2.entity.Equipment;
 import com.teamobi.mobiarmy2.server.CaptionManager;
 import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.EquipmentManager;

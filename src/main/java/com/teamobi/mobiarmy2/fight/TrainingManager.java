@@ -1,8 +1,8 @@
 package com.teamobi.mobiarmy2.fight;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
-import com.teamobi.mobiarmy2.model.Player;
-import com.teamobi.mobiarmy2.model.User;
+import com.teamobi.mobiarmy2.entity.Player;
+import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.Message;
 
 import java.io.DataOutputStream;

@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.constant.GameConstants;
-import com.teamobi.mobiarmy2.model.LevelXpRequired;
+import com.teamobi.mobiarmy2.entity.LevelXpRequired;
 
 import java.util.ArrayList;
 import java.util.List;

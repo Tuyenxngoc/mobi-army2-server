@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.dao;
 
 import com.google.gson.Gson;
-import com.teamobi.mobiarmy2.model.Equipment;
+import com.teamobi.mobiarmy2.entity.Equipment;
 import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.HikariCPManager;

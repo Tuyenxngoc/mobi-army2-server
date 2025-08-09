@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.dao;
 
-import com.teamobi.mobiarmy2.model.LevelXpRequired;
+import com.teamobi.mobiarmy2.entity.LevelXpRequired;
 import com.teamobi.mobiarmy2.server.ClanXpManager;
 import com.teamobi.mobiarmy2.server.HikariCPManager;
 import com.teamobi.mobiarmy2.server.UserXpManager;

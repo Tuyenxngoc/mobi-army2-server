@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.network;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
-import com.teamobi.mobiarmy2.model.User;
+import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.server;
 
-import com.teamobi.mobiarmy2.model.Formula;
+import com.teamobi.mobiarmy2.entity.Formula;
 
 import java.util.ArrayList;
 import java.util.HashMap;

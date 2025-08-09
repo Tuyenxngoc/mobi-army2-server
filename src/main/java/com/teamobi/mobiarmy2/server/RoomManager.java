@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.config.ServerConfig;
-import com.teamobi.mobiarmy2.model.Room;
+import com.teamobi.mobiarmy2.entity.Room;
 import lombok.Getter;
 
 public class RoomManager {

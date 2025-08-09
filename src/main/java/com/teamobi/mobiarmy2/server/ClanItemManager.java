@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.server;
 
-import com.teamobi.mobiarmy2.model.ClanItemShop;
+import com.teamobi.mobiarmy2.entity.ClanItemShop;
 
 import java.util.HashMap;
 import java.util.Map;

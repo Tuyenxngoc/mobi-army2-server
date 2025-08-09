@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.dao;
 
 import com.google.gson.Gson;
-import com.teamobi.mobiarmy2.model.SpecialItem;
+import com.teamobi.mobiarmy2.entity.SpecialItem;
 import com.teamobi.mobiarmy2.server.HikariCPManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
 import com.teamobi.mobiarmy2.util.GsonUtil;

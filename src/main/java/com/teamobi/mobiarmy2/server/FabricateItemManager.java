@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.server;
 
-import com.teamobi.mobiarmy2.model.FabricateItem;
-import com.teamobi.mobiarmy2.model.SpecialItemChest;
+import com.teamobi.mobiarmy2.entity.FabricateItem;
+import com.teamobi.mobiarmy2.entity.SpecialItemChest;
 
 import java.util.ArrayList;
 import java.util.HashSet;

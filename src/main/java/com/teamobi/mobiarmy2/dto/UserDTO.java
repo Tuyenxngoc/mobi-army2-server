@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.dto;
 
-import com.teamobi.mobiarmy2.model.EquipmentChest;
-import com.teamobi.mobiarmy2.model.SpecialItemChest;
+import com.teamobi.mobiarmy2.entity.EquipmentChest;
+import com.teamobi.mobiarmy2.entity.SpecialItemChest;
 import lombok.Getter;
 import lombok.Setter;
 
