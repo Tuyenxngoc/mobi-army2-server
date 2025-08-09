@@ -1,10 +1,8 @@
-package com.teamobi.mobiarmy2.network.impl;
-
-import com.teamobi.mobiarmy2.network.IMessage;
+package com.teamobi.mobiarmy2.network;
 
 import java.io.*;
 
-public class Message implements IMessage {
+public class Message {
 
     private final byte command;
     private ByteArrayOutputStream os;
@@ -22,27 +20,22 @@ public class Message implements IMessage {
         dis = new DataInputStream(new ByteArrayInputStream(data));
     }
 
-    @Override
     public byte getCommand() {
         return command;
     }
 
-    @Override
     public byte[] getData() {
         return os.toByteArray();
     }
 
-    @Override
     public DataInputStream reader() {
         return dis;
     }
 
-    @Override
     public DataOutputStream writer() {
         return dos;
     }
 
-    @Override
     public void cleanup() {
         try {
             if (dis != null) {

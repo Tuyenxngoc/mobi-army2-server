@@ -2,7 +2,7 @@ package com.teamobi.mobiarmy2.ui.controllers;
 
 import com.sun.management.OperatingSystemMXBean;
 import com.teamobi.mobiarmy2.model.User;
-import com.teamobi.mobiarmy2.network.ISession;
+import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -120,9 +120,9 @@ public class ServerViewController implements ServerListener {
     }
 
     @Override
-    public void onUsersUpdated(List<ISession> sessions) {
+    public void onUsersUpdated(List<Session> sessions) {
         List<User> updatedUsers = sessions.stream()
-                .map(ISession::getUser)
+                .map(Session::getUser)
                 .filter(User::isLogged)
                 .toList();
         userList.setAll(updatedUsers);

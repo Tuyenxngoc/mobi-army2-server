@@ -3,9 +3,8 @@ package com.teamobi.mobiarmy2.server;
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.model.User;
-import com.teamobi.mobiarmy2.network.IMessage;
-import com.teamobi.mobiarmy2.network.ISession;
-import com.teamobi.mobiarmy2.network.impl.Session;
+import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.service.IConnectionBlockerService;
 import com.teamobi.mobiarmy2.service.IGameDataService;
 import com.teamobi.mobiarmy2.service.ILeaderboardService;
@@ -26,7 +25,7 @@ public class ServerManager {
     private final ILeaderboardService leaderboardService;
     private final ServerConfig serverConfig;
     private final IConnectionBlockerService connectionBlockerService;
-    private final ArrayList<ISession> sessions;
+    private final ArrayList<Session> sessions;
     private final List<ServerListener> listeners;
     private ServerSocket server;
     private long countClients;
@@ -82,7 +81,7 @@ public class ServerManager {
                             continue;
                         }
 
-                        ISession session = new Session(++countClients, socket);
+                        Session session = new Session(++countClients, socket);
                         sessions.add(session);
 
                         connectionBlockerService.incrementIpConnectionCount(ipAddress);
@@ -109,7 +108,7 @@ public class ServerManager {
         isStart = false;
         try {
             while (!sessions.isEmpty()) {
-                ISession session = sessions.getFirst();
+                Session session = sessions.getFirst();
                 session.close();
             }
             if (server != null) {
@@ -129,8 +128,8 @@ public class ServerManager {
         notifyListeners();
     }
 
-    public void sendToServer(IMessage ms) {
-        for (ISession session : sessions) {
+    public void sendToServer(Message ms) {
+        for (Session session : sessions) {
             session.sendMessage(ms);
         }
     }
@@ -138,7 +137,7 @@ public class ServerManager {
     public User getUserByUserId(int userId) {
         return sessions.stream()
                 .filter(session -> session != null && session.getUser() != null && session.getUser().getUserId() == userId)
-                .map(ISession::getUser)
+                .map(Session::getUser)
                 .findFirst()
                 .orElse(null);
     }
@@ -148,7 +147,7 @@ public class ServerManager {
                 .filter(session -> session != null && session.getUser() != null &&
                         session.getUser().getUserId() != excludedUserId &&
                         session.getUser().getState() == UserState.WAITING)
-                .map(ISession::getUser)
+                .map(Session::getUser)
                 .limit(10)
                 .toList();
     }

@@ -6,9 +6,8 @@ import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.fight.TrainingManager;
-import com.teamobi.mobiarmy2.network.IMessage;
-import com.teamobi.mobiarmy2.network.ISession;
-import com.teamobi.mobiarmy2.network.impl.Message;
+import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
@@ -35,7 +34,7 @@ public class User {
     private final IUserService userService;
     private final ServerConfig serverConfig;
     private final IGiftBoxService giftBoxService;
-    private final ISession session;
+    private final Session session;
     private UserState state;
     private String accountId;
     private int userId;
@@ -71,7 +70,7 @@ public class User {
     private FightWait fightWait;
     private TrainingManager trainingManager;
 
-    public User(ISession session) {
+    public User(Session session) {
         this.session = session;
         this.state = UserState.WAITING;
         this.userService = new UserService(
@@ -98,7 +97,7 @@ public class User {
         return giftBoxService.isOpeningGift();
     }
 
-    public void sendMessage(IMessage ms) {
+    public void sendMessage(Message ms) {
         session.sendMessage(ms);
     }
 
@@ -273,7 +272,7 @@ public class User {
         equipmentPurchased++;
 
         try {
-            IMessage ms = new Message(Cmd.BUY_EQUIP);
+            Message ms = new Message(Cmd.BUY_EQUIP);
             DataOutputStream ds = ms.writer();
             ds.writeByte(0);
             ds.writeInt(addEquipment.getKey());
@@ -380,7 +379,7 @@ public class User {
                 return;
             }
 
-            IMessage ms = new Message(Cmd.INVENTORY_UPDATE);
+            Message ms = new Message(Cmd.INVENTORY_UPDATE);
             ds = ms.writer();
             ds.writeByte(updateQuantity);
             ds.write(bas.toByteArray());

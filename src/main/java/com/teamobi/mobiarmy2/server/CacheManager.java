@@ -1,9 +1,9 @@
 package com.teamobi.mobiarmy2.server;
 
-import com.teamobi.mobiarmy2.network.IMessage;
+import com.teamobi.mobiarmy2.network.Message;
 
 public class CacheManager {
-    public static IMessage cachedSpecialItemShop = null;
-    public static IMessage cachedClanItemShop = null;
-    public static IMessage cachedShopEquipments = null;
+    public static Message cachedSpecialItemShop = null;
+    public static Message cachedClanItemShop = null;
+    public static Message cachedShopEquipments = null;
 }

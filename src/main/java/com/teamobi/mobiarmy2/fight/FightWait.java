@@ -5,8 +5,7 @@ import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.model.Room;
 import com.teamobi.mobiarmy2.model.User;
-import com.teamobi.mobiarmy2.network.IMessage;
-import com.teamobi.mobiarmy2.network.impl.Message;
+import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.MapManager;
 import com.teamobi.mobiarmy2.server.ServerManager;
@@ -141,7 +140,7 @@ public class FightWait {
 
     private void sendUpdateItemSlot(User us) {
         try {
-            IMessage ms = new Message(Cmd.ITEM_SLOT);
+            Message ms = new Message(Cmd.ITEM_SLOT);
             DataOutputStream ds = ms.writer();
             for (byte i = 0; i < 4; i++) {
                 ds.writeByte(us.getItemFightQuantity(12 + i));
@@ -155,7 +154,7 @@ public class FightWait {
 
     private void sendUpdateMap(User us) {
         try {
-            IMessage ms = new Message(Cmd.MAP_SELECT);
+            Message ms = new Message(Cmd.MAP_SELECT);
             DataOutputStream ds = ms.writer();
             ds.writeByte(mapId);
             ds.flush();
@@ -168,7 +167,7 @@ public class FightWait {
     private void sendMessageKick(int index, String s) {
         try {
             User user = users[index];
-            IMessage ms = new Message(Cmd.KICK);
+            Message ms = new Message(Cmd.KICK);
             DataOutputStream ds = ms.writer();
             ds.writeShort(index);
             ds.writeInt(user.getUserId());
@@ -210,7 +209,7 @@ public class FightWait {
 
     private void notifyPlayerLeave(int userId) {
         try {
-            IMessage ms = new Message(Cmd.SOMEONE_LEAVEBOARD);
+            Message ms = new Message(Cmd.SOMEONE_LEAVEBOARD);
             DataOutputStream ds = ms.writer();
             ds.writeInt(userId);
             ds.writeInt(getRoomOwner().getUserId());
@@ -407,7 +406,7 @@ public class FightWait {
                         (j >= 4 && user.getItemFightQuantity(12 + j - 4) == 0) //Item chứa đã hết
                 ) {
                     try {
-                        IMessage ms = new Message(Cmd.SERVER_MESSAGE);
+                        Message ms = new Message(Cmd.SERVER_MESSAGE);
                         DataOutputStream ds = ms.writer();
                         ds.writeUTF(GameString.createGameStartErrorMessageInvalidSlot(user.getUsername(), j));
                         ds.flush();
@@ -458,7 +457,7 @@ public class FightWait {
         countdownTimer.stop();
     }
 
-    public void sendToTeam(IMessage ms) {
+    public void sendToTeam(Message ms) {
         for (User user : users) {
             if (user != null) {
                 user.sendMessage(ms);
@@ -495,7 +494,7 @@ public class FightWait {
         }
 
         try {
-            IMessage ms = new Message(Cmd.CHAT_TO_BOARD);
+            Message ms = new Message(Cmd.CHAT_TO_BOARD);
             DataOutputStream ds = ms.writer();
             ds.writeInt(userId);
             ds.writeUTF(message);
@@ -578,7 +577,7 @@ public class FightWait {
         }
 
         try {
-            IMessage ms = new Message(Cmd.READY);
+            Message ms = new Message(Cmd.READY);
             DataOutputStream ds = ms.writer();
             ds.writeInt(userId);
             ds.writeBoolean(ready);
@@ -628,7 +627,7 @@ public class FightWait {
         money = newMoney;
 
         try {
-            IMessage ms = new Message(Cmd.SET_MONEY);
+            Message ms = new Message(Cmd.SET_MONEY);
             DataOutputStream ds = ms.writer();
             ds.writeShort(0);
             ds.writeInt(newMoney);
@@ -708,7 +707,7 @@ public class FightWait {
         }
 
         try {
-            IMessage ms = new Message(Cmd.CHANGE_TEAM);
+            Message ms = new Message(Cmd.CHANGE_TEAM);
             DataOutputStream ds = ms.writer();
             ds.writeInt(user.getUserId());
             ds.writeByte(newIndex);
@@ -781,7 +780,7 @@ public class FightWait {
                     (byte) 34, (byte) 35, (byte) 36, (byte) 37, (byte) 38, (byte) 39
             ));
             try {
-                IMessage ms = new Message(Cmd.TRAINING_MAP);
+                Message ms = new Message(Cmd.TRAINING_MAP);
                 DataOutputStream ds = ms.writer();
                 ds.writeByte(mapRandom);
                 ds.flush();
@@ -797,7 +796,7 @@ public class FightWait {
         countdownTimer.reset();
 
         try {
-            IMessage ms = new Message(Cmd.MAP_SELECT);
+            Message ms = new Message(Cmd.MAP_SELECT);
             DataOutputStream ds = ms.writer();
             ds.writeByte(mapId);
             ds.flush();
@@ -820,7 +819,7 @@ public class FightWait {
         List<User> userList = ServerManager.getInstance().findWaitPlayers(userId);
 
         try {
-            IMessage ms = new Message(Cmd.FIND_PLAYER);
+            Message ms = new Message(Cmd.FIND_PLAYER);
             DataOutputStream ds = ms.writer();
             ds.writeBoolean(true);
             ds.writeByte(userList.size());
@@ -863,7 +862,7 @@ public class FightWait {
         }
 
         try {
-            IMessage ms = new Message(Cmd.FIND_PLAYER);
+            Message ms = new Message(Cmd.FIND_PLAYER);
             DataOutputStream ds = ms.writer();
             ds.writeBoolean(false);
             ds.writeUTF(GameString.createInviteMessage(roomOwner.getUsername()));
@@ -918,7 +917,7 @@ public class FightWait {
             return;
         }
 
-        IMessage ms;
+        Message ms;
         DataOutputStream ds;
         if (numPlayers != 0) {
             ms = new Message(Cmd.SOMEONE_JOINBOARD);

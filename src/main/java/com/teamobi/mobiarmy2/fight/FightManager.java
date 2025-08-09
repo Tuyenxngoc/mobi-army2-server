@@ -6,8 +6,7 @@ import com.teamobi.mobiarmy2.constant.MatchResult;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.model.*;
 import com.teamobi.mobiarmy2.model.boss.*;
-import com.teamobi.mobiarmy2.network.IMessage;
-import com.teamobi.mobiarmy2.network.impl.Message;
+import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
@@ -87,7 +86,7 @@ public class FightManager {
     private void sendLuckyUpdate(byte index) {
         try {
             Player player = players[index];
-            IMessage ms = new Message(Cmd.LUCKY);
+            Message ms = new Message(Cmd.LUCKY);
             DataOutputStream ds = ms.writer();
             ds.writeByte(index);
             ds.flush();
@@ -100,7 +99,7 @@ public class FightManager {
 
     private void sendPoisonUpdate(byte index) {
         try {
-            IMessage ms = new Message(Cmd.POISON);
+            Message ms = new Message(Cmd.POISON);
             DataOutputStream ds = ms.writer();
             ds.writeByte(index);
             ds.flush();
@@ -112,7 +111,7 @@ public class FightManager {
 
     private void sendEyeSmokeUpdate(byte index) {
         try {
-            IMessage ms = new Message(Cmd.EYE_SMOKE);
+            Message ms = new Message(Cmd.EYE_SMOKE);
             DataOutputStream ds = ms.writer();
             ds.writeByte(0);
             ds.writeByte(index);
@@ -125,7 +124,7 @@ public class FightManager {
 
     private void sendFreezeUpdate(byte index) {
         try {
-            IMessage ms = new Message(Cmd.FREEZE);
+            Message ms = new Message(Cmd.FREEZE);
             DataOutputStream ds = ms.writer();
             ds.writeByte(0);
             ds.writeByte(index);
@@ -139,7 +138,7 @@ public class FightManager {
     private void sendHpUpdate(byte index) {
         try {
             Player player = players[index];
-            IMessage ms = new Message(Cmd.UPDATE_HP);
+            Message ms = new Message(Cmd.UPDATE_HP);
             DataOutputStream ds = ms.writer();
             ds.writeByte(index);
             ds.writeShort(player.getHp());
@@ -155,7 +154,7 @@ public class FightManager {
     private void sendAngryUpdate(byte index) {
         try {
             Player player = players[index];
-            IMessage ms = new Message(Cmd.ANGRY);
+            Message ms = new Message(Cmd.ANGRY);
             DataOutputStream ds = ms.writer();
             ds.writeByte(index);
             ds.writeByte(player.getAngry());
@@ -170,7 +169,7 @@ public class FightManager {
     private void sendMoneyUpdate(Player player, int money) {
         try {
             User user = player.getUser();
-            IMessage ms = new Message(Cmd.BONUS_MONEY);
+            Message ms = new Message(Cmd.BONUS_MONEY);
             DataOutputStream ds = ms.writer();
             ds.writeInt(user.getUserId());
             ds.writeInt(money);
@@ -288,7 +287,7 @@ public class FightManager {
         }
 
         try {
-            IMessage ms = new Message(Cmd.WIND);
+            Message ms = new Message(Cmd.WIND);
             DataOutputStream ds = ms.writer();
             ds.writeByte(windX);
             ds.writeByte(windY);
@@ -663,7 +662,7 @@ public class FightManager {
 
     private void sendMssAddBosses(Boss[] bosses) {
         try {
-            IMessage ms = new Message(Cmd.GET_BOSS);
+            Message ms = new Message(Cmd.GET_BOSS);
             DataOutputStream ds = ms.writer();
             ds.writeByte(bosses.length);
             for (Boss boss : bosses) {
@@ -698,7 +697,7 @@ public class FightManager {
 
     private void sendNextTurnMessage(int turn) {
         try {
-            IMessage ms = new Message(Cmd.NEXT_TURN_2);
+            Message ms = new Message(Cmd.NEXT_TURN_2);
             DataOutputStream ds = ms.writer();
             ds.writeByte(turn);
             ds.flush();
@@ -839,7 +838,7 @@ public class FightManager {
 
             try {
                 //Gửi thông báo kết thúc ván chơi
-                IMessage ms = new Message(Cmd.STOP_GAME);
+                Message ms = new Message(Cmd.STOP_GAME);
                 DataOutputStream ds = ms.writer();
                 ds.writeByte(winStatus);
                 ds.writeByte(0);
@@ -1097,7 +1096,7 @@ public class FightManager {
             }
 
             try {
-                IMessage ms = new Message(Cmd.START_ARMY);
+                Message ms = new Message(Cmd.START_ARMY);
                 DataOutputStream ds = ms.writer();
                 ds.writeByte(fightWait.getMapId());
                 ds.writeByte(MAX_PLAY_TIME);
@@ -1156,7 +1155,7 @@ public class FightManager {
 
         byte typeShoot = 0;
         try {
-            IMessage ms = new Message(Cmd.FIRE_ARMY);
+            Message ms = new Message(Cmd.FIRE_ARMY);
             DataOutputStream ds = ms.writer();
             ds.writeByte(typeShoot);
             ds.writeByte(player.isUsePow() ? 1 : 0);
@@ -1258,7 +1257,7 @@ public class FightManager {
     public void sendMessageUpdateXY(int index) {
         try {
             Player player = players[index];
-            IMessage ms = new Message(Cmd.MOVE_ARMY);
+            Message ms = new Message(Cmd.MOVE_ARMY);
             DataOutputStream ds = ms.writer();
             ds.writeByte(index);
             ds.writeShort(player.getX());
@@ -1323,7 +1322,7 @@ public class FightManager {
         }
 
         try {
-            IMessage ms = new Message(Cmd.USE_ITEM);
+            Message ms = new Message(Cmd.USE_ITEM);
             DataOutputStream ds = ms.writer();
             ds.writeByte(index);
             ds.writeByte(itemIndex);

@@ -3,8 +3,7 @@ package com.teamobi.mobiarmy2.fight;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.model.Player;
 import com.teamobi.mobiarmy2.model.User;
-import com.teamobi.mobiarmy2.network.IMessage;
-import com.teamobi.mobiarmy2.network.impl.Message;
+import com.teamobi.mobiarmy2.network.Message;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -26,7 +25,7 @@ public class TrainingManager {
         players[1] = new Player(1, 550, 200, 1000, 1000);
 
         try {
-            IMessage ms = new Message(Cmd.START_ARMY);
+            Message ms = new Message(Cmd.START_ARMY);
             DataOutputStream ds = ms.writer();
             short[] equips = trainingUser.getEquips();
             for (short i : equips) {

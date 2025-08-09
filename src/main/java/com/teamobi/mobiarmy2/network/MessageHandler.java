@@ -1,13 +1,11 @@
-package com.teamobi.mobiarmy2.network.impl;
+package com.teamobi.mobiarmy2.network;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
-import com.teamobi.mobiarmy2.network.IMessage;
-import com.teamobi.mobiarmy2.network.IMessageHandler;
 import com.teamobi.mobiarmy2.service.IUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MessageHandler implements IMessageHandler {
+public class MessageHandler {
     private static final Logger logger = LoggerFactory.getLogger(MessageHandler.class);
 
     private final IUserService userService;
@@ -16,8 +14,7 @@ public class MessageHandler implements IMessageHandler {
         this.userService = userService;
     }
 
-    @Override
-    public void onMessage(IMessage ms) {
+    public void onMessage(Message ms) {
         try {
             switch (ms.getCommand()) {
                 case Cmd.MORE_GAME -> userService.getMoreGame();

@@ -3,8 +3,7 @@ package com.teamobi.mobiarmy2.service.impl;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.model.User;
-import com.teamobi.mobiarmy2.network.IMessage;
-import com.teamobi.mobiarmy2.network.impl.Message;
+import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.service.IGiftBoxService;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -46,7 +45,7 @@ public class GiftBoxService implements IGiftBoxService {
 
     private void sendStartMessage(int availableGifts, int giftOpenTime) {
         try {
-            IMessage ms = new Message(Cmd.GET_LUCKYGIFT);
+            Message ms = new Message(Cmd.GET_LUCKYGIFT);
             DataOutputStream ds = ms.writer();
             ds.writeByte(-1);
             ds.writeByte(giftOpenTime);

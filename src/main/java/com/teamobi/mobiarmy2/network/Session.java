@@ -1,10 +1,7 @@
-package com.teamobi.mobiarmy2.network.impl;
+package com.teamobi.mobiarmy2.network;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.model.User;
-import com.teamobi.mobiarmy2.network.IMessage;
-import com.teamobi.mobiarmy2.network.IMessageHandler;
-import com.teamobi.mobiarmy2.network.ISession;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +14,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Session implements ISession {
+public class Session {
     private static final Logger logger = LoggerFactory.getLogger(Session.class);
 
     private static final int TIMEOUT_DURATION = 180_000;
@@ -32,7 +29,7 @@ public class Session implements ISession {
 
     private final byte[] sessionKey;
     private final Sender sender = new Sender();
-    private final IMessageHandler messageHandler;
+    private final MessageHandler messageHandler;
     private final long sessionId;
     private final String IPAddress;
     private final User user;
@@ -79,12 +76,10 @@ public class Session implements ISession {
         return sendKeyComplete;
     }
 
-    @Override
-    public void sendMessage(IMessage message) {
+    public void sendMessage(Message message) {
         sender.addMessage(message);
     }
 
-    @Override
     public void close() {
         try {
             if (user.isLogged()) {
@@ -100,50 +95,41 @@ public class Session implements ISession {
         }
     }
 
-    @Override
     public String getIPAddress() {
         return IPAddress;
     }
 
-    @Override
     public String getPlatform() {
         return platform;
     }
 
-    @Override
     public void setPlatform(String platform) {
         this.platform = platform;
     }
 
-    @Override
     public String getVersion() {
         return version;
     }
 
-    @Override
     public void setVersion(String version) {
         this.version = version;
     }
 
-    @Override
     public byte getProvider() {
         return provider;
     }
 
-    @Override
     public void setProvider(byte provider) {
         this.provider = provider;
     }
 
-    @Override
     public User getUser() {
         return user;
     }
 
-    @Override
     public void sendKeys() {
         try {
-            IMessage ms = new Message(Cmd.GET_KEY);
+            Message ms = new Message(Cmd.GET_KEY);
             DataOutputStream ds = ms.writer();
             ds.writeByte(sessionKey.length);
             ds.writeByte(sessionKey[0]);
@@ -167,7 +153,7 @@ public class Session implements ISession {
         return "Client " + sessionId;
     }
 
-    protected synchronized void doSendMessage(IMessage message) {
+    protected synchronized void doSendMessage(Message message) {
         byte[] data = message.getData();
         try {
             if (sendKeyComplete) {
@@ -251,9 +237,9 @@ public class Session implements ISession {
 
     class Sender implements Runnable {
 
-        private final ArrayList<IMessage> sendingMessage = new ArrayList<>();
+        private final ArrayList<Message> sendingMessage = new ArrayList<>();
 
-        public void addMessage(IMessage message) {
+        public void addMessage(Message message) {
             sendingMessage.add(message);
         }
 
@@ -262,7 +248,7 @@ public class Session implements ISession {
             try {
                 while (Session.this.isSendKeyComplete()) {
                     while (!sendingMessage.isEmpty() && Session.this.dis != null) {
-                        IMessage message = sendingMessage.removeFirst();
+                        Message message = sendingMessage.removeFirst();
                         logger.info("   Send mss {} to {}", Cmd.getCmdNameByValue(message.getCommand()), Session.this);
                         Session.this.doSendMessage(message);
                     }
@@ -285,7 +271,7 @@ public class Session implements ISession {
             try {
                 while (Session.this.dis != null) {
                     Session.this.socket.setSoTimeout(TIMEOUT_DURATION);
-                    IMessage message = readMessage();
+                    Message message = readMessage();
                     if (message == null) {
                         break;
                     }
@@ -303,12 +289,12 @@ public class Session implements ISession {
             }
         }
 
-        private boolean requiresAuthentication(IMessage message) {
+        private boolean requiresAuthentication(Message message) {
             Byte cmd = message.getCommand();
             return !WHITE_LIST_CMD.contains(cmd);
         }
 
-        private IMessage readMessage() {
+        private Message readMessage() {
             try {
                 byte cmd = Session.this.dis.readByte();
                 if (Session.this.sendKeyComplete) {
