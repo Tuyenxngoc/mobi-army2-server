@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ApplicationContext {
-
     private final Map<Class<?>, Object> beans = new HashMap<>();
 
     private ApplicationContext() {
@@ -65,6 +64,7 @@ public class ApplicationContext {
         registerBean(LoginRateLimiterService.class, new LoginRateLimiterService(getBean(RedisConnectionManager.class)));
         registerBean(ConnectionBlockerService.class, new ConnectionBlockerService(getBean(RedisConnectionManager.class)));
 
+        registerBean(RoomManager.class, new RoomManager(getBean(ServerConfig.class)));
         registerBean(ServerManager.class, new ServerManager(
                 getBean(GameDataService.class),
                 getBean(LeaderboardService.class),
@@ -93,5 +93,4 @@ public class ApplicationContext {
     private static class SingletonHelper {
         private static final ApplicationContext INSTANCE = new ApplicationContext();
     }
-
 }

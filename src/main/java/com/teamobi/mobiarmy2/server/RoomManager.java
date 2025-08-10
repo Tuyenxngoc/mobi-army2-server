@@ -9,8 +9,8 @@ public class RoomManager {
     @Getter
     private Room[] rooms;
 
-    public RoomManager() {
-        this.serverConfig = null;// ApplicationContext.getInstance().getBean(ServerConfig.class);
+    public RoomManager(ServerConfig serverConfig) {
+        this.serverConfig = serverConfig;
     }
 
     public void init() {

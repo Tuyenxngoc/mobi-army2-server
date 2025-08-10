@@ -7,6 +7,7 @@ import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.entity.*;
 import com.teamobi.mobiarmy2.entity.boss.*;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.server.ApplicationContext;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
@@ -47,7 +48,6 @@ public class FightManager {
     private final com.teamobi.mobiarmy2.fight.CountdownTimer countdownTimer;
     private final ExecutorService executorNextTurn;
     private final ExecutorService executorEndGame;
-    private final ClanService clanService;
     private Player[] players;
     private int totalPlayers;
     private int turnCount;
@@ -58,9 +58,8 @@ public class FightManager {
     private byte windY;
     private long startTime;
 
-    public FightManager(FightWait fightWait, ClanService clanService) {
+    public FightManager(FightWait fightWait) {
         this.fightWait = fightWait;
-        this.clanService = clanService;
         this.players = new Player[MAX_ELEMENT_FIGHT];
         this.mapManager = new FightMapManager(this);
         this.bulletManager = new BulletManager(this);
@@ -885,6 +884,8 @@ public class FightManager {
 
                     //Cộng xp và cup cho clan
                     if (user.getClanId() != null) {
+                        ClanService clanService = ApplicationContext.getInstance()
+                                .getBean(ClanService.class);
                         clanService.updateXp(user.getClanId(), user.getUserId(), player.getAllXpUp() / 100);
                         clanService.updateCup(user.getClanId(), user.getUserId(), player.getAllCupUp());
                     }
@@ -1050,6 +1051,8 @@ public class FightManager {
                 if (clanItemsCache.containsKey(user.getClanId())) {
                     clanItems = clanItemsCache.get(user.getClanId());
                 } else {
+                    ClanService clanService = ApplicationContext.getInstance()
+                            .getBean(ClanService.class);
                     clanItems = clanService.getClanItems(user.getClanId());
                     clanItemsCache.put(user.getClanId(), clanItems);
                 }

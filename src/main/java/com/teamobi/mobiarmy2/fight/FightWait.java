@@ -49,7 +49,7 @@ public class FightWait {
 
         byte maxPlayers = room.getMaxPlayerFight();
 
-        this.fightManager = new FightManager(this, null);//ApplicationContext.getInstance().getBean(IClanService.class)
+        this.fightManager = new FightManager(this);
         this.users = new User[maxPlayers];
         this.items = new byte[maxPlayers][MAX_ITEMS_SLOT];
         this.readies = new boolean[maxPlayers];

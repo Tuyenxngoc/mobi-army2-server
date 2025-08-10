@@ -18,7 +18,6 @@ public class SpecialItemDAO {
         this.hikariCPManager = hikariCPManager;
     }
 
-
     public void loadAll() {
         try (Connection connection = hikariCPManager.getConnection();
              Statement statement = connection.createStatement()) {
