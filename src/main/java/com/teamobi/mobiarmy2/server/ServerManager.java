@@ -22,7 +22,6 @@ import java.util.List;
 public class ServerManager {
     private final GameDataService gameDataService;
     private final LeaderboardService leaderboardService;
-    private final ServerConfig serverConfig;
     private final ConnectionBlockerService connectionBlockerService;
     private final ArrayList<Session> sessions = new ArrayList<>();
     private ServerSocket server;
@@ -32,10 +31,9 @@ public class ServerManager {
     @Getter
     private boolean isMaintenanceMode = false;
 
-    public ServerManager(GameDataService gameDataService, LeaderboardService leaderboardService, ServerConfig serverConfig, ConnectionBlockerService connectionBlockerService) {
+    public ServerManager(GameDataService gameDataService, LeaderboardService leaderboardService, ConnectionBlockerService connectionBlockerService) {
         this.gameDataService = gameDataService;
         this.leaderboardService = leaderboardService;
-        this.serverConfig = serverConfig;
         this.connectionBlockerService = connectionBlockerService;
     }
 
@@ -52,6 +50,7 @@ public class ServerManager {
         log.info("Start server!");
         isStart = true;
         try {
+            ServerConfig serverConfig = ApplicationContext.getInstance().getBean(ServerConfig.class);
             server = new ServerSocket(serverConfig.getPort());
             log.info("Server start at port: {}", serverConfig.getPort());
             while (isStart) {

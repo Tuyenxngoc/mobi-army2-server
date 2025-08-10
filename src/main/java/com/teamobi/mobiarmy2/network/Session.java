@@ -64,8 +64,7 @@ public class Session {
                 applicationContext.getBean(AccountDAO.class),
                 applicationContext.getBean(GiftCodeDAO.class),
                 applicationContext.getBean(UserGiftCodeDAO.class),
-                applicationContext.getBean(UserCharacterDAO.class),
-                applicationContext.getBean(ServerManager.class)
+                applicationContext.getBean(UserCharacterDAO.class)
         );
         GiftBoxService giftBoxService = new GiftBoxService();
         this.user = new User(this, userService, giftBoxService);

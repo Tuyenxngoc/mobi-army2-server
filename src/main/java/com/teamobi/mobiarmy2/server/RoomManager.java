@@ -5,15 +5,11 @@ import com.teamobi.mobiarmy2.entity.Room;
 import lombok.Getter;
 
 public class RoomManager {
-    private final ServerConfig serverConfig;
     @Getter
     private Room[] rooms;
 
-    public RoomManager(ServerConfig serverConfig) {
-        this.serverConfig = serverConfig;
-    }
-
     public void init() {
+        ServerConfig serverConfig = ApplicationContext.getInstance().getBean(ServerConfig.class);
         byte[] roomQuantities = serverConfig.getRoomQuantity();
         int totalRooms = 0;
 

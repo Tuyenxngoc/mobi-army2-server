@@ -38,8 +38,6 @@ public class UserService {
     private final UserGiftCodeDAO userGiftCodeDAO;
     private final UserCharacterDAO userCharacterDAO;
 
-    private final ServerManager serverManager;
-
     private UserAction userAction;
     private int totalTransactionAmount;
     private List<EquipmentChest> selectedEquips;
@@ -49,7 +47,13 @@ public class UserService {
     private long timeSinceLeftRoom;
     private long lastSpinTime;
 
-    public UserService(ServerConfig serverConfig, ClanService clanService, LeaderboardService leaderboardService, LoginRateLimiterService loginRateLimiterService, UserDAO userDAO, AccountDAO accountDAO, GiftCodeDAO giftCodeDAO, UserGiftCodeDAO userGiftCodeDAO, UserCharacterDAO userCharacterDAO, ServerManager serverManager) {
+    public UserService(ServerConfig serverConfig,
+                       ClanService clanService,
+                       LeaderboardService leaderboardService,
+                       LoginRateLimiterService loginRateLimiterService,
+                       UserDAO userDAO, AccountDAO accountDAO,
+                       GiftCodeDAO giftCodeDAO, UserGiftCodeDAO userGiftCodeDAO,
+                       UserCharacterDAO userCharacterDAO) {
         this.serverConfig = serverConfig;
         this.clanService = clanService;
         this.leaderboardService = leaderboardService;
@@ -59,7 +63,6 @@ public class UserService {
         this.giftCodeDAO = giftCodeDAO;
         this.userGiftCodeDAO = userGiftCodeDAO;
         this.userCharacterDAO = userCharacterDAO;
-        this.serverManager = serverManager;
     }
 
     private static String getFormattedRankDisplay(int rank) {
@@ -115,7 +118,8 @@ public class UserService {
             return;
         }
 
-        if (serverManager.isMaintenanceMode()) {
+        if (ApplicationContext.getInstance()
+                .getBean(ServerManager.class).isMaintenanceMode()) {
             sendMessageLoginFail(GameString.MAINTENANCE_MODE);
             return;
         }
@@ -169,7 +173,8 @@ public class UserService {
             }
 
             //Kiểm tra có đang đăng nhập hay không
-            User userLogin = serverManager.getUserByUserId(userDTO.getUserId());
+            User userLogin = ApplicationContext.getInstance()
+                    .getBean(ServerManager.class).getUserByUserId(userDTO.getUserId());
             if (userLogin != null) {
                 userLogin.getUserService().sendMoneyErrorMessage(GameString.ACCOUNT_OTHER_LOGIN);
                 userLogin.getSession().close();
@@ -1213,7 +1218,8 @@ public class UserService {
                 sendServerInfo(GameString.createMessageFromSender(user.getUsername(), content), true);
                 return;
             }
-            User receiver = serverManager.getUserByUserId(userId);
+            User receiver = ApplicationContext.getInstance()
+                    .getBean(ServerManager.class).getUserByUserId(userId);
             if (receiver == null) {
                 sendServerMessage(GameString.INVITE_OFFLINE);
                 return;
@@ -1234,7 +1240,8 @@ public class UserService {
             ds.flush();
 
             if (toServer) {
-                serverManager.sendToServer(ms);
+                ApplicationContext.getInstance()
+                        .getBean(ServerManager.class).sendToServer(ms);
             } else {
                 sendMessage(ms);
             }

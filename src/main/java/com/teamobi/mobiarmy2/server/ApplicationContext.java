@@ -34,7 +34,7 @@ public class ApplicationContext {
         registerBean(MapDAO.class, new MapDAO(getBean(HikariCPManager.class)));
         registerBean(MissionDAO.class, new MissionDAO(getBean(HikariCPManager.class)));
         registerBean(PaymentDAO.class, new PaymentDAO(getBean(HikariCPManager.class)));
-        registerBean(RankingDAO.class, new RankingDAO(getBean(HikariCPManager.class), getBean(ServerConfig.class)));
+        registerBean(RankingDAO.class, new RankingDAO(getBean(HikariCPManager.class)));
         registerBean(SpecialItemDAO.class, new SpecialItemDAO(getBean(HikariCPManager.class)));
         registerBean(UserCharacterDAO.class, new UserCharacterDAO(getBean(HikariCPManager.class)));
         registerBean(UserDAO.class, new UserDAO(getBean(HikariCPManager.class)));
@@ -54,21 +54,15 @@ public class ApplicationContext {
                 getBean(ExperienceLevelDAO.class),
                 getBean(FabricateItemDAO.class)
         ));
-        registerBean(LeaderboardService.class, new LeaderboardService(
-                getBean(RankingDAO.class),
-                getBean(ServerConfig.class)
-        ));
-        registerBean(ClanService.class, new ClanService(
-                getBean(ClanDAO.class)
-        ));
+        registerBean(LeaderboardService.class, new LeaderboardService(getBean(RankingDAO.class)));
+        registerBean(ClanService.class, new ClanService(getBean(ClanDAO.class)));
         registerBean(LoginRateLimiterService.class, new LoginRateLimiterService(getBean(RedisConnectionManager.class)));
         registerBean(ConnectionBlockerService.class, new ConnectionBlockerService(getBean(RedisConnectionManager.class)));
 
-        registerBean(RoomManager.class, new RoomManager(getBean(ServerConfig.class)));
+        registerBean(RoomManager.class, new RoomManager());
         registerBean(ServerManager.class, new ServerManager(
                 getBean(GameDataService.class),
                 getBean(LeaderboardService.class),
-                getBean(ServerConfig.class),
                 getBean(ConnectionBlockerService.class)
         ));
     }

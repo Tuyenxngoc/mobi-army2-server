@@ -3,6 +3,7 @@ package com.teamobi.mobiarmy2.service;
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.dao.RankingDAO;
 import com.teamobi.mobiarmy2.dto.UserLeaderboardDTO;
+import com.teamobi.mobiarmy2.server.ApplicationContext;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
@@ -12,14 +13,12 @@ public class LeaderboardService {
     private static final String[] CATEGORIES = {"DANH DỰ", "CAO THỦ", "ĐẠI GIA XU", "ĐẠI GIA LƯỢNG", "DANH DỰ TUẦN", "ĐẠI GIA TUẦN"};
     private static final String[] LABELS = {"Danh dự", "XP", "Xu", "Lượng", "Danh dự", "Xu"};
     private final RankingDAO rankingDAO;
-    private final ServerConfig serverConfig;
     private final Timer timer;
     private final List<List<UserLeaderboardDTO>> leaderboardEntries;
     private boolean isComplete;
 
-    public LeaderboardService(RankingDAO rankingDAO, ServerConfig serverConfig) {
+    public LeaderboardService(RankingDAO rankingDAO) {
         this.rankingDAO = rankingDAO;
-        this.serverConfig = serverConfig;
         this.timer = new Timer(true);
         this.leaderboardEntries = new ArrayList<>(CATEGORIES.length);
         for (int i = 0; i < CATEGORIES.length; i++) {
@@ -61,7 +60,8 @@ public class LeaderboardService {
     }
 
     private void addBonusGiftsForPlayers() {
-        int[] topBonus = serverConfig.getTopBonus();
+        int[] topBonus = ApplicationContext.getInstance()
+                .getBean(ServerConfig.class).getTopBonus();
 
         int i = 0;
         for (UserLeaderboardDTO userLeaderboardDTO : leaderboardEntries.getFirst()) {
