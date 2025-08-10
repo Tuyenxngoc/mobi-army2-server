@@ -1,41 +1,23 @@
 package com.teamobi.mobiarmy2.ui.controllers;
 
 import com.sun.management.OperatingSystemMXBean;
-import com.teamobi.mobiarmy2.model.User;
-import com.teamobi.mobiarmy2.network.ISession;
+import com.teamobi.mobiarmy2.server.ApplicationContext;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.util.Duration;
 
 import java.lang.management.ManagementFactory;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author tuyen
- */
-public class ServerViewController implements ServerListener {
-
+public class ServerViewController {
     @FXML
     public Tab serverInfoTab;
     @FXML
     public TextField searchUserField;
-    @FXML
-    private TableView<User> userTable;
-    @FXML
-    private TableColumn<User, Integer> userIdColumn;
-    @FXML
-    private TableColumn<User, String> usernameColumn;
-    @FXML
-    private TableColumn<User, String> ipAddressColumn;
     @FXML
     private Label serverStatus;
     @FXML
@@ -49,7 +31,6 @@ public class ServerViewController implements ServerListener {
     @FXML
     private Button maintainButton;
 
-    private ObservableList<User> userList;
     private Timeline countdownTimeline;
 
     private void showError(String title, String content) {
@@ -119,33 +100,13 @@ public class ServerViewController implements ServerListener {
         maintainButton.setDisable(false);
         serverStatus.setText("Maintenance Mode");
 
-        ServerManager.getInstance().setMaintenanceMode(true);
-    }
-
-    @Override
-    public void onUsersUpdated(List<ISession> sessions) {
-        List<User> updatedUsers = sessions.stream()
-                .map(ISession::getUser)
-                .filter(User::isLogged)
-                .toList();
-        userList.setAll(updatedUsers);
+        ApplicationContext.getInstance()
+                .getBean(ServerManager.class)
+                .setMaintenanceMode(true);
     }
 
     @FXML
     public void initialize() {
-        userList = FXCollections.observableArrayList();
-
-        userIdColumn.setCellValueFactory(cellData ->
-                new SimpleIntegerProperty(cellData.getValue().getUserId()).asObject());
-        usernameColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getUsername()));
-        ipAddressColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getSession().getIPAddress()));
-
-        userTable.setItems(userList);
-
-        ServerManager.getInstance().addServerListener(this);
-
         serverInfoTab.setOnSelectionChanged(event -> {
             if (serverInfoTab.isSelected()) {
                 updateServerInfo();
@@ -179,14 +140,5 @@ public class ServerViewController implements ServerListener {
     @FXML
     public void searchUser() {
         String query = searchUserField.getText().toLowerCase().trim();
-
-        ObservableList<User> filteredUsers = FXCollections.observableArrayList();
-        for (User user : userList) {
-            if (user.getUsername().toLowerCase().contains(query) || String.valueOf(user.getUserId()).contains(query)) {
-                filteredUsers.add(user);
-            }
-        }
-
-        userTable.setItems(filteredUsers);
     }
 }

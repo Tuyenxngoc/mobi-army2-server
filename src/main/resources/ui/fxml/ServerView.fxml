@@ -21,13 +21,6 @@
                         <TextField fx:id="searchUserField" promptText="Enter username or ID"/>
                         <Button text="Search" onAction="#searchUser"/>
                     </HBox>
-                    <TableView fx:id="userTable">
-                        <columns>
-                            <TableColumn text="User ID" fx:id="userIdColumn"/>
-                            <TableColumn text="Username" fx:id="usernameColumn"/>
-                            <TableColumn text="IP Address" fx:id="ipAddressColumn"/>
-                        </columns>
-                    </TableView>
                 </VBox>
             </Tab>
             <Tab text="Server Info" fx:id="serverInfoTab" closable="false">

@@ -18,11 +18,7 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Random;
 
-/**
- * @author tuyen
- */
 public class Utils {
-
     private static final Random RANDOM;
     private static final DateTimeFormatter DATE_TIME_FORMATTER;
     private static final NumberFormat NUMBER_FORMAT;
@@ -356,5 +352,9 @@ public class Utils {
             Arrays.fill(adjustedArray, originalArray.length, desiredSize, defaultValue);
         }
         return adjustedArray;
+    }
+
+    public static boolean isNullOrEmpty(String s) {
+        return s == null || s.trim().isEmpty();
     }
 }

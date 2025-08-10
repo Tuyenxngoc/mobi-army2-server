@@ -1,15 +1,12 @@
 package com.teamobi.mobiarmy2.server;
 
-import com.teamobi.mobiarmy2.model.Formula;
+import com.teamobi.mobiarmy2.entity.Formula;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author tuyen
- */
 public class FormulaManager {
     public static final Map<Byte, Map<Byte, List<Formula>>> FORMULAS = new HashMap<>();
 

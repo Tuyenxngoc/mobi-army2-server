@@ -1,8 +1,8 @@
 package com.teamobi.mobiarmy2.util;
 
-import com.teamobi.mobiarmy2.model.Boss;
-import com.teamobi.mobiarmy2.model.MapTile;
-import com.teamobi.mobiarmy2.model.Player;
+import com.teamobi.mobiarmy2.entity.Boss;
+import com.teamobi.mobiarmy2.entity.MapTile;
+import com.teamobi.mobiarmy2.entity.Player;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -11,11 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * @author tuyen
- */
 public class MapTileExporter {
-
     public static void saveMapTilesToFile(List<MapTile> mapTiles, int imageWidth, int imageHeight, Player[] players, String filePath) throws IOException {
         BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = image.createGraphics();
@@ -70,5 +66,4 @@ public class MapTileExporter {
             }
         }
     }
-
 }

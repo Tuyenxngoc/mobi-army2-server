@@ -1,16 +1,13 @@
 package com.teamobi.mobiarmy2.server;
 
-import com.teamobi.mobiarmy2.model.FabricateItem;
-import com.teamobi.mobiarmy2.model.SpecialItemChest;
+import com.teamobi.mobiarmy2.entity.FabricateItem;
+import com.teamobi.mobiarmy2.entity.SpecialItemChest;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * @author tuyen
- */
 public class FabricateItemManager {
     public static final List<FabricateItem> FABRICATE_ITEMS = new ArrayList<>();
 

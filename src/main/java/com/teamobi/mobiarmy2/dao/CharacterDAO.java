@@ -1,0 +1,45 @@
+package com.teamobi.mobiarmy2.dao;
+
+import com.teamobi.mobiarmy2.entity.Character;
+import com.teamobi.mobiarmy2.server.CharacterManager;
+import com.teamobi.mobiarmy2.server.HikariCPManager;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class CharacterDAO {
+    private final HikariCPManager hikariCPManager;
+
+    public CharacterDAO(HikariCPManager hikariCPManager) {
+        this.hikariCPManager = hikariCPManager;
+    }
+
+    public void loadAll() {
+        try (Connection connection = hikariCPManager.getConnection();
+             Statement statement = connection.createStatement()) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT character_id, name, xu, luong, wind_resistance, min_angle, damage, bullet_damage, bullet_count FROM `characters`")) {
+                CharacterManager.CHARACTERS.clear();
+
+                while (resultSet.next()) {
+                    Character character = new Character();
+                    character.setId(resultSet.getByte("character_id"));
+                    character.setName(resultSet.getString("name"));
+                    character.setPriceXu(resultSet.getInt("xu"));
+                    character.setPriceLuong(resultSet.getInt("luong"));
+                    character.setWindResistance(resultSet.getByte("wind_resistance"));
+                    character.setMinAngle(resultSet.getByte("min_angle"));
+                    character.setDamage(resultSet.getShort("damage"));
+                    character.setBulletDamage(resultSet.getByte("bullet_damage"));
+                    character.setBulletCount(resultSet.getByte("bullet_count"));
+
+                    CharacterManager.CHARACTERS.add(character);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+}

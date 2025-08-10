@@ -1,24 +1,15 @@
 package com.teamobi.mobiarmy2.server;
 
-import com.teamobi.mobiarmy2.config.IServerConfig;
-import com.teamobi.mobiarmy2.model.Room;
+import com.teamobi.mobiarmy2.config.ServerConfig;
+import com.teamobi.mobiarmy2.entity.Room;
 import lombok.Getter;
 
 public class RoomManager {
-
-    private final IServerConfig serverConfig;
     @Getter
     private Room[] rooms;
 
-    public RoomManager() {
-        this.serverConfig = ApplicationContext.getInstance().getBean(IServerConfig.class);
-    }
-
-    public static RoomManager getInstance() {
-        return RoomManager.SingletonHelper.INSTANCE;
-    }
-
     public void init() {
+        ServerConfig serverConfig = ApplicationContext.getInstance().getBean(ServerConfig.class);
         byte[] roomQuantities = serverConfig.getRoomQuantity();
         int totalRooms = 0;
 
@@ -54,9 +45,4 @@ public class RoomManager {
             }
         }
     }
-
-    private static class SingletonHelper {
-        private static final RoomManager INSTANCE = new RoomManager();
-    }
-
 }

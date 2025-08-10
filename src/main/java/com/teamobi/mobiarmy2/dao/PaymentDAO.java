@@ -1,0 +1,41 @@
+package com.teamobi.mobiarmy2.dao;
+
+import com.teamobi.mobiarmy2.entity.Payment;
+import com.teamobi.mobiarmy2.server.HikariCPManager;
+import com.teamobi.mobiarmy2.server.PaymentManager;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class PaymentDAO {
+    private final HikariCPManager hikariCPManager;
+
+    public PaymentDAO(HikariCPManager hikariCPManager) {
+        this.hikariCPManager = hikariCPManager;
+    }
+
+    public void loadAll() {
+        try (Connection connection = hikariCPManager.getConnection();
+             Statement statement = connection.createStatement()) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM `payments`")) {
+                PaymentManager.PAYMENT_MAP.clear();
+
+                while (resultSet.next()) {
+                    Payment payment = new Payment();
+                    payment.setId(resultSet.getString("payment_id"));
+                    payment.setInfo(resultSet.getString("info"));
+                    payment.setUrl(resultSet.getString("url"));
+                    payment.setMssTo(resultSet.getString("mss_to"));
+                    payment.setMssContent(resultSet.getString("mss_content"));
+
+                    PaymentManager.PAYMENT_MAP.put(payment.getId(), payment);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+}

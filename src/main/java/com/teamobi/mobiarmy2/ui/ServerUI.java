@@ -12,11 +12,7 @@ import javafx.stage.Stage;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * @author tuyen
- */
 public class ServerUI extends Application {
-
     public static void launchUI(String[] args) {
         launch(args);
     }
