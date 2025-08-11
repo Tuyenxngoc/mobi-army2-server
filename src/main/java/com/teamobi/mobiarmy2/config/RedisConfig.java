@@ -23,15 +23,15 @@ public class RedisConfig {
         properties = new Properties();
         try (FileInputStream fis = new FileInputStream(GameConstants.CONFIG_BASE_URL + "/redis.properties")) {
             properties.load(fis);
-            initializeConfigProperties();
-            validateConfigProperties();
+            initConfig();
+            validateConfig();
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
     }
 
-    private void initializeConfigProperties() {
+    private void initConfig() {
         try {
             this.host = properties.getProperty("redis.host", "localhost");
             this.port = Integer.parseInt(properties.getProperty("redis.port", "6379"));
@@ -45,7 +45,7 @@ public class RedisConfig {
         }
     }
 
-    private void validateConfigProperties() {
+    private void validateConfig() {
         if (host == null || host.isEmpty()) {
             System.err.println("Lỗi: 'redis.host' không được để trống.");
             System.exit(1);

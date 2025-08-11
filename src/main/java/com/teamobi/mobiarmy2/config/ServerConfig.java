@@ -74,15 +74,15 @@ public class ServerConfig {
              InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8)
         ) {
             configMap.load(isr);
-            initializeConfigProperties();
-            validateConfigProperties();
+            initConfig();
+            validateConfig();
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
         }
     }
 
-    private void initializeConfigProperties() {
+    private void initConfig() {
         Gson gson = GsonUtil.getInstance();
         try {
             debug = Boolean.parseBoolean(configMap.getProperty("debug", "false"));
@@ -155,7 +155,7 @@ public class ServerConfig {
         }
     }
 
-    private void validateConfigProperties() {
+    private void validateConfig() {
         int totalRoomTypes = roomNameVi.length;
         if (roomNameEn.length != totalRoomTypes ||
                 roomQuantity.length != totalRoomTypes ||
