@@ -3,7 +3,10 @@ package com.teamobi.mobiarmy2.service;
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.*;
 import com.teamobi.mobiarmy2.dao.*;
-import com.teamobi.mobiarmy2.dto.*;
+import com.teamobi.mobiarmy2.dto.FriendDTO;
+import com.teamobi.mobiarmy2.dto.GiftCodeDTO;
+import com.teamobi.mobiarmy2.dto.UserCharacterDTO;
+import com.teamobi.mobiarmy2.dto.UserLeaderboardDTO;
 import com.teamobi.mobiarmy2.entity.*;
 import com.teamobi.mobiarmy2.entity.Character;
 import com.teamobi.mobiarmy2.fight.FightWait;
@@ -11,6 +14,7 @@ import com.teamobi.mobiarmy2.fight.TrainingManager;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.*;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Setter;
@@ -21,14 +25,13 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class UserService {
+public class UserService extends BaseService {
     private static final int minimumWaitTime = 5000;
 
     @Setter
     private User user;
 
     private final ServerConfig serverConfig;
-    private final ClanService clanService;
     private final LeaderboardService leaderboardService;
     private final LoginRateLimiterService loginRateLimiterService;
 
@@ -47,15 +50,16 @@ public class UserService {
     private long timeSinceLeftRoom;
     private long lastSpinTime;
 
-    public UserService(ServerConfig serverConfig,
-                       ClanService clanService,
-                       LeaderboardService leaderboardService,
-                       LoginRateLimiterService loginRateLimiterService,
-                       UserDAO userDAO, AccountDAO accountDAO,
-                       GiftCodeDAO giftCodeDAO, UserGiftCodeDAO userGiftCodeDAO,
-                       UserCharacterDAO userCharacterDAO) {
+    public UserService(
+            Session session,
+            ServerConfig serverConfig,
+            LeaderboardService leaderboardService,
+            LoginRateLimiterService loginRateLimiterService,
+            UserDAO userDAO, AccountDAO accountDAO,
+            GiftCodeDAO giftCodeDAO, UserGiftCodeDAO userGiftCodeDAO,
+            UserCharacterDAO userCharacterDAO) {
+        super(session);
         this.serverConfig = serverConfig;
-        this.clanService = clanService;
         this.leaderboardService = leaderboardService;
         this.loginRateLimiterService = loginRateLimiterService;
         this.userDAO = userDAO;
@@ -87,235 +91,6 @@ public class UserService {
             selectedSpecialItems = new ArrayList<>();
         }
         return selectedSpecialItems;
-    }
-
-    private void sendMessage(Message ms) {
-        user.sendMessage(ms);
-    }
-
-    private boolean isInvalidInput(String input) {
-        return !input.matches(CommonConstant.ALPHANUMERIC_PATTERN);
-    }
-
-    private void sendMessageLoginFail(String message) {
-        try {
-            Message ms = new Message(Cmd.LOGIN_FAIL);
-            DataOutputStream ds = ms.writer();
-            ds.writeUTF(message);
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
-    }
-
-    public void handleLogin(Message ms) {
-        if (user.isLogged()) {
-            return;
-        }
-
-        if (!leaderboardService.isComplete()) {
-            sendMessageLoginFail(GameString.RANKING_NOT_LOADED);
-            return;
-        }
-
-        if (ApplicationContext.getInstance()
-                .getBean(ServerManager.class).isMaintenanceMode()) {
-            sendMessageLoginFail(GameString.MAINTENANCE_MODE);
-            return;
-        }
-
-        try {
-            DataInputStream dis = ms.reader();
-            String username = dis.readUTF().trim();
-            String password = dis.readUTF().trim();
-            String version = dis.readUTF().trim();
-
-            if (isInvalidInput(username) || isInvalidInput(password)) {
-                sendMessageLoginFail(GameString.INVALID_ACCOUNT_PASSWORD);
-                return;
-            }
-
-            //Kiểm tra thời gian đăng xuất gần nhất
-            long remainingTime = loginRateLimiterService.getRemainingLoginTime(username);
-            if (remainingTime > 0) {
-                sendMessageLoginFail(GameString.createLoginCooldownMessage(remainingTime));
-                return;
-            }
-
-            AccountDTO accountDTO = accountDAO.findByUsernameAndPassword(username, password);
-            if (accountDTO == null) {
-                sendMessageLoginFail(GameString.LOGIN_FAILED);
-                return;
-            }
-            if (accountDTO.isLock()) {
-                sendMessageLoginFail(GameString.ACCOUNT_LOCKED);
-                return;
-            }
-            if (!accountDTO.isActive()) {
-                sendMessageLoginFail(GameString.ACCOUNT_INACTIVE);
-                return;
-            }
-            user.setAccountId(accountDTO.getAccountId());
-
-            UserDTO userDTO = userDAO.findByAccountId(user.getAccountId());
-            if (userDTO == null) {
-                // Tạo mới người dùng
-                Optional<Integer> result = userDAO.create(accountDTO.getAccountId(), 1000, 0);
-
-                if (result.isPresent()) {
-                    userDTO = userDAO.findByAccountId(accountDTO.getAccountId());
-                }
-
-                if (userDTO == null) {
-                    sendMessageLoginFail(GameString.LOGIN_FAILED);
-                    return;
-                }
-            }
-
-            //Kiểm tra có đang đăng nhập hay không
-            User userLogin = ApplicationContext.getInstance()
-                    .getBean(ServerManager.class).getUserByUserId(userDTO.getUserId());
-            if (userLogin != null) {
-                userLogin.getUserService().sendMoneyErrorMessage(GameString.ACCOUNT_OTHER_LOGIN);
-                userLogin.getSession().close();
-
-                sendMessageLoginFail(GameString.LOGIN_ANOTHER_DEVICE);
-                return;
-            }
-
-            //Dữ liệu tài khoản
-            updateUserFromDTO(userDTO);
-
-            //Dữ liệu nhân vật
-            List<UserCharacterDTO> userCharacterDTOS = userCharacterDAO.findAllByUserId(user.getUserId());
-            if (userCharacterDTOS.isEmpty()) {
-                //Tạo mới nhân vật
-                Optional<Integer> result1 = userCharacterDAO.create(user.getUserId(), CharacterManager.CHARACTERS.get(0).getId());
-                Optional<Integer> result2 = userCharacterDAO.create(user.getUserId(), CharacterManager.CHARACTERS.get(1).getId());
-                Optional<Integer> result3 = userCharacterDAO.create(user.getUserId(), CharacterManager.CHARACTERS.get(2).getId());
-                if (result1.isPresent() && result2.isPresent() && result3.isPresent()) {
-                    userCharacterDTOS = userCharacterDAO.findAllByUserId(user.getUserId());
-                }
-
-                if (userCharacterDTOS.isEmpty()) {
-                    sendMessageLoginFail(GameString.LOGIN_FAILED);
-                    return;
-                }
-            }
-            updateUserCharacters(userCharacterDTOS);
-
-            user.setUsername(username);
-            user.getSession().setVersion(version);
-            user.setLogged(true);
-
-            //Tặng quà hằng ngày
-            if (Utils.canReceiveDailyReward(userDTO.getDailyRewardTime())) {
-                //Gửi item
-                byte indexItem = FightItemManager.getRandomItem();
-                byte quantity = 1;
-                user.updateFightItems(indexItem, quantity);
-                sendMessageToUser(GameString.createDailyRewardMessage(quantity, FightItemManager.FIGHT_ITEMS.get(indexItem).getName()));
-
-                //Cập nhật quà top
-                if (user.getTopEarningsXu() > 0) {
-                    user.updateXu(user.getTopEarningsXu());
-                    sendMessageToUser(GameString.createDailyTopRewardMessage(user.getTopEarningsXu()));
-                    user.setTopEarningsXu(0);
-                }
-
-                //Tặng quà tết
-                LocalDateTime now = LocalDateTime.now();
-                if (now.isAfter(serverConfig.getTetStartTime()) && now.isBefore(serverConfig.getTetEndTime())) {
-                    int luckyXu = Utils.getNonLinearRandom(1000, 50999);
-                    int xuUp = (luckyXu / 1000) * 1000;
-                    user.updateXu(xuUp);
-                    sendMessageToUser(GameString.createDailyRewardMessage(xuUp));
-                }
-
-                //Đặt lại số lần mua nguyên liệu
-                user.setMaterialsPurchased((byte) 0);
-
-                //Gửi message khi login
-                for (String msg : serverConfig.getMessage()) {
-                    sendMessageToUser(msg);
-                }
-
-                //Cập nhật nhiệm vụ đăng nhập
-                user.updateMission(16, 1);
-
-                // Cập nhật thời gian nhận quà
-                userDAO.setDailyRewardTime(user.getUserId(), LocalDateTime.now());
-            }
-
-            //Đánh dấu trạng thái online
-            userDAO.setOnline(userDTO.getUserId(), Boolean.TRUE);
-
-            sendLoginSuccess();
-            sendCharacterData(serverConfig);
-            sendRoomCaption(serverConfig);
-            sendMapCollisionInfo();
-            sendServerInfo(serverConfig.getMessageLogin(), false);
-        } catch (IOException ignored) {
-        }
-    }
-
-    private void updateUserFromDTO(UserDTO userDTO) {
-        user.setUserId(userDTO.getUserId());
-        user.setXu(userDTO.getXu());
-        user.setLuong(userDTO.getLuong());
-        user.setCup(userDTO.getCup());
-        user.setPointEvent(userDTO.getPointEvent());
-        user.setClanId(userDTO.getClanId());
-        user.setActiveCharacterId(userDTO.getActiveCharacterId());
-        user.setFriends(userDTO.getFriends());
-        user.setMission(userDTO.getMission());
-        user.setMissionLevel(userDTO.getMissionLevel());
-        user.setSpecialItemChest(userDTO.getSpecialItemChest());
-        user.setEquipmentChest(userDTO.getEquipmentChest());
-        user.setFightItems(userDTO.getItems());
-        user.setXpX2Time(userDTO.getXpX2Time());
-        user.setTopEarningsXu(userDTO.getTopEarningsXu());
-        user.setMaterialsPurchased(userDTO.getMaterialsPurchased());
-        user.setEquipmentPurchased(userDTO.getEquipmentPurchased());
-        user.setChestLocked(userDTO.isChestLocked());
-        user.setInvitationLocked(userDTO.isInvitationLocked());
-    }
-
-    private void updateUserCharacters(List<UserCharacterDTO> userCharacterDTOS) {
-        int totalCharacter = CharacterManager.CHARACTERS.size();
-        user.setUserCharacterIds(new long[totalCharacter]);
-        user.setOwnedCharacters(new boolean[totalCharacter]);
-        user.setLevels(new int[totalCharacter]);
-        user.setXps(new int[totalCharacter]);
-        user.setPoints(new int[totalCharacter]);
-        user.setAddedPoints(new short[totalCharacter][5]);
-        user.setCharacterEquips(new EquipmentChest[totalCharacter][6]);
-        user.setEquipData(new int[totalCharacter][6]);
-
-        for (UserCharacterDTO userCharacterDTO : userCharacterDTOS) {
-            byte characterId = userCharacterDTO.getCharacterId();
-            user.getUserCharacterIds()[characterId] = userCharacterDTO.getUserCharacterId();
-            user.getOwnedCharacters()[characterId] = true;
-            user.getLevels()[characterId] = userCharacterDTO.getLevel();
-            user.getXps()[characterId] = userCharacterDTO.getXp();
-            user.getPoints()[characterId] = userCharacterDTO.getPoints();
-            user.getAddedPoints()[characterId] = userCharacterDTO.getAdditionalPoints();
-            user.getEquipData()[characterId] = new int[]{-1, -1, -1, -1, -1, -1};
-
-            int[] data = userCharacterDTO.getData();
-            for (int j = 0; j < data.length; j++) {
-                EquipmentChest equip = user.getEquipmentByKey(data[j]);
-                if (equip == null) {
-                    continue;
-                }
-                if (equip.isExpired()) {
-                    equip.setInUse(false);
-                } else {
-                    user.getCharacterEquips()[characterId][j] = equip;
-                    user.getEquipData()[characterId][j] = equip.getKey();
-                }
-            }
-        }
     }
 
     public void handleLogout() {
@@ -354,43 +129,6 @@ public class UserService {
         return userCharacterDTO;
     }
 
-    public void sendCharacterData(ServerConfig config) {
-        try {
-            List<Character> characterEntries = CharacterManager.CHARACTERS;
-            int characterCount = characterEntries.size();
-            Message ms = new Message(Cmd.SKIP_2);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(characterCount);
-            for (Character character : characterEntries) {
-                ds.writeByte(character.getWindResistance());
-            }
-            ds.writeByte(characterCount);
-            for (Character character : characterEntries) {
-                ds.writeShort(character.getMinAngle());
-            }
-            ds.writeByte(characterCount);
-            for (Character character : characterEntries) {
-                ds.writeByte(character.getBulletDamage());
-            }
-            ds.writeByte(characterCount);
-            for (Character character : characterEntries) {
-                ds.writeByte(character.getBulletCount());
-            }
-            ds.writeByte(config.getMaxElementFight());
-            ds.writeByte(config.getBossRoomMapId().length);
-            for (byte mapId : config.getBossRoomMapId()) {
-                ds.writeByte(mapId);
-            }
-            for (byte bossId : config.getBossRoomBossId()) {
-                ds.writeByte(bossId);
-            }
-            ds.writeByte(config.getNumPlayer());
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
-    }
-
     public void sendRoomName() {
         String[] names = serverConfig.getBossRoomName();
         int startMapBoss = serverConfig.getStartMapBoss();
@@ -407,62 +145,6 @@ public class UserService {
             sendMessage(ms);
         } catch (IOException ignored) {
         }
-    }
-
-    private void sendRoomCaption(ServerConfig config) {
-        String[] names = config.getRoomNameVi();
-        try {
-            Message ms = new Message(Cmd.ROOM_CAPTION);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(names.length);
-            for (int i = 0; i < names.length; i++) {
-                ds.writeUTF(names[i]);
-                ds.writeUTF(config.getRoomNameEn()[i]);
-            }
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
-    }
-
-    public void sendMapCollisionInfo() {
-        try {
-            Message ms = new Message(Cmd.UNDESTROYTILE);
-            DataOutputStream ds = ms.writer();
-            ds.writeShort(MapManager.ID_NOT_COLLISIONS.size());
-            for (int i : MapManager.ID_NOT_COLLISIONS) {
-                ds.writeShort(i);
-            }
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
-    }
-
-    public void sendServerMessage(String message) {
-        try {
-            Message ms = new Message(Cmd.SERVER_MESSAGE);
-            DataOutputStream ds = ms.writer();
-            ds.writeUTF(message);
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
-    }
-
-    public void sendMoneyErrorMessage(String message) {
-        try {
-            Message ms = new Message(Cmd.SET_MONEY_ERROR);
-            DataOutputStream ds = ms.writer();
-            ds.writeUTF(message);
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
-    }
-
-    public void handleHandshakeMessage() {
-        user.getSession().sendKeys();
     }
 
     public void extendItemDuration(Message ms) {
@@ -585,130 +267,6 @@ public class UserService {
         }
         ds.flush();
         sendMessage(ms);
-    }
-
-    public void sendLoginSuccess() {
-        try {
-            Message ms = new Message(Cmd.LOGIN_SUCESS);
-            DataOutputStream ds = ms.writer();
-            ds.writeInt(user.getUserId());
-            ds.writeInt(user.getXu());
-            ds.writeInt(user.getLuong());
-            ds.writeByte(user.getActiveCharacterId());
-            ds.writeShort(user.getClanId() != null ? user.getClanId() : 0);
-            ds.writeByte(0);//clan rights
-
-            for (int i = 0; i < 10; i++) {
-                EquipmentChest equip = user.getCharacterEquips()[i][5];
-                if (equip != null) {
-                    ds.writeBoolean(true);
-                    for (short s : equip.getEquipment().getDisguiseEquippedIndexes()) {
-                        ds.writeShort(s);
-                    }
-                } else {
-                    ds.writeBoolean(false);
-                }
-
-                for (int j = 0; j < 5; j++) {
-                    if (user.getCharacterEquips()[i][j] != null) {
-                        ds.writeShort(user.getCharacterEquips()[i][j].getEquipment().getEquipIndex());
-                    } else if (EquipmentManager.equipDefault[i][j] != null) {
-                        ds.writeShort(EquipmentManager.equipDefault[i][j].getEquipIndex());
-                    } else {
-                        ds.writeShort(-1);
-                    }
-                }
-            }
-
-            for (int i = 0; i < FightItemManager.FIGHT_ITEMS.size(); i++) {
-                ds.writeByte(user.getFightItems()[i]);
-                FightItem fightItem = FightItemManager.FIGHT_ITEMS.get(i);
-                ds.writeInt(fightItem.getBuyXu());
-                ds.writeInt(fightItem.getBuyLuong());
-            }
-
-            for (int i = 0; i < 10; i++) {
-                if (i > 2) {
-                    ds.writeByte(user.getOwnedCharacters()[i] ? 1 : 0);
-                    Character character = CharacterManager.CHARACTERS.get(i);
-                    ds.writeShort(character.getPriceXu() / 1000);
-                    ds.writeShort(character.getPriceLuong());
-                }
-            }
-
-            ds.writeUTF(serverConfig.getAddInfo());
-            ds.writeUTF(serverConfig.getAddInfoUrl());
-            ds.writeUTF(serverConfig.getRegTeamUrl());
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
-    }
-
-    public void contributeToClan(Message ms) {
-        if (user.isNotWaiting()) {
-            return;
-        }
-        if (user.getClanId() == null) {
-            return;
-        }
-
-        try {
-            DataInputStream dis = ms.reader();
-            byte type = dis.readByte();
-            int quantity = dis.readInt();
-
-            if (quantity <= 0) {
-                return;
-            }
-
-            if (type == 0) {
-                if (quantity > user.getXu()) {
-                    return;
-                }
-
-                int minXuContributeClan = serverConfig.getMinXuContributeClan();
-                if (quantity < minXuContributeClan) {
-                    sendServerMessage(GameString.createClanContributionMinXuMessage(minXuContributeClan));
-                    return;
-                }
-
-                //Update xu user
-                user.updateXu(-quantity);
-
-                //Update xu clan
-                clanService.contributeClan(user.getClanId(), user.getUserId(), quantity, Boolean.TRUE);
-                sendServerMessage(GameString.CONTRIBUTION_SUCCESS);
-            } else {
-                if (quantity > user.getLuong()) {
-                    return;
-                }
-
-                //Update lg user
-                user.updateLuong(-quantity);
-
-                //Update lg clan
-                clanService.contributeClan(user.getClanId(), user.getUserId(), quantity, Boolean.FALSE);
-                sendServerMessage(GameString.CONTRIBUTION_SUCCESS);
-            }
-        } catch (IOException ignored) {
-        }
-    }
-
-    public void getVersionCode(Message ms) {
-        try {
-            String platform = ms.reader().readUTF();
-            user.getSession().setPlatform(platform);
-        } catch (IOException ignored) {
-        }
-    }
-
-    public void getProvider(Message ms) {
-        try {
-            byte provider = ms.reader().readByte();
-            user.getSession().setProvider(provider);
-        } catch (IOException ignored) {
-        }
     }
 
     public void handleMergeEquipments(Message ms) {
@@ -930,92 +488,6 @@ public class UserService {
         }
     }
 
-    public void handlePurchaseClanItem(Message ms) {
-        if (user.getClanId() == null) {
-            sendServerMessage(GameString.NO_CLAN_MEMBERSHIP);
-            return;
-        }
-        try {
-            DataInputStream dis = ms.reader();
-            byte type = dis.readByte();
-            if (type == 0) {
-                sendClanShop();
-            } else {
-                byte unit = dis.readByte();
-                byte itemId = dis.readByte();
-                buyClanShop(unit, itemId);
-            }
-        } catch (IOException ignored) {
-        }
-    }
-
-    private void buyClanShop(byte unit, byte itemId) {
-        ClanItemShop clanItemShop = ClanItemManager.getItemClanById(itemId);
-
-        if (clanItemShop == null || clanItemShop.getOnSale() != 1) {
-            return;
-        }
-
-        int currentLevel = clanService.getClanLevel(user.getClanId());
-        if (currentLevel < clanItemShop.getLevel()) {
-            sendServerMessage(GameString.CLAN_LEVEL_INSUFFICIENT);
-            return;
-        }
-
-        if (unit == 0) {//Xu
-            if (clanItemShop.getXu() < 0) {
-                return;
-            }
-            int xuClan = clanService.getClanXu(user.getClanId());
-            if (xuClan < clanItemShop.getXu()) {
-                sendServerMessage(GameString.CLAN_NOT_ENOUGH_XU);
-                return;
-            }
-
-            clanService.updateItemClan(user.getClanId(), user.getUserId(), clanItemShop, true);
-        } else {//Luong
-            if (clanItemShop.getLuong() < 0) {
-                return;
-            }
-            int luongClan = clanService.getClanLuong(user.getClanId());
-            if (luongClan < clanItemShop.getLuong()) {
-                sendServerMessage(GameString.CLAN_NOT_ENOUGH_LUONG);
-                return;
-            }
-
-            clanService.updateItemClan(user.getClanId(), user.getUserId(), clanItemShop, false);
-        }
-        sendServerMessage(GameString.PURCHASE_SUCCESS);
-    }
-
-    private void sendClanShop() {
-        Message ms = CacheManager.cachedClanItemShop;
-        if (ms != null) {
-            sendMessage(ms);
-            return;
-        }
-
-        try {
-            ms = new Message(Cmd.SHOP_BIETDOI);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(ClanItemManager.CLAN_ITEM_MAP.size());
-            for (ClanItemShop clanItemShop : ClanItemManager.CLAN_ITEM_MAP.values()) {
-                ds.writeByte(clanItemShop.getId());
-                ds.writeUTF(clanItemShop.getName());
-                ds.writeInt(clanItemShop.getXu());
-                ds.writeInt(clanItemShop.getLuong());
-                ds.writeByte(clanItemShop.getTime());
-                ds.writeByte(clanItemShop.getLevel());
-            }
-            ds.flush();
-
-            CacheManager.cachedClanItemShop = ms;
-
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
-    }
-
     public void enterTrainingMap() {
         try {
             initializeTrainingManager();
@@ -1225,48 +697,6 @@ public class UserService {
                 return;
             }
             sendMessageToUser(false, receiver, content);
-        } catch (IOException ignored) {
-        }
-    }
-
-    private void sendServerInfo(String message, boolean toServer) {
-        if (message == null || message.isEmpty()) {
-            return;
-        }
-        try {
-            Message ms = new Message(Cmd.SERVER_INFO);
-            DataOutputStream ds = ms.writer();
-            ds.writeUTF(message);
-            ds.flush();
-
-            if (toServer) {
-                ApplicationContext.getInstance()
-                        .getBean(ServerManager.class).sendToServer(ms);
-            } else {
-                sendMessage(ms);
-            }
-        } catch (IOException ignored) {
-        }
-    }
-
-    public void sendMessageToUser(String message) {
-        sendMessageToUser(true, user, message);
-    }
-
-    private void sendMessageToUser(boolean isAdminSender, User recipient, String message) {
-        try {
-            Message ms = new Message(Cmd.CHAT_TO);
-            DataOutputStream ds = ms.writer();
-            if (isAdminSender) {
-                ds.writeInt(1);
-                ds.writeUTF("ADMIN");
-            } else {
-                ds.writeInt(user.getUserId());
-                ds.writeUTF(user.getUsername());
-            }
-            ds.writeUTF(message);
-            ds.flush();
-            recipient.sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
@@ -2184,7 +1614,7 @@ public class UserService {
                 sendMessageLoginFail(GameString.FRIEND_ADD_MISSING_NAME);
                 return;
             }
-            if (isInvalidInput(username)) {
+            if (Utils.isAlphanumeric(username)) {
                 sendMessageLoginFail(GameString.FRIEND_ADD_INVALID_NAME);
                 return;
             }
@@ -2512,7 +1942,7 @@ public class UserService {
             String oldPass = dis.readUTF().trim();
             String newPass = dis.readUTF().trim();
 
-            if (isInvalidInput(oldPass) || isInvalidInput(newPass)) {
+            if (Utils.isAlphanumeric(oldPass) || Utils.isAlphanumeric(newPass)) {
                 sendServerMessage(GameString.PASSWORD_INVALID_CHARACTER);
                 return;
             }
@@ -2998,137 +2428,6 @@ public class UserService {
         }
     }
 
-    public void getClanIcon(Message ms) {
-        try {
-            short clanId = ms.reader().readShort();
-            byte[] data = clanService.getClanIcon(clanId);
-            if (data == null) {
-                return;
-            }
-            ms = new Message(Cmd.CLAN_ICON);
-            DataOutputStream ds = ms.writer();
-            ds.writeShort(clanId);
-            ds.writeShort(data.length);
-            ds.write(data);
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
-    }
-
-    public void getTopClan(Message ms) {
-        try {
-            byte page = ms.reader().readByte();
-
-            byte totalPages = clanService.getTotalPagesClan();
-            if (page > totalPages) {
-                page = 0;
-            }
-
-            List<ClanDTO> topClan = clanService.getTopTeams(page);
-            ms = new Message(Cmd.TOP_CLAN);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(page);
-            for (int i = 0; i < topClan.size(); i++) {
-                ClanDTO clan = topClan.get(i);
-                ds.writeShort(clan.getClanId());
-                ds.writeUTF(String.format("#%d: %s", i + 1, clan.getName()));
-                ds.writeByte(clan.getMemberCount());
-                ds.writeByte(clan.getMaxMemberCount());
-                ds.writeUTF(clan.getMasterName());
-                ds.writeInt(clan.getXu());
-                ds.writeInt(clan.getLuong());
-                ds.writeInt(clan.getCup());
-                ds.writeByte(clan.getLevel());
-                ds.writeByte(clan.getLevelPercentage());
-                ds.writeUTF(clan.getDescription());
-            }
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
-    }
-
-    public void getInfoClan(Message ms) {
-        try {
-            short clanId = ms.reader().readShort();
-            ClanInfoDTO clanDetails = clanService.getClanInfo(clanId);
-            if (clanDetails == null) {
-                sendMessageLoginFail(GameString.CLAN_NOT_FOUND);
-                return;
-            }
-            ms = new Message(Cmd.CLAN_INFO);
-            DataOutputStream ds = ms.writer();
-            ds.writeShort(clanDetails.getClanId());
-            ds.writeUTF(clanDetails.getName());
-            ds.writeByte(clanDetails.getMemberCount());
-            ds.writeByte(clanDetails.getMaxMemberCount());
-            ds.writeUTF(clanDetails.getMasterName());
-            ds.writeInt(clanDetails.getXu());
-            ds.writeInt(clanDetails.getLuong());
-            ds.writeInt(clanDetails.getCup());
-            ds.writeInt(clanDetails.getExp());
-            ds.writeInt(clanDetails.getXpUpLevel());
-            ds.writeByte(clanDetails.getLevel());
-            ds.writeByte(clanDetails.getLevelPercentage());
-            ds.writeUTF(clanDetails.getDescription());
-            ds.writeUTF(clanDetails.getCreatedDate());
-            ds.writeByte(clanDetails.getItems().size());
-            for (ClanItemDTO item : clanDetails.getItems()) {
-                ds.writeUTF(item.getName());
-                ds.writeInt(item.getTime());
-            }
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
-    }
-
-    public void getClanMember(Message ms) {
-        try {
-            DataInputStream dis = ms.reader();
-            byte page = dis.readByte();
-            short clanId = dis.readShort();
-
-            byte totalPage = clanService.getTotalPage(clanId);
-            if (totalPage == -1) {
-                return;
-            }
-            if (page >= totalPage) {
-                page = 0;
-            }
-            if (page < 0) {
-                page = (byte) (totalPage - 1);
-            }
-
-            List<ClanMemDTO> clanMemDTO = clanService.getMemberClan(clanId, page);
-
-            ms = new Message(Cmd.CLAN_MEMBER);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(page);
-            ds.writeUTF("BIỆT ĐỘI");
-            for (ClanMemDTO memClan : clanMemDTO) {
-                ds.writeInt(memClan.getUserId());
-                ds.writeUTF(memClan.getUsername());
-                ds.writeInt(memClan.getPoint());
-                ds.writeByte(memClan.getActiveCharacter());
-                ds.writeByte(memClan.getOnline());
-                ds.writeByte(memClan.getLevel());
-                ds.writeByte(memClan.getLevelPt());
-                ds.writeByte(memClan.getIndex());
-                ds.writeInt(memClan.getCup());
-                for (int j = 0; j < 5; j++) {
-                    ds.writeShort(memClan.getDataEquip()[j]);
-                }
-                ds.writeUTF(memClan.getContributeText());
-                ds.writeUTF(memClan.getContributeCount());
-            }
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
-    }
-
     public void getBigImage(Message ms) {
         try {
             int id = ms.reader().readByte();
@@ -3146,10 +2445,6 @@ public class UserService {
             sendMessage(ms);
         } catch (IOException ignored) {
         }
-    }
-
-    public void handleRegister(Message ms) {
-        sendMessageLoginFail(GameString.REGISTRATION_REQUIRED);
     }
 
     public void rechargeMoney(Message ms) {
@@ -3352,14 +2647,6 @@ public class UserService {
             ds.writeByte(0);
             ds.flush();
             sendMessage(ms);
-        } catch (IOException ignored) {
-        }
-    }
-
-    public void getStringMessage(Message ms) {
-        DataInputStream dis = ms.reader();
-        try {
-            String str = dis.readUTF();
         } catch (IOException ignored) {
         }
     }

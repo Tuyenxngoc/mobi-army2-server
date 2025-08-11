@@ -26,8 +26,8 @@ import java.util.Set;
 @Getter
 @Setter
 public class User {
-    private final UserService userService;
-    private final GiftBoxService giftBoxService;
+    private UserService userService;
+    private GiftBoxService giftBoxService;
     private final Session session;
     private UserState state = UserState.WAITING;
     private String accountId;
@@ -64,10 +64,8 @@ public class User {
     private FightWait fightWait;
     private TrainingManager trainingManager;
 
-    public User(Session session, UserService userService, GiftBoxService giftBoxService) {
+    public User(Session session) {
         this.session = session;
-        this.userService = userService;
-        this.giftBoxService = giftBoxService;
     }
 
     public boolean isNotWaiting() {

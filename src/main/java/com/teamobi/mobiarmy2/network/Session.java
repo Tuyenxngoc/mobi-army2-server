@@ -6,7 +6,12 @@ import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.server.ApplicationContext;
 import com.teamobi.mobiarmy2.server.ServerManager;
-import com.teamobi.mobiarmy2.service.*;
+import com.teamobi.mobiarmy2.service.LeaderboardService;
+import com.teamobi.mobiarmy2.service.LoginRateLimiterService;
+import com.teamobi.mobiarmy2.service.LoginService;
+import com.teamobi.mobiarmy2.service.UserService;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.DataInputStream;
@@ -31,20 +36,27 @@ public class Session {
 
     private final byte[] sessionKey;
     private final Sender sender = new Sender();
-    private final MessageHandler messageHandler;
+    private MessageHandler messageHandler;
     private final long sessionId;
+    @Getter
     private final String IPAddress;
-    private final User user;
+    @Getter
+    @Setter
+    private User user;
     private Socket socket;
     private DataInputStream dis;
     private DataOutputStream dos;
+    @Getter
     private boolean sendKeyComplete;
     private byte curR;
     private byte curW;
     private Thread collectorThread;
     private Thread sendThread;
+    @Setter
     private String platform;
+    @Setter
     private String version;
+    @Setter
     private byte provider;
 
     public Session(long sessionId, Socket socket) throws IOException {
@@ -53,26 +65,16 @@ public class Session {
         this.dis = new DataInputStream(socket.getInputStream());
         this.dos = new DataOutputStream(socket.getOutputStream());
         this.IPAddress = socket.getInetAddress().getHostAddress();
-
-        ApplicationContext applicationContext = ApplicationContext.getInstance();
-        UserService userService = new UserService(
-                applicationContext.getBean(ServerConfig.class),
-                applicationContext.getBean(ClanService.class),
-                applicationContext.getBean(LeaderboardService.class),
-                applicationContext.getBean(LoginRateLimiterService.class),
-                applicationContext.getBean(UserDAO.class),
-                applicationContext.getBean(AccountDAO.class),
-                applicationContext.getBean(GiftCodeDAO.class),
-                applicationContext.getBean(UserGiftCodeDAO.class),
-                applicationContext.getBean(UserCharacterDAO.class)
-        );
-        GiftBoxService giftBoxService = new GiftBoxService();
-        this.user = new User(this, userService, giftBoxService);
-        userService.setUser(this.user);
-        giftBoxService.setUser(this.user);
-        this.messageHandler = new MessageHandler(userService);
-
         this.sessionKey = generateSessionKey();
+        ApplicationContext context = ApplicationContext.getInstance();
+        LoginService loginService = new LoginService(
+                this,
+                context.getBean(LoginRateLimiterService.class),
+                context.getBean(UserDAO.class),
+                context.getBean(AccountDAO.class),
+                context.getBean(UserCharacterDAO.class)
+        );
+        this.messageHandler = new MessageHandler(loginService);
         initializeThreads();
     }
 
@@ -87,10 +89,6 @@ public class Session {
         SecureRandom random = new SecureRandom();
         random.nextBytes(key);
         return key;
-    }
-
-    private boolean isSendKeyComplete() {
-        return sendKeyComplete;
     }
 
     public void sendMessage(Message message) {
@@ -112,38 +110,6 @@ public class Session {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public String getIPAddress() {
-        return IPAddress;
-    }
-
-    public String getPlatform() {
-        return platform;
-    }
-
-    public void setPlatform(String platform) {
-        this.platform = platform;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public byte getProvider() {
-        return provider;
-    }
-
-    public void setProvider(byte provider) {
-        this.provider = provider;
-    }
-
-    public User getUser() {
-        return user;
     }
 
     public void sendKeys() {
@@ -252,6 +218,24 @@ public class Session {
         if (isSendKeyComplete()) {
             close();
         }
+    }
+
+    public void initService() {
+        ApplicationContext context = ApplicationContext.getInstance();
+
+        UserService userService = new UserService(
+                this,
+                context.getBean(ServerConfig.class),
+                context.getBean(LeaderboardService.class),
+                context.getBean(LoginRateLimiterService.class),
+                context.getBean(UserDAO.class),
+                context.getBean(AccountDAO.class),
+                context.getBean(GiftCodeDAO.class),
+                context.getBean(UserGiftCodeDAO.class),
+                context.getBean(UserCharacterDAO.class)
+        );
+
+        this.messageHandler.setUserService(userService);
     }
 
     class Sender implements Runnable {

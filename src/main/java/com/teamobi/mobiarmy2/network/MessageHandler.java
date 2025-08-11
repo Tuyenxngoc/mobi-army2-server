@@ -1,15 +1,23 @@
 package com.teamobi.mobiarmy2.network;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
+import com.teamobi.mobiarmy2.service.ClanService;
+import com.teamobi.mobiarmy2.service.LoginService;
 import com.teamobi.mobiarmy2.service.UserService;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class MessageHandler {
-    private final UserService userService;
+    @Setter
+    private UserService userService;
+    @Setter
+    private ClanService clanService;
 
-    public MessageHandler(UserService userService) {
-        this.userService = userService;
+    private LoginService loginService;
+
+    public MessageHandler(LoginService loginService) {
+        this.loginService = loginService;
     }
 
     public void onMessage(Message ms) {
@@ -17,7 +25,7 @@ public class MessageHandler {
             switch (ms.getCommand()) {
                 case Cmd.MORE_GAME -> userService.getMoreGame();
 
-                case Cmd.GET_KEY -> userService.handleHandshakeMessage();
+                case Cmd.GET_KEY -> loginService.handleHandshakeMessage();
 
                 case Cmd.GET_AGENT_PROVIDER -> userService.handleSendAgentAndProviders();
 
@@ -25,7 +33,7 @@ public class MessageHandler {
 
                 case Cmd.MISSISON -> userService.handleGetMissions(ms);
 
-                case Cmd.CLAN_MONEY -> userService.contributeToClan(ms);
+                case Cmd.CLAN_MONEY -> clanService.contributeToClan(ms);
 
                 case Cmd.CHANGE_ROOM_NAME -> userService.sendRoomName();
 
@@ -35,7 +43,7 @@ public class MessageHandler {
 
                 case Cmd.BANGTHANHTICH -> userService.viewLeaderboard(ms);
 
-                case Cmd.SHOP_BIETDOI -> userService.handlePurchaseClanItem(ms);
+                case Cmd.SHOP_BIETDOI -> clanService.handlePurchaseClanItem(ms);
 
                 case Cmd.TRAINING_MAP -> userService.enterTrainingMap();
 
@@ -45,7 +53,7 @@ public class MessageHandler {
 
                 case Cmd.VIP_EQUIP -> userService.equipVipItems(ms);
 
-                case Cmd.LOGIN -> userService.handleLogin(ms);
+                case Cmd.LOGIN -> loginService.handleLogin(ms);
 
                 case Cmd.CHAT_TO -> userService.handleSendMessage(ms);
 
@@ -101,7 +109,7 @@ public class MessageHandler {
 
                 case Cmd.SET_MAX_PLAYER -> userService.handleSetMaxPlayerFightWait(ms);
 
-                case Cmd.SET_PROVIDER -> userService.getProvider(ms);
+                case Cmd.SET_PROVIDER -> loginService.getProvider(ms);
 
                 case Cmd.CHOOSE_ITEM -> userService.handleChoseItemFight(ms);
 
@@ -141,25 +149,25 @@ public class MessageHandler {
 
                 case Cmd.RULET -> userService.handleSpinWheel(ms);
 
-                case Cmd.VERSION_CODE -> userService.getVersionCode(ms);
+                case Cmd.VERSION_CODE -> loginService.getVersionCode(ms);
 
-                case Cmd.CLAN_ICON -> userService.getClanIcon(ms);
+                case Cmd.CLAN_ICON -> clanService.getClanIcon(ms);
 
-                case Cmd.TOP_CLAN -> userService.getTopClan(ms);
+                case Cmd.TOP_CLAN -> clanService.getTopClan(ms);
 
-                case Cmd.CLAN_INFO -> userService.getInfoClan(ms);
+                case Cmd.CLAN_INFO -> clanService.getInfoClan(ms);
 
-                case Cmd.CLAN_MEMBER -> userService.getClanMember(ms);
+                case Cmd.CLAN_MEMBER -> clanService.getClanMember(ms);
 
                 case Cmd.GET_BIG_IMAGE -> userService.getBigImage(ms);
 
-                case Cmd.REGISTER_2 -> userService.handleRegister(ms);
+                case Cmd.REGISTER_2 -> loginService.handleRegister(ms);
 
                 case Cmd.CHARGE_MONEY_2 -> userService.rechargeMoney(ms);
 
                 case Cmd.MATERIAL_ICON -> userService.getMaterialIconMessage(ms);
 
-                case Cmd.GETSTRING -> userService.getStringMessage(ms);
+                case Cmd.GETSTRING -> loginService.getStringMessage(ms);
 
                 default -> log.warn("Command {} is not supported", ms.getCommand());
             }

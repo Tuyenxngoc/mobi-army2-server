@@ -4,7 +4,10 @@ import com.teamobi.mobiarmy2.config.HikariCPConfig;
 import com.teamobi.mobiarmy2.config.RedisConfig;
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.dao.*;
-import com.teamobi.mobiarmy2.service.*;
+import com.teamobi.mobiarmy2.service.ConnectionBlockerService;
+import com.teamobi.mobiarmy2.service.GameDataService;
+import com.teamobi.mobiarmy2.service.LeaderboardService;
+import com.teamobi.mobiarmy2.service.LoginRateLimiterService;
 
 public class BeanRegistry {
     public static void registerBeans() {
@@ -52,7 +55,7 @@ public class BeanRegistry {
                 context.getBean(FabricateItemDAO.class)
         ));
         context.registerBean(LeaderboardService.class, new LeaderboardService(context.getBean(RankingDAO.class)));
-        context.registerBean(ClanService.class, new ClanService(context.getBean(ClanDAO.class)));
+//        context.registerBean(ClanService.class, new ClanService(context.getBean(ClanDAO.class)));
         context.registerBean(LoginRateLimiterService.class, new LoginRateLimiterService(context.getBean(RedisConnectionManager.class)));
         context.registerBean(ConnectionBlockerService.class, new ConnectionBlockerService(context.getBean(RedisConnectionManager.class)));
 
