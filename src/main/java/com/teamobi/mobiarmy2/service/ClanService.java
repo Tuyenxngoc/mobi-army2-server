@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ClanService extends BaseService {
-    private final ConcurrentHashMap<Short, Object> clanLocks = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Short, Object> clanLocks = new ConcurrentHashMap<>();
     private final ClanDAO clanDAO;
 
     public ClanService(Session session, ClanDAO clanDAO) {
@@ -40,31 +40,6 @@ public class ClanService extends BaseService {
 
     private Object getClanLock(short clanId) {
         return clanLocks.computeIfAbsent(clanId, k -> new Object());
-    }
-
-    public byte getTotalPage(short clanId) {
-        Byte mem = clanDAO.getMembersOfClan(clanId);
-        if (mem == null) {
-            return -1;
-        }
-        return (byte) Math.ceil((double) mem / 10);
-    }
-
-    public byte getTotalPagesClan() {
-        double count = clanDAO.getCountClan();
-        return (byte) Math.ceil(count / 10);
-    }
-
-    public ClanInfoDTO getClanInfo(short clanId) {
-        return clanDAO.getClanInfo(clanId);
-    }
-
-    public List<ClanMemDTO> getMemberClan(short clanId, byte page) {
-        return clanDAO.getClanMember(clanId, page);
-    }
-
-    public List<ClanDTO> getTopTeams(byte page) {
-        return clanDAO.getTopTeams(page);
     }
 
     public boolean[] getClanItems(short clanId) {
@@ -167,7 +142,6 @@ public class ClanService extends BaseService {
         }
     }
 
-    //==========
     public void contributeToClan(Message ms) {
         User user = session.getUser();
         if (user.isNotWaiting()) {
@@ -311,12 +285,13 @@ public class ClanService extends BaseService {
         try {
             byte page = ms.reader().readByte();
 
-            byte totalPages = getTotalPagesClan();
+            double count = clanDAO.getCountClan();
+            byte totalPages = (byte) Math.ceil(count / 10);
             if (page > totalPages) {
                 page = 0;
             }
 
-            List<ClanDTO> topClan = getTopTeams(page);
+            List<ClanDTO> topClan = clanDAO.getTopTeams(page);
             ms = new Message(Cmd.TOP_CLAN);
             DataOutputStream ds = ms.writer();
             ds.writeByte(page);
@@ -346,10 +321,11 @@ public class ClanService extends BaseService {
             byte page = dis.readByte();
             short clanId = dis.readShort();
 
-            byte totalPage = getTotalPage(clanId);
-            if (totalPage == -1) {
+            Byte memberCount = clanDAO.getMembersOfClan(clanId);
+            if (memberCount == null) {
                 return;
             }
+            byte totalPage = (byte) Math.ceil((double) memberCount / 10);
             if (page >= totalPage) {
                 page = 0;
             }
@@ -357,7 +333,7 @@ public class ClanService extends BaseService {
                 page = (byte) (totalPage - 1);
             }
 
-            List<ClanMemDTO> clanMemDTO = getMemberClan(clanId, page);
+            List<ClanMemDTO> clanMemDTO = clanDAO.getClanMember(clanId, page);
 
             ms = new Message(Cmd.CLAN_MEMBER);
             DataOutputStream ds = ms.writer();
@@ -406,7 +382,7 @@ public class ClanService extends BaseService {
     public void getInfoClan(Message ms) {
         try {
             short clanId = ms.reader().readShort();
-            ClanInfoDTO clanDetails = getClanInfo(clanId);
+            ClanInfoDTO clanDetails = clanDAO.getClanInfo(clanId);
             if (clanDetails == null) {
                 sendMessageLoginFail(GameString.CLAN_NOT_FOUND);
                 return;
