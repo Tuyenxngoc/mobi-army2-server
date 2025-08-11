@@ -10,6 +10,7 @@ import com.teamobi.mobiarmy2.server.ApplicationContext;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.MapManager;
 import com.teamobi.mobiarmy2.server.ServerManager;
+import lombok.Getter;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -22,21 +23,33 @@ public class FightWait {
     public static final int KICK_BOSS_TIME = 90;
     public static final byte[] CONTINUOUS_MAPS = {30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
 
+    @Getter
     private final FightManager fightManager;
+    @Getter
     private final Room room;
+    @Getter
     private final byte id;
     private final CountdownTimer countdownTimer;
+    @Getter
     private User[] users;
     private boolean[] readies;
     private byte[][] items;
+    @Getter
     private boolean started;
     private int numReady;
+    @Getter
     private int maxSetPlayers;
+    @Getter
     private byte numPlayers;
+    @Getter
     private boolean isPassSet;
+    @Getter
     private String password;
+    @Getter
     private int money;
+    @Getter
     private String name;
+    @Getter
     private byte mapId;
     private int bossIndex;
     private byte continuousLevel;
@@ -221,56 +234,16 @@ public class FightWait {
         }
     }
 
-    public int getMaxSetPlayers() {
-        return maxSetPlayers;
-    }
-
-    public boolean isStarted() {
-        return started;
-    }
-
     public boolean isContinuous() {
         return room.isContinuous();
-    }
-
-    public boolean isPassSet() {
-        return isPassSet;
     }
 
     public boolean isFightWaitInvalid() {
         return numPlayers == maxSetPlayers || started || (isContinuous() && continuousLevel > 0);
     }
 
-    public byte getNumPlayers() {
-        return numPlayers;
-    }
-
-    public byte getId() {
-        return id;
-    }
-
-    public byte getMapId() {
-        return mapId;
-    }
-
     public byte getRoomType() {
         return room.getType();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public int getMoney() {
-        return money;
-    }
-
-    public Room getRoom() {
-        return room;
     }
 
     public User getUserByUserId(int userId) {
@@ -283,14 +256,6 @@ public class FightWait {
 
     public byte[] getItems(byte i) {
         return items[i];
-    }
-
-    public User[] getUsers() {
-        return users;
-    }
-
-    public FightManager getFightManager() {
-        return fightManager;
     }
 
     public void fightComplete() {

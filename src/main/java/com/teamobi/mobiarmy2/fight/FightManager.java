@@ -13,6 +13,7 @@ import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
 import com.teamobi.mobiarmy2.service.ClanService;
 import com.teamobi.mobiarmy2.util.Utils;
+import lombok.Getter;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -48,13 +49,18 @@ public class FightManager {
     private final com.teamobi.mobiarmy2.fight.CountdownTimer countdownTimer;
     private final ExecutorService executorNextTurn;
     private final ExecutorService executorEndGame;
+    @Getter
     private Player[] players;
+    @Getter
     private int totalPlayers;
+    @Getter
     private int turnCount;
     private boolean isBossTurn;
     private int playerTurn;
     private int bossTurn;
+    @Getter
     private byte windX;
+    @Getter
     private byte windY;
     private long startTime;
 
@@ -1410,26 +1416,6 @@ public class FightManager {
 
     public void onTimeUp() {
         nextTurn();
-    }
-
-    public int getTotalPlayers() {
-        return totalPlayers;
-    }
-
-    public int getTurnCount() {
-        return turnCount;
-    }
-
-    public byte getWindY() {
-        return windY;
-    }
-
-    public byte getWindX() {
-        return windX;
-    }
-
-    public Player[] getPlayers() {
-        return players;
     }
 
     public Player getPlayerTurn() {
