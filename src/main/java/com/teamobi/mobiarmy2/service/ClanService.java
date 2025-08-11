@@ -42,22 +42,6 @@ public class ClanService extends BaseService {
         return clanLocks.computeIfAbsent(clanId, k -> new Object());
     }
 
-    public int getClanLevel(short clanId) {
-        return clanDAO.getLevel(clanId);
-    }
-
-    public int getClanXu(short clanId) {
-        return clanDAO.getXu(clanId);
-    }
-
-    public int getClanLuong(short clanId) {
-        return clanDAO.getLuong(clanId);
-    }
-
-    public byte[] getClanIcon(short clanId) {
-        return Utils.getFile(String.format(GameConstants.CLAN_ICON_PATH, clanDAO.getClanIcon(clanId)));
-    }
-
     public byte getTotalPage(short clanId) {
         Byte mem = clanDAO.getMembersOfClan(clanId);
         if (mem == null) {
@@ -263,7 +247,7 @@ public class ClanService extends BaseService {
             return;
         }
 
-        int currentLevel = getClanLevel(user.getClanId());
+        int currentLevel = clanDAO.getLevel(user.getClanId());
         if (currentLevel < clanItemShop.getLevel()) {
             sendServerMessage(GameString.CLAN_LEVEL_INSUFFICIENT);
             return;
@@ -273,7 +257,7 @@ public class ClanService extends BaseService {
             if (clanItemShop.getXu() < 0) {
                 return;
             }
-            int xuClan = getClanXu(user.getClanId());
+            int xuClan = clanDAO.getXu(user.getClanId());
             if (xuClan < clanItemShop.getXu()) {
                 sendServerMessage(GameString.CLAN_NOT_ENOUGH_XU);
                 return;
@@ -284,7 +268,7 @@ public class ClanService extends BaseService {
             if (clanItemShop.getLuong() < 0) {
                 return;
             }
-            int luongClan = getClanLuong(user.getClanId());
+            int luongClan = clanDAO.getLuong(user.getClanId());
             if (luongClan < clanItemShop.getLuong()) {
                 sendServerMessage(GameString.CLAN_NOT_ENOUGH_LUONG);
                 return;
@@ -404,7 +388,7 @@ public class ClanService extends BaseService {
     public void getClanIcon(Message ms) {
         try {
             short clanId = ms.reader().readShort();
-            byte[] data = getClanIcon(clanId);
+            byte[] data = Utils.getFile(String.format(GameConstants.CLAN_ICON_PATH, clanDAO.getClanIcon(clanId)));
             if (data == null) {
                 return;
             }
