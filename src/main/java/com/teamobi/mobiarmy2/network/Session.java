@@ -6,10 +6,7 @@ import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.server.ApplicationContext;
 import com.teamobi.mobiarmy2.server.ServerManager;
-import com.teamobi.mobiarmy2.service.LeaderboardService;
-import com.teamobi.mobiarmy2.service.LoginRateLimiterService;
-import com.teamobi.mobiarmy2.service.LoginService;
-import com.teamobi.mobiarmy2.service.UserService;
+import com.teamobi.mobiarmy2.service.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -235,7 +232,13 @@ public class Session {
                 context.getBean(UserCharacterDAO.class)
         );
 
+        ClanService clanService = new ClanService(
+                this,
+                context.getBean(ClanDAO.class)
+        );
+
         this.messageHandler.setUserService(userService);
+        this.messageHandler.setClanService(clanService);
     }
 
     class Sender implements Runnable {

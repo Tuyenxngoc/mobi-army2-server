@@ -4,17 +4,19 @@ import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.dao.RankingDAO;
 import com.teamobi.mobiarmy2.dto.UserLeaderboardDTO;
 import com.teamobi.mobiarmy2.server.ApplicationContext;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 
 @Slf4j
 public class LeaderboardService {
-    private static final String[] CATEGORIES = {"DANH DỰ", "CAO THỦ", "ĐẠI GIA XU", "ĐẠI GIA LƯỢNG", "DANH DỰ TUẦN", "ĐẠI GIA TUẦN"};
-    private static final String[] LABELS = {"Danh dự", "XP", "Xu", "Lượng", "Danh dự", "Xu"};
+    public static final String[] CATEGORIES = {"DANH DỰ", "CAO THỦ", "ĐẠI GIA XU", "ĐẠI GIA LƯỢNG", "DANH DỰ TUẦN", "ĐẠI GIA TUẦN"};
+    public static final String[] LABELS = {"Danh dự", "XP", "Xu", "Lượng", "Danh dự", "Xu"};
     private final RankingDAO rankingDAO;
     private final Timer timer;
     private final List<List<UserLeaderboardDTO>> leaderboardEntries;
+    @Getter
     private boolean isComplete;
 
     public LeaderboardService(RankingDAO rankingDAO) {
@@ -24,18 +26,6 @@ public class LeaderboardService {
         for (int i = 0; i < CATEGORIES.length; i++) {
             leaderboardEntries.add(new ArrayList<>());
         }
-    }
-
-    public boolean isComplete() {
-        return isComplete;
-    }
-
-    public String[] getCategories() {
-        return CATEGORIES;
-    }
-
-    public String[] getLabels() {
-        return LABELS;
     }
 
     public void init() {

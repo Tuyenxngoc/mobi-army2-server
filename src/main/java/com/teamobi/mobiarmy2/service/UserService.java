@@ -442,15 +442,15 @@ public class UserService extends BaseService {
             byte type = dis.readByte();
             byte page = dis.readByte();
 
-            if (type >= leaderboardService.getCategories().length) {
+            if (type >= LeaderboardService.CATEGORIES.length) {
                 return;
             }
             ms = new Message(Cmd.BANGTHANHTICH);
             DataOutputStream ds = ms.writer();
             ds.writeByte(type);
             if (type < 0) {
-                ds.writeByte(leaderboardService.getCategories().length);
-                for (String name : leaderboardService.getCategories()) {
+                ds.writeByte(LeaderboardService.CATEGORIES.length);
+                for (String name : LeaderboardService.CATEGORIES) {
                     ds.writeUTF(name);
                 }
             } else {
@@ -464,7 +464,7 @@ public class UserService extends BaseService {
                 }
                 //Gửi dữ liệu
                 ds.writeByte(page);
-                ds.writeUTF(leaderboardService.getLabels()[type]);
+                ds.writeUTF(LeaderboardService.LABELS[type]);
                 List<UserLeaderboardDTO> bangXH = leaderboardService.getUsers(type, page, 10);
                 if (bangXH != null) {
                     for (UserLeaderboardDTO pl : bangXH) {

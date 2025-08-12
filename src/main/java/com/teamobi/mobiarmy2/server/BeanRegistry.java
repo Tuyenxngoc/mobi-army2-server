@@ -55,7 +55,6 @@ public class BeanRegistry {
                 context.getBean(FabricateItemDAO.class)
         ));
         context.registerBean(LeaderboardService.class, new LeaderboardService(context.getBean(RankingDAO.class)));
-//        context.registerBean(ClanService.class, new ClanService(context.getBean(ClanDAO.class)));
         context.registerBean(LoginRateLimiterService.class, new LoginRateLimiterService(context.getBean(RedisConnectionManager.class)));
         context.registerBean(ConnectionBlockerService.class, new ConnectionBlockerService(context.getBean(RedisConnectionManager.class)));
 
