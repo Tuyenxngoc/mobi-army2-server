@@ -237,8 +237,25 @@ public class Session {
                 context.getBean(ClanDAO.class)
         );
 
+        FriendService friendService = new FriendService(
+                this,
+                context.getBean(UserDAO.class)
+        );
+
+        ShopService shopService = new ShopService(
+                this,
+                context.getBean(UserCharacterDAO.class)
+        );
+
+        ResourceService resourceService = new ResourceService(
+                this
+        );
+
         this.messageHandler.setUserService(userService);
         this.messageHandler.setClanService(clanService);
+        this.messageHandler.setFriendService(friendService);
+        this.messageHandler.setShopService(shopService);
+        this.messageHandler.setResourceService(resourceService);
     }
 
     class Sender implements Runnable {

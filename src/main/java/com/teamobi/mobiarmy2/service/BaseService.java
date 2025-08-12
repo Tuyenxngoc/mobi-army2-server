@@ -1,6 +1,8 @@
 package com.teamobi.mobiarmy2.service;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
+import com.teamobi.mobiarmy2.entity.EquipmentChest;
+import com.teamobi.mobiarmy2.entity.SpecialItemChest;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
@@ -9,6 +11,7 @@ import com.teamobi.mobiarmy2.server.ServerManager;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Map;
 
 public abstract class BaseService {
     protected final Session session;
@@ -97,4 +100,69 @@ public abstract class BaseService {
         }
     }
 
+    public void sendCharacterInfo() {
+        User user = session.getUser();
+        try {
+            Message ms = new Message(Cmd.CHARACTOR_INFO);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(user.getCurrentLevel());
+            ds.writeByte(user.getCurrentLevelPercent());
+            ds.writeShort(user.getCurrentPoint());
+            for (short point : user.getCurrentAddedPoints()) {
+                ds.writeShort(point);
+            }
+            ds.writeInt(user.getCurrentXp());
+            ds.writeInt(user.getCurrentRequiredXp());
+            ds.writeInt(user.getCup());
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException ignored) {
+        }
+    }
+
+    public void sendInventoryInfo() {
+        User user = session.getUser();
+        try {
+            Message ms = new Message(Cmd.INVENTORY);
+            DataOutputStream ds = ms.writer();
+            Map<Integer, EquipmentChest> equipmentChest = user.getEquipmentChest();
+            ds.writeByte(equipmentChest.size());
+            for (EquipmentChest equipment : equipmentChest.values()) {
+                ds.writeInt(equipment.getKey());
+                ds.writeByte(equipment.getEquipment().getCharacterId());
+                ds.writeByte(equipment.getEquipment().getEquipType());
+                ds.writeShort(equipment.getEquipment().getEquipIndex());
+                ds.writeUTF(equipment.getEquipment().getName());
+                ds.writeByte(equipment.getAddPoints().length * 2);
+                for (int j = 0; j < equipment.getAddPoints().length; j++) {
+                    ds.writeByte(equipment.getAddPoints()[j]);
+                    ds.writeByte(equipment.getAddPercents()[j]);
+                }
+                ds.writeByte(equipment.getRemainingDays());
+                ds.writeByte(equipment.getEmptySlot());
+                ds.writeByte(equipment.getEquipment().isDisguise() ? 1 : 0);
+                ds.writeByte(equipment.getVipLevel());
+            }
+            for (int i = 0; i < 5; i++) {
+                ds.writeInt(user.getEquipData()[user.getActiveCharacterId()][i]);
+            }
+            ds.flush();
+            sendMessage(ms);
+
+            ms = new Message(Cmd.MATERIAL);
+            ds = ms.writer();
+            ds.writeByte(0);
+            Map<Byte, SpecialItemChest> specialItemChest = user.getSpecialItemChest();
+            ds.writeByte(specialItemChest.size());
+            for (SpecialItemChest item : specialItemChest.values()) {
+                ds.writeByte(item.getItem().getId());
+                ds.writeShort(item.getQuantity());
+                ds.writeUTF(item.getItem().getName());
+                ds.writeUTF(item.getItem().getDetail());
+            }
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException ignored) {
+        }
+    }
 }

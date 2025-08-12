@@ -1,9 +1,7 @@
 package com.teamobi.mobiarmy2.network;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
-import com.teamobi.mobiarmy2.service.ClanService;
-import com.teamobi.mobiarmy2.service.LoginService;
-import com.teamobi.mobiarmy2.service.UserService;
+import com.teamobi.mobiarmy2.service.*;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,6 +11,12 @@ public class MessageHandler {
     private UserService userService;
     @Setter
     private ClanService clanService;
+    @Setter
+    private FriendService friendService;
+    @Setter
+    private ShopService shopService;
+    @Setter
+    private ResourceService resourceService;
 
     private LoginService loginService;
 
@@ -49,7 +53,7 @@ public class MessageHandler {
 
                 case Cmd.SIGN_OUT -> userService.handleLogout(ms);
 
-                case Cmd.SHOP_LINHTINH -> userService.handleSpecialItemShop(ms);
+                case Cmd.SHOP_LINHTINH -> shopService.handleSpecialItemShop(ms);
 
                 case Cmd.VIP_EQUIP -> userService.equipVipItems(ms);
 
@@ -89,15 +93,15 @@ public class MessageHandler {
 
                 case Cmd.JOIN_ANY_BOARD -> userService.handleJoinAnyBoard(ms);
 
-                case Cmd.REQUEST_FRIENDLIST -> userService.handleViewFriendList();
+                case Cmd.REQUEST_FRIENDLIST -> friendService.handleViewFriendList();
 
-                case Cmd.ADD_FRIEND -> userService.handleAddFriend(ms);
+                case Cmd.ADD_FRIEND -> friendService.handleAddFriend(ms);
 
-                case Cmd.DELETE_FRIEND -> userService.handleRemoveFriend(ms);
+                case Cmd.DELETE_FRIEND -> friendService.handleRemoveFriend(ms);
 
                 case Cmd.PLAYER_DETAIL -> userService.handleGetFlayerDetail(ms);
 
-                case Cmd.SEARCH -> userService.handleFindPlayer(ms);
+                case Cmd.SEARCH -> friendService.handleFindPlayer(ms);
 
                 case Cmd.PING -> userService.ping(ms);
 
@@ -117,9 +121,9 @@ public class MessageHandler {
 
                 case Cmd.CHANGE_TEAM -> userService.handleChangeTeam(ms);
 
-                case Cmd.BUY_ITEM -> userService.handlePurchaseItem(ms);
+                case Cmd.BUY_ITEM -> shopService.handlePurchaseItem(ms);
 
-                case Cmd.BUY_GUN -> userService.handleBuyCharacter(ms);
+                case Cmd.BUY_GUN -> shopService.handleBuyCharacter(ms);
 
                 case Cmd.MAP_SELECT -> userService.handleSelectMap(ms);
 
@@ -135,7 +139,7 @@ public class MessageHandler {
 
                 case Cmd.TRAININGSHOOT -> userService.trainShooting(ms);
 
-                case Cmd.GET_FILEPACK -> userService.getFilePack(ms);
+                case Cmd.GET_FILEPACK -> resourceService.getFilePack(ms);
 
                 case Cmd.ADD_POINT -> userService.handleAddPoints(ms);
 
@@ -143,7 +147,7 @@ public class MessageHandler {
 
                 case Cmd.CHANGE_EQUIP -> userService.handleChangeEquipment(ms);
 
-                case Cmd.SHOP_EQUIP -> userService.handleSendShopEquipments();
+                case Cmd.SHOP_EQUIP -> shopService.handleSendShopEquipments();
 
                 case Cmd.BUY_EQUIP -> userService.handleEquipmentTransactions(ms);
 
@@ -159,13 +163,13 @@ public class MessageHandler {
 
                 case Cmd.CLAN_MEMBER -> clanService.getClanMember(ms);
 
-                case Cmd.GET_BIG_IMAGE -> userService.getBigImage(ms);
+                case Cmd.GET_BIG_IMAGE -> resourceService.getBigImage(ms);
 
                 case Cmd.REGISTER_2 -> loginService.handleRegister(ms);
 
                 case Cmd.CHARGE_MONEY_2 -> userService.rechargeMoney(ms);
 
-                case Cmd.MATERIAL_ICON -> userService.getMaterialIconMessage(ms);
+                case Cmd.MATERIAL_ICON -> resourceService.getMaterialIconMessage(ms);
 
                 case Cmd.GETSTRING -> loginService.getStringMessage(ms);
 

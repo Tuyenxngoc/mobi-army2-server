@@ -1,14 +1,15 @@
 package com.teamobi.mobiarmy2.service;
 
 import com.teamobi.mobiarmy2.config.ServerConfig;
-import com.teamobi.mobiarmy2.constant.*;
+import com.teamobi.mobiarmy2.constant.Cmd;
+import com.teamobi.mobiarmy2.constant.GameString;
+import com.teamobi.mobiarmy2.constant.UserAction;
+import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.dao.*;
-import com.teamobi.mobiarmy2.dto.FriendDTO;
 import com.teamobi.mobiarmy2.dto.GiftCodeDTO;
 import com.teamobi.mobiarmy2.dto.UserCharacterDTO;
 import com.teamobi.mobiarmy2.dto.UserLeaderboardDTO;
 import com.teamobi.mobiarmy2.entity.*;
-import com.teamobi.mobiarmy2.entity.Character;
 import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.fight.TrainingManager;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
@@ -502,131 +503,6 @@ public class UserService extends BaseService {
 
     public void handleLogout(Message ms) {
         user.getSession().close();
-    }
-
-    public void handleSpecialItemShop(Message ms) {
-        if (user.isNotWaiting()) {
-            return;
-        }
-        try {
-            DataInputStream dis = ms.reader();
-            byte type = dis.readByte();
-            if (type == 0) {
-                sendSpecialItem();
-            } else {
-                byte unit = dis.readByte();
-                byte itemId = dis.readByte();
-                byte quantity = dis.readByte();
-                purchaseSpecialItem(unit, itemId, quantity);
-            }
-        } catch (IOException ignored) {
-        }
-    }
-
-    private void purchaseSpecialItem(byte unit, byte itemId, byte quantity) {
-        //Kiểm tra số lượng mua hợp lệ
-        if (quantity < 1) {
-            return;
-        }
-
-        //Kiểm tra số lượng đang có trong rương
-        if (user.getInventorySpecialItemCount(itemId) + quantity > serverConfig.getMaxSpecialItemSlots()) {
-            sendServerMessage(GameString.CHEST_MAXIMUM_REACHED);
-            return;
-        }
-
-        SpecialItem item = SpecialItemManager.getSpecialItemById(itemId);
-        if (item == null || !item.isOnSale() || (unit == 0 ? item.getPriceXu() : item.getPriceLuong()) < 0) {
-            return;
-        }
-
-        //Giới hạn số lần mua vật liệu
-        if (item.isMaterial()) {
-            if (user.getMaterialsPurchased() >= GameConstants.MAX_MATERIAL_PURCHASE_LIMIT) {
-                sendServerMessage(GameString.MATERIAL_PURCHASE_LIMIT);
-                return;
-            } else if (user.getMaterialsPurchased() + quantity > GameConstants.MAX_MATERIAL_PURCHASE_LIMIT) {
-                sendServerMessage(GameString.createMaterialPurchaseLimitMessage(GameConstants.MAX_MATERIAL_PURCHASE_LIMIT - user.getMaterialsPurchased()));
-                return;
-            }
-        }
-
-        if (unit == 0) {//Mua bằng xu
-            int totalPrice = quantity * item.getPriceXu();
-            if (user.getXu() < totalPrice) {
-                sendServerMessage(GameString.INSUFFICIENT_FUNDS);
-                return;
-            }
-            user.updateXu(-totalPrice);
-        } else {//Mua bằng lượng
-            int totalPrice = quantity * item.getPriceLuong();
-            if (user.getLuong() < totalPrice) {
-                sendServerMessage(GameString.INSUFFICIENT_FUNDS);
-                return;
-            }
-            user.updateLuong(-totalPrice);
-        }
-
-        //Xử lý khi mua item đặc biệt
-        boolean saveItem = handleSpecialItemPurchase(itemId);
-
-        if (saveItem) {
-            //Tạo item mới
-            SpecialItemChest newItem = new SpecialItemChest(quantity, item);
-
-            //Thêm vào rương đồ
-            user.updateInventory(null, null, List.of(newItem), null);
-        }
-
-        //Cập nhật số lượng mua nếu là vật liệu
-        if (item.isMaterial()) {
-            user.incrementMaterialsPurchased(quantity);
-        }
-
-        //Gửi thông báo mua thành công
-        sendServerMessage(GameString.PURCHASE_SUCCESS);
-    }
-
-    private boolean handleSpecialItemPurchase(byte itemId) {
-        if (itemId == 50) {
-            user.resetPoints();
-            sendCharacterInfo();
-            return false;
-        }
-
-        return true;
-    }
-
-    private void sendSpecialItem() {
-        Message ms = CacheManager.cachedSpecialItemShop;
-        if (ms != null) {
-            sendMessage(ms);
-            return;
-        }
-
-        try {
-            ms = new Message(Cmd.SHOP_LINHTINH);
-            DataOutputStream ds = ms.writer();
-            Map<Byte, SpecialItem> sorted = new TreeMap<>(SpecialItemManager.SPECIAL_ITEMS);
-            for (SpecialItem specialItem : sorted.values()) {
-                if (!specialItem.isOnSale()) {
-                    continue;
-                }
-                ds.writeByte(specialItem.getId());
-                ds.writeUTF(specialItem.getName());
-                ds.writeUTF(specialItem.getDetail());
-                ds.writeInt(specialItem.getPriceXu());
-                ds.writeInt(specialItem.getPriceLuong());
-                ds.writeByte(specialItem.getExpirationDays());
-                ds.writeByte(specialItem.isShowSelection() ? 0 : 1);
-            }
-            ds.flush();
-
-            CacheManager.cachedSpecialItemShop = ms;
-
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
     }
 
     public void equipVipItems(Message ms) {
@@ -1482,88 +1358,6 @@ public class UserService extends BaseService {
         }
     }
 
-    public void handleViewFriendList() {
-        try {
-            Message ms = new Message(Cmd.FRIENDLIST);
-            DataOutputStream ds = ms.writer();
-            if (!user.getFriends().isEmpty()) {
-                List<FriendDTO> friends = userDAO.getFriendsList(user.getUserId(), user.getFriends());
-                for (FriendDTO friend : friends) {
-                    ds.writeInt(friend.getUserId());
-                    ds.writeUTF(friend.getName());
-                    ds.writeInt(friend.getXu());
-                    ds.writeByte(friend.getActiveCharacterId());
-                    ds.writeShort(friend.getClanId());
-                    ds.writeByte(friend.getOnline());
-                    ds.writeByte(friend.getLevel());
-                    ds.writeByte(friend.getLevelPt());
-                    for (short i : friend.getData()) {
-                        ds.writeShort(i);
-                    }
-                }
-            }
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
-    }
-
-    public void handleAddFriend(Message ms) {
-        int maxFriends = serverConfig.getMaxFriends();
-        Set<Integer> friends = user.getFriends();
-        try {
-            int id = ms.reader().readInt();
-
-            // Kiểm tra số lượng bạn bè đã đạt giới hạn
-            if (friends.size() >= maxFriends) {
-                sendAddFriendMessage(2);
-                return;
-            }
-
-            // Kiểm tra nếu bạn bè đã tồn tại
-            if (!friends.add(id)) {
-                sendAddFriendMessage(1);
-                return;
-            }
-
-            sendAddFriendMessage(0);
-        } catch (IOException e) {
-            sendAddFriendMessage(1);
-        }
-    }
-
-    public void handleRemoveFriend(Message ms) {
-        try {
-            Integer id = ms.reader().readInt();
-            user.getFriends().remove(id);
-            sendDeleteFriendMessage(0);
-        } catch (IOException e) {
-            sendDeleteFriendMessage(1);
-        }
-    }
-
-    private void sendDeleteFriendMessage(int status) {
-        try {
-            Message ms = new Message(Cmd.DELETE_FRIEND_RESULT);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(status);
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
-    }
-
-    private void sendAddFriendMessage(int status) {
-        try {
-            Message ms = new Message(Cmd.ADD_FRIEND_RESULT);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(status);
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
-    }
-
     public void handleGetFlayerDetail(Message ms) {
         try {
             int userId = ms.reader().readInt();
@@ -1600,30 +1394,6 @@ public class UserService extends BaseService {
                 ds.writeInt(us.getCurrentRequiredXp());
                 ds.writeInt(us.getCup());
                 ds.writeUTF(rankDisplayText);
-            }
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
-    }
-
-    public void handleFindPlayer(Message ms) {
-        try {
-            String username = ms.reader().readUTF().trim();
-            if (username.isEmpty()) {
-                sendMessageLoginFail(GameString.FRIEND_ADD_MISSING_NAME);
-                return;
-            }
-            if (Utils.isAlphanumeric(username)) {
-                sendMessageLoginFail(GameString.FRIEND_ADD_INVALID_NAME);
-                return;
-            }
-            Optional<Integer> foundUserId = userDAO.findUserIdByUsername(username);
-            ms = new Message(Cmd.SEARCH);
-            DataOutputStream ds = ms.writer();
-            if (foundUserId.isPresent()) {
-                ds.writeInt(foundUserId.get());
-                ds.writeUTF(username);
             }
             ds.flush();
             sendMessage(ms);
@@ -1717,102 +1487,6 @@ public class UserService extends BaseService {
             return;
         }
         user.getFightWait().changeTeam(user);
-    }
-
-    public void handlePurchaseItem(Message ms) {
-        try {
-            DataInputStream dis = ms.reader();
-            byte unit = dis.readByte();
-            byte itemIndex = dis.readByte();
-            byte quantity = dis.readByte();
-            if (itemIndex < 0 || itemIndex >= FightItemManager.FIGHT_ITEMS.size()) {
-                return;
-            }
-            if (user.getFightItems()[itemIndex] + quantity > serverConfig.getMaxItem()) {
-                return;
-            }
-            if (unit == 0) {
-                int total = FightItemManager.FIGHT_ITEMS.get(itemIndex).getBuyXu() * quantity;
-                if (user.getXu() < total || total < 0) {
-                    return;
-                }
-                user.updateXu(-total);
-            } else {
-                int total = FightItemManager.FIGHT_ITEMS.get(itemIndex).getBuyLuong() * quantity;
-                if (user.getLuong() < total || total < 0) {
-                    return;
-                }
-                user.updateLuong(-total);
-            }
-            user.updateFightItems(itemIndex, quantity);
-            ms = new Message(Cmd.BUY_ITEM);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(1);
-            ds.writeByte(itemIndex);
-            ds.writeByte(user.getFightItems()[itemIndex]);
-            ds.writeInt(user.getXu());
-            ds.writeInt(user.getLuong());
-            ds.flush();
-            sendMessage(ms);
-            sendServerMessage(GameString.PURCHASE_SUCCESS);
-        } catch (IOException ignored) {
-        }
-    }
-
-    public void handleBuyCharacter(Message ms) {
-        try {
-            DataInputStream dis = ms.reader();
-            byte index = dis.readByte();
-            byte unit = dis.readByte();
-            if (index < 0 || index >= user.getOwnedCharacters().length - 3) {
-                return;
-            }
-            index += 3;
-            if (user.getOwnedCharacters()[index]) {
-                return;
-            }
-            Character character = CharacterManager.CHARACTERS.get(index);
-            if (unit == 0) {
-                if (character.getPriceXu() <= 0) {
-                    return;
-                }
-                if (user.getXu() < character.getPriceXu()) {
-                    sendServerMessage(GameString.INSUFFICIENT_FUNDS);
-                    return;
-                }
-                user.updateXu(-character.getPriceXu());
-            } else {
-                if (character.getPriceLuong() <= 0) {
-                    return;
-                }
-                if (user.getLuong() < character.getPriceLuong()) {
-                    sendServerMessage(GameString.INSUFFICIENT_FUNDS);
-                    return;
-                }
-                user.updateLuong(-character.getPriceLuong());
-            }
-
-            Optional<Integer> result = userCharacterDAO.create(user.getUserId(), index);
-            if (result.isPresent()) {
-                UserCharacterDTO userCharacterDTO = userCharacterDAO.findByUserIdAndCharacterId(user.getUserId(), index);
-                if (userCharacterDTO != null) {
-                    user.getLevels()[index] = userCharacterDTO.getLevel();
-                    user.getXps()[index] = userCharacterDTO.getXp();
-                    user.getPoints()[index] = userCharacterDTO.getPoints();
-                    user.getAddedPoints()[index] = userCharacterDTO.getAdditionalPoints();
-                    user.getUserCharacterIds()[index] = userCharacterDTO.getUserCharacterId();
-                    user.getOwnedCharacters()[index] = true;
-                    user.getEquipData()[index] = userCharacterDTO.getData();
-
-                    ms = new Message(Cmd.BUY_GUN);
-                    DataOutputStream ds = ms.writer();
-                    ds.writeByte(index - 3);
-                    ds.flush();
-                    sendMessage(ms);
-                }
-            }
-        } catch (IOException ignored) {
-        }
     }
 
     public void handleSelectMap(Message ms) {
@@ -1958,148 +1632,6 @@ public class UserService extends BaseService {
         }
     }
 
-    public void getFilePack(Message ms) {
-        try {
-            DataInputStream dis = ms.reader();
-            byte type = dis.readByte();
-            byte version = dis.readByte();
-
-            switch (type) {
-                case 1 -> {
-                    ms = new Message(Cmd.GET_FILEPACK);
-                    DataOutputStream ds = ms.writer();
-                    ds.writeByte(type);
-                    ds.writeByte(serverConfig.getIconVersion2());
-                    if (version != serverConfig.getIconVersion2()) {
-                        byte[] ab = Utils.getFile(GameConstants.ICON_CACHE_NAME);
-                        if (ab == null) {
-                            return;
-                        }
-                        ds.writeShort(ab.length);
-                        ds.write(ab);
-                    }
-                    ds.flush();
-                    sendMessage(ms);
-                }
-
-                case 2 -> {
-                    ms = new Message(Cmd.GET_FILEPACK);
-                    DataOutputStream ds = ms.writer();
-                    ds.writeByte(type);
-                    ds.writeByte(serverConfig.getValuesVersion2());
-                    if (version != serverConfig.getValuesVersion2()) {
-                        byte[] ab = Utils.getFile(GameConstants.MAP_CACHE_NAME);
-                        if (ab == null) {
-                            return;
-                        }
-                        ds.writeShort(ab.length);
-                        ds.write(ab);
-                    }
-                    ds.flush();
-                    sendMessage(ms);
-                }
-                case 3 -> {
-                    ms = new Message(Cmd.GET_FILEPACK);
-                    DataOutputStream ds = ms.writer();
-                    ds.writeByte(type);
-                    ds.writeByte(serverConfig.getPlayerVersion2());
-                    if (version != serverConfig.getPlayerVersion2()) {
-                        byte[] ab = Utils.getFile(GameConstants.PLAYER_CACHE_NAME);
-                        if (ab == null) {
-                            return;
-                        }
-                        ds.writeShort(ab.length);
-                        ds.write(ab);
-                    }
-                    ds.flush();
-                    sendMessage(ms);
-                }
-                case 4 -> {
-                    ms = new Message(Cmd.GET_FILEPACK);
-                    DataOutputStream ds = ms.writer();
-                    ds.writeByte(type);
-                    ds.writeByte(serverConfig.getEquipVersion2());
-                    if (version != serverConfig.getEquipVersion2()) {
-                        byte[] ab = Utils.getFile(GameConstants.EQUIP_CACHE_NAME);
-                        if (ab == null) {
-                            return;
-                        }
-                        ds.writeInt(ab.length);
-                        ds.write(ab);
-                    }
-                    ds.flush();
-                    sendMessage(ms);
-                }
-                case 5 -> {
-                    ms = new Message(Cmd.GET_FILEPACK);
-                    DataOutputStream ds = ms.writer();
-                    ds.writeByte(type);
-                    ds.writeByte(serverConfig.getLevelCVersion2());
-                    if (version != serverConfig.getLevelCVersion2()) {
-                        byte[] ab = Utils.getFile(GameConstants.LEVEL_CACHE_NAME);
-                        if (ab == null) {
-                            return;
-                        }
-                        ds.writeShort(ab.length);
-                        ds.write(ab);
-                    }
-                    ds.flush();
-                    sendMessage(ms);
-                }
-                case 6 -> {
-                    sendCharacterInfo();
-                    sendInventoryInfo();
-                }
-            }
-        } catch (IOException ignored) {
-        }
-    }
-
-    private void sendInventoryInfo() {
-        try {
-            Message ms = new Message(Cmd.INVENTORY);
-            DataOutputStream ds = ms.writer();
-            Map<Integer, EquipmentChest> equipmentChest = user.getEquipmentChest();
-            ds.writeByte(equipmentChest.size());
-            for (EquipmentChest equipment : equipmentChest.values()) {
-                ds.writeInt(equipment.getKey());
-                ds.writeByte(equipment.getEquipment().getCharacterId());
-                ds.writeByte(equipment.getEquipment().getEquipType());
-                ds.writeShort(equipment.getEquipment().getEquipIndex());
-                ds.writeUTF(equipment.getEquipment().getName());
-                ds.writeByte(equipment.getAddPoints().length * 2);
-                for (int j = 0; j < equipment.getAddPoints().length; j++) {
-                    ds.writeByte(equipment.getAddPoints()[j]);
-                    ds.writeByte(equipment.getAddPercents()[j]);
-                }
-                ds.writeByte(equipment.getRemainingDays());
-                ds.writeByte(equipment.getEmptySlot());
-                ds.writeByte(equipment.getEquipment().isDisguise() ? 1 : 0);
-                ds.writeByte(equipment.getVipLevel());
-            }
-            for (int i = 0; i < 5; i++) {
-                ds.writeInt(user.getEquipData()[user.getActiveCharacterId()][i]);
-            }
-            ds.flush();
-            sendMessage(ms);
-
-            ms = new Message(Cmd.MATERIAL);
-            ds = ms.writer();
-            ds.writeByte(0);
-            Map<Byte, SpecialItemChest> specialItemChest = user.getSpecialItemChest();
-            ds.writeByte(specialItemChest.size());
-            for (SpecialItemChest item : specialItemChest.values()) {
-                ds.writeByte(item.getItem().getId());
-                ds.writeShort(item.getQuantity());
-                ds.writeUTF(item.getItem().getName());
-                ds.writeUTF(item.getItem().getDetail());
-            }
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
-    }
-
     public void handleAddPoints(Message ms) {
         try {
             short[] points = new short[5];
@@ -2117,25 +1649,6 @@ public class UserService extends BaseService {
         } catch (IOException ignored) {
         }
         sendCharacterInfo();
-    }
-
-    public void sendCharacterInfo() {
-        try {
-            Message ms = new Message(Cmd.CHARACTOR_INFO);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(user.getCurrentLevel());
-            ds.writeByte(user.getCurrentLevelPercent());
-            ds.writeShort(user.getCurrentPoint());
-            for (short point : user.getCurrentAddedPoints()) {
-                ds.writeShort(point);
-            }
-            ds.writeInt(user.getCurrentXp());
-            ds.writeInt(user.getCurrentRequiredXp());
-            ds.writeInt(user.getCup());
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
     }
 
     public void handleChangeEquipment(Message ms) {
@@ -2166,38 +1679,6 @@ public class UserService extends BaseService {
             DataOutputStream ds = ms.writer();
             ds.writeByte(changeSuccessful ? 1 : 0);
             ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
-    }
-
-    public void handleSendShopEquipments() {
-        Message ms = CacheManager.cachedShopEquipments;
-        if (ms != null) {
-            sendMessage(ms);
-            return;
-        }
-
-        try {
-            ms = new Message(Cmd.SHOP_EQUIP);
-            DataOutputStream ds = ms.writer();
-            List<Short> equipIds = EquipmentManager.SALE_INDEX_TO_ID;
-            ds.writeShort(equipIds.size());
-            for (Short id : equipIds) {
-                Equipment equip = EquipmentManager.getEquipment(id);
-                ds.writeByte(equip.getCharacterId());
-                ds.writeByte(equip.getEquipType());
-                ds.writeShort(equip.getEquipIndex());
-                ds.writeUTF(equip.getName());
-                ds.writeInt(equip.getPriceXu());
-                ds.writeInt(equip.getPriceLuong());
-                ds.writeByte(equip.getExpirationDays());
-                ds.writeByte(equip.getLevelRequirement());
-            }
-            ds.flush();
-
-            CacheManager.cachedShopEquipments = ms;
-
             sendMessage(ms);
         } catch (IOException ignored) {
         }
@@ -2428,25 +1909,6 @@ public class UserService extends BaseService {
         }
     }
 
-    public void getBigImage(Message ms) {
-        try {
-            int id = ms.reader().readByte();
-            ms = new Message(Cmd.GET_BIG_IMAGE);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(id);
-            byte[] file = Utils.getFile(String.format(GameConstants.BIG_IMAGE_PATH, id));
-            if (file != null) {
-                ds.writeShort(file.length);
-                ds.write(file);
-            } else {
-                ds.writeShort(0);
-            }
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
-    }
-
     public void rechargeMoney(Message ms) {
         try {
             DataInputStream dis = ms.reader();
@@ -2478,41 +1940,6 @@ public class UserService extends BaseService {
                     }
                 }
             }
-        } catch (IOException ignored) {
-        }
-    }
-
-    public void getMaterialIconMessage(Message ms) {
-        try {
-            DataInputStream dis = ms.reader();
-            byte typeIcon = dis.readByte();
-            byte iconId = dis.readByte();
-
-            byte indexIcon = 0;
-            byte[] data = null;
-            switch (typeIcon) {
-                case 0, 1 -> data = Utils.getFile(String.format(GameConstants.ITEM_ICON_PATH, iconId));
-                case 2 -> data = Utils.getFile(String.format(GameConstants.MAP_ICON_PATH, iconId));
-                case 3, 4 -> {
-                    indexIcon = dis.readByte();
-                    data = Utils.getFile(String.format(GameConstants.ITEM_ICON_PATH, iconId));
-                }
-            }
-            if (data == null) {
-                data = new byte[0];
-            }
-
-            ms = new Message(Cmd.MATERIAL_ICON);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(typeIcon);
-            ds.writeByte(iconId);
-            ds.writeShort(data.length);
-            ds.write(data);
-            if (typeIcon == 3 || typeIcon == 4) {
-                ds.writeByte(indexIcon);
-            }
-            ds.flush();
-            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }
