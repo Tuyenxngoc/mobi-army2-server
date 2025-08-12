@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.util;
+package com.teamobi.mobiarmy2.common.util;
 
 import com.teamobi.mobiarmy2.entity.Boss;
 import com.teamobi.mobiarmy2.entity.MapTile;

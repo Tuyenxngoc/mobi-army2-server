@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.server;
 
-import com.teamobi.mobiarmy2.config.RedisConfig;
+import com.teamobi.mobiarmy2.common.config.RedisConfig;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;

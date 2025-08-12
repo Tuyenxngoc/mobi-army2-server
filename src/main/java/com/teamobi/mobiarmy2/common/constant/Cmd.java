@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.constant;
+package com.teamobi.mobiarmy2.common.constant;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;

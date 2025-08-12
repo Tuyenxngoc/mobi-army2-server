@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.ui.controllers;
 
 import com.sun.management.OperatingSystemMXBean;
-import com.teamobi.mobiarmy2.server.ApplicationContext;
+import com.teamobi.mobiarmy2.bootstrap.ApplicationContext;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;

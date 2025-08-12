@@ -1,9 +1,13 @@
-package com.teamobi.mobiarmy2.server;
+package com.teamobi.mobiarmy2.bootstrap;
 
-import com.teamobi.mobiarmy2.config.HikariCPConfig;
-import com.teamobi.mobiarmy2.config.RedisConfig;
-import com.teamobi.mobiarmy2.config.ServerConfig;
+import com.teamobi.mobiarmy2.common.config.HikariCPConfig;
+import com.teamobi.mobiarmy2.common.config.RedisConfig;
+import com.teamobi.mobiarmy2.common.config.ServerConfig;
 import com.teamobi.mobiarmy2.dao.*;
+import com.teamobi.mobiarmy2.server.HikariCPManager;
+import com.teamobi.mobiarmy2.server.RedisConnectionManager;
+import com.teamobi.mobiarmy2.server.RoomManager;
+import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.ConnectionBlockerService;
 import com.teamobi.mobiarmy2.service.GameDataService;
 import com.teamobi.mobiarmy2.service.LeaderboardService;

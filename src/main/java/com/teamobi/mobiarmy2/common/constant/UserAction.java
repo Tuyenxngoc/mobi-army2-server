@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.constant;
+package com.teamobi.mobiarmy2.common.constant;
 
 public enum UserAction {
     INSERT_GEM_INTO_EQUIPMENT("Ghép ngọc vào trang bị"),

@@ -1,16 +1,16 @@
 package com.teamobi.mobiarmy2.dao;
 
 import com.google.gson.Gson;
-import com.teamobi.mobiarmy2.config.ServerConfig;
-import com.teamobi.mobiarmy2.constant.GameString;
+import com.teamobi.mobiarmy2.bootstrap.ApplicationContext;
+import com.teamobi.mobiarmy2.common.config.ServerConfig;
+import com.teamobi.mobiarmy2.common.constant.GameString;
+import com.teamobi.mobiarmy2.common.util.GsonUtil;
+import com.teamobi.mobiarmy2.common.util.Utils;
 import com.teamobi.mobiarmy2.dto.UserLeaderboardDTO;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
-import com.teamobi.mobiarmy2.server.ApplicationContext;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.HikariCPManager;
 import com.teamobi.mobiarmy2.server.UserXpManager;
-import com.teamobi.mobiarmy2.util.GsonUtil;
-import com.teamobi.mobiarmy2.util.Utils;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

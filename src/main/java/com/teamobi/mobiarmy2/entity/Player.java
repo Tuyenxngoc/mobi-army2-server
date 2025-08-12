@@ -1,11 +1,11 @@
 package com.teamobi.mobiarmy2.entity;
 
-import com.teamobi.mobiarmy2.constant.GameConstants;
+import com.teamobi.mobiarmy2.common.constant.GameConstants;
+import com.teamobi.mobiarmy2.common.util.Utils;
 import com.teamobi.mobiarmy2.entity.boss.GiftBox;
 import com.teamobi.mobiarmy2.entity.boss.GiftBoxFalling;
 import com.teamobi.mobiarmy2.fight.FightManager;
 import com.teamobi.mobiarmy2.fight.FightMapManager;
-import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
 

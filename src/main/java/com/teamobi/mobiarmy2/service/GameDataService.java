@@ -1,6 +1,8 @@
 package com.teamobi.mobiarmy2.service;
 
-import com.teamobi.mobiarmy2.constant.GameConstants;
+import com.teamobi.mobiarmy2.common.constant.GameConstants;
+import com.teamobi.mobiarmy2.common.util.TeamImageOutput;
+import com.teamobi.mobiarmy2.common.util.Utils;
 import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.entity.ArmyMap;
 import com.teamobi.mobiarmy2.entity.Caption;
@@ -10,8 +12,6 @@ import com.teamobi.mobiarmy2.server.CaptionManager;
 import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.MapManager;
-import com.teamobi.mobiarmy2.util.TeamImageOutput;
-import com.teamobi.mobiarmy2.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayOutputStream;

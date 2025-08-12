@@ -15,7 +15,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <exec.mainClass>com.teamobi.mobiarmy2.MobiArmy2</exec.mainClass>
+        <exec.mainClass>com.teamobi.mobiarmy2.bootstrap.MobiArmy2</exec.mainClass>
         <lombok.version>1.18.30</lombok.version>
     </properties>
 

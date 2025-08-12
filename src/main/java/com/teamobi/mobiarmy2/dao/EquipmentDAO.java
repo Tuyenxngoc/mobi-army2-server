@@ -1,11 +1,11 @@
 package com.teamobi.mobiarmy2.dao;
 
 import com.google.gson.Gson;
+import com.teamobi.mobiarmy2.common.util.GsonUtil;
 import com.teamobi.mobiarmy2.entity.Equipment;
 import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.HikariCPManager;
-import com.teamobi.mobiarmy2.util.GsonUtil;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

@@ -1,10 +1,10 @@
 package com.teamobi.mobiarmy2.dao;
 
-import com.teamobi.mobiarmy2.constant.GameConstants;
+import com.teamobi.mobiarmy2.common.constant.GameConstants;
+import com.teamobi.mobiarmy2.common.util.Utils;
 import com.teamobi.mobiarmy2.entity.ArmyMap;
 import com.teamobi.mobiarmy2.server.HikariCPManager;
 import com.teamobi.mobiarmy2.server.MapManager;
-import com.teamobi.mobiarmy2.util.Utils;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

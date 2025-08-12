@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.constant;
+package com.teamobi.mobiarmy2.common.constant;
 
 public class GameConstants {
     public static final short MAX_ABILITY_VALUE = 32_000;

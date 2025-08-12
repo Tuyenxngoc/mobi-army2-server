@@ -1,6 +1,6 @@
-package com.teamobi.mobiarmy2.util;
+package com.teamobi.mobiarmy2.common.util;
 
-import com.teamobi.mobiarmy2.constant.CommonConstant;
+import com.teamobi.mobiarmy2.common.constant.CommonConstant;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

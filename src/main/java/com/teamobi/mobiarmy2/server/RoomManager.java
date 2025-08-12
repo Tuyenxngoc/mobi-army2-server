@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.server;
 
-import com.teamobi.mobiarmy2.config.ServerConfig;
+import com.teamobi.mobiarmy2.bootstrap.ApplicationContext;
+import com.teamobi.mobiarmy2.common.config.ServerConfig;
 import com.teamobi.mobiarmy2.entity.Room;
 import lombok.Getter;
 

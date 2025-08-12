@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.entity;
 
+import com.teamobi.mobiarmy2.common.util.Utils;
 import com.teamobi.mobiarmy2.server.EffectManager;
-import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
 

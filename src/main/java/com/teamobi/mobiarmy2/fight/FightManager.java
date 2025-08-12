@@ -1,18 +1,18 @@
 package com.teamobi.mobiarmy2.fight;
 
-import com.teamobi.mobiarmy2.constant.Cmd;
-import com.teamobi.mobiarmy2.constant.GameString;
-import com.teamobi.mobiarmy2.constant.MatchResult;
-import com.teamobi.mobiarmy2.constant.UserState;
+import com.teamobi.mobiarmy2.bootstrap.ApplicationContext;
+import com.teamobi.mobiarmy2.common.constant.Cmd;
+import com.teamobi.mobiarmy2.common.constant.GameString;
+import com.teamobi.mobiarmy2.common.constant.MatchResult;
+import com.teamobi.mobiarmy2.common.constant.UserState;
+import com.teamobi.mobiarmy2.common.util.Utils;
 import com.teamobi.mobiarmy2.entity.*;
 import com.teamobi.mobiarmy2.entity.boss.*;
 import com.teamobi.mobiarmy2.network.Message;
-import com.teamobi.mobiarmy2.server.ApplicationContext;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
 import com.teamobi.mobiarmy2.service.ClanService;
-import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 
 import java.io.DataOutputStream;

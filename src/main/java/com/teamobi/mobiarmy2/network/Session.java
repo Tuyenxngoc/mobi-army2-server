@@ -1,10 +1,10 @@
 package com.teamobi.mobiarmy2.network;
 
-import com.teamobi.mobiarmy2.config.ServerConfig;
-import com.teamobi.mobiarmy2.constant.Cmd;
+import com.teamobi.mobiarmy2.bootstrap.ApplicationContext;
+import com.teamobi.mobiarmy2.common.config.ServerConfig;
+import com.teamobi.mobiarmy2.common.constant.Cmd;
 import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.entity.User;
-import com.teamobi.mobiarmy2.server.ApplicationContext;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.*;
 import lombok.Getter;

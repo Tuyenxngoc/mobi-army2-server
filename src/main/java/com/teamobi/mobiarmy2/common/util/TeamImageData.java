@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.util;
+package com.teamobi.mobiarmy2.common.util;
 
 public class TeamImageData {
     private static final byte[] packData;

@@ -1,17 +1,21 @@
 package com.teamobi.mobiarmy2.entity;
 
-import com.teamobi.mobiarmy2.config.ServerConfig;
-import com.teamobi.mobiarmy2.constant.Cmd;
-import com.teamobi.mobiarmy2.constant.GameConstants;
-import com.teamobi.mobiarmy2.constant.UserState;
+import com.teamobi.mobiarmy2.bootstrap.ApplicationContext;
+import com.teamobi.mobiarmy2.common.config.ServerConfig;
+import com.teamobi.mobiarmy2.common.constant.Cmd;
+import com.teamobi.mobiarmy2.common.constant.GameConstants;
+import com.teamobi.mobiarmy2.common.constant.UserState;
+import com.teamobi.mobiarmy2.common.util.Utils;
 import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.fight.TrainingManager;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
-import com.teamobi.mobiarmy2.server.*;
+import com.teamobi.mobiarmy2.server.CharacterManager;
+import com.teamobi.mobiarmy2.server.EquipmentManager;
+import com.teamobi.mobiarmy2.server.SpecialItemManager;
+import com.teamobi.mobiarmy2.server.UserXpManager;
 import com.teamobi.mobiarmy2.service.GiftBoxService;
 import com.teamobi.mobiarmy2.service.UserService;
-import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
 

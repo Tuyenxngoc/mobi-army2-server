@@ -1,11 +1,11 @@
 package com.teamobi.mobiarmy2.fight;
 
+import com.teamobi.mobiarmy2.common.util.Utils;
 import com.teamobi.mobiarmy2.entity.Bullet;
 import com.teamobi.mobiarmy2.entity.MapBrick;
 import com.teamobi.mobiarmy2.entity.MapTile;
 import com.teamobi.mobiarmy2.entity.Player;
 import com.teamobi.mobiarmy2.server.MapManager;
-import com.teamobi.mobiarmy2.util.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;

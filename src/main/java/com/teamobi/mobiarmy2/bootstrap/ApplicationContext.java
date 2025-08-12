@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.server;
+package com.teamobi.mobiarmy2.bootstrap;
 
 import java.util.HashMap;
 import java.util.Map;
