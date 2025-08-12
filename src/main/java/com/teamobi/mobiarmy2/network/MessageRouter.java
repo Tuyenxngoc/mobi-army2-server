@@ -6,7 +6,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class MessageHandler {
+public class MessageRouter {
     @Setter
     private UserService userService;
     @Setter
@@ -20,7 +20,7 @@ public class MessageHandler {
 
     private LoginService loginService;
 
-    public MessageHandler(LoginService loginService) {
+    public MessageRouter(LoginService loginService) {
         this.loginService = loginService;
     }
 

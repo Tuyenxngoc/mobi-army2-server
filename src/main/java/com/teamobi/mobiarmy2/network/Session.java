@@ -33,7 +33,7 @@ public class Session {
 
     private final byte[] sessionKey;
     private final Sender sender = new Sender();
-    private MessageHandler messageHandler;
+    private MessageRouter messageRouter;
     private final long sessionId;
     @Getter
     private final String IPAddress;
@@ -71,7 +71,7 @@ public class Session {
                 context.getBean(AccountDAO.class),
                 context.getBean(UserCharacterDAO.class)
         );
-        this.messageHandler = new MessageHandler(loginService);
+        this.messageRouter = new MessageRouter(loginService);
         initializeThreads();
     }
 
@@ -251,11 +251,11 @@ public class Session {
                 this
         );
 
-        this.messageHandler.setUserService(userService);
-        this.messageHandler.setClanService(clanService);
-        this.messageHandler.setFriendService(friendService);
-        this.messageHandler.setShopService(shopService);
-        this.messageHandler.setResourceService(resourceService);
+        messageRouter.setUserService(userService);
+        messageRouter.setClanService(clanService);
+        messageRouter.setFriendService(friendService);
+        messageRouter.setShopService(shopService);
+        messageRouter.setResourceService(resourceService);
     }
 
     class Sender implements Runnable {
@@ -301,7 +301,7 @@ public class Session {
                         message.cleanup();
                         break;
                     }
-                    Session.this.messageHandler.onMessage(message);
+                    Session.this.messageRouter.onMessage(message);
                     message.cleanup();
                 }
                 closeMessage();
