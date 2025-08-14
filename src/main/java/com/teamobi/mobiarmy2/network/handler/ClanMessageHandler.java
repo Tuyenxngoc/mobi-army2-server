@@ -142,7 +142,7 @@ public class ClanMessageHandler extends BaseMessageHandler {
         }
     }
 
-    public void contributeToClan(Message ms) {
+    public void contributeToClan(Message ms) throws IOException {
         User user = session.getUser();
         if (user.isNotWaiting()) {
             return;
@@ -151,65 +151,59 @@ public class ClanMessageHandler extends BaseMessageHandler {
             return;
         }
 
-        try {
-            DataInputStream dis = ms.reader();
-            byte type = dis.readByte();
-            int quantity = dis.readInt();
+        DataInputStream dis = ms.reader();
+        byte type = dis.readByte();
+        int quantity = dis.readInt();
 
-            if (quantity <= 0) {
+        if (quantity <= 0) {
+            return;
+        }
+
+        if (type == 0) {
+            if (quantity > user.getXu()) {
                 return;
             }
 
-            if (type == 0) {
-                if (quantity > user.getXu()) {
-                    return;
-                }
-
-                int minXuContributeClan = ApplicationContext.getInstance().getBean(ServerConfig.class).getMinXuContributeClan();
-                if (quantity < minXuContributeClan) {
-                    sendServerMessage(GameString.createClanContributionMinXuMessage(minXuContributeClan));
-                    return;
-                }
-
-                //Update xu user
-                user.updateXu(-quantity);
-
-                //Update xu clan
-                contributeClan(user.getClanId(), user.getUserId(), quantity, Boolean.TRUE);
-                sendServerMessage(GameString.CONTRIBUTION_SUCCESS);
-            } else {
-                if (quantity > user.getLuong()) {
-                    return;
-                }
-
-                //Update lg user
-                user.updateLuong(-quantity);
-
-                //Update lg clan
-                contributeClan(user.getClanId(), user.getUserId(), quantity, Boolean.FALSE);
-                sendServerMessage(GameString.CONTRIBUTION_SUCCESS);
+            int minXuContributeClan = ApplicationContext.getInstance().getBean(ServerConfig.class).getMinXuContributeClan();
+            if (quantity < minXuContributeClan) {
+                sendServerMessage(GameString.createClanContributionMinXuMessage(minXuContributeClan));
+                return;
             }
-        } catch (IOException ignored) {
+
+            //Update xu user
+            user.updateXu(-quantity);
+
+            //Update xu clan
+            contributeClan(user.getClanId(), user.getUserId(), quantity, Boolean.TRUE);
+            sendServerMessage(GameString.CONTRIBUTION_SUCCESS);
+        } else {
+            if (quantity > user.getLuong()) {
+                return;
+            }
+
+            //Update lg user
+            user.updateLuong(-quantity);
+
+            //Update lg clan
+            contributeClan(user.getClanId(), user.getUserId(), quantity, Boolean.FALSE);
+            sendServerMessage(GameString.CONTRIBUTION_SUCCESS);
         }
     }
 
-    public void handlePurchaseClanItem(Message ms) {
+    public void handlePurchaseClanItem(Message ms) throws IOException {
         User user = session.getUser();
         if (user.getClanId() == null) {
             sendServerMessage(GameString.NO_CLAN_MEMBERSHIP);
             return;
         }
-        try {
-            DataInputStream dis = ms.reader();
-            byte type = dis.readByte();
-            if (type == 0) {
-                sendClanShop();
-            } else {
-                byte unit = dis.readByte();
-                byte itemId = dis.readByte();
-                buyClanShop(unit, itemId);
-            }
-        } catch (IOException ignored) {
+        DataInputStream dis = ms.reader();
+        byte type = dis.readByte();
+        if (type == 0) {
+            sendClanShop();
+        } else {
+            byte unit = dis.readByte();
+            byte itemId = dis.readByte();
+            buyClanShop(unit, itemId);
         }
     }
 
@@ -253,164 +247,149 @@ public class ClanMessageHandler extends BaseMessageHandler {
         sendServerMessage(GameString.PURCHASE_SUCCESS);
     }
 
-    private void sendClanShop() {
+    private void sendClanShop() throws IOException {
         Message ms = CacheManager.cachedClanItemShop;
         if (ms != null) {
             sendMessage(ms);
             return;
         }
 
-        try {
-            ms = new Message(Cmd.SHOP_BIETDOI);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(ClanItemManager.CLAN_ITEM_MAP.size());
-            for (ClanItemShop clanItemShop : ClanItemManager.CLAN_ITEM_MAP.values()) {
-                ds.writeByte(clanItemShop.getId());
-                ds.writeUTF(clanItemShop.getName());
-                ds.writeInt(clanItemShop.getXu());
-                ds.writeInt(clanItemShop.getLuong());
-                ds.writeByte(clanItemShop.getTime());
-                ds.writeByte(clanItemShop.getLevel());
-            }
-            ds.flush();
-
-            CacheManager.cachedClanItemShop = ms;
-
-            sendMessage(ms);
-        } catch (IOException ignored) {
+        ms = new Message(Cmd.SHOP_BIETDOI);
+        DataOutputStream ds = ms.writer();
+        ds.writeByte(ClanItemManager.CLAN_ITEM_MAP.size());
+        for (ClanItemShop clanItemShop : ClanItemManager.CLAN_ITEM_MAP.values()) {
+            ds.writeByte(clanItemShop.getId());
+            ds.writeUTF(clanItemShop.getName());
+            ds.writeInt(clanItemShop.getXu());
+            ds.writeInt(clanItemShop.getLuong());
+            ds.writeByte(clanItemShop.getTime());
+            ds.writeByte(clanItemShop.getLevel());
         }
+        ds.flush();
+
+        CacheManager.cachedClanItemShop = ms;
+
+        sendMessage(ms);
     }
 
-    public void getTopClan(Message ms) {
-        try {
-            byte page = ms.reader().readByte();
+    public void getTopClan(Message ms) throws IOException {
+        byte page = ms.reader().readByte();
 
-            double count = clanDAO.getCountClan();
-            byte totalPages = (byte) Math.ceil(count / 10);
-            if (page > totalPages) {
-                page = 0;
-            }
-
-            List<ClanDTO> topClan = clanDAO.getTopTeams(page);
-            ms = new Message(Cmd.TOP_CLAN);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(page);
-            for (int i = 0; i < topClan.size(); i++) {
-                ClanDTO clan = topClan.get(i);
-                ds.writeShort(clan.getClanId());
-                ds.writeUTF(String.format("#%d: %s", i + 1, clan.getName()));
-                ds.writeByte(clan.getMemberCount());
-                ds.writeByte(clan.getMaxMemberCount());
-                ds.writeUTF(clan.getMasterName());
-                ds.writeInt(clan.getXu());
-                ds.writeInt(clan.getLuong());
-                ds.writeInt(clan.getCup());
-                ds.writeByte(clan.getLevel());
-                ds.writeByte(clan.getLevelPercentage());
-                ds.writeUTF(clan.getDescription());
-            }
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
+        double count = clanDAO.getCountClan();
+        byte totalPages = (byte) Math.ceil(count / 10);
+        if (page > totalPages) {
+            page = 0;
         }
+
+        List<ClanDTO> topClan = clanDAO.getTopTeams(page);
+        ms = new Message(Cmd.TOP_CLAN);
+        DataOutputStream ds = ms.writer();
+        ds.writeByte(page);
+        for (int i = 0; i < topClan.size(); i++) {
+            ClanDTO clan = topClan.get(i);
+            ds.writeShort(clan.getClanId());
+            ds.writeUTF(String.format("#%d: %s", i + 1, clan.getName()));
+            ds.writeByte(clan.getMemberCount());
+            ds.writeByte(clan.getMaxMemberCount());
+            ds.writeUTF(clan.getMasterName());
+            ds.writeInt(clan.getXu());
+            ds.writeInt(clan.getLuong());
+            ds.writeInt(clan.getCup());
+            ds.writeByte(clan.getLevel());
+            ds.writeByte(clan.getLevelPercentage());
+            ds.writeUTF(clan.getDescription());
+        }
+        ds.flush();
+        sendMessage(ms);
     }
 
-    public void getClanMember(Message ms) {
-        try {
-            DataInputStream dis = ms.reader();
-            byte page = dis.readByte();
-            short clanId = dis.readShort();
+    public void getClanMember(Message ms) throws IOException {
+        DataInputStream dis = ms.reader();
+        byte page = dis.readByte();
+        short clanId = dis.readShort();
 
-            Byte memberCount = clanDAO.getMembersOfClan(clanId);
-            if (memberCount == null) {
-                return;
-            }
-            byte totalPage = (byte) Math.ceil((double) memberCount / 10);
-            if (page >= totalPage) {
-                page = 0;
-            }
-            if (page < 0) {
-                page = (byte) (totalPage - 1);
-            }
-
-            List<ClanMemDTO> clanMemDTO = clanDAO.getClanMember(clanId, page);
-
-            ms = new Message(Cmd.CLAN_MEMBER);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(page);
-            ds.writeUTF("BIỆT ĐỘI");
-            for (ClanMemDTO memClan : clanMemDTO) {
-                ds.writeInt(memClan.getUserId());
-                ds.writeUTF(memClan.getUsername());
-                ds.writeInt(memClan.getPoint());
-                ds.writeByte(memClan.getActiveCharacter());
-                ds.writeByte(memClan.getOnline());
-                ds.writeByte(memClan.getLevel());
-                ds.writeByte(memClan.getLevelPt());
-                ds.writeByte(memClan.getIndex());
-                ds.writeInt(memClan.getCup());
-                for (int j = 0; j < 5; j++) {
-                    ds.writeShort(memClan.getDataEquip()[j]);
-                }
-                ds.writeUTF(memClan.getContributeText());
-                ds.writeUTF(memClan.getContributeCount());
-            }
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
+        Byte memberCount = clanDAO.getMembersOfClan(clanId);
+        if (memberCount == null) {
+            return;
         }
+        byte totalPage = (byte) Math.ceil((double) memberCount / 10);
+        if (page >= totalPage) {
+            page = 0;
+        }
+        if (page < 0) {
+            page = (byte) (totalPage - 1);
+        }
+
+        List<ClanMemDTO> clanMemDTO = clanDAO.getClanMember(clanId, page);
+
+        ms = new Message(Cmd.CLAN_MEMBER);
+        DataOutputStream ds = ms.writer();
+        ds.writeByte(page);
+        ds.writeUTF("BIỆT ĐỘI");
+        for (ClanMemDTO memClan : clanMemDTO) {
+            ds.writeInt(memClan.getUserId());
+            ds.writeUTF(memClan.getUsername());
+            ds.writeInt(memClan.getPoint());
+            ds.writeByte(memClan.getActiveCharacter());
+            ds.writeByte(memClan.getOnline());
+            ds.writeByte(memClan.getLevel());
+            ds.writeByte(memClan.getLevelPt());
+            ds.writeByte(memClan.getIndex());
+            ds.writeInt(memClan.getCup());
+            for (int j = 0; j < 5; j++) {
+                ds.writeShort(memClan.getDataEquip()[j]);
+            }
+            ds.writeUTF(memClan.getContributeText());
+            ds.writeUTF(memClan.getContributeCount());
+        }
+        ds.flush();
+        sendMessage(ms);
     }
 
-    public void getClanIcon(Message ms) {
-        try {
-            short clanId = ms.reader().readShort();
-            byte[] data = Utils.getFile(String.format(GameConstants.CLAN_ICON_PATH, clanDAO.getClanIcon(clanId)));
-            if (data == null) {
-                return;
-            }
-            ms = new Message(Cmd.CLAN_ICON);
-            DataOutputStream ds = ms.writer();
-            ds.writeShort(clanId);
-            ds.writeShort(data.length);
-            ds.write(data);
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
+    public void getClanIcon(Message ms) throws IOException {
+        short clanId = ms.reader().readShort();
+        byte[] data = Utils.getFile(String.format(GameConstants.CLAN_ICON_PATH, clanDAO.getClanIcon(clanId)));
+        if (data == null) {
+            return;
         }
+        ms = new Message(Cmd.CLAN_ICON);
+        DataOutputStream ds = ms.writer();
+        ds.writeShort(clanId);
+        ds.writeShort(data.length);
+        ds.write(data);
+        ds.flush();
+        sendMessage(ms);
     }
 
-    public void getInfoClan(Message ms) {
-        try {
-            short clanId = ms.reader().readShort();
-            ClanInfoDTO clanDetails = clanDAO.getClanInfo(clanId);
-            if (clanDetails == null) {
-                sendMessageLoginFail(GameString.CLAN_NOT_FOUND);
-                return;
-            }
-            ms = new Message(Cmd.CLAN_INFO);
-            DataOutputStream ds = ms.writer();
-            ds.writeShort(clanDetails.getClanId());
-            ds.writeUTF(clanDetails.getName());
-            ds.writeByte(clanDetails.getMemberCount());
-            ds.writeByte(clanDetails.getMaxMemberCount());
-            ds.writeUTF(clanDetails.getMasterName());
-            ds.writeInt(clanDetails.getXu());
-            ds.writeInt(clanDetails.getLuong());
-            ds.writeInt(clanDetails.getCup());
-            ds.writeInt(clanDetails.getExp());
-            ds.writeInt(clanDetails.getXpUpLevel());
-            ds.writeByte(clanDetails.getLevel());
-            ds.writeByte(clanDetails.getLevelPercentage());
-            ds.writeUTF(clanDetails.getDescription());
-            ds.writeUTF(clanDetails.getCreatedDate());
-            ds.writeByte(clanDetails.getItems().size());
-            for (ClanItemDTO item : clanDetails.getItems()) {
-                ds.writeUTF(item.getName());
-                ds.writeInt(item.getTime());
-            }
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
+    public void getInfoClan(Message ms) throws IOException {
+        short clanId = ms.reader().readShort();
+        ClanInfoDTO clanDetails = clanDAO.getClanInfo(clanId);
+        if (clanDetails == null) {
+            sendMessageLoginFail(GameString.CLAN_NOT_FOUND);
+            return;
         }
+        ms = new Message(Cmd.CLAN_INFO);
+        DataOutputStream ds = ms.writer();
+        ds.writeShort(clanDetails.getClanId());
+        ds.writeUTF(clanDetails.getName());
+        ds.writeByte(clanDetails.getMemberCount());
+        ds.writeByte(clanDetails.getMaxMemberCount());
+        ds.writeUTF(clanDetails.getMasterName());
+        ds.writeInt(clanDetails.getXu());
+        ds.writeInt(clanDetails.getLuong());
+        ds.writeInt(clanDetails.getCup());
+        ds.writeInt(clanDetails.getExp());
+        ds.writeInt(clanDetails.getXpUpLevel());
+        ds.writeByte(clanDetails.getLevel());
+        ds.writeByte(clanDetails.getLevelPercentage());
+        ds.writeUTF(clanDetails.getDescription());
+        ds.writeUTF(clanDetails.getCreatedDate());
+        ds.writeByte(clanDetails.getItems().size());
+        for (ClanItemDTO item : clanDetails.getItems()) {
+            ds.writeUTF(item.getName());
+            ds.writeInt(item.getTime());
+        }
+        ds.flush();
+        sendMessage(ms);
     }
 }

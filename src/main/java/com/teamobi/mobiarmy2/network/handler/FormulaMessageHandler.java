@@ -6,7 +6,6 @@ import com.teamobi.mobiarmy2.common.util.Utils;
 import com.teamobi.mobiarmy2.entity.EquipmentChest;
 import com.teamobi.mobiarmy2.entity.Formula;
 import com.teamobi.mobiarmy2.entity.SpecialItemChest;
-import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.FormulaManager;
@@ -23,79 +22,70 @@ public class FormulaMessageHandler extends BaseMessageHandler {
         super(session);
     }
 
-    public void handleMergeEquipments(Message ms) {
-        try {
-            DataInputStream dis = ms.reader();
-            byte id = dis.readByte();
-            byte action = dis.readByte();
-            if (action == 1) {
-                sendFormulaInfo(id);
-            } else if (action == 2) {
-                byte level = dis.readByte();
-                processFormulaCrafting(id, level);
-            }
-        } catch (IOException ignored) {
+    public void handleMergeEquipments(Message ms) throws IOException {
+        DataInputStream dis = ms.reader();
+        byte id = dis.readByte();
+        byte action = dis.readByte();
+        if (action == 1) {
+            sendFormulaInfo(id);
+        } else if (action == 2) {
+            byte level = dis.readByte();
+            processFormulaCrafting(id, level);
         }
     }
 
-    private void sendFormulaInfo(byte id) {
-        User user = session.getUser();
-        try {
-            Map<Byte, List<Formula>> formulaMap = FormulaManager.FORMULAS.get(id);
-            if (formulaMap == null) {
-                return;
-            }
-            List<Formula> formulaEntries = formulaMap.get(user.getActiveCharacterId());
-            if (formulaEntries == null) {
-                return;
-            }
-            Message ms = new Message(Cmd.FOMULA);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(1);
-            ds.writeByte(id);
-            ds.writeByte(formulaEntries.size());
-            for (Formula formula : formulaEntries) {
-                boolean hasRequiredItem = true;
-                boolean hasRequiredEquip = user.hasEquipment(formula.getRequiredEquip().getEquipIndex(), formula.getLevel());
-                boolean hasRequiredLevel = user.getCurrentLevel() >= formula.getLevelRequired();
+    private void sendFormulaInfo(byte id) throws IOException {
+        Map<Byte, List<Formula>> formulaMap = FormulaManager.FORMULAS.get(id);
+        if (formulaMap == null) {
+            return;
+        }
+        List<Formula> formulaEntries = formulaMap.get(user.getActiveCharacterId());
+        if (formulaEntries == null) {
+            return;
+        }
+        Message ms = new Message(Cmd.FOMULA);
+        DataOutputStream ds = ms.writer();
+        ds.writeByte(1);
+        ds.writeByte(id);
+        ds.writeByte(formulaEntries.size());
+        for (Formula formula : formulaEntries) {
+            boolean hasRequiredItem = true;
+            boolean hasRequiredEquip = user.hasEquipment(formula.getRequiredEquip().getEquipIndex(), formula.getLevel());
+            boolean hasRequiredLevel = user.getCurrentLevel() >= formula.getLevelRequired();
 
-                ds.writeByte(formula.getResultEquip().getEquipIndex());
-                ds.writeUTF("%s cấp %d".formatted(formula.getResultEquip().getName(), (formula.getLevel() + 1)));
-                ds.writeByte(formula.getLevelRequired());
-                ds.writeByte(formula.getCharacterId());
-                ds.writeByte(formula.getEquipType());
-                ds.writeByte(formula.getRequiredItems().size());
-                for (SpecialItemChest item : formula.getRequiredItems()) {
-                    short itemCountInInventory = user.getInventorySpecialItemCount(item.getItem().getId());
-                    ds.writeByte(item.getItem().getId());
-                    ds.writeUTF(item.getItem().getName());
+            ds.writeByte(formula.getResultEquip().getEquipIndex());
+            ds.writeUTF("%s cấp %d".formatted(formula.getResultEquip().getName(), (formula.getLevel() + 1)));
+            ds.writeByte(formula.getLevelRequired());
+            ds.writeByte(formula.getCharacterId());
+            ds.writeByte(formula.getEquipType());
+            ds.writeByte(formula.getRequiredItems().size());
+            for (SpecialItemChest item : formula.getRequiredItems()) {
+                short itemCountInInventory = user.getInventorySpecialItemCount(item.getItem().getId());
+                ds.writeByte(item.getItem().getId());
+                ds.writeUTF(item.getItem().getName());
+                ds.writeByte(item.getQuantity());
+                if (itemCountInInventory < item.getQuantity()) {
+                    hasRequiredItem = false;
+                    ds.writeByte(itemCountInInventory);
+                } else {
                     ds.writeByte(item.getQuantity());
-                    if (itemCountInInventory < item.getQuantity()) {
-                        hasRequiredItem = false;
-                        ds.writeByte(itemCountInInventory);
-                    } else {
-                        ds.writeByte(item.getQuantity());
-                    }
-                }
-                ds.writeByte(formula.getRequiredEquip().getEquipIndex());
-                ds.writeUTF(formula.getRequiredEquip().getName());
-                ds.writeByte(formula.getLevel());
-                ds.writeBoolean(hasRequiredEquip);
-                ds.writeBoolean(hasRequiredEquip && hasRequiredItem && hasRequiredLevel);
-                ds.writeByte(formula.getDetails().length);
-                for (String detail : formula.getDetails()) {
-                    ds.writeUTF(detail);
                 }
             }
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
+            ds.writeByte(formula.getRequiredEquip().getEquipIndex());
+            ds.writeUTF(formula.getRequiredEquip().getName());
+            ds.writeByte(formula.getLevel());
+            ds.writeBoolean(hasRequiredEquip);
+            ds.writeBoolean(hasRequiredEquip && hasRequiredItem && hasRequiredLevel);
+            ds.writeByte(formula.getDetails().length);
+            for (String detail : formula.getDetails()) {
+                ds.writeUTF(detail);
+            }
         }
+        ds.flush();
+        sendMessage(ms);
     }
 
-    private void processFormulaCrafting(byte id, byte level) {
-        User user = session.getUser();
-
+    private void processFormulaCrafting(byte id, byte level) throws IOException {
         Map<Byte, List<Formula>> formulaMap = FormulaManager.FORMULAS.get(id);
         if (formulaMap == null) {
             return;
@@ -173,15 +163,12 @@ public class FormulaMessageHandler extends BaseMessageHandler {
         sendFormulaProcessingResult(GameString.ITEM_CRAFT_SUCCESS);
     }
 
-    private void sendFormulaProcessingResult(String message) {
-        try {
-            Message ms = new Message(Cmd.FOMULA);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(0);
-            ds.writeUTF(message);
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
+    private void sendFormulaProcessingResult(String message) throws IOException {
+        Message ms = new Message(Cmd.FOMULA);
+        DataOutputStream ds = ms.writer();
+        ds.writeByte(0);
+        ds.writeUTF(message);
+        ds.flush();
+        sendMessage(ms);
     }
 }

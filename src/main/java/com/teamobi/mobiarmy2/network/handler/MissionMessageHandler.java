@@ -3,7 +3,6 @@ package com.teamobi.mobiarmy2.network.handler;
 import com.teamobi.mobiarmy2.common.constant.Cmd;
 import com.teamobi.mobiarmy2.common.constant.GameString;
 import com.teamobi.mobiarmy2.entity.Mission;
-import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.MissionManager;
@@ -17,25 +16,20 @@ public class MissionMessageHandler extends BaseMessageHandler {
         super(session);
     }
 
-    public void handleGetMissions(Message ms) {
-        User user = session.getUser();
+    public void handleGetMissions(Message ms) throws IOException {
         if (user.isNotWaiting()) {
             return;
         }
-        try {
-            byte action = ms.reader().readByte();
-            if (action == 0) {
-                sendMissionInfo();
-            } else {
-                byte missionId = ms.reader().readByte();
-                missionComplete(missionId);
-            }
-        } catch (IOException ignored) {
+        byte action = ms.reader().readByte();
+        if (action == 0) {
+            sendMissionInfo();
+        } else {
+            byte missionId = ms.reader().readByte();
+            missionComplete(missionId);
         }
     }
 
     private void missionComplete(byte missionId) throws IOException {
-        User user = session.getUser();
         String message;
         Mission mission = MissionManager.getMissionById(missionId);
         if (mission == null) {
@@ -73,7 +67,6 @@ public class MissionMessageHandler extends BaseMessageHandler {
     }
 
     private void sendMissionInfo() throws IOException {
-        User user = session.getUser();
         Message ms = new Message(Cmd.MISSISON);
         DataOutputStream ds = ms.writer();
         int i = 0;

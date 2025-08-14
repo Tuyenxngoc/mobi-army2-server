@@ -129,7 +129,10 @@ public class User {
         } else {
             xu += xuUp;
         }
-        userMessageHandler.sendUpdateMoney();
+        try {
+            userMessageHandler.sendUpdateMoney();
+        } catch (IOException e) {
+        }
     }
 
     public synchronized void updateLuong(int luongUp) {
@@ -144,7 +147,10 @@ public class User {
         } else {
             luong += luongUp;
         }
-        userMessageHandler.sendUpdateMoney();
+        try {
+            userMessageHandler.sendUpdateMoney();
+        } catch (IOException e) {
+        }
     }
 
     public synchronized void updateCup(int cupUp) {
@@ -159,7 +165,10 @@ public class User {
         } else {
             cup += cupUp;
         }
-        userMessageHandler.sendUpdateCup(cupUp);
+        try {
+            userMessageHandler.sendUpdateCup(cupUp);
+        } catch (IOException e) {
+        }
     }
 
     public synchronized void updateXp(int xpUp) {
@@ -193,7 +202,10 @@ public class User {
         }
         xps[activeCharacterId] = (int) totalXp;
 
-        userMessageHandler.sendUpdateXp(xpUp, levelDiff > 0);
+        try {
+            userMessageHandler.sendUpdateXp(xpUp, levelDiff > 0);
+        } catch (IOException e) {
+        }
     }
 
     public short[] getEquips() {

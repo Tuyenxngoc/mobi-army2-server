@@ -15,6 +15,7 @@ import java.util.Map;
 
 public abstract class BaseMessageHandler {
     protected final Session session;
+    protected User user;
 
     protected BaseMessageHandler(Session session) {
         this.session = session;

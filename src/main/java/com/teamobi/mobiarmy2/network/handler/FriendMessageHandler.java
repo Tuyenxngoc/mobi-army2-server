@@ -10,7 +10,9 @@ import com.teamobi.mobiarmy2.dto.FriendDTO;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
+import com.teamobi.mobiarmy2.server.ServerManager;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -25,34 +27,64 @@ public class FriendMessageHandler extends BaseMessageHandler {
         this.userDAO = userDAO;
     }
 
-    public void handleViewFriendList() {
-        User user = session.getUser();
-        try {
-            Message ms = new Message(Cmd.FRIENDLIST);
-            DataOutputStream ds = ms.writer();
-            if (!user.getFriends().isEmpty()) {
-                List<FriendDTO> friends = userDAO.getFriendsList(user.getUserId(), user.getFriends());
-                for (FriendDTO friend : friends) {
-                    ds.writeInt(friend.getUserId());
-                    ds.writeUTF(friend.getName());
-                    ds.writeInt(friend.getXu());
-                    ds.writeByte(friend.getActiveCharacterId());
-                    ds.writeShort(friend.getClanId());
-                    ds.writeByte(friend.getOnline());
-                    ds.writeByte(friend.getLevel());
-                    ds.writeByte(friend.getLevelPt());
-                    for (short i : friend.getData()) {
-                        ds.writeShort(i);
-                    }
-                }
-            }
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
+    public void handleSendMessage(Message ms) throws IOException {
+        ServerConfig serverConfig = ApplicationContext.getInstance()
+                .getBean(ServerConfig.class);
+
+        DataInputStream dis = ms.reader();
+        int userId = dis.readInt();
+        String content = dis.readUTF().trim();
+        if (content.isEmpty() || content.length() > 100) {
+            return;
         }
+        //Neu la admin -> bo qua
+        if (userId == 1) {
+            return;
+        }
+        //Neu la nguoi dua tin -> chat The gioi
+        if (userId == 2) {
+            int priceChatServer = serverConfig.getPriceChatServer();
+            if (user.getXu() < priceChatServer) {
+                sendServerMessage(GameString.INSUFFICIENT_FUNDS);
+                return;
+            }
+            user.updateXu(-priceChatServer);
+            sendServerInfo(GameString.createMessageFromSender(user.getUsername(), content), true);
+            return;
+        }
+        User receiver = ApplicationContext.getInstance()
+                .getBean(ServerManager.class).getUserByUserId(userId);
+        if (receiver == null) {
+            sendServerMessage(GameString.INVITE_OFFLINE);
+            return;
+        }
+        sendMessageToUser(false, receiver, content);
     }
 
-    public void handleAddFriend(Message ms) {
+    public void handleViewFriendList() throws IOException {
+        Message ms = new Message(Cmd.FRIENDLIST);
+        DataOutputStream ds = ms.writer();
+        if (!user.getFriends().isEmpty()) {
+            List<FriendDTO> friends = userDAO.getFriendsList(user.getUserId(), user.getFriends());
+            for (FriendDTO friend : friends) {
+                ds.writeInt(friend.getUserId());
+                ds.writeUTF(friend.getName());
+                ds.writeInt(friend.getXu());
+                ds.writeByte(friend.getActiveCharacterId());
+                ds.writeShort(friend.getClanId());
+                ds.writeByte(friend.getOnline());
+                ds.writeByte(friend.getLevel());
+                ds.writeByte(friend.getLevelPt());
+                for (short i : friend.getData()) {
+                    ds.writeShort(i);
+                }
+            }
+        }
+        ds.flush();
+        sendMessage(ms);
+    }
+
+    public void handleAddFriend(Message ms) throws IOException {
         int maxFriends = ApplicationContext.getInstance().getBean(ServerConfig.class).getMaxFriends();
         Set<Integer> friends = session.getUser().getFriends();
         try {
@@ -76,19 +108,15 @@ public class FriendMessageHandler extends BaseMessageHandler {
         }
     }
 
-    private void sendAddFriendMessage(int status) {
-        try {
-            Message ms = new Message(Cmd.ADD_FRIEND_RESULT);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(status);
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
+    private void sendAddFriendMessage(int status) throws IOException {
+        Message ms = new Message(Cmd.ADD_FRIEND_RESULT);
+        DataOutputStream ds = ms.writer();
+        ds.writeByte(status);
+        ds.flush();
+        sendMessage(ms);
     }
 
-    public void handleRemoveFriend(Message ms) {
-        User user = session.getUser();
+    public void handleRemoveFriend(Message ms) throws IOException {
         try {
             Integer id = ms.reader().readInt();
             user.getFriends().remove(id);
@@ -98,38 +126,32 @@ public class FriendMessageHandler extends BaseMessageHandler {
         }
     }
 
-    private void sendDeleteFriendMessage(int status) {
-        try {
-            Message ms = new Message(Cmd.DELETE_FRIEND_RESULT);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(status);
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
+    private void sendDeleteFriendMessage(int status) throws IOException {
+        Message ms = new Message(Cmd.DELETE_FRIEND_RESULT);
+        DataOutputStream ds = ms.writer();
+        ds.writeByte(status);
+        ds.flush();
+        sendMessage(ms);
     }
 
-    public void handleFindPlayer(Message ms) {
-        try {
-            String username = ms.reader().readUTF().trim();
-            if (username.isEmpty()) {
-                sendMessageLoginFail(GameString.FRIEND_ADD_MISSING_NAME);
-                return;
-            }
-            if (Utils.isAlphanumeric(username)) {
-                sendMessageLoginFail(GameString.FRIEND_ADD_INVALID_NAME);
-                return;
-            }
-            Optional<Integer> foundUserId = userDAO.findUserIdByUsername(username);
-            ms = new Message(Cmd.SEARCH);
-            DataOutputStream ds = ms.writer();
-            if (foundUserId.isPresent()) {
-                ds.writeInt(foundUserId.get());
-                ds.writeUTF(username);
-            }
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
+    public void handleFindPlayer(Message ms) throws IOException {
+        String username = ms.reader().readUTF().trim();
+        if (username.isEmpty()) {
+            sendMessageLoginFail(GameString.FRIEND_ADD_MISSING_NAME);
+            return;
         }
+        if (Utils.isAlphanumeric(username)) {
+            sendMessageLoginFail(GameString.FRIEND_ADD_INVALID_NAME);
+            return;
+        }
+        Optional<Integer> foundUserId = userDAO.findUserIdByUsername(username);
+        ms = new Message(Cmd.SEARCH);
+        DataOutputStream ds = ms.writer();
+        if (foundUserId.isPresent()) {
+            ds.writeInt(foundUserId.get());
+            ds.writeUTF(username);
+        }
+        ds.flush();
+        sendMessage(ms);
     }
 }
