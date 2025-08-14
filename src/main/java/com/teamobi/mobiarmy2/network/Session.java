@@ -35,7 +35,7 @@ public class Session {
 
     private final byte[] sessionKey;
     private final Sender sender = new Sender();
-    private MessageRouter messageRouter;
+    private final MessageRouter messageRouter;
     private final long sessionId;
     @Getter
     private final String IPAddress;
@@ -219,7 +219,7 @@ public class Session {
         }
     }
 
-    public void initService() {
+    public void initMessageHandlers() {
         ApplicationContext context = ApplicationContext.getInstance();
 
         UserMessageHandler userMessageHandler = new UserMessageHandler(
@@ -234,30 +234,28 @@ public class Session {
                 context.getBean(UserCharacterDAO.class)
         );
 
-        ClanMessageHandler clanMessageHandler = new ClanMessageHandler(
-                this,
-                context.getBean(ClanDAO.class)
-        );
-
-        FriendMessageHandler friendMessageHandler = new FriendMessageHandler(
-                this,
-                context.getBean(UserDAO.class)
-        );
-
-        ShopMessageHandler shopMessageHandler = new ShopMessageHandler(
-                this,
-                context.getBean(UserCharacterDAO.class)
-        );
-
-        ResourceMessageHandler resourceService = new ResourceMessageHandler(
-                this
-        );
+        ClanMessageHandler clanMessageHandler = new ClanMessageHandler(this, context.getBean(ClanDAO.class));
+        FriendMessageHandler friendMessageHandler = new FriendMessageHandler(this, context.getBean(UserDAO.class));
+        ShopMessageHandler shopMessageHandler = new ShopMessageHandler(this, context.getBean(UserCharacterDAO.class));
+        ResourceMessageHandler resourceService = new ResourceMessageHandler(this);
+        MissionMessageHandler missionMessageHandler = new MissionMessageHandler(this);
+        FormulaMessageHandler formulaMessageHandler = new FormulaMessageHandler(this);
+        RoomMessageHandler roomMessageHandler = new RoomMessageHandler(this);
+        FightWaitMessageHandler fightWaitMessageHandler = new FightWaitMessageHandler(this, context.getBean(UserDAO.class));
+        FightManagerMessageHandler fightManagerMessageHandler = new FightManagerMessageHandler(this);
+        InventoryMessageHandler inventoryMessageHandler = new InventoryMessageHandler(this);
 
         messageRouter.setUserMessageHandler(userMessageHandler);
         messageRouter.setClanMessageHandler(clanMessageHandler);
         messageRouter.setFriendMessageHandler(friendMessageHandler);
         messageRouter.setShopMessageHandler(shopMessageHandler);
         messageRouter.setResourceService(resourceService);
+        messageRouter.setMissionMessageHandler(missionMessageHandler);
+        messageRouter.setFormulaMessageHandler(formulaMessageHandler);
+        messageRouter.setRoomMessageHandler(roomMessageHandler);
+        messageRouter.setFightWaitMessageHandler(fightWaitMessageHandler);
+        messageRouter.setFightManagerMessageHandler(fightManagerMessageHandler);
+        messageRouter.setInventoryMessageHandler(inventoryMessageHandler);
     }
 
     class Sender implements Runnable {

@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class MessageRouter {
+    private final AuthMessageHandler authMessageHandler;
+
     @Setter
     private UserMessageHandler userMessageHandler;
     @Setter
@@ -27,8 +29,8 @@ public class MessageRouter {
     private FightWaitMessageHandler fightWaitMessageHandler;
     @Setter
     private FightManagerMessageHandler fightManagerMessageHandler;
-
-    private AuthMessageHandler authMessageHandler;
+    @Setter
+    private InventoryMessageHandler inventoryMessageHandler;
 
     public MessageRouter(AuthMessageHandler authMessageHandler) {
         this.authMessageHandler = authMessageHandler;
@@ -41,9 +43,9 @@ public class MessageRouter {
 
                 case Cmd.GET_KEY -> authMessageHandler.handleHandshakeMessage();
 
-                case Cmd.GET_AGENT_PROVIDER -> userMessageHandler.handleSendAgentAndProviders();
+                case Cmd.GET_AGENT_PROVIDER -> authMessageHandler.handleSendAgentAndProviders();
 
-                case Cmd.GET_MORE_DAY -> userMessageHandler.extendItemDuration(ms);
+                case Cmd.GET_MORE_DAY -> inventoryMessageHandler.extendItemDuration(ms);
 
                 case Cmd.MISSISON -> missionMessageHandler.handleGetMissions(ms);
 
@@ -65,7 +67,7 @@ public class MessageRouter {
 
                 case Cmd.SHOP_LINHTINH -> shopMessageHandler.handleSpecialItemShop(ms);
 
-                case Cmd.VIP_EQUIP -> userMessageHandler.equipVipItems(ms);
+                case Cmd.VIP_EQUIP -> inventoryMessageHandler.equipVipItems(ms);
 
                 case Cmd.LOGIN -> authMessageHandler.handleLogin(ms);
 
@@ -85,7 +87,7 @@ public class MessageRouter {
 
                 case Cmd.READY -> fightWaitMessageHandler.setReady(ms);
 
-                case Cmd.IMBUE -> userMessageHandler.imbueGem(ms);
+                case Cmd.IMBUE -> inventoryMessageHandler.imbueGem(ms);
 
                 case Cmd.SET_PASS -> fightWaitMessageHandler.handleSetPasswordFightWait(ms);
 
@@ -113,7 +115,7 @@ public class MessageRouter {
 
                 case Cmd.SEARCH -> friendMessageHandler.handleFindPlayer(ms);
 
-                case Cmd.PING -> userMessageHandler.ping(ms);
+                case Cmd.PING -> authMessageHandler.ping(ms);
 
                 case Cmd.SKIP -> fightManagerMessageHandler.skipTurn();
 
@@ -159,7 +161,7 @@ public class MessageRouter {
 
                 case Cmd.SHOP_EQUIP -> shopMessageHandler.handleSendShopEquipments();
 
-                case Cmd.BUY_EQUIP -> userMessageHandler.handleEquipmentTransactions(ms);
+                case Cmd.BUY_EQUIP -> inventoryMessageHandler.handleEquipmentTransactions(ms);
 
                 case Cmd.RULET -> userMessageHandler.handleSpinWheel(ms);
 

@@ -95,7 +95,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
         User user = new User(session);
         user.setAccountId(accountDTO.getAccountId());
         session.setUser(user);
-        session.initService();
+        session.initMessageHandlers();
 
         UserDTO userDTO = userDAO.findByAccountId(user.getAccountId());
         if (userDTO == null) {
@@ -373,6 +373,26 @@ public class AuthMessageHandler extends BaseMessageHandler {
 
     public void handleHandshakeMessage() {
         session.sendKeys();
+    }
+
+    public void handleSendAgentAndProviders() throws IOException {
+        Message ms = new Message(Cmd.GET_AGENT_PROVIDER);
+        DataOutputStream ds = ms.writer();
+        ds.writeUTF("none");
+        ds.writeByte(0);
+        ds.flush();
+        sendMessage(ms);
+    }
+
+    public void ping(Message ms) throws IOException {
+        DataInputStream dis = ms.reader();
+        int pingId = dis.readInt();
+
+        Message response = new Message(Cmd.PING);
+        DataOutputStream ds = response.writer();
+        ds.writeInt(pingId);
+        ds.flush();
+        sendMessage(response);
     }
 
     public void getProvider(Message ms) throws IOException {
