@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.service;
+package com.teamobi.mobiarmy2.network.handler;
 
 import com.teamobi.mobiarmy2.bootstrap.ApplicationContext;
 import com.teamobi.mobiarmy2.common.config.ServerConfig;
@@ -29,11 +29,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ClanService extends BaseService {
+public class ClanMessageHandler extends BaseMessageHandler {
     private static final ConcurrentHashMap<Short, Object> clanLocks = new ConcurrentHashMap<>();
     private final ClanDAO clanDAO;
 
-    public ClanService(Session session, ClanDAO clanDAO) {
+    public ClanMessageHandler(Session session, ClanDAO clanDAO) {
         super(session);
         this.clanDAO = clanDAO;
     }

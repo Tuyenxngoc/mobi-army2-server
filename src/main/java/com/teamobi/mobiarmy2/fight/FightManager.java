@@ -9,10 +9,10 @@ import com.teamobi.mobiarmy2.common.util.Utils;
 import com.teamobi.mobiarmy2.entity.*;
 import com.teamobi.mobiarmy2.entity.boss.*;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.handler.ClanMessageHandler;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
-import com.teamobi.mobiarmy2.service.ClanService;
 import lombok.Getter;
 
 import java.io.DataOutputStream;
@@ -819,7 +819,7 @@ public class FightManager {
                 if (player == null || player.getUser() == null) {
                     continue;
                 }
-                player.getUser().getUserService().sendMoneyErrorMessage(GameString.MATCH_NOT_COUNTED);
+                player.getUser().getUserMessageHandler().sendMoneyErrorMessage(GameString.MATCH_NOT_COUNTED);
             }
         }
 
@@ -854,8 +854,8 @@ public class FightManager {
                 user.sendMessage(ms);
 
                 //Gửi thông báo số xp và cup nhận được
-                user.getUserService().sendUpdateXp(player.getAllXpUp(), false);
-                user.getUserService().sendUpdateCup(Math.min(player.getAllCupUp(), Byte.MAX_VALUE));
+                user.getUserMessageHandler().sendUpdateXp(player.getAllXpUp(), false);
+                user.getUserMessageHandler().sendUpdateCup(Math.min(player.getAllCupUp(), Byte.MAX_VALUE));
 
                 //Cộng thêm quà nếu trận đấu là hợp lệ
                 if (!fightInValid) {
@@ -872,7 +872,7 @@ public class FightManager {
                             user.updateInventory(null, null, List.of(newItem), null);
 
                             String reward = String.format("Phần thưởng diệt trùm của bạn là %dx %s", newItem.getQuantity(), newItem.getItem().getName());
-                            user.getUserService().sendServerMessage(reward);
+                            user.getUserMessageHandler().sendServerMessage(reward);
                         } else {
                             StringBuilder reward = new StringBuilder("Phần thưởng diệt trùm của bạn là ");
                             int count = Utils.nextInt(2, 3);
@@ -884,16 +884,16 @@ public class FightManager {
                                 reward.append(FightItemManager.FIGHT_ITEMS.get(indexItem).getName()).append(", ");
                             }
                             reward.deleteCharAt(reward.length() - 2);
-                            user.getUserService().sendServerMessage(reward.toString());
+                            user.getUserMessageHandler().sendServerMessage(reward.toString());
                         }
                     }
 
                     //Cộng xp và cup cho clan
                     if (user.getClanId() != null) {
-                        ClanService clanService = ApplicationContext.getInstance()
-                                .getBean(ClanService.class);
-                        clanService.updateXp(user.getClanId(), user.getUserId(), player.getAllXpUp() / 100);
-                        clanService.updateCup(user.getClanId(), user.getUserId(), player.getAllCupUp());
+                        ClanMessageHandler clanMessageHandler = ApplicationContext.getInstance()
+                                .getBean(ClanMessageHandler.class);
+                        clanMessageHandler.updateXp(user.getClanId(), user.getUserId(), player.getAllXpUp() / 100);
+                        clanMessageHandler.updateCup(user.getClanId(), user.getUserId(), player.getAllCupUp());
                     }
                 }
 
@@ -1057,9 +1057,9 @@ public class FightManager {
                 if (clanItemsCache.containsKey(user.getClanId())) {
                     clanItems = clanItemsCache.get(user.getClanId());
                 } else {
-                    ClanService clanService = ApplicationContext.getInstance()
-                            .getBean(ClanService.class);
-                    clanItems = clanService.getClanItems(user.getClanId());
+                    ClanMessageHandler clanMessageHandler = ApplicationContext.getInstance()
+                            .getBean(ClanMessageHandler.class);
+                    clanItems = clanMessageHandler.getClanItems(user.getClanId());
                     clanItemsCache.put(user.getClanId(), clanItems);
                 }
             }
@@ -1301,7 +1301,7 @@ public class FightManager {
 
         //Khi đấu boss thì cấm dùng 1 số item
         if (fightWait.getRoomType() == 5 && UNAUTHORIZED_ITEMS.contains(itemIndex)) {
-            player.getUser().getUserService().sendMoneyErrorMessage(GameString.ITEM_UNAUTHORIZED);
+            player.getUser().getUserMessageHandler().sendMoneyErrorMessage(GameString.ITEM_UNAUTHORIZED);
             return;
         }
 

@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.service;
+package com.teamobi.mobiarmy2.network.handler;
 
 import com.teamobi.mobiarmy2.bootstrap.ApplicationContext;
 import com.teamobi.mobiarmy2.common.constant.Cmd;
@@ -13,10 +13,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
-public abstract class BaseService {
+public abstract class BaseMessageHandler {
     protected final Session session;
 
-    protected BaseService(Session session) {
+    protected BaseMessageHandler(Session session) {
         this.session = session;
     }
 

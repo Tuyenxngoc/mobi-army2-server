@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.service;
+package com.teamobi.mobiarmy2.network.handler;
 
 import com.teamobi.mobiarmy2.bootstrap.ApplicationContext;
 import com.teamobi.mobiarmy2.common.config.ServerConfig;
@@ -12,8 +12,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class ResourceService extends BaseService {
-    public ResourceService(Session session) {
+public class ResourceMessageHandler extends BaseMessageHandler {
+    public ResourceMessageHandler(Session session) {
         super(session);
     }
 

@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.service;
+package com.teamobi.mobiarmy2.network.handler;
 
 import com.teamobi.mobiarmy2.bootstrap.ApplicationContext;
 import com.teamobi.mobiarmy2.common.config.ServerConfig;
@@ -18,6 +18,7 @@ import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.*;
+import com.teamobi.mobiarmy2.service.LoginRateLimiterService;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -26,14 +27,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public class LoginService extends BaseService {
+public class AuthMessageHandler extends BaseMessageHandler {
     private final LoginRateLimiterService loginRateLimiterService;
 
     private final UserDAO userDAO;
     private final AccountDAO accountDAO;
     private final UserCharacterDAO userCharacterDAO;
 
-    public LoginService(Session session, LoginRateLimiterService loginRateLimiterService, UserDAO userDAO, AccountDAO accountDAO, UserCharacterDAO userCharacterDAO) {
+    public AuthMessageHandler(Session session, LoginRateLimiterService loginRateLimiterService, UserDAO userDAO, AccountDAO accountDAO, UserCharacterDAO userCharacterDAO) {
         super(session);
         this.loginRateLimiterService = loginRateLimiterService;
         this.userDAO = userDAO;
@@ -112,7 +113,7 @@ public class LoginService extends BaseService {
             User userLogin = ApplicationContext.getInstance()
                     .getBean(ServerManager.class).getUserByUserId(userDTO.getUserId());
             if (userLogin != null) {
-                userLogin.getUserService().sendMoneyErrorMessage(GameString.ACCOUNT_OTHER_LOGIN);
+                userLogin.getUserMessageHandler().sendMoneyErrorMessage(GameString.ACCOUNT_OTHER_LOGIN);
                 userLogin.getSession().close();
 
                 sendMessageLoginFail(GameString.LOGIN_ANOTHER_DEVICE);

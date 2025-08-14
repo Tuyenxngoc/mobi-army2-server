@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.service;
+package com.teamobi.mobiarmy2.network.handler;
 
 import com.teamobi.mobiarmy2.bootstrap.ApplicationContext;
 import com.teamobi.mobiarmy2.common.config.ServerConfig;
@@ -19,6 +19,8 @@ import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.*;
+import com.teamobi.mobiarmy2.service.LeaderboardService;
+import com.teamobi.mobiarmy2.service.LoginRateLimiterService;
 import lombok.Setter;
 
 import java.io.DataInputStream;
@@ -27,7 +29,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class UserService extends BaseService {
+public class UserMessageHandler extends BaseMessageHandler {
     private static final int minimumWaitTime = 5000;
 
     @Setter
@@ -52,7 +54,7 @@ public class UserService extends BaseService {
     private long timeSinceLeftRoom;
     private long lastSpinTime;
 
-    public UserService(
+    public UserMessageHandler(
             Session session,
             ServerConfig serverConfig,
             LeaderboardService leaderboardService,
@@ -191,241 +193,6 @@ public class UserService extends BaseService {
                 user.updateInventory(equip, null, null, null);
                 sendServerMessage(GameString.EXTEND_SUCCESS);
             }
-        } catch (IOException ignored) {
-        }
-    }
-
-    public void handleGetMissions(Message ms) {
-        if (user.isNotWaiting()) {
-            return;
-        }
-        try {
-            byte action = ms.reader().readByte();
-            if (action == 0) {
-                sendMissionInfo();
-            } else {
-                byte missionId = ms.reader().readByte();
-                missionComplete(missionId);
-            }
-        } catch (IOException ignored) {
-        }
-    }
-
-    private void missionComplete(byte missionId) throws IOException {
-        String message;
-        Mission mission = MissionManager.getMissionById(missionId);
-        if (mission == null) {
-            message = GameString.MISSION_NOT_FOUND;
-        } else {
-            byte missionType = mission.getType();
-            byte missionLevel = user.getMissionLevel()[missionType];
-            byte requiredLevel = mission.getLevel();
-
-            if (user.getMission()[missionType] < mission.getRequirement()) {
-                message = GameString.MISSION_NOT_COMPLETED;
-            } else if (missionLevel == requiredLevel) {
-                user.getMissionLevel()[mission.getType()]++;
-                if (mission.getRewardXu() > 0) {
-                    user.updateXu(mission.getRewardXu());
-                }
-                if (mission.getRewardLuong() > 0) {
-                    user.updateLuong(mission.getRewardLuong());
-                }
-                if (mission.getRewardXp() > 0) {
-                    user.updateXp(mission.getRewardXp());
-                }
-                if (mission.getRewardCup() > 0) {
-                    user.updateCup(mission.getRewardCup());
-                }
-                sendMissionInfo();
-                message = GameString.createMissionCompleteMessage(mission.getReward());
-            } else if (missionLevel < requiredLevel) {
-                message = GameString.MISSION_NOT_COMPLETED;
-            } else {
-                message = GameString.MISSION_COMPLETED;
-            }
-        }
-        sendMoneyErrorMessage(message);
-    }
-
-    private void sendMissionInfo() throws IOException {
-        Message ms = new Message(Cmd.MISSISON);
-        DataOutputStream ds = ms.writer();
-        int i = 0;
-        for (List<Byte> missionIds : MissionManager.MISSIONS_BY_TYPE.values()) {
-            int index = user.getMissionLevel()[i] - 1;
-            if (index >= missionIds.size()) {
-                index = missionIds.size() - 1;
-            }
-            Mission mission = MissionManager.getMissionById(missionIds.get(index));
-            ds.writeByte(mission.getId());
-            ds.writeByte(mission.getLevel());
-            ds.writeUTF(mission.getName());
-            ds.writeUTF(mission.getReward());
-            ds.writeInt(mission.getRequirement());
-            ds.writeInt(Math.min(user.getMission()[i], mission.getRequirement()));
-            ds.writeBoolean(user.getMission()[i] >= mission.getRequirement());
-            i++;
-        }
-        ds.flush();
-        sendMessage(ms);
-    }
-
-    public void handleMergeEquipments(Message ms) {
-        try {
-            DataInputStream dis = ms.reader();
-            byte id = dis.readByte();
-            byte action = dis.readByte();
-            if (action == 1) {
-                sendFormulaInfo(id);
-            } else if (action == 2) {
-                byte level = dis.readByte();
-                processFormulaCrafting(id, level);
-            }
-        } catch (IOException ignored) {
-        }
-    }
-
-    private void processFormulaCrafting(byte id, byte level) {
-        Map<Byte, List<Formula>> formulaMap = FormulaManager.FORMULAS.get(id);
-        if (formulaMap == null) {
-            return;
-        }
-        List<Formula> formulas = formulaMap.get(user.getActiveCharacterId());
-        if (formulas == null) {
-            return;
-        }
-        Formula formula = formulas.get(level);
-        if (formula == null) {
-            return;
-        }
-
-        //Kiểm tra có đủ level chế đồ yêu cầu không
-        if (user.getCurrentLevel() < formula.getLevelRequired()) {
-            sendFormulaProcessingResult(GameString.ITEM_CRAFT_FAILURE);
-            return;
-        }
-
-        //Kiểm tra có trang bị yêu cầu không
-        EquipmentChest requiredEquip = user.getEquipment(formula.getRequiredEquip().getEquipIndex(), user.getActiveCharacterId(), formula.getLevel());
-        if (requiredEquip == null) {
-            sendFormulaProcessingResult(GameString.ITEM_CRAFT_FAILURE);
-            return;
-        }
-
-        //Tạo một danh sách item cần xóa
-        List<SpecialItemChest> itemsToRemove = new ArrayList<>();
-
-        //Kiểm tra có đủ item yêu cầu không
-        for (SpecialItemChest item : formula.getRequiredItems()) {
-            short itemCountInInventory = user.getInventorySpecialItemCount(item.getItem().getId());
-            if (itemCountInInventory < item.getQuantity()) {
-                sendFormulaProcessingResult(GameString.ITEM_CRAFT_FAILURE);
-                return;
-            }
-            itemsToRemove.add(item);
-        }
-
-        //Kiểm tra có công thức hoặc đủ xu không
-        SpecialItemChest material = user.getSpecialItemById(formula.getMaterial().getId());
-        if (material == null && user.getXu() < formula.getMaterial().getPriceXu()) {
-            sendFormulaProcessingResult(GameString.ITEM_CRAFT_FAILURE);
-            return;
-        } else {
-            if (material != null) {//Nếu có công thức thì thêm vào danh sách item xóa
-                itemsToRemove.add(new SpecialItemChest((short) 1, material.getItem()));
-            } else {//Nếu chưu có thì trừ xu
-                user.updateXu(-formula.getMaterial().getPriceXu());
-            }
-        }
-
-        //Xoá trang bị và item yêu cầu
-        user.updateInventory(null, requiredEquip, null, itemsToRemove);
-
-        //Random chỉ số
-        byte[] addPoints = new byte[5];
-        byte[] addPercents = new byte[5];
-        for (int i = 0; i < 5; i++) {
-            addPoints[i] = (byte) Utils.nextInt(formula.getAddPointsMin()[i], formula.getAddPointsMax()[i]);
-            addPercents[i] = (byte) Utils.nextInt(formula.getAddPercentsMin()[i], formula.getAddPercentsMax()[i]);
-        }
-
-        //Tạo trang bị mới
-        EquipmentChest newEquip = new EquipmentChest();
-        newEquip.setEquipment(formula.getResultEquip());
-        newEquip.setVipLevel((byte) (formula.getLevel() + 1));
-        newEquip.setAddPoints(addPoints);
-        newEquip.setAddPercents(addPercents);
-
-        //Thêm trang bị vào rương
-        user.addEquipment(newEquip);
-
-        //Gửi thông báo
-        sendFormulaProcessingResult(GameString.ITEM_CRAFT_SUCCESS);
-    }
-
-    private void sendFormulaProcessingResult(String message) {
-        try {
-            Message ms = new Message(Cmd.FOMULA);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(0);
-            ds.writeUTF(message);
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
-    }
-
-    private void sendFormulaInfo(byte id) {
-        try {
-            Map<Byte, List<Formula>> formulaMap = FormulaManager.FORMULAS.get(id);
-            if (formulaMap == null) {
-                return;
-            }
-            List<Formula> formulaEntries = formulaMap.get(user.getActiveCharacterId());
-            if (formulaEntries == null) {
-                return;
-            }
-            Message ms = new Message(Cmd.FOMULA);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(1);
-            ds.writeByte(id);
-            ds.writeByte(formulaEntries.size());
-            for (Formula formula : formulaEntries) {
-                boolean hasRequiredItem = true;
-                boolean hasRequiredEquip = user.hasEquipment(formula.getRequiredEquip().getEquipIndex(), formula.getLevel());
-                boolean hasRequiredLevel = user.getCurrentLevel() >= formula.getLevelRequired();
-
-                ds.writeByte(formula.getResultEquip().getEquipIndex());
-                ds.writeUTF("%s cấp %d".formatted(formula.getResultEquip().getName(), (formula.getLevel() + 1)));
-                ds.writeByte(formula.getLevelRequired());
-                ds.writeByte(formula.getCharacterId());
-                ds.writeByte(formula.getEquipType());
-                ds.writeByte(formula.getRequiredItems().size());
-                for (SpecialItemChest item : formula.getRequiredItems()) {
-                    short itemCountInInventory = user.getInventorySpecialItemCount(item.getItem().getId());
-                    ds.writeByte(item.getItem().getId());
-                    ds.writeUTF(item.getItem().getName());
-                    ds.writeByte(item.getQuantity());
-                    if (itemCountInInventory < item.getQuantity()) {
-                        hasRequiredItem = false;
-                        ds.writeByte(itemCountInInventory);
-                    } else {
-                        ds.writeByte(item.getQuantity());
-                    }
-                }
-                ds.writeByte(formula.getRequiredEquip().getEquipIndex());
-                ds.writeUTF(formula.getRequiredEquip().getName());
-                ds.writeByte(formula.getLevel());
-                ds.writeBoolean(hasRequiredEquip);
-                ds.writeBoolean(hasRequiredEquip && hasRequiredItem && hasRequiredLevel);
-                ds.writeByte(formula.getDetails().length);
-                for (String detail : formula.getDetails()) {
-                    ds.writeUTF(detail);
-                }
-            }
-            ds.flush();
-            sendMessage(ms);
         } catch (IOException ignored) {
         }
     }

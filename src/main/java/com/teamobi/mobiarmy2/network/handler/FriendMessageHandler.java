@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.service;
+package com.teamobi.mobiarmy2.network.handler;
 
 import com.teamobi.mobiarmy2.bootstrap.ApplicationContext;
 import com.teamobi.mobiarmy2.common.config.ServerConfig;
@@ -17,10 +17,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public class FriendService extends BaseService {
+public class FriendMessageHandler extends BaseMessageHandler {
     private final UserDAO userDAO;
 
-    public FriendService(Session session, UserDAO userDAO) {
+    public FriendMessageHandler(Session session, UserDAO userDAO) {
         super(session);
         this.userDAO = userDAO;
     }

@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.service;
+package com.teamobi.mobiarmy2.network.handler;
 
 import com.teamobi.mobiarmy2.bootstrap.ApplicationContext;
 import com.teamobi.mobiarmy2.common.config.ServerConfig;
@@ -21,10 +21,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
-public class ShopService extends BaseService {
+public class ShopMessageHandler extends BaseMessageHandler {
     private final UserCharacterDAO userCharacterDAO;
 
-    public ShopService(Session session, UserCharacterDAO userCharacterDAO) {
+    public ShopMessageHandler(Session session, UserCharacterDAO userCharacterDAO) {
         super(session);
         this.userCharacterDAO = userCharacterDAO;
     }

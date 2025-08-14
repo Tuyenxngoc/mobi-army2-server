@@ -5,8 +5,10 @@ import com.teamobi.mobiarmy2.common.config.ServerConfig;
 import com.teamobi.mobiarmy2.common.constant.Cmd;
 import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.entity.User;
+import com.teamobi.mobiarmy2.network.handler.*;
 import com.teamobi.mobiarmy2.server.ServerManager;
-import com.teamobi.mobiarmy2.service.*;
+import com.teamobi.mobiarmy2.service.LeaderboardService;
+import com.teamobi.mobiarmy2.service.LoginRateLimiterService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -64,7 +66,7 @@ public class Session {
         this.IPAddress = socket.getInetAddress().getHostAddress();
         this.sessionKey = generateSessionKey();
         ApplicationContext context = ApplicationContext.getInstance();
-        LoginService loginService = new LoginService(
+        AuthMessageHandler loginService = new AuthMessageHandler(
                 this,
                 context.getBean(LoginRateLimiterService.class),
                 context.getBean(UserDAO.class),
@@ -95,7 +97,7 @@ public class Session {
     public void close() {
         try {
             if (user.isLogged()) {
-                user.getUserService().handleLogout();
+                user.getUserMessageHandler().handleLogout();
             }
 
             ApplicationContext.getInstance()
@@ -220,7 +222,7 @@ public class Session {
     public void initService() {
         ApplicationContext context = ApplicationContext.getInstance();
 
-        UserService userService = new UserService(
+        UserMessageHandler userMessageHandler = new UserMessageHandler(
                 this,
                 context.getBean(ServerConfig.class),
                 context.getBean(LeaderboardService.class),
@@ -232,29 +234,29 @@ public class Session {
                 context.getBean(UserCharacterDAO.class)
         );
 
-        ClanService clanService = new ClanService(
+        ClanMessageHandler clanMessageHandler = new ClanMessageHandler(
                 this,
                 context.getBean(ClanDAO.class)
         );
 
-        FriendService friendService = new FriendService(
+        FriendMessageHandler friendMessageHandler = new FriendMessageHandler(
                 this,
                 context.getBean(UserDAO.class)
         );
 
-        ShopService shopService = new ShopService(
+        ShopMessageHandler shopMessageHandler = new ShopMessageHandler(
                 this,
                 context.getBean(UserCharacterDAO.class)
         );
 
-        ResourceService resourceService = new ResourceService(
+        ResourceMessageHandler resourceService = new ResourceMessageHandler(
                 this
         );
 
-        messageRouter.setUserService(userService);
-        messageRouter.setClanService(clanService);
-        messageRouter.setFriendService(friendService);
-        messageRouter.setShopService(shopService);
+        messageRouter.setUserMessageHandler(userMessageHandler);
+        messageRouter.setClanMessageHandler(clanMessageHandler);
+        messageRouter.setFriendMessageHandler(friendMessageHandler);
+        messageRouter.setShopMessageHandler(shopMessageHandler);
         messageRouter.setResourceService(resourceService);
     }
 

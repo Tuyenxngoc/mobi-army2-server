@@ -10,12 +10,12 @@ import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.fight.TrainingManager;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
+import com.teamobi.mobiarmy2.network.handler.UserMessageHandler;
 import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
 import com.teamobi.mobiarmy2.server.UserXpManager;
 import com.teamobi.mobiarmy2.service.GiftBoxService;
-import com.teamobi.mobiarmy2.service.UserService;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,7 +30,7 @@ import java.util.Set;
 @Getter
 @Setter
 public class User {
-    private UserService userService;
+    private UserMessageHandler userMessageHandler;
     private GiftBoxService giftBoxService;
     private final Session session;
     private UserState state = UserState.WAITING;
@@ -129,7 +129,7 @@ public class User {
         } else {
             xu += xuUp;
         }
-        userService.sendUpdateMoney();
+        userMessageHandler.sendUpdateMoney();
     }
 
     public synchronized void updateLuong(int luongUp) {
@@ -144,7 +144,7 @@ public class User {
         } else {
             luong += luongUp;
         }
-        userService.sendUpdateMoney();
+        userMessageHandler.sendUpdateMoney();
     }
 
     public synchronized void updateCup(int cupUp) {
@@ -159,7 +159,7 @@ public class User {
         } else {
             cup += cupUp;
         }
-        userService.sendUpdateCup(cupUp);
+        userMessageHandler.sendUpdateCup(cupUp);
     }
 
     public synchronized void updateXp(int xpUp) {
@@ -193,7 +193,7 @@ public class User {
         }
         xps[activeCharacterId] = (int) totalXp;
 
-        userService.sendUpdateXp(xpUp, levelDiff > 0);
+        userMessageHandler.sendUpdateXp(xpUp, levelDiff > 0);
     }
 
     public short[] getEquips() {
