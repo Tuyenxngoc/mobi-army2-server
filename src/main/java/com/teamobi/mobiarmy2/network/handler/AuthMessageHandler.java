@@ -198,7 +198,6 @@ public class AuthMessageHandler extends BaseMessageHandler {
     }
 
     private void updateUserFromDTO(UserDTO userDTO) {
-        User user = session.getUser();
         user.setUserId(userDTO.getUserId());
         user.setXu(userDTO.getXu());
         user.setLuong(userDTO.getLuong());
@@ -223,7 +222,6 @@ public class AuthMessageHandler extends BaseMessageHandler {
     private void updateUserCharacters(List<UserCharacterDTO> userCharacterDTOS) {
         int totalCharacter = CharacterManager.CHARACTERS.size();
 
-        User user = session.getUser();
         user.setUserCharacterIds(new long[totalCharacter]);
         user.setOwnedCharacters(new boolean[totalCharacter]);
         user.setLevels(new int[totalCharacter]);
@@ -260,7 +258,6 @@ public class AuthMessageHandler extends BaseMessageHandler {
     }
 
     public void sendLoginSuccess() throws IOException {
-        User user = session.getUser();
         Message ms = new Message(Cmd.LOGIN_SUCESS);
         DataOutputStream ds = ms.writer();
         ds.writeInt(user.getUserId());

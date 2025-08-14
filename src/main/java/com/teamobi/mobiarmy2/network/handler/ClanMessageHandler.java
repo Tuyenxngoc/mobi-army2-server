@@ -12,7 +12,6 @@ import com.teamobi.mobiarmy2.dto.ClanInfoDTO;
 import com.teamobi.mobiarmy2.dto.ClanItemDTO;
 import com.teamobi.mobiarmy2.dto.ClanMemDTO;
 import com.teamobi.mobiarmy2.entity.ClanItemShop;
-import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.json.ClanItemJson;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
@@ -143,7 +142,6 @@ public class ClanMessageHandler extends BaseMessageHandler {
     }
 
     public void contributeToClan(Message ms) throws IOException {
-        User user = session.getUser();
         if (user.isNotWaiting()) {
             return;
         }
@@ -191,7 +189,6 @@ public class ClanMessageHandler extends BaseMessageHandler {
     }
 
     public void handlePurchaseClanItem(Message ms) throws IOException {
-        User user = session.getUser();
         if (user.getClanId() == null) {
             sendServerMessage(GameString.NO_CLAN_MEMBERSHIP);
             return;
@@ -208,7 +205,6 @@ public class ClanMessageHandler extends BaseMessageHandler {
     }
 
     private void buyClanShop(byte unit, byte itemId) {
-        User user = session.getUser();
         ClanItemShop clanItemShop = ClanItemManager.getItemClanById(itemId);
 
         if (clanItemShop == null || clanItemShop.getOnSale() != 1) {

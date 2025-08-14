@@ -70,7 +70,6 @@ public abstract class BaseMessageHandler {
                 ds.writeInt(1);
                 ds.writeUTF("ADMIN");
             } else {
-                User user = session.getUser();
                 ds.writeInt(user.getUserId());
                 ds.writeUTF(user.getUsername());
             }
@@ -102,7 +101,6 @@ public abstract class BaseMessageHandler {
     }
 
     public void sendCharacterInfo() {
-        User user = session.getUser();
         try {
             Message ms = new Message(Cmd.CHARACTOR_INFO);
             DataOutputStream ds = ms.writer();
@@ -122,7 +120,6 @@ public abstract class BaseMessageHandler {
     }
 
     public void sendInventoryInfo() {
-        User user = session.getUser();
         try {
             Message ms = new Message(Cmd.INVENTORY);
             DataOutputStream ds = ms.writer();
