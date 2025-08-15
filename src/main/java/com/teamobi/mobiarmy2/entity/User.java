@@ -77,7 +77,7 @@ public class User {
     }
 
     public boolean isOpeningGift() {
-        return giftBoxService.isOpeningGift();
+        return giftBoxService != null && giftBoxService.isOpeningGift();
     }
 
     public void sendMessage(Message ms) {
@@ -512,7 +512,7 @@ public class User {
         int[] abilities = new int[5];
         short[] percents = new short[5];
 
-        short[] points = addedPoints[activeCharacterId];
+        short[] points = addedPoints[activeCharacterId].clone();
         for (int i = 0; i < points.length; i++) {
             points[i] += teamPoints;
         }
