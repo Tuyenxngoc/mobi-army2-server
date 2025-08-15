@@ -5,6 +5,8 @@ import com.teamobi.mobiarmy2.common.constant.Cmd;
 import com.teamobi.mobiarmy2.entity.EquipmentChest;
 import com.teamobi.mobiarmy2.entity.SpecialItemChest;
 import com.teamobi.mobiarmy2.entity.User;
+import com.teamobi.mobiarmy2.fight.FightManager;
+import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.ServerManager;
@@ -15,7 +17,6 @@ import java.util.Map;
 
 public abstract class BaseMessageHandler {
     protected final Session session;
-    protected User user;
 
     protected BaseMessageHandler(Session session) {
         this.session = session;
@@ -23,6 +24,18 @@ public abstract class BaseMessageHandler {
 
     protected void sendMessage(Message ms) {
         session.sendMessage(ms);
+    }
+
+    protected User us() {
+        return session.getUser();
+    }
+
+    protected FightWait fw() {
+        return us() != null ? us().getFightWait() : null;
+    }
+
+    protected FightManager fm() {
+        return fw() != null ? fw().getFightManager() : null;
     }
 
     public void sendServerMessage(String message) {
@@ -70,8 +83,8 @@ public abstract class BaseMessageHandler {
                 ds.writeInt(1);
                 ds.writeUTF("ADMIN");
             } else {
-                ds.writeInt(user.getUserId());
-                ds.writeUTF(user.getUsername());
+                ds.writeInt(us().getUserId());
+                ds.writeUTF(us().getUsername());
             }
             ds.writeUTF(message);
             ds.flush();
@@ -104,15 +117,15 @@ public abstract class BaseMessageHandler {
         try {
             Message ms = new Message(Cmd.CHARACTOR_INFO);
             DataOutputStream ds = ms.writer();
-            ds.writeByte(user.getCurrentLevel());
-            ds.writeByte(user.getCurrentLevelPercent());
-            ds.writeShort(user.getCurrentPoint());
-            for (short point : user.getCurrentAddedPoints()) {
+            ds.writeByte(us().getCurrentLevel());
+            ds.writeByte(us().getCurrentLevelPercent());
+            ds.writeShort(us().getCurrentPoint());
+            for (short point : us().getCurrentAddedPoints()) {
                 ds.writeShort(point);
             }
-            ds.writeInt(user.getCurrentXp());
-            ds.writeInt(user.getCurrentRequiredXp());
-            ds.writeInt(user.getCup());
+            ds.writeInt(us().getCurrentXp());
+            ds.writeInt(us().getCurrentRequiredXp());
+            ds.writeInt(us().getCup());
             ds.flush();
             sendMessage(ms);
         } catch (IOException ignored) {
@@ -123,7 +136,7 @@ public abstract class BaseMessageHandler {
         try {
             Message ms = new Message(Cmd.INVENTORY);
             DataOutputStream ds = ms.writer();
-            Map<Integer, EquipmentChest> equipmentChest = user.getEquipmentChest();
+            Map<Integer, EquipmentChest> equipmentChest = us().getEquipmentChest();
             ds.writeByte(equipmentChest.size());
             for (EquipmentChest equipment : equipmentChest.values()) {
                 ds.writeInt(equipment.getKey());
@@ -142,7 +155,7 @@ public abstract class BaseMessageHandler {
                 ds.writeByte(equipment.getVipLevel());
             }
             for (int i = 0; i < 5; i++) {
-                ds.writeInt(user.getEquipData()[user.getActiveCharacterId()][i]);
+                ds.writeInt(us().getEquipData()[us().getActiveCharacterId()][i]);
             }
             ds.flush();
             sendMessage(ms);
@@ -150,7 +163,7 @@ public abstract class BaseMessageHandler {
             ms = new Message(Cmd.MATERIAL);
             ds = ms.writer();
             ds.writeByte(0);
-            Map<Byte, SpecialItemChest> specialItemChest = user.getSpecialItemChest();
+            Map<Byte, SpecialItemChest> specialItemChest = us().getSpecialItemChest();
             ds.writeByte(specialItemChest.size());
             for (SpecialItemChest item : specialItemChest.values()) {
                 ds.writeByte(item.getItem().getId());
@@ -167,8 +180,8 @@ public abstract class BaseMessageHandler {
     public void sendUpdateMoney() throws IOException {
         Message ms = new Message(Cmd.UPDATE_MONEY);
         DataOutputStream ds = ms.writer();
-        ds.writeInt(user.getXu());
-        ds.writeInt(user.getLuong());
+        ds.writeInt(us().getXu());
+        ds.writeInt(us().getLuong());
         ds.flush();
         sendMessage(ms);
     }
@@ -177,7 +190,7 @@ public abstract class BaseMessageHandler {
         Message ms = new Message(Cmd.CUP);
         DataOutputStream ds = ms.writer();
         ds.writeByte(cupUp);
-        ds.writeInt(user.getCup());
+        ds.writeInt(us().getCup());
         ds.flush();
         sendMessage(ms);
     }
@@ -186,16 +199,16 @@ public abstract class BaseMessageHandler {
         Message ms = new Message(Cmd.UPDATE_EXP);
         DataOutputStream ds = ms.writer();
         ds.writeInt(xpUp);
-        ds.writeInt(user.getCurrentXp());
-        ds.writeInt(user.getCurrentRequiredXp());
+        ds.writeInt(us().getCurrentXp());
+        ds.writeInt(us().getCurrentRequiredXp());
         if (updateLevel) {
             ds.writeByte(1);
-            ds.writeByte(user.getCurrentLevel());
-            ds.writeByte(user.getCurrentLevelPercent());
-            ds.writeShort(user.getCurrentPoint());
+            ds.writeByte(us().getCurrentLevel());
+            ds.writeByte(us().getCurrentLevelPercent());
+            ds.writeShort(us().getCurrentPoint());
         } else {
             ds.writeByte(0);
-            ds.writeByte(user.getCurrentLevelPercent());
+            ds.writeByte(us().getCurrentLevelPercent());
         }
         ds.flush();
         sendMessage(ms);

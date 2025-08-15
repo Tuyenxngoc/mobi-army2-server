@@ -17,7 +17,7 @@ public class MissionMessageHandler extends BaseMessageHandler {
     }
 
     public void handleGetMissions(Message ms) throws IOException {
-        if (user.isNotWaiting()) {
+        if (us().isNotWaiting()) {
             return;
         }
         byte action = ms.reader().readByte();
@@ -36,24 +36,24 @@ public class MissionMessageHandler extends BaseMessageHandler {
             message = GameString.MISSION_NOT_FOUND;
         } else {
             byte missionType = mission.getType();
-            byte missionLevel = user.getMissionLevel()[missionType];
+            byte missionLevel = us().getMissionLevel()[missionType];
             byte requiredLevel = mission.getLevel();
 
-            if (user.getMission()[missionType] < mission.getRequirement()) {
+            if (us().getMission()[missionType] < mission.getRequirement()) {
                 message = GameString.MISSION_NOT_COMPLETED;
             } else if (missionLevel == requiredLevel) {
-                user.getMissionLevel()[mission.getType()]++;
+                us().getMissionLevel()[mission.getType()]++;
                 if (mission.getRewardXu() > 0) {
-                    user.updateXu(mission.getRewardXu());
+                    us().updateXu(mission.getRewardXu());
                 }
                 if (mission.getRewardLuong() > 0) {
-                    user.updateLuong(mission.getRewardLuong());
+                    us().updateLuong(mission.getRewardLuong());
                 }
                 if (mission.getRewardXp() > 0) {
-                    user.updateXp(mission.getRewardXp());
+                    us().updateXp(mission.getRewardXp());
                 }
                 if (mission.getRewardCup() > 0) {
-                    user.updateCup(mission.getRewardCup());
+                    us().updateCup(mission.getRewardCup());
                 }
                 sendMissionInfo();
                 message = GameString.createMissionCompleteMessage(mission.getReward());
@@ -71,7 +71,7 @@ public class MissionMessageHandler extends BaseMessageHandler {
         DataOutputStream ds = ms.writer();
         int i = 0;
         for (List<Byte> missionIds : MissionManager.MISSIONS_BY_TYPE.values()) {
-            int index = user.getMissionLevel()[i] - 1;
+            int index = us().getMissionLevel()[i] - 1;
             if (index >= missionIds.size()) {
                 index = missionIds.size() - 1;
             }
@@ -81,8 +81,8 @@ public class MissionMessageHandler extends BaseMessageHandler {
             ds.writeUTF(mission.getName());
             ds.writeUTF(mission.getReward());
             ds.writeInt(mission.getRequirement());
-            ds.writeInt(Math.min(user.getMission()[i], mission.getRequirement()));
-            ds.writeBoolean(user.getMission()[i] >= mission.getRequirement());
+            ds.writeInt(Math.min(us().getMission()[i], mission.getRequirement()));
+            ds.writeBoolean(us().getMission()[i] >= mission.getRequirement());
             i++;
         }
         ds.flush();

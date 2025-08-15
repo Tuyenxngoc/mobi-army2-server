@@ -15,14 +15,14 @@ public class CharacterMessageHandler extends BaseMessageHandler {
 
     public void handleChoseCharacter(Message ms) throws IOException {
         byte characterId = ms.reader().readByte();
-        if (characterId >= CharacterManager.CHARACTERS.size() || characterId < 0 || !user.getOwnedCharacters()[characterId]) {
+        if (characterId >= CharacterManager.CHARACTERS.size() || characterId < 0 || !us().getOwnedCharacters()[characterId]) {
             return;
         }
-        user.setActiveCharacterId(characterId);
+        us().setActiveCharacterId(characterId);
 
         ms = new Message(Cmd.CHOOSE_GUN);
         DataOutputStream ds = ms.writer();
-        ds.writeInt(user.getUserId());
+        ds.writeInt(us().getUserId());
         ds.writeByte(characterId);
         ds.flush();
         sendMessage(ms);
@@ -35,7 +35,7 @@ public class CharacterMessageHandler extends BaseMessageHandler {
         Message ms = new Message(Cmd.CURR_EQUIP_DBKEY);
         DataOutputStream ds = ms.writer();
         for (int i = 0; i < 5; i++) {
-            ds.writeInt(user.getEquipData()[user.getActiveCharacterId()][i]);
+            ds.writeInt(us().getEquipData()[us().getActiveCharacterId()][i]);
         }
         ds.flush();
         sendMessage(ms);
@@ -51,8 +51,8 @@ public class CharacterMessageHandler extends BaseMessageHandler {
             }
             totalPoints += points[i];
         }
-        if (totalPoints <= user.getCurrentPoint()) {
-            user.updatePoints(points, totalPoints);
+        if (totalPoints <= us().getCurrentPoint()) {
+            us().updatePoints(points, totalPoints);
         }
 
         sendCharacterInfo();

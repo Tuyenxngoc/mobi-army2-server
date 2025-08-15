@@ -2,13 +2,11 @@ package com.teamobi.mobiarmy2.network;
 
 import com.teamobi.mobiarmy2.bootstrap.ApplicationContext;
 import com.teamobi.mobiarmy2.common.constant.Cmd;
-import com.teamobi.mobiarmy2.dao.AccountDAO;
-import com.teamobi.mobiarmy2.dao.ClanDAO;
-import com.teamobi.mobiarmy2.dao.UserCharacterDAO;
-import com.teamobi.mobiarmy2.dao.UserDAO;
+import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.handler.*;
 import com.teamobi.mobiarmy2.server.ServerManager;
+import com.teamobi.mobiarmy2.service.LeaderboardService;
 import com.teamobi.mobiarmy2.service.LoginRateLimiterService;
 import lombok.Getter;
 import lombok.Setter;
@@ -238,6 +236,11 @@ public class Session {
         FightWaitMessageHandler fightWaitMessageHandler = new FightWaitMessageHandler(this, context.getBean(UserDAO.class));
         FightManagerMessageHandler fightManagerMessageHandler = new FightManagerMessageHandler(this);
         InventoryMessageHandler inventoryMessageHandler = new InventoryMessageHandler(this);
+        LeaderboardMessageHandler leaderboardMessageHandler = new LeaderboardMessageHandler(this, context.getBean(LeaderboardService.class));
+        GiftBoxMessageHandler giftBoxMessageHandler = new GiftBoxMessageHandler(this);
+        SpinMessageHandler spinMessageHandler = new SpinMessageHandler(this);
+        PaymentMessageHandler paymentMessageHandler = new PaymentMessageHandler(this, context.getBean(GiftCodeDAO.class), context.getBean(UserGiftCodeDAO.class));
+        CharacterMessageHandler characterMessageHandler = new CharacterMessageHandler(this);
 
         messageRouter.setClanMessageHandler(clanMessageHandler);
         messageRouter.setFriendMessageHandler(friendMessageHandler);
@@ -249,6 +252,11 @@ public class Session {
         messageRouter.setFightWaitMessageHandler(fightWaitMessageHandler);
         messageRouter.setFightManagerMessageHandler(fightManagerMessageHandler);
         messageRouter.setInventoryMessageHandler(inventoryMessageHandler);
+        messageRouter.setLeaderboardMessageHandler(leaderboardMessageHandler);
+        messageRouter.setGiftBoxMessageHandler(giftBoxMessageHandler);
+        messageRouter.setSpinMessageHandler(spinMessageHandler);
+        messageRouter.setPaymentMessageHandler(paymentMessageHandler);
+        messageRouter.setCharacterMessageHandler(characterMessageHandler);
     }
 
     class Sender implements Runnable {
@@ -290,7 +298,7 @@ public class Session {
                         break;
                     }
                     log.info("{} send mss {}", Session.this, Cmd.getCmdNameByValue(message.getCommand()));
-                    if (!Session.this.user.isLogged() && requiresAuthentication(message)) {
+                    if ((Session.this.user == null || !Session.this.user.isLogged()) && requiresAuthentication(message)) {
                         message.cleanup();
                         break;
                     }

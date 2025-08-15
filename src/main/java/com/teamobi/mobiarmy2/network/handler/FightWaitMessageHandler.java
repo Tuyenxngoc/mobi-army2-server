@@ -37,24 +37,24 @@ public class FightWaitMessageHandler extends BaseMessageHandler {
         if (message.isEmpty() || message.length() > 100) {
             return;
         }
-        user.getFightWait().chatMessage(user.getUserId(), message);
+        fw().chatMessage(us().getUserId(), message);
     }
 
     public void handleKickPlayer(Message ms) throws IOException {
         int userId = ms.reader().readInt();
-        user.getFightWait().kickPlayer(user.getUserId(), userId);
+        fw().kickPlayer(us().getUserId(), userId);
     }
 
     public void handleLeaveBoard() {
-        if (user.getState() == UserState.WAITING) {
+        if (us().getState() == UserState.WAITING) {
             return;
         }
-        user.getFightWait().leaveTeam(user.getUserId());
+        fw().leaveTeam(us().getUserId());
     }
 
     public void setReady(Message ms) throws IOException {
         boolean ready = ms.reader().readBoolean();
-        user.getFightWait().setReady(ready, user.getUserId());
+        fw().setReady(ready, us().getUserId());
     }
 
     public void handleSetPasswordFightWait(Message ms) throws IOException {
@@ -62,7 +62,7 @@ public class FightWaitMessageHandler extends BaseMessageHandler {
         if (password.isEmpty() || password.length() > 10 || !Utils.isAlphanumeric(password)) {
             return;
         }
-        user.getFightWait().setPassRoom(password, user.getUserId());
+        fw().setPassRoom(password, us().getUserId());
     }
 
     public void handleSetMoneyFightWait(Message ms) throws IOException {
@@ -70,14 +70,14 @@ public class FightWaitMessageHandler extends BaseMessageHandler {
         if (xu < 0) {
             return;
         }
-        user.getFightWait().setMoney(xu, user.getUserId());
+        fw().setMoney(xu, us().getUserId());
     }
 
     public void handleStartGame() {
-        if (user.getState() != UserState.WAIT_FIGHT) {
+        if (us().getState() != UserState.WAIT_FIGHT) {
             return;
         }
-        user.getFightWait().startGame(user.getUserId());
+        fw().startGame(us().getUserId());
     }
 
     public void handleSetFightWaitName(Message ms) throws IOException {
@@ -85,12 +85,12 @@ public class FightWaitMessageHandler extends BaseMessageHandler {
         if (name.isEmpty() || name.length() > 20 || !Utils.isAlphanumeric(name)) {
             return;
         }
-        user.getFightWait().setRoomName(user.getUserId(), name);
+        fw().setRoomName(us().getUserId(), name);
     }
 
     public void handleSetMaxPlayerFightWait(Message ms) throws IOException {
         byte maxPlayers = ms.reader().readByte();
-        user.getFightWait().setMaxPlayers(user.getUserId(), maxPlayers);
+        fw().setMaxPlayers(us().getUserId(), maxPlayers);
     }
 
     public void handleChoseItemFight(Message ms) throws IOException {
@@ -99,45 +99,45 @@ public class FightWaitMessageHandler extends BaseMessageHandler {
 
         for (int i = 0; i < items.length; i++) {
             byte index = dis.readByte();
-            if (user.getItemFightQuantity(index) > 0) {
+            if (us().getItemFightQuantity(index) > 0) {
                 items[i] = index;
             } else {
                 items[i] = -1;
             }
         }
-        user.getFightWait().setItems(user.getUserId(), items);
+        fw().setItems(us().getUserId(), items);
     }
 
-    public void handleChangeTeam(Message ms) {
-        if (user.getState() != UserState.WAIT_FIGHT) {
+    public void handleChangeTeam() {
+        if (us().getState() != UserState.WAIT_FIGHT) {
             return;
         }
-        user.getFightWait().changeTeam(user);
+        fw().changeTeam(us());
     }
 
     public void handleSelectMap(Message ms) throws IOException {
         byte mapId = ms.reader().readByte();
-        user.getFightWait().setMap(user.getUserId(), mapId);
+        fw().setMap(us().getUserId(), mapId);
     }
 
     public void handleFindPlayerWait(Message ms) throws IOException {
         DataInputStream dis = ms.reader();
         boolean find = dis.readBoolean();
         if (find) {
-            user.getFightWait().findPlayer(user.getUserId());
+            fw().findPlayer(us().getUserId());
         } else {
             int userId = dis.readInt();
-            user.getFightWait().inviteToRoom(userId);
+            fw().inviteToRoom(userId);
         }
     }
 
     public void handleGetFlayerDetail(Message ms) throws IOException {
         int userId = ms.reader().readInt();
         User us = null;
-        if (userId == user.getUserId()) {
-            us = user;
-        } else if (user.isNotWaiting()) {
-            us = user.getFightWait().getUserByUserId(userId);
+        if (userId == us().getUserId()) {
+            us = us();
+        } else if (us().isNotWaiting()) {
+            us = fw().getUserByUserId(userId);
         }
         ms = new Message(Cmd.PLAYER_DETAIL);
         DataOutputStream ds = ms.writer();

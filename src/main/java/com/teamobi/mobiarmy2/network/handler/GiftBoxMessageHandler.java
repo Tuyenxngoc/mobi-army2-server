@@ -12,6 +12,6 @@ public class GiftBoxMessageHandler extends BaseMessageHandler {
 
     public void openLuckyGift(Message ms) throws IOException {
         byte index = ms.reader().readByte();
-        user.getGiftBoxService().openGiftBoxAfterFight(index);
+        us().getGiftBoxService().openGiftBoxAfterFight(index);
     }
 }

@@ -39,7 +39,7 @@ public class FormulaMessageHandler extends BaseMessageHandler {
         if (formulaMap == null) {
             return;
         }
-        List<Formula> formulaEntries = formulaMap.get(user.getActiveCharacterId());
+        List<Formula> formulaEntries = formulaMap.get(us().getActiveCharacterId());
         if (formulaEntries == null) {
             return;
         }
@@ -50,8 +50,8 @@ public class FormulaMessageHandler extends BaseMessageHandler {
         ds.writeByte(formulaEntries.size());
         for (Formula formula : formulaEntries) {
             boolean hasRequiredItem = true;
-            boolean hasRequiredEquip = user.hasEquipment(formula.getRequiredEquip().getEquipIndex(), formula.getLevel());
-            boolean hasRequiredLevel = user.getCurrentLevel() >= formula.getLevelRequired();
+            boolean hasRequiredEquip = us().hasEquipment(formula.getRequiredEquip().getEquipIndex(), formula.getLevel());
+            boolean hasRequiredLevel = us().getCurrentLevel() >= formula.getLevelRequired();
 
             ds.writeByte(formula.getResultEquip().getEquipIndex());
             ds.writeUTF("%s cấp %d".formatted(formula.getResultEquip().getName(), (formula.getLevel() + 1)));
@@ -60,7 +60,7 @@ public class FormulaMessageHandler extends BaseMessageHandler {
             ds.writeByte(formula.getEquipType());
             ds.writeByte(formula.getRequiredItems().size());
             for (SpecialItemChest item : formula.getRequiredItems()) {
-                short itemCountInInventory = user.getInventorySpecialItemCount(item.getItem().getId());
+                short itemCountInInventory = us().getInventorySpecialItemCount(item.getItem().getId());
                 ds.writeByte(item.getItem().getId());
                 ds.writeUTF(item.getItem().getName());
                 ds.writeByte(item.getQuantity());
@@ -90,7 +90,7 @@ public class FormulaMessageHandler extends BaseMessageHandler {
         if (formulaMap == null) {
             return;
         }
-        List<Formula> formulas = formulaMap.get(user.getActiveCharacterId());
+        List<Formula> formulas = formulaMap.get(us().getActiveCharacterId());
         if (formulas == null) {
             return;
         }
@@ -100,13 +100,13 @@ public class FormulaMessageHandler extends BaseMessageHandler {
         }
 
         //Kiểm tra có đủ level chế đồ yêu cầu không
-        if (user.getCurrentLevel() < formula.getLevelRequired()) {
+        if (us().getCurrentLevel() < formula.getLevelRequired()) {
             sendFormulaProcessingResult(GameString.ITEM_CRAFT_FAILURE);
             return;
         }
 
         //Kiểm tra có trang bị yêu cầu không
-        EquipmentChest requiredEquip = user.getEquipment(formula.getRequiredEquip().getEquipIndex(), user.getActiveCharacterId(), formula.getLevel());
+        EquipmentChest requiredEquip = us().getEquipment(formula.getRequiredEquip().getEquipIndex(), us().getActiveCharacterId(), formula.getLevel());
         if (requiredEquip == null) {
             sendFormulaProcessingResult(GameString.ITEM_CRAFT_FAILURE);
             return;
@@ -117,7 +117,7 @@ public class FormulaMessageHandler extends BaseMessageHandler {
 
         //Kiểm tra có đủ item yêu cầu không
         for (SpecialItemChest item : formula.getRequiredItems()) {
-            short itemCountInInventory = user.getInventorySpecialItemCount(item.getItem().getId());
+            short itemCountInInventory = us().getInventorySpecialItemCount(item.getItem().getId());
             if (itemCountInInventory < item.getQuantity()) {
                 sendFormulaProcessingResult(GameString.ITEM_CRAFT_FAILURE);
                 return;
@@ -126,20 +126,20 @@ public class FormulaMessageHandler extends BaseMessageHandler {
         }
 
         //Kiểm tra có công thức hoặc đủ xu không
-        SpecialItemChest material = user.getSpecialItemById(formula.getMaterial().getId());
-        if (material == null && user.getXu() < formula.getMaterial().getPriceXu()) {
+        SpecialItemChest material = us().getSpecialItemById(formula.getMaterial().getId());
+        if (material == null && us().getXu() < formula.getMaterial().getPriceXu()) {
             sendFormulaProcessingResult(GameString.ITEM_CRAFT_FAILURE);
             return;
         } else {
             if (material != null) {//Nếu có công thức thì thêm vào danh sách item xóa
                 itemsToRemove.add(new SpecialItemChest((short) 1, material.getItem()));
             } else {//Nếu chưu có thì trừ xu
-                user.updateXu(-formula.getMaterial().getPriceXu());
+                us().updateXu(-formula.getMaterial().getPriceXu());
             }
         }
 
         //Xoá trang bị và item yêu cầu
-        user.updateInventory(null, requiredEquip, null, itemsToRemove);
+        us().updateInventory(null, requiredEquip, null, itemsToRemove);
 
         //Random chỉ số
         byte[] addPoints = new byte[5];
@@ -157,7 +157,7 @@ public class FormulaMessageHandler extends BaseMessageHandler {
         newEquip.setAddPercents(addPercents);
 
         //Thêm trang bị vào rương
-        user.addEquipment(newEquip);
+        us().addEquipment(newEquip);
 
         //Gửi thông báo
         sendFormulaProcessingResult(GameString.ITEM_CRAFT_SUCCESS);

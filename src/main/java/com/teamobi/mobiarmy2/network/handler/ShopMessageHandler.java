@@ -39,30 +39,30 @@ public class ShopMessageHandler extends BaseMessageHandler {
         if (itemIndex < 0 || itemIndex >= FightItemManager.FIGHT_ITEMS.size()) {
             return;
         }
-        if (user.getFightItems()[itemIndex] + quantity > ApplicationContext.getInstance().getBean(ServerConfig.class).getMaxItem()) {
+        if (us().getFightItems()[itemIndex] + quantity > ApplicationContext.getInstance().getBean(ServerConfig.class).getMaxItem()) {
             return;
         }
         if (unit == 0) {
             int total = FightItemManager.FIGHT_ITEMS.get(itemIndex).getBuyXu() * quantity;
-            if (user.getXu() < total || total < 0) {
+            if (us().getXu() < total || total < 0) {
                 return;
             }
-            user.updateXu(-total);
+            us().updateXu(-total);
         } else {
             int total = FightItemManager.FIGHT_ITEMS.get(itemIndex).getBuyLuong() * quantity;
-            if (user.getLuong() < total || total < 0) {
+            if (us().getLuong() < total || total < 0) {
                 return;
             }
-            user.updateLuong(-total);
+            us().updateLuong(-total);
         }
-        user.updateFightItems(itemIndex, quantity);
+        us().updateFightItems(itemIndex, quantity);
         ms = new Message(Cmd.BUY_ITEM);
         DataOutputStream ds = ms.writer();
         ds.writeByte(1);
         ds.writeByte(itemIndex);
-        ds.writeByte(user.getFightItems()[itemIndex]);
-        ds.writeInt(user.getXu());
-        ds.writeInt(user.getLuong());
+        ds.writeByte(us().getFightItems()[itemIndex]);
+        ds.writeInt(us().getXu());
+        ds.writeInt(us().getLuong());
         ds.flush();
         sendMessage(ms);
         sendServerMessage(GameString.PURCHASE_SUCCESS);
@@ -72,11 +72,11 @@ public class ShopMessageHandler extends BaseMessageHandler {
         DataInputStream dis = ms.reader();
         byte index = dis.readByte();
         byte unit = dis.readByte();
-        if (index < 0 || index >= user.getOwnedCharacters().length - 3) {
+        if (index < 0 || index >= us().getOwnedCharacters().length - 3) {
             return;
         }
         index += 3;
-        if (user.getOwnedCharacters()[index]) {
+        if (us().getOwnedCharacters()[index]) {
             return;
         }
         Character character = CharacterManager.CHARACTERS.get(index);
@@ -84,33 +84,33 @@ public class ShopMessageHandler extends BaseMessageHandler {
             if (character.getPriceXu() <= 0) {
                 return;
             }
-            if (user.getXu() < character.getPriceXu()) {
+            if (us().getXu() < character.getPriceXu()) {
                 sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                 return;
             }
-            user.updateXu(-character.getPriceXu());
+            us().updateXu(-character.getPriceXu());
         } else {
             if (character.getPriceLuong() <= 0) {
                 return;
             }
-            if (user.getLuong() < character.getPriceLuong()) {
+            if (us().getLuong() < character.getPriceLuong()) {
                 sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                 return;
             }
-            user.updateLuong(-character.getPriceLuong());
+            us().updateLuong(-character.getPriceLuong());
         }
 
-        Optional<Integer> result = userCharacterDAO.create(user.getUserId(), index);
+        Optional<Integer> result = userCharacterDAO.create(us().getUserId(), index);
         if (result.isPresent()) {
-            UserCharacterDTO userCharacterDTO = userCharacterDAO.findByUserIdAndCharacterId(user.getUserId(), index);
+            UserCharacterDTO userCharacterDTO = userCharacterDAO.findByUserIdAndCharacterId(us().getUserId(), index);
             if (userCharacterDTO != null) {
-                user.getLevels()[index] = userCharacterDTO.getLevel();
-                user.getXps()[index] = userCharacterDTO.getXp();
-                user.getPoints()[index] = userCharacterDTO.getPoints();
-                user.getAddedPoints()[index] = userCharacterDTO.getAdditionalPoints();
-                user.getUserCharacterIds()[index] = userCharacterDTO.getUserCharacterId();
-                user.getOwnedCharacters()[index] = true;
-                user.getEquipData()[index] = userCharacterDTO.getData();
+                us().getLevels()[index] = userCharacterDTO.getLevel();
+                us().getXps()[index] = userCharacterDTO.getXp();
+                us().getPoints()[index] = userCharacterDTO.getPoints();
+                us().getAddedPoints()[index] = userCharacterDTO.getAdditionalPoints();
+                us().getUserCharacterIds()[index] = userCharacterDTO.getUserCharacterId();
+                us().getOwnedCharacters()[index] = true;
+                us().getEquipData()[index] = userCharacterDTO.getData();
 
                 ms = new Message(Cmd.BUY_GUN);
                 DataOutputStream ds = ms.writer();
@@ -151,7 +151,7 @@ public class ShopMessageHandler extends BaseMessageHandler {
     }
 
     public void handleSpecialItemShop(Message ms) throws IOException {
-        if (user.isNotWaiting()) {
+        if (us().isNotWaiting()) {
             return;
         }
         DataInputStream dis = ms.reader();
@@ -174,7 +174,7 @@ public class ShopMessageHandler extends BaseMessageHandler {
         }
 
         //Kiểm tra số lượng đang có trong rương
-        if (user.getInventorySpecialItemCount(itemId) + quantity > serverConfig.getMaxSpecialItemSlots()) {
+        if (us().getInventorySpecialItemCount(itemId) + quantity > serverConfig.getMaxSpecialItemSlots()) {
             sendServerMessage(GameString.CHEST_MAXIMUM_REACHED);
             return;
         }
@@ -186,29 +186,29 @@ public class ShopMessageHandler extends BaseMessageHandler {
 
         //Giới hạn số lần mua vật liệu
         if (item.isMaterial()) {
-            if (user.getMaterialsPurchased() >= GameConstants.MAX_MATERIAL_PURCHASE_LIMIT) {
+            if (us().getMaterialsPurchased() >= GameConstants.MAX_MATERIAL_PURCHASE_LIMIT) {
                 sendServerMessage(GameString.MATERIAL_PURCHASE_LIMIT);
                 return;
-            } else if (user.getMaterialsPurchased() + quantity > GameConstants.MAX_MATERIAL_PURCHASE_LIMIT) {
-                sendServerMessage(GameString.createMaterialPurchaseLimitMessage(GameConstants.MAX_MATERIAL_PURCHASE_LIMIT - user.getMaterialsPurchased()));
+            } else if (us().getMaterialsPurchased() + quantity > GameConstants.MAX_MATERIAL_PURCHASE_LIMIT) {
+                sendServerMessage(GameString.createMaterialPurchaseLimitMessage(GameConstants.MAX_MATERIAL_PURCHASE_LIMIT - us().getMaterialsPurchased()));
                 return;
             }
         }
 
         if (unit == 0) {//Mua bằng xu
             int totalPrice = quantity * item.getPriceXu();
-            if (user.getXu() < totalPrice) {
+            if (us().getXu() < totalPrice) {
                 sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                 return;
             }
-            user.updateXu(-totalPrice);
+            us().updateXu(-totalPrice);
         } else {//Mua bằng lượng
             int totalPrice = quantity * item.getPriceLuong();
-            if (user.getLuong() < totalPrice) {
+            if (us().getLuong() < totalPrice) {
                 sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                 return;
             }
-            user.updateLuong(-totalPrice);
+            us().updateLuong(-totalPrice);
         }
 
         //Xử lý khi mua item đặc biệt
@@ -219,12 +219,12 @@ public class ShopMessageHandler extends BaseMessageHandler {
             SpecialItemChest newItem = new SpecialItemChest(quantity, item);
 
             //Thêm vào rương đồ
-            user.updateInventory(null, null, List.of(newItem), null);
+            us().updateInventory(null, null, List.of(newItem), null);
         }
 
         //Cập nhật số lượng mua nếu là vật liệu
         if (item.isMaterial()) {
-            user.incrementMaterialsPurchased(quantity);
+            us().incrementMaterialsPurchased(quantity);
         }
 
         //Gửi thông báo mua thành công
@@ -233,7 +233,7 @@ public class ShopMessageHandler extends BaseMessageHandler {
 
     private boolean handleSpecialItemPurchase(byte itemId) {
         if (itemId == 50) {
-            user.resetPoints();
+            us().resetPoints();
             sendCharacterInfo();
             return false;
         }

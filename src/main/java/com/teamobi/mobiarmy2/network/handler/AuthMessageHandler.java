@@ -49,46 +49,45 @@ public class AuthMessageHandler extends BaseMessageHandler {
     }
 
     public void handleUserLogoutCleanup() {
-        if (user.getState() == UserState.FIGHTING || user.getState() == UserState.WAIT_FIGHT) {
-            user.getFightWait().leaveTeam(user.getUserId());
+        if (us().getState() == UserState.FIGHTING || us().getState() == UserState.WAIT_FIGHT) {
+            us().getFightWait().leaveTeam(us().getUserId());
         }
 
         //Cập nhật thông tin tài khoản
-        userDAO.update(user);
+        userDAO.update(us());
 
         //Cập nhật thông tin nhân vật
         List<UserCharacterDTO> userCharacterDTOS = new ArrayList<>();
-        for (byte i = 0; i < user.getOwnedCharacters().length; i++) {
-            if (user.getOwnedCharacters()[i]) {
+        for (byte i = 0; i < us().getOwnedCharacters().length; i++) {
+            if (us().getOwnedCharacters()[i]) {
                 UserCharacterDTO userCharacterDTO = getUserCharacterDTO(i);
                 userCharacterDTOS.add(userCharacterDTO);
             }
         }
         userCharacterDAO.updateAll(userCharacterDTOS);
 
-        user.setLogged(false);
+        us().setLogged(false);
 
         //Lưu thời gian đăng xuất gần nhất
-        loginRateLimiterService.saveLogoutTime(user.getUsername());
+        loginRateLimiterService.saveLogoutTime(us().getUsername());
     }
 
     private UserCharacterDTO getUserCharacterDTO(byte i) {
         UserCharacterDTO userCharacterDTO = new UserCharacterDTO();
         userCharacterDTO.setCharacterId(i);
-        userCharacterDTO.setUserId(user.getUserId());
-        userCharacterDTO.setLevel(user.getLevels()[i]);
-        userCharacterDTO.setXp(user.getXps()[i]);
-        userCharacterDTO.setPoints(user.getPoints()[i]);
-        userCharacterDTO.setAdditionalPoints(user.getAddedPoints()[i]);
-        userCharacterDTO.setData(user.getEquipData()[i]);
+        userCharacterDTO.setUserId(us().getUserId());
+        userCharacterDTO.setLevel(us().getLevels()[i]);
+        userCharacterDTO.setXp(us().getXps()[i]);
+        userCharacterDTO.setPoints(us().getPoints()[i]);
+        userCharacterDTO.setAdditionalPoints(us().getAddedPoints()[i]);
+        userCharacterDTO.setData(us().getEquipData()[i]);
         return userCharacterDTO;
     }
 
     public void handleLogin(Message ms) throws IOException {
         ServerConfig serverConfig = ApplicationContext.getInstance().getBean(ServerConfig.class);
 
-        User currentUser = session.getUser();
-        if (currentUser != null && currentUser.isLogged()) {
+        if (us() != null && us().isLogged()) {
             return;
         }
 
@@ -132,10 +131,12 @@ public class AuthMessageHandler extends BaseMessageHandler {
         // Tạo người dùng mới
         User user = new User(session);
         user.setAccountId(accountDTO.getAccountId());
+
+        // Đặt người dùng vào session
         session.setUser(user);
         session.initMessageHandlers();
 
-        UserDTO userDTO = userDAO.findByAccountId(user.getAccountId());
+        UserDTO userDTO = userDAO.findByAccountId(us().getAccountId());
         if (userDTO == null) {
             // Tạo mới người dùng
             Optional<Integer> result = userDAO.create(accountDTO.getAccountId(), 1000, 0);
@@ -165,14 +166,14 @@ public class AuthMessageHandler extends BaseMessageHandler {
         updateUserFromDTO(userDTO);
 
         //Dữ liệu nhân vật
-        List<UserCharacterDTO> userCharacterDTOS = userCharacterDAO.findAllByUserId(user.getUserId());
+        List<UserCharacterDTO> userCharacterDTOS = userCharacterDAO.findAllByUserId(us().getUserId());
         if (userCharacterDTOS.isEmpty()) {
             //Tạo mới nhân vật
-            Optional<Integer> result1 = userCharacterDAO.create(user.getUserId(), CharacterManager.CHARACTERS.get(0).getId());
-            Optional<Integer> result2 = userCharacterDAO.create(user.getUserId(), CharacterManager.CHARACTERS.get(1).getId());
-            Optional<Integer> result3 = userCharacterDAO.create(user.getUserId(), CharacterManager.CHARACTERS.get(2).getId());
+            Optional<Integer> result1 = userCharacterDAO.create(us().getUserId(), CharacterManager.CHARACTERS.get(0).getId());
+            Optional<Integer> result2 = userCharacterDAO.create(us().getUserId(), CharacterManager.CHARACTERS.get(1).getId());
+            Optional<Integer> result3 = userCharacterDAO.create(us().getUserId(), CharacterManager.CHARACTERS.get(2).getId());
             if (result1.isPresent() && result2.isPresent() && result3.isPresent()) {
-                userCharacterDTOS = userCharacterDAO.findAllByUserId(user.getUserId());
+                userCharacterDTOS = userCharacterDAO.findAllByUserId(us().getUserId());
             }
 
             if (userCharacterDTOS.isEmpty()) {
@@ -182,23 +183,23 @@ public class AuthMessageHandler extends BaseMessageHandler {
         }
         updateUserCharacters(userCharacterDTOS);
 
-        user.setUsername(username);
-        user.getSession().setVersion(version);
-        user.setLogged(true);
+        us().setUsername(username);
+        us().getSession().setVersion(version);
+        us().setLogged(true);
 
         //Tặng quà hằng ngày
         if (Utils.canReceiveDailyReward(userDTO.getDailyRewardTime())) {
             //Gửi item
             byte indexItem = FightItemManager.getRandomItem();
             byte quantity = 1;
-            user.updateFightItems(indexItem, quantity);
+            us().updateFightItems(indexItem, quantity);
             sendMessageToUser(GameString.createDailyRewardMessage(quantity, FightItemManager.FIGHT_ITEMS.get(indexItem).getName()));
 
             //Cập nhật quà top
-            if (user.getTopEarningsXu() > 0) {
-                user.updateXu(user.getTopEarningsXu());
-                sendMessageToUser(GameString.createDailyTopRewardMessage(user.getTopEarningsXu()));
-                user.setTopEarningsXu(0);
+            if (us().getTopEarningsXu() > 0) {
+                us().updateXu(us().getTopEarningsXu());
+                sendMessageToUser(GameString.createDailyTopRewardMessage(us().getTopEarningsXu()));
+                us().setTopEarningsXu(0);
             }
 
             //Tặng quà tết
@@ -206,12 +207,12 @@ public class AuthMessageHandler extends BaseMessageHandler {
             if (now.isAfter(serverConfig.getTetStartTime()) && now.isBefore(serverConfig.getTetEndTime())) {
                 int luckyXu = Utils.getNonLinearRandom(1000, 50999);
                 int xuUp = (luckyXu / 1000) * 1000;
-                user.updateXu(xuUp);
+                us().updateXu(xuUp);
                 sendMessageToUser(GameString.createDailyRewardMessage(xuUp));
             }
 
             //Đặt lại số lần mua nguyên liệu
-            user.setMaterialsPurchased((byte) 0);
+            us().setMaterialsPurchased((byte) 0);
 
             //Gửi message khi login
             for (String msg : serverConfig.getMessage()) {
@@ -219,10 +220,10 @@ public class AuthMessageHandler extends BaseMessageHandler {
             }
 
             //Cập nhật nhiệm vụ đăng nhập
-            user.updateMission(16, 1);
+            us().updateMission(16, 1);
 
             // Cập nhật thời gian nhận quà
-            userDAO.setDailyRewardTime(user.getUserId(), LocalDateTime.now());
+            userDAO.setDailyRewardTime(us().getUserId(), LocalDateTime.now());
         }
 
         //Đánh dấu trạng thái online
@@ -236,60 +237,60 @@ public class AuthMessageHandler extends BaseMessageHandler {
     }
 
     private void updateUserFromDTO(UserDTO userDTO) {
-        user.setUserId(userDTO.getUserId());
-        user.setXu(userDTO.getXu());
-        user.setLuong(userDTO.getLuong());
-        user.setCup(userDTO.getCup());
-        user.setPointEvent(userDTO.getPointEvent());
-        user.setClanId(userDTO.getClanId());
-        user.setActiveCharacterId(userDTO.getActiveCharacterId());
-        user.setFriends(userDTO.getFriends());
-        user.setMission(userDTO.getMission());
-        user.setMissionLevel(userDTO.getMissionLevel());
-        user.setSpecialItemChest(userDTO.getSpecialItemChest());
-        user.setEquipmentChest(userDTO.getEquipmentChest());
-        user.setFightItems(userDTO.getItems());
-        user.setXpX2Time(userDTO.getXpX2Time());
-        user.setTopEarningsXu(userDTO.getTopEarningsXu());
-        user.setMaterialsPurchased(userDTO.getMaterialsPurchased());
-        user.setEquipmentPurchased(userDTO.getEquipmentPurchased());
-        user.setChestLocked(userDTO.isChestLocked());
-        user.setInvitationLocked(userDTO.isInvitationLocked());
+        us().setUserId(userDTO.getUserId());
+        us().setXu(userDTO.getXu());
+        us().setLuong(userDTO.getLuong());
+        us().setCup(userDTO.getCup());
+        us().setPointEvent(userDTO.getPointEvent());
+        us().setClanId(userDTO.getClanId());
+        us().setActiveCharacterId(userDTO.getActiveCharacterId());
+        us().setFriends(userDTO.getFriends());
+        us().setMission(userDTO.getMission());
+        us().setMissionLevel(userDTO.getMissionLevel());
+        us().setSpecialItemChest(userDTO.getSpecialItemChest());
+        us().setEquipmentChest(userDTO.getEquipmentChest());
+        us().setFightItems(userDTO.getItems());
+        us().setXpX2Time(userDTO.getXpX2Time());
+        us().setTopEarningsXu(userDTO.getTopEarningsXu());
+        us().setMaterialsPurchased(userDTO.getMaterialsPurchased());
+        us().setEquipmentPurchased(userDTO.getEquipmentPurchased());
+        us().setChestLocked(userDTO.isChestLocked());
+        us().setInvitationLocked(userDTO.isInvitationLocked());
     }
 
     private void updateUserCharacters(List<UserCharacterDTO> userCharacterDTOS) {
         int totalCharacter = CharacterManager.CHARACTERS.size();
 
-        user.setUserCharacterIds(new long[totalCharacter]);
-        user.setOwnedCharacters(new boolean[totalCharacter]);
-        user.setLevels(new int[totalCharacter]);
-        user.setXps(new int[totalCharacter]);
-        user.setPoints(new int[totalCharacter]);
-        user.setAddedPoints(new short[totalCharacter][5]);
-        user.setCharacterEquips(new EquipmentChest[totalCharacter][6]);
-        user.setEquipData(new int[totalCharacter][6]);
+        us().setUserCharacterIds(new long[totalCharacter]);
+        us().setOwnedCharacters(new boolean[totalCharacter]);
+        us().setLevels(new int[totalCharacter]);
+        us().setXps(new int[totalCharacter]);
+        us().setPoints(new int[totalCharacter]);
+        us().setAddedPoints(new short[totalCharacter][5]);
+        us().setCharacterEquips(new EquipmentChest[totalCharacter][6]);
+        us().setEquipData(new int[totalCharacter][6]);
 
         for (UserCharacterDTO userCharacterDTO : userCharacterDTOS) {
             byte characterId = userCharacterDTO.getCharacterId();
-            user.getUserCharacterIds()[characterId] = userCharacterDTO.getUserCharacterId();
-            user.getOwnedCharacters()[characterId] = true;
-            user.getLevels()[characterId] = userCharacterDTO.getLevel();
-            user.getXps()[characterId] = userCharacterDTO.getXp();
-            user.getPoints()[characterId] = userCharacterDTO.getPoints();
-            user.getAddedPoints()[characterId] = userCharacterDTO.getAdditionalPoints();
-            user.getEquipData()[characterId] = new int[]{-1, -1, -1, -1, -1, -1};
+            us().getUserCharacterIds()[characterId] = userCharacterDTO.getUserCharacterId();
+            us().getOwnedCharacters()[characterId] = true;
+            us().getLevels()[characterId] = userCharacterDTO.getLevel();
+            us().getXps()[characterId] = userCharacterDTO.getXp();
+            us().getPoints()[characterId] = userCharacterDTO.getPoints();
+            us().getAddedPoints()[characterId] = userCharacterDTO.getAdditionalPoints();
+            us().getEquipData()[characterId] = new int[]{-1, -1, -1, -1, -1, -1};
 
             int[] data = userCharacterDTO.getData();
             for (int j = 0; j < data.length; j++) {
-                EquipmentChest equip = user.getEquipmentByKey(data[j]);
+                EquipmentChest equip = us().getEquipmentByKey(data[j]);
                 if (equip == null) {
                     continue;
                 }
                 if (equip.isExpired()) {
                     equip.setInUse(false);
                 } else {
-                    user.getCharacterEquips()[characterId][j] = equip;
-                    user.getEquipData()[characterId][j] = equip.getKey();
+                    us().getCharacterEquips()[characterId][j] = equip;
+                    us().getEquipData()[characterId][j] = equip.getKey();
                 }
             }
         }
@@ -298,15 +299,15 @@ public class AuthMessageHandler extends BaseMessageHandler {
     public void sendLoginSuccess() throws IOException {
         Message ms = new Message(Cmd.LOGIN_SUCESS);
         DataOutputStream ds = ms.writer();
-        ds.writeInt(user.getUserId());
-        ds.writeInt(user.getXu());
-        ds.writeInt(user.getLuong());
-        ds.writeByte(user.getActiveCharacterId());
-        ds.writeShort(user.getClanId() != null ? user.getClanId() : 0);
+        ds.writeInt(us().getUserId());
+        ds.writeInt(us().getXu());
+        ds.writeInt(us().getLuong());
+        ds.writeByte(us().getActiveCharacterId());
+        ds.writeShort(us().getClanId() != null ? us().getClanId() : 0);
         ds.writeByte(0);//clan rights
 
         for (int i = 0; i < 10; i++) {
-            EquipmentChest equip = user.getCharacterEquips()[i][5];
+            EquipmentChest equip = us().getCharacterEquips()[i][5];
             if (equip != null) {
                 ds.writeBoolean(true);
                 for (short s : equip.getEquipment().getDisguiseEquippedIndexes()) {
@@ -317,8 +318,8 @@ public class AuthMessageHandler extends BaseMessageHandler {
             }
 
             for (int j = 0; j < 5; j++) {
-                if (user.getCharacterEquips()[i][j] != null) {
-                    ds.writeShort(user.getCharacterEquips()[i][j].getEquipment().getEquipIndex());
+                if (us().getCharacterEquips()[i][j] != null) {
+                    ds.writeShort(us().getCharacterEquips()[i][j].getEquipment().getEquipIndex());
                 } else if (EquipmentManager.equipDefault[i][j] != null) {
                     ds.writeShort(EquipmentManager.equipDefault[i][j].getEquipIndex());
                 } else {
@@ -328,7 +329,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
         }
 
         for (int i = 0; i < FightItemManager.FIGHT_ITEMS.size(); i++) {
-            ds.writeByte(user.getFightItems()[i]);
+            ds.writeByte(us().getFightItems()[i]);
             FightItem fightItem = FightItemManager.FIGHT_ITEMS.get(i);
             ds.writeInt(fightItem.getBuyXu());
             ds.writeInt(fightItem.getBuyLuong());
@@ -336,7 +337,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
 
         for (int i = 0; i < 10; i++) {
             if (i > 2) {
-                ds.writeByte(user.getOwnedCharacters()[i] ? 1 : 0);
+                ds.writeByte(us().getOwnedCharacters()[i] ? 1 : 0);
                 Character character = CharacterManager.CHARACTERS.get(i);
                 ds.writeShort(character.getPriceXu() / 1000);
                 ds.writeShort(character.getPriceLuong());
@@ -467,12 +468,12 @@ public class AuthMessageHandler extends BaseMessageHandler {
             return;
         }
 
-        if (!accountDAO.existsByAccountIdAndPassword(user.getAccountId(), oldPass)) {
+        if (!accountDAO.existsByAccountIdAndPassword(us().getAccountId(), oldPass)) {
             sendServerMessage(GameString.PASSWORD_INCORRECT_OLD);
             return;
         }
 
-        accountDAO.changePassword(user.getAccountId(), newPass);
+        accountDAO.changePassword(us().getAccountId(), newPass);
         sendServerMessage(GameString.PASSWORD_CHANGE_SUCCESS);
     }
 

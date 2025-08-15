@@ -63,25 +63,25 @@ public class PaymentMessageHandler extends BaseMessageHandler {
             return;
         }
 
-        boolean existsByUserId = userGiftCodeDAO.existsByUserId(user.getUserId());
+        boolean existsByUserId = userGiftCodeDAO.existsByUserId(us().getUserId());
         if (existsByUserId) {
             sendServerMessage(GameString.GIFT_CODE_ALREADY_USED);
             return;
         }
 
         giftCodeDAO.decrementUsageLimit(giftCode.getGiftCodeId());
-        userGiftCodeDAO.create(giftCode.getGiftCodeId(), user.getUserId());
+        userGiftCodeDAO.create(giftCode.getGiftCodeId(), us().getUserId());
 
         if (giftCode.getXu() > 0) {
-            user.updateXu(giftCode.getXu());
+            us().updateXu(giftCode.getXu());
             sendMessageToUser(GameString.createGiftCodeRewardMessage(code, Utils.getStringNumber(giftCode.getXu()) + " xu"));
         }
         if (giftCode.getLuong() > 0) {
-            user.updateLuong(giftCode.getLuong());
+            us().updateLuong(giftCode.getLuong());
             sendMessageToUser(GameString.createGiftCodeRewardMessage(code, Utils.getStringNumber(giftCode.getLuong()) + " lượng"));
         }
         if (giftCode.getExp() > 0) {
-            user.updateXp(giftCode.getExp());
+            us().updateXp(giftCode.getExp());
             sendMessageToUser(GameString.createGiftCodeRewardMessage(code, Utils.getStringNumber(giftCode.getExp()) + " exp"));
         }
         if (giftCode.getItems() != null) {
@@ -96,7 +96,7 @@ public class PaymentMessageHandler extends BaseMessageHandler {
                 additionalItems.add(newItem);
                 sendMessageToUser(GameString.createGiftCodeRewardMessageWithQuantity(code, newItem.getQuantity(), newItem.getItem().getName()));
             }
-            user.updateInventory(null, null, additionalItems, null);
+            us().updateInventory(null, null, additionalItems, null);
         }
         if (giftCode.getEquips() != null) {
             for (EquipmentChestJson json : giftCode.getEquips()) {
@@ -107,7 +107,7 @@ public class PaymentMessageHandler extends BaseMessageHandler {
                 }
                 addEquip.setAddPoints(json.getAddPoints());
                 addEquip.setAddPercents(json.getAddPercents());
-                user.addEquipment(addEquip);
+                us().addEquipment(addEquip);
                 sendMessageToUser(GameString.createGiftCodeRewardMessage(code, addEquip.getEquipment().getName()));
             }
         }

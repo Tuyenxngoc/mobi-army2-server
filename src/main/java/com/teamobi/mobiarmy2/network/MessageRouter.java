@@ -140,7 +140,7 @@ public class MessageRouter {
 
                 case Cmd.CHOOSE_GUN -> characterMessageHandler.handleChoseCharacter(ms);
 
-                case Cmd.CHANGE_TEAM -> fightWaitMessageHandler.handleChangeTeam(ms);
+                case Cmd.CHANGE_TEAM -> fightWaitMessageHandler.handleChangeTeam();
 
                 case Cmd.BUY_ITEM -> shopMessageHandler.handlePurchaseItem(ms);
 

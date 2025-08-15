@@ -30,17 +30,17 @@ public class SpinMessageHandler extends BaseMessageHandler {
 
         byte unit = ms.reader().readByte();
         if (unit == 0) {
-            if (user.getXu() < serverConfig.getSpinXuCost()) {
+            if (us().getXu() < serverConfig.getSpinXuCost()) {
                 sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                 return;
             }
-            user.updateXu(-serverConfig.getSpinXuCost());
+            us().updateXu(-serverConfig.getSpinXuCost());
         } else {
-            if (user.getLuong() < serverConfig.getSpinLuongCost()) {
+            if (us().getLuong() < serverConfig.getSpinLuongCost()) {
                 sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                 return;
             }
-            user.updateLuong(-serverConfig.getSpinLuongCost());
+            us().updateLuong(-serverConfig.getSpinLuongCost());
         }
         ms = new Message(Cmd.RULET);
         DataOutputStream ds = ms.writer();
@@ -55,19 +55,19 @@ public class SpinMessageHandler extends BaseMessageHandler {
                     itemId = FightItemManager.getRandomItem();
                     quantity = serverConfig.getSpinItemCounts()[0][Utils.nextInt(serverConfig.getSpinItemCounts()[1])];
                     if (i == luckyIndex) {
-                        user.updateFightItems(itemId, (byte) quantity);
+                        us().updateFightItems(itemId, (byte) quantity);
                     }
                 }
                 case 1 -> {
                     quantity = serverConfig.getSpinXuCounts()[0][Utils.nextInt(serverConfig.getSpinXuCounts()[1])];
                     if (i == luckyIndex) {
-                        user.updateXu(quantity);
+                        us().updateXu(quantity);
                     }
                 }
                 case 2 -> {
                     quantity = serverConfig.getSpinXpCounts()[0][Utils.nextInt(serverConfig.getSpinXpCounts()[1])];
                     if (i == luckyIndex) {
-                        user.updateXp(quantity);
+                        us().updateXp(quantity);
                     }
                 }
             }

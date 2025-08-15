@@ -24,15 +24,15 @@ public class FightManagerMessageHandler extends BaseMessageHandler {
         short x = dis.readShort();
         short y = dis.readShort();
 
-        if (user.getState() == UserState.FIGHTING) {
-            user.getFightWait().getFightManager().changeLocation(user.getUserId(), x, y);
-        } else if (user.getState() == UserState.TRAINING) {
-            user.getTrainingManager().changeLocation(x, y);
+        if (us().getState() == UserState.FIGHTING) {
+            fm().changeLocation(us().getUserId(), x, y);
+        } else if (us().getState() == UserState.TRAINING) {
+            us().getTrainingManager().changeLocation(x, y);
         }
     }
 
     public void shoot(Message ms) throws IOException {
-        if (user.getState() != UserState.FIGHTING) {
+        if (us().getState() != UserState.FIGHTING) {
             return;
         }
         DataInputStream dis = ms.reader();
@@ -47,7 +47,7 @@ public class FightManagerMessageHandler extends BaseMessageHandler {
         }
         byte numShoot = dis.readByte();
 
-        user.getFightWait().getFightManager().addShoot(user.getUserId(), bullId, x, y, angle, force, force2, numShoot);
+        fm().addShoot(us().getUserId(), bullId, x, y, angle, force, force2, numShoot);
     }
 
     public void processShootingResult(Message ms) {
@@ -61,15 +61,15 @@ public class FightManagerMessageHandler extends BaseMessageHandler {
                 return;
             }
 
-            if (user.getItemFightQuantity(itemIndex) < 1) {
+            if (us().getItemFightQuantity(itemIndex) < 1) {
                 return;
             }
         }
-        user.getFightWait().getFightManager().useItem(user.getUserId(), itemIndex);
+        fm().useItem(us().getUserId(), itemIndex);
     }
 
     public void skipTurn() {
-        user.getFightWait().getFightManager().skipTurn(user.getUserId());
+        fm().skipTurn(us().getUserId());
     }
 
     public void updateCoordinates(Message ms) throws IOException {
@@ -94,7 +94,7 @@ public class FightManagerMessageHandler extends BaseMessageHandler {
         initializeTrainingManager();
         Message ms = new Message(Cmd.TRAINING_MAP);
         DataOutputStream ds = ms.writer();
-        ds.writeByte(user.getTrainingManager().getMapId());
+        ds.writeByte(us().getTrainingManager().getMapId());
         ds.flush();
         sendMessage(ms);
     }
@@ -105,19 +105,19 @@ public class FightManagerMessageHandler extends BaseMessageHandler {
         initializeTrainingManager();
 
         if (type == 0) {//Start game
-            if (user.isNotWaiting()) {
+            if (us().isNotWaiting()) {
                 return;
             }
 
-            user.setState(UserState.TRAINING);
-            user.getTrainingManager().startTraining();
+            us().setState(UserState.TRAINING);
+            us().getTrainingManager().startTraining();
         } else {//Out game
-            if (user.getState() != UserState.TRAINING) {
+            if (us().getState() != UserState.TRAINING) {
                 return;
             }
 
-            user.setState(UserState.WAITING);
-            user.getTrainingManager().stopTraining();
+            us().setState(UserState.WAITING);
+            us().getTrainingManager().stopTraining();
 
             ms = new Message(Cmd.TRAINING);
             DataOutputStream ds = ms.writer();
@@ -128,7 +128,7 @@ public class FightManagerMessageHandler extends BaseMessageHandler {
     }
 
     public void trainShooting(Message ms) throws IOException {
-        if (user.getState() != UserState.TRAINING) {
+        if (us().getState() != UserState.TRAINING) {
             return;
         }
 
@@ -144,13 +144,13 @@ public class FightManagerMessageHandler extends BaseMessageHandler {
         }
         byte numShoot = dis.readByte();
 
-        user.getTrainingManager().addShoot(user, bullId, x, y, angle, force, force2, numShoot);
+        us().getTrainingManager().addShoot(us(), bullId, x, y, angle, force, force2, numShoot);
     }
 
     private void initializeTrainingManager() {
-        if (user.getTrainingManager() == null) {
+        if (us().getTrainingManager() == null) {
             ServerConfig serverConfig = ApplicationContext.getInstance().getBean(ServerConfig.class);
-            user.setTrainingManager(new TrainingManager(user, serverConfig.getTrainingMapId()));
+            us().setTrainingManager(new TrainingManager(us(), serverConfig.getTrainingMapId()));
         }
     }
 }

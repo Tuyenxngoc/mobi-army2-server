@@ -38,7 +38,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
     }
 
     public void handleSendRoomList() throws IOException {
-        if (user.isNotWaiting()) {
+        if (us().isNotWaiting()) {
             return;
         }
         RoomManager roomManager = ApplicationContext.getInstance()
@@ -56,7 +56,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
     }
 
     public void handleEnteringRoom(Message ms) throws IOException {
-        if (user.isNotWaiting()) {
+        if (us().isNotWaiting()) {
             return;
         }
         Room[] rooms = ApplicationContext.getInstance()
@@ -66,7 +66,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
             return;
         }
         Room room = rooms[roomNumber];
-        if (room.getType() == 6 && user.getClanId() == null) {
+        if (room.getType() == 6 && us().getClanId() == null) {
             sendServerMessage(GameString.NO_CLAN_MEMBERSHIP);
             return;
         }
@@ -91,7 +91,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
     }
 
     public void handleJoinBoard(Message ms) throws IOException {
-        if (user.isNotWaiting()) {
+        if (us().isNotWaiting()) {
             return;
         }
 
@@ -119,7 +119,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
             sendServerMessage(GameString.AREA_INCORRECT_PASSWORD);
             return;
         }
-        fightWait.addUser(user);
+        fightWait.addUser(us());
     }
 
     public void handleJoinAnyBoard(Message ms) throws IOException {
@@ -143,7 +143,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
                                 !fight.isPassSet() &&
                                 !fight.isContinuous() &&
                                 fight.getNumPlayers() < fight.getMaxSetPlayers() &&
-                                fight.getMoney() <= user.getXu()
+                                fight.getMoney() <= us().getXu()
                         ) {
                             fightWait = fight;
                             break outerLoop;
@@ -161,7 +161,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
                     if (!fight.isStarted() &&
                             !fight.isPassSet() &&
                             fight.getNumPlayers() < fight.getMaxSetPlayers() &&
-                            fight.getMoney() <= user.getXu() &&
+                            fight.getMoney() <= us().getXu() &&
                             fight.getMaxSetPlayers() == type * 2
                     ) {
                         fightWait = fight;
@@ -178,7 +178,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
                 for (FightWait fight : room.getFightWaits()) {
                     if (!fight.isStarted() &&
                             !fight.isPassSet() &&
-                            fight.getMoney() <= user.getXu() &&
+                            fight.getMoney() <= us().getXu() &&
                             fight.getNumPlayers() == 0
                     ) {
                         fightWait = fight;
@@ -196,7 +196,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
                     if (!fight.isStarted() &&
                             !fight.isPassSet() &&
                             fight.getNumPlayers() < fight.getMaxSetPlayers() &&
-                            fight.getMoney() <= user.getXu()
+                            fight.getMoney() <= us().getXu()
                     ) {
                         fightWait = fight;
                         break;
@@ -208,8 +208,8 @@ public class RoomMessageHandler extends BaseMessageHandler {
         if (fightWait == null) {
             sendMoneyErrorMessage(GameString.AREA_NOT_FOUND);
         } else {
-            fightWait.sendInfo(user);
-            fightWait.addUser(user);
+            fightWait.sendInfo(us());
+            fightWait.addUser(us());
         }
     }
 }

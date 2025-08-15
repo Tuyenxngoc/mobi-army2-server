@@ -44,12 +44,12 @@ public class FriendMessageHandler extends BaseMessageHandler {
         //Neu la nguoi dua tin -> chat The gioi
         if (userId == 2) {
             int priceChatServer = serverConfig.getPriceChatServer();
-            if (user.getXu() < priceChatServer) {
+            if (us().getXu() < priceChatServer) {
                 sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                 return;
             }
-            user.updateXu(-priceChatServer);
-            sendServerInfo(GameString.createMessageFromSender(user.getUsername(), content), true);
+            us().updateXu(-priceChatServer);
+            sendServerInfo(GameString.createMessageFromSender(us().getUsername(), content), true);
             return;
         }
         User receiver = ApplicationContext.getInstance()
@@ -64,8 +64,8 @@ public class FriendMessageHandler extends BaseMessageHandler {
     public void handleViewFriendList() throws IOException {
         Message ms = new Message(Cmd.FRIENDLIST);
         DataOutputStream ds = ms.writer();
-        if (!user.getFriends().isEmpty()) {
-            List<FriendDTO> friends = userDAO.getFriendsList(user.getUserId(), user.getFriends());
+        if (!us().getFriends().isEmpty()) {
+            List<FriendDTO> friends = userDAO.getFriendsList(us().getUserId(), us().getFriends());
             for (FriendDTO friend : friends) {
                 ds.writeInt(friend.getUserId());
                 ds.writeUTF(friend.getName());
@@ -119,7 +119,7 @@ public class FriendMessageHandler extends BaseMessageHandler {
     public void handleRemoveFriend(Message ms) throws IOException {
         try {
             Integer id = ms.reader().readInt();
-            user.getFriends().remove(id);
+            us().getFriends().remove(id);
             sendDeleteFriendMessage(0);
         } catch (IOException e) {
             sendDeleteFriendMessage(1);

@@ -52,7 +52,7 @@ public class InventoryMessageHandler extends BaseMessageHandler {
         DataInputStream dis = ms.reader();
         byte action = dis.readByte();
         int key = dis.readInt();
-        EquipmentChest equip = user.getEquipmentByKey(key);
+        EquipmentChest equip = us().getEquipmentByKey(key);
         if (equip == null) {
             return;
         }
@@ -80,13 +80,13 @@ public class InventoryMessageHandler extends BaseMessageHandler {
             ds.flush();
             sendMessage(ms);
         } else {
-            if (user.getXu() < gia) {
+            if (us().getXu() < gia) {
                 sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                 return;
             }
-            user.updateXu(-gia);
+            us().updateXu(-gia);
             equip.setPurchaseDate(LocalDateTime.now());
-            user.updateInventory(equip, null, null, null);
+            us().updateInventory(equip, null, null, null);
             sendServerMessage(GameString.EXTEND_SUCCESS);
         }
     }
@@ -95,16 +95,16 @@ public class InventoryMessageHandler extends BaseMessageHandler {
         DataInputStream dis = ms.reader();
         byte action = dis.readByte();
         int key = dis.readInt();
-        EquipmentChest equip = user.getEquipmentByKey(key);
+        EquipmentChest equip = us().getEquipmentByKey(key);
         if (equip == null ||
                 equip.isExpired() ||
                 !equip.getEquipment().isDisguise() ||
-                equip.getEquipment().getLevelRequirement() > user.getCurrentLevel() ||
-                equip.getEquipment().getCharacterId() != user.getActiveCharacterId()
+                equip.getEquipment().getLevelRequirement() > us().getCurrentLevel() ||
+                equip.getEquipment().getCharacterId() != us().getActiveCharacterId()
         ) {
             return;
         }
-        EquipmentChest oldEquip = user.getCharacterEquips()[user.getActiveCharacterId()][5];
+        EquipmentChest oldEquip = us().getCharacterEquips()[us().getActiveCharacterId()][5];
         if (oldEquip != null) {
             oldEquip.setInUse(false);
         }
@@ -112,12 +112,12 @@ public class InventoryMessageHandler extends BaseMessageHandler {
         DataOutputStream ds = ms.writer();
         ds.writeByte(action);
         if (action == 0) {
-            user.getEquipData()[user.getActiveCharacterId()][5] = -1;
-            user.getCharacterEquips()[user.getActiveCharacterId()][5] = null;
+            us().getEquipData()[us().getActiveCharacterId()][5] = -1;
+            us().getCharacterEquips()[us().getActiveCharacterId()][5] = null;
         } else {
             equip.setInUse(true);
-            user.getEquipData()[user.getActiveCharacterId()][5] = equip.getKey();
-            user.getCharacterEquips()[user.getActiveCharacterId()][5] = equip;
+            us().getEquipData()[us().getActiveCharacterId()][5] = equip.getKey();
+            us().getCharacterEquips()[us().getActiveCharacterId()][5] = equip;
             for (short a : equip.getEquipment().getDisguiseEquippedIndexes()) {
                 ds.writeShort(a);
             }
@@ -154,13 +154,13 @@ public class InventoryMessageHandler extends BaseMessageHandler {
 
                 //Lấy thông tin vật phẩm từ rương người chơi
                 if (id >= Byte.MAX_VALUE) {//Trường hợp trang bị
-                    EquipmentChest equipment = user.getEquipmentByKey(id);
+                    EquipmentChest equipment = us().getEquipmentByKey(id);
                     if (equipment == null || equipList.contains(equipment)) {
                         continue;
                     }
                     equipList.add(equipment);
                 } else {//Trường hợp là ngọc
-                    SpecialItemChest specialItem = user.getSpecialItemById((byte) id);
+                    SpecialItemChest specialItem = us().getSpecialItemById((byte) id);
                     if (specialItem == null || specialItem.getItem() == null || specialItem.getQuantity() < quantity || specialItemList.contains(specialItem)) {
                         continue;
                     }
@@ -228,7 +228,7 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                             equip.decrementEmptySlot();
                             equip.addPoints(specialItem.getItem().getAbility());
                         }
-                        user.updateInventory(equip, null, null, specialItemList);
+                        us().updateInventory(equip, null, null, specialItemList);
                         sendServerMessage(GameString.GEM_COMBINE_SUCCESS);
                     } else {
                         sendServerMessage(GameString.GEM_COMBINE_NO_SLOT);
@@ -244,22 +244,22 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                         newItem.setQuantity((short) 1);
                         newItem.setItem(SpecialItemManager.getSpecialItemById((byte) (specialItemChest.getItem().getId() + 1)));
 
-                        user.updateInventory(null, null, List.of(newItem), List.of(specialItemChest));
+                        us().updateInventory(null, null, List.of(newItem), List.of(specialItemChest));
                         sendServerMessage(GameString.createGemUpgradeSuccessMessage(newItem.getQuantity(), newItem.getItem().getName()));
                     } else {
                         specialItemChest.setQuantity((short) 1);
-                        user.updateInventory(null, null, null, List.of(specialItemChest));
+                        us().updateInventory(null, null, null, List.of(specialItemChest));
                         sendServerMessage(GameString.COMBINE_FAILURE);
                     }
                 }
 
                 case SELL_GEM -> {
-                    if (user.isChestLocked()) {
+                    if (us().isChestLocked()) {
                         sendServerMessage(GameString.CHEST_LOCKED_NO_SELL);
                         return;
                     }
-                    user.updateInventory(null, null, null, specialItemList);
-                    user.updateXu(totalTransactionAmount);
+                    us().updateInventory(null, null, null, specialItemList);
+                    us().updateXu(totalTransactionAmount);
                     sendServerMessage(GameString.PURCHASE_SUCCESS);
                 }
 
@@ -267,16 +267,16 @@ public class InventoryMessageHandler extends BaseMessageHandler {
 
                 case COMBINE_SPECIAL_ITEM -> {
                     if (fabricateItem.getRewardXu() > 0) {
-                        user.updateXu(fabricateItem.getRewardXu());
+                        us().updateXu(fabricateItem.getRewardXu());
                     }
                     if (fabricateItem.getRewardLuong() > 0) {
-                        user.updateLuong(fabricateItem.getRewardLuong());
+                        us().updateLuong(fabricateItem.getRewardLuong());
                     }
                     if (fabricateItem.getRewardCup() > 0) {
-                        user.updateCup(fabricateItem.getRewardCup());
+                        us().updateCup(fabricateItem.getRewardCup());
                     }
                     if (fabricateItem.getRewardExp() > 0) {
-                        user.updateXp(fabricateItem.getRewardExp());
+                        us().updateXp(fabricateItem.getRewardExp());
                     }
 
                     List<SpecialItemChest> addItems = fabricateItem.getRewardItem()
@@ -284,7 +284,7 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                             .map(SpecialItemChest::new)
                             .toList();
 
-                    user.updateInventory(null, null, addItems, specialItemList);
+                    us().updateInventory(null, null, addItems, specialItemList);
 
                     if (!fabricateItem.getCompletionMessage().isEmpty()) {
                         sendServerMessage(fabricateItem.getCompletionMessage());
@@ -300,8 +300,8 @@ public class InventoryMessageHandler extends BaseMessageHandler {
     private void handleUseSpecialItem(SpecialItemChest specialItemChest) {
         switch (specialItemChest.getItem().getId()) {
             case 54 -> {
-                user.addDaysToXpX2Time(1);
-                user.updateInventory(null, null, null, List.of(specialItemChest));
+                us().addDaysToXpX2Time(1);
+                us().updateInventory(null, null, null, List.of(specialItemChest));
                 sendServerMessage(GameString.ITEM_X2_XP_USAGE_SUCCESS);
             }
 
@@ -320,17 +320,17 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                             addPercents[n] = (byte) Utils.nextInt(8, 10);
                         }
                         EquipmentChest newEquip = new EquipmentChest();
-                        newEquip.setEquipment(EquipmentManager.getEquipment(user.getActiveCharacterId(), i, (short) (30 + i)));
+                        newEquip.setEquipment(EquipmentManager.getEquipment(us().getActiveCharacterId(), i, (short) (30 + i)));
                         newEquip.setVipLevel((byte) 1);
                         newEquip.setAddPoints(addPoints);
                         newEquip.setAddPercents(addPercents);
 
-                        user.addEquipment(newEquip);
+                        us().addEquipment(newEquip);
                     }
 
                     ExchangeLimitManager.incrementGoldCount(0);
 
-                    user.updateInventory(null, null, null, List.of(specialItemChest));
+                    us().updateInventory(null, null, null, List.of(specialItemChest));
                     sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 } else if (specialItemChest.getQuantity() == 100) {
                     if (ExchangeLimitManager.isGoldLimitReached(1)) {
@@ -346,17 +346,17 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                             addPercents[n] = (byte) Utils.nextInt(10, 12);
                         }
                         EquipmentChest newEquip = new EquipmentChest();
-                        newEquip.setEquipment(EquipmentManager.getEquipment(user.getActiveCharacterId(), i, (short) (30 + i)));
+                        newEquip.setEquipment(EquipmentManager.getEquipment(us().getActiveCharacterId(), i, (short) (30 + i)));
                         newEquip.setVipLevel((byte) 2);
                         newEquip.setAddPoints(addPoints);
                         newEquip.setAddPercents(addPercents);
 
-                        user.addEquipment(newEquip);
+                        us().addEquipment(newEquip);
                     }
 
                     ExchangeLimitManager.incrementGoldCount(1);
 
-                    user.updateInventory(null, null, null, List.of(specialItemChest));
+                    us().updateInventory(null, null, null, List.of(specialItemChest));
                     sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 } else if (specialItemChest.getQuantity() == 150) {
                     if (ExchangeLimitManager.isGoldLimitReached(2)) {
@@ -372,21 +372,21 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                             addPercents[n] = (byte) Utils.nextInt(12, 14);
                         }
                         EquipmentChest newEquip = new EquipmentChest();
-                        newEquip.setEquipment(EquipmentManager.getEquipment(user.getActiveCharacterId(), i, (short) (30 + i)));
+                        newEquip.setEquipment(EquipmentManager.getEquipment(us().getActiveCharacterId(), i, (short) (30 + i)));
                         newEquip.setVipLevel((byte) 3);
                         newEquip.setAddPoints(addPoints);
                         newEquip.setAddPercents(addPercents);
 
-                        user.addEquipment(newEquip);
+                        us().addEquipment(newEquip);
                     }
 
                     ExchangeLimitManager.incrementGoldCount(2);
 
-                    user.updateInventory(null, null, null, List.of(specialItemChest));
+                    us().updateInventory(null, null, null, List.of(specialItemChest));
                     sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 } else {
-                    user.updateXp(1000 * specialItemChest.getQuantity());
-                    user.updateInventory(null, null, null, List.of(specialItemChest));
+                    us().updateXp(1000 * specialItemChest.getQuantity());
+                    us().updateInventory(null, null, null, List.of(specialItemChest));
                     sendServerMessage(GameString.USE_BANH_TRUNG_SUCCESS);
                 }
             }
@@ -417,17 +417,17 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                         }
 
                         EquipmentChest newEquipment = new EquipmentChest();
-                        newEquipment.setEquipment(EquipmentManager.getEquipment(user.getActiveCharacterId(), i, (short) (25 + i)));
+                        newEquipment.setEquipment(EquipmentManager.getEquipment(us().getActiveCharacterId(), i, (short) (25 + i)));
                         newEquipment.setVipLevel((byte) 1);
                         newEquipment.setAddPoints(generatedPoints);
                         newEquipment.setAddPercents(generatedPercents);
 
-                        user.addEquipment(newEquipment);
+                        us().addEquipment(newEquipment);
                     }
 
                     ExchangeLimitManager.incrementSilverCount(0);
 
-                    user.updateInventory(null, null, null, List.of(specialItemChest));
+                    us().updateInventory(null, null, null, List.of(specialItemChest));
                     sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 } else if (specialItemChest.getQuantity() == 100) {
                     if (ExchangeLimitManager.isSilverLimitReached(1)) {
@@ -454,17 +454,17 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                         }
 
                         EquipmentChest newEquipment = new EquipmentChest();
-                        newEquipment.setEquipment(EquipmentManager.getEquipment(user.getActiveCharacterId(), i, (short) (25 + i)));
+                        newEquipment.setEquipment(EquipmentManager.getEquipment(us().getActiveCharacterId(), i, (short) (25 + i)));
                         newEquipment.setVipLevel((byte) 2);
                         newEquipment.setAddPoints(generatedPoints);
                         newEquipment.setAddPercents(generatedPercents);
 
-                        user.addEquipment(newEquipment);
+                        us().addEquipment(newEquipment);
                     }
 
                     ExchangeLimitManager.incrementSilverCount(1);
 
-                    user.updateInventory(null, null, null, List.of(specialItemChest));
+                    us().updateInventory(null, null, null, List.of(specialItemChest));
                     sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 } else if (specialItemChest.getQuantity() == 150) {
                     if (ExchangeLimitManager.isSilverLimitReached(2)) {
@@ -491,21 +491,21 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                         }
 
                         EquipmentChest newEquipment = new EquipmentChest();
-                        newEquipment.setEquipment(EquipmentManager.getEquipment(user.getActiveCharacterId(), i, (short) (25 + i)));
+                        newEquipment.setEquipment(EquipmentManager.getEquipment(us().getActiveCharacterId(), i, (short) (25 + i)));
                         newEquipment.setVipLevel((byte) 3);
                         newEquipment.setAddPoints(generatedPoints);
                         newEquipment.setAddPercents(generatedPercents);
 
-                        user.addEquipment(newEquipment);
+                        us().addEquipment(newEquipment);
                     }
 
                     ExchangeLimitManager.incrementSilverCount(2);
 
-                    user.updateInventory(null, null, null, List.of(specialItemChest));
+                    us().updateInventory(null, null, null, List.of(specialItemChest));
                     sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 } else {
-                    user.updateXp(500 * specialItemChest.getQuantity());
-                    user.updateInventory(null, null, null, List.of(specialItemChest));
+                    us().updateXp(500 * specialItemChest.getQuantity());
+                    us().updateInventory(null, null, null, List.of(specialItemChest));
                     sendServerMessage(GameString.USE_BANH_TET_SUCCESS);
                 }
             }
@@ -539,7 +539,7 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                     rewardMessage.setLength(rewardMessage.length() - 2);
                 }
 
-                user.updateInventory(null, null, generatedItems, List.of(specialItemChest));
+                us().updateInventory(null, null, generatedItems, List.of(specialItemChest));
                 sendServerMessage(rewardMessage.toString());
             }
         }
@@ -597,23 +597,23 @@ public class InventoryMessageHandler extends BaseMessageHandler {
         boolean changeSuccessful = false;
         for (int i = 0; i < 5; i++) {
             int key = ms.reader().readInt();
-            EquipmentChest equip = user.getEquipmentByKey(key);
+            EquipmentChest equip = us().getEquipmentByKey(key);
             if (equip == null ||
                     equip.isInUse() ||
                     equip.isExpired() ||
                     equip.getEquipment().isDisguise() ||
-                    equip.getEquipment().getLevelRequirement() > user.getCurrentLevel() ||
-                    equip.getEquipment().getCharacterId() != user.getActiveCharacterId() || equip.getEquipment().getEquipType() != i
+                    equip.getEquipment().getLevelRequirement() > us().getCurrentLevel() ||
+                    equip.getEquipment().getCharacterId() != us().getActiveCharacterId() || equip.getEquipment().getEquipType() != i
             ) {
                 continue;
             }
-            EquipmentChest oldEquip = user.getCharacterEquips()[user.getActiveCharacterId()][i];
+            EquipmentChest oldEquip = us().getCharacterEquips()[us().getActiveCharacterId()][i];
             if (oldEquip != null) {
                 oldEquip.setInUse(false);
             }
             equip.setInUse(true);
-            user.getCharacterEquips()[user.getActiveCharacterId()][i] = equip;
-            user.getEquipData()[user.getActiveCharacterId()][i] = equip.getKey();
+            us().getCharacterEquips()[us().getActiveCharacterId()][i] = equip;
+            us().getEquipData()[us().getActiveCharacterId()][i] = equip.getKey();
             changeSuccessful = true;
         }
         ms = new Message(Cmd.CHANGE_EQUIP);
@@ -647,7 +647,7 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                 }
                 for (int i = 0; i < size; i++) {
                     int key = dis.readInt();
-                    EquipmentChest equip = user.getEquipmentByKey(key);
+                    EquipmentChest equip = us().getEquipmentByKey(key);
                     if (equip == null || equipList.contains(equip)) {
                         continue;
                     }
@@ -691,13 +691,13 @@ public class InventoryMessageHandler extends BaseMessageHandler {
             }
             case 2 -> {//Xác nhận bán trang bị
                 if (userAction == UserAction.REMOVE_GEM_FROM_EQUIPMENT) {//Xác nhận tháo ngọc
-                    if (user.getXu() < totalTransactionAmount) {
+                    if (us().getXu() < totalTransactionAmount) {
                         sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                         return;
                     }
 
                     //Trừ phí tháo ngọc
-                    user.updateXu(-totalTransactionAmount);
+                    us().updateXu(-totalTransactionAmount);
 
                     EquipmentChest selectedEquipment = equipList.getFirst();
                     if (selectedEquipment == null) {
@@ -723,13 +723,13 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                     selectedEquipment.setEmptySlot((byte) 3);
 
                     //Cập nhật rương
-                    user.updateInventory(selectedEquipment, null, recoveredGems, null);
+                    us().updateInventory(selectedEquipment, null, recoveredGems, null);
 
                     //Gửi thông báo thành công
                     sendServerMessage(GameString.GEM_REMOVAL_SUCCESS);
                 } else if (userAction == UserAction.SELL_EQUIPMENT) {//Xác nhận bán trang bị
                     //Kiểm tra có khóa rương không
-                    if (user.isChestLocked()) {
+                    if (us().isChestLocked()) {
                         sendServerMessage(GameString.CHEST_LOCKED_NO_SELL);
                         return;
                     }
@@ -745,9 +745,9 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                         }
                     }
                     for (EquipmentChest validEquipment : equipList) {
-                        user.updateInventory(null, validEquipment, null, null);
+                        us().updateInventory(null, validEquipment, null, null);
                     }
-                    user.updateXu(totalTransactionAmount);
+                    us().updateXu(totalTransactionAmount);
                     sendServerMessage(GameString.PURCHASE_SUCCESS);
                 }
                 userAction = null;
@@ -757,7 +757,7 @@ public class InventoryMessageHandler extends BaseMessageHandler {
 
     private void purchaseEquipment(short saleIndex, byte unit) {
         ServerConfig serverConfig = ApplicationContext.getInstance().getBean(ServerConfig.class);
-        if (user.getEquipmentChest().size() >= serverConfig.getMaxEquipmentSlots()) {
+        if (us().getEquipmentChest().size() >= serverConfig.getMaxEquipmentSlots()) {
             sendServerMessage(GameString.CHEST_NO_SPACE);
             return;
         }
@@ -766,21 +766,21 @@ public class InventoryMessageHandler extends BaseMessageHandler {
             return;
         }
         if (unit == 0) {
-            if (user.getXu() < equipment.getPriceXu()) {
+            if (us().getXu() < equipment.getPriceXu()) {
                 sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                 return;
             }
-            user.updateXu(-equipment.getPriceXu());
+            us().updateXu(-equipment.getPriceXu());
         } else {
-            if (user.getLuong() < equipment.getPriceLuong()) {
+            if (us().getLuong() < equipment.getPriceLuong()) {
                 sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                 return;
             }
-            user.updateLuong(-equipment.getPriceLuong());
+            us().updateLuong(-equipment.getPriceLuong());
         }
         EquipmentChest newEquip = new EquipmentChest();
         newEquip.setEquipment(equipment);
-        user.addEquipment(newEquip);
+        us().addEquipment(newEquip);
         sendServerMessage(GameString.PURCHASE_SUCCESS);
     }
 }
