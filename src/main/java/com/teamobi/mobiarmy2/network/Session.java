@@ -1,13 +1,14 @@
 package com.teamobi.mobiarmy2.network;
 
 import com.teamobi.mobiarmy2.bootstrap.ApplicationContext;
-import com.teamobi.mobiarmy2.common.config.ServerConfig;
 import com.teamobi.mobiarmy2.common.constant.Cmd;
-import com.teamobi.mobiarmy2.dao.*;
+import com.teamobi.mobiarmy2.dao.AccountDAO;
+import com.teamobi.mobiarmy2.dao.ClanDAO;
+import com.teamobi.mobiarmy2.dao.UserCharacterDAO;
+import com.teamobi.mobiarmy2.dao.UserDAO;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.handler.*;
 import com.teamobi.mobiarmy2.server.ServerManager;
-import com.teamobi.mobiarmy2.service.LeaderboardService;
 import com.teamobi.mobiarmy2.service.LoginRateLimiterService;
 import lombok.Getter;
 import lombok.Setter;
@@ -54,9 +55,14 @@ public class Session {
     @Setter
     private String platform;
     @Setter
+    @Getter
     private String version;
     @Setter
-    private byte provider;
+    @Getter
+    private byte provider = -1;
+    @Setter
+    @Getter
+    private String agent;
 
     public Session(long sessionId, Socket socket) throws IOException {
         this.sessionId = sessionId;
@@ -96,8 +102,8 @@ public class Session {
 
     public void close() {
         try {
-            if (user.isLogged()) {
-                user.getUserMessageHandler().handleLogout();
+            if (user != null && user.isLogged()) {
+                messageRouter.getAuthMessageHandler().handleUserLogoutCleanup();
             }
 
             ApplicationContext.getInstance()
@@ -222,18 +228,6 @@ public class Session {
     public void initMessageHandlers() {
         ApplicationContext context = ApplicationContext.getInstance();
 
-        UserMessageHandler userMessageHandler = new UserMessageHandler(
-                this,
-                context.getBean(ServerConfig.class),
-                context.getBean(LeaderboardService.class),
-                context.getBean(LoginRateLimiterService.class),
-                context.getBean(UserDAO.class),
-                context.getBean(AccountDAO.class),
-                context.getBean(GiftCodeDAO.class),
-                context.getBean(UserGiftCodeDAO.class),
-                context.getBean(UserCharacterDAO.class)
-        );
-
         ClanMessageHandler clanMessageHandler = new ClanMessageHandler(this, context.getBean(ClanDAO.class));
         FriendMessageHandler friendMessageHandler = new FriendMessageHandler(this, context.getBean(UserDAO.class));
         ShopMessageHandler shopMessageHandler = new ShopMessageHandler(this, context.getBean(UserCharacterDAO.class));
@@ -245,11 +239,10 @@ public class Session {
         FightManagerMessageHandler fightManagerMessageHandler = new FightManagerMessageHandler(this);
         InventoryMessageHandler inventoryMessageHandler = new InventoryMessageHandler(this);
 
-        messageRouter.setUserMessageHandler(userMessageHandler);
         messageRouter.setClanMessageHandler(clanMessageHandler);
         messageRouter.setFriendMessageHandler(friendMessageHandler);
         messageRouter.setShopMessageHandler(shopMessageHandler);
-        messageRouter.setResourceService(resourceService);
+        messageRouter.setResourceMessageHandler(resourceService);
         messageRouter.setMissionMessageHandler(missionMessageHandler);
         messageRouter.setFormulaMessageHandler(formulaMessageHandler);
         messageRouter.setRoomMessageHandler(roomMessageHandler);

@@ -593,6 +593,36 @@ public class InventoryMessageHandler extends BaseMessageHandler {
         sendMessage(ms);
     }
 
+    public void handleChangeEquipment(Message ms) throws IOException {
+        boolean changeSuccessful = false;
+        for (int i = 0; i < 5; i++) {
+            int key = ms.reader().readInt();
+            EquipmentChest equip = user.getEquipmentByKey(key);
+            if (equip == null ||
+                    equip.isInUse() ||
+                    equip.isExpired() ||
+                    equip.getEquipment().isDisguise() ||
+                    equip.getEquipment().getLevelRequirement() > user.getCurrentLevel() ||
+                    equip.getEquipment().getCharacterId() != user.getActiveCharacterId() || equip.getEquipment().getEquipType() != i
+            ) {
+                continue;
+            }
+            EquipmentChest oldEquip = user.getCharacterEquips()[user.getActiveCharacterId()][i];
+            if (oldEquip != null) {
+                oldEquip.setInUse(false);
+            }
+            equip.setInUse(true);
+            user.getCharacterEquips()[user.getActiveCharacterId()][i] = equip;
+            user.getEquipData()[user.getActiveCharacterId()][i] = equip.getKey();
+            changeSuccessful = true;
+        }
+        ms = new Message(Cmd.CHANGE_EQUIP);
+        DataOutputStream ds = ms.writer();
+        ds.writeByte(changeSuccessful ? 1 : 0);
+        ds.flush();
+        sendMessage(ms);
+    }
+
     public void handleEquipmentTransactions(Message ms) throws IOException {
         List<EquipmentChest> equipList = getSelectedEquips();
 

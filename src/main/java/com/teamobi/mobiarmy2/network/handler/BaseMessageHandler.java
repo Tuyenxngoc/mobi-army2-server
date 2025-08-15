@@ -163,4 +163,41 @@ public abstract class BaseMessageHandler {
         } catch (IOException ignored) {
         }
     }
+
+    public void sendUpdateMoney() throws IOException {
+        Message ms = new Message(Cmd.UPDATE_MONEY);
+        DataOutputStream ds = ms.writer();
+        ds.writeInt(user.getXu());
+        ds.writeInt(user.getLuong());
+        ds.flush();
+        sendMessage(ms);
+    }
+
+    public void sendUpdateCup(int cupUp) throws IOException {
+        Message ms = new Message(Cmd.CUP);
+        DataOutputStream ds = ms.writer();
+        ds.writeByte(cupUp);
+        ds.writeInt(user.getCup());
+        ds.flush();
+        sendMessage(ms);
+    }
+
+    public void sendUpdateXp(int xpUp, boolean updateLevel) throws IOException {
+        Message ms = new Message(Cmd.UPDATE_EXP);
+        DataOutputStream ds = ms.writer();
+        ds.writeInt(xpUp);
+        ds.writeInt(user.getCurrentXp());
+        ds.writeInt(user.getCurrentRequiredXp());
+        if (updateLevel) {
+            ds.writeByte(1);
+            ds.writeByte(user.getCurrentLevel());
+            ds.writeByte(user.getCurrentLevelPercent());
+            ds.writeShort(user.getCurrentPoint());
+        } else {
+            ds.writeByte(0);
+            ds.writeByte(user.getCurrentLevelPercent());
+        }
+        ds.flush();
+        sendMessage(ms);
+    }
 }

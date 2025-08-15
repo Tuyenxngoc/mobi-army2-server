@@ -17,6 +17,18 @@ public class ResourceMessageHandler extends BaseMessageHandler {
         super(session);
     }
 
+    public void getMoreGame() throws IOException {
+        ServerConfig serverConfig = ApplicationContext.getInstance().getBean(ServerConfig.class);
+
+        Message ms = new Message(Cmd.MORE_GAME);
+        DataOutputStream ds = ms.writer();
+        ds.writeUTF(serverConfig.getDownloadTitle());
+        ds.writeUTF(serverConfig.getDownloadInfo());
+        ds.writeUTF(serverConfig.getDownloadUrl());
+        ds.flush();
+        sendMessage(ms);
+    }
+
     public void getBigImage(Message ms) throws IOException {
         int id = ms.reader().readByte();
         ms = new Message(Cmd.GET_BIG_IMAGE);

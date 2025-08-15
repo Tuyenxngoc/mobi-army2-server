@@ -2,15 +2,14 @@ package com.teamobi.mobiarmy2.network;
 
 import com.teamobi.mobiarmy2.common.constant.Cmd;
 import com.teamobi.mobiarmy2.network.handler.*;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class MessageRouter {
+    @Getter
     private final AuthMessageHandler authMessageHandler;
-
-    @Setter
-    private UserMessageHandler userMessageHandler;
     @Setter
     private ClanMessageHandler clanMessageHandler;
     @Setter
@@ -18,7 +17,7 @@ public class MessageRouter {
     @Setter
     private ShopMessageHandler shopMessageHandler;
     @Setter
-    private ResourceMessageHandler resourceService;
+    private ResourceMessageHandler resourceMessageHandler;
     @Setter
     private MissionMessageHandler missionMessageHandler;
     @Setter
@@ -31,6 +30,16 @@ public class MessageRouter {
     private FightManagerMessageHandler fightManagerMessageHandler;
     @Setter
     private InventoryMessageHandler inventoryMessageHandler;
+    @Setter
+    private LeaderboardMessageHandler leaderboardMessageHandler;
+    @Setter
+    private GiftBoxMessageHandler giftBoxMessageHandler;
+    @Setter
+    private SpinMessageHandler spinMessageHandler;
+    @Setter
+    private PaymentMessageHandler paymentMessageHandler;
+    @Setter
+    private CharacterMessageHandler characterMessageHandler;
 
     public MessageRouter(AuthMessageHandler authMessageHandler) {
         this.authMessageHandler = authMessageHandler;
@@ -39,7 +48,7 @@ public class MessageRouter {
     public void onMessage(Message ms) {
         try {
             switch (ms.getCommand()) {
-                case Cmd.MORE_GAME -> userMessageHandler.getMoreGame();
+                case Cmd.MORE_GAME -> resourceMessageHandler.getMoreGame();
 
                 case Cmd.GET_KEY -> authMessageHandler.handleHandshakeMessage();
 
@@ -55,9 +64,9 @@ public class MessageRouter {
 
                 case Cmd.FOMULA -> formulaMessageHandler.handleMergeEquipments(ms);
 
-                case Cmd.GET_LUCKYGIFT -> userMessageHandler.openLuckyGift(ms);
+                case Cmd.GET_LUCKYGIFT -> giftBoxMessageHandler.openLuckyGift(ms);
 
-                case Cmd.BANGTHANHTICH -> userMessageHandler.viewLeaderboard(ms);
+                case Cmd.BANGTHANHTICH -> leaderboardMessageHandler.viewLeaderboard(ms);
 
                 case Cmd.SHOP_BIETDOI -> clanMessageHandler.handlePurchaseClanItem(ms);
 
@@ -129,7 +138,7 @@ public class MessageRouter {
 
                 case Cmd.CHOOSE_ITEM -> fightWaitMessageHandler.handleChoseItemFight(ms);
 
-                case Cmd.CHOOSE_GUN -> userMessageHandler.handleChoseCharacter(ms);
+                case Cmd.CHOOSE_GUN -> characterMessageHandler.handleChoseCharacter(ms);
 
                 case Cmd.CHANGE_TEAM -> fightWaitMessageHandler.handleChangeTeam(ms);
 
@@ -139,31 +148,31 @@ public class MessageRouter {
 
                 case Cmd.MAP_SELECT -> fightWaitMessageHandler.handleSelectMap(ms);
 
-                case Cmd.LOAD_CARD -> userMessageHandler.handleCardRecharge(ms);
+                case Cmd.LOAD_CARD -> paymentMessageHandler.handleCardRecharge(ms);
 
                 case Cmd.FIND_PLAYER -> fightWaitMessageHandler.handleFindPlayerWait(ms);
 
                 case Cmd.CHECK_CROSS -> fightManagerMessageHandler.clearBullet(ms);
 
-                case Cmd.CHANGE_PASS -> userMessageHandler.handleChangePassword(ms);
+                case Cmd.CHANGE_PASS -> authMessageHandler.handleChangePassword(ms);
 
                 case Cmd.TRAINING -> fightManagerMessageHandler.startTraining(ms);
 
                 case Cmd.TRAININGSHOOT -> fightManagerMessageHandler.trainShooting(ms);
 
-                case Cmd.GET_FILEPACK -> resourceService.getFilePack(ms);
+                case Cmd.GET_FILEPACK -> resourceMessageHandler.getFilePack(ms);
 
-                case Cmd.ADD_POINT -> userMessageHandler.handleAddPoints(ms);
+                case Cmd.ADD_POINT -> characterMessageHandler.handleAddPoints(ms);
 
-                case Cmd.CHARACTOR_INFO -> userMessageHandler.sendCharacterInfo();
+                case Cmd.CHARACTOR_INFO -> characterMessageHandler.sendCharacterInfo();
 
-                case Cmd.CHANGE_EQUIP -> userMessageHandler.handleChangeEquipment(ms);
+                case Cmd.CHANGE_EQUIP -> inventoryMessageHandler.handleChangeEquipment(ms);
 
                 case Cmd.SHOP_EQUIP -> shopMessageHandler.handleSendShopEquipments();
 
                 case Cmd.BUY_EQUIP -> inventoryMessageHandler.handleEquipmentTransactions(ms);
 
-                case Cmd.RULET -> userMessageHandler.handleSpinWheel(ms);
+                case Cmd.RULET -> spinMessageHandler.handleSpinWheel(ms);
 
                 case Cmd.VERSION_CODE -> authMessageHandler.getVersionCode(ms);
 
@@ -175,15 +184,15 @@ public class MessageRouter {
 
                 case Cmd.CLAN_MEMBER -> clanMessageHandler.getClanMember(ms);
 
-                case Cmd.GET_BIG_IMAGE -> resourceService.getBigImage(ms);
+                case Cmd.GET_BIG_IMAGE -> resourceMessageHandler.getBigImage(ms);
 
                 case Cmd.REGISTER_2 -> authMessageHandler.handleRegister(ms);
 
-                case Cmd.CHARGE_MONEY_2 -> userMessageHandler.rechargeMoney(ms);
+                case Cmd.CHARGE_MONEY_2 -> paymentMessageHandler.rechargeMoney(ms);
 
-                case Cmd.MATERIAL_ICON -> resourceService.getMaterialIconMessage(ms);
+                case Cmd.MATERIAL_ICON -> resourceMessageHandler.getMaterialIconMessage(ms);
 
-                case Cmd.GETSTRING -> authMessageHandler.getStringMessage(ms);
+                case Cmd.GETSTRING -> authMessageHandler.getAgent(ms);
 
                 default -> log.warn("Command {} is not supported", ms.getCommand());
             }

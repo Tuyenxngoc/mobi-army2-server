@@ -4,6 +4,7 @@ import com.teamobi.mobiarmy2.bootstrap.ApplicationContext;
 import com.teamobi.mobiarmy2.common.config.ServerConfig;
 import com.teamobi.mobiarmy2.common.constant.Cmd;
 import com.teamobi.mobiarmy2.common.constant.GameString;
+import com.teamobi.mobiarmy2.common.constant.UserState;
 import com.teamobi.mobiarmy2.common.util.Utils;
 import com.teamobi.mobiarmy2.dao.AccountDAO;
 import com.teamobi.mobiarmy2.dao.UserCharacterDAO;
@@ -24,6 +25,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,6 +46,42 @@ public class AuthMessageHandler extends BaseMessageHandler {
 
     public void handleLogout() {
         session.close();
+    }
+
+    public void handleUserLogoutCleanup() {
+        if (user.getState() == UserState.FIGHTING || user.getState() == UserState.WAIT_FIGHT) {
+            user.getFightWait().leaveTeam(user.getUserId());
+        }
+
+        //Cập nhật thông tin tài khoản
+        userDAO.update(user);
+
+        //Cập nhật thông tin nhân vật
+        List<UserCharacterDTO> userCharacterDTOS = new ArrayList<>();
+        for (byte i = 0; i < user.getOwnedCharacters().length; i++) {
+            if (user.getOwnedCharacters()[i]) {
+                UserCharacterDTO userCharacterDTO = getUserCharacterDTO(i);
+                userCharacterDTOS.add(userCharacterDTO);
+            }
+        }
+        userCharacterDAO.updateAll(userCharacterDTOS);
+
+        user.setLogged(false);
+
+        //Lưu thời gian đăng xuất gần nhất
+        loginRateLimiterService.saveLogoutTime(user.getUsername());
+    }
+
+    private UserCharacterDTO getUserCharacterDTO(byte i) {
+        UserCharacterDTO userCharacterDTO = new UserCharacterDTO();
+        userCharacterDTO.setCharacterId(i);
+        userCharacterDTO.setUserId(user.getUserId());
+        userCharacterDTO.setLevel(user.getLevels()[i]);
+        userCharacterDTO.setXp(user.getXps()[i]);
+        userCharacterDTO.setPoints(user.getPoints()[i]);
+        userCharacterDTO.setAdditionalPoints(user.getAddedPoints()[i]);
+        userCharacterDTO.setData(user.getEquipData()[i]);
+        return userCharacterDTO;
     }
 
     public void handleLogin(Message ms) throws IOException {
@@ -376,10 +414,19 @@ public class AuthMessageHandler extends BaseMessageHandler {
     }
 
     public void handleSendAgentAndProviders() throws IOException {
+        String agent = session.getAgent();
+        if (agent == null || agent.isEmpty()) {
+            return;
+        }
+        byte provider = session.getProvider();
+        if (provider == -1) {
+            return;
+        }
+
         Message ms = new Message(Cmd.GET_AGENT_PROVIDER);
         DataOutputStream ds = ms.writer();
-        ds.writeUTF("none");
-        ds.writeByte(0);
+        ds.writeUTF(agent);
+        ds.writeByte(provider);
         ds.flush();
         sendMessage(ms);
     }
@@ -409,11 +456,32 @@ public class AuthMessageHandler extends BaseMessageHandler {
         sendMessageLoginFail(GameString.REGISTRATION_REQUIRED);
     }
 
-    public void getStringMessage(Message ms) throws IOException {
+    public void handleChangePassword(Message ms) throws IOException {
         DataInputStream dis = ms.reader();
-        String str = dis.readUTF();
-        if (str.isEmpty()) {
+
+        String oldPass = dis.readUTF().trim();
+        String newPass = dis.readUTF().trim();
+
+        if (Utils.isAlphanumeric(oldPass) || Utils.isAlphanumeric(newPass)) {
+            sendServerMessage(GameString.PASSWORD_INVALID_CHARACTER);
             return;
         }
+
+        if (!accountDAO.existsByAccountIdAndPassword(user.getAccountId(), oldPass)) {
+            sendServerMessage(GameString.PASSWORD_INCORRECT_OLD);
+            return;
+        }
+
+        accountDAO.changePassword(user.getAccountId(), newPass);
+        sendServerMessage(GameString.PASSWORD_CHANGE_SUCCESS);
+    }
+
+    public void getAgent(Message ms) throws IOException {
+        DataInputStream dis = ms.reader();
+        String agent = dis.readUTF();
+        if (agent.isEmpty()) {
+            return;
+        }
+        session.setAgent(agent);
     }
 }
