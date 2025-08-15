@@ -134,6 +134,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
 
         // Đặt người dùng vào session
         session.setUser(user);
+        session.setVersion(version);
         session.initMessageHandlers();
 
         UserDTO userDTO = userDAO.findByAccountId(us().getAccountId());
@@ -184,7 +185,6 @@ public class AuthMessageHandler extends BaseMessageHandler {
         updateUserCharacters(userCharacterDTOS);
 
         us().setUsername(username);
-        us().getSession().setVersion(version);
         us().setLogged(true);
 
         //Tặng quà hằng ngày
