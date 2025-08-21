@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.server;
 
-import com.teamobi.mobiarmy2.common.util.Utils;
 import com.teamobi.mobiarmy2.entity.FightItem;
+import com.teamobi.mobiarmy2.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.network;
 
-import com.teamobi.mobiarmy2.common.constant.Cmd;
+import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.network.handler.*;
 import lombok.Getter;
 import lombok.Setter;

@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.entity;
 
-import com.teamobi.mobiarmy2.common.constant.GameConstants;
+import com.teamobi.mobiarmy2.constant.GameConstants;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

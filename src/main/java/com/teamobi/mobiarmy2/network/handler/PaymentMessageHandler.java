@@ -1,8 +1,7 @@
 package com.teamobi.mobiarmy2.network.handler;
 
-import com.teamobi.mobiarmy2.common.constant.Cmd;
-import com.teamobi.mobiarmy2.common.constant.GameString;
-import com.teamobi.mobiarmy2.common.util.Utils;
+import com.teamobi.mobiarmy2.constant.Cmd;
+import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dao.GiftCodeDAO;
 import com.teamobi.mobiarmy2.dao.UserGiftCodeDAO;
 import com.teamobi.mobiarmy2.dto.GiftCodeDTO;
@@ -16,6 +15,7 @@ import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.PaymentManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
+import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

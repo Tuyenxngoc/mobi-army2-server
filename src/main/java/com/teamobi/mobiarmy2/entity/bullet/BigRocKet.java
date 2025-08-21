@@ -1,9 +1,9 @@
 package com.teamobi.mobiarmy2.entity.bullet;
 
-import com.teamobi.mobiarmy2.common.util.Utils;
 import com.teamobi.mobiarmy2.entity.Bullet;
 import com.teamobi.mobiarmy2.entity.Player;
 import com.teamobi.mobiarmy2.fight.BulletManager;
+import com.teamobi.mobiarmy2.util.Utils;
 
 import java.util.ArrayList;
 

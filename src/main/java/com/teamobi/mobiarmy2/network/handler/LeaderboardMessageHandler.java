@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.network.handler;
 
-import com.teamobi.mobiarmy2.common.constant.Cmd;
+import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.dto.UserLeaderboardDTO;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;

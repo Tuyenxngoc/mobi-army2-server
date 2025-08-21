@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.service;
 
-import com.teamobi.mobiarmy2.bootstrap.ApplicationContext;
-import com.teamobi.mobiarmy2.common.config.ServerConfig;
+import com.teamobi.mobiarmy2.app.ApplicationContext;
+import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.dao.RankingDAO;
 import com.teamobi.mobiarmy2.dto.UserLeaderboardDTO;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.bootstrap;
+package com.teamobi.mobiarmy2.app;
 
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.ui.ServerUI;

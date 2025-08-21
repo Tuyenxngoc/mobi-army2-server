@@ -1,9 +1,9 @@
 package com.teamobi.mobiarmy2.entity.boss;
 
-import com.teamobi.mobiarmy2.common.util.Utils;
 import com.teamobi.mobiarmy2.entity.Boss;
 import com.teamobi.mobiarmy2.entity.Reward;
 import com.teamobi.mobiarmy2.fight.FightManager;
+import com.teamobi.mobiarmy2.util.Utils;
 
 public class GiftBox extends Boss {
     private static final short[] COINS_BONUS = {1000, 5000, 10000, 15000, 20000, 25000, 30000};

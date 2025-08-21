@@ -1,8 +1,8 @@
 package com.teamobi.mobiarmy2.server;
 
-import com.teamobi.mobiarmy2.bootstrap.ApplicationContext;
-import com.teamobi.mobiarmy2.common.config.ServerConfig;
-import com.teamobi.mobiarmy2.common.constant.UserState;
+import com.teamobi.mobiarmy2.app.ApplicationContext;
+import com.teamobi.mobiarmy2.config.ServerConfig;
+import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;

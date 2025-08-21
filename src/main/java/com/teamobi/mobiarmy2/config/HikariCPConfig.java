@@ -1,7 +1,7 @@
-package com.teamobi.mobiarmy2.common.config;
+package com.teamobi.mobiarmy2.config;
 
-import com.teamobi.mobiarmy2.common.constant.GameConstants;
-import com.teamobi.mobiarmy2.common.util.Utils;
+import com.teamobi.mobiarmy2.constant.GameConstants;
+import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
 

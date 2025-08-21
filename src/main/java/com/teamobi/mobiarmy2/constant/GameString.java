@@ -1,6 +1,6 @@
-package com.teamobi.mobiarmy2.common.constant;
+package com.teamobi.mobiarmy2.constant;
 
-import com.teamobi.mobiarmy2.common.util.Utils;
+import com.teamobi.mobiarmy2.util.Utils;
 
 public class GameString {
     public static final String MAINTENANCE_MODE = "Server đang bảo trì. Vui lòng quay lại sau khi hoàn tất";

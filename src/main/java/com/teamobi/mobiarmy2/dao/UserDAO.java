@@ -1,8 +1,6 @@
 package com.teamobi.mobiarmy2.dao;
 
 import com.google.gson.Gson;
-import com.teamobi.mobiarmy2.common.util.GsonUtil;
-import com.teamobi.mobiarmy2.common.util.Utils;
 import com.teamobi.mobiarmy2.dto.FriendDTO;
 import com.teamobi.mobiarmy2.dto.UserDTO;
 import com.teamobi.mobiarmy2.entity.EquipmentChest;
@@ -11,6 +9,8 @@ import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.server.*;
+import com.teamobi.mobiarmy2.util.GsonUtil;
+import com.teamobi.mobiarmy2.util.Utils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

@@ -1,8 +1,8 @@
-package com.teamobi.mobiarmy2.common.config;
+package com.teamobi.mobiarmy2.config;
 
 import com.google.gson.Gson;
-import com.teamobi.mobiarmy2.common.constant.GameConstants;
-import com.teamobi.mobiarmy2.common.util.GsonUtil;
+import com.teamobi.mobiarmy2.constant.GameConstants;
+import com.teamobi.mobiarmy2.util.GsonUtil;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.fight;
 
-import com.teamobi.mobiarmy2.common.constant.Cmd;
+import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.entity.Player;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.Message;

@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.common.constant;
+package com.teamobi.mobiarmy2.constant;
 
 public enum TransactionType {
     XU,

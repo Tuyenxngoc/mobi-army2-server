@@ -1,9 +1,9 @@
 package com.teamobi.mobiarmy2.fight;
 
-import com.teamobi.mobiarmy2.bootstrap.ApplicationContext;
-import com.teamobi.mobiarmy2.common.constant.Cmd;
-import com.teamobi.mobiarmy2.common.constant.GameString;
-import com.teamobi.mobiarmy2.common.constant.UserState;
+import com.teamobi.mobiarmy2.app.ApplicationContext;
+import com.teamobi.mobiarmy2.constant.Cmd;
+import com.teamobi.mobiarmy2.constant.GameString;
+import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.entity.Room;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.Message;

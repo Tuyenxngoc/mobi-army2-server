@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.network.handler;
 
-import com.teamobi.mobiarmy2.common.constant.Cmd;
-import com.teamobi.mobiarmy2.common.constant.GameString;
+import com.teamobi.mobiarmy2.constant.Cmd;
+import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.entity.Mission;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
