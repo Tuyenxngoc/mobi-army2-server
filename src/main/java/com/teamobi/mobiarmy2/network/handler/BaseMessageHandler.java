@@ -39,25 +39,11 @@ public abstract class BaseMessageHandler {
     }
 
     public void sendServerMessage(String message) {
-        try {
-            Message ms = new Message(Cmd.SERVER_MESSAGE);
-            DataOutputStream ds = ms.writer();
-            ds.writeUTF(message);
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
+        us().sendServerMessage(message);
     }
 
     public void sendMoneyErrorMessage(String message) {
-        try {
-            Message ms = new Message(Cmd.SET_MONEY_ERROR);
-            DataOutputStream ds = ms.writer();
-            ds.writeUTF(message);
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException ignored) {
-        }
+        us().sendMoneyErrorMessage(message);
     }
 
     public void sendMessageLoginFail(String message) {
@@ -175,42 +161,5 @@ public abstract class BaseMessageHandler {
             sendMessage(ms);
         } catch (IOException ignored) {
         }
-    }
-
-    public void sendUpdateMoney() throws IOException {
-        Message ms = new Message(Cmd.UPDATE_MONEY);
-        DataOutputStream ds = ms.writer();
-        ds.writeInt(us().getXu());
-        ds.writeInt(us().getLuong());
-        ds.flush();
-        sendMessage(ms);
-    }
-
-    public void sendUpdateCup(int cupUp) throws IOException {
-        Message ms = new Message(Cmd.CUP);
-        DataOutputStream ds = ms.writer();
-        ds.writeByte(cupUp);
-        ds.writeInt(us().getCup());
-        ds.flush();
-        sendMessage(ms);
-    }
-
-    public void sendUpdateXp(int xpUp, boolean updateLevel) throws IOException {
-        Message ms = new Message(Cmd.UPDATE_EXP);
-        DataOutputStream ds = ms.writer();
-        ds.writeInt(xpUp);
-        ds.writeInt(us().getCurrentXp());
-        ds.writeInt(us().getCurrentRequiredXp());
-        if (updateLevel) {
-            ds.writeByte(1);
-            ds.writeByte(us().getCurrentLevel());
-            ds.writeByte(us().getCurrentLevelPercent());
-            ds.writeShort(us().getCurrentPoint());
-        } else {
-            ds.writeByte(0);
-            ds.writeByte(us().getCurrentLevelPercent());
-        }
-        ds.flush();
-        sendMessage(ms);
     }
 }

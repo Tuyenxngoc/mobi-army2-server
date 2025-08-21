@@ -819,7 +819,7 @@ public class FightManager {
                 if (player == null || player.getUser() == null) {
                     continue;
                 }
-                player.getUser().getUserMessageHandler().sendMoneyErrorMessage(GameString.MATCH_NOT_COUNTED);
+                player.getUser().sendMoneyErrorMessage(GameString.MATCH_NOT_COUNTED);
             }
         }
 
@@ -854,8 +854,8 @@ public class FightManager {
                 user.sendMessage(ms);
 
                 //Gửi thông báo số xp và cup nhận được
-                user.getUserMessageHandler().sendUpdateXp(player.getAllXpUp(), false);
-                user.getUserMessageHandler().sendUpdateCup(Math.min(player.getAllCupUp(), Byte.MAX_VALUE));
+                user.sendUpdateXp(player.getAllXpUp(), false);
+                user.sendUpdateCup(Math.min(player.getAllCupUp(), Byte.MAX_VALUE));
 
                 //Cộng thêm quà nếu trận đấu là hợp lệ
                 if (!fightInValid) {
@@ -872,7 +872,7 @@ public class FightManager {
                             user.updateInventory(null, null, List.of(newItem), null);
 
                             String reward = String.format("Phần thưởng diệt trùm của bạn là %dx %s", newItem.getQuantity(), newItem.getItem().getName());
-                            user.getUserMessageHandler().sendServerMessage(reward);
+                            user.sendServerMessage(reward);
                         } else {
                             StringBuilder reward = new StringBuilder("Phần thưởng diệt trùm của bạn là ");
                             int count = Utils.nextInt(2, 3);
@@ -884,7 +884,7 @@ public class FightManager {
                                 reward.append(FightItemManager.FIGHT_ITEMS.get(indexItem).getName()).append(", ");
                             }
                             reward.deleteCharAt(reward.length() - 2);
-                            user.getUserMessageHandler().sendServerMessage(reward.toString());
+                            user.sendServerMessage(reward.toString());
                         }
                     }
 
@@ -1301,7 +1301,7 @@ public class FightManager {
 
         //Khi đấu boss thì cấm dùng 1 số item
         if (fightWait.getRoomType() == 5 && UNAUTHORIZED_ITEMS.contains(itemIndex)) {
-            player.getUser().getUserMessageHandler().sendMoneyErrorMessage(GameString.ITEM_UNAUTHORIZED);
+            player.getUser().sendMoneyErrorMessage(GameString.ITEM_UNAUTHORIZED);
             return;
         }
 

@@ -9,7 +9,6 @@ import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.fight.TrainingManager;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
-import com.teamobi.mobiarmy2.network.handler.UserMessageHandler;
 import com.teamobi.mobiarmy2.server.CharacterManager;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
@@ -18,6 +17,8 @@ import com.teamobi.mobiarmy2.service.GiftBoxService;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -30,7 +31,7 @@ import java.util.Set;
 @Getter
 @Setter
 public class User {
-    private UserMessageHandler userMessageHandler;
+    private static final Logger log = LoggerFactory.getLogger(User.class);
     private GiftBoxService giftBoxService;
     private final Session session;
     private UserState state = UserState.WAITING;
@@ -129,10 +130,8 @@ public class User {
         } else {
             xu += xuUp;
         }
-        try {
-            userMessageHandler.sendUpdateMoney();
-        } catch (IOException e) {
-        }
+
+        sendUpdateMoney();
     }
 
     public synchronized void updateLuong(int luongUp) {
@@ -147,10 +146,8 @@ public class User {
         } else {
             luong += luongUp;
         }
-        try {
-            userMessageHandler.sendUpdateMoney();
-        } catch (IOException e) {
-        }
+
+        sendUpdateMoney();
     }
 
     public synchronized void updateCup(int cupUp) {
@@ -165,10 +162,8 @@ public class User {
         } else {
             cup += cupUp;
         }
-        try {
-            userMessageHandler.sendUpdateCup(cupUp);
-        } catch (IOException e) {
-        }
+
+        sendUpdateCup(cupUp);
     }
 
     public synchronized void updateXp(int xpUp) {
@@ -202,10 +197,7 @@ public class User {
         }
         xps[activeCharacterId] = (int) totalXp;
 
-        try {
-            userMessageHandler.sendUpdateXp(xpUp, levelDiff > 0);
-        } catch (IOException e) {
-        }
+        sendUpdateXp(xpUp, levelDiff > 0);
     }
 
     public short[] getEquips() {
@@ -555,5 +547,78 @@ public class User {
         }
         SpecialItemChest newItem = new SpecialItemChest(quantity, specialItem);
         updateInventory(null, null, List.of(newItem), null);
+    }
+
+    public void sendUpdateMoney() {
+        try {
+            Message ms = new Message(Cmd.UPDATE_MONEY);
+            DataOutputStream ds = ms.writer();
+            ds.writeInt(xu);
+            ds.writeInt(luong);
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException e) {
+            log.error("Error sending update money message", e);
+        }
+    }
+
+    public void sendUpdateCup(int cupUp) {
+        try {
+            Message ms = new Message(Cmd.CUP);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(cupUp);
+            ds.writeInt(cup);
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException e) {
+            log.error("Error sending update cup message", e);
+        }
+    }
+
+    public void sendUpdateXp(int xpUp, boolean updateLevel) {
+        try {
+            Message ms = new Message(Cmd.UPDATE_EXP);
+            DataOutputStream ds = ms.writer();
+            ds.writeInt(xpUp);
+            ds.writeInt(getCurrentXp());
+            ds.writeInt(getCurrentRequiredXp());
+            if (updateLevel) {
+                ds.writeByte(1);
+                ds.writeByte(getCurrentLevel());
+                ds.writeByte(getCurrentLevelPercent());
+                ds.writeShort(getCurrentPoint());
+            } else {
+                ds.writeByte(0);
+                ds.writeByte(getCurrentLevelPercent());
+            }
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException e) {
+            log.error("Error sending update XP message", e);
+        }
+    }
+
+    public void sendMoneyErrorMessage(String message) {
+        try {
+            Message ms = new Message(Cmd.SET_MONEY_ERROR);
+            DataOutputStream ds = ms.writer();
+            ds.writeUTF(message);
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException e) {
+            log.error("Error sending money error message", e);
+        }
+    }
+
+    public void sendServerMessage(String message) {
+        try {
+            Message ms = new Message(Cmd.SERVER_MESSAGE);
+            DataOutputStream ds = ms.writer();
+            ds.writeUTF(message);
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException e) {
+            log.error("Error sending server message", e);
+        }
     }
 }

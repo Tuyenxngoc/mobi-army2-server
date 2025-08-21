@@ -156,7 +156,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
         User userLogin = ApplicationContext.getInstance()
                 .getBean(ServerManager.class).getUserByUserId(userDTO.getUserId());
         if (userLogin != null) {
-            userLogin.getUserMessageHandler().sendMoneyErrorMessage(GameString.ACCOUNT_OTHER_LOGIN);
+            userLogin.sendMoneyErrorMessage(GameString.ACCOUNT_OTHER_LOGIN);
             userLogin.getSession().close();
 
             sendMessageLoginFail(GameString.LOGIN_ANOTHER_DEVICE);

@@ -289,19 +289,19 @@ public class FightWait {
         //Kiểm tra thời gian kết thúc ván gần nhất
         long remainingTime = 5000 - (System.currentTimeMillis() - endTime);
         if (remainingTime > 0) {
-            roomOwner.getUserMessageHandler().sendServerMessage(GameString.createWaitClickMessage(remainingTime / 1000 + 1));
+            roomOwner.sendServerMessage(GameString.createWaitClickMessage(remainingTime / 1000 + 1));
             return;
         }
 
         //Kiểm tra thời gian người chơi vào phòng gần nhất
         remainingTime = 5000 - (System.currentTimeMillis() - lastPlayerJoinTime);
         if (remainingTime > 0) {
-            roomOwner.getUserMessageHandler().sendMoneyErrorMessage(GameString.createWaitClickMessage(remainingTime / 1000 + 1));
+            roomOwner.sendMoneyErrorMessage(GameString.createWaitClickMessage(remainingTime / 1000 + 1));
             return;
         }
 
         if (numReady == 0 && room.getType() != 5) {
-            roomOwner.getUserMessageHandler().sendServerMessage(GameString.TEAM_NOT_READY);
+            roomOwner.sendServerMessage(GameString.TEAM_NOT_READY);
             return;
         }
 
@@ -316,7 +316,7 @@ public class FightWait {
                         continue;
                     }
                     if (Objects.equals(users[j].getClanId(), users[i].getClanId())) {
-                        roomOwner.getUserMessageHandler().sendServerMessage(GameString.TEAM_MUST_BE_SAME_FACTION);
+                        roomOwner.sendServerMessage(GameString.TEAM_MUST_BE_SAME_FACTION);
                         return;
                     }
                 }
@@ -335,17 +335,17 @@ public class FightWait {
             }
 
             if (user.isOpeningGift()) {
-                roomOwner.getUserMessageHandler().sendServerMessage(GameString.createOpeningGiftMessage(user.getUsername()));
+                roomOwner.sendServerMessage(GameString.createOpeningGiftMessage(user.getUsername()));
                 return;
             }
 
             if (bossIndex != i && !readies[i]) {
-                roomOwner.getUserMessageHandler().sendServerMessage(GameString.createGameStartErrorMessageUserNotReady(user.getUsername()));
+                roomOwner.sendServerMessage(GameString.createGameStartErrorMessageUserNotReady(user.getUsername()));
                 return;
             }
 
             if (user.getXu() < money) {
-                roomOwner.getUserMessageHandler().sendServerMessage(GameString.createGameStartErrorMessageInsufficientFunds(user.getUsername()));
+                roomOwner.sendServerMessage(GameString.createGameStartErrorMessageInsufficientFunds(user.getUsername()));
                 return;
             }
 
@@ -409,7 +409,7 @@ public class FightWait {
         }
 
         if (room.getType() != 5 && numTeamBlue != numTeamRed) {
-            roomOwner.getUserMessageHandler().sendServerMessage(GameString.TEAM_SIZE_MISMATCH);
+            roomOwner.sendServerMessage(GameString.TEAM_SIZE_MISMATCH);
         }
 
         //Cập nhật lại điểm đồng đội
@@ -492,7 +492,7 @@ public class FightWait {
 
         User user = users[index];
         if (user.isOpeningGift()) {
-            roomOwner.getUserMessageHandler().sendServerMessage(GameString.createOpeningGiftMessage(users[index].getUsername()));
+            roomOwner.sendServerMessage(GameString.createOpeningGiftMessage(users[index].getUsername()));
             return;
         }
 
@@ -577,12 +577,12 @@ public class FightWait {
         }
 
         if (newMoney < room.getMinXu() || newMoney > room.getMaxXu()) {
-            roomOwner.getUserMessageHandler().sendServerMessage(GameString.createBettingRangeErrorMessage(room.getMinXu(), room.getMaxXu()));
+            roomOwner.sendServerMessage(GameString.createBettingRangeErrorMessage(room.getMinXu(), room.getMaxXu()));
             return;
         }
 
         if (roomOwner.getXu() < newMoney) {
-            roomOwner.getUserMessageHandler().sendServerMessage(GameString.INSUFFICIENT_FUNDS);
+            roomOwner.sendServerMessage(GameString.INSUFFICIENT_FUNDS);
             return;
         }
 
@@ -695,7 +695,7 @@ public class FightWait {
         }
 
         if (isContinuous()) {
-            roomOwner.getUserMessageHandler().sendServerMessage(GameString.MAP_SELECTION_ERROR);
+            roomOwner.sendServerMessage(GameString.MAP_SELECTION_ERROR);
             return;
         }
 
@@ -704,7 +704,7 @@ public class FightWait {
                 continue;
             }
             if (user.isOpeningGift()) {
-                user.getUserMessageHandler().sendServerMessage(GameString.createOpeningGiftMessage(user.getUsername()));
+                user.sendServerMessage(GameString.createOpeningGiftMessage(user.getUsername()));
                 return;
             }
         }
@@ -719,7 +719,7 @@ public class FightWait {
             }
 
             if (!mapIdFound) {
-                roomOwner.getUserMessageHandler().sendServerMessage(GameString.createMapSelectionErrorMessage(MapManager.getMapNames(room.getMapCanSelected())));
+                roomOwner.sendServerMessage(GameString.createMapSelectionErrorMessage(MapManager.getMapNames(room.getMapCanSelected())));
                 return;
             }
         } else {
@@ -734,7 +734,7 @@ public class FightWait {
                 } else {
                     msg = GameString.MAP_SELECTION_ERROR;
                 }
-                roomOwner.getUserMessageHandler().sendServerMessage(msg);
+                roomOwner.sendServerMessage(msg);
                 return;
             }
         }
@@ -815,17 +815,17 @@ public class FightWait {
         User user = ApplicationContext.getInstance()
                 .getBean(ServerManager.class).getUserByUserId(userId);
         if (user == null) {
-            roomOwner.getUserMessageHandler().sendServerMessage(GameString.INVITE_OFFLINE);
+            roomOwner.sendServerMessage(GameString.INVITE_OFFLINE);
             return;
         }
 
         if (user.isNotWaiting()) {
-            roomOwner.getUserMessageHandler().sendServerMessage(GameString.INVITE_ALREADY_IN_GAME);
+            roomOwner.sendServerMessage(GameString.INVITE_ALREADY_IN_GAME);
             return;
         }
 
         if (user.isInvitationLocked()) {
-            roomOwner.getUserMessageHandler().sendServerMessage(GameString.INVITE_DISABLED);
+            roomOwner.sendServerMessage(GameString.INVITE_DISABLED);
             return;
         }
 
@@ -861,22 +861,22 @@ public class FightWait {
 
     public synchronized void addUser(User us) throws IOException {
         if (room.getType() == 6 && us.getClanId() == null) {
-            us.getUserMessageHandler().sendServerMessage(GameString.NO_CLAN_MEMBERSHIP);
+            us.sendServerMessage(GameString.NO_CLAN_MEMBERSHIP);
             return;
         }
 
         if (started || (isContinuous() && continuousLevel > 0)) {
-            us.getUserMessageHandler().sendServerMessage(GameString.AREA_JOIN_IN_PROGRESS);
+            us.sendServerMessage(GameString.AREA_JOIN_IN_PROGRESS);
             return;
         }
 
         if (money > us.getXu()) {
-            us.getUserMessageHandler().sendServerMessage(GameString.AREA_INSUFFICIENT_FUNDS);
+            us.sendServerMessage(GameString.AREA_INSUFFICIENT_FUNDS);
             return;
         }
 
         if (numPlayers >= maxSetPlayers) {
-            us.getUserMessageHandler().sendServerMessage(GameString.AREA_FULL);
+            us.sendServerMessage(GameString.AREA_FULL);
             return;
         }
 

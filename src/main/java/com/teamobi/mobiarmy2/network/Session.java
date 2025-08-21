@@ -135,7 +135,7 @@ public class Session {
 
     @Override
     public String toString() {
-        if (user.getUsername() != null) {
+        if (user != null && user.getUsername() != null) {
             return user.getUsername();
         }
         return "Client " + sessionId;
