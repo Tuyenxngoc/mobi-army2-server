@@ -2,6 +2,8 @@ package com.teamobi.mobiarmy2.ui.controllers;
 
 import com.sun.management.OperatingSystemMXBean;
 import com.teamobi.mobiarmy2.app.ApplicationContext;
+import com.teamobi.mobiarmy2.constant.Cmd;
+import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -9,6 +11,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.util.Duration;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -77,6 +81,12 @@ public class ServerViewController {
 
     private void startCountdown(int countdownTime) {
         maintainButton.setDisable(true);
+
+        // Bật chế độ bảo trì trên server
+        ApplicationContext.getInstance()
+                .getBean(ServerManager.class)
+                .setMaintenanceMode(true);
+
         final int[] timeRemaining = {countdownTime};
 
         serverStatus.setText("Maintenance in " + timeRemaining[0] + " seconds...");
@@ -85,6 +95,22 @@ public class ServerViewController {
             timeRemaining[0]--;
 
             serverStatus.setText("Maintenance in " + timeRemaining[0] + " seconds...");
+
+            // Cứ mỗi 60 giây hoặc khi còn < 30 giây thì nhắc nhở
+            if (timeRemaining[0] % 60 == 0 || timeRemaining[0] == 30 || timeRemaining[0] == 10) {
+                try {
+                    Message ms = new Message(Cmd.SERVER_INFO);
+                    DataOutputStream ds = ms.writer();
+                    ds.writeUTF("Server sẽ bảo trì sau " + timeRemaining[0] + " giây, vui lòng thoát game để tránh mất dữ liệu.");
+                    ds.flush();
+
+                    ApplicationContext.getInstance()
+                            .getBean(ServerManager.class)
+                            .sendToServer(ms);
+                } catch (IOException e) {
+
+                }
+            }
 
             if (timeRemaining[0] <= 0) {
                 countdownTimeline.stop();
@@ -97,12 +123,16 @@ public class ServerViewController {
     }
 
     private void enterMaintenanceMode() {
-        maintainButton.setDisable(false);
-        serverStatus.setText("Maintenance Mode");
+        ServerManager serverManager = ApplicationContext.getInstance()
+                .getBean(ServerManager.class);
+        serverManager.stop();
 
-        ApplicationContext.getInstance()
-                .getBean(ServerManager.class)
-                .setMaintenanceMode(true);
+        try {
+            javafx.application.Platform.exit(); // thoát JavaFX Application Thread
+        } catch (Exception ignored) {
+        }
+
+        System.exit(0); // thoát hẳn JVM
     }
 
     @FXML
@@ -127,7 +157,25 @@ public class ServerViewController {
                 int countdownTime = Integer.parseInt(countdownStr);
 
                 if (countdownTime > 0) {
-                    startCountdown(countdownTime);
+                    int minSeconds = 180;
+
+                    if (countdownTime < minSeconds) {
+                        Alert warning = new Alert(Alert.AlertType.WARNING);
+                        warning.setTitle("Warning: Low Countdown Time");
+                        warning.setHeaderText(null);
+                        warning.setContentText("Bạn chỉ đặt " + countdownTime + " giây, ít hơn mức khuyến nghị (" + minSeconds + " giây).\n"
+                                + "Người chơi có thể không kịp thoát trận. Bạn có muốn tiếp tục không?");
+                        ButtonType yesButton = new ButtonType("Tiếp tục", ButtonBar.ButtonData.YES);
+                        ButtonType noButton = new ButtonType("Hủy", ButtonBar.ButtonData.NO);
+                        warning.getButtonTypes().setAll(yesButton, noButton);
+
+                        Optional<ButtonType> resultWarn = warning.showAndWait();
+                        if (resultWarn.isPresent() && resultWarn.get() == yesButton) {
+                            startCountdown(countdownTime);
+                        }
+                    } else {
+                        startCountdown(countdownTime);
+                    }
                 } else {
                     showError("Invalid time", "Please enter a positive integer for the countdown.");
                 }
