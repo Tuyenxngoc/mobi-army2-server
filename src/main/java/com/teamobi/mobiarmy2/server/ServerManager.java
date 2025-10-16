@@ -60,7 +60,7 @@ public class ServerManager {
                         Socket socket = server.accept();
 
                         String ipAddress = socket.getInetAddress().getHostAddress();
-                        if (connectionBlockerService.isIpBlocked(ipAddress)) {
+                        if (connectionBlockerService.tryIncrementConnection(ipAddress)) {
                             log.warn("IP {} is blocked due to too many connections.", ipAddress);
                             socket.close();
                             continue;
@@ -68,8 +68,6 @@ public class ServerManager {
 
                         Session session = new Session(++countClients, socket);
                         sessions.add(session);
-
-                        connectionBlockerService.incrementIpConnectionCount(ipAddress);
 
                         log.info("Accept socket client {} done!", countClients);
                     } catch (Exception ignored) {
@@ -103,10 +101,6 @@ public class ServerManager {
             ApplicationContext.getInstance()
                     .getBean(HikariCPManager.class)
                     .closeDataSource();
-
-            ApplicationContext.getInstance()
-                    .getBean(RedisConnectionManager.class)
-                    .close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -115,7 +109,7 @@ public class ServerManager {
     public synchronized void disconnect(Session session) {
         String ipAddress = session.getIPAddress();
         sessions.remove(session);
-        connectionBlockerService.decrementIpConnectionCount(ipAddress);
+        connectionBlockerService.decrementConnection(ipAddress);
     }
 
     public void sendToServer(Message ms) {

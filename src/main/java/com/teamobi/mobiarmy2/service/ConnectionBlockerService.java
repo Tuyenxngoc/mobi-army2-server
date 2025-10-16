@@ -1,56 +1,49 @@
 package com.teamobi.mobiarmy2.service;
 
-import com.teamobi.mobiarmy2.server.RedisConnectionManager;
 import lombok.extern.slf4j.Slf4j;
-import redis.clients.jedis.Jedis;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 public class ConnectionBlockerService {
-    private static final int MAX_CONNECTIONS_PER_IP = 10;
-    private static final int IP_BLOCK_DURATION = 3600;
-    private final RedisConnectionManager redisConnectionManager;
+    private static final int MAX_CONNECTIONS_PER_IP = 3;
+    private final Map<String, AtomicInteger> connectionMap = new ConcurrentHashMap<>();
 
-    public ConnectionBlockerService(RedisConnectionManager redisConnectionManager) {
-        this.redisConnectionManager = redisConnectionManager;
-    }
-
-    private String getKey(String ipAddress) {
-        return "ip:" + ipAddress;
-    }
-
+    /**
+     * Kiểm tra IP có bị chặn không
+     */
     public boolean isIpBlocked(String ipAddress) {
-        try (Jedis jedis = redisConnectionManager.getConnection()) {
-            String key = getKey(ipAddress);
-            String countStr = jedis.get(key);
-            if (countStr != null) {
-                int count = Integer.parseInt(countStr);
-                return count >= MAX_CONNECTIONS_PER_IP;
-            }
-        } catch (Exception e) {
-            log.error("Error checking IP connection count in Redis", e);
-        }
-        return false;
+        AtomicInteger count = connectionMap.get(ipAddress);
+        return count != null && count.get() >= MAX_CONNECTIONS_PER_IP;
     }
 
-    public void incrementIpConnectionCount(String ipAddress) {
-        try (Jedis jedis = redisConnectionManager.getConnection()) {
-            String key = getKey(ipAddress);
-            jedis.incr(key);
-            jedis.expire(key, IP_BLOCK_DURATION);
-        } catch (Exception e) {
-            log.error("Error incrementing IP connection count in Redis", e);
-        }
+    /**
+     * Tăng số kết nối hiện tại. Trả về true nếu kết nối được phép, false nếu chặn
+     */
+    public boolean tryIncrementConnection(String ipAddress) {
+        return connectionMap.compute(ipAddress, (ip, count) -> {
+            if (count == null) count = new AtomicInteger(0);
+
+            if (count.get() >= MAX_CONNECTIONS_PER_IP) {
+                // Không tăng nữa, return nguyên count
+                return count;
+            } else {
+                count.incrementAndGet();
+                return count;
+            }
+        }).get() <= MAX_CONNECTIONS_PER_IP;
     }
 
-    public void decrementIpConnectionCount(String ipAddress) {
-        try (Jedis jedis = redisConnectionManager.getConnection()) {
-            String key = getKey(ipAddress);
-            long count = jedis.decr(key);
-            if (count <= 0) {
-                jedis.del(key);
-            }
-        } catch (Exception e) {
-            log.error("Error decrementing IP connection count in Redis", e);
-        }
+    /**
+     * Giảm số kết nối khi kết thúc
+     */
+    public void decrementConnection(String ipAddress) {
+        connectionMap.computeIfPresent(ipAddress, (ip, count) -> {
+            int remaining = count.decrementAndGet();
+            if (remaining <= 0) return null; // Xóa IP khỏi map khi không còn kết nối
+            return count;
+        });
     }
 }

@@ -1,11 +1,9 @@
 package com.teamobi.mobiarmy2.app;
 
 import com.teamobi.mobiarmy2.config.HikariCPConfig;
-import com.teamobi.mobiarmy2.config.RedisConfig;
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.server.HikariCPManager;
-import com.teamobi.mobiarmy2.server.RedisConnectionManager;
 import com.teamobi.mobiarmy2.server.RoomManager;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.ConnectionBlockerService;
@@ -19,10 +17,8 @@ public class BeanRegistry {
 
         context.registerBean(ServerConfig.class, new ServerConfig());
         context.registerBean(HikariCPConfig.class, new HikariCPConfig());
-        context.registerBean(RedisConfig.class, new RedisConfig());
 
         context.registerBean(HikariCPManager.class, new HikariCPManager(context.getBean(HikariCPConfig.class)));
-        context.registerBean(RedisConnectionManager.class, new RedisConnectionManager(context.getBean(RedisConfig.class)));
 
         context.registerBean(AccountDAO.class, new AccountDAO(context.getBean(HikariCPManager.class)));
         context.registerBean(CaptionLevelDAO.class, new CaptionLevelDAO(context.getBean(HikariCPManager.class)));
@@ -59,8 +55,8 @@ public class BeanRegistry {
                 context.getBean(FabricateItemDAO.class)
         ));
         context.registerBean(LeaderboardService.class, new LeaderboardService(context.getBean(RankingDAO.class)));
-        context.registerBean(LoginRateLimiterService.class, new LoginRateLimiterService(context.getBean(RedisConnectionManager.class)));
-        context.registerBean(ConnectionBlockerService.class, new ConnectionBlockerService(context.getBean(RedisConnectionManager.class)));
+        context.registerBean(LoginRateLimiterService.class, new LoginRateLimiterService());
+        context.registerBean(ConnectionBlockerService.class, new ConnectionBlockerService());
 
         context.registerBean(RoomManager.class, new RoomManager());
         context.registerBean(ServerManager.class, new ServerManager(
