@@ -17,8 +17,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 @Slf4j
 public class Session {
@@ -33,7 +34,7 @@ public class Session {
     );
 
     private final byte[] sessionKey;
-    private final Sender sender = new Sender();
+    private final MessageSender messageSender = new MessageSender();
     private final MessageRouter messageRouter;
     private final long sessionId;
     @Getter
@@ -78,11 +79,7 @@ public class Session {
                 context.getBean(UserCharacterDAO.class)
         );
         this.messageRouter = new MessageRouter(loginService);
-        initializeThreads();
-    }
-
-    private void initializeThreads() {
-        this.sendThread = new Thread(sender, sessionId + "_send");
+        this.sendThread = new Thread(messageSender, sessionId + "_send");
         this.collectorThread = new Thread(new MessageCollector(), sessionId + "_collector");
         this.collectorThread.start();
     }
@@ -95,7 +92,7 @@ public class Session {
     }
 
     public void sendMessage(Message message) {
-        sender.addMessage(message);
+        messageSender.enqueue(message);
     }
 
     public void close() {
@@ -259,26 +256,24 @@ public class Session {
         messageRouter.setCharacterMessageHandler(characterMessageHandler);
     }
 
-    class Sender implements Runnable {
-        private final ArrayList<Message> sendingMessage = new ArrayList<>();
+    class MessageSender implements Runnable {
+        private final BlockingQueue<Message> queue = new LinkedBlockingQueue<>();
 
-        public void addMessage(Message message) {
-            sendingMessage.add(message);
+        public void enqueue(Message message) {
+            if (message == null) {
+                return;
+            }
+            queue.offer(message);
         }
 
         @Override
         public void run() {
             try {
-                while (Session.this.isSendKeyComplete()) {
-                    while (!sendingMessage.isEmpty() && Session.this.dis != null) {
-                        Message message = sendingMessage.removeFirst();
+                while (isSendKeyComplete()) {
+                    if (dos != null) {
+                        Message message = queue.take();
                         log.info("   Send mss {} to {}", Cmd.getCmdNameByValue(message.getCommand()), Session.this);
-                        Session.this.doSendMessage(message);
-                    }
-                    try {
-                        Thread.sleep(10L);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        doSendMessage(message);
                     }
                 }
             } catch (Exception e) {
@@ -291,18 +286,18 @@ public class Session {
         @Override
         public void run() {
             try {
-                while (Session.this.dis != null) {
-                    Session.this.socket.setSoTimeout(TIMEOUT_DURATION);
+                while (dis != null) {
+                    socket.setSoTimeout(TIMEOUT_DURATION);
                     Message message = readMessage();
                     if (message == null) {
                         break;
                     }
                     log.info("{} send mss {}", Session.this, Cmd.getCmdNameByValue(message.getCommand()));
-                    if ((Session.this.user == null || !Session.this.user.isLogged()) && requiresAuthentication(message)) {
+                    if ((user == null || !user.isLogged()) && requiresAuthentication(message)) {
                         message.cleanup();
                         break;
                     }
-                    Session.this.messageRouter.onMessage(message);
+                    messageRouter.onMessage(message);
                     message.cleanup();
                 }
                 closeMessage();
@@ -318,28 +313,28 @@ public class Session {
 
         private Message readMessage() {
             try {
-                byte cmd = Session.this.dis.readByte();
-                if (Session.this.sendKeyComplete) {
-                    cmd = Session.this.readKey(cmd);
+                byte cmd = dis.readByte();
+                if (sendKeyComplete) {
+                    cmd = readKey(cmd);
                 }
                 int size;
-                if (Session.this.sendKeyComplete) {
-                    byte b1 = Session.this.dis.readByte();
-                    byte b2 = Session.this.dis.readByte();
-                    size = ((Session.this.readKey(b1) & 0xff) << 8) | (Session.this.readKey(b2) & 0xff);
+                if (sendKeyComplete) {
+                    byte b1 = dis.readByte();
+                    byte b2 = dis.readByte();
+                    size = ((readKey(b1) & 0xff) << 8) | (readKey(b2) & 0xff);
                 } else {
-                    size = Session.this.dis.readUnsignedShort();
+                    size = dis.readUnsignedShort();
                 }
                 byte[] data = new byte[size];
                 int len = 0;
                 int byteRead = 0;
                 while (len != -1 && byteRead < size) {
-                    len = Session.this.dis.read(data, byteRead, size - byteRead);
+                    len = dis.read(data, byteRead, size - byteRead);
                     if (len > 0) {
                         byteRead += len;
                     }
                 }
-                if (Session.this.sendKeyComplete) {
+                if (sendKeyComplete) {
                     for (int i = 0; i < data.length; i++) {
                         data[i] = readKey(data[i]);
                     }

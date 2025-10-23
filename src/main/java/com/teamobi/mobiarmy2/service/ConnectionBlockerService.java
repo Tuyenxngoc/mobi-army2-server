@@ -1,12 +1,9 @@
 package com.teamobi.mobiarmy2.service;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@Slf4j
 public class ConnectionBlockerService {
     private static final int MAX_CONNECTIONS_PER_IP = 3;
     private final Map<String, AtomicInteger> connectionMap = new ConcurrentHashMap<>();
