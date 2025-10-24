@@ -28,26 +28,33 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
         try {
             byte[] data = message.getData();
             byte command = message.getCommand();
+            int size = (data != null) ? data.length : 0;
 
+            // Các lệnh đặc biệt: gửi raw data, không mã hóa
+            boolean isRawCmd = command == -120 || command == 90 || command == -104 || command == -108;
+
+            // Ghi CMD
             out.writeByte(writeKey(command));
 
-            if (data != null) {
-                int size = data.length;
+            if (isRawCmd) {
+                out.writeInt(size);
+                if (data != null && size > 0) {
+                    out.writeBytes(data);
+                }
+            } else {
+                // Ghi độ dài
+                out.writeByte(writeKey((byte) (size >> 8)));
+                out.writeByte(writeKey((byte) (size & 0xFF)));
 
-                if (command == 90) {
-                    out.writeInt(size);
-                } else {
-                    out.writeByte(writeKey((byte) (size >> 8)));
-                    out.writeByte(writeKey((byte) (size & 0xFF)));
-
+                if (data != null && size > 0) {
+                    // Mã hóa nội dung
                     for (int i = 0; i < data.length; i++) {
                         data[i] = writeKey(data[i]);
                     }
-                }
 
-                out.writeBytes(data);
-            } else {
-                out.writeShort(0);
+                    // Ghi data đã mã hóa
+                    out.writeBytes(data);
+                }
             }
 
             message.cleanup();

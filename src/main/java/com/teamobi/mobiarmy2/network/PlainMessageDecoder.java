@@ -11,12 +11,13 @@ import java.util.List;
 public class PlainMessageDecoder extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
+        if (in.readableBytes() < 3) {
+            return;
+        }
 
         in.markReaderIndex();
 
         try {
-            if (in.readableBytes() < 3) return;
-
             byte cmd = in.readByte();
             int size = in.readUnsignedShort();
 

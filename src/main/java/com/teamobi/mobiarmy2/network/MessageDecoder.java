@@ -36,7 +36,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
         byte startCurR = curR;
 
         try {
-            // Lệnh (cmd)
+            // Đọc CMD
             byte cmd = readKey(in.readByte());
 
             // Độ dài (2 bytes)
