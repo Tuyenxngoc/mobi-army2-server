@@ -47,6 +47,13 @@
             <version>5.1.0</version>
         </dependency>
 
+        <!-- Netty -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.115.Final</version>
+        </dependency>
+
         <!-- Password encryption -->
         <dependency>
             <groupId>org.mindrot</groupId>
