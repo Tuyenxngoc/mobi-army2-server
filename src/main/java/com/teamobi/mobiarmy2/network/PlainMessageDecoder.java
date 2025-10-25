@@ -10,30 +10,24 @@ import java.util.List;
 @Slf4j
 public class PlainMessageDecoder extends ByteToMessageDecoder {
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
         if (in.readableBytes() < 3) {
             return;
         }
 
         in.markReaderIndex();
 
-        try {
-            byte cmd = in.readByte();
-            int size = in.readUnsignedShort();
+        byte cmd = in.readByte();
+        int size = in.readUnsignedShort();
 
-            if (in.readableBytes() < size) {
-                in.resetReaderIndex();
-                return;
-            }
-
-            byte[] data = new byte[size];
-            in.readBytes(data);
-
-            out.add(new Message(cmd, data));
-
-        } catch (Exception e) {
-            log.error("Lỗi trong quá trình giải mã PlainMessage", e);
-            ctx.close();
+        if (in.readableBytes() < size) {
+            in.resetReaderIndex();
+            return;
         }
+
+        byte[] data = new byte[size];
+        in.readBytes(data);
+
+        out.add(new Message(cmd, data));
     }
 }

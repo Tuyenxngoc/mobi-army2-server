@@ -26,7 +26,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
         // Header tối thiểu = 3 bytes (cmd + size)
         if (in.readableBytes() < 3) {
             return;
@@ -35,36 +35,30 @@ public class MessageDecoder extends ByteToMessageDecoder {
         in.markReaderIndex();
         byte startCurR = curR;
 
-        try {
-            // Đọc CMD
-            byte cmd = readKey(in.readByte());
+        // Đọc CMD
+        byte cmd = readKey(in.readByte());
 
-            // Độ dài (2 bytes)
-            byte b1 = in.readByte();
-            byte b2 = in.readByte();
-            int size = ((readKey(b1) & 0xFF) << 8) | (readKey(b2) & 0xFF);
+        // Độ dài (2 bytes)
+        byte b1 = in.readByte();
+        byte b2 = in.readByte();
+        int size = ((readKey(b1) & 0xFF) << 8) | (readKey(b2) & 0xFF);
 
-            // Chưa đủ dữ liệu cho body → chờ thêm
-            if (in.readableBytes() < size) {
-                in.resetReaderIndex();
-                curR = startCurR;
-                return;
-            }
-
-            // Đọc và giải mã body
-            byte[] data = new byte[size];
-            in.readBytes(data);
-            for (int i = 0; i < data.length; i++) {
-                data[i] = readKey(data[i]);
-            }
-
-            // Thêm vào pipeline
-            out.add(new Message(cmd, data));
-
-        } catch (Exception e) {
-            log.error("Lỗi trong quá trình giải mã tin nhắn", e);
-            ctx.close();
+        // Chưa đủ dữ liệu cho body → chờ thêm
+        if (in.readableBytes() < size) {
+            in.resetReaderIndex();
+            curR = startCurR;
+            return;
         }
+
+        // Đọc và giải mã body
+        byte[] data = new byte[size];
+        in.readBytes(data);
+        for (int i = 0; i < data.length; i++) {
+            data[i] = readKey(data[i]);
+        }
+
+        // Thêm vào pipeline
+        out.add(new Message(cmd, data));
     }
 
 }

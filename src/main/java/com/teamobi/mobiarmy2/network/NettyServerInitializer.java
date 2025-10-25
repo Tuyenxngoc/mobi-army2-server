@@ -9,9 +9,10 @@ public class NettyServerInitializer extends ChannelInitializer<SocketChannel> {
         long sessionId = System.nanoTime();
         SessionHandler sessionHandler = new SessionHandler(sessionId);
 
+        // Initial pipeline with plain encoder/decoder
         ch.pipeline().addLast("decoder-plain", new PlainMessageDecoder());
-        ch.pipeline().addLast("encoder-plain", new PlainMessageEncoder());
         ch.pipeline().addLast("session", sessionHandler);
+        ch.pipeline().addLast("encoder-plain", new PlainMessageEncoder());
 
         // Callback replace secure
         sessionHandler.setOnKeyExchangeComplete(() -> {
