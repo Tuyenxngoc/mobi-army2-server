@@ -11,8 +11,8 @@ public class NettyServerInitializer extends ChannelInitializer<SocketChannel> {
 
         // Initial pipeline with plain encoder/decoder
         ch.pipeline().addLast("decoder-plain", new PlainMessageDecoder());
-        ch.pipeline().addLast("session", sessionHandler);
         ch.pipeline().addLast("encoder-plain", new PlainMessageEncoder());
+        ch.pipeline().addLast("session", sessionHandler);
 
         // Callback replace secure
         sessionHandler.setOnKeyExchangeComplete(() -> {
