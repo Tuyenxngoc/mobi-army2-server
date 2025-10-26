@@ -3,7 +3,6 @@ package com.teamobi.mobiarmy2.network;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.entity.User;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
@@ -15,13 +14,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
-@ChannelHandler.Sharable
 public class SessionHandler extends SimpleChannelInboundHandler<Message> {
     private static final Set<Byte> WHITE_LIST_CMDS = Set.of((byte) -27, (byte) 1, (byte) 58, (byte) 114, (byte) 121, (byte) 127);
-    private static final Set<Byte> KEEP_ALIVE_CMDS = Set.of((byte) -27, (byte) 42);//todo: add other keep-alive commands
+    private static final Set<Byte> KEEP_ALIVE_CMDS = Set.of((byte) 20, (byte) 16);//todo: add other keep-alive commands
+    private static final int TIMEOUT_DURATION = 180_000;
+
     @Getter
     private final long sessionId;
     @Getter
@@ -134,7 +133,7 @@ public class SessionHandler extends SimpleChannelInboundHandler<Message> {
             long now = System.currentTimeMillis();
             long idleMillis = now - lastKeepAliveTime;
 
-            if (idleMillis > TimeUnit.MINUTES.toMillis(5)) {
+            if (idleMillis > TIMEOUT_DURATION) {
                 log.warn("Session {} idle for {} ms (no keep-alive cmd), closing", sessionId, idleMillis);
                 ctx.close();
             }
