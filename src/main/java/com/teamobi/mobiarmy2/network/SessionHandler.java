@@ -6,6 +6,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.timeout.IdleStateEvent;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -13,12 +14,14 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.security.SecureRandom;
-import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @ChannelHandler.Sharable
 public class SessionHandler extends SimpleChannelInboundHandler<Message> {
-    private static final List<Byte> WHITE_LIST_CMD = List.of((byte) -27, (byte) 1, (byte) 58, (byte) 114, (byte) 121, (byte) 127);
+    private static final Set<Byte> WHITE_LIST_CMDS = Set.of((byte) -27, (byte) 1, (byte) 58, (byte) 114, (byte) 121, (byte) 127);
+    private static final Set<Byte> KEEP_ALIVE_CMDS = Set.of((byte) -27, (byte) 42);//todo: add other keep-alive commands
     @Getter
     private final long sessionId;
     @Getter
@@ -31,12 +34,11 @@ public class SessionHandler extends SimpleChannelInboundHandler<Message> {
     @Getter
     @Setter
     private User user;
+    private volatile long lastKeepAliveTime = System.currentTimeMillis();
 
     public SessionHandler(long sessionId) {
         this.sessionId = sessionId;
         this.sessionKey = generateSessionKey();
-
-
         this.messageRouter = null;
     }
 
@@ -77,6 +79,10 @@ public class SessionHandler extends SimpleChannelInboundHandler<Message> {
     protected void channelRead0(ChannelHandlerContext ctx, Message msg) {
         byte cmd = msg.getCommand();
 
+        if (KEEP_ALIVE_CMDS.contains(cmd)) {
+            lastKeepAliveTime = System.currentTimeMillis();
+        }
+
         // Handle GET_KEY command
         if (cmd == Cmd.GET_KEY && !keySent) {
             try {
@@ -110,7 +116,7 @@ public class SessionHandler extends SimpleChannelInboundHandler<Message> {
 
         log.info("Session {} received message: {}", sessionId, cmd);
 
-        if ((user == null || !user.isLogged()) && !WHITE_LIST_CMD.contains(cmd)) {
+        if ((user == null || !user.isLogged()) && !WHITE_LIST_CMDS.contains(cmd)) {
             log.warn("Session {} received unauthorized command {} before login. Ignoring.", sessionId, cmd);
             return;
         }
@@ -119,6 +125,21 @@ public class SessionHandler extends SimpleChannelInboundHandler<Message> {
             messageRouter.onMessage(msg);
         } else {
             log.warn("No message router defined for session {}", sessionId);
+        }
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if (evt instanceof IdleStateEvent) {
+            long now = System.currentTimeMillis();
+            long idleMillis = now - lastKeepAliveTime;
+
+            if (idleMillis > TimeUnit.MINUTES.toMillis(5)) {
+                log.warn("Session {} idle for {} ms (no keep-alive cmd), closing", sessionId, idleMillis);
+                ctx.close();
+            }
+        } else {
+            super.userEventTriggered(ctx, evt);
         }
     }
 
