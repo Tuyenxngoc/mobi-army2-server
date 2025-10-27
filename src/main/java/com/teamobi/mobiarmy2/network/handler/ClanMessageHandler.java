@@ -1,7 +1,5 @@
 package com.teamobi.mobiarmy2.network.handler;
 
-import com.teamobi.mobiarmy2.app.ApplicationContext;
-import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.constant.GameString;
@@ -29,6 +27,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ClanMessageHandler extends BaseMessageHandler {
+    private static final int MIN_XU_CONTRIBUTE_CLAN = 1000;
     private static final ConcurrentHashMap<Short, Object> clanLocks = new ConcurrentHashMap<>();
     private final ClanDAO clanDAO;
 
@@ -162,9 +161,8 @@ public class ClanMessageHandler extends BaseMessageHandler {
                 return;
             }
 
-            int minXuContributeClan = ApplicationContext.getInstance().getBean(ServerConfig.class).getMinXuContributeClan();
-            if (quantity < minXuContributeClan) {
-                sendServerMessage(GameString.createClanContributionMinXuMessage(minXuContributeClan));
+            if (quantity < MIN_XU_CONTRIBUTE_CLAN) {
+                sendServerMessage(GameString.createClanContributionMinXuMessage(MIN_XU_CONTRIBUTE_CLAN));
                 return;
             }
 

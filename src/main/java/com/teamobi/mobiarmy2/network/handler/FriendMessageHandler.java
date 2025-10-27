@@ -20,6 +20,8 @@ import java.util.Optional;
 import java.util.Set;
 
 public class FriendMessageHandler extends BaseMessageHandler {
+    private static final int PRICE_CHAT_SERVER = 10_000;
+
     private final UserDAO userDAO;
 
     public FriendMessageHandler(Session session, UserDAO userDAO) {
@@ -43,12 +45,11 @@ public class FriendMessageHandler extends BaseMessageHandler {
         }
         //Neu la nguoi dua tin -> chat The gioi
         if (userId == 2) {
-            int priceChatServer = serverConfig.getPriceChatServer();
-            if (us().getXu() < priceChatServer) {
+            if (us().getXu() < PRICE_CHAT_SERVER) {
                 sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                 return;
             }
-            us().updateXu(-priceChatServer);
+            us().updateXu(-PRICE_CHAT_SERVER);
             sendServerInfo(GameString.createMessageFromSender(us().getUsername(), content), true);
             return;
         }
