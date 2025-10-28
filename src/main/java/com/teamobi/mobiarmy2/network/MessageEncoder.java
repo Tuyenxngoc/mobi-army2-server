@@ -15,7 +15,7 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
     }
 
     private byte writeKey(byte b) {
-        byte[] sessionKey = sessionHandler.getSessionKey();
+        byte[] sessionKey = sessionHandler.getEncryptionKey();
         byte result = (byte) ((sessionKey[curW++] & 0xFF) ^ (b & 0xFF));
         if (curW >= sessionKey.length) {
             curW = 0;

@@ -17,7 +17,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
     }
 
     private byte readKey(byte b) {
-        byte[] sessionKey = sessionHandler.getSessionKey();
+        byte[] sessionKey = sessionHandler.getEncryptionKey();
         byte result = (byte) ((sessionKey[curR++] & 0xFF) ^ (b & 0xFF));
         if (curR >= sessionKey.length) {
             curR = 0;

@@ -410,10 +410,6 @@ public class AuthMessageHandler extends BaseMessageHandler {
         sendMessage(ms);
     }
 
-    public void handleHandshakeMessage() {
-        session.sendKeys();
-    }
-
     public void handleSendAgentAndProviders() throws IOException {
         String agent = session.getAgent();
         if (agent == null || agent.isEmpty()) {

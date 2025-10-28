@@ -61,8 +61,7 @@ public class BeanRegistry {
         context.registerBean(RoomManager.class, new RoomManager());
         context.registerBean(ServerManager.class, new ServerManager(
                 context.getBean(GameDataService.class),
-                context.getBean(LeaderboardService.class),
-                context.getBean(ConnectionBlockerService.class)
+                context.getBean(LeaderboardService.class)
         ));
     }
 }

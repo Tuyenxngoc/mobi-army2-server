@@ -50,8 +50,6 @@ public class MessageRouter {
             switch (ms.getCommand()) {
                 case Cmd.MORE_GAME -> resourceMessageHandler.getMoreGame();
 
-                case Cmd.GET_KEY -> authMessageHandler.handleHandshakeMessage();
-
                 case Cmd.GET_AGENT_PROVIDER -> authMessageHandler.handleSendAgentAndProviders();
 
                 case Cmd.GET_MORE_DAY -> inventoryMessageHandler.extendItemDuration(ms);

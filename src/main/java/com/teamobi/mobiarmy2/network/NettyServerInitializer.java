@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.network;
 
 import com.teamobi.mobiarmy2.app.ApplicationContext;
+import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.ConnectionBlockerService;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
@@ -11,10 +12,9 @@ import java.util.concurrent.TimeUnit;
 public class NettyServerInitializer extends ChannelInitializer<SocketChannel> {
     @Override
     protected void initChannel(SocketChannel ch) {
-        long sessionId = System.nanoTime();
-        SessionHandler sessionHandler = new SessionHandler(sessionId);
-
-        ConnectionBlockerService connectionBlockerService = ApplicationContext.getInstance().getBean(ConnectionBlockerService.class);
+        ApplicationContext context = ApplicationContext.getInstance();
+        SessionHandler sessionHandler = new SessionHandler(context.getBean(ServerManager.class));
+        ConnectionBlockerService connectionBlockerService = context.getBean(ConnectionBlockerService.class);
 
         // Initial pipeline with plain encoder/decoder
         ch.pipeline().addLast("conn-limit", new ConnectionLimitHandler(connectionBlockerService));
