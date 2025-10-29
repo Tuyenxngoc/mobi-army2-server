@@ -87,7 +87,7 @@ public class FriendMessageHandler extends BaseMessageHandler {
 
     public void handleAddFriend(Message ms) throws IOException {
         int maxFriends = ApplicationContext.getInstance().getBean(ServerConfig.class).getMaxFriends();
-        Set<Integer> friends = session.getUser().getFriends();
+        Set<Integer> friends = us().getFriends();
         try {
             int id = ms.reader().readInt();
 
