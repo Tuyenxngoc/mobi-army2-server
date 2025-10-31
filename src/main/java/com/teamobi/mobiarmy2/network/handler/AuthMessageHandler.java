@@ -45,7 +45,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
     }
 
     public void handleLogout() {
-        session.close();
+        session.closeChannel();
     }
 
     public void handleUserLogoutCleanup() {
@@ -157,7 +157,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
                 .getBean(ServerManager.class).getUserByUserId(userDTO.getUserId());
         if (userLogin != null) {
             userLogin.sendMoneyErrorMessage(GameString.ACCOUNT_OTHER_LOGIN);
-            userLogin.getSession().close();
+            userLogin.getSession().closeChannel();
 
             sendMessageLoginFail(GameString.LOGIN_ANOTHER_DEVICE);
             return;
