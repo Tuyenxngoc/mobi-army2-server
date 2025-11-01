@@ -166,8 +166,8 @@ public class ResourceMessageHandler extends BaseMessageHandler {
                 sendMessage(ms);
             }
             case 6 -> {
-                sendCharacterInfo();
-                sendInventoryInfo();
+                us().sendCharacterInfo();
+                us().sendInventoryInfo();
             }
         }
     }

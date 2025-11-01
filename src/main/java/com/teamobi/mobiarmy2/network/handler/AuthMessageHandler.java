@@ -93,7 +93,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
 
         if (ApplicationContext.getInstance()
                 .getBean(ServerManager.class).isMaintenanceMode()) {
-            sendMessageLoginFail(GameString.MAINTENANCE_MODE);
+            us().sendMessageLoginFail(GameString.MAINTENANCE_MODE);
             return;
         }
 
@@ -103,28 +103,28 @@ public class AuthMessageHandler extends BaseMessageHandler {
         String version = dis.readUTF().trim();
 
         if (Utils.isAlphanumeric(username) || Utils.isAlphanumeric(password)) {
-            sendMessageLoginFail(GameString.INVALID_ACCOUNT_PASSWORD);
+            us().sendMessageLoginFail(GameString.INVALID_ACCOUNT_PASSWORD);
             return;
         }
 
         //Kiểm tra thời gian đăng xuất gần nhất
         long remainingTime = loginRateLimiterService.getRemainingLoginTime(username);
         if (remainingTime > 0) {
-            sendMessageLoginFail(GameString.createLoginCooldownMessage(remainingTime));
+            us().sendMessageLoginFail(GameString.createLoginCooldownMessage(remainingTime));
             return;
         }
 
         AccountDTO accountDTO = accountDAO.findByUsernameAndPassword(username, password);
         if (accountDTO == null) {
-            sendMessageLoginFail(GameString.LOGIN_FAILED);
+            us().sendMessageLoginFail(GameString.LOGIN_FAILED);
             return;
         }
         if (accountDTO.isLock()) {
-            sendMessageLoginFail(GameString.ACCOUNT_LOCKED);
+            us().sendMessageLoginFail(GameString.ACCOUNT_LOCKED);
             return;
         }
         if (!accountDTO.isActive()) {
-            sendMessageLoginFail(GameString.ACCOUNT_INACTIVE);
+            us().sendMessageLoginFail(GameString.ACCOUNT_INACTIVE);
             return;
         }
 
@@ -147,7 +147,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
             }
 
             if (userDTO == null) {
-                sendMessageLoginFail(GameString.LOGIN_FAILED);
+                us().sendMessageLoginFail(GameString.LOGIN_FAILED);
                 return;
             }
         }
@@ -159,7 +159,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
             userLogin.sendMoneyErrorMessage(GameString.ACCOUNT_OTHER_LOGIN);
             userLogin.getSession().closeChannel();
 
-            sendMessageLoginFail(GameString.LOGIN_ANOTHER_DEVICE);
+            us().sendMessageLoginFail(GameString.LOGIN_ANOTHER_DEVICE);
             return;
         }
 
@@ -178,7 +178,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
             }
 
             if (userCharacterDTOS.isEmpty()) {
-                sendMessageLoginFail(GameString.LOGIN_FAILED);
+                us().sendMessageLoginFail(GameString.LOGIN_FAILED);
                 return;
             }
         }
@@ -193,12 +193,12 @@ public class AuthMessageHandler extends BaseMessageHandler {
             byte indexItem = FightItemManager.getRandomItem();
             byte quantity = 1;
             us().updateFightItems(indexItem, quantity);
-            sendMessageToUser(GameString.createDailyRewardMessage(quantity, FightItemManager.FIGHT_ITEMS.get(indexItem).getName()));
+            us().sendMessageToUser(GameString.createDailyRewardMessage(quantity, FightItemManager.FIGHT_ITEMS.get(indexItem).getName()));
 
             //Cập nhật quà top
             if (us().getTopEarningsXu() > 0) {
                 us().updateXu(us().getTopEarningsXu());
-                sendMessageToUser(GameString.createDailyTopRewardMessage(us().getTopEarningsXu()));
+                us().sendMessageToUser(GameString.createDailyTopRewardMessage(us().getTopEarningsXu()));
                 us().setTopEarningsXu(0);
             }
 
@@ -208,7 +208,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
                 int luckyXu = Utils.getNonLinearRandom(1000, 50999);
                 int xuUp = (luckyXu / 1000) * 1000;
                 us().updateXu(xuUp);
-                sendMessageToUser(GameString.createDailyRewardMessage(xuUp));
+                us().sendMessageToUser(GameString.createDailyRewardMessage(xuUp));
             }
 
             //Đặt lại số lần mua nguyên liệu
@@ -216,7 +216,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
 
             //Gửi message khi login
             for (String msg : serverConfig.getMessage()) {
-                sendMessageToUser(msg);
+                us().sendMessageToUser(msg);
             }
 
             //Cập nhật nhiệm vụ đăng nhập
@@ -233,7 +233,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
         sendCharacterData(serverConfig);
         sendRoomCaption(serverConfig);
         sendMapCollisionInfo();
-        sendServerInfo(serverConfig.getMessageLogin(), false);
+        us().sendServerInfo(serverConfig.getMessageLogin(), false);
     }
 
     private void updateUserFromDTO(UserDTO userDTO) {
@@ -450,7 +450,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
     }
 
     public void handleRegister(Message ms) {
-        sendMessageLoginFail(GameString.REGISTRATION_REQUIRED);
+        us().sendMessageLoginFail(GameString.REGISTRATION_REQUIRED);
     }
 
     public void handleChangePassword(Message ms) throws IOException {
@@ -460,17 +460,17 @@ public class AuthMessageHandler extends BaseMessageHandler {
         String newPass = dis.readUTF().trim();
 
         if (Utils.isAlphanumeric(oldPass) || Utils.isAlphanumeric(newPass)) {
-            sendServerMessage(GameString.PASSWORD_INVALID_CHARACTER);
+            us().sendServerMessage(GameString.PASSWORD_INVALID_CHARACTER);
             return;
         }
 
         if (!accountDAO.existsByAccountIdAndPassword(us().getAccountId(), oldPass)) {
-            sendServerMessage(GameString.PASSWORD_INCORRECT_OLD);
+            us().sendServerMessage(GameString.PASSWORD_INCORRECT_OLD);
             return;
         }
 
         accountDAO.changePassword(us().getAccountId(), newPass);
-        sendServerMessage(GameString.PASSWORD_CHANGE_SUCCESS);
+        us().sendServerMessage(GameString.PASSWORD_CHANGE_SUCCESS);
     }
 
     public void getAgent(Message ms) throws IOException {

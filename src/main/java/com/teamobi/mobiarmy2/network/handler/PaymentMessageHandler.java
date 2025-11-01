@@ -44,28 +44,28 @@ public class PaymentMessageHandler extends BaseMessageHandler {
             handleGiftCode(serial);
             return;
         }
-        sendServerMessage(serial + " " + pin);
+        us().sendServerMessage(serial + " " + pin);
     }
 
     private void handleGiftCode(String code) {
         GiftCodeDTO giftCode = giftCodeDAO.findById(code);
         if (giftCode == null) {
-            sendServerMessage(GameString.GIFT_CODE_INVALID);
+            us().sendServerMessage(GameString.GIFT_CODE_INVALID);
             return;
         }
         if (giftCode.getLimit() <= 0) {
-            sendServerMessage(GameString.GIFT_CODE_LIMIT_REACHED);
+            us().sendServerMessage(GameString.GIFT_CODE_LIMIT_REACHED);
             return;
         }
         if (giftCode.getExpiryDate() != null && LocalDateTime.now().isAfter(giftCode.getExpiryDate())) {
             String formattedDate = Utils.formatLocalDateTime(giftCode.getExpiryDate());
-            sendServerMessage(GameString.createGiftCodeExpiryMessage(formattedDate));
+            us().sendServerMessage(GameString.createGiftCodeExpiryMessage(formattedDate));
             return;
         }
 
         boolean existsByUserId = userGiftCodeDAO.existsByUserId(us().getUserId());
         if (existsByUserId) {
-            sendServerMessage(GameString.GIFT_CODE_ALREADY_USED);
+            us().sendServerMessage(GameString.GIFT_CODE_ALREADY_USED);
             return;
         }
 
@@ -74,15 +74,15 @@ public class PaymentMessageHandler extends BaseMessageHandler {
 
         if (giftCode.getXu() > 0) {
             us().updateXu(giftCode.getXu());
-            sendMessageToUser(GameString.createGiftCodeRewardMessage(code, Utils.getStringNumber(giftCode.getXu()) + " xu"));
+            us().sendMessageToUser(GameString.createGiftCodeRewardMessage(code, Utils.getStringNumber(giftCode.getXu()) + " xu"));
         }
         if (giftCode.getLuong() > 0) {
             us().updateLuong(giftCode.getLuong());
-            sendMessageToUser(GameString.createGiftCodeRewardMessage(code, Utils.getStringNumber(giftCode.getLuong()) + " lượng"));
+            us().sendMessageToUser(GameString.createGiftCodeRewardMessage(code, Utils.getStringNumber(giftCode.getLuong()) + " lượng"));
         }
         if (giftCode.getExp() > 0) {
             us().updateXp(giftCode.getExp());
-            sendMessageToUser(GameString.createGiftCodeRewardMessage(code, Utils.getStringNumber(giftCode.getExp()) + " exp"));
+            us().sendMessageToUser(GameString.createGiftCodeRewardMessage(code, Utils.getStringNumber(giftCode.getExp()) + " exp"));
         }
         if (giftCode.getItems() != null) {
             List<SpecialItemChest> additionalItems = new ArrayList<>();
@@ -94,7 +94,7 @@ public class PaymentMessageHandler extends BaseMessageHandler {
                 }
                 newItem.setQuantity(item.getQuantity());
                 additionalItems.add(newItem);
-                sendMessageToUser(GameString.createGiftCodeRewardMessageWithQuantity(code, newItem.getQuantity(), newItem.getItem().getName()));
+                us().sendMessageToUser(GameString.createGiftCodeRewardMessageWithQuantity(code, newItem.getQuantity(), newItem.getItem().getName()));
             }
             us().updateInventory(null, null, additionalItems, null);
         }
@@ -108,11 +108,11 @@ public class PaymentMessageHandler extends BaseMessageHandler {
                 addEquip.setAddPoints(json.getAddPoints());
                 addEquip.setAddPercents(json.getAddPercents());
                 us().addEquipment(addEquip);
-                sendMessageToUser(GameString.createGiftCodeRewardMessage(code, addEquip.getEquipment().getName()));
+                us().sendMessageToUser(GameString.createGiftCodeRewardMessage(code, addEquip.getEquipment().getName()));
             }
         }
 
-        sendServerMessage(GameString.GIFT_CODE_SUCCESS);
+        us().sendServerMessage(GameString.GIFT_CODE_SUCCESS);
     }
 
     public void rechargeMoney(Message ms) throws IOException {

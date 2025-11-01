@@ -9,16 +9,11 @@ import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.fight.TrainingManager;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
-import com.teamobi.mobiarmy2.server.CharacterManager;
-import com.teamobi.mobiarmy2.server.EquipmentManager;
-import com.teamobi.mobiarmy2.server.SpecialItemManager;
-import com.teamobi.mobiarmy2.server.UserXpManager;
+import com.teamobi.mobiarmy2.server.*;
 import com.teamobi.mobiarmy2.service.GiftBoxService;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -31,7 +26,6 @@ import java.util.Set;
 @Getter
 @Setter
 public class User {
-    private static final Logger log = LoggerFactory.getLogger(User.class);
     private GiftBoxService giftBoxService;
     private final Session session;
     private UserState state = UserState.WAITING;
@@ -558,7 +552,7 @@ public class User {
             ds.flush();
             sendMessage(ms);
         } catch (IOException e) {
-            log.error("Error sending update money message", e);
+            e.printStackTrace();
         }
     }
 
@@ -571,7 +565,7 @@ public class User {
             ds.flush();
             sendMessage(ms);
         } catch (IOException e) {
-            log.error("Error sending update cup message", e);
+            e.printStackTrace();
         }
     }
 
@@ -594,7 +588,7 @@ public class User {
             ds.flush();
             sendMessage(ms);
         } catch (IOException e) {
-            log.error("Error sending update XP message", e);
+            e.printStackTrace();
         }
     }
 
@@ -606,7 +600,7 @@ public class User {
             ds.flush();
             sendMessage(ms);
         } catch (IOException e) {
-            log.error("Error sending money error message", e);
+            e.printStackTrace();
         }
     }
 
@@ -618,7 +612,143 @@ public class User {
             ds.flush();
             sendMessage(ms);
         } catch (IOException e) {
-            log.error("Error sending server message", e);
+            e.printStackTrace();
+        }
+    }
+
+    public void sendMessageLoginFail(String message) {
+        try {
+            Message ms = new Message(Cmd.LOGIN_FAIL);
+            DataOutputStream ds = ms.writer();
+            ds.writeUTF(message);
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendMessageToUser(String message) {
+        sendMessageToUser(true, message, this);
+    }
+
+    public void sendMessageToUser(boolean isAdminSender, String message, User recipient) {
+        try {
+            Message ms = new Message(Cmd.CHAT_TO);
+            DataOutputStream ds = ms.writer();
+            if (isAdminSender) {
+                ds.writeInt(1);
+                ds.writeUTF("ADMIN");
+            } else {
+                ds.writeInt(getUserId());
+                ds.writeUTF(getUsername());
+            }
+            ds.writeUTF(message);
+            ds.flush();
+            recipient.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendServerInfo(String message, boolean toServer) {
+        if (message == null || message.isEmpty()) {
+            return;
+        }
+        try {
+            Message ms = new Message(Cmd.SERVER_INFO);
+            DataOutputStream ds = ms.writer();
+            ds.writeUTF(message);
+            ds.flush();
+
+            if (toServer) {
+                ApplicationContext.getInstance()
+                        .getBean(ServerManager.class).sendToServer(ms);
+            } else {
+                sendMessage(ms);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendCharacterInfo() {
+        try {
+            Message ms = new Message(Cmd.CHARACTOR_INFO);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(getCurrentLevel());
+            ds.writeByte(getCurrentLevelPercent());
+            ds.writeShort(getCurrentPoint());
+            for (short point : getCurrentAddedPoints()) {
+                ds.writeShort(point);
+            }
+            ds.writeInt(getCurrentXp());
+            ds.writeInt(getCurrentRequiredXp());
+            ds.writeInt(getCup());
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendEquipInfo() {
+        try {
+            Message ms = new Message(Cmd.CURR_EQUIP_DBKEY);
+            DataOutputStream ds = ms.writer();
+            for (int i = 0; i < 5; i++) {
+                ds.writeInt(getEquipData()[getActiveCharacterId()][i]);
+            }
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendInventoryInfo() {
+        try {
+            Message ms = new Message(Cmd.INVENTORY);
+            DataOutputStream ds = ms.writer();
+            Map<Integer, EquipmentChest> equipmentChest = getEquipmentChest();
+            ds.writeByte(equipmentChest.size());
+            for (EquipmentChest equipment : equipmentChest.values()) {
+                ds.writeInt(equipment.getKey());
+                ds.writeByte(equipment.getEquipment().getCharacterId());
+                ds.writeByte(equipment.getEquipment().getEquipType());
+                ds.writeShort(equipment.getEquipment().getEquipIndex());
+                ds.writeUTF(equipment.getEquipment().getName());
+                ds.writeByte(equipment.getAddPoints().length * 2);
+                for (int j = 0; j < equipment.getAddPoints().length; j++) {
+                    ds.writeByte(equipment.getAddPoints()[j]);
+                    ds.writeByte(equipment.getAddPercents()[j]);
+                }
+                ds.writeByte(equipment.getRemainingDays());
+                ds.writeByte(equipment.getEmptySlot());
+                ds.writeByte(equipment.getEquipment().isDisguise() ? 1 : 0);
+                ds.writeByte(equipment.getVipLevel());
+            }
+            for (int i = 0; i < 5; i++) {
+                ds.writeInt(getEquipData()[getActiveCharacterId()][i]);
+            }
+            ds.flush();
+            sendMessage(ms);
+
+            ms = new Message(Cmd.MATERIAL);
+            ds = ms.writer();
+            ds.writeByte(0);
+            Map<Byte, SpecialItemChest> specialItemChest = getSpecialItemChest();
+            ds.writeByte(specialItemChest.size());
+            for (SpecialItemChest item : specialItemChest.values()) {
+                ds.writeByte(item.getItem().getId());
+                ds.writeShort(item.getQuantity());
+                ds.writeUTF(item.getItem().getName());
+                ds.writeUTF(item.getItem().getDetail());
+            }
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

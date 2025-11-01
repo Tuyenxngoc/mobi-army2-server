@@ -162,7 +162,7 @@ public class ClanMessageHandler extends BaseMessageHandler {
             }
 
             if (quantity < MIN_XU_CONTRIBUTE_CLAN) {
-                sendServerMessage(GameString.createClanContributionMinXuMessage(MIN_XU_CONTRIBUTE_CLAN));
+                us().sendServerMessage(GameString.createClanContributionMinXuMessage(MIN_XU_CONTRIBUTE_CLAN));
                 return;
             }
 
@@ -171,7 +171,7 @@ public class ClanMessageHandler extends BaseMessageHandler {
 
             //Update xu clan
             contributeClan(us().getClanId(), us().getUserId(), quantity, Boolean.TRUE);
-            sendServerMessage(GameString.CONTRIBUTION_SUCCESS);
+            us().sendServerMessage(GameString.CONTRIBUTION_SUCCESS);
         } else {
             if (quantity > us().getLuong()) {
                 return;
@@ -182,13 +182,13 @@ public class ClanMessageHandler extends BaseMessageHandler {
 
             //Update lg clan
             contributeClan(us().getClanId(), us().getUserId(), quantity, Boolean.FALSE);
-            sendServerMessage(GameString.CONTRIBUTION_SUCCESS);
+            us().sendServerMessage(GameString.CONTRIBUTION_SUCCESS);
         }
     }
 
     public void handlePurchaseClanItem(Message ms) throws IOException {
         if (us().getClanId() == null) {
-            sendServerMessage(GameString.NO_CLAN_MEMBERSHIP);
+            us().sendServerMessage(GameString.NO_CLAN_MEMBERSHIP);
             return;
         }
         DataInputStream dis = ms.reader();
@@ -211,7 +211,7 @@ public class ClanMessageHandler extends BaseMessageHandler {
 
         int currentLevel = clanDAO.getLevel(us().getClanId());
         if (currentLevel < clanItemShop.getLevel()) {
-            sendServerMessage(GameString.CLAN_LEVEL_INSUFFICIENT);
+            us().sendServerMessage(GameString.CLAN_LEVEL_INSUFFICIENT);
             return;
         }
 
@@ -221,7 +221,7 @@ public class ClanMessageHandler extends BaseMessageHandler {
             }
             int xuClan = clanDAO.getXu(us().getClanId());
             if (xuClan < clanItemShop.getXu()) {
-                sendServerMessage(GameString.CLAN_NOT_ENOUGH_XU);
+                us().sendServerMessage(GameString.CLAN_NOT_ENOUGH_XU);
                 return;
             }
 
@@ -232,13 +232,13 @@ public class ClanMessageHandler extends BaseMessageHandler {
             }
             int luongClan = clanDAO.getLuong(us().getClanId());
             if (luongClan < clanItemShop.getLuong()) {
-                sendServerMessage(GameString.CLAN_NOT_ENOUGH_LUONG);
+                us().sendServerMessage(GameString.CLAN_NOT_ENOUGH_LUONG);
                 return;
             }
 
             updateItemClan(us().getClanId(), us().getUserId(), clanItemShop, false);
         }
-        sendServerMessage(GameString.PURCHASE_SUCCESS);
+        us().sendServerMessage(GameString.PURCHASE_SUCCESS);
     }
 
     private void sendClanShop() throws IOException {
@@ -359,7 +359,7 @@ public class ClanMessageHandler extends BaseMessageHandler {
         short clanId = ms.reader().readShort();
         ClanInfoDTO clanDetails = clanDAO.getClanInfo(clanId);
         if (clanDetails == null) {
-            sendMessageLoginFail(GameString.CLAN_NOT_FOUND);
+            us().sendMessageLoginFail(GameString.CLAN_NOT_FOUND);
             return;
         }
         ms = new Message(Cmd.CLAN_INFO);

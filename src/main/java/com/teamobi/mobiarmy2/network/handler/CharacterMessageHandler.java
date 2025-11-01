@@ -27,18 +27,8 @@ public class CharacterMessageHandler extends BaseMessageHandler {
         ds.flush();
         sendMessage(ms);
 
-        sendCharacterInfo();
-        sendEquipInfo();
-    }
-
-    private void sendEquipInfo() throws IOException {
-        Message ms = new Message(Cmd.CURR_EQUIP_DBKEY);
-        DataOutputStream ds = ms.writer();
-        for (int i = 0; i < 5; i++) {
-            ds.writeInt(us().getEquipData()[us().getActiveCharacterId()][i]);
-        }
-        ds.flush();
-        sendMessage(ms);
+        us().sendCharacterInfo();
+        us().sendEquipInfo();
     }
 
     public void handleAddPoints(Message ms) throws IOException {
@@ -55,6 +45,10 @@ public class CharacterMessageHandler extends BaseMessageHandler {
             us().updatePoints(points, totalPoints);
         }
 
-        sendCharacterInfo();
+        us().sendCharacterInfo();
+    }
+
+    public void handleGetCharacterInfo() {
+        us().sendCharacterInfo();
     }
 }

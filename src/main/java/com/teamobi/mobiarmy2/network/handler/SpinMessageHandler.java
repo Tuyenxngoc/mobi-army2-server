@@ -43,20 +43,20 @@ public class SpinMessageHandler extends BaseMessageHandler {
     public void handleSpinWheel(Message ms) throws IOException {
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastSpinTime < SPIN_WAIT_TIME_MS) {
-            sendServerMessage(GameString.SPIN_WAIT_TIME);
+            us().sendServerMessage(GameString.SPIN_WAIT_TIME);
             return;
         }
 
         byte unit = ms.reader().readByte();
         if (unit == 0) {
             if (us().getXu() < SPIN_XU_COST) {
-                sendServerMessage(GameString.INSUFFICIENT_FUNDS);
+                us().sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                 return;
             }
             us().updateXu(-SPIN_XU_COST);
         } else {
             if (us().getLuong() < SPIN_LUONG_COST) {
-                sendServerMessage(GameString.INSUFFICIENT_FUNDS);
+                us().sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                 return;
             }
             us().updateLuong(-SPIN_LUONG_COST);

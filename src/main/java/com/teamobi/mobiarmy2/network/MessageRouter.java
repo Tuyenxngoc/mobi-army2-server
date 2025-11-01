@@ -162,7 +162,7 @@ public class MessageRouter {
 
                 case Cmd.ADD_POINT -> characterMessageHandler.handleAddPoints(ms);
 
-                case Cmd.CHARACTOR_INFO -> characterMessageHandler.sendCharacterInfo();
+                case Cmd.CHARACTOR_INFO -> characterMessageHandler.handleGetCharacterInfo();
 
                 case Cmd.CHANGE_EQUIP -> inventoryMessageHandler.handleChangeEquipment(ms);
 

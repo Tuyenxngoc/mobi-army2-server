@@ -65,7 +65,7 @@ public class ShopMessageHandler extends BaseMessageHandler {
         ds.writeInt(us().getLuong());
         ds.flush();
         sendMessage(ms);
-        sendServerMessage(GameString.PURCHASE_SUCCESS);
+        us().sendServerMessage(GameString.PURCHASE_SUCCESS);
     }
 
     public void handleBuyCharacter(Message ms) throws IOException {
@@ -85,7 +85,7 @@ public class ShopMessageHandler extends BaseMessageHandler {
                 return;
             }
             if (us().getXu() < character.getPriceXu()) {
-                sendServerMessage(GameString.INSUFFICIENT_FUNDS);
+                us().sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                 return;
             }
             us().updateXu(-character.getPriceXu());
@@ -94,7 +94,7 @@ public class ShopMessageHandler extends BaseMessageHandler {
                 return;
             }
             if (us().getLuong() < character.getPriceLuong()) {
-                sendServerMessage(GameString.INSUFFICIENT_FUNDS);
+                us().sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                 return;
             }
             us().updateLuong(-character.getPriceLuong());
@@ -175,7 +175,7 @@ public class ShopMessageHandler extends BaseMessageHandler {
 
         //Kiểm tra số lượng đang có trong rương
         if (us().getInventorySpecialItemCount(itemId) + quantity > serverConfig.getMaxSpecialItemSlots()) {
-            sendServerMessage(GameString.CHEST_MAXIMUM_REACHED);
+            us().sendServerMessage(GameString.CHEST_MAXIMUM_REACHED);
             return;
         }
 
@@ -187,10 +187,10 @@ public class ShopMessageHandler extends BaseMessageHandler {
         //Giới hạn số lần mua vật liệu
         if (item.isMaterial()) {
             if (us().getMaterialsPurchased() >= GameConstants.MAX_MATERIAL_PURCHASE_LIMIT) {
-                sendServerMessage(GameString.MATERIAL_PURCHASE_LIMIT);
+                us().sendServerMessage(GameString.MATERIAL_PURCHASE_LIMIT);
                 return;
             } else if (us().getMaterialsPurchased() + quantity > GameConstants.MAX_MATERIAL_PURCHASE_LIMIT) {
-                sendServerMessage(GameString.createMaterialPurchaseLimitMessage(GameConstants.MAX_MATERIAL_PURCHASE_LIMIT - us().getMaterialsPurchased()));
+                us().sendServerMessage(GameString.createMaterialPurchaseLimitMessage(GameConstants.MAX_MATERIAL_PURCHASE_LIMIT - us().getMaterialsPurchased()));
                 return;
             }
         }
@@ -198,14 +198,14 @@ public class ShopMessageHandler extends BaseMessageHandler {
         if (unit == 0) {//Mua bằng xu
             int totalPrice = quantity * item.getPriceXu();
             if (us().getXu() < totalPrice) {
-                sendServerMessage(GameString.INSUFFICIENT_FUNDS);
+                us().sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                 return;
             }
             us().updateXu(-totalPrice);
         } else {//Mua bằng lượng
             int totalPrice = quantity * item.getPriceLuong();
             if (us().getLuong() < totalPrice) {
-                sendServerMessage(GameString.INSUFFICIENT_FUNDS);
+                us().sendServerMessage(GameString.INSUFFICIENT_FUNDS);
                 return;
             }
             us().updateLuong(-totalPrice);
@@ -228,13 +228,13 @@ public class ShopMessageHandler extends BaseMessageHandler {
         }
 
         //Gửi thông báo mua thành công
-        sendServerMessage(GameString.PURCHASE_SUCCESS);
+        us().sendServerMessage(GameString.PURCHASE_SUCCESS);
     }
 
     private boolean handleSpecialItemPurchase(byte itemId) {
         if (itemId == 50) {
             us().resetPoints();
-            sendCharacterInfo();
+            us().sendCharacterInfo();
             return false;
         }
 

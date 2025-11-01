@@ -41,7 +41,8 @@ public class GiftBoxService {
             ds.writeUTF(GameString.createGiftOpeningSummaryMessage(availableGifts, MAX_OPENED_GIFTS, XU_COST_PER_GIFT));
             ds.flush();
             user.sendMessage(ms);
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -79,7 +80,8 @@ public class GiftBoxService {
             }
             ds.flush();
             user.sendMessage(ms);
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -205,7 +207,8 @@ public class GiftBoxService {
             ds.writeUTF(reward.str());
             ds.flush();
             user.sendMessage(ms);
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
