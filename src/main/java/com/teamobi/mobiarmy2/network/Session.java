@@ -18,25 +18,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Slf4j
 public class Session {
     private static final Set<Byte> WHITE_LIST_CMDS = Set.of((byte) -27, (byte) 1, (byte) 58, (byte) 114, (byte) 121, (byte) 127);
-    private static final BlockingQueue<Runnable> cleanupQueue = new LinkedBlockingQueue<>();
-    private static final Thread cleanupThread;
-
-    static {
-        cleanupThread = new Thread(() -> {
-            while (true) {
-                try {
-                    Runnable task = cleanupQueue.take();
-                    task.run();
-                } catch (InterruptedException e) {
-                    log.warn("Cleanup thread interrupted, continuing...");
-                } catch (Exception e) {
-                    log.error("Error in cleanup thread: {}", e.getMessage(), e);
-                }
-            }
-        }, "Session-Cleanup-Thread");
-        cleanupThread.setDaemon(true);
-        cleanupThread.start();
-    }
 
     @Getter
     private final long sessionId;
@@ -125,17 +106,14 @@ public class Session {
     }
 
     public void cleanup() {
-        try {
-            if (user != null && user.isLogged()) {
-                cleanupQueue.offer(() -> messageRouter.getAuthMessageHandler().handleUserLogoutCleanup());
-            }
-        } catch (Exception e) {
-            log.error("Session {} cleanup error: {}", sessionId, e.getMessage(), e);
-        } finally {
-            // Stop worker thread
-            if (workerThread.isAlive()) {
-                workerThread.interrupt();
-            }
+        // Stop worker thread
+        if (workerThread.isAlive()) {
+            workerThread.interrupt();
+        }
+
+        if (user != null && user.isLogged()) {
+            // Save user data
+            messageRouter.getAuthMessageHandler().handleUserLogoutCleanup();
         }
     }
 
