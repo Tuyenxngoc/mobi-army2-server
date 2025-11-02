@@ -1,5 +1,7 @@
-package com.teamobi.mobiarmy2.network;
+package com.teamobi.mobiarmy2.network.codec;
 
+import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.SessionHandler;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;

@@ -1,6 +1,10 @@
 package com.teamobi.mobiarmy2.network;
 
 import com.teamobi.mobiarmy2.app.ApplicationContext;
+import com.teamobi.mobiarmy2.network.codec.MessageDecoder;
+import com.teamobi.mobiarmy2.network.codec.MessageEncoder;
+import com.teamobi.mobiarmy2.network.codec.PlainMessageDecoder;
+import com.teamobi.mobiarmy2.network.codec.PlainMessageEncoder;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.ConnectionBlockerService;
 import io.netty.channel.ChannelInitializer;
