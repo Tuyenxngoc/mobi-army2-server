@@ -49,6 +49,7 @@ public class Session {
     private final MessageRouter messageRouter;
     private final BlockingQueue<Message> messageQueue = new LinkedBlockingQueue<>();
     private final Thread workerThread;
+    private volatile boolean running = true;
 
     public Session(long sessionId, Channel channel) {
         this.sessionId = sessionId;
@@ -70,14 +71,23 @@ public class Session {
     }
 
     private void processLoop() {
-        while (!Thread.currentThread().isInterrupted()) {
-            try {
-                Message msg = messageQueue.take();
-                messageRouter.onMessage(msg);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            } catch (Exception e) {
-                log.error("Session {} error while processing message: {}", sessionId, e.getMessage(), e);
+        try {
+            while (running) {
+                try {
+                    Message msg = messageQueue.take();
+                    if (!running) break; // Check again after blocking call
+                    messageRouter.onMessage(msg);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                } catch (Exception e) {
+                    log.error("Session {} error while processing message: {}", sessionId, e.getMessage(), e);
+                }
+            }
+        } finally {
+            // Cleanup on exit
+            if (isUserLoggedIn()) {
+                messageRouter.getAuthMessageHandler().handleUserLogoutCleanup();
             }
         }
     }
@@ -96,6 +106,10 @@ public class Session {
         if (WHITE_LIST_CMDS.contains(msg.getCommand())) {
             return true;
         }
+        return isUserLoggedIn();
+    }
+
+    private boolean isUserLoggedIn() {
         return user != null && user.isLogged();
     }
 
@@ -106,14 +120,9 @@ public class Session {
     }
 
     public void cleanup() {
-        // Stop worker thread
+        running = false;
         if (workerThread.isAlive()) {
             workerThread.interrupt();
-        }
-
-        if (user != null && user.isLogged()) {
-            // Save user data
-            messageRouter.getAuthMessageHandler().handleUserLogoutCleanup();
         }
     }
 
