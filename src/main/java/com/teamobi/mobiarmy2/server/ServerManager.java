@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.config.ServerConfig;
+import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.NettyServerInitializer;
@@ -18,6 +19,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,6 +28,7 @@ public class ServerManager {
     private final GameDataService gameDataService;
     private final LeaderboardService leaderboardService;
     private final ConcurrentHashMap<Long, Session> sessions = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, Long> userToSession = new ConcurrentHashMap<>();
     @Setter
     @Getter
     private boolean isMaintenanceMode = false;
@@ -80,7 +83,10 @@ public class ServerManager {
     }
 
     public void removeSession(Long sessionId) {
-        sessions.remove(sessionId);
+        Session removed = sessions.remove(sessionId);
+        if (removed != null && removed.getUser() != null) {
+            userToSession.remove(removed.getUser().getUserId());
+        }
     }
 
     public void sendToServer(Message ms) {
@@ -90,10 +96,44 @@ public class ServerManager {
     }
 
     public User getUserByUserId(int userId) {
-        return null;
+        Long sessionId = userToSession.get(userId);
+        if (sessionId == null) {
+            return null;
+        }
+        Session session = sessions.get(sessionId);
+        return session != null ? session.getUser() : null;
+    }
+
+    public void registerUser(User user) {
+        if (user != null && user.getSession() != null) {
+            userToSession.put(user.getUserId(), user.getSession().getSessionId());
+        }
+    }
+
+    public void unregisterUser(int userId) {
+        userToSession.remove(userId);
     }
 
     public List<User> findWaitPlayers(int excludedUserId) {
-        return null;
+        List<User> result = new ArrayList<>(10);
+        for (var entry : userToSession.entrySet()) {
+            if (result.size() >= 10) break;
+            int userId = entry.getKey();
+            if (userId == excludedUserId) continue;
+
+            Long sessionId = entry.getValue();
+            if (sessionId == null) continue;
+
+            Session session = sessions.get(sessionId);
+            if (session == null) continue;
+
+            User user = session.getUser();
+            if (user == null || !user.isLogged()) continue;
+
+            if (user.getState() == UserState.WAITING) {
+                result.add(user);
+            }
+        }
+        return result;
     }
 }

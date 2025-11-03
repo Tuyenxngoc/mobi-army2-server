@@ -126,29 +126,36 @@ public class Session {
         }
     }
 
-    public void initMessageHandlers() {
+    public void registerHandlers() {
         ApplicationContext context = ApplicationContext.getInstance();
 
-        ClanMessageHandler clanMessageHandler = new ClanMessageHandler(this, context.getBean(ClanDAO.class));
-        FriendMessageHandler friendMessageHandler = new FriendMessageHandler(this, context.getBean(UserDAO.class));
-        ShopMessageHandler shopMessageHandler = new ShopMessageHandler(this, context.getBean(UserCharacterDAO.class));
-        ResourceMessageHandler resourceService = new ResourceMessageHandler(this);
-        MissionMessageHandler missionMessageHandler = new MissionMessageHandler(this);
-        FormulaMessageHandler formulaMessageHandler = new FormulaMessageHandler(this);
-        RoomMessageHandler roomMessageHandler = new RoomMessageHandler(this);
-        FightWaitMessageHandler fightWaitMessageHandler = new FightWaitMessageHandler(this, context.getBean(UserDAO.class));
-        FightManagerMessageHandler fightManagerMessageHandler = new FightManagerMessageHandler(this);
-        InventoryMessageHandler inventoryMessageHandler = new InventoryMessageHandler(this);
-        LeaderboardMessageHandler leaderboardMessageHandler = new LeaderboardMessageHandler(this, context.getBean(LeaderboardService.class));
-        GiftBoxMessageHandler giftBoxMessageHandler = new GiftBoxMessageHandler(this);
-        SpinMessageHandler spinMessageHandler = new SpinMessageHandler(this);
-        PaymentMessageHandler paymentMessageHandler = new PaymentMessageHandler(this, context.getBean(GiftCodeDAO.class), context.getBean(UserGiftCodeDAO.class));
-        CharacterMessageHandler characterMessageHandler = new CharacterMessageHandler(this);
+        final ClanDAO clanDAO = context.getBean(ClanDAO.class);
+        final UserDAO userDAO = context.getBean(UserDAO.class);
+        final UserCharacterDAO userCharacterDAO = context.getBean(UserCharacterDAO.class);
+        final LeaderboardService leaderboardService = context.getBean(LeaderboardService.class);
+        final GiftCodeDAO giftCodeDAO = context.getBean(GiftCodeDAO.class);
+        final UserGiftCodeDAO userGiftCodeDAO = context.getBean(UserGiftCodeDAO.class);
+
+        final ClanMessageHandler clanMessageHandler = new ClanMessageHandler(this, clanDAO);
+        final FriendMessageHandler friendMessageHandler = new FriendMessageHandler(this, userDAO);
+        final ShopMessageHandler shopMessageHandler = new ShopMessageHandler(this, userCharacterDAO);
+        final ResourceMessageHandler resourceMessageHandler = new ResourceMessageHandler(this);
+        final MissionMessageHandler missionMessageHandler = new MissionMessageHandler(this);
+        final FormulaMessageHandler formulaMessageHandler = new FormulaMessageHandler(this);
+        final RoomMessageHandler roomMessageHandler = new RoomMessageHandler(this);
+        final FightWaitMessageHandler fightWaitMessageHandler = new FightWaitMessageHandler(this, userDAO);
+        final FightManagerMessageHandler fightManagerMessageHandler = new FightManagerMessageHandler(this);
+        final InventoryMessageHandler inventoryMessageHandler = new InventoryMessageHandler(this);
+        final LeaderboardMessageHandler leaderboardMessageHandler = new LeaderboardMessageHandler(this, leaderboardService);
+        final GiftBoxMessageHandler giftBoxMessageHandler = new GiftBoxMessageHandler(this);
+        final SpinMessageHandler spinMessageHandler = new SpinMessageHandler(this);
+        final PaymentMessageHandler paymentMessageHandler = new PaymentMessageHandler(this, giftCodeDAO, userGiftCodeDAO);
+        final CharacterMessageHandler characterMessageHandler = new CharacterMessageHandler(this);
 
         messageRouter.setClanMessageHandler(clanMessageHandler);
         messageRouter.setFriendMessageHandler(friendMessageHandler);
         messageRouter.setShopMessageHandler(shopMessageHandler);
-        messageRouter.setResourceMessageHandler(resourceService);
+        messageRouter.setResourceMessageHandler(resourceMessageHandler);
         messageRouter.setMissionMessageHandler(missionMessageHandler);
         messageRouter.setFormulaMessageHandler(formulaMessageHandler);
         messageRouter.setRoomMessageHandler(roomMessageHandler);

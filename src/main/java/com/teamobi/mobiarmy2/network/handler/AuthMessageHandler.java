@@ -68,6 +68,11 @@ public class AuthMessageHandler extends BaseMessageHandler {
 
         us().setLogged(false);
 
+        // Unregister from online index
+        ApplicationContext.getInstance()
+                .getBean(ServerManager.class)
+                .unregisterUser(us().getUserId());
+
         //Lưu thời gian đăng xuất gần nhất
         loginRateLimiterService.saveLogoutTime(us().getUsername());
     }
@@ -135,7 +140,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
         // Đặt người dùng vào session
         session.setUser(user);
         session.setVersion(version);
-        session.initMessageHandlers();
+        session.registerHandlers();
 
         UserDTO userDTO = userDAO.findByAccountId(us().getAccountId());
         if (userDTO == null) {
@@ -186,6 +191,11 @@ public class AuthMessageHandler extends BaseMessageHandler {
 
         us().setUsername(username);
         us().setLogged(true);
+
+        // Register into online index for fast lookup
+        ApplicationContext.getInstance()
+                .getBean(ServerManager.class)
+                .registerUser(us());
 
         //Tặng quà hằng ngày
         if (Utils.canReceiveDailyReward(userDTO.getDailyRewardTime())) {
