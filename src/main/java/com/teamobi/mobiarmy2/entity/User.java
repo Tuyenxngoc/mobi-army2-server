@@ -246,7 +246,7 @@ public class User {
         }
         addEquipment.setEmptySlot((byte) 3);
         addEquipment.setSlots(new byte[]{-1, -1, -1});
-        addEquipment.setKey(equipmentPurchased | 0x10000);
+        addEquipment.setKey((userId << 16) | (equipmentPurchased & 0xFFFF));
         addEquipmentChest(addEquipment);
 
         //Tăng số lượng trang bị mua
@@ -640,8 +640,8 @@ public class User {
                 ds.writeInt(1);
                 ds.writeUTF("ADMIN");
             } else {
-                ds.writeInt(getUserId());
-                ds.writeUTF(getUsername());
+                ds.writeInt(userId);
+                ds.writeUTF(username);
             }
             ds.writeUTF(message);
             ds.flush();
@@ -684,7 +684,7 @@ public class User {
             }
             ds.writeInt(getCurrentXp());
             ds.writeInt(getCurrentRequiredXp());
-            ds.writeInt(getCup());
+            ds.writeInt(cup);
             ds.flush();
             sendMessage(ms);
         } catch (IOException e) {
@@ -697,7 +697,7 @@ public class User {
             Message ms = new Message(Cmd.CURR_EQUIP_DBKEY);
             DataOutputStream ds = ms.writer();
             for (int i = 0; i < 5; i++) {
-                ds.writeInt(getEquipData()[getActiveCharacterId()][i]);
+                ds.writeInt(equipData[activeCharacterId][i]);
             }
             ds.flush();
             sendMessage(ms);
@@ -710,7 +710,6 @@ public class User {
         try {
             Message ms = new Message(Cmd.INVENTORY);
             DataOutputStream ds = ms.writer();
-            Map<Integer, EquipmentChest> equipmentChest = getEquipmentChest();
             ds.writeByte(equipmentChest.size());
             for (EquipmentChest equipment : equipmentChest.values()) {
                 ds.writeInt(equipment.getKey());
@@ -737,7 +736,6 @@ public class User {
             ms = new Message(Cmd.MATERIAL);
             ds = ms.writer();
             ds.writeByte(0);
-            Map<Byte, SpecialItemChest> specialItemChest = getSpecialItemChest();
             ds.writeByte(specialItemChest.size());
             for (SpecialItemChest item : specialItemChest.values()) {
                 ds.writeByte(item.getItem().getId());
