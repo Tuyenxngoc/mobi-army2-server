@@ -30,19 +30,18 @@ public class FriendMessageHandler extends BaseMessageHandler {
     }
 
     public void handleSendMessage(Message ms) throws IOException {
-        ServerConfig serverConfig = ApplicationContext.getInstance()
-                .getBean(ServerConfig.class);
-
         DataInputStream dis = ms.reader();
         int userId = dis.readInt();
         String content = dis.readUTF().trim();
         if (content.isEmpty() || content.length() > 100) {
             return;
         }
+
         //Neu la admin -> bo qua
         if (userId == 1) {
             return;
         }
+
         //Neu la nguoi dua tin -> chat The gioi
         if (userId == 2) {
             if (us().getXu() < PRICE_CHAT_SERVER) {
@@ -53,6 +52,7 @@ public class FriendMessageHandler extends BaseMessageHandler {
             us().sendServerInfo(GameString.createMessageFromSender(us().getUsername(), content), true);
             return;
         }
+
         User receiver = ApplicationContext.getInstance()
                 .getBean(ServerManager.class).getUserByUserId(userId);
         if (receiver == null) {

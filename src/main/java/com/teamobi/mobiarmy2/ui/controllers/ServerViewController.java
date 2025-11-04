@@ -7,11 +7,13 @@ import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.util.Duration;
 
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Optional;
@@ -59,8 +61,8 @@ public class ServerViewController {
         memoryUsage.setText(String.format("%d MB / %d MB", usedMemory / (1024 * 1024), totalMemory / (1024 * 1024)));
 
         // Disk space
-        long freeSpace = new java.io.File("/").getFreeSpace();
-        long totalSpace = new java.io.File("/").getTotalSpace();
+        long freeSpace = new File("/").getFreeSpace();
+        long totalSpace = new File("/").getTotalSpace();
         diskSpace.setText(String.format("%d GB / %d GB", freeSpace / (1024 * 1024 * 1024), totalSpace / (1024 * 1024 * 1024)));
 
         // Uptime
@@ -97,7 +99,7 @@ public class ServerViewController {
             serverStatus.setText("Maintenance in " + timeRemaining[0] + " seconds...");
 
             // Cứ mỗi 60 giây hoặc khi còn < 30 giây thì nhắc nhở
-            if (timeRemaining[0] % 60 == 0 || timeRemaining[0] == 30 || timeRemaining[0] == 10) {
+            if (timeRemaining[0] > 0 && (timeRemaining[0] % 60 == 0 || timeRemaining[0] == 30 || timeRemaining[0] == 10)) {
                 try {
                     Message ms = new Message(Cmd.SERVER_INFO);
                     DataOutputStream ds = ms.writer();
@@ -108,7 +110,7 @@ public class ServerViewController {
                             .getBean(ServerManager.class)
                             .sendToServer(ms);
                 } catch (IOException e) {
-
+                    e.printStackTrace();
                 }
             }
 
@@ -128,7 +130,7 @@ public class ServerViewController {
         serverManager.stop();
 
         try {
-            javafx.application.Platform.exit(); // thoát JavaFX Application Thread
+            Platform.exit(); // thoát JavaFX Application Thread
         } catch (Exception ignored) {
         }
 
