@@ -138,11 +138,11 @@ public class FriendMessageHandler extends BaseMessageHandler {
     public void handleFindPlayer(Message ms) throws IOException {
         String username = ms.reader().readUTF().trim();
         if (username.isEmpty()) {
-            us().sendMessageLoginFail(GameString.FRIEND_ADD_MISSING_NAME);
+            us().sendServerMessage(GameString.FRIEND_ADD_MISSING_NAME);
             return;
         }
         if (Utils.isAlphanumeric(username)) {
-            us().sendMessageLoginFail(GameString.FRIEND_ADD_INVALID_NAME);
+            us().sendServerMessage(GameString.FRIEND_ADD_INVALID_NAME);
             return;
         }
         Optional<Integer> foundUserId = userDAO.findUserIdByUsername(username);

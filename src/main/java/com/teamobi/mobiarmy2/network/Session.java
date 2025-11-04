@@ -67,6 +67,9 @@ public class Session {
 
     public void sendMessage(Message msg) {
         if (msg == null || channel == null || !channel.isActive()) return;
+
+        log.debug("Session {} -> Command {}", sessionId, msg.getCommand());
+
         channel.writeAndFlush(msg);
     }
 

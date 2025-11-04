@@ -616,18 +616,6 @@ public class User {
         }
     }
 
-    public void sendMessageLoginFail(String message) {
-        try {
-            Message ms = new Message(Cmd.LOGIN_FAIL);
-            DataOutputStream ds = ms.writer();
-            ds.writeUTF(message);
-            ds.flush();
-            sendMessage(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void sendMessageToUser(String message) {
         sendMessageToUser(true, message, this);
     }

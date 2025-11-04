@@ -61,6 +61,7 @@ public class SessionHandler extends SimpleChannelInboundHandler<Message> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message msg) {
         byte cmd = msg.getCommand();
+        log.debug("Session {} <- Command {}", session.getSessionId(), cmd);
 
         if (KEEP_ALIVE_CMDS.contains(cmd)) {
             lastKeepAliveTime = System.currentTimeMillis();

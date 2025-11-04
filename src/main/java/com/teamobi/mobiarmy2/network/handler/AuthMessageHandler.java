@@ -89,6 +89,18 @@ public class AuthMessageHandler extends BaseMessageHandler {
         return userCharacterDTO;
     }
 
+    public void sendMessageLoginFail(String message) {
+        try {
+            Message ms = new Message(Cmd.LOGIN_FAIL);
+            DataOutputStream ds = ms.writer();
+            ds.writeUTF(message);
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void handleLogin(Message ms) throws IOException {
         ServerConfig serverConfig = ApplicationContext.getInstance().getBean(ServerConfig.class);
 
@@ -98,7 +110,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
 
         if (ApplicationContext.getInstance()
                 .getBean(ServerManager.class).isMaintenanceMode()) {
-            us().sendMessageLoginFail(GameString.MAINTENANCE_MODE);
+            sendMessageLoginFail(GameString.MAINTENANCE_MODE);
             return;
         }
 
@@ -108,28 +120,28 @@ public class AuthMessageHandler extends BaseMessageHandler {
         String version = dis.readUTF().trim();
 
         if (Utils.isAlphanumeric(username) || Utils.isAlphanumeric(password)) {
-            us().sendMessageLoginFail(GameString.INVALID_ACCOUNT_PASSWORD);
+            sendMessageLoginFail(GameString.INVALID_ACCOUNT_PASSWORD);
             return;
         }
 
         //Kiểm tra thời gian đăng xuất gần nhất
         long remainingTime = loginRateLimiterService.getRemainingLoginTime(username);
         if (remainingTime > 0) {
-            us().sendMessageLoginFail(GameString.createLoginCooldownMessage(remainingTime));
+            sendMessageLoginFail(GameString.createLoginCooldownMessage(remainingTime));
             return;
         }
 
         AccountDTO accountDTO = accountDAO.findByUsernameAndPassword(username, password);
         if (accountDTO == null) {
-            us().sendMessageLoginFail(GameString.LOGIN_FAILED);
+            sendMessageLoginFail(GameString.LOGIN_FAILED);
             return;
         }
         if (accountDTO.isLock()) {
-            us().sendMessageLoginFail(GameString.ACCOUNT_LOCKED);
+            sendMessageLoginFail(GameString.ACCOUNT_LOCKED);
             return;
         }
         if (!accountDTO.isActive()) {
-            us().sendMessageLoginFail(GameString.ACCOUNT_INACTIVE);
+            sendMessageLoginFail(GameString.ACCOUNT_INACTIVE);
             return;
         }
 
@@ -152,7 +164,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
             }
 
             if (userDTO == null) {
-                us().sendMessageLoginFail(GameString.LOGIN_FAILED);
+                sendMessageLoginFail(GameString.LOGIN_FAILED);
                 return;
             }
         }
@@ -164,7 +176,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
             userLogin.sendMoneyErrorMessage(GameString.ACCOUNT_OTHER_LOGIN);
             userLogin.getSession().closeChannel();
 
-            us().sendMessageLoginFail(GameString.LOGIN_ANOTHER_DEVICE);
+            sendMessageLoginFail(GameString.LOGIN_ANOTHER_DEVICE);
             return;
         }
 
@@ -183,7 +195,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
             }
 
             if (userCharacterDTOS.isEmpty()) {
-                us().sendMessageLoginFail(GameString.LOGIN_FAILED);
+                sendMessageLoginFail(GameString.LOGIN_FAILED);
                 return;
             }
         }
@@ -460,7 +472,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
     }
 
     public void handleRegister(Message ms) {
-        us().sendMessageLoginFail(GameString.REGISTRATION_REQUIRED);
+        sendMessageLoginFail(GameString.REGISTRATION_REQUIRED);
     }
 
     public void handleChangePassword(Message ms) throws IOException {

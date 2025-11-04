@@ -359,7 +359,7 @@ public class ClanMessageHandler extends BaseMessageHandler {
         short clanId = ms.reader().readShort();
         ClanInfoDTO clanDetails = clanDAO.getClanInfo(clanId);
         if (clanDetails == null) {
-            us().sendMessageLoginFail(GameString.CLAN_NOT_FOUND);
+            us().sendServerMessage(GameString.CLAN_NOT_FOUND);
             return;
         }
         ms = new Message(Cmd.CLAN_INFO);

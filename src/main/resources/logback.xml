@@ -10,4 +10,6 @@
         <appender-ref ref="Console"/>
     </root>
 
+    <logger name="com.teamobi.mobiarmy2" level="DEBUG"/>
+
 </configuration>
