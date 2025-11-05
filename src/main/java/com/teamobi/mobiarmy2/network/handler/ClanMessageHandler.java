@@ -1,143 +1,28 @@
 package com.teamobi.mobiarmy2.network.handler;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
-import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.constant.GameString;
-import com.teamobi.mobiarmy2.dao.ClanDAO;
-import com.teamobi.mobiarmy2.dto.ClanDTO;
-import com.teamobi.mobiarmy2.dto.ClanInfoDTO;
-import com.teamobi.mobiarmy2.dto.ClanItemDTO;
-import com.teamobi.mobiarmy2.dto.ClanMemDTO;
+import com.teamobi.mobiarmy2.dto.*;
 import com.teamobi.mobiarmy2.entity.ClanItemShop;
-import com.teamobi.mobiarmy2.json.ClanItemJson;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.CacheManager;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
-import com.teamobi.mobiarmy2.server.ClanXpManager;
-import com.teamobi.mobiarmy2.util.Utils;
+import com.teamobi.mobiarmy2.service.ClanService;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ClanMessageHandler extends BaseMessageHandler {
     private static final int MIN_XU_CONTRIBUTE_CLAN = 1000;
-    private static final ConcurrentHashMap<Short, Object> clanLocks = new ConcurrentHashMap<>();
-    private final ClanDAO clanDAO;
 
-    public ClanMessageHandler(Session session, ClanDAO clanDAO) {
+    private final ClanService clanService;
+
+    public ClanMessageHandler(Session session, ClanService clanService) {
         super(session);
-        this.clanDAO = clanDAO;
-    }
-
-    private Object getClanLock(short clanId) {
-        return clanLocks.computeIfAbsent(clanId, k -> new Object());
-    }
-
-    public boolean[] getClanItems(short clanId) {
-        boolean[] result = new boolean[ClanItemManager.CLAN_ITEM_MAP.size()];
-        LocalDateTime now = LocalDateTime.now();
-        ClanItemJson[] items = clanDAO.getClanItems(clanId);
-
-        for (ClanItemJson item : items) {
-            if (item.getTime().isAfter(now)) {
-                result[item.getId() - 1] = true;
-            }
-        }
-
-        return result;
-    }
-
-    public void updateItemClan(short clanId, int userId, ClanItemShop clanItemShop, boolean isBuyXu) {
-        synchronized (getClanLock(clanId)) {
-            if (isBuyXu) {
-                clanDAO.updateXu(clanId, -clanItemShop.getXu());
-                clanDAO.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItemShop.getXu()) + " xu", userId, -clanItemShop.getXu(), 0);
-            } else {
-                clanDAO.updateLuong(clanId, -clanItemShop.getLuong());
-                clanDAO.gopClanContribute("Mua item đội -" + Utils.getStringNumber(clanItemShop.getLuong()) + " lượng", userId, 0, -clanItemShop.getLuong());
-            }
-
-            ClanItemJson[] items = clanDAO.getClanItems(clanId);
-            boolean found = false;
-            LocalDateTime now = LocalDateTime.now();
-
-            for (ClanItemJson item : items) {
-                if (item.getId() == clanItemShop.getId()) {
-                    if (item.getTime().isBefore(now)) {
-                        item.setTime(now);
-                    }
-                    item.setTime(item.getTime().plusHours(clanItemShop.getTime()));
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) {
-                List<ClanItemJson> updatedItems = new ArrayList<>(Arrays.asList(items));
-                ClanItemJson newItem = new ClanItemJson();
-                newItem.setId(clanItemShop.getId());
-                newItem.setTime(now.plusHours(clanItemShop.getTime()));
-                updatedItems.add(newItem);
-                items = updatedItems.toArray(new ClanItemJson[0]);
-            }
-            clanDAO.updateClanItems(clanId, items);
-        }
-    }
-
-    public void contributeClan(short clanId, int userId, int quantity, boolean isXu) {
-        synchronized (getClanLock(clanId)) {
-            if (isXu) {
-                clanDAO.updateXu(clanId, quantity);
-                clanDAO.gopClanContribute("Góp " + Utils.getStringNumber(quantity) + " xu", userId, quantity, 0);
-            } else {
-                clanDAO.updateLuong(clanId, quantity);
-                clanDAO.gopClanContribute("Góp " + Utils.getStringNumber(quantity) + " lượng", userId, 0, quantity);
-            }
-        }
-    }
-
-    public void updateXp(short clanId, int userId, int xpUp) {
-        if (xpUp == 0) {
-            return;
-        }
-        synchronized (getClanLock(clanId)) {
-            int currentXp = clanDAO.getXp(clanId);
-            long newXp = currentXp + xpUp;
-            if (newXp > GameConstants.MAX_XP) {
-                newXp = GameConstants.MAX_XP;
-            } else if (newXp < GameConstants.MIN_XP) {
-                newXp = GameConstants.MIN_XP;
-            }
-
-            int level = ClanXpManager.getLevelByXP((int) newXp);
-            clanDAO.updateXp(clanId, userId, (int) newXp, level);
-            clanDAO.updateClanMemberPoints(userId, xpUp);
-        }
-    }
-
-    public void updateCup(short clanId, int userId, int cupUp) {
-        if (cupUp == 0) {
-            return;
-        }
-        synchronized (getClanLock(clanId)) {
-            int currentCup = clanDAO.getCup(clanId);
-            long newCup = currentCup + cupUp;
-            if (newCup > GameConstants.MAX_CUP) {
-                newCup = GameConstants.MAX_CUP;
-            } else if (newCup < GameConstants.MIN_CUP) {
-                newCup = GameConstants.MIN_CUP;
-            }
-
-            clanDAO.updateCup(clanId, userId, (int) newCup);
-            clanDAO.updateClanMemberPoints(userId, cupUp * 2);
-        }
+        this.clanService = clanService;
     }
 
     public void contributeToClan(Message ms) throws IOException {
@@ -170,7 +55,7 @@ public class ClanMessageHandler extends BaseMessageHandler {
             us().updateXu(-quantity);
 
             //Update xu clan
-            contributeClan(us().getClanId(), us().getUserId(), quantity, Boolean.TRUE);
+            clanService.contributeToClan(us().getClanId(), us().getUserId(), quantity, true);
             us().sendServerMessage(GameString.CONTRIBUTION_SUCCESS);
         } else {
             if (quantity > us().getLuong()) {
@@ -181,7 +66,7 @@ public class ClanMessageHandler extends BaseMessageHandler {
             us().updateLuong(-quantity);
 
             //Update lg clan
-            contributeClan(us().getClanId(), us().getUserId(), quantity, Boolean.FALSE);
+            clanService.contributeToClan(us().getClanId(), us().getUserId(), quantity, false);
             us().sendServerMessage(GameString.CONTRIBUTION_SUCCESS);
         }
     }
@@ -209,8 +94,7 @@ public class ClanMessageHandler extends BaseMessageHandler {
             return;
         }
 
-        int currentLevel = clanDAO.getLevel(us().getClanId());
-        if (currentLevel < clanItemShop.getLevel()) {
+        if (!clanService.canUnlockClanItem(us().getClanId(), clanItemShop)) {
             us().sendServerMessage(GameString.CLAN_LEVEL_INSUFFICIENT);
             return;
         }
@@ -219,24 +103,23 @@ public class ClanMessageHandler extends BaseMessageHandler {
             if (clanItemShop.getXu() < 0) {
                 return;
             }
-            int xuClan = clanDAO.getXu(us().getClanId());
-            if (xuClan < clanItemShop.getXu()) {
+            if (!clanService.hasEnoughFundsForClanItem(us().getClanId(), clanItemShop, true)) {
                 us().sendServerMessage(GameString.CLAN_NOT_ENOUGH_XU);
                 return;
             }
 
-            updateItemClan(us().getClanId(), us().getUserId(), clanItemShop, true);
+            clanService.purchaseClanItem(us().getClanId(), us().getUserId(), clanItemShop, true);
         } else {//Luong
             if (clanItemShop.getLuong() < 0) {
                 return;
             }
-            int luongClan = clanDAO.getLuong(us().getClanId());
-            if (luongClan < clanItemShop.getLuong()) {
+
+            if (!clanService.hasEnoughFundsForClanItem(us().getClanId(), clanItemShop, false)) {
                 us().sendServerMessage(GameString.CLAN_NOT_ENOUGH_LUONG);
                 return;
             }
 
-            updateItemClan(us().getClanId(), us().getUserId(), clanItemShop, false);
+            clanService.purchaseClanItem(us().getClanId(), us().getUserId(), clanItemShop, false);
         }
         us().sendServerMessage(GameString.PURCHASE_SUCCESS);
     }
@@ -267,15 +150,12 @@ public class ClanMessageHandler extends BaseMessageHandler {
     }
 
     public void getTopClan(Message ms) throws IOException {
-        byte page = ms.reader().readByte();
+        byte requestedPage = ms.reader().readByte();
 
-        double count = clanDAO.getCountClan();
-        byte totalPages = (byte) Math.ceil(count / 10);
-        if (page > totalPages) {
-            page = 0;
-        }
+        TopClanResultDTO result = clanService.getTopClan(requestedPage);
+        byte page = result.getPage();
+        List<ClanDTO> topClan = result.getClans();
 
-        List<ClanDTO> topClan = clanDAO.getTopTeams(page);
         ms = new Message(Cmd.TOP_CLAN);
         DataOutputStream ds = ms.writer();
         ds.writeByte(page);
@@ -299,22 +179,15 @@ public class ClanMessageHandler extends BaseMessageHandler {
 
     public void getClanMember(Message ms) throws IOException {
         DataInputStream dis = ms.reader();
-        byte page = dis.readByte();
+        byte requestedPage = dis.readByte();
         short clanId = dis.readShort();
 
-        Byte memberCount = clanDAO.getMembersOfClan(clanId);
-        if (memberCount == null) {
-            return;
+        ClanMembersResultDTO result = clanService.getClanMembers(clanId, requestedPage);
+        if (result == null) {
+            return;// not found or invalid
         }
-        byte totalPage = (byte) Math.ceil((double) memberCount / 10);
-        if (page >= totalPage) {
-            page = 0;
-        }
-        if (page < 0) {
-            page = (byte) (totalPage - 1);
-        }
-
-        List<ClanMemDTO> clanMemDTO = clanDAO.getClanMember(clanId, page);
+        byte page = result.getPage();
+        List<ClanMemDTO> clanMemDTO = result.getMembers();
 
         ms = new Message(Cmd.CLAN_MEMBER);
         DataOutputStream ds = ms.writer();
@@ -342,7 +215,7 @@ public class ClanMessageHandler extends BaseMessageHandler {
 
     public void getClanIcon(Message ms) throws IOException {
         short clanId = ms.reader().readShort();
-        byte[] data = Utils.getFile(String.format(GameConstants.CLAN_ICON_PATH, clanDAO.getClanIcon(clanId)));
+        byte[] data = clanService.getClanIconBytes(clanId);
         if (data == null) {
             return;
         }
@@ -357,7 +230,7 @@ public class ClanMessageHandler extends BaseMessageHandler {
 
     public void getInfoClan(Message ms) throws IOException {
         short clanId = ms.reader().readShort();
-        ClanInfoDTO clanDetails = clanDAO.getClanInfo(clanId);
+        ClanInfoDTO clanDetails = clanService.getClanInfo(clanId);
         if (clanDetails == null) {
             us().sendServerMessage(GameString.CLAN_NOT_FOUND);
             return;

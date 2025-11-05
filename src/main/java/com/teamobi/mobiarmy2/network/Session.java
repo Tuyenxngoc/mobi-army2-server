@@ -4,6 +4,7 @@ import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.handler.*;
+import com.teamobi.mobiarmy2.service.ClanService;
 import com.teamobi.mobiarmy2.service.LeaderboardService;
 import com.teamobi.mobiarmy2.service.LoginRateLimiterService;
 import io.netty.channel.Channel;
@@ -132,28 +133,28 @@ public class Session {
     public void registerHandlers() {
         ApplicationContext context = ApplicationContext.getInstance();
 
-        final ClanDAO clanDAO = context.getBean(ClanDAO.class);
-        final UserDAO userDAO = context.getBean(UserDAO.class);
-        final UserCharacterDAO userCharacterDAO = context.getBean(UserCharacterDAO.class);
-        final LeaderboardService leaderboardService = context.getBean(LeaderboardService.class);
-        final GiftCodeDAO giftCodeDAO = context.getBean(GiftCodeDAO.class);
-        final UserGiftCodeDAO userGiftCodeDAO = context.getBean(UserGiftCodeDAO.class);
+        UserDAO userDAO = context.getBean(UserDAO.class);
+        UserCharacterDAO userCharacterDAO = context.getBean(UserCharacterDAO.class);
+        LeaderboardService leaderboardService = context.getBean(LeaderboardService.class);
+        GiftCodeDAO giftCodeDAO = context.getBean(GiftCodeDAO.class);
+        UserGiftCodeDAO userGiftCodeDAO = context.getBean(UserGiftCodeDAO.class);
+        ClanService clanService = context.getBean(ClanService.class);
 
-        final ClanMessageHandler clanMessageHandler = new ClanMessageHandler(this, clanDAO);
-        final FriendMessageHandler friendMessageHandler = new FriendMessageHandler(this, userDAO);
-        final ShopMessageHandler shopMessageHandler = new ShopMessageHandler(this, userCharacterDAO);
-        final ResourceMessageHandler resourceMessageHandler = new ResourceMessageHandler(this);
-        final MissionMessageHandler missionMessageHandler = new MissionMessageHandler(this);
-        final FormulaMessageHandler formulaMessageHandler = new FormulaMessageHandler(this);
-        final RoomMessageHandler roomMessageHandler = new RoomMessageHandler(this);
-        final FightWaitMessageHandler fightWaitMessageHandler = new FightWaitMessageHandler(this, userDAO);
-        final FightManagerMessageHandler fightManagerMessageHandler = new FightManagerMessageHandler(this);
-        final InventoryMessageHandler inventoryMessageHandler = new InventoryMessageHandler(this);
-        final LeaderboardMessageHandler leaderboardMessageHandler = new LeaderboardMessageHandler(this, leaderboardService);
-        final GiftBoxMessageHandler giftBoxMessageHandler = new GiftBoxMessageHandler(this);
-        final SpinMessageHandler spinMessageHandler = new SpinMessageHandler(this);
-        final PaymentMessageHandler paymentMessageHandler = new PaymentMessageHandler(this, giftCodeDAO, userGiftCodeDAO);
-        final CharacterMessageHandler characterMessageHandler = new CharacterMessageHandler(this);
+        ClanMessageHandler clanMessageHandler = new ClanMessageHandler(this, clanService);
+        FriendMessageHandler friendMessageHandler = new FriendMessageHandler(this, userDAO);
+        ShopMessageHandler shopMessageHandler = new ShopMessageHandler(this, userCharacterDAO);
+        ResourceMessageHandler resourceMessageHandler = new ResourceMessageHandler(this);
+        MissionMessageHandler missionMessageHandler = new MissionMessageHandler(this);
+        FormulaMessageHandler formulaMessageHandler = new FormulaMessageHandler(this);
+        RoomMessageHandler roomMessageHandler = new RoomMessageHandler(this);
+        FightWaitMessageHandler fightWaitMessageHandler = new FightWaitMessageHandler(this, userDAO);
+        FightManagerMessageHandler fightManagerMessageHandler = new FightManagerMessageHandler(this);
+        InventoryMessageHandler inventoryMessageHandler = new InventoryMessageHandler(this);
+        LeaderboardMessageHandler leaderboardMessageHandler = new LeaderboardMessageHandler(this, leaderboardService);
+        GiftBoxMessageHandler giftBoxMessageHandler = new GiftBoxMessageHandler(this);
+        SpinMessageHandler spinMessageHandler = new SpinMessageHandler(this);
+        PaymentMessageHandler paymentMessageHandler = new PaymentMessageHandler(this, giftCodeDAO, userGiftCodeDAO);
+        CharacterMessageHandler characterMessageHandler = new CharacterMessageHandler(this);
 
         messageRouter.setClanMessageHandler(clanMessageHandler);
         messageRouter.setFriendMessageHandler(friendMessageHandler);

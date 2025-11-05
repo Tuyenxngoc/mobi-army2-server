@@ -1,6 +1,5 @@
 package com.teamobi.mobiarmy2.fight;
 
-import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.constant.MatchResult;
@@ -8,10 +7,10 @@ import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.entity.*;
 import com.teamobi.mobiarmy2.entity.boss.*;
 import com.teamobi.mobiarmy2.network.Message;
-import com.teamobi.mobiarmy2.network.handler.ClanMessageHandler;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
+import com.teamobi.mobiarmy2.service.ClanService;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 
@@ -45,8 +44,8 @@ public class FightManager {
 
     private final FightWait fightWait;
     private final FightMapManager mapManager;
-    private final com.teamobi.mobiarmy2.fight.BulletManager bulletManager;
-    private final com.teamobi.mobiarmy2.fight.CountdownTimer countdownTimer;
+    private final BulletManager bulletManager;
+    private final CountdownTimer countdownTimer;
     private final ExecutorService executorNextTurn;
     private final ExecutorService executorEndGame;
     @Getter
@@ -64,8 +63,11 @@ public class FightManager {
     private byte windY;
     private long startTime;
 
-    public FightManager(FightWait fightWait) {
+    private final ClanService clanService;
+
+    public FightManager(FightWait fightWait, ClanService clanService) {
         this.fightWait = fightWait;
+        this.clanService = clanService;
         this.players = new Player[MAX_ELEMENT_FIGHT];
         this.mapManager = new FightMapManager(this);
         this.bulletManager = new BulletManager(this);
@@ -890,10 +892,8 @@ public class FightManager {
 
                     //Cộng xp và cup cho clan
                     if (user.getClanId() != null) {
-                        ClanMessageHandler clanMessageHandler = ApplicationContext.getInstance()
-                                .getBean(ClanMessageHandler.class);
-                        clanMessageHandler.updateXp(user.getClanId(), user.getUserId(), player.getAllXpUp() / 100);
-                        clanMessageHandler.updateCup(user.getClanId(), user.getUserId(), player.getAllCupUp());
+                        clanService.updateXp(user.getClanId(), user.getUserId(), player.getAllXpUp() / 100);
+                        clanService.updateCup(user.getClanId(), user.getUserId(), player.getAllCupUp());
                     }
                 }
 
@@ -1057,9 +1057,7 @@ public class FightManager {
                 if (clanItemsCache.containsKey(user.getClanId())) {
                     clanItems = clanItemsCache.get(user.getClanId());
                 } else {
-                    ClanMessageHandler clanMessageHandler = ApplicationContext.getInstance()
-                            .getBean(ClanMessageHandler.class);
-                    clanItems = clanMessageHandler.getClanItems(user.getClanId());
+                    clanItems = clanService.getClanItems(user.getClanId());
                     clanItemsCache.put(user.getClanId(), clanItems);
                 }
             }

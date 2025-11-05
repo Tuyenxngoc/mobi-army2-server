@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConnectionBlockerService {
-    private static final int MAX_CONNECTIONS_PER_IP = 3;
+    private static final int MAX_CONNECTIONS_PER_IP = 8;
     private final Map<String, AtomicInteger> connectionMap = new ConcurrentHashMap<>();
 
     /**

@@ -10,6 +10,7 @@ import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.MapManager;
 import com.teamobi.mobiarmy2.server.ServerManager;
+import com.teamobi.mobiarmy2.service.ClanService;
 import lombok.Getter;
 
 import java.io.DataOutputStream;
@@ -62,7 +63,7 @@ public class FightWait {
 
         byte maxPlayers = room.getMaxPlayerFight();
 
-        this.fightManager = new FightManager(this);
+        this.fightManager = new FightManager(this, ApplicationContext.getInstance().getBean(ClanService.class));
         this.users = new User[maxPlayers];
         this.items = new byte[maxPlayers][MAX_ITEMS_SLOT];
         this.readies = new boolean[maxPlayers];

@@ -122,6 +122,9 @@ public class SessionHandler extends SimpleChannelInboundHandler<Message> {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
+        if (session == null) {
+            return;
+        }
         log.info("Client {} disconnected", session.getSessionId());
 
         session.cleanup();
