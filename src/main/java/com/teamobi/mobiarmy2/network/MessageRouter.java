@@ -33,8 +33,6 @@ public class MessageRouter {
     @Setter
     private LeaderboardMessageHandler leaderboardMessageHandler;
     @Setter
-    private GiftBoxMessageHandler giftBoxMessageHandler;
-    @Setter
     private SpinMessageHandler spinMessageHandler;
     @Setter
     private PaymentMessageHandler paymentMessageHandler;
@@ -62,7 +60,7 @@ public class MessageRouter {
 
                 case Cmd.FOMULA -> formulaMessageHandler.handleMergeEquipments(ms);
 
-                case Cmd.GET_LUCKYGIFT -> giftBoxMessageHandler.openLuckyGift(ms);
+                case Cmd.GET_LUCKYGIFT -> fightWaitMessageHandler.openLuckyGift(ms);
 
                 case Cmd.BANGTHANHTICH -> leaderboardMessageHandler.viewLeaderboard(ms);
 

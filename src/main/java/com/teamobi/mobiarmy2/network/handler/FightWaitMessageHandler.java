@@ -32,6 +32,11 @@ public class FightWaitMessageHandler extends BaseMessageHandler {
         }
     }
 
+    public void openLuckyGift(Message ms) throws IOException {
+        byte index = ms.reader().readByte();
+        fw().openGiftBoxAfterFight(us().getUserId(), index);
+    }
+
     public void handleChatMessage(Message ms) throws IOException {
         String message = ms.reader().readUTF().trim();
         if (message.isEmpty() || message.length() > 100) {

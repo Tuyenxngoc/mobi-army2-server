@@ -10,7 +10,6 @@ import com.teamobi.mobiarmy2.fight.TrainingManager;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.*;
-import com.teamobi.mobiarmy2.service.GiftBoxService;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,7 +25,6 @@ import java.util.Set;
 @Getter
 @Setter
 public class User {
-    private GiftBoxService giftBoxService;
     private final Session session;
     private UserState state = UserState.WAITING;
     private String accountId;
@@ -69,10 +67,6 @@ public class User {
 
     public boolean isNotWaiting() {
         return !state.equals(UserState.WAITING);
-    }
-
-    public boolean isOpeningGift() {
-        return giftBoxService != null && giftBoxService.isOpeningGift();
     }
 
     public void sendMessage(Message ms) {

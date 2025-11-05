@@ -32,7 +32,7 @@ public class FightWait {
     private final byte id;
     private final CountdownTimer countdownTimer;
     @Getter
-    private User[] users;
+    private User[] users;//Chẵn - đội xanh, lẻ - đội đỏ
     private boolean[] readies;
     private byte[][] items;
     @Getter
@@ -335,7 +335,7 @@ public class FightWait {
                 continue;
             }
 
-            if (user.isOpeningGift()) {
+            if (isOpeningGift(i)) {
                 roomOwner.sendServerMessage(GameString.createOpeningGiftMessage(user.getUsername()));
                 return;
             }
@@ -492,8 +492,8 @@ public class FightWait {
         }
 
         User user = users[index];
-        if (user.isOpeningGift()) {
-            roomOwner.sendServerMessage(GameString.createOpeningGiftMessage(users[index].getUsername()));
+        if (isOpeningGift(index)) {
+            roomOwner.sendServerMessage(GameString.createOpeningGiftMessage(user.getUsername()));
             return;
         }
 
@@ -700,11 +700,12 @@ public class FightWait {
             return;
         }
 
-        for (User user : users) {
+        for (int i = 0; i < users.length; i++) {
+            User user = users[i];
             if (user == null) {
                 continue;
             }
-            if (user.isOpeningGift()) {
+            if (isOpeningGift(i)) {
                 user.sendServerMessage(GameString.createOpeningGiftMessage(user.getUsername()));
                 return;
             }
@@ -946,5 +947,18 @@ public class FightWait {
 
         sendUpdateMap(us);
         sendUpdateItemSlot(us);
+    }
+
+    public void startGiftBoxOpening(boolean isBlueWin) {
+        //Todo
+    }
+
+    private boolean isOpeningGift(int i) {
+        //Todo
+        return false;
+    }
+
+    public void openGiftBoxAfterFight(int userId, byte index) {
+        //Todo
     }
 }

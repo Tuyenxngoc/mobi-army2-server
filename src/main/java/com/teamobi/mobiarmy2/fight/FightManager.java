@@ -959,16 +959,19 @@ public class FightManager {
                 } catch (InterruptedException ignored) {
                 }
 
-                for (byte i = 0; i < MAX_USER_FIGHT; i++) {
-                    Player player = players[i];
-                    if (player == null || player.getUser() == null) {
-                        continue;
-                    }
-                    if ((player.isTeamBlue() && result == MatchResult.BLUE_WIN) ||
-                            (!player.isTeamBlue() && result == MatchResult.RED_WIN)) {
-                        player.getUser().getGiftBoxService().startGiftBoxOpening(2, 30);
-                    }
-                }
+                boolean isBlueWin = result == MatchResult.BLUE_WIN;
+                fightWait.startGiftBoxOpening(isBlueWin);
+
+//                for (byte i = 0; i < MAX_USER_FIGHT; i++) {
+//                    Player player = players[i];
+//                    if (player == null || player.getUser() == null) {
+//                        continue;
+//                    }
+//                    if ((player.isTeamBlue() && result == MatchResult.BLUE_WIN) ||
+//                            (!player.isTeamBlue() && result == MatchResult.RED_WIN)) {
+//                        player.getUser().getGiftBoxService().startGiftBoxOpening(2, 30);
+//                    }
+//                }
             }
 
             refreshFightManager();

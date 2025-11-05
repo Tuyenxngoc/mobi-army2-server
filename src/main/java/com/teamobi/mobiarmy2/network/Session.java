@@ -151,7 +151,6 @@ public class Session {
         FightManagerMessageHandler fightManagerMessageHandler = new FightManagerMessageHandler(this);
         InventoryMessageHandler inventoryMessageHandler = new InventoryMessageHandler(this);
         LeaderboardMessageHandler leaderboardMessageHandler = new LeaderboardMessageHandler(this, leaderboardService);
-        GiftBoxMessageHandler giftBoxMessageHandler = new GiftBoxMessageHandler(this);
         SpinMessageHandler spinMessageHandler = new SpinMessageHandler(this);
         PaymentMessageHandler paymentMessageHandler = new PaymentMessageHandler(this, giftCodeDAO, userGiftCodeDAO);
         CharacterMessageHandler characterMessageHandler = new CharacterMessageHandler(this);
@@ -167,7 +166,6 @@ public class Session {
         messageRouter.setFightManagerMessageHandler(fightManagerMessageHandler);
         messageRouter.setInventoryMessageHandler(inventoryMessageHandler);
         messageRouter.setLeaderboardMessageHandler(leaderboardMessageHandler);
-        messageRouter.setGiftBoxMessageHandler(giftBoxMessageHandler);
         messageRouter.setSpinMessageHandler(spinMessageHandler);
         messageRouter.setPaymentMessageHandler(paymentMessageHandler);
         messageRouter.setCharacterMessageHandler(characterMessageHandler);
