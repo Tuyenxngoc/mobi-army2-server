@@ -10,7 +10,7 @@ import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.service.GameDataService;
 import com.teamobi.mobiarmy2.service.LeaderboardService;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -25,30 +25,39 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class ServerManager {
-    private final GameDataService gameDataService;
-    private final LeaderboardService leaderboardService;
     private final ConcurrentHashMap<Long, Session> sessions = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer, Long> userToSession = new ConcurrentHashMap<>();
     @Setter
     @Getter
     private boolean isMaintenanceMode = false;
 
-    public ServerManager(GameDataService gameDataService, LeaderboardService leaderboardService) {
-        this.gameDataService = gameDataService;
-        this.leaderboardService = leaderboardService;
-    }
+    private Channel serverChannel;
+    private EventLoopGroup bossGroup;
+    private EventLoopGroup workerGroup;
 
     public void init() {
+        ApplicationContext ctx = ApplicationContext.getInstance();
+
+        ServerConfig serverConfig = ctx.getBean(ServerConfig.class);
+        GameDataService gameDataService = ctx.getBean(GameDataService.class);
+        LeaderboardService leaderboardService = ctx.getBean(LeaderboardService.class);
+
         gameDataService.loadServerData();
         gameDataService.setCache();
         leaderboardService.init();
-        ApplicationContext.getInstance().getBean(RoomManager.class).init();
-        ExchangeLimitManager.init();
+
+        RoomManager roomManager = ctx.getBean(RoomManager.class);
+        roomManager.init();
+
+        if (serverConfig.isTet()) {
+            ExchangeLimitManager exchangeLimitManager = ctx.getBean(ExchangeLimitManager.class);
+            exchangeLimitManager.init();
+        }
     }
 
     public void start() {
-        EventLoopGroup bossGroup = new NioEventLoopGroup(1); // nhận kết nối
-        EventLoopGroup workerGroup = new NioEventLoopGroup(); // xử lý IO
+        bossGroup = new NioEventLoopGroup(1); // nhận kết nối
+        workerGroup = new NioEventLoopGroup(); // xử lý IO
 
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();
@@ -60,26 +69,48 @@ public class ServerManager {
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
             int port = ApplicationContext.getInstance().getBean(ServerConfig.class).getPort();
-            ChannelFuture f = bootstrap.bind(port).sync();
+            serverChannel = bootstrap.bind(port).sync().channel();
             log.info("Netty Server started on port {}", port);
 
-            f.channel().closeFuture().sync();
+            serverChannel.closeFuture().sync();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.error("Server thread interrupted", e);
-        } finally {
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
         }
     }
 
     public void stop() {
+        log.info("Stopping server...");
 
-        ApplicationContext.getInstance().getBean(HikariCPManager.class).closeDataSource();
+        // Đóng tất cả session
+        for (Session session : sessions.values()) {
+            session.closeChannel();
+        }
+
+        // Đóng channel chính
+        if (serverChannel != null && serverChannel.isOpen()) {
+            serverChannel.close().syncUninterruptibly();
+        }
+
+        // Đóng EventLoopGroups
+        if (bossGroup != null) {
+            bossGroup.shutdownGracefully();
+        }
+        if (workerGroup != null) {
+            workerGroup.shutdownGracefully();
+        }
+
+        log.info("Server stopped successfully.");
     }
 
     public void addSession(Session session) {
         sessions.put(session.getSessionId(), session);
+    }
+
+    public void registerUser(User user) {
+        if (user != null && user.getSession() != null) {
+            userToSession.put(user.getUserId(), user.getSession().getSessionId());
+        }
     }
 
     public void removeSession(Long sessionId) {
@@ -102,16 +133,6 @@ public class ServerManager {
         }
         Session session = sessions.get(sessionId);
         return session != null ? session.getUser() : null;
-    }
-
-    public void registerUser(User user) {
-        if (user != null && user.getSession() != null) {
-            userToSession.put(user.getUserId(), user.getSession().getSessionId());
-        }
-    }
-
-    public void unregisterUser(int userId) {
-        userToSession.remove(userId);
     }
 
     public List<User> findWaitPlayers(int excludedUserId) {

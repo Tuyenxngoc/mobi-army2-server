@@ -59,6 +59,7 @@ public class ServerConfig {
     private int[] topBonus;
     private LocalDateTime tetStartTime;
     private LocalDateTime tetEndTime;
+    private boolean isTet;
 
     public ServerConfig() {
         configMap = new Properties();
@@ -132,6 +133,8 @@ public class ServerConfig {
 
             tetStartTime = LocalDateTime.parse(configMap.getProperty("tet.start"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             tetEndTime = LocalDateTime.parse(configMap.getProperty("tet.end"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            LocalDateTime now = LocalDateTime.now();
+            isTet = !now.isBefore(tetStartTime) && !now.isAfter(tetEndTime);
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);

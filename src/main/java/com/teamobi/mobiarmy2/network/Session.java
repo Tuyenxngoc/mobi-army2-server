@@ -63,7 +63,6 @@ public class Session {
         this.messageRouter = new MessageRouter(authMessageHandler);
 
         this.workerThread = new Thread(this::processLoop, "Session-Worker-" + sessionId);
-        this.workerThread.setDaemon(true);
         this.workerThread.start();
     }
 

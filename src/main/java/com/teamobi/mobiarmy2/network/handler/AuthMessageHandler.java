@@ -68,11 +68,6 @@ public class AuthMessageHandler extends BaseMessageHandler {
 
         us().setLogged(false);
 
-        // Unregister from online index
-        ApplicationContext.getInstance()
-                .getBean(ServerManager.class)
-                .unregisterUser(us().getUserId());
-
         //Lưu thời gian đăng xuất gần nhất
         loginRateLimiterService.saveLogoutTime(us().getUsername());
     }
@@ -225,8 +220,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
             }
 
             //Tặng quà tết
-            LocalDateTime now = LocalDateTime.now();
-            if (now.isAfter(serverConfig.getTetStartTime()) && now.isBefore(serverConfig.getTetEndTime())) {
+            if (serverConfig.isTet()) {
                 int luckyXu = Utils.getNonLinearRandom(1000, 50999);
                 int xuUp = (luckyXu / 1000) * 1000;
                 us().updateXu(xuUp);
