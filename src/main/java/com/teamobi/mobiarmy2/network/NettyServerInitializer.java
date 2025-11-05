@@ -14,18 +14,27 @@ import io.netty.handler.timeout.IdleStateHandler;
 import java.util.concurrent.TimeUnit;
 
 public class NettyServerInitializer extends ChannelInitializer<SocketChannel> {
+    private final ConnectionBlockerService connectionBlockerService;
+    private final ServerManager serverManager;
+
+    public NettyServerInitializer() {
+        ApplicationContext context = ApplicationContext.getInstance();
+
+        connectionBlockerService = context.getBean(ConnectionBlockerService.class);
+        serverManager = context.getBean(ServerManager.class);
+    }
+
     @Override
     protected void initChannel(SocketChannel ch) {
-        ApplicationContext context = ApplicationContext.getInstance();
-        SessionHandler sessionHandler = new SessionHandler(context.getBean(ServerManager.class));
-        ConnectionBlockerService connectionBlockerService = context.getBean(ConnectionBlockerService.class);
+        SessionHandler sessionHandler = new SessionHandler(serverManager);
 
         // Initial pipeline with plain encoder/decoder
-        ch.pipeline().addLast("conn-limit", new ConnectionLimitHandler(connectionBlockerService));
-        ch.pipeline().addLast("idle", new IdleStateHandler(1, 0, 0, TimeUnit.MINUTES));
-        ch.pipeline().addLast("decoder-plain", new PlainMessageDecoder());
-        ch.pipeline().addLast("encoder-plain", new PlainMessageEncoder());
-        ch.pipeline().addLast("session", sessionHandler);
+        ch.pipeline()
+                .addLast("conn-limit", new ConnectionLimitHandler(connectionBlockerService))
+                .addLast("idle", new IdleStateHandler(1, 0, 0, TimeUnit.MINUTES))
+                .addLast("decoder-plain", new PlainMessageDecoder())
+                .addLast("encoder-plain", new PlainMessageEncoder())
+                .addLast("session", sessionHandler);
 
         // Callback replace secure
         sessionHandler.setOnKeyExchangeComplete(() -> {

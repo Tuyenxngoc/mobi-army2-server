@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.network;
 
 import com.teamobi.mobiarmy2.app.ApplicationContext;
+import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.handler.*;
@@ -69,7 +70,7 @@ public class Session {
     public void sendMessage(Message msg) {
         if (msg == null || channel == null || !channel.isActive()) return;
 
-        log.debug("Session {} -> Command {}", sessionId, msg.getCommand());
+        log.debug("Session {} -> Command {}", sessionId, Cmd.getCmdNameByValue(msg.getCommand()));
 
         channel.writeAndFlush(msg);
     }

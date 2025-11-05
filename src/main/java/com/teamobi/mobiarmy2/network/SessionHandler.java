@@ -61,7 +61,8 @@ public class SessionHandler extends SimpleChannelInboundHandler<Message> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message msg) {
         byte cmd = msg.getCommand();
-        log.debug("Session {} <- Command {}", session.getSessionId(), cmd);
+
+        log.debug("Session {} <- Command {}", session.getSessionId(), Cmd.getCmdNameByValue(cmd));
 
         if (KEEP_ALIVE_CMDS.contains(cmd)) {
             lastKeepAliveTime = System.currentTimeMillis();
@@ -107,6 +108,7 @@ public class SessionHandler extends SimpleChannelInboundHandler<Message> {
             long idleMillis = now - lastKeepAliveTime;
 
             if (idleMillis > TIMEOUT_DURATION) {
+                log.debug("Session {} timed out due to inactivity", session.getSessionId());
                 ctx.close();
             }
         } else {
