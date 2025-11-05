@@ -6,33 +6,25 @@ import com.teamobi.mobiarmy2.entity.MapTile;
 import com.teamobi.mobiarmy2.entity.Player;
 import com.teamobi.mobiarmy2.server.MapManager;
 import com.teamobi.mobiarmy2.util.Utils;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class FightMapManager {
+    @Getter
     private final List<MapTile> mapTiles = new ArrayList<>();
     private final FightManager fightManager;
+    @Getter
     private short width;
+    @Getter
     private short height;
     private short[] playerInitXPositions;
     private short[] playerInitYPositions;
 
     public FightMapManager(FightManager fightManager) {
         this.fightManager = fightManager;
-    }
-
-    public short getHeight() {
-        return height;
-    }
-
-    public short getWidth() {
-        return width;
-    }
-
-    public List<MapTile> getMapTiles() {
-        return mapTiles;
     }
 
     public List<short[]> getRandomPlayerPositions(int numPlayers) {
