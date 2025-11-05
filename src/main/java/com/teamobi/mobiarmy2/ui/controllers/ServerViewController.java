@@ -125,13 +125,10 @@ public class ServerViewController {
     }
 
     private void enterMaintenanceMode() {
-        ServerManager serverManager = ApplicationContext.getInstance()
-                .getBean(ServerManager.class);
-        serverManager.stop();
-
         try {
             Platform.exit(); // thoát JavaFX Application Thread
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         System.exit(0); // thoát hẳn JVM

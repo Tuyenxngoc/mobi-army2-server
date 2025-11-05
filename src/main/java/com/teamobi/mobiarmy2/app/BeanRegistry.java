@@ -59,6 +59,6 @@ public class BeanRegistry {
 
         context.registerBean(ExchangeLimitManager.class, new ExchangeLimitManager());
         context.registerBean(RoomManager.class, new RoomManager());
-        context.registerBean(ServerManager.class, new ServerManager());
+        context.registerBean(ServerManager.class, new ServerManager(context.getBean(ServerConfig.class)));
     }
 }

@@ -30,15 +30,21 @@ public class ServerManager {
     @Setter
     @Getter
     private boolean isMaintenanceMode = false;
+    private boolean isRunning = false;
 
     private Channel serverChannel;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
 
+    private final ServerConfig serverConfig;
+
+    public ServerManager(ServerConfig serverConfig) {
+        this.serverConfig = serverConfig;
+    }
+
     public void init() {
         ApplicationContext ctx = ApplicationContext.getInstance();
 
-        ServerConfig serverConfig = ctx.getBean(ServerConfig.class);
         GameDataService gameDataService = ctx.getBean(GameDataService.class);
         LeaderboardService leaderboardService = ctx.getBean(LeaderboardService.class);
 
@@ -56,6 +62,13 @@ public class ServerManager {
     }
 
     public void start() {
+        if (isRunning) {
+            log.warn("Server is already running.");
+            return;
+        }
+        isRunning = true;
+
+        log.info("Starting server...");
         bossGroup = new NioEventLoopGroup(1); // nhận kết nối
         workerGroup = new NioEventLoopGroup(); // xử lý IO
 
@@ -68,7 +81,7 @@ public class ServerManager {
                     .childOption(ChannelOption.TCP_NODELAY, true)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
-            int port = ApplicationContext.getInstance().getBean(ServerConfig.class).getPort();
+            int port = serverConfig.getPort();
             serverChannel = bootstrap.bind(port).sync().channel();
             log.info("Netty Server started on port {}", port);
 
@@ -80,6 +93,12 @@ public class ServerManager {
     }
 
     public void stop() {
+        if (!isRunning) {
+            log.warn("Server is not running.");
+            return;
+        }
+        isRunning = false;
+
         log.info("Stopping server...");
 
         // Đóng tất cả session
