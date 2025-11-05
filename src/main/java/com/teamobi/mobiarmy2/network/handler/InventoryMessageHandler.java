@@ -298,7 +298,6 @@ public class InventoryMessageHandler extends BaseMessageHandler {
     }
 
     private void handleUseSpecialItem(SpecialItemChest specialItemChest) {
-        ExchangeLimitManager exchangeLimitManager = null;
         switch (specialItemChest.getItem().getId()) {
             case 54 -> {
                 us().addDaysToXpX2Time(1);
@@ -307,6 +306,16 @@ public class InventoryMessageHandler extends BaseMessageHandler {
             }
 
             case 86 -> {
+                ApplicationContext ctx = ApplicationContext.getInstance();
+                ServerConfig serverConfig = ctx.getBean(ServerConfig.class);
+                if (!serverConfig.isTet()) {
+                    us().updateXp(1000 * specialItemChest.getQuantity());
+                    us().updateInventory(null, null, null, List.of(specialItemChest));
+                    us().sendServerMessage("Dùng bánh trưng thành công");
+                    return;
+                }
+
+                ExchangeLimitManager exchangeLimitManager = ctx.getBean(ExchangeLimitManager.class);
                 if (specialItemChest.getQuantity() == 50) {
                     if (exchangeLimitManager.isGoldLimitReached(0)) {
                         us().sendServerMessage("Đã hết số lượng trang bị vàng cấp 1");
@@ -385,14 +394,20 @@ public class InventoryMessageHandler extends BaseMessageHandler {
 
                     us().updateInventory(null, null, null, List.of(specialItemChest));
                     us().sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
-                } else {
-                    us().updateXp(1000 * specialItemChest.getQuantity());
-                    us().updateInventory(null, null, null, List.of(specialItemChest));
-                    us().sendServerMessage(GameString.USE_BANH_TRUNG_SUCCESS);
                 }
             }
 
             case 87 -> {
+                ApplicationContext ctx = ApplicationContext.getInstance();
+                ServerConfig serverConfig = ctx.getBean(ServerConfig.class);
+                if (!serverConfig.isTet()) {
+                    us().updateXp(500 * specialItemChest.getQuantity());
+                    us().updateInventory(null, null, null, List.of(specialItemChest));
+                    us().sendServerMessage("Dùng bánh tét thành công");
+                    return;
+                }
+
+                ExchangeLimitManager exchangeLimitManager = ctx.getBean(ExchangeLimitManager.class);
                 if (specialItemChest.getQuantity() == 50) {
                     if (exchangeLimitManager.isSilverLimitReached(0)) {
                         us().sendServerMessage("Đã hết số lượng trang bị bạc cấp 1");
@@ -504,10 +519,6 @@ public class InventoryMessageHandler extends BaseMessageHandler {
 
                     us().updateInventory(null, null, null, List.of(specialItemChest));
                     us().sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
-                } else {
-                    us().updateXp(500 * specialItemChest.getQuantity());
-                    us().updateInventory(null, null, null, List.of(specialItemChest));
-                    us().sendServerMessage(GameString.USE_BANH_TET_SUCCESS);
                 }
             }
 
@@ -556,25 +567,25 @@ public class InventoryMessageHandler extends BaseMessageHandler {
 
             case 86 -> {
                 if (specialItemChest.getQuantity() == 50) {
-                    sendMessageConfirm(GameString.EXCHANGE_BANH_TRUNG_TO_GOLD_EQUIP_1);
+                    sendMessageConfirm("Bạn có muốn đổi 50 bánh trưng hoàn thiện để lấy một bộ trang bị vàng cấp 1 không?");
                 } else if (specialItemChest.getQuantity() == 100) {
-                    sendMessageConfirm(GameString.EXCHANGE_BANH_TRUNG_TO_GOLD_EQUIP_2);
+                    sendMessageConfirm("Bạn có muốn đổi 100 bánh trưng hoàn thiện để lấy một bộ trang bị vàng cấp 2 không?");
                 } else if (specialItemChest.getQuantity() == 150) {
-                    sendMessageConfirm(GameString.EXCHANGE_BANH_TRUNG_TO_GOLD_EQUIP_3);
+                    sendMessageConfirm("Bạn có muốn đổi 150 bánh trưng hoàn thiện để lấy một bộ trang bị vàng cấp 3 không?");
                 } else {
-                    sendMessageConfirm(GameString.USE_BANH_TRUNG_REQUEST);
+                    sendMessageConfirm("Bạn có muốn dùng bánh trưng không?");
                 }
             }
 
             case 87 -> {
                 if (specialItemChest.getQuantity() == 50) {
-                    sendMessageConfirm(GameString.EXCHANGE_BANH_TET_TO_SILVER_EQUIP_1);
+                    sendMessageConfirm("Bạn có muốn đổi 50 bánh tét hoàn thiện để lấy một bộ trang bị bạc cấp 1 không?");
                 } else if (specialItemChest.getQuantity() == 100) {
-                    sendMessageConfirm(GameString.EXCHANGE_BANH_TET_TO_SILVER_EQUIP_2);
+                    sendMessageConfirm("Bạn có muốn đổi 100 bánh tét hoàn thiện để lấy một bộ trang bị bạc cấp 2 không?");
                 } else if (specialItemChest.getQuantity() == 150) {
-                    sendMessageConfirm(GameString.EXCHANGE_BANH_TET_TO_SILVER_EQUIP_3);
+                    sendMessageConfirm("Bạn có muốn đổi 150 bánh tét hoàn thiện để lấy một bộ trang bị bạc cấp 3 không?");
                 } else {
-                    sendMessageConfirm(GameString.USE_BANH_TET_REQUEST);
+                    sendMessageConfirm("Bạn có muốn dùng bánh tét không?");
                 }
             }
 
