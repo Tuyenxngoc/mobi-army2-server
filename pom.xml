@@ -4,8 +4,8 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.teamobi</groupId>
-    <artifactId>MobiArmy2</artifactId>
-    <version>1.0</version>
+    <artifactId>mobi-army2-server</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>mobi-army2-server</name>
     <description>Server for MobiArmy2 game</description>
