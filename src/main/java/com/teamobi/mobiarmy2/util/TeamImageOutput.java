@@ -30,7 +30,7 @@ public class TeamImageOutput {
                 String name = names.get(i);
                 ds.writeByte(name.length());
                 byte[] namePack = name.getBytes();
-                TeamImageData.pack(namePack);
+                GameDataEncryptor.encode(namePack);
                 ds.write(namePack, 0, namePack.length);
                 byte[] ab = Utils.getFile(files.get(i));
                 if (ab == null) {
@@ -40,7 +40,7 @@ public class TeamImageOutput {
                 data.write(ab, 0, ab.length);
             }
             byte[] dataPack = data.toByteArray();
-            TeamImageData.pack(dataPack);
+            GameDataEncryptor.encode(dataPack);
             ds.write(dataPack, 0, dataPack.length);
             output = bas.toByteArray();
             data.close();

@@ -1,0 +1,91 @@
+package com.teamobi.mobiarmy2.network.handler;
+
+import com.teamobi.mobiarmy2.constant.Cmd;
+import com.teamobi.mobiarmy2.constant.GameString;
+import com.teamobi.mobiarmy2.entity.Mission;
+import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.Session;
+import com.teamobi.mobiarmy2.server.MissionManager;
+
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.List;
+
+public class MissionMessageHandler extends BaseMessageHandler {
+    public MissionMessageHandler(Session session) {
+        super(session);
+    }
+
+    public void handleGetMissions(Message ms) throws IOException {
+        if (us().isNotWaiting()) {
+            return;
+        }
+        byte action = ms.reader().readByte();
+        if (action == 0) {
+            sendMissionInfo();
+        } else {
+            byte missionId = ms.reader().readByte();
+            missionComplete(missionId);
+        }
+    }
+
+    private void missionComplete(byte missionId) throws IOException {
+        String message;
+        Mission mission = MissionManager.getMissionById(missionId);
+        if (mission == null) {
+            message = GameString.MISSION_NOT_FOUND;
+        } else {
+            byte missionType = mission.getType();
+            byte missionLevel = us().getMissionLevel()[missionType];
+            byte requiredLevel = mission.getLevel();
+
+            if (us().getMission()[missionType] < mission.getRequirement()) {
+                message = GameString.MISSION_NOT_COMPLETED;
+            } else if (missionLevel == requiredLevel) {
+                us().getMissionLevel()[mission.getType()]++;
+                if (mission.getRewardXu() > 0) {
+                    us().updateXu(mission.getRewardXu());
+                }
+                if (mission.getRewardLuong() > 0) {
+                    us().updateLuong(mission.getRewardLuong());
+                }
+                if (mission.getRewardXp() > 0) {
+                    us().updateXp(mission.getRewardXp());
+                }
+                if (mission.getRewardCup() > 0) {
+                    us().updateCup(mission.getRewardCup());
+                }
+                sendMissionInfo();
+                message = GameString.createMissionCompleteMessage(mission.getReward());
+            } else if (missionLevel < requiredLevel) {
+                message = GameString.MISSION_NOT_COMPLETED;
+            } else {
+                message = GameString.MISSION_COMPLETED;
+            }
+        }
+        us().sendMoneyErrorMessage(message);
+    }
+
+    private void sendMissionInfo() throws IOException {
+        Message ms = new Message(Cmd.MISSISON);
+        DataOutputStream ds = ms.writer();
+        int i = 0;
+        for (List<Byte> missionIds : MissionManager.MISSIONS_BY_TYPE.values()) {
+            int index = us().getMissionLevel()[i] - 1;
+            if (index >= missionIds.size()) {
+                index = missionIds.size() - 1;
+            }
+            Mission mission = MissionManager.getMissionById(missionIds.get(index));
+            ds.writeByte(mission.getId());
+            ds.writeByte(mission.getLevel());
+            ds.writeUTF(mission.getName());
+            ds.writeUTF(mission.getReward());
+            ds.writeInt(mission.getRequirement());
+            ds.writeInt(Math.min(us().getMission()[i], mission.getRequirement()));
+            ds.writeBoolean(us().getMission()[i] >= mission.getRequirement());
+            i++;
+        }
+        ds.flush();
+        sendMessage(ms);
+    }
+}

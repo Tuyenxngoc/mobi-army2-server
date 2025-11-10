@@ -4,8 +4,8 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.teamobi</groupId>
-    <artifactId>MobiArmy2</artifactId>
-    <version>1.0</version>
+    <artifactId>mobi-army2-server</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>mobi-army2-server</name>
     <description>Server for MobiArmy2 game</description>
@@ -15,7 +15,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <exec.mainClass>com.teamobi.mobiarmy2.MobiArmy2</exec.mainClass>
+        <exec.mainClass>com.teamobi.mobiarmy2.app.MobiArmy2</exec.mainClass>
         <lombok.version>1.18.30</lombok.version>
     </properties>
 
@@ -47,11 +47,11 @@
             <version>5.1.0</version>
         </dependency>
 
-        <!-- Cache -->
+        <!-- Netty -->
         <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>5.2.0</version>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.115.Final</version>
         </dependency>
 
         <!-- Password encryption -->

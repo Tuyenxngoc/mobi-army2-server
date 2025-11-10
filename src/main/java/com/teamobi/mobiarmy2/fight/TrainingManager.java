@@ -52,7 +52,7 @@ public class TrainingManager {
     }
 
     public void addShoot(User user, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
-        trainingUser.getUserService().sendServerMessage("To be continue...: " + bullId + " " + x + " " + y + " " + angle + " " + force + " " + force2 + " " + numShoot);
+        trainingUser.sendServerMessage("To be continue...: " + bullId + " " + x + " " + y + " " + angle + " " + force + " " + force2 + " " + numShoot);
     }
 
     public byte getMapId() {

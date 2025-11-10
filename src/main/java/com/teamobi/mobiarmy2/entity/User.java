@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.entity;
 
+import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameConstants;
@@ -9,8 +10,6 @@ import com.teamobi.mobiarmy2.fight.TrainingManager;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.*;
-import com.teamobi.mobiarmy2.service.GiftBoxService;
-import com.teamobi.mobiarmy2.service.UserService;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,8 +25,6 @@ import java.util.Set;
 @Getter
 @Setter
 public class User {
-    private final UserService userService;
-    private final GiftBoxService giftBoxService;
     private final Session session;
     private UserState state = UserState.WAITING;
     private String accountId;
@@ -64,18 +61,12 @@ public class User {
     private FightWait fightWait;
     private TrainingManager trainingManager;
 
-    public User(Session session, UserService userService, GiftBoxService giftBoxService) {
+    public User(Session session) {
         this.session = session;
-        this.userService = userService;
-        this.giftBoxService = giftBoxService;
     }
 
     public boolean isNotWaiting() {
         return !state.equals(UserState.WAITING);
-    }
-
-    public boolean isOpeningGift() {
-        return giftBoxService.isOpeningGift();
     }
 
     public void sendMessage(Message ms) {
@@ -127,7 +118,8 @@ public class User {
         } else {
             xu += xuUp;
         }
-        userService.sendUpdateMoney();
+
+        sendUpdateMoney();
     }
 
     public synchronized void updateLuong(int luongUp) {
@@ -142,7 +134,8 @@ public class User {
         } else {
             luong += luongUp;
         }
-        userService.sendUpdateMoney();
+
+        sendUpdateMoney();
     }
 
     public synchronized void updateCup(int cupUp) {
@@ -157,7 +150,8 @@ public class User {
         } else {
             cup += cupUp;
         }
-        userService.sendUpdateCup(cupUp);
+
+        sendUpdateCup(cupUp);
     }
 
     public synchronized void updateXp(int xpUp) {
@@ -191,7 +185,7 @@ public class User {
         }
         xps[activeCharacterId] = (int) totalXp;
 
-        userService.sendUpdateXp(xpUp, levelDiff > 0);
+        sendUpdateXp(xpUp, levelDiff > 0);
     }
 
     public short[] getEquips() {
@@ -246,7 +240,7 @@ public class User {
         }
         addEquipment.setEmptySlot((byte) 3);
         addEquipment.setSlots(new byte[]{-1, -1, -1});
-        addEquipment.setKey(equipmentPurchased | 0x10000);
+        addEquipment.setKey((userId << 16) | (equipmentPurchased & 0xFFFF));
         addEquipmentChest(addEquipment);
 
         //Tăng số lượng trang bị mua
@@ -498,7 +492,7 @@ public class User {
         int[] abilities = new int[5];
         short[] percents = new short[5];
 
-        short[] points = addedPoints[activeCharacterId];
+        short[] points = addedPoints[activeCharacterId].clone();
         for (int i = 0; i < points.length; i++) {
             points[i] += teamPoints;
         }
@@ -541,5 +535,200 @@ public class User {
         }
         SpecialItemChest newItem = new SpecialItemChest(quantity, specialItem);
         updateInventory(null, null, List.of(newItem), null);
+    }
+
+    public void sendUpdateMoney() {
+        try {
+            Message ms = new Message(Cmd.UPDATE_MONEY);
+            DataOutputStream ds = ms.writer();
+            ds.writeInt(xu);
+            ds.writeInt(luong);
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendUpdateCup(int cupUp) {
+        try {
+            Message ms = new Message(Cmd.CUP);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(cupUp);
+            ds.writeInt(cup);
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendUpdateXp(int xpUp, boolean updateLevel) {
+        try {
+            Message ms = new Message(Cmd.UPDATE_EXP);
+            DataOutputStream ds = ms.writer();
+            ds.writeInt(xpUp);
+            ds.writeInt(getCurrentXp());
+            ds.writeInt(getCurrentRequiredXp());
+            if (updateLevel) {
+                ds.writeByte(1);
+                ds.writeByte(getCurrentLevel());
+                ds.writeByte(getCurrentLevelPercent());
+                ds.writeShort(getCurrentPoint());
+            } else {
+                ds.writeByte(0);
+                ds.writeByte(getCurrentLevelPercent());
+            }
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendMoneyErrorMessage(String message) {
+        try {
+            Message ms = new Message(Cmd.SET_MONEY_ERROR);
+            DataOutputStream ds = ms.writer();
+            ds.writeUTF(message);
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendServerMessage(String message) {
+        try {
+            Message ms = new Message(Cmd.SERVER_MESSAGE);
+            DataOutputStream ds = ms.writer();
+            ds.writeUTF(message);
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendMessageToUser(String message) {
+        sendMessageToUser(true, message, this);
+    }
+
+    public void sendMessageToUser(boolean isAdminSender, String message, User recipient) {
+        try {
+            Message ms = new Message(Cmd.CHAT_TO);
+            DataOutputStream ds = ms.writer();
+            if (isAdminSender) {
+                ds.writeInt(1);
+                ds.writeUTF("ADMIN");
+            } else {
+                ds.writeInt(userId);
+                ds.writeUTF(username);
+            }
+            ds.writeUTF(message);
+            ds.flush();
+            recipient.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendServerInfo(String message, boolean toServer) {
+        if (message == null || message.isEmpty()) {
+            return;
+        }
+        try {
+            Message ms = new Message(Cmd.SERVER_INFO);
+            DataOutputStream ds = ms.writer();
+            ds.writeUTF(message);
+            ds.flush();
+
+            if (toServer) {
+                ApplicationContext.getInstance()
+                        .getBean(ServerManager.class).sendToServer(ms);
+            } else {
+                sendMessage(ms);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendCharacterInfo() {
+        try {
+            Message ms = new Message(Cmd.CHARACTOR_INFO);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(getCurrentLevel());
+            ds.writeByte(getCurrentLevelPercent());
+            ds.writeShort(getCurrentPoint());
+            for (short point : getCurrentAddedPoints()) {
+                ds.writeShort(point);
+            }
+            ds.writeInt(getCurrentXp());
+            ds.writeInt(getCurrentRequiredXp());
+            ds.writeInt(cup);
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendEquipInfo() {
+        try {
+            Message ms = new Message(Cmd.CURR_EQUIP_DBKEY);
+            DataOutputStream ds = ms.writer();
+            for (int i = 0; i < 5; i++) {
+                ds.writeInt(equipData[activeCharacterId][i]);
+            }
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendInventoryInfo() {
+        try {
+            Message ms = new Message(Cmd.INVENTORY);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(equipmentChest.size());
+            for (EquipmentChest equipment : equipmentChest.values()) {
+                ds.writeInt(equipment.getKey());
+                ds.writeByte(equipment.getEquipment().getCharacterId());
+                ds.writeByte(equipment.getEquipment().getEquipType());
+                ds.writeShort(equipment.getEquipment().getEquipIndex());
+                ds.writeUTF(equipment.getEquipment().getName());
+                ds.writeByte(equipment.getAddPoints().length * 2);
+                for (int j = 0; j < equipment.getAddPoints().length; j++) {
+                    ds.writeByte(equipment.getAddPoints()[j]);
+                    ds.writeByte(equipment.getAddPercents()[j]);
+                }
+                ds.writeByte(equipment.getRemainingDays());
+                ds.writeByte(equipment.getEmptySlot());
+                ds.writeByte(equipment.getEquipment().isDisguise() ? 1 : 0);
+                ds.writeByte(equipment.getVipLevel());
+            }
+            for (int i = 0; i < 5; i++) {
+                ds.writeInt(getEquipData()[getActiveCharacterId()][i]);
+            }
+            ds.flush();
+            sendMessage(ms);
+
+            ms = new Message(Cmd.MATERIAL);
+            ds = ms.writer();
+            ds.writeByte(0);
+            ds.writeByte(specialItemChest.size());
+            for (SpecialItemChest item : specialItemChest.values()) {
+                ds.writeByte(item.getItem().getId());
+                ds.writeShort(item.getQuantity());
+                ds.writeUTF(item.getItem().getName());
+                ds.writeUTF(item.getItem().getDetail());
+            }
+            ds.flush();
+            sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

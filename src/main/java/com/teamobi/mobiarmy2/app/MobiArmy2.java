@@ -1,7 +1,5 @@
-package com.teamobi.mobiarmy2;
+package com.teamobi.mobiarmy2.app;
 
-import com.teamobi.mobiarmy2.server.ApplicationContext;
-import com.teamobi.mobiarmy2.server.BeanRegistry;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.ui.ServerUI;
 

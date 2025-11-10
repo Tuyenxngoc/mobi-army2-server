@@ -22,7 +22,7 @@ public class TeamImageInput {
             for (int i = 0; i < lent; i++) {
                 byte[] data = new byte[ds.readByte()];
                 ds.read(data);
-                TeamImageData.pack(data);
+                GameDataEncryptor.encode(data);
                 names[i] = new String(data);
                 dataStarts[i] = dataLent;
                 dataLents[i] = ds.readUnsignedShort();
@@ -30,7 +30,7 @@ public class TeamImageInput {
             }
             data = new byte[dataLent];
             ds.readFully(data);
-            TeamImageData.pack(data);
+            GameDataEncryptor.encode(data);
             bas.close();
             ds.close();
         } catch (IOException e) {

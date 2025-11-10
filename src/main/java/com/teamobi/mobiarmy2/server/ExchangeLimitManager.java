@@ -21,16 +21,16 @@ public class ExchangeLimitManager {
     private static final int[] MAX_GOLD_PER_VIP = {10, 5, 2};
     private static final int[] MAX_SILVER_PER_VIP = {15, 10, 5};
 
-    private static final AtomicInteger[] goldCounters = initCounters(MAX_GOLD_PER_VIP.length);
-    private static final AtomicInteger[] silverCounters = initCounters(MAX_SILVER_PER_VIP.length);
-    private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private final AtomicInteger[] goldCounters = initCounters(MAX_GOLD_PER_VIP.length);
+    private final AtomicInteger[] silverCounters = initCounters(MAX_SILVER_PER_VIP.length);
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
-    public static void init() {
+    public void init() {
         scheduleInitialResets();
         scheduleMidnightTask();
     }
 
-    private static AtomicInteger[] initCounters(int size) {
+    private AtomicInteger[] initCounters(int size) {
         AtomicInteger[] counters = new AtomicInteger[size];
         for (int i = 0; i < counters.length; i++) {
             counters[i] = new AtomicInteger();
@@ -38,43 +38,43 @@ public class ExchangeLimitManager {
         return counters;
     }
 
-    public static boolean isGoldLimitReached(int vipLevel) {
+    public boolean isGoldLimitReached(int vipLevel) {
         return goldCounters[vipLevel].get() >= MAX_GOLD_PER_VIP[vipLevel];
     }
 
-    public static void incrementGoldCount(int vipLevel) {
+    public void incrementGoldCount(int vipLevel) {
         goldCounters[vipLevel].getAndIncrement();
     }
 
-    public static boolean isSilverLimitReached(int vipLevel) {
+    public boolean isSilverLimitReached(int vipLevel) {
         return silverCounters[vipLevel].get() >= MAX_SILVER_PER_VIP[vipLevel];
     }
 
-    public static void incrementSilverCount(int vipLevel) {
+    public void incrementSilverCount(int vipLevel) {
         silverCounters[vipLevel].getAndIncrement();
     }
 
-    public static void resetCounters() {
+    public void resetCounters() {
         resetCounterArray(goldCounters);
         resetCounterArray(silverCounters);
         log.info("Transaction counters have been reset.");
     }
 
-    private static void resetCounterArray(AtomicInteger[] counters) {
+    private void resetCounterArray(AtomicInteger[] counters) {
         for (AtomicInteger counter : counters) {
             counter.set(0);
         }
     }
 
-    private static void scheduleInitialResets() {
+    private void scheduleInitialResets() {
         long remainingSeconds = calculateDelayUntilMidnight();
         generateAndScheduleResets(0, remainingSeconds);
     }
 
-    private static void scheduleMidnightTask() {
+    private void scheduleMidnightTask() {
         long delayUntilMidnight = calculateDelayUntilMidnight();
         scheduler.scheduleAtFixedRate(
-                ExchangeLimitManager::scheduleDailyResets,
+                this::scheduleDailyResets,
                 delayUntilMidnight,
                 86400,
                 TimeUnit.SECONDS
@@ -82,18 +82,18 @@ public class ExchangeLimitManager {
         log.info("Scheduling daily reset task with delay of {} seconds until midnight.", delayUntilMidnight);
     }
 
-    private static long calculateDelayUntilMidnight() {
+    private long calculateDelayUntilMidnight() {
         ZoneId zone = ZoneId.systemDefault();
         ZonedDateTime now = ZonedDateTime.now(zone);
         ZonedDateTime nextMidnight = now.toLocalDate().plusDays(1).atStartOfDay(zone);
         return ChronoUnit.SECONDS.between(now, nextMidnight);
     }
 
-    private static void scheduleDailyResets() {
+    private void scheduleDailyResets() {
         generateAndScheduleResets(0, 86400);
     }
 
-    private static void generateAndScheduleResets(long minDelay, long maxDelay) {
+    private void generateAndScheduleResets(long minDelay, long maxDelay) {
         Set<Long> delays = new HashSet<>();
         Random random = new Random();
         ZoneId zone = ZoneId.systemDefault();
@@ -113,7 +113,7 @@ public class ExchangeLimitManager {
             resetTimes.add(formattedTime);
 
             scheduler.schedule(
-                    ExchangeLimitManager::resetCounters,
+                    this::resetCounters,
                     delay,
                     TimeUnit.SECONDS
             );

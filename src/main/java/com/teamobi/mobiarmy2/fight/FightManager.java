@@ -7,7 +7,6 @@ import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.entity.*;
 import com.teamobi.mobiarmy2.entity.boss.*;
 import com.teamobi.mobiarmy2.network.Message;
-import com.teamobi.mobiarmy2.server.ApplicationContext;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
@@ -45,8 +44,8 @@ public class FightManager {
 
     private final FightWait fightWait;
     private final FightMapManager mapManager;
-    private final com.teamobi.mobiarmy2.fight.BulletManager bulletManager;
-    private final com.teamobi.mobiarmy2.fight.CountdownTimer countdownTimer;
+    private final BulletManager bulletManager;
+    private final CountdownTimer countdownTimer;
     private final ExecutorService executorNextTurn;
     private final ExecutorService executorEndGame;
     @Getter
@@ -64,8 +63,11 @@ public class FightManager {
     private byte windY;
     private long startTime;
 
-    public FightManager(FightWait fightWait) {
+    private final ClanService clanService;
+
+    public FightManager(FightWait fightWait, ClanService clanService) {
         this.fightWait = fightWait;
+        this.clanService = clanService;
         this.players = new Player[MAX_ELEMENT_FIGHT];
         this.mapManager = new FightMapManager(this);
         this.bulletManager = new BulletManager(this);
@@ -819,7 +821,7 @@ public class FightManager {
                 if (player == null || player.getUser() == null) {
                     continue;
                 }
-                player.getUser().getUserService().sendMoneyErrorMessage(GameString.MATCH_NOT_COUNTED);
+                player.getUser().sendMoneyErrorMessage(GameString.MATCH_NOT_COUNTED);
             }
         }
 
@@ -854,8 +856,8 @@ public class FightManager {
                 user.sendMessage(ms);
 
                 //Gửi thông báo số xp và cup nhận được
-                user.getUserService().sendUpdateXp(player.getAllXpUp(), false);
-                user.getUserService().sendUpdateCup(Math.min(player.getAllCupUp(), Byte.MAX_VALUE));
+                user.sendUpdateXp(player.getAllXpUp(), false);
+                user.sendUpdateCup(Math.min(player.getAllCupUp(), Byte.MAX_VALUE));
 
                 //Cộng thêm quà nếu trận đấu là hợp lệ
                 if (!fightInValid) {
@@ -872,7 +874,7 @@ public class FightManager {
                             user.updateInventory(null, null, List.of(newItem), null);
 
                             String reward = String.format("Phần thưởng diệt trùm của bạn là %dx %s", newItem.getQuantity(), newItem.getItem().getName());
-                            user.getUserService().sendServerMessage(reward);
+                            user.sendServerMessage(reward);
                         } else {
                             StringBuilder reward = new StringBuilder("Phần thưởng diệt trùm của bạn là ");
                             int count = Utils.nextInt(2, 3);
@@ -884,14 +886,12 @@ public class FightManager {
                                 reward.append(FightItemManager.FIGHT_ITEMS.get(indexItem).getName()).append(", ");
                             }
                             reward.deleteCharAt(reward.length() - 2);
-                            user.getUserService().sendServerMessage(reward.toString());
+                            user.sendServerMessage(reward.toString());
                         }
                     }
 
                     //Cộng xp và cup cho clan
                     if (user.getClanId() != null) {
-                        ClanService clanService = ApplicationContext.getInstance()
-                                .getBean(ClanService.class);
                         clanService.updateXp(user.getClanId(), user.getUserId(), player.getAllXpUp() / 100);
                         clanService.updateCup(user.getClanId(), user.getUserId(), player.getAllCupUp());
                     }
@@ -959,16 +959,19 @@ public class FightManager {
                 } catch (InterruptedException ignored) {
                 }
 
-                for (byte i = 0; i < MAX_USER_FIGHT; i++) {
-                    Player player = players[i];
-                    if (player == null || player.getUser() == null) {
-                        continue;
-                    }
-                    if ((player.isTeamBlue() && result == MatchResult.BLUE_WIN) ||
-                            (!player.isTeamBlue() && result == MatchResult.RED_WIN)) {
-                        player.getUser().getGiftBoxService().startGiftBoxOpening(2, 30);
-                    }
-                }
+                boolean isBlueWin = result == MatchResult.BLUE_WIN;
+                fightWait.startGiftBoxOpening(isBlueWin);
+
+//                for (byte i = 0; i < MAX_USER_FIGHT; i++) {
+//                    Player player = players[i];
+//                    if (player == null || player.getUser() == null) {
+//                        continue;
+//                    }
+//                    if ((player.isTeamBlue() && result == MatchResult.BLUE_WIN) ||
+//                            (!player.isTeamBlue() && result == MatchResult.RED_WIN)) {
+//                        player.getUser().getGiftBoxService().startGiftBoxOpening(2, 30);
+//                    }
+//                }
             }
 
             refreshFightManager();
@@ -1057,8 +1060,6 @@ public class FightManager {
                 if (clanItemsCache.containsKey(user.getClanId())) {
                     clanItems = clanItemsCache.get(user.getClanId());
                 } else {
-                    ClanService clanService = ApplicationContext.getInstance()
-                            .getBean(ClanService.class);
                     clanItems = clanService.getClanItems(user.getClanId());
                     clanItemsCache.put(user.getClanId(), clanItems);
                 }
@@ -1175,11 +1176,11 @@ public class FightManager {
                 ds.writeByte(force2);
             }
             if (bullId == 14 || bullId == 40) {
-                ds.writeByte(0);
-                ds.writeByte(0);
+                ds.writeByte(0);//angle
+                ds.writeByte(0);//force
             }
             if (bullId == 44 || bullId == 45 || bullId == 47) {
-                ds.writeByte(0);
+                ds.writeByte(0);//angle
             }
             ds.writeByte(numShoot);
             ds.writeByte(bullets.size());
@@ -1301,7 +1302,7 @@ public class FightManager {
 
         //Khi đấu boss thì cấm dùng 1 số item
         if (fightWait.getRoomType() == 5 && UNAUTHORIZED_ITEMS.contains(itemIndex)) {
-            player.getUser().getUserService().sendMoneyErrorMessage(GameString.ITEM_UNAUTHORIZED);
+            player.getUser().sendMoneyErrorMessage(GameString.ITEM_UNAUTHORIZED);
             return;
         }
 

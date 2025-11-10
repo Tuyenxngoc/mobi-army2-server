@@ -3,87 +3,77 @@ package com.teamobi.mobiarmy2.service;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.entity.User;
-import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.server.FightItemManager;
+import com.teamobi.mobiarmy2.util.MessageUtils;
 import com.teamobi.mobiarmy2.util.Utils;
-import lombok.Getter;
-import lombok.Setter;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.*;
 
 public class GiftBoxService {
     private static final int MAX_GIFTS = 12;          // Số quà tối đa
     private static final int MAX_OPENED_GIFTS = 6;    // Số quà có thể mở tối đa
     private static final int XU_COST_PER_GIFT = 1000; // Chi phí mở mỗi quà khi hết lượt
+    private static final int DEFAULT_GIFT_TIME = 30; // Thời gian mặc định để mở quà (giây)
 
-    @Setter
-    private User user;
-    private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-    private int availableGifts = 0;    // Số quà hiện có
-    private int giftOpenTime = 0;      // Thời gian mở quà
-    @Getter
-    private boolean openingGift = false;   // Trạng thái mở quà
-    private boolean[] giftOpened = new boolean[MAX_GIFTS];  // Mảng kiểm tra quà đã mở hay chưa
-    private int openedGiftCount = 0;
-    private ScheduledFuture<?> giftBoxTask;
+    private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledFuture<?> giftTask;
 
-    private void sendStartMessage(int availableGifts, int giftOpenTime) {
-        try {
-            Message ms = new Message(Cmd.GET_LUCKYGIFT);
-            DataOutputStream ds = ms.writer();
+    private final Map<Integer, GiftBoxState> userGiftStates = new ConcurrentHashMap<>();
+    private int giftOpenTime;
+    private boolean running = false;
+
+    static class GiftBoxState {
+        User user;
+        int freeGiftBoxCount; // Số lượt mở quà miễn phí còn lại
+        boolean[] giftOpened = new boolean[MAX_GIFTS]; // Mảng kiểm tra quà đã mở hay chưa
+        int openedGiftCount = 0; // Số quà đã mở
+        boolean openingGift = true; // Trạng thái đang mở quà
+
+        GiftBoxState(User user, int freeGiftBoxCount) {
+            this.user = user;
+            this.freeGiftBoxCount = freeGiftBoxCount;
+        }
+    }
+
+    static class Reward {
+        byte id;
+        byte type;
+        String str;
+
+        Reward(byte id, byte type, String str) {
+            this.id = id;
+            this.type = type;
+            this.str = str;
+        }
+    }
+
+    private void sendStartMessage(User user, int freeGiftBoxCount, int giftOpenTime) {
+        MessageUtils.send(user.getSession(), Cmd.GET_LUCKYGIFT, ds -> {
             ds.writeByte(-1);
             ds.writeByte(giftOpenTime);
-            ds.writeUTF(GameString.createGiftOpeningSummaryMessage(availableGifts, MAX_OPENED_GIFTS, XU_COST_PER_GIFT));
-            ds.flush();
-            user.sendMessage(ms);
-        } catch (IOException ignored) {
-        }
+            ds.writeUTF(GameString.createGiftOpeningSummaryMessage(freeGiftBoxCount, MAX_OPENED_GIFTS, XU_COST_PER_GIFT));
+        });
     }
 
-    private void startGiftBoxThread() {
-        if (giftBoxTask != null && !giftBoxTask.isDone()) {
-            return;
-        }
-
-        giftBoxTask = executorService.scheduleAtFixedRate(() -> {
-            if (openedGiftCount >= MAX_OPENED_GIFTS || giftOpenTime <= 0 || !openingGift) {
-                sendGiftResults();
-                resetGiftBoxState();
-                giftBoxTask.cancel(false);
-                return;
-            }
-
-            giftOpenTime--;
-        }, 0, 1, TimeUnit.SECONDS);
-    }
-
-    private void sendGiftResults() {
-        try {
-            Message ms = new Message(Cmd.GET_LUCKYGIFT);
-            DataOutputStream ds = ms.writer();
+    private void sendGiftResults(GiftBoxState state) {
+        MessageUtils.send(state.user.getSession(), Cmd.GET_LUCKYGIFT, ds -> {
             ds.writeByte(-2);
-            for (boolean opened : giftOpened) {
+            for (boolean opened : state.giftOpened) {
                 if (opened) {
                     ds.writeByte(-1);
                 } else {
-                    Reward reward = generateAndProcessReward(false);
-                    ds.writeByte(reward.type());
-                    ds.writeByte(reward.id());
-                    ds.writeUTF(reward.str());
+                    Reward reward = generateAndProcessReward(null);
+                    ds.writeByte(reward.type);
+                    ds.writeByte(reward.id);
+                    ds.writeUTF(reward.str);
                 }
             }
-            ds.flush();
-            user.sendMessage(ms);
-        } catch (IOException ignored) {
-        }
+        });
     }
 
-    private Reward generateAndProcessReward(boolean updateUser) {
+    private Reward generateAndProcessReward(User user) {
         byte id;
         byte type = 2;
         String str;
@@ -93,7 +83,7 @@ public class GiftBoxService {
             case 0 -> {
                 int randomXu = Utils.getNonLinearRandom(50, 1049);
                 int xuUp = (randomXu / 50) * 50;
-                if (updateUser) {
+                if (user != null) {
                     user.updateXu(xuUp);
                 } else {
                     xuUp += 100;
@@ -104,7 +94,7 @@ public class GiftBoxService {
             case 1 -> {
                 int randomXp = Utils.getNonLinearRandom(50, 1049);
                 int xpUp = (randomXp / 50) * 50;
-                if (updateUser) {
+                if (user != null) {
                     user.updateXp(xpUp, false);
                 } else {
                     xpUp += 100;
@@ -114,7 +104,7 @@ public class GiftBoxService {
             }
             case 2 -> {
                 byte[] nextItem = new byte[]{0, 10, 20, 30, 40};
-                if (updateUser) {
+                if (user != null) {
                     byte idItem = (byte) Utils.nextInt(6);
                     id = (byte) (idItem + nextItem[Utils.nextInt(nextItem.length)]);
                     user.addSpecialItem(id, (short) 1);
@@ -128,7 +118,7 @@ public class GiftBoxService {
                 type = 3;
                 id = FightItemManager.getRandomItem();
                 byte numb;
-                if (updateUser) {
+                if (user != null) {
                     numb = (byte) Utils.nextInt(1, 5);
                     user.updateFightItems(id, numb);
                 } else {
@@ -139,7 +129,7 @@ public class GiftBoxService {
             case 4 -> {
                 id = (byte) Utils.nextInt(62, 68);
                 short numb;
-                if (updateUser) {
+                if (user != null) {
                     numb = (short) Utils.nextInt(1, 5);
                     user.addSpecialItem(id, numb);
                 } else {
@@ -150,7 +140,7 @@ public class GiftBoxService {
             default -> {
                 byte[] arrItems = new byte[]{54};
                 id = arrItems[Utils.nextInt(arrItems.length)];
-                if (updateUser) {
+                if (user != null) {
                     user.addSpecialItem(id, (short) 1);
                 }
                 str = "+1";
@@ -159,56 +149,108 @@ public class GiftBoxService {
         return new Reward(id, type, str);
     }
 
-    private void resetGiftBoxState() {
-        this.availableGifts = 0;
-        this.openingGift = false;
-        this.giftOpened = new boolean[MAX_GIFTS];
-        this.openedGiftCount = 0;
-    }
-
-    public void startGiftBoxOpening(int availableGifts, int giftOpenTime) {
-        this.availableGifts = availableGifts;
-        this.giftOpenTime = giftOpenTime;
-        this.openingGift = true;
-        sendStartMessage(availableGifts, giftOpenTime);
-        startGiftBoxThread();
-    }
-
-    public void openGiftBoxAfterFight(byte boxIndex) {
-        if (boxIndex == -2) {
-            openingGift = false;
+    public void startGiftBoxOpening(List<User> winners, int freeGiftBoxCount) {
+        if (running) {
             return;
         }
-        if (boxIndex < 0 || boxIndex >= giftOpened.length || giftOpened[boxIndex]) {
+
+        giftOpenTime = DEFAULT_GIFT_TIME;
+        running = true;
+
+        // Khởi tạo trạng thái từng người
+        for (User u : winners) {
+            GiftBoxState state = new GiftBoxState(u, freeGiftBoxCount);
+            userGiftStates.put(u.getUserId(), state);
+            sendStartMessage(u, freeGiftBoxCount, giftOpenTime);
+        }
+
+        // Bộ đếm chung
+        giftTask = executor.scheduleAtFixedRate(() -> {
+            giftOpenTime--;
+
+            // Lặp qua toàn bộ người chơi đang mở quà
+            for (GiftBoxState state : userGiftStates.values()) {
+                if (!state.openingGift) {
+                    continue;
+                }
+
+                if (state.openedGiftCount >= MAX_OPENED_GIFTS) {
+                    finishForPlayer(state);
+                    continue;
+                }
+
+                if (giftOpenTime <= 0) {
+                    finishForPlayer(state);
+                }
+            }
+
+            // Dừng khi hết thời gian hoặc tất cả người chơi đều đóng
+            if (giftOpenTime <= 0 || allPlayersDone()) {
+                stopGiftEvent();
+            }
+
+        }, 0, 1, TimeUnit.SECONDS);
+    }
+
+    private boolean allPlayersDone() {
+        return userGiftStates.values().stream().noneMatch(s -> s.openingGift);
+    }
+
+    public boolean isOpeningGift(int userId) {
+        GiftBoxState state = userGiftStates.get(userId);
+        return state != null && state.openingGift;
+    }
+
+    private void finishForPlayer(GiftBoxState state) {
+        if (!state.openingGift) {
             return;
         }
-        if (availableGifts > 0) {
-            availableGifts--;
+        state.openingGift = false;
+        sendGiftResults(state);
+    }
+
+    private void stopGiftEvent() {
+        if (giftTask != null) {
+            giftTask.cancel(false);
+        }
+        running = false;
+        userGiftStates.clear();
+    }
+
+    public void openGiftBoxAfterFight(int userId, byte boxIndex) {
+        GiftBoxState state = userGiftStates.get(userId);
+        if (state == null || !state.openingGift) {
+            return;
+        }
+
+        if (boxIndex == -2) {// Lệnh đóng mở quà
+            state.openingGift = false;
+            return;
+        }
+        if (boxIndex < 0 || boxIndex >= state.giftOpened.length || state.giftOpened[boxIndex]) {// Kiểm tra chỉ số hợp lệ
+            return;
+        }
+
+        User user = state.user;
+        if (state.freeGiftBoxCount > 0) {
+            state.freeGiftBoxCount--;
         } else if (user.getXu() >= XU_COST_PER_GIFT) {
             user.updateXu(-XU_COST_PER_GIFT);
         } else {
-            openingGift = false;
+            state.openingGift = false;
             return;
         }
 
-        giftOpened[boxIndex] = true;
-        openedGiftCount++;
+        state.giftOpened[boxIndex] = true;
+        state.openedGiftCount++;
 
-        Reward reward = generateAndProcessReward(true);
-        try {
-            Message ms = new Message(Cmd.GET_LUCKYGIFT);
-            DataOutputStream ds = ms.writer();
+        Reward reward = generateAndProcessReward(user);
+        MessageUtils.send(user.getSession(), Cmd.GET_LUCKYGIFT, ds -> {
             ds.writeByte(0);
             ds.writeByte(boxIndex);
-            ds.writeByte(reward.type());
-            ds.writeByte(reward.id());
-            ds.writeUTF(reward.str());
-            ds.flush();
-            user.sendMessage(ms);
-        } catch (IOException ignored) {
-        }
-    }
-
-    private record Reward(byte id, byte type, String str) {
+            ds.writeByte(reward.type);
+            ds.writeByte(reward.id);
+            ds.writeUTF(reward.str);
+        });
     }
 }

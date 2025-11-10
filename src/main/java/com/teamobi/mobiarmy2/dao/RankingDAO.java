@@ -1,11 +1,11 @@
 package com.teamobi.mobiarmy2.dao;
 
 import com.google.gson.Gson;
+import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dto.UserLeaderboardDTO;
 import com.teamobi.mobiarmy2.json.EquipmentChestJson;
-import com.teamobi.mobiarmy2.server.ApplicationContext;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.HikariCPManager;
 import com.teamobi.mobiarmy2.server.UserXpManager;
