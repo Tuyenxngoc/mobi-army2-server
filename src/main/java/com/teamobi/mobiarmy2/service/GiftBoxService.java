@@ -3,12 +3,10 @@ package com.teamobi.mobiarmy2.service;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.entity.User;
-import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.server.FightItemManager;
+import com.teamobi.mobiarmy2.util.MessageUtils;
 import com.teamobi.mobiarmy2.util.Utils;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -52,23 +50,15 @@ public class GiftBoxService {
     }
 
     private void sendStartMessage(User user, int freeGiftBoxCount, int giftOpenTime) {
-        try {
-            Message ms = new Message(Cmd.GET_LUCKYGIFT);
-            DataOutputStream ds = ms.writer();
+        MessageUtils.send(user.getSession(), Cmd.GET_LUCKYGIFT, ds -> {
             ds.writeByte(-1);
             ds.writeByte(giftOpenTime);
             ds.writeUTF(GameString.createGiftOpeningSummaryMessage(freeGiftBoxCount, MAX_OPENED_GIFTS, XU_COST_PER_GIFT));
-            ds.flush();
-            user.sendMessage(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        });
     }
 
     private void sendGiftResults(GiftBoxState state) {
-        try {
-            Message ms = new Message(Cmd.GET_LUCKYGIFT);
-            DataOutputStream ds = ms.writer();
+        MessageUtils.send(state.user.getSession(), Cmd.GET_LUCKYGIFT, ds -> {
             ds.writeByte(-2);
             for (boolean opened : state.giftOpened) {
                 if (opened) {
@@ -80,11 +70,7 @@ public class GiftBoxService {
                     ds.writeUTF(reward.str);
                 }
             }
-            ds.flush();
-            state.user.sendMessage(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        });
     }
 
     private Reward generateAndProcessReward(User user) {
@@ -259,18 +245,12 @@ public class GiftBoxService {
         state.openedGiftCount++;
 
         Reward reward = generateAndProcessReward(user);
-        try {
-            Message ms = new Message(Cmd.GET_LUCKYGIFT);
-            DataOutputStream ds = ms.writer();
+        MessageUtils.send(user.getSession(), Cmd.GET_LUCKYGIFT, ds -> {
             ds.writeByte(0);
             ds.writeByte(boxIndex);
             ds.writeByte(reward.type);
             ds.writeByte(reward.id);
             ds.writeUTF(reward.str);
-            ds.flush();
-            user.sendMessage(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        });
     }
 }
