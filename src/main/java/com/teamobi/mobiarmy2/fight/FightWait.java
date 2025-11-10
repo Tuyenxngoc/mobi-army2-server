@@ -11,10 +11,12 @@ import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.MapManager;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.ClanService;
+import com.teamobi.mobiarmy2.service.GiftBoxService;
 import lombok.Getter;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -57,6 +59,8 @@ public class FightWait {
     private long endTime;
     private long lastPlayerJoinTime;
 
+    private final GiftBoxService giftBoxService;
+
     public FightWait(Room room, byte id) {
         this.room = room;
         this.id = id;
@@ -83,6 +87,8 @@ public class FightWait {
 
         this.maxSetPlayers = room.getNumPlayerInitRoom();
         this.countdownTimer = new CountdownTimer(KICK_BOSS_TIME, this::onTimeUp);
+
+        this.giftBoxService = new GiftBoxService();
     }
 
     private void refreshFightWait() {
@@ -335,7 +341,7 @@ public class FightWait {
                 continue;
             }
 
-            if (isOpeningGift(i)) {
+            if (giftBoxService.isOpeningGift(user.getUserId())) {
                 roomOwner.sendServerMessage(GameString.createOpeningGiftMessage(user.getUsername()));
                 return;
             }
@@ -492,7 +498,7 @@ public class FightWait {
         }
 
         User user = users[index];
-        if (isOpeningGift(index)) {
+        if (giftBoxService.isOpeningGift(user.getUserId())) {
             roomOwner.sendServerMessage(GameString.createOpeningGiftMessage(user.getUsername()));
             return;
         }
@@ -700,12 +706,11 @@ public class FightWait {
             return;
         }
 
-        for (int i = 0; i < users.length; i++) {
-            User user = users[i];
+        for (User user : users) {
             if (user == null) {
                 continue;
             }
-            if (isOpeningGift(i)) {
+            if (giftBoxService.isOpeningGift(user.getUserId())) {
                 user.sendServerMessage(GameString.createOpeningGiftMessage(user.getUsername()));
                 return;
             }
@@ -950,15 +955,22 @@ public class FightWait {
     }
 
     public void startGiftBoxOpening(boolean isBlueWin) {
-        //Todo
+        List<User> winners = new ArrayList<>();
+        for (int i = 0; i < users.length; i++) {
+            User us = users[i];
+            boolean isBlueTeam = (i % 2 == 0);
+
+            // Nếu đội thắng trùng với người chơi này, thêm vào danh sách winners
+            if ((isBlueWin && isBlueTeam) || (!isBlueWin && !isBlueTeam)) {
+                winners.add(us);
+            }
+        }
+
+        // Khởi tạo gift box cho toàn bộ người thắng, 2 lượt mở miễn phí
+        giftBoxService.startGiftBoxOpening(winners, 2);
     }
 
-    private boolean isOpeningGift(int i) {
-        //Todo
-        return false;
-    }
-
-    public void openGiftBoxAfterFight(int userId, byte index) {
-        //Todo
+    public void openGiftBoxAfterFight(int userId, byte boxIndex) {
+        giftBoxService.openGiftBoxAfterFight(userId, boxIndex);
     }
 }
