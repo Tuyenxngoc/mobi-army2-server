@@ -193,7 +193,7 @@ public class MessageRouter {
                 default -> log.warn("Command {} is not supported", ms.getCommand());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error processing command {}: {}", ms.getCommand(), e.getMessage(), e);
         }
     }
 }

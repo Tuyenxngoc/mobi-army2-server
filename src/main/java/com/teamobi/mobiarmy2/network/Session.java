@@ -19,6 +19,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 @Slf4j
 public class Session {
+    private static final Message POISON_PILL = new PoisonMessage();
     private static final Set<Byte> WHITE_LIST_CMDS = Set.of((byte) -27, (byte) 1, (byte) 58, (byte) 114, (byte) 121, (byte) 127);
 
     @Getter
@@ -77,17 +78,17 @@ public class Session {
     private void processLoop() {
         try {
             while (running) {
-                try {
-                    Message msg = messageQueue.take();
-                    if (!running) break; // Check again after blocking call
-                    messageRouter.onMessage(msg);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+                Message msg = messageQueue.take();
+
+                // Check for poison pill
+                if (msg instanceof PoisonMessage) {
                     break;
-                } catch (Exception e) {
-                    log.error("Session {} error while processing message: {}", sessionId, e.getMessage(), e);
                 }
+
+                messageRouter.onMessage(msg);
             }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         } finally {
             // Cleanup on exit
             if (isUserLoggedIn()) {
@@ -97,9 +98,10 @@ public class Session {
     }
 
     public void enqueueMessage(Message msg) {
-        if (isActive() && isAuthorized(msg)) {
-            messageQueue.offer(msg);
+        if (!running || !isActive() || !isAuthorized(msg)) {
+            return;
         }
+        messageQueue.offer(msg);
     }
 
     public boolean isActive() {
@@ -124,10 +126,13 @@ public class Session {
     }
 
     public void cleanup() {
-        running = false;
-        if (workerThread.isAlive()) {
-            workerThread.interrupt();
+        if (!running) {
+            return;
         }
+        running = false;
+
+        messageQueue.clear();
+        messageQueue.offer(POISON_PILL);
     }
 
     public void registerHandlers() {
