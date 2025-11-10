@@ -57,7 +57,5 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
                 out.writeBytes(data);
             }
         }
-
-        message.cleanup();
     }
 }

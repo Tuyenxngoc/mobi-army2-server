@@ -4,6 +4,7 @@ import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
+import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.entity.Room;
 import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.network.Message;
@@ -16,6 +17,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class RoomMessageHandler extends BaseMessageHandler {
+    private static final int minimumWaitTime = 5000;
+    private long timeSinceLeftRoom;
+
     public RoomMessageHandler(Session session) {
         super(session);
     }
@@ -95,7 +99,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
             return;
         }
 
-        long timeRemaining = 0;// minimumWaitTime - (System.currentTimeMillis() - timeSinceLeftRoom);
+        long timeRemaining = minimumWaitTime - (System.currentTimeMillis() - timeSinceLeftRoom);
         if (timeRemaining > 0) {
             us().sendServerMessage(GameString.createJoinAreaErrorMessage((int) (timeRemaining / 1000) + 1));
             return;
@@ -120,6 +124,15 @@ public class RoomMessageHandler extends BaseMessageHandler {
             return;
         }
         fightWait.addUser(us());
+    }
+
+    public void handleLeaveBoard() {
+        if (us().getState() == UserState.WAITING) {
+            return;
+        }
+        fw().leaveTeam(us().getUserId());
+
+        timeSinceLeftRoom = System.currentTimeMillis();
     }
 
     public void handleJoinAnyBoard(Message ms) throws IOException {

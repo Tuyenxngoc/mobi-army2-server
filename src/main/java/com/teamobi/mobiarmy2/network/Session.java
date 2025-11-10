@@ -70,7 +70,7 @@ public class Session {
     public void sendMessage(Message msg) {
         if (msg == null || channel == null || !channel.isActive()) return;
 
-        log.debug("Session {} -> Command {}", sessionId, Cmd.getCmdNameByValue(msg.getCommand()));
+        log.debug("Server sends ms {} to client {}", Cmd.getCmdNameByValue(msg.getCommand()), sessionId);
 
         channel.writeAndFlush(msg);
     }

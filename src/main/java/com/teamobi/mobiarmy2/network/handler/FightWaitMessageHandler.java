@@ -50,13 +50,6 @@ public class FightWaitMessageHandler extends BaseMessageHandler {
         fw().kickPlayer(us().getUserId(), userId);
     }
 
-    public void handleLeaveBoard() {
-        if (us().getState() == UserState.WAITING) {
-            return;
-        }
-        fw().leaveTeam(us().getUserId());
-    }
-
     public void setReady(Message ms) throws IOException {
         boolean ready = ms.reader().readBoolean();
         fw().setReady(ready, us().getUserId());

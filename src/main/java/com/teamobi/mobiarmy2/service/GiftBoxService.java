@@ -224,7 +224,7 @@ public class GiftBoxService {
         }
 
         if (boxIndex == -2) {// Lệnh đóng mở quà
-            state.openingGift = false;
+            finishForPlayer(state);
             return;
         }
         if (boxIndex < 0 || boxIndex >= state.giftOpened.length || state.giftOpened[boxIndex]) {// Kiểm tra chỉ số hợp lệ
@@ -237,7 +237,7 @@ public class GiftBoxService {
         } else if (user.getXu() >= XU_COST_PER_GIFT) {
             user.updateXu(-XU_COST_PER_GIFT);
         } else {
-            state.openingGift = false;
+            finishForPlayer(state);
             return;
         }
 

@@ -956,17 +956,16 @@ public class FightWait {
 
     public void startGiftBoxOpening(boolean isBlueWin) {
         List<User> winners = new ArrayList<>();
-        for (int i = 0; i < users.length; i++) {
-            User us = users[i];
-            boolean isBlueTeam = (i % 2 == 0);
 
-            // Nếu đội thắng trùng với người chơi này, thêm vào danh sách winners
-            if ((isBlueWin && isBlueTeam) || (!isBlueWin && !isBlueTeam)) {
+        int startIndex = isBlueWin ? 0 : 1;
+
+        for (int i = startIndex; i < users.length; i += 2) {
+            User us = users[i];
+            if (us != null) {
                 winners.add(us);
             }
         }
 
-        // Khởi tạo gift box cho toàn bộ người thắng, 2 lượt mở miễn phí
         giftBoxService.startGiftBoxOpening(winners, 2);
     }
 

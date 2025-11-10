@@ -88,7 +88,7 @@ public class MessageRouter {
 
                 case Cmd.KICK -> fightWaitMessageHandler.handleKickPlayer(ms);
 
-                case Cmd.LEAVE_BOARD -> fightWaitMessageHandler.handleLeaveBoard();
+                case Cmd.LEAVE_BOARD -> roomMessageHandler.handleLeaveBoard();
 
                 case Cmd.READY -> fightWaitMessageHandler.setReady(ms);
 
