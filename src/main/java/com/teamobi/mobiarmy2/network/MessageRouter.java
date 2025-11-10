@@ -102,7 +102,7 @@ public class MessageRouter {
 
                 case Cmd.MOVE_ARMY -> fightManagerMessageHandler.movePlayer(ms);
 
-                case Cmd.FIRE_ARMY -> fightManagerMessageHandler.shoot(ms);
+                case Cmd.FIRE_ARMY -> fightManagerMessageHandler.handleShot(ms);
 
                 case Cmd.SHOOT_RESULT -> fightManagerMessageHandler.processShootingResult(ms);
 

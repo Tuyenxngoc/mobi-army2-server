@@ -31,7 +31,7 @@ public class FightManagerMessageHandler extends BaseMessageHandler {
         }
     }
 
-    public void shoot(Message ms) throws IOException {
+    public void handleShot(Message ms) throws IOException {
         if (us().getState() != UserState.FIGHTING) {
             return;
         }

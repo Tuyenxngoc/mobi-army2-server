@@ -1176,11 +1176,11 @@ public class FightManager {
                 ds.writeByte(force2);
             }
             if (bullId == 14 || bullId == 40) {
-                ds.writeByte(0);
-                ds.writeByte(0);
+                ds.writeByte(0);//angle
+                ds.writeByte(0);//force
             }
             if (bullId == 44 || bullId == 45 || bullId == 47) {
-                ds.writeByte(0);
+                ds.writeByte(0);//angle
             }
             ds.writeByte(numShoot);
             ds.writeByte(bullets.size());
