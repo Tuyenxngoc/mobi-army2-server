@@ -106,10 +106,8 @@ public class ServerManager {
             session.closeChannel();
         }
 
-        // Đợi tất cả worker threads hoàn thành
-        for (Session session : sessions.values()) {
-            session.awaitTermination(5000);
-        }
+        //Tắt executor dùng Virtual Thread
+        Session.shutdownExecutor();
 
         // Đóng channel chính
         if (serverChannel != null && serverChannel.isOpen()) {

@@ -14,11 +14,11 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.*;
 
 @Slf4j
 public class Session {
+    private static final ExecutorService VIRTUAL_EXECUTOR = Executors.newVirtualThreadPerTaskExecutor();
     private static final Message POISON_PILL = new PoisonMessage();
     private static final Set<Byte> WHITE_LIST_CMDS = Set.of((byte) -27, (byte) 1, (byte) 58, (byte) 114, (byte) 121, (byte) 127);
 
@@ -51,7 +51,6 @@ public class Session {
 
     private final MessageRouter messageRouter;
     private final BlockingQueue<Message> messageQueue = new LinkedBlockingQueue<>();
-    private final Thread workerThread;
     private volatile boolean running = true;
 
     public Session(long sessionId, Channel channel) {
@@ -59,18 +58,27 @@ public class Session {
         this.channel = channel;
         this.ipAddress = channel.remoteAddress().toString();
 
-        ApplicationContext context = ApplicationContext.getInstance();
-        AuthMessageHandler authMessageHandler = new AuthMessageHandler(this, context.getBean(LoginRateLimiterService.class), context.getBean(UserDAO.class), context.getBean(AccountDAO.class), context.getBean(UserCharacterDAO.class));
+        ApplicationContext ctx = ApplicationContext.getInstance();
+        AuthMessageHandler authMessageHandler = new AuthMessageHandler(
+                this,
+                ctx.getBean(LoginRateLimiterService.class),
+                ctx.getBean(UserDAO.class),
+                ctx.getBean(AccountDAO.class),
+                ctx.getBean(UserCharacterDAO.class)
+        );
         this.messageRouter = new MessageRouter(authMessageHandler);
 
-        this.workerThread = new Thread(this::processLoop, "Session-Worker-" + sessionId);
-        this.workerThread.start();
+        VIRTUAL_EXECUTOR.submit(this::processLoop);
     }
 
     public void sendMessage(Message msg) {
-        if (msg == null || channel == null || !channel.isActive()) return;
+        if (msg == null || channel == null || !channel.isActive()) {
+            return;
+        }
 
-        log.debug("Server sends ms {} to client {}", Cmd.getCmdNameByValue(msg.getCommand()), sessionId);
+        if (log.isDebugEnabled()) {
+            log.debug("Server sends ms {} to client {}", Cmd.getCmdNameByValue(msg.getCommand()), sessionId);
+        }
 
         channel.writeAndFlush(msg);
     }
@@ -102,7 +110,7 @@ public class Session {
             return;
         }
 
-        if (messageQueue.offer(msg)) {
+        if (!messageQueue.offer(msg)) {
             log.warn("Failed to enqueue message for session {}, queue might be full", sessionId);
         }
     }
@@ -125,22 +133,6 @@ public class Session {
     public void closeChannel() {
         if (isActive()) {
             channel.close();
-        }
-    }
-
-    public void awaitTermination(long timeoutMs) {
-        if (workerThread == null || !workerThread.isAlive()) {
-            return;
-        }
-
-        try {
-            workerThread.join(timeoutMs);
-            if (workerThread.isAlive()) {
-                workerThread.interrupt();
-                workerThread.join(500);
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
         }
     }
 
@@ -193,5 +185,19 @@ public class Session {
         messageRouter.setSpinMessageHandler(spinMessageHandler);
         messageRouter.setPaymentMessageHandler(paymentMessageHandler);
         messageRouter.setCharacterMessageHandler(characterMessageHandler);
+    }
+
+    public static void shutdownExecutor() {
+        VIRTUAL_EXECUTOR.shutdown();
+        try {
+            if (!VIRTUAL_EXECUTOR.awaitTermination(10, TimeUnit.SECONDS)) {
+                log.warn("Executor did not terminate in time, forcing shutdown...");
+                VIRTUAL_EXECUTOR.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            log.error("Interrupted while waiting for executor shutdown", e);
+            VIRTUAL_EXECUTOR.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 }
