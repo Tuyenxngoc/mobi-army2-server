@@ -14,12 +14,7 @@ public class ConnectionBlockerService {
     public boolean tryIncrementConnection(String ipAddress) {
         AtomicInteger count = connectionMap.computeIfAbsent(ipAddress, ip -> new AtomicInteger(0));
         int newCount = count.incrementAndGet();
-        if (newCount > MAX_CONNECTIONS_PER_IP) {
-            // Vượt quá → giảm lại và chặn
-            count.decrementAndGet();
-            return false;
-        }
-        return true;
+        return newCount <= MAX_CONNECTIONS_PER_IP;
     }
 
     /**
