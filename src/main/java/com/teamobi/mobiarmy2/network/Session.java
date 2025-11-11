@@ -101,7 +101,10 @@ public class Session {
         if (!running || !isActive() || !isAuthorized(msg)) {
             return;
         }
-        messageQueue.offer(msg);
+
+        if (messageQueue.offer(msg)) {
+            log.warn("Failed to enqueue message for session {}, queue might be full", sessionId);
+        }
     }
 
     public boolean isActive() {
@@ -122,6 +125,22 @@ public class Session {
     public void closeChannel() {
         if (isActive()) {
             channel.close();
+        }
+    }
+
+    public void awaitTermination(long timeoutMs) {
+        if (workerThread == null || !workerThread.isAlive()) {
+            return;
+        }
+
+        try {
+            workerThread.join(timeoutMs);
+            if (workerThread.isAlive()) {
+                workerThread.interrupt();
+                workerThread.join(500);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 

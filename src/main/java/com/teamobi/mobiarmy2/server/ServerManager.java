@@ -106,6 +106,11 @@ public class ServerManager {
             session.closeChannel();
         }
 
+        // Đợi tất cả worker threads hoàn thành
+        for (Session session : sessions.values()) {
+            session.awaitTermination(5000);
+        }
+
         // Đóng channel chính
         if (serverChannel != null && serverChannel.isOpen()) {
             serverChannel.close().syncUninterruptibly();
