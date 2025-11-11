@@ -16,7 +16,18 @@ import java.util.Set;
 
 @Slf4j
 public class SessionHandler extends SimpleChannelInboundHandler<Message> {
-    private static final Set<Byte> KEEP_ALIVE_CMDS = Set.of((byte) 20, (byte) 16);//todo: add other keep-alive commands
+    private static final Set<Byte> KEEP_ALIVE_CMDS = Set.of(
+            Cmd.PING,
+            Cmd.READY,
+            Cmd.ROOM_LIST,
+            Cmd.BOARD_LIST,
+            Cmd.MOVE_ARMY,
+            Cmd.FIRE_ARMY,
+            Cmd.USE_ITEM,
+            Cmd.SKIP,
+            Cmd.CHAT_TO,
+            Cmd.CHAT_TO_BOARD
+    );
     private static final int TIMEOUT_DURATION = 180_000;
     private static final SecureRandom RANDOM = new SecureRandom();
 
@@ -110,7 +121,7 @@ public class SessionHandler extends SimpleChannelInboundHandler<Message> {
             long idleMillis = now - lastKeepAliveTime;
 
             if (idleMillis > TIMEOUT_DURATION) {
-                log.debug("Session {} timed out due to inactivity", session.getSessionId());
+                log.info("Session {} timed out due to inactivity", session.getSessionId());
                 ctx.close();
             }
         } else {

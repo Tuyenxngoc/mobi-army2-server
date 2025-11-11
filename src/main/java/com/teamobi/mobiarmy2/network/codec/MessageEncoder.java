@@ -26,9 +26,9 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Message message, ByteBuf out) throws Exception {
-        byte[] data = message.getData();
-        byte command = message.getCommand();
+    protected void encode(ChannelHandlerContext ctx, Message msg, ByteBuf out) throws Exception {
+        byte[] data = msg.getData();
+        byte command = msg.getCommand();
         int size = (data != null) ? data.length : 0;
 
         // Các lệnh đặc biệt: gửi raw data, không mã hóa
@@ -49,12 +49,9 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
 
             if (data != null && size > 0) {
                 // Mã hóa nội dung
-                for (int i = 0; i < data.length; i++) {
-                    data[i] = writeKey(data[i]);
+                for (int i = 0; i < size; i++) {
+                    out.writeByte(writeKey(data[i]));
                 }
-
-                // Ghi data đã mã hóa
-                out.writeBytes(data);
             }
         }
     }

@@ -20,7 +20,14 @@ import java.util.concurrent.*;
 public class Session {
     private static final ExecutorService VIRTUAL_EXECUTOR = Executors.newVirtualThreadPerTaskExecutor();
     private static final Message POISON_PILL = new PoisonMessage();
-    private static final Set<Byte> WHITE_LIST_CMDS = Set.of((byte) -27, (byte) 1, (byte) 58, (byte) 114, (byte) 121, (byte) 127);
+    private static final Set<Byte> WHITE_LIST_CMDS = Set.of(
+            Cmd.GET_KEY,
+            Cmd.LOGIN,
+            Cmd.REGISTER_2,
+            Cmd.SET_PROVIDER,
+            Cmd.VERSION_CODE,
+            Cmd.GETSTRING
+    );
 
     @Getter
     private final long sessionId;

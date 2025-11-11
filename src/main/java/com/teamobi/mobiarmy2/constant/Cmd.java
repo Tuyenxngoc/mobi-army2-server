@@ -61,7 +61,7 @@ public class Cmd {
     public static final byte FIND_PLAYER = 78;
     public static final byte FIRE_ARMY = 22;
     public static final byte ADD_POINT = 98;
-    public static final byte GETSTRING = Byte.MAX_VALUE;
+    public static final byte GETSTRING = 127;
     public static final byte GET_ITEM_SLOT = 94;
     public static final byte JOIN_ANY_BOARD = 28;
     public static final byte JOIN_BOARD = 8;
