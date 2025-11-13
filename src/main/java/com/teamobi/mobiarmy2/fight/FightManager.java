@@ -1161,7 +1161,7 @@ public class FightManager {
             return;
         }
 
-        byte typeShoot = 0;
+        byte typeShoot = bulletManager.getTypeShoot();
         try {
             Message ms = new Message(Cmd.FIRE_ARMY);
             DataOutputStream ds = ms.writer();
@@ -1185,46 +1185,53 @@ public class FightManager {
             ds.writeByte(numShoot);
             ds.writeByte(bullets.size());
             for (Bullet bullet : bullets) {
-                List<Short> xArrays = bullet.getXArray();
-                List<Short> yArrays = bullet.getYArray();
-                ds.writeShort(xArrays.size());
-                if (typeShoot == 0) {
-                    for (int j = 0; j < xArrays.size(); j++) {
-                        if (j == 0) {
-                            ds.writeShort(xArrays.getFirst());
-                            ds.writeShort(yArrays.getFirst());
+                List<BulletPoint> trajectory = bullet.getTrajectory();
+                int size = trajectory.size();
+                ds.writeShort(size);// Ghi độ dài quỹ đạo
+
+                if (typeShoot == 0) {// Ghi tọa độ theo dạng delta (chênh lệch)
+                    for (int i = 0; i < size; i++) {
+                        BulletPoint point = bullet.getTrajectory().get(i);
+
+                        if (i == 0) {
+                            // Điểm đầu tiên: ghi tọa độ tuyệt đối
+                            ds.writeShort(point.getX());
+                            ds.writeShort(point.getY());
                         } else {
-                            if ((j == xArrays.size() - 1) && bullId == 49) {
-                                ds.writeShort(xArrays.get(j));
-                                ds.writeShort(yArrays.get(j));
-                                ds.writeByte(bulletManager.getMgtAddX());
-                                ds.writeByte(bulletManager.getMgtAddY());
-                                break;
+                            if ((i == size - 1) && bullId == 49) {// Điểm cuối của laser Magenta
+                                ds.writeShort(point.getX());
+                                ds.writeShort(point.getY());
+                                ds.writeByte(bullet.getDXLaser());
+                                ds.writeByte(bullet.getDYLaser());
+                            } else {
+                                BulletPoint prevPoint = bullet.getTrajectory().get(i - 1);
+                                ds.writeByte((byte) (point.getX() - prevPoint.getX()));
+                                ds.writeByte((byte) (point.getY() - prevPoint.getY()));
                             }
-                            ds.writeByte((byte) (xArrays.get(j) - xArrays.get(j - 1)));
-                            ds.writeByte((byte) (yArrays.get(j) - yArrays.get(j - 1)));
                         }
                     }
-                } else if (typeShoot == 1) {
-                    for (int j = 0; j < xArrays.size(); j++) {
-                        ds.writeShort(xArrays.get(j));
-                        ds.writeShort(yArrays.get(j));
+                } else if (typeShoot == 1) { // Ghi tọa độ tuyệt đối cho mỗi điểm
+                    for (BulletPoint point : bullet.getTrajectory()) {
+                        ds.writeShort(point.getX());
+                        ds.writeShort(point.getY());
                     }
                 }
+
                 if (bullId == 48) {
-                    ds.writeByte(1);
-                    for (int j = 0; j < 1; j++) {
-                        ds.writeShort(0);
-                        ds.writeShort(0);
+                    ds.writeByte(bullet.getHitPoints().size());
+                    for (BulletPoint hit : bullet.getHitPoints()) {
+                        ds.writeShort(hit.getX());
+                        ds.writeShort(hit.getY());
                     }
                 }
             }
 
-            byte bulletSuperState = bulletManager.getTypeSC();
-            ds.writeByte(bulletSuperState);
-            if (bulletSuperState == 1 || bulletSuperState == 2) {
-                ds.writeShort(bulletManager.getXSC());
-                ds.writeShort(bulletManager.getYSC());
+            // Ghi thông tin nếu đạn siêu cao
+            byte typeSuper = bulletManager.getTypeSuper();
+            ds.writeByte(typeSuper);
+            if (typeSuper == 1 || typeSuper == 2) {
+                ds.writeShort(bulletManager.getXSuper());
+                ds.writeShort(bulletManager.getYSuper());
             }
             ds.flush();
             fightWait.sendToTeam(ms);
