@@ -325,7 +325,7 @@ public class Player {
             return;
         }
 
-        Player shooter = bull.getPl();
+        Player shooter = bull.getPlayer();
         int bullId = bull.getBullId();
         int shooterCharacterId = shooter.getCharacterId();
 

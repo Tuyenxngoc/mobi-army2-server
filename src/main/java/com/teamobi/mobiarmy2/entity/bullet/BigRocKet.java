@@ -31,7 +31,7 @@ public class BigRocKet extends Bullet {
             if (this.Y < -1200) {
                 vy = 0;
                 for (byte i = 0; i < 21; i++) {
-                    X = (short) (X - (pl.getX() - toX) / 20);
+                    X = (short) (X - (player.getX() - toX) / 20);
                     super.frame++;
                     this.XArray.add(X);
                     this.YArray.add(Y);

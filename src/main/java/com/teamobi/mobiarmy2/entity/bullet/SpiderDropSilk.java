@@ -22,7 +22,7 @@ public class SpiderDropSilk extends Bullet {
         YArray.add(Y);
 
         //Cập nhật vị tri người chơi
-        VenomousSpider spider = (VenomousSpider) pl;
+        VenomousSpider spider = (VenomousSpider) player;
         Player targetPlayer = spider.getTargetPlayer();
         targetPlayer.setY((short) (Y - 3));
         bulletManager.getFightManager().sendMessageUpdateXY(targetPlayer.getIndex());

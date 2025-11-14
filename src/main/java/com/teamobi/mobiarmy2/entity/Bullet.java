@@ -13,6 +13,7 @@ import java.util.List;
 @Setter
 public class Bullet {
     protected BulletManager bulletManager;
+    protected Player player;
     protected boolean collect;
     protected byte bullId;
     protected int damage;
@@ -33,18 +34,17 @@ public class Bullet {
     protected short maxY;
     protected short frame;
     protected byte typeSC;
-    protected Player pl;
     protected boolean isXuyenPlayer;
     protected boolean isXuyenMap;
     protected boolean isCanCollision;
     protected List<Short> XArray;
     protected List<Short> YArray;
 
-    public Bullet(BulletManager bulletManager, byte bullId, int damage, Player pl, int X, int Y, int vx, int vy, int msg, int g100) {
+    public Bullet(BulletManager bulletManager, byte bullId, int damage, Player player, int X, int Y, int vx, int vy, int msg, int g100) {
         this.bulletManager = bulletManager;
         this.bullId = bullId;
-        this.damage = (damage * pl.getDamage()) / 100;
-        this.pl = pl;
+        this.damage = (damage * player.getDamage()) / 100;
+        this.player = player;
         this.X = (short) X;
         this.Y = (short) Y;
         this.lastX = (short) X;
@@ -119,7 +119,7 @@ public class Bullet {
             Y = collisionPoint[1];
             XArray.add(X);
             YArray.add(Y);
-            if (pl.getUsedItemId() == -1 && !pl.isUsePow()) {
+            if (player.getUsedItemId() == -1 && !player.isUsePow()) {
                 if (this.isMaxY) {
                     if (this.Y - this.maxY > 350 && this.Y - this.maxY < 450) {
                         this.typeSC = 1;
@@ -127,7 +127,7 @@ public class Bullet {
                         this.typeSC = 2;
                     }
                 }
-                if ((pl.getGunId() == 2 || pl.getGunId() == 3) && (Math.abs(lastX - XArray.getFirst()) > 375)) {
+                if ((player.getGunId() == 2 || player.getGunId() == 3) && (Math.abs(lastX - XArray.getFirst()) > 375)) {
                     this.typeSC = 4;
                 }
             }

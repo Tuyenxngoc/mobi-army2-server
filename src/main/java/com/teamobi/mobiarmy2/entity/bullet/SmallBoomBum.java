@@ -18,8 +18,8 @@ public class SmallBoomBum extends Bullet {
         XArray.add(X);
         YArray.add(Y);
         bulletManager.getFightManager().getMapManger().collision(X, Y, this);
-        pl.setDead(true);
-        pl.setWidth((short) 0);
-        pl.setHeight((short) 0);
+        player.setDead(true);
+        player.setWidth((short) 0);
+        player.setHeight((short) 0);
     }
 }
