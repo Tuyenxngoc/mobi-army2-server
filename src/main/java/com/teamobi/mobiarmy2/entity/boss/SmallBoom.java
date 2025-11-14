@@ -20,7 +20,7 @@ public class SmallBoom extends Boss {
         moveToTarget(player);
         int distance = calculateDistance(player.getX(), player.getY());
         if (distance < 25) {
-            fightManager.newShoot(index, (byte) 32, (short) 0, (byte) 0, (byte) 0, (byte) 1, true);
+            fightManager.sendShootData(index, (byte) 32, (short) 0, (byte) 0, (byte) 0, (byte) 1);
             return;
         }
         if (!fightManager.checkWin()) {

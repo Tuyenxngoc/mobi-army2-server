@@ -3,7 +3,6 @@ package com.teamobi.mobiarmy2.fight;
 import com.teamobi.mobiarmy2.entity.Bullet;
 import com.teamobi.mobiarmy2.entity.MapBrick;
 import com.teamobi.mobiarmy2.entity.MapTile;
-import com.teamobi.mobiarmy2.entity.Player;
 import com.teamobi.mobiarmy2.server.MapManager;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
@@ -15,7 +14,6 @@ import java.util.List;
 public class FightMapManager {
     @Getter
     private final List<MapTile> mapTiles = new ArrayList<>();
-    private final FightManager fightManager;
     @Getter
     private short width;
     @Getter
@@ -23,8 +21,7 @@ public class FightMapManager {
     private short[] playerInitXPositions;
     private short[] playerInitYPositions;
 
-    public FightMapManager(FightManager fightManager) {
-        this.fightManager = fightManager;
+    public FightMapManager() {
     }
 
     public List<short[]> getRandomPlayerPositions(int numPlayers) {
@@ -99,7 +96,7 @@ public class FightMapManager {
         }
     }
 
-    public boolean isCollision(short x, short y) {
+    public boolean isCollision(int x, int y) {
         for (MapTile tile : mapTiles) {
             if (tile.isCollision(x, y)) {
                 return true;
@@ -108,17 +105,10 @@ public class FightMapManager {
         return false;
     }
 
-    public void collision(short X, short Y, Bullet bull) {
+    public void handleCollision(Bullet bullet) {
         for (MapTile mapTile : mapTiles) {
-            mapTile.collision(X, Y, bull);
+            mapTile.collision(bullet);
         }
-        for (int i = 0; i < fightManager.getTotalPlayers(); i++) {
-            Player pl = fightManager.getPlayers()[i];
-            if (pl != null && pl.getCharacterId() != 17) {
-                pl.collision(X, Y, bull);
-            }
-        }
-        //Todo: bom hen gio
     }
 
     public void addNewTiles(MapTile mapTile) {

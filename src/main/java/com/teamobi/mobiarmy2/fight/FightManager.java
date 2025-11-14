@@ -69,7 +69,7 @@ public class FightManager {
         this.fightWait = fightWait;
         this.clanService = clanService;
         this.players = new Player[MAX_ELEMENT_FIGHT];
-        this.mapManager = new FightMapManager(this);
+        this.mapManager = new FightMapManager();
         this.bulletManager = new BulletManager(this);
         this.countdownTimer = new CountdownTimer(MAX_PLAY_TIME + 10, this::onTimeUp);
         this.executorNextTurn = Executors.newSingleThreadExecutor();
@@ -444,124 +444,6 @@ public class FightManager {
             bosses[i] = (Boss) players[i + MAX_USER_FIGHT];
         }
         sendMssAddBosses(bosses);
-    }
-
-    public short[] getForceArgXY(int idGun, boolean isXuyenMap, short X, short Y, short toX, short toY, short Mx, short My, int arg, int force, int msg, int g100) {
-        byte i = (byte) (Utils.nextInt(2) == 0 ? -1 : 1);
-        short argS = (short) (i == 1 ? arg : 180 - arg);
-        byte forceS = (byte) force;
-        do {
-            short x, y, vx, vy;
-            x = (short) (X + (20 * Utils.cos(argS) >> 10));
-            y = (short) (Y - 12 - (20 * Utils.sin(argS) >> 10));
-            vx = (short) (forceS * Utils.cos(argS) >> 10);
-            vy = (short) -(forceS * Utils.sin(argS) >> 10);
-            short ax100 = (short) (windX * msg / 100);
-            short ay100 = (short) (windY * msg / 100);
-            short vxTemp = 0, vyTemp = 0, vyTemp2 = 0;
-
-            if (idGun == 13) {
-                y -= 25;
-            }
-            while (true) {
-                if ((x < -200) || (x > mapManager.getWidth() + 200) || (y > mapManager.getHeight() + 200)) {
-                    break;
-                }
-                short preX = x, preY = y;
-                x += vx;
-                y += vy;
-                byte collision = getCollisionPoint(preX, preY, x, y, toX, toY, Mx, My, isXuyenMap);
-                if (collision == 1) {
-                    return new short[]{argS, forceS};
-                } else if (collision == 2) {
-                    break;
-                }
-                vxTemp += Math.abs(ax100);
-                vyTemp += Math.abs(ay100);
-                vyTemp2 += g100;
-                if (Math.abs(vxTemp) >= 100) {
-                    if (ax100 > 0) {
-                        vx += vxTemp / 100;
-                    } else {
-                        vx -= vxTemp / 100;
-                    }
-                    vxTemp %= 100;
-                }
-                if (Math.abs(vyTemp) >= 100) {
-                    if (ay100 > 0) {
-                        vy += vyTemp / 100;
-                    } else {
-                        vy -= vyTemp / 100;
-                    }
-                    vyTemp %= 100;
-                }
-                if (Math.abs(vyTemp2) >= 100) {
-                    vy += vyTemp2 / 100;
-                    vyTemp2 %= 100;
-                }
-            }
-            forceS++;
-            if (forceS > 30) {
-                argS += i;
-                forceS = (byte) force;
-                argS = (short) Utils.toArg0_360(argS);
-                if (argS == arg) {
-                    break;
-                }
-            }
-        } while (true);
-
-        return null;
-    }
-
-    private byte getCollisionPoint(short X1, short Y1, short X2, short Y2, short toX, short toY, short Mx, short My, boolean isXuyenMap) {
-        int Dx = X2 - X1;
-        int Dy = Y2 - Y1;
-        byte x_unit = 0;
-        byte y_unit = 0;
-        byte x_unit2 = 0;
-        byte y_unit2 = 0;
-        if (Dx < 0) {
-            x_unit = x_unit2 = -1;
-        } else if (Dx > 0) {
-            x_unit = x_unit2 = 1;
-        }
-        if (Dy < 0) {
-            y_unit = y_unit2 = -1;
-        } else if (Dy > 0) {
-            y_unit = y_unit2 = 1;
-        }
-        int k1 = Math.abs(Dx);
-        int k2 = Math.abs(Dy);
-        if (k1 > k2) {
-            y_unit2 = 0;
-        } else {
-            k1 = Math.abs(Dy);
-            k2 = Math.abs(Dx);
-            x_unit2 = 0;
-        }
-        int k = k1 >> 1;
-        short X = X1, Y = Y1;
-        for (int i = 0; i <= k1; i++) {
-            if (Math.abs(X - toX) <= Mx && Math.abs(Y - toY) <= My) {
-                return 1;
-            }
-            if (!isXuyenMap) {
-                if (mapManager.isCollision(X, Y)) {
-                    return 2;
-                }
-            }
-            k += k2;
-            if (k >= k1) {
-                k -= k1;
-                X += x_unit;
-                Y += y_unit;
-            } else {
-                X += x_unit2;
-                Y += y_unit2;
-            }
-        }
-        return 0;
     }
 
     public synchronized void nextTurn() {
@@ -1136,13 +1018,15 @@ public class FightManager {
         Player player = players[index];
         player.updateXY(x, y);
 
-        newShoot(index, bullId, angle, force, force2, numShoot, true);
+        bulletManager.addShoot();
+        bulletManager.drawBullet();
+
+        sendShootData(index, bullId, angle, force, force2, numShoot);
+
     }
 
-    public void newShoot(int index, byte bullId, short angle, byte force, byte force2, byte numShoot, boolean isNextTurn) {
+    public void sendShootData(int index, byte bullId, short angle, byte force, byte force2, byte numShoot) {
         Player player = players[index];
-
-
         byte typeShoot = bulletManager.getTypeShoot();
         List<Bullet> bullets = bulletManager.getBullets();
         try {
@@ -1168,13 +1052,13 @@ public class FightManager {
             ds.writeByte(numShoot);
             ds.writeByte(bullets.size());
             for (Bullet bullet : bullets) {
-                List<BulletPoint> trajectory = bullet.getTrajectory();
+                List<Point> trajectory = bullet.getTrajectory();
                 int size = trajectory.size();
                 ds.writeShort(size);// Ghi độ dài quỹ đạo
 
                 if (typeShoot == 0) {// Ghi tọa độ theo dạng delta (chênh lệch)
                     for (int i = 0; i < size; i++) {
-                        BulletPoint point = bullet.getTrajectory().get(i);
+                        Point point = bullet.getTrajectory().get(i);
 
                         if (i == 0) {
                             // Điểm đầu tiên: ghi tọa độ tuyệt đối
@@ -1187,14 +1071,14 @@ public class FightManager {
                                 ds.writeByte(bullet.getDXLaser());
                                 ds.writeByte(bullet.getDYLaser());
                             } else {
-                                BulletPoint prevPoint = bullet.getTrajectory().get(i - 1);
+                                Point prevPoint = bullet.getTrajectory().get(i - 1);
                                 ds.writeByte((byte) (point.getX() - prevPoint.getX()));
                                 ds.writeByte((byte) (point.getY() - prevPoint.getY()));
                             }
                         }
                     }
                 } else if (typeShoot == 1) { // Ghi tọa độ tuyệt đối cho mỗi điểm
-                    for (BulletPoint point : bullet.getTrajectory()) {
+                    for (Point point : bullet.getTrajectory()) {
                         ds.writeShort(point.getX());
                         ds.writeShort(point.getY());
                     }
@@ -1202,7 +1086,7 @@ public class FightManager {
 
                 if (bullId == 48) {
                     ds.writeByte(bullet.getHitPoints().size());
-                    for (BulletPoint hit : bullet.getHitPoints()) {
+                    for (Point hit : bullet.getHitPoints()) {
                         ds.writeShort(hit.getX());
                         ds.writeShort(hit.getY());
                     }
@@ -1365,7 +1249,7 @@ public class FightManager {
             }
 
             //Tự sát
-            case 24 -> newShoot(playerIndex, (byte) 50, (short) 0, (byte) 0, (byte) 0, (byte) 1, true);
+            case 24 -> sendShootData(playerIndex, (byte) 50, (short) 0, (byte) 0, (byte) 0, (byte) 1);
 
             //Ufo Todo
             case 27 -> {
@@ -1564,5 +1448,9 @@ public class FightManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void handleBulletCollisionWithPlayers(Bullet bullet) {
+
     }
 }

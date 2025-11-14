@@ -35,7 +35,7 @@ public class ApaBullet extends Bullet {
                 int y = (this.Y - 12) - (20 * Utils.sin(arg) >> 10);
                 int vxn = (this.force * Utils.cos(arg) >> 11);
                 int vyn = -(this.force * Utils.sin(arg) >> 11);
-                bulletManager.addBullet(new Bullet(bulletManager, (byte) 18, this.satThuongGoc, super.pl, x, y, vxn, vyn, 30, 100));
+                bulletManager.addShoot(new Bullet(bulletManager, (byte) 18, this.satThuongGoc, super.pl, x, y, vxn, vyn, 30, 100));
             }
         }
     }

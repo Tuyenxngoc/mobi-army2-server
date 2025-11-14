@@ -14,7 +14,7 @@ public class ItemBomB52 extends Bullet {
     public void nextXY() {
         super.nextXY();
         if (super.collect) {
-            this.bulletManager.addBullet(new B52Bullet(bulletManager, (byte) 3, this.damage, super.pl, this.X - 50, this.Y - 260, 2, 0, 0, 80, this.X, this.Y));
+            this.bulletManager.addShoot(new B52Bullet(bulletManager, (byte) 3, this.damage, super.pl, this.X - 50, this.Y - 260, 2, 0, 0, 80, this.X, this.Y));
         }
     }
 }

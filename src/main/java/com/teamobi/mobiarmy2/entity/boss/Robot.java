@@ -19,10 +19,10 @@ public class Robot extends Boss {
         }
 
         if (Math.abs(x - closestPlayer.getX()) <= 40 && Math.abs(y - closestPlayer.getY()) <= 40) {
-            fightManager.newShoot(index, (byte) 35, (short) 0, (byte) 0, (byte) 0, (byte) 1, false);
+            fightManager.sendShootData(index, (byte) 35, (short) 0, (byte) 0, (byte) 0, (byte) 1);
             byte force = (byte) Utils.nextInt(15, 30);
             short arg = (short) Utils.nextInt(80, 100);
-            fightManager.newShoot(index, (byte) 36, arg, force, (byte) 0, (byte) 1, true);
+            fightManager.sendShootData(index, (byte) 36, arg, force, (byte) 0, (byte) 1);
             return;
         }
 
@@ -44,7 +44,7 @@ public class Robot extends Boss {
                     }
                     return;
                 }
-                fightManager.newShoot(index, (byte) 0, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1, true);
+                fightManager.sendShootData(index, (byte) 0, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1);
             }
             case 1 -> {
                 short[] forceArgXY = fightManager.getForceArgXY(
@@ -57,7 +57,7 @@ public class Robot extends Boss {
                     }
                     return;
                 }
-                fightManager.newShoot(index, (byte) 2, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1, true);
+                fightManager.sendShootData(index, (byte) 2, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1);
             }
             case 2 -> {
                 short[] forceArgXY = fightManager.getForceArgXY(
@@ -70,7 +70,7 @@ public class Robot extends Boss {
                     }
                     return;
                 }
-                fightManager.newShoot(index, (byte) 10, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1, true);
+                fightManager.sendShootData(index, (byte) 10, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1);
             }
             case 3 -> {
                 usedItemId = 6;
@@ -84,7 +84,7 @@ public class Robot extends Boss {
                     }
                     return;
                 }
-                fightManager.newShoot(index, (byte) 6, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1, true);
+                fightManager.sendShootData(index, (byte) 6, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1);
             }
             case 4 -> {
                 usedItemId = 7;
@@ -98,7 +98,7 @@ public class Robot extends Boss {
                     }
                     return;
                 }
-                fightManager.newShoot(index, (byte) 7, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1, true);
+                fightManager.sendShootData(index, (byte) 7, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1);
             }
             default -> {
                 short[] forceArgXY = fightManager.getForceArgXY(
@@ -111,7 +111,7 @@ public class Robot extends Boss {
                     }
                     return;
                 }
-                fightManager.newShoot(index, (byte) 36, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1, true);
+                fightManager.sendShootData(index, (byte) 36, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1);
             }
         }
     }

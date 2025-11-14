@@ -307,14 +307,16 @@ public class Player {
         die();
     }
 
-    public boolean isCollision(short x, short y) {
+    public boolean isCollision(int x, int y) {
         if (eyeSmokeCount > 0) {
             return false;
         }
         return Utils.inRegion(x, y, this.x - this.width / 2, this.y - this.height, this.width, this.height);
     }
 
-    public synchronized void collision(short bx, short by, Bullet bull) {
+    public synchronized void collision(Bullet bull) {
+        int bx = bull.getX();
+        int by = bull.getY();
         //Bỏ qua nếu đã bại hoặc đang vô hình
         if (isDead || invisibleCount > 0) {
             return;

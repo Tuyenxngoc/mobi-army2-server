@@ -31,7 +31,7 @@ public class MapTile {
         }
     }
 
-    public boolean isCollision(short x, short y) {
+    public boolean isCollision(int x, int y) {
         return (Utils.inRegion(x, y, this.x, this.y, image.getWidth(), image.getHeight()))
                 && Utils.isNotAlpha(this.getARGB(x - this.x, y - this.y));
     }
@@ -40,16 +40,20 @@ public class MapTile {
         return image.getPixelData()[y * image.getWidth() + x];
     }
 
-    public void collision(int bx, int by, Bullet bullet) {
-        ImageData bulletHoleImage = EffectManager.getHoleImageByBulletId(bullet.getBullId());
+    public void collision(Bullet bullet) {
+        int bx = bullet.getX();
+        int by = bullet.getY();
+        ImageData bulletHoleImage = EffectManager.getHoleImageByBulletId(bullet.getBulletManager().getBulletId());
         int w = bulletHoleImage.getWidth();
         int h = bulletHoleImage.getHeight();
         int[] argbS = bulletHoleImage.getPixelData();
         if (!this.collision || !Utils.intersectRegions(bx - w / 2, by - h / 2, w, h, this.x, this.y, image.getWidth(), image.getHeight())) {
             return;
         }
-        bx -= x + w / 2;
-        by -= y + h / 2;
+
+        bx -= this.x + w / 2;
+        by -= this.y + h / 2;
+
         for (int i = 0; i < h; i++) {
             for (int j = 0; j < w; j++) {
                 if (Utils.inRegion(bx + j, by + i, 0, 0, image.getWidth(), image.getHeight())) {
