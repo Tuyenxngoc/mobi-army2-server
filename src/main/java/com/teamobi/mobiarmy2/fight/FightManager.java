@@ -1141,27 +1141,10 @@ public class FightManager {
 
     public void newShoot(int index, byte bullId, short angle, byte force, byte force2, byte numShoot, boolean isNextTurn) {
         Player player = players[index];
-        if (player.isDoubleShoot()) {
-            player.setDoubleShoot(false);
-        } else {
-            numShoot = 1;
-        }
 
-        //Tính toán người chơi nào rơi sao
-        handleLuckUpdates();
-
-        bulletManager.addShoot(player, bullId, angle, force, force2, numShoot);
-        bulletManager.fillXY();
-
-        //Gửi ms những người chơi may mắn
-        updateLuckyPlayers();
-
-        List<Bullet> bullets = bulletManager.getBullets();
-        if (bullets.isEmpty()) {
-            return;
-        }
 
         byte typeShoot = bulletManager.getTypeShoot();
+        List<Bullet> bullets = bulletManager.getBullets();
         try {
             Message ms = new Message(Cmd.FIRE_ARMY);
             DataOutputStream ds = ms.writer();
@@ -1237,14 +1220,6 @@ public class FightManager {
             fightWait.sendToTeam(ms);
         } catch (IOException e) {
             e.printStackTrace();
-        }
-
-        //Xóa các đạn đã bắn
-        bulletManager.getBullets().clear();
-
-        //Nếu chưa kết thúc trận đấu thì tìm lượt mới
-        if (isNextTurn && !checkWin()) {
-            nextTurn();
         }
     }
 
