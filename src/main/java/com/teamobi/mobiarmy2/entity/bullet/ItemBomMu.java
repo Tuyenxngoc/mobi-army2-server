@@ -13,7 +13,7 @@ public class ItemBomMu extends Bullet {
     @Override
     public void nextXY() {
         super.nextXY();
-        if (super.collect) {
+        if (super.isCollected) {
             for (int i = 0; i < 8; i++) {
                 Player pl = bulletManager.getFightManager().getPlayers()[i];
                 if (pl != null) {

@@ -22,7 +22,7 @@ public class ItemKhoangDat extends Bullet {
             this.bulletManager.getFightManager().getMapManger().collision(X, Y, this);
         }
         if (this.frame == nFrame) {
-            this.collect = true;
+            this.isCollected = true;
         }
     }
 }

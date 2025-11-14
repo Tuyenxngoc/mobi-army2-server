@@ -10,8 +10,8 @@ public class BalloonLazer extends Bullet {
     }
 
     @Override
-    public boolean isCollect() {
-        return this.collect;
+    public boolean isCollected() {
+        return this.isCollected;
     }
 
     public void nextXY() {
@@ -22,7 +22,7 @@ public class BalloonLazer extends Bullet {
         this.XArray.add(X);
         this.YArray.add(Y);
         if ((X < -200) || (X > bulletManager.getFightManager().getMapManger().getWidth() + 200) || (Y > bulletManager.getFightManager().getMapManger().getHeight() + 200)) {
-            collect = true;
+            isCollected = true;
             return;
         }
         short preX = X, preY = Y;
@@ -31,7 +31,7 @@ public class BalloonLazer extends Bullet {
         lastY = Y;
         short[] XYVC = bulletManager.getCollisionPoint(preX, preY, X, Y, isXuyenPlayer, isXuyenMap);
         if (XYVC != null) {
-            collect = true;
+            isCollected = true;
             X = XYVC[0];
             Y = XYVC[1];
             XArray.add(X);

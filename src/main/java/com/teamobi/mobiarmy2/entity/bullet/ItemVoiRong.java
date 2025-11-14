@@ -13,7 +13,7 @@ public class ItemVoiRong extends Bullet {
     @Override
     public void nextXY() {
         super.nextXY();
-        if (super.collect) {
+        if (super.isCollected) {
             bulletManager.setHasVoiRong(true);
             bulletManager.getVoiRongs().add(new BulletManager.VoiRong(X, Y, 3));
         }

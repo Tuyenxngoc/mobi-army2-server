@@ -14,7 +14,7 @@ public class ItemBomHenGio extends Bullet {
     @Override
     public void nextXY() {
         super.nextXY();
-        if (super.collect) {
+        if (super.isCollected) {
             this.isCanCollision = true;
 //            this.bulletManager.buls.add(new BulletManager.Bullets(this));
         }

@@ -13,7 +13,7 @@ public class ItemTraiPha extends Bullet {
     @Override
     public void nextXY() {
         super.nextXY();
-        if (super.collect) {
+        if (super.isCollected) {
             this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 12, this.damage, player, this.X - 8, this.Y - 493, -1, 2, 0, 100));
             this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 12, this.damage, player, this.X + 12, this.Y - 496, 0, 1, 0, 100));
             this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 12, this.damage, player, this.X - 19, this.Y - 505, -2, 1, 0, 100));

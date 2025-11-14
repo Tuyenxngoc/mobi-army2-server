@@ -20,7 +20,7 @@ public class ChickyBullet extends Bullet {
         if (this.force2 == super.frame) {
             bulletManager.addBullet(new ChickyEggs(bulletManager, (byte) 20, (int) this.satThuongGoc, super.player, super.lastX, super.lastY, 0, 0, 20, 50));
         }
-        if (this.isCollect()) {
+        if (this.isCollected()) {
             return;
         }
     }

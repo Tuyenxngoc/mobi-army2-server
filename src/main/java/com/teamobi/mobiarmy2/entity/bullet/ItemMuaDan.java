@@ -13,8 +13,8 @@ public class ItemMuaDan extends Bullet {
     @Override
     public void nextXY() {
         super.nextXY();
-        if (super.isMaxY || this.collect) {
-            this.collect = true;
+        if (super.isMaxY || this.isCollected) {
+            this.isCollected = true;
             for (int i = 0; i < 10; i++) {
                 XArray.add(X);
                 YArray.add(Y);

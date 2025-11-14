@@ -13,7 +13,7 @@ public class ItemLaser extends Bullet {
     @Override
     public void nextXY() {
         super.nextXY();
-        if (super.collect) {
+        if (super.isCollected) {
             this.bulletManager.addBullet(new ItemLaserDelay(bulletManager, (byte) 15, this.damage, super.player, this.X, this.Y));
         }
     }

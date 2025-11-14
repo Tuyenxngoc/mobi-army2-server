@@ -14,7 +14,7 @@ public class SpiderDropSilk extends Bullet {
 
     @Override
     public void nextXY() {
-        collect = true;
+        isCollected = true;
         XArray.add(X);
         YArray.add(Y);
         Y += 38;

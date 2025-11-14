@@ -14,26 +14,31 @@ import java.util.List;
 public class Bullet {
     protected BulletManager bulletManager;
     protected Player player;
-    protected boolean collect;
+    protected boolean isCollected;
     protected byte bullId;
     protected int damage;
+
     protected short X;
     protected short Y;
     protected short lastX;
     protected short lastY;
     protected short vx;
     protected short vy;
+
     protected short ax100;
     protected short ay100;
     protected short g100;
+
     protected short vxTemp;
     protected short vyTemp;
     protected short vyTemp2;
+
     protected boolean isMaxY;
-    protected short XmaxY;
-    protected short maxY;
+    protected short peakX;
+    protected short peakY;
+
     protected short frame;
-    protected byte typeSC;
+    protected byte superType;
     protected boolean isXuyenPlayer;
     protected boolean isXuyenMap;
     protected boolean isCanCollision;
@@ -58,12 +63,12 @@ public class Bullet {
         this.vxTemp = 0;
         this.vyTemp = 0;
         this.vyTemp2 = 0;
-        this.collect = false;
+        this.isCollected = false;
         this.isMaxY = false;
-        this.XmaxY = -1;
-        this.maxY = -1;
+        this.peakX = -1;
+        this.peakY = -1;
         this.frame = 0;
-        this.typeSC = 0;
+        this.superType = 0;
         this.XArray = new ArrayList<>();
         this.YArray = new ArrayList<>();
         this.isXuyenPlayer = false;
@@ -101,44 +106,108 @@ public class Bullet {
         FightMapManager mapManager = fightManager.getMapManger();
 
         frame++;
+
         this.XArray.add(X);
         this.YArray.add(Y);
+
+        // Kiểm tra đạn bay ra ngoài map
         if ((X < -200) || (X > mapManager.getWidth() + 200) || (Y > mapManager.getHeight() + 200)) {
-            collect = true;
+            isCollected = true;
             return;
         }
-        short preX = X, preY = Y;
+
+        // Lưu vị trí cũ để kiểm tra va chạm
+        short preX = X;
+        short preY = Y;
+
+        // Di chuyển đạn theo vận tốc
         X += vx;
-        lastX = X;
         Y += vy;
+
+        lastX = X;
         lastY = Y;
+
+        // Kiểm tra va chạm với map/player
         short[] collisionPoint = bulletManager.getCollisionPoint(preX, preY, X, Y, isXuyenPlayer, isXuyenMap);
         if (collisionPoint != null) {
-            collect = true;
+            isCollected = true;
+
             X = collisionPoint[0];
             Y = collisionPoint[1];
             XArray.add(X);
             YArray.add(Y);
-            if (player.getUsedItemId() == -1 && !player.isUsePow()) {
-                if (this.isMaxY) {
-                    if (this.Y - this.maxY > 350 && this.Y - this.maxY < 450) {
-                        this.typeSC = 1;
-                    } else if (this.Y - this.maxY >= 450) {
-                        this.typeSC = 2;
-                    }
-                }
-                if ((player.getGunId() == 2 || player.getGunId() == 3) && (Math.abs(lastX - XArray.getFirst()) > 375)) {
-                    this.typeSC = 4;
-                }
-            }
+
+            // Tính super shot type
+            calculateSuperType();
+
             if (this.isCanCollision) {
                 mapManager.collision(X, Y, this);
             }
+
             return;
         }
+
+        // Cập nhật gia tốc
+        updateAcceleration();
+
+        // Xác định điểm cao nhất (đỉnh quỹ đạo)
+        if (vy > 0 && !isMaxY) {
+            isMaxY = true;
+            peakX = X;
+            peakY = Y;
+        }
+
+        // Áp dụng hiệu ứng Vòi Rồng
+        applyVoiRongEffect();
+    }
+
+    private void applyVoiRongEffect() {
+        if (!this.bulletManager.isHasVoiRong()) {
+            return;
+        }
+
+        for (BulletManager.VoiRong vr : this.bulletManager.getVoiRongs()) {
+            if (this.X >= vr.X - 5 && this.X <= vr.X + 10) {
+                this.vx -= 2;
+                this.vy -= 2;
+                break;
+            }
+        }
+    }
+
+    private void calculateSuperType() {
+        // Nếu dùng item hoặc dùng power thì không tính
+        if (player.getUsedItemId() != -1 || player.isUsePow()) {
+            return;
+        }
+
+        if (isMaxY) {// Siêu cao
+            int dropHeight = Y - peakY;
+
+            if (dropHeight > 350 && dropHeight < 450) {// Super type 1: Rơi từ độ cao 350-450
+                superType = 1;
+            } else if (dropHeight >= 450) {// Super type 2: Rơi từ độ cao >= 450
+                superType = 2;
+            }
+        }
+
+        short gunId = player.getGunId();
+        if ((gunId == 2 || gunId == 3) && !XArray.isEmpty()) { // Siêu xa
+            int distance = Math.abs(X - XArray.getFirst());
+
+            if (distance > 375) {
+                superType = 4;
+            }
+        }
+    }
+
+    private void updateAcceleration() {
+        // Tích lũy gia tốc
         vxTemp += Math.abs(ax100);
         vyTemp += Math.abs(ay100);
         vyTemp2 += g100;
+
+        // Cập nhật vận tốc X
         if (Math.abs(vxTemp) >= 100) {
             if (ax100 > 0) {
                 vx += vxTemp / 100;
@@ -147,6 +216,8 @@ public class Bullet {
             }
             vxTemp %= 100;
         }
+
+        // Cập nhật vận tốc Y
         if (Math.abs(vyTemp) >= 100) {
             if (ay100 > 0) {
                 vy += vyTemp / 100;
@@ -155,23 +226,10 @@ public class Bullet {
             }
             vyTemp %= 100;
         }
+
         if (Math.abs(vyTemp2) >= 100) {
             vy += vyTemp2 / 100;
             vyTemp2 %= 100;
-        }
-        if (vy > 0 && !isMaxY) {
-            isMaxY = true;
-            XmaxY = X;
-            maxY = Y;
-        }
-        if (this.bulletManager.isHasVoiRong()) {
-            for (BulletManager.VoiRong vr : this.bulletManager.getVoiRongs()) {
-                if (this.X >= vr.X - 5 && this.X <= vr.X + 10) {
-                    this.vx -= 2;
-                    this.vy -= 2;
-                    break;
-                }
-            }
         }
     }
 }

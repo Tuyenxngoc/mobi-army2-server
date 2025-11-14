@@ -21,7 +21,7 @@ public class ApaBullet extends Bullet {
     public void nextXY() {
         super.nextXY();
         if (this.force2 == frame) {
-            this.collect = true;
+            this.isCollected = true;
             this.isCanCollision = false;
             this.damage = 0;
             bulletManager.getFightManager().getMapManger().collision(this.X, this.Y, this);

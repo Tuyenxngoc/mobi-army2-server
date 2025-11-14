@@ -18,7 +18,7 @@ public class MGTBulletOld extends Bullet {
         XArray.add(X);
         YArray.add(Y);
         if ((X < -200) || (X > bulletManager.getFightManager().getMapManger().getWidth() + 200) || (Y > bulletManager.getFightManager().getMapManger().getHeight() + 200)) {
-            collect = true;
+            isCollected = true;
             return;
         }
         short preX = X, preY = Y;
@@ -42,7 +42,7 @@ public class MGTBulletOld extends Bullet {
         }
         short[] XYVC = bulletManager.getCollisionPoint(preX, preY, X, Y, isXuyenPlayer, isXuyenMap);
         if (XYVC != null) {
-            collect = true;
+            isCollected = true;
             X = XYVC[0];
             Y = XYVC[1];
             XArray.add(X);

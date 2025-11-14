@@ -521,7 +521,7 @@ public class BulletManager {
             hasNext = false;
             for (int i = 0; i < bullets.size(); i++) {
                 Bullet bullet = bullets.get(i);
-                if (bullet == null || bullet.isCollect()) {
+                if (bullet == null || bullet.isCollected()) {
                     continue;
                 }
                 hasNext = true;

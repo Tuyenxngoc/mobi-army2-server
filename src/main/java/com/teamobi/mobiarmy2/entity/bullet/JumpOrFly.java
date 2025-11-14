@@ -18,7 +18,7 @@ public class JumpOrFly extends Bullet {
             super.isXuyenMap = false;
         }
         super.nextXY();
-        if (super.collect) {
+        if (super.isCollected) {
             bulletManager.getFightManager().getPlayerTurn().setXY(X, Y);
         }
     }

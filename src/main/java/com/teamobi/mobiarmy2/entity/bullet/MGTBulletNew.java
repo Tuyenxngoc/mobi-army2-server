@@ -19,7 +19,7 @@ public class MGTBulletNew extends Bullet {
     public void nextXY() {
         super.nextXY();
         if (isMaxY) {
-            this.collect = true;
+            this.isCollected = true;
             int nextX = X - XArray.getFirst();
             int nextY = Y - YArray.getFirst();
             int arg = Utils.getArg(nextX, nextY);

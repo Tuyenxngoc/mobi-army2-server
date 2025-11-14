@@ -24,7 +24,7 @@ public class ItemXuyenDat extends Bullet {
         lastY = Y;
         short[] XYVC = bulletManager.getCollisionPoint(preX, preY, X, Y, isXuyenPlayer, isXuyenMap);
         if (XYVC != null) {
-            collect = true;
+            isCollected = true;
             X = XYVC[0];
             Y = XYVC[1];
             XArray.add(X);
@@ -39,13 +39,13 @@ public class ItemXuyenDat extends Bullet {
         if ((X < -100) || (X > bulletManager.getFightManager().getMapManger().getWidth() + 100) || (Y > bulletManager.getFightManager().getMapManger().getHeight() + 200)) {
             XArray.add(X);
             YArray.add(Y);
-            collect = true;
+            isCollected = true;
             return;
         }
         if (this.frame == force - 1) {
             XArray.add(X);
             YArray.add(Y);
-            this.collect = true;
+            this.isCollected = true;
             return;
         }
         vyTemp2 -= g100;

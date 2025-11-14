@@ -14,7 +14,7 @@ public class ChickyEggs extends Bullet {
         if (super.frame == 0) {
             short[] XYVC = bulletManager.getCollisionPoint(X, Y, X, (short) (Y + 8), isXuyenPlayer, isXuyenMap);
             if (XYVC != null) {
-                collect = true;
+                isCollected = true;
                 X = XYVC[0];
                 Y = XYVC[1];
                 XArray.add(X);

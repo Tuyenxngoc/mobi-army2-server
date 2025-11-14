@@ -11,7 +11,7 @@ public class ItemTuSat extends Bullet {
 
     @Override
     public void nextXY() {
-        this.collect = true;
+        this.isCollected = true;
         this.XArray.add(X);
         this.YArray.add(Y);
         this.Y += 2;
