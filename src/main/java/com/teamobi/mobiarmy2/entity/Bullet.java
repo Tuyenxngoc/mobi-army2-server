@@ -38,10 +38,9 @@ public class Bullet {
     protected short peakY;
 
     protected short frame;
-    protected byte superType;
-    protected boolean isXuyenPlayer;
-    protected boolean isXuyenMap;
-    protected boolean isCanCollision;
+    protected boolean canPassThroughPlayers;
+    protected boolean canPassThroughMap;
+    protected boolean canCollide;
     protected List<Short> XArray;
     protected List<Short> YArray;
 
@@ -68,12 +67,11 @@ public class Bullet {
         this.peakX = -1;
         this.peakY = -1;
         this.frame = 0;
-        this.superType = 0;
         this.XArray = new ArrayList<>();
         this.YArray = new ArrayList<>();
-        this.isXuyenPlayer = false;
-        this.isXuyenMap = false;
-        this.isCanCollision = true;
+        this.canPassThroughPlayers = false;
+        this.canPassThroughMap = false;
+        this.canCollide = true;
     }
 
     public static int getImpactRadiusByBullId(int bullId) {
@@ -128,19 +126,21 @@ public class Bullet {
         lastY = Y;
 
         // Kiểm tra va chạm với map/player
-        short[] collisionPoint = bulletManager.getCollisionPoint(preX, preY, X, Y, isXuyenPlayer, isXuyenMap);
-        if (collisionPoint != null) {
+        short[] collisionResult = bulletManager.getCollisionPoint(preX, preY, X, Y, canPassThroughPlayers, canPassThroughMap);
+        if (collisionResult != null) {
             isCollected = true;
 
-            X = collisionPoint[0];
-            Y = collisionPoint[1];
+            X = collisionResult[0];
+            Y = collisionResult[1];
             XArray.add(X);
             YArray.add(Y);
 
-            // Tính super shot type
-            calculateSuperType();
+            int type = collisionResult[2]; // Loại va chạm
+            if (type == 1) { // Va chạm với player tính super shot type
+                calculateSuperType();
+            }
 
-            if (this.isCanCollision) {
+            if (this.canCollide) {
                 mapManager.collision(X, Y, this);
             }
 
@@ -185,9 +185,9 @@ public class Bullet {
             int dropHeight = Y - peakY;
 
             if (dropHeight > 350 && dropHeight < 450) {// Super type 1: Rơi từ độ cao 350-450
-                superType = 1;
+                bulletManager.setSuperType((byte) 1);
             } else if (dropHeight >= 450) {// Super type 2: Rơi từ độ cao >= 450
-                superType = 2;
+                bulletManager.setSuperType((byte) 2);
             }
         }
 
@@ -196,8 +196,13 @@ public class Bullet {
             int distance = Math.abs(X - XArray.getFirst());
 
             if (distance > 375) {
-                superType = 4;
+                bulletManager.setSuperType((byte) 4);
             }
+        }
+
+        if (bulletManager.getSuperType() != 0) {
+            bulletManager.setSuperX(peakX);
+            bulletManager.setSuperY(peakY);
         }
     }
 

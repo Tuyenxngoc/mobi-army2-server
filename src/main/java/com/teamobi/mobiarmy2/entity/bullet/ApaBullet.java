@@ -22,7 +22,7 @@ public class ApaBullet extends Bullet {
         super.nextXY();
         if (this.force2 == frame) {
             this.isCollected = true;
-            this.isCanCollision = false;
+            this.canCollide = false;
             this.damage = 0;
             bulletManager.getFightManager().getMapManger().collision(this.X, this.Y, this);
             int arg = bulletManager.getArg() + Utils.toArg0_360(Utils.getArg(this.player.getX() - this.X, this.player.getY() - this.Y));

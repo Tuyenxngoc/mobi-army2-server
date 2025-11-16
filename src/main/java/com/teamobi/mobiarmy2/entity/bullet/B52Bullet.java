@@ -10,8 +10,8 @@ public class B52Bullet extends Bullet {
 
     public B52Bullet(BulletManager bulletManager, byte bullId, int damage, Player pl, int X, int Y, int vx, int vy, int msg, int g100, short toX, short toY) {
         super(bulletManager, bullId, damage, pl, X, Y, vx, vy, msg, g100);
-        super.isXuyenMap = true;
-        super.isXuyenPlayer = true;
+        super.canPassThroughMap = true;
+        super.canPassThroughPlayers = true;
         this.toX = toX;
         this.toY = toY;
     }
@@ -20,8 +20,8 @@ public class B52Bullet extends Bullet {
     public void nextXY() {
         super.nextXY();
         if (toY <= Y) {
-            super.isXuyenMap = false;
-            super.isXuyenPlayer = false;
+            super.canPassThroughMap = false;
+            super.canPassThroughPlayers = false;
             X = toX;
             Y = toY;
         }

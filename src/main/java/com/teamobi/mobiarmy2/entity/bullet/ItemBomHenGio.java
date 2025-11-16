@@ -7,15 +7,15 @@ import com.teamobi.mobiarmy2.fight.BulletManager;
 public class ItemBomHenGio extends Bullet {
     public ItemBomHenGio(BulletManager bullMNG, byte bullId, int satThuong, Player pl, int X, int Y, int vx, int vy, int msg, int g100) {
         super(bullMNG, bullId, satThuong, pl, X, Y, vx, vy, msg, g100);
-        this.isCanCollision = false;
-        this.isXuyenPlayer = true;
+        this.canCollide = false;
+        this.canPassThroughPlayers = true;
     }
 
     @Override
     public void nextXY() {
         super.nextXY();
         if (super.isCollected) {
-            this.isCanCollision = true;
+            this.canCollide = true;
 //            this.bulletManager.buls.add(new BulletManager.Bullets(this));
         }
     }

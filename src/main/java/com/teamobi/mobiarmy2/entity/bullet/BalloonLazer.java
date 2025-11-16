@@ -29,14 +29,14 @@ public class BalloonLazer extends Bullet {
         lastX = X;
         Y += vy;
         lastY = Y;
-        short[] XYVC = bulletManager.getCollisionPoint(preX, preY, X, Y, isXuyenPlayer, isXuyenMap);
+        short[] XYVC = bulletManager.getCollisionPoint(preX, preY, X, Y, canPassThroughPlayers, canPassThroughMap);
         if (XYVC != null) {
             isCollected = true;
             X = XYVC[0];
             Y = XYVC[1];
             XArray.add(X);
             YArray.add(Y);
-            if (this.isCanCollision) {
+            if (this.canCollide) {
                 bulletManager.getFightManager().getMapManger().collision(X, Y, this);
             }
         }

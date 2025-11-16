@@ -7,15 +7,15 @@ import com.teamobi.mobiarmy2.fight.BulletManager;
 public class JumpOrFly extends Bullet {
     public JumpOrFly(BulletManager bullMNG, byte bullId, int satThuong, Player pl, int X, int Y, int vx, int vy, int msg, int g100) {
         super(bullMNG, bullId, satThuong, pl, X, Y, vx, vy, msg, g100);
-        super.isCanCollision = false;
-        super.isXuyenPlayer = true;
-        super.isXuyenMap = true;
+        super.canCollide = false;
+        super.canPassThroughPlayers = true;
+        super.canPassThroughMap = true;
     }
 
     @Override
     public void nextXY() {
         if (this.isMaxY) {
-            super.isXuyenMap = false;
+            super.canPassThroughMap = false;
         }
         super.nextXY();
         if (super.isCollected) {

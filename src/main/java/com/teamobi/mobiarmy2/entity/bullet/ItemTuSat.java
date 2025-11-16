@@ -17,7 +17,7 @@ public class ItemTuSat extends Bullet {
         this.Y += 2;
         this.XArray.add(X);
         this.YArray.add(Y);
-        if (this.isCanCollision) {
+        if (this.canCollide) {
             bulletManager.getFightManager().getMapManger().collision(X, Y, this);
         }
     }

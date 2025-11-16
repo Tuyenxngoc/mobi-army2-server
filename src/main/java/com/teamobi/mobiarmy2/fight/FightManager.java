@@ -1161,11 +1161,10 @@ public class FightManager {
             return;
         }
 
-        byte typeShoot = 0;
         try {
             Message ms = new Message(Cmd.FIRE_ARMY);
             DataOutputStream ds = ms.writer();
-            ds.writeByte(typeShoot);
+            ds.writeByte(bulletManager.getTypeShoot());
             ds.writeByte(player.isUsePow() ? 1 : 0);
             ds.writeByte(index);
             ds.writeByte(bullId);
@@ -1188,7 +1187,7 @@ public class FightManager {
                 List<Short> xArrays = bullet.getXArray();
                 List<Short> yArrays = bullet.getYArray();
                 ds.writeShort(xArrays.size());
-                if (typeShoot == 0) {
+                if (bulletManager.getTypeShoot() == 0) {
                     for (int j = 0; j < xArrays.size(); j++) {
                         if (j == 0) {
                             ds.writeShort(xArrays.getFirst());
@@ -1205,7 +1204,7 @@ public class FightManager {
                             ds.writeByte((byte) (yArrays.get(j) - yArrays.get(j - 1)));
                         }
                     }
-                } else if (typeShoot == 1) {
+                } else if (bulletManager.getTypeShoot() == 1) {
                     for (int j = 0; j < xArrays.size(); j++) {
                         ds.writeShort(xArrays.get(j));
                         ds.writeShort(yArrays.get(j));
@@ -1220,11 +1219,11 @@ public class FightManager {
                 }
             }
 
-            byte bulletSuperState = bulletManager.getTypeSC();
-            ds.writeByte(bulletSuperState);
-            if (bulletSuperState == 1 || bulletSuperState == 2) {
-                ds.writeShort(bulletManager.getXSC());
-                ds.writeShort(bulletManager.getYSC());
+            byte superType = bulletManager.getSuperType();
+            ds.writeByte(superType);
+            if (superType == 1 || superType == 2) {
+                ds.writeShort(bulletManager.getSuperX());
+                ds.writeShort(bulletManager.getSuperY());
             }
             ds.flush();
             fightWait.sendToTeam(ms);

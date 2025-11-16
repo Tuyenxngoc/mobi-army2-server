@@ -118,7 +118,7 @@ public class FightMapManager {
                 pl.collision(X, Y, bull);
             }
         }
-        //Todo: bom hen gio
+        //Todo: bom hen gio fix
     }
 
     public void addNewTiles(MapTile mapTile) {

@@ -15,6 +15,11 @@ import java.util.List;
 @Setter
 public class BulletManager {
     public static final boolean MGT_BULL_NEW = true;
+    private byte typeShoot = 0;
+    private byte superType;
+    private short superX;
+    private short superY;
+
     private FightManager fightManager;
     private ArrayList<Bullet> bullets;
     private byte force2;
@@ -530,66 +535,56 @@ public class BulletManager {
         } while (hasNext);
     }
 
-    public short[] getCollisionPoint(short X1, short Y1, short X2, short Y2, boolean isXuyenPlayer, boolean isXuyenMap) {
-        int Dx = X2 - X1;
-        int Dy = Y2 - Y1;
+    public short[] getCollisionPoint(short x1, short y1, short x2, short y2, boolean canPassThroughPlayers, boolean canPassThroughMap) {
+        int deltaX = x2 - x1;
+        int deltaY = y2 - y1;
+
         byte x_unit = 0;
         byte y_unit = 0;
         byte x_unit2 = 0;
         byte y_unit2 = 0;
-        Player us = this.fightManager.getPlayerTurn();
-        if (Dx < 0) {
+
+        if (deltaX < 0) {
             x_unit = x_unit2 = -1;
-        } else if (Dx > 0) {
+        } else if (deltaX > 0) {
             x_unit = x_unit2 = 1;
         }
-        if (Dy < 0) {
+        if (deltaY < 0) {
             y_unit = y_unit2 = -1;
-        } else if (Dy > 0) {
+        } else if (deltaY > 0) {
             y_unit = y_unit2 = 1;
         }
-        int k1 = Math.abs(Dx);
-        int k2 = Math.abs(Dy);
+
+        int k1 = Math.abs(deltaX);
+        int k2 = Math.abs(deltaY);
         if (k1 > k2) {
             y_unit2 = 0;
         } else {
-            k1 = Math.abs(Dy);
-            k2 = Math.abs(Dx);
+            k1 = Math.abs(deltaY);
+            k2 = Math.abs(deltaX);
             x_unit2 = 0;
         }
         int k = k1 >> 1;
-        short X = X1, Y = Y1;
+        short X = x1, Y = y1;
+
         for (int i = 0; i <= k1; i++) {
-            if (!isXuyenMap) {
+            // Check map collision
+            if (!canPassThroughMap) {
                 if (fightManager.getMapManger().isCollision(X, Y)) {
-                    return new short[]{X, Y};
+                    return new short[]{X, Y, 0};
                 }
             }
-            if (!isXuyenPlayer && us.getCharacterId() != 16) {
+
+            // Check player collision
+            if (!canPassThroughPlayers) {
                 for (int j = 0; j < fightManager.getTotalPlayers(); j++) {
                     Player pl = fightManager.getPlayers()[j];
-                    if (pl != null) {
-                        if (pl.getCharacterId() > 15 && pl.isDead()) {
-                            continue;
-                        }
-                        if (pl.isCollision(X, Y)) {
-                            return new short[]{X, Y};
-                        }
+                    if (pl != null && pl.isCollision(X, Y)) {
+                        return new short[]{X, Y, 1};
                     }
                 }
             }
-            if (us.getCharacterId() == 16) {
-                for (int j = 0; j < 8; j++) {
-                    Player pl = this.fightManager.getPlayers()[j];
-                    if (pl == null || pl.isDead()) {
-                        continue;
-                    }
-                    if (pl.isCollision(X, Y)) {
-                        return new short[]{X, Y};
-                    }
-                }
 
-            }
             k += k2;
             if (k >= k1) {
                 k -= k1;

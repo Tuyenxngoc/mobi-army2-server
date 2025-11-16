@@ -10,8 +10,8 @@ public class ItemXuyenDat extends Bullet {
     public ItemXuyenDat(BulletManager bullMNG, byte bullId, int satThuong, Player pl, int X, int Y, int vx, int vy, int msg, int g100, int force) {
         super(bullMNG, bullId, satThuong, pl, X, Y, vx, vy, msg, g100);
         this.force = force / 2;
-        this.isXuyenMap = true;
-        this.isXuyenPlayer = false;
+        this.canPassThroughMap = true;
+        this.canPassThroughPlayers = false;
     }
 
     @Override
@@ -22,14 +22,14 @@ public class ItemXuyenDat extends Bullet {
         lastX = X;
         Y += vy;
         lastY = Y;
-        short[] XYVC = bulletManager.getCollisionPoint(preX, preY, X, Y, isXuyenPlayer, isXuyenMap);
+        short[] XYVC = bulletManager.getCollisionPoint(preX, preY, X, Y, canPassThroughPlayers, canPassThroughMap);
         if (XYVC != null) {
             isCollected = true;
             X = XYVC[0];
             Y = XYVC[1];
             XArray.add(X);
             YArray.add(Y);
-            if (this.isCanCollision) {
+            if (this.canCollide) {
                 bulletManager.getFightManager().getMapManger().collision(X, Y, this);
             }
             return;

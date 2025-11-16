@@ -12,7 +12,7 @@ public class ChickyEggs extends Bullet {
     @Override
     public void nextXY() {
         if (super.frame == 0) {
-            short[] XYVC = bulletManager.getCollisionPoint(X, Y, X, (short) (Y + 8), isXuyenPlayer, isXuyenMap);
+            short[] XYVC = bulletManager.getCollisionPoint(X, Y, X, (short) (Y + 8), canPassThroughPlayers, canPassThroughMap);
             if (XYVC != null) {
                 isCollected = true;
                 X = XYVC[0];
@@ -21,7 +21,7 @@ public class ChickyEggs extends Bullet {
                 YArray.add(Y);
                 XArray.add(X);
                 YArray.add(Y);
-                if (this.isCanCollision) {
+                if (this.canCollide) {
                     bulletManager.getFightManager().getMapManger().collision(X, Y, this);
                 }
                 return;
