@@ -26,9 +26,7 @@ public class BalloonLazer extends Bullet {
             return;
         }
         short preX = x, preY = y;
-        lastX = x;
         y += vy;
-        lastY = y;
         short[] XYVC = bulletManager.getCollisionPoint(preX, preY, x, y, canPassThroughPlayers, canPassThroughMap);
         if (XYVC != null) {
             isCollected = true;

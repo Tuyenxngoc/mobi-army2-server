@@ -26,7 +26,6 @@ public class BulletManager {
     private List<VoiRong> voiRongs;
     private List<BomHenGio> boms;
     private List<Boss> addBosses;
-    private List<Bullets> buls;
     private byte mgtAddX;
     private byte mgtAddY;
     private byte typeSC;
@@ -42,7 +41,6 @@ public class BulletManager {
         this.voiRongs = new ArrayList<>();
         this.boms = new ArrayList<>();
         this.addBosses = new ArrayList<>();
-        this.buls = new ArrayList<>();
         this.hasVoiRong = false;
         this.force2 = -1;
         this.mangNhenId = 200;

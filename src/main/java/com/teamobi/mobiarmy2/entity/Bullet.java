@@ -22,8 +22,6 @@ public class Bullet {
     protected List<Short> YArray;
     protected short x;
     protected short y;
-    protected short lastX;
-    protected short lastY;
     protected short vx;
     protected short vy;
 
@@ -51,8 +49,6 @@ public class Bullet {
         this.player = player;
         this.x = (short) X;
         this.y = (short) Y;
-        this.lastX = (short) X;
-        this.lastY = (short) Y;
         this.vx = (short) vx;
         this.vy = (short) vy;
         FightManager fightManager = bulletManager.getFightManager();
@@ -121,9 +117,6 @@ public class Bullet {
         // Di chuyển đạn theo vận tốc
         x += vx;
         y += vy;
-
-        lastX = x;
-        lastY = y;
 
         // Kiểm tra va chạm với map/player
         short[] collisionResult = bulletManager.getCollisionPoint(preX, preY, x, y, canPassThroughPlayers, canPassThroughMap);

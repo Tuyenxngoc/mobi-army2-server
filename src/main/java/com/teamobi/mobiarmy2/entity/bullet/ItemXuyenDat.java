@@ -20,9 +20,7 @@ public class ItemXuyenDat extends Bullet {
         frame++;
         short preX = x, preY = y;
         x += vx;
-        lastX = x;
         y += vy;
-        lastY = y;
         short[] XYVC = bulletManager.getCollisionPoint(preX, preY, x, y, canPassThroughPlayers, canPassThroughMap);
         if (XYVC != null) {
             isCollected = true;
