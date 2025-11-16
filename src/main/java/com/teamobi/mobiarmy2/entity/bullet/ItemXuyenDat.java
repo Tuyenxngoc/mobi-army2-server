@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.entity.bullet;
 
 import com.teamobi.mobiarmy2.entity.Bullet;
 import com.teamobi.mobiarmy2.entity.Player;
+import com.teamobi.mobiarmy2.entity.VoiRong;
 import com.teamobi.mobiarmy2.fight.BulletManager;
 
 public class ItemXuyenDat extends Bullet {
@@ -15,7 +16,7 @@ public class ItemXuyenDat extends Bullet {
     }
 
     @Override
-    public void nextXY() {
+    public void update() {
         frame++;
         short preX = x, preY = y;
         x += vx;
@@ -54,7 +55,7 @@ public class ItemXuyenDat extends Bullet {
             vyTemp2 %= 100;
         }
         if (this.bulletManager.isHasVoiRong()) {
-            for (BulletManager.VoiRong vr : this.bulletManager.getVoiRongs()) {
+            for (VoiRong vr : this.bulletManager.getVoiRongs()) {
                 if (this.x >= vr.X - 5 && this.x <= vr.X + 10) {
                     this.vx -= 2;
                     this.vy -= 2;

@@ -16,8 +16,8 @@ public class MGTBulletNew extends Bullet {
     }
 
     @Override
-    public void nextXY() {
-        super.nextXY();
+    public void update() {
+        super.update();
         if (isMaxY) {
             this.isCollected = true;
             int nextX = x - XArray.getFirst();

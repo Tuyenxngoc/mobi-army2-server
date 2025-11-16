@@ -17,8 +17,8 @@ public class B52Bullet extends Bullet {
     }
 
     @Override
-    public void nextXY() {
-        super.nextXY();
+    public void update() {
+        super.update();
         if (toY <= y) {
             super.canPassThroughMap = false;
             super.canPassThroughPlayers = false;

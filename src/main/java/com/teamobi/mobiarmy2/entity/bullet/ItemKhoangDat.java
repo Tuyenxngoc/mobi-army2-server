@@ -13,7 +13,7 @@ public class ItemKhoangDat extends Bullet {
     }
 
     @Override
-    public void nextXY() {
+    public void update() {
         this.y += 2;
         this.frame++;
         this.XArray.add(x);

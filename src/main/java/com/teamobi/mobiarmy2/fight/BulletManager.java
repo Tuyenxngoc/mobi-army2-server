@@ -1,8 +1,6 @@
 package com.teamobi.mobiarmy2.fight;
 
-import com.teamobi.mobiarmy2.entity.Boss;
-import com.teamobi.mobiarmy2.entity.Bullet;
-import com.teamobi.mobiarmy2.entity.Player;
+import com.teamobi.mobiarmy2.entity.*;
 import com.teamobi.mobiarmy2.entity.bullet.*;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
@@ -520,7 +518,7 @@ public class BulletManager {
         }
     }
 
-    public void fillXY() {
+    public void updateBullets() {
         boolean hasNext;
         do {
             hasNext = false;
@@ -530,7 +528,7 @@ public class BulletManager {
                     continue;
                 }
                 hasNext = true;
-                bullet.nextXY();
+                bullet.update();
             }
         } while (hasNext);
     }
@@ -603,41 +601,4 @@ public class BulletManager {
         fightManager.collisionPlayers(bullet.getX(), bullet.getY(), bullet);
     }
 
-    public static class VoiRong {
-        public int X;
-        public int Y;
-        public int count;
-
-        public VoiRong(int X, int Y, int count) {
-            this.X = X;
-            this.Y = Y;
-            this.count = count;
-        }
-
-    }
-
-    public static class BomHenGio {
-        public int id;
-        public int X;
-        public int Y;
-        public int count;
-        public Bullet bull;
-
-        public BomHenGio(int id, Bullet bull, int count) {
-            this.id = id;
-            this.X = bull.getX();
-            this.Y = bull.getY();
-            this.count = count;
-            this.bull = bull;
-        }
-
-    }
-
-    public static class Bullets {
-        public Bullet bull;
-
-        public Bullets(Bullet bull) {
-            this.bull = bull;
-        }
-    }
 }

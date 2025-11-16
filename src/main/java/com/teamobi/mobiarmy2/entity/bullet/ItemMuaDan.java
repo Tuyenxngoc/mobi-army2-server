@@ -11,8 +11,8 @@ public class ItemMuaDan extends Bullet {
     }
 
     @Override
-    public void nextXY() {
-        super.nextXY();
+    public void update() {
+        super.update();
         if (super.isMaxY || this.isCollected) {
             this.isCollected = true;
             for (int i = 0; i < 10; i++) {

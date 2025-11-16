@@ -10,7 +10,7 @@ public class ChickyEggs extends Bullet {
     }
 
     @Override
-    public void nextXY() {
+    public void update() {
         if (super.frame == 0) {
             short[] XYVC = bulletManager.getCollisionPoint(x, y, x, (short) (y + 8), canPassThroughPlayers, canPassThroughMap);
             if (XYVC != null) {
@@ -29,6 +29,6 @@ public class ChickyEggs extends Bullet {
                 y += 8;
             }
         }
-        super.nextXY();
+        super.update();
     }
 }

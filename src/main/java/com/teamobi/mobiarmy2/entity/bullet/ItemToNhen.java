@@ -12,8 +12,8 @@ public class ItemToNhen extends Bullet {
     }
 
     @Override
-    public void nextXY() {
-        super.nextXY();
+    public void update() {
+        super.update();
         if (super.isCollected) {
             bulletManager.getFightManager().getMapManger().addNewTiles(new MapTile(bulletManager.getMangNhenId(), (short) (x - 21), (short) (y - 20), EffectManager.spiderWebData, true));
             bulletManager.decreaseSpiderWebCount();

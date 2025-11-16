@@ -13,7 +13,7 @@ public class MGTBulletOld extends Bullet {
     }
 
     @Override
-    public void nextXY() {
+    public void update() {
         frame++;
         XArray.add(x);
         YArray.add(y);

@@ -14,7 +14,7 @@ public class BalloonLazer extends Bullet {
         return this.isCollected;
     }
 
-    public void nextXY() {
+    public void update() {
         frame++;
         Player pl2 = bulletManager.getFightManager().findClosestPlayer(x, y);
         x = pl2.getX();

@@ -15,8 +15,8 @@ public class ChickyBullet extends Bullet {
     }
 
     @Override
-    public void nextXY() {
-        super.nextXY();
+    public void update() {
+        super.update();
         if (this.force2 == super.frame) {
             bulletManager.addBullet(new ChickyEggs(bulletManager, (byte) 20, (int) this.satThuongGoc, super.player, super.lastX, super.lastY, 0, 0, 20, 50));
         }

@@ -17,7 +17,7 @@ public class ItemChuotGanBom extends Bullet {
     }
 
     @Override
-    public void nextXY() {
+    public void update() {
         nYRoi++;
         for (int i = 0; i < nYRoi; i++) {
             if (bulletManager.getFightManager().getMapManger().isCollision(x, y)) {

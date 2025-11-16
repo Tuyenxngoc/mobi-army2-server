@@ -11,7 +11,7 @@ public class ItemKhoangDat2 extends Bullet {
     }
 
     @Override
-    public void nextXY() {
-        super.nextXY();
+    public void update() {
+        super.update();
     }
 }

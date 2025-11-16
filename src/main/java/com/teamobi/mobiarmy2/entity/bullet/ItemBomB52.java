@@ -11,8 +11,8 @@ public class ItemBomB52 extends Bullet {
     }
 
     @Override
-    public void nextXY() {
-        super.nextXY();
+    public void update() {
+        super.update();
         if (super.isCollected) {
             this.bulletManager.addBullet(new B52Bullet(bulletManager, (byte) 3, this.damage, super.player, this.x - 50, this.y - 260, 2, 0, 0, 80, this.x, this.y));
         }

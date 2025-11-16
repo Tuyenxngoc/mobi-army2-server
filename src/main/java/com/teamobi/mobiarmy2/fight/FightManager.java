@@ -1151,7 +1151,7 @@ public class FightManager {
         handleLuckUpdates();
 
         bulletManager.addShoot(player, bullId, angle, force, force2, numShoot);
-        bulletManager.fillXY();
+        bulletManager.updateBullets();
 
         //Gửi ms những người chơi may mắn
         updateLuckyPlayers();

@@ -11,8 +11,8 @@ public class ItemSaoBang extends Bullet {
     }
 
     @Override
-    public void nextXY() {
-        super.nextXY();
+    public void update() {
+        super.update();
         if (super.isCollected) {
             this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 24, this.damage, player, this.x, this.y - 187, 0, 3, 0, 50));
             for (int i = 1; i < 7; i++) {

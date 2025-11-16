@@ -10,7 +10,7 @@ public class ItemLaserDelay extends Bullet {
     }
 
     @Override
-    public void nextXY() {
-        super.nextXY();
+    public void update() {
+        super.update();
     }
 }

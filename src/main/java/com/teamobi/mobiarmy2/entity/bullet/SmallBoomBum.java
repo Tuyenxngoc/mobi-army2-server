@@ -10,7 +10,7 @@ public class SmallBoomBum extends Bullet {
     }
 
     @Override
-    public void nextXY() {
+    public void update() {
         isCollected = true;
         XArray.add(x);
         YArray.add(y);

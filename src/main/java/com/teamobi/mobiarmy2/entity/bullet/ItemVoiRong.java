@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.entity.bullet;
 
 import com.teamobi.mobiarmy2.entity.Bullet;
 import com.teamobi.mobiarmy2.entity.Player;
+import com.teamobi.mobiarmy2.entity.VoiRong;
 import com.teamobi.mobiarmy2.fight.BulletManager;
 
 public class ItemVoiRong extends Bullet {
@@ -11,11 +12,11 @@ public class ItemVoiRong extends Bullet {
     }
 
     @Override
-    public void nextXY() {
-        super.nextXY();
+    public void update() {
+        super.update();
         if (super.isCollected) {
             bulletManager.setHasVoiRong(true);
-            bulletManager.getVoiRongs().add(new BulletManager.VoiRong(x, y, 3));
+            bulletManager.getVoiRongs().add(new VoiRong(x, y, 3));
         }
     }
 }

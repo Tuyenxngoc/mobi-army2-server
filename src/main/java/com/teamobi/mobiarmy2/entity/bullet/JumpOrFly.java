@@ -13,11 +13,11 @@ public class JumpOrFly extends Bullet {
     }
 
     @Override
-    public void nextXY() {
+    public void update() {
         if (this.isMaxY) {
             super.canPassThroughMap = false;
         }
-        super.nextXY();
+        super.update();
         if (super.isCollected) {
             bulletManager.getFightManager().getPlayerTurn().setXY(x, y);
         }

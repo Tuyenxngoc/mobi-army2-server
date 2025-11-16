@@ -18,8 +18,8 @@ public class ApaBullet extends Bullet {
     }
 
     @Override
-    public void nextXY() {
-        super.nextXY();
+    public void update() {
+        super.update();
         if (this.force2 == frame) {
             this.isCollected = true;
             this.canCollide = false;

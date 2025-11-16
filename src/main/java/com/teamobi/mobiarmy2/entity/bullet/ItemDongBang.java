@@ -10,8 +10,8 @@ public class ItemDongBang extends Bullet {
     }
 
     @Override
-    public void nextXY() {
-        super.nextXY();
+    public void update() {
+        super.update();
         if (super.isCollected) {
             for (int i = 0; i < 8; i++) {
                 Player pl = bulletManager.getFightManager().getPlayers()[i];

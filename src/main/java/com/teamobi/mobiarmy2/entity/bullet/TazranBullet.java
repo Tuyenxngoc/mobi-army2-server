@@ -15,8 +15,8 @@ public class TazranBullet extends Bullet {
     }
 
     @Override
-    public void nextXY() {
-        super.nextXY();
+    public void update() {
+        super.update();
         if (quayLai == 0) {
             if (addTZ) {
                 vx += 1;

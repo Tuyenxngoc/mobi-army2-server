@@ -16,8 +16,8 @@ public class SmallBoomAdd extends Bullet {
     }
 
     @Override
-    public void nextXY() {
-        super.nextXY();
+    public void update() {
+        super.update();
         FightManager fightManager = bulletManager.getFightManager();
         FightMapManager mapManager = fightManager.getMapManger();
         if (super.isCollected && x > 0 && x < mapManager.getWidth() && y < mapManager.getHeight()) {

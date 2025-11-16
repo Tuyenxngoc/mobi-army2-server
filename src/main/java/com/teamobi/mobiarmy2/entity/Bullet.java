@@ -18,6 +18,8 @@ public class Bullet {
     protected byte bullId;
     protected int damage;
 
+    protected List<Short> XArray;
+    protected List<Short> YArray;
     protected short x;
     protected short y;
     protected short lastX;
@@ -41,8 +43,6 @@ public class Bullet {
     protected boolean canPassThroughPlayers;
     protected boolean canPassThroughMap;
     protected boolean canCollide;
-    protected List<Short> XArray;
-    protected List<Short> YArray;
 
     public Bullet(BulletManager bulletManager, byte bullId, int damage, Player player, int X, int Y, int vx, int vy, int msg, int g100) {
         this.bulletManager = bulletManager;
@@ -99,7 +99,7 @@ public class Bullet {
         };
     }
 
-    public void nextXY() {
+    public void update() {
         FightManager fightManager = bulletManager.getFightManager();
         FightMapManager mapManager = fightManager.getMapManger();
 
@@ -158,15 +158,15 @@ public class Bullet {
         }
 
         // Áp dụng hiệu ứng Vòi Rồng
-        applyVoiRongEffect();
+        applyGravityFieldEffect();
     }
 
-    private void applyVoiRongEffect() {
+    private void applyGravityFieldEffect() {
         if (!bulletManager.isHasVoiRong()) {
             return;
         }
 
-        for (BulletManager.VoiRong vr : bulletManager.getVoiRongs()) {
+        for (VoiRong vr : bulletManager.getVoiRongs()) {
             if (x >= vr.X - 5 && x <= vr.X + 10) {
                 vx -= 2;
                 vy -= 2;

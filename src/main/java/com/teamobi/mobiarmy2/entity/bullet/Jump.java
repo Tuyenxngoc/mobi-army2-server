@@ -10,7 +10,7 @@ public class Jump extends Bullet {
     }
 
     @Override
-    public void nextXY() {
+    public void update() {
         this.isCollected = true;
         this.XArray.add(x);
         this.YArray.add(y);

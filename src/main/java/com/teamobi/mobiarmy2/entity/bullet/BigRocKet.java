@@ -25,7 +25,7 @@ public class BigRocKet extends Bullet {
     }
 
     @Override
-    public void nextXY() {
+    public void update() {
         if (this.flyshoot) {
             this.vy = -50;
             if (this.y < -1200) {
@@ -40,6 +40,6 @@ public class BigRocKet extends Bullet {
                 this.flyshoot = false;
             }
         }
-        super.nextXY();
+        super.update();
     }
 }
