@@ -20,43 +20,43 @@ public class ItemChuotGanBom extends Bullet {
     public void nextXY() {
         nYRoi++;
         for (int i = 0; i < nYRoi; i++) {
-            if (bulletManager.getFightManager().getMapManger().isCollision(X, Y)) {
+            if (bulletManager.getFightManager().getMapManger().isCollision(x, y)) {
                 nYRoi = 0;
                 break;
             }
-            Y++;
+            y++;
         }
         byte step = 4;
         if (addX) {
-            X += step;
+            x += step;
         } else {
-            X -= step;
+            x -= step;
         }
-        if (bulletManager.getFightManager().getMapManger().isCollision(X, (short) (Y - 5))) {
+        if (bulletManager.getFightManager().getMapManger().isCollision(x, (short) (y - 5))) {
             if (addX) {
-                X -= step;
+                x -= step;
             } else {
-                X += step;
+                x += step;
             }
         } else {
             for (int i = 4; i >= 0; i--) {
-                if (bulletManager.getFightManager().getMapManger().isCollision(X, (short) (Y - i))) {
-                    Y -= i;
+                if (bulletManager.getFightManager().getMapManger().isCollision(x, (short) (y - i))) {
+                    y -= i;
                     break;
                 }
             }
         }
-        if (this.Y > bulletManager.getFightManager().getMapManger().getHeight() + 100) {
-            XArray.add(X);
-            YArray.add(Y);
+        if (this.y > bulletManager.getFightManager().getMapManger().getHeight() + 100) {
+            XArray.add(x);
+            YArray.add(y);
             this.isCollected = true;
             return;
         }
-        XArray.add(X);
-        YArray.add(Y);
+        XArray.add(x);
+        YArray.add(y);
         if (super.frame == nStep) {
             super.isCollected = true;
-            bulletManager.getFightManager().getMapManger().collision(X, Y, this);
+            bulletManager.getFightManager().getMapManger().collision(x, y, this);
             return;
         }
         super.frame++;

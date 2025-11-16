@@ -15,7 +15,7 @@ public class ItemTeleport extends Bullet {
     public void nextXY() {
         super.nextXY();
         if (super.isCollected) {
-            bulletManager.getFightManager().getPlayerTurn().setXY(X, Y);
+            bulletManager.getFightManager().getPlayerTurn().setXY(x, y);
         }
     }
 }

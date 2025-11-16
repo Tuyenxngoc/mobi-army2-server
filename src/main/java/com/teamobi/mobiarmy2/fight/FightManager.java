@@ -1582,4 +1582,13 @@ public class FightManager {
             e.printStackTrace();
         }
     }
+
+    public void collisionPlayers(short x, short y, Bullet bullet) {
+        for (int i = 0; i < totalPlayers; i++) {
+            Player pl = players[i];
+            if (pl != null && pl.getCharacterId() != 17) {
+                pl.collision(x, y, bullet);
+            }
+        }
+    }
 }

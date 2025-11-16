@@ -15,40 +15,40 @@ public class MGTBulletOld extends Bullet {
     @Override
     public void nextXY() {
         frame++;
-        XArray.add(X);
-        YArray.add(Y);
-        if ((X < -200) || (X > bulletManager.getFightManager().getMapManger().getWidth() + 200) || (Y > bulletManager.getFightManager().getMapManger().getHeight() + 200)) {
+        XArray.add(x);
+        YArray.add(y);
+        if ((x < -200) || (x > bulletManager.getFightManager().getMapManger().getWidth() + 200) || (y > bulletManager.getFightManager().getMapManger().getHeight() + 200)) {
             isCollected = true;
             return;
         }
-        short preX = X, preY = Y;
+        short preX = x, preY = y;
         vxTemp += Math.abs(vx);
         vyTemp += Math.abs(vy);
         if (Math.abs(vxTemp) >= 100) {
             if (vx > 0) {
-                X += vxTemp / 100;
+                x += vxTemp / 100;
             } else {
-                X -= vxTemp / 100;
+                x -= vxTemp / 100;
             }
             vxTemp %= 100;
         }
         if (Math.abs(vyTemp) >= 100) {
             if (vy > 0) {
-                Y += vyTemp / 100;
+                y += vyTemp / 100;
             } else {
-                Y -= vyTemp / 100;
+                y -= vyTemp / 100;
             }
             vyTemp %= 100;
         }
-        short[] XYVC = bulletManager.getCollisionPoint(preX, preY, X, Y, canPassThroughPlayers, canPassThroughMap);
+        short[] XYVC = bulletManager.getCollisionPoint(preX, preY, x, y, canPassThroughPlayers, canPassThroughMap);
         if (XYVC != null) {
             isCollected = true;
-            X = XYVC[0];
-            Y = XYVC[1];
-            XArray.add(X);
-            YArray.add(Y);
+            x = XYVC[0];
+            y = XYVC[1];
+            XArray.add(x);
+            YArray.add(y);
             if (this.canCollide) {
-                bulletManager.getFightManager().getMapManger().collision(X, Y, this);
+                bulletManager.getFightManager().getMapManger().collision(x, y, this);
             }
             return;
         }

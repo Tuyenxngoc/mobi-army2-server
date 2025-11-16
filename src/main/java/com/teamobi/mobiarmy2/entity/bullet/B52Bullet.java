@@ -19,11 +19,11 @@ public class B52Bullet extends Bullet {
     @Override
     public void nextXY() {
         super.nextXY();
-        if (toY <= Y) {
+        if (toY <= y) {
             super.canPassThroughMap = false;
             super.canPassThroughPlayers = false;
-            X = toX;
-            Y = toY;
+            x = toX;
+            y = toY;
         }
     }
 }

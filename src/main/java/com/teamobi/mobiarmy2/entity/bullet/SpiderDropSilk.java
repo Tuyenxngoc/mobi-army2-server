@@ -15,20 +15,20 @@ public class SpiderDropSilk extends Bullet {
     @Override
     public void nextXY() {
         isCollected = true;
-        XArray.add(X);
-        YArray.add(Y);
-        Y += 38;
-        XArray.add(X);
-        YArray.add(Y);
+        XArray.add(x);
+        YArray.add(y);
+        y += 38;
+        XArray.add(x);
+        YArray.add(y);
 
         //Cập nhật vị tri người chơi
         VenomousSpider spider = (VenomousSpider) player;
         Player targetPlayer = spider.getTargetPlayer();
-        targetPlayer.setY((short) (Y - 3));
+        targetPlayer.setY((short) (y - 3));
         bulletManager.getFightManager().sendMessageUpdateXY(targetPlayer.getIndex());
 
         //Thêm mạng nhện
-        bulletManager.getFightManager().getMapManger().addNewTiles(new MapTile(bulletManager.getMangNhenId(), (short) (X - 21), (short) (Y - 20), EffectManager.spiderWebData, true));
+        bulletManager.getFightManager().getMapManger().addNewTiles(new MapTile(bulletManager.getMangNhenId(), (short) (x - 21), (short) (y - 20), EffectManager.spiderWebData, true));
         bulletManager.decreaseSpiderWebCount();
     }
 }

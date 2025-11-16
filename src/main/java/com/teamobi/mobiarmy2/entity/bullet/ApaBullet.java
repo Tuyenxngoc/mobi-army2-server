@@ -24,15 +24,15 @@ public class ApaBullet extends Bullet {
             this.isCollected = true;
             this.canCollide = false;
             this.damage = 0;
-            bulletManager.getFightManager().getMapManger().collision(this.X, this.Y, this);
-            int arg = bulletManager.getArg() + Utils.toArg0_360(Utils.getArg(this.player.getX() - this.X, this.player.getY() - this.Y));
+            bulletManager.getFightManager().getMapManger().collision(this.x, this.y, this);
+            int arg = bulletManager.getArg() + Utils.toArg0_360(Utils.getArg(this.player.getX() - this.x, this.player.getY() - this.y));
             if (bulletManager.getArg() < 90) {
                 arg = 180 - arg;
             }
             arg = arg - 15;
             for (int i = 0; i < 3; i++, arg += 15) {
-                int x = this.X + (20 * Utils.cos(arg) >> 10);
-                int y = (this.Y - 12) - (20 * Utils.sin(arg) >> 10);
+                int x = this.x + (20 * Utils.cos(arg) >> 10);
+                int y = (this.y - 12) - (20 * Utils.sin(arg) >> 10);
                 int vxn = (this.force * Utils.cos(arg) >> 11);
                 int vyn = -(this.force * Utils.sin(arg) >> 11);
                 bulletManager.addBullet(new Bullet(bulletManager, (byte) 18, this.satThuongGoc, super.player, x, y, vxn, vyn, 30, 100));

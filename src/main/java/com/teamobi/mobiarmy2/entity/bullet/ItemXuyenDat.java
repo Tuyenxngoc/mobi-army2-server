@@ -17,34 +17,34 @@ public class ItemXuyenDat extends Bullet {
     @Override
     public void nextXY() {
         frame++;
-        short preX = X, preY = Y;
-        X += vx;
-        lastX = X;
-        Y += vy;
-        lastY = Y;
-        short[] XYVC = bulletManager.getCollisionPoint(preX, preY, X, Y, canPassThroughPlayers, canPassThroughMap);
+        short preX = x, preY = y;
+        x += vx;
+        lastX = x;
+        y += vy;
+        lastY = y;
+        short[] XYVC = bulletManager.getCollisionPoint(preX, preY, x, y, canPassThroughPlayers, canPassThroughMap);
         if (XYVC != null) {
             isCollected = true;
-            X = XYVC[0];
-            Y = XYVC[1];
-            XArray.add(X);
-            YArray.add(Y);
+            x = XYVC[0];
+            y = XYVC[1];
+            XArray.add(x);
+            YArray.add(y);
             if (this.canCollide) {
-                bulletManager.getFightManager().getMapManger().collision(X, Y, this);
+                bulletManager.getFightManager().getMapManger().collision(x, y, this);
             }
             return;
         }
-        XArray.add(X);
-        YArray.add(Y);
-        if ((X < -100) || (X > bulletManager.getFightManager().getMapManger().getWidth() + 100) || (Y > bulletManager.getFightManager().getMapManger().getHeight() + 200)) {
-            XArray.add(X);
-            YArray.add(Y);
+        XArray.add(x);
+        YArray.add(y);
+        if ((x < -100) || (x > bulletManager.getFightManager().getMapManger().getWidth() + 100) || (y > bulletManager.getFightManager().getMapManger().getHeight() + 200)) {
+            XArray.add(x);
+            YArray.add(y);
             isCollected = true;
             return;
         }
         if (this.frame == force - 1) {
-            XArray.add(X);
-            YArray.add(Y);
+            XArray.add(x);
+            YArray.add(y);
             this.isCollected = true;
             return;
         }
@@ -55,7 +55,7 @@ public class ItemXuyenDat extends Bullet {
         }
         if (this.bulletManager.isHasVoiRong()) {
             for (BulletManager.VoiRong vr : this.bulletManager.getVoiRongs()) {
-                if (this.X >= vr.X - 5 && this.X <= vr.X + 10) {
+                if (this.x >= vr.X - 5 && this.x <= vr.X + 10) {
                     this.vx -= 2;
                     this.vy -= 2;
                     break;

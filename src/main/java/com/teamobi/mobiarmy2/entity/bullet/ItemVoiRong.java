@@ -15,7 +15,7 @@ public class ItemVoiRong extends Bullet {
         super.nextXY();
         if (super.isCollected) {
             bulletManager.setHasVoiRong(true);
-            bulletManager.getVoiRongs().add(new BulletManager.VoiRong(X, Y, 3));
+            bulletManager.getVoiRongs().add(new BulletManager.VoiRong(x, y, 3));
         }
     }
 }

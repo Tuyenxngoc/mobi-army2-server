@@ -14,12 +14,12 @@ public class ItemKhoangDat extends Bullet {
 
     @Override
     public void nextXY() {
-        this.Y += 2;
+        this.y += 2;
         this.frame++;
-        this.XArray.add(X);
-        this.YArray.add(Y);
-        if (bulletManager.getFightManager().getMapManger().isCollision(X, Y)) {
-            this.bulletManager.getFightManager().getMapManger().collision(X, Y, this);
+        this.XArray.add(x);
+        this.YArray.add(y);
+        if (bulletManager.getFightManager().getMapManger().isCollision(x, y)) {
+            this.bulletManager.getFightManager().getMapManger().collision(x, y, this);
         }
         if (this.frame == nFrame) {
             this.isCollected = true;

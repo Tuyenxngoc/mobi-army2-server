@@ -17,8 +17,8 @@ public class ItemDongBang extends Bullet {
                 Player pl = bulletManager.getFightManager().getPlayers()[i];
                 if (pl != null) {
                     int tamAH = Bullet.getImpactRadiusByBullId(bullId);
-                    int kcX = Math.abs(pl.getX() - X);
-                    int kcY = Math.abs(pl.getY() - pl.getHeight() / 2 - Y);
+                    int kcX = Math.abs(pl.getX() - x);
+                    int kcY = Math.abs(pl.getY() - pl.getHeight() / 2 - y);
                     int kc = (int) Math.sqrt(kcX * kcX + kcY * kcY);
                     if (!pl.isDead() && pl.getInvisibleCount() <= 0 && kc <= tamAH + pl.getWidth() / 2) {
                         bulletManager.getFightManager().updateCantMove(pl);

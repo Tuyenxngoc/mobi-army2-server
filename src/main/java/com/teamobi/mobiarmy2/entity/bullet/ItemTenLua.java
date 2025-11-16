@@ -17,9 +17,9 @@ public class ItemTenLua extends Bullet {
     public void nextXY() {
         super.nextXY();
         if (super.frame == this.force || this.isCollected) {
-            this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 27, super.damage, player, this.X + 18, this.Y - 20, 2, -1, 15, 60));
-            this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 27, super.damage, player, this.X + 17, this.Y - 20, -3, -1, 15, 60));
-            this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 27, super.damage, player, this.X + 16, this.Y - 23, 3, -2, 15, 60));
+            this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 27, super.damage, player, this.x + 18, this.y - 20, 2, -1, 15, 60));
+            this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 27, super.damage, player, this.x + 17, this.y - 20, -3, -1, 15, 60));
+            this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 27, super.damage, player, this.x + 16, this.y - 23, 3, -2, 15, 60));
         }
     }
 }

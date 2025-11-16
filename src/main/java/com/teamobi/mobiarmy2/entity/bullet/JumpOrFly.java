@@ -19,7 +19,7 @@ public class JumpOrFly extends Bullet {
         }
         super.nextXY();
         if (super.isCollected) {
-            bulletManager.getFightManager().getPlayerTurn().setXY(X, Y);
+            bulletManager.getFightManager().getPlayerTurn().setXY(x, y);
         }
     }
 }

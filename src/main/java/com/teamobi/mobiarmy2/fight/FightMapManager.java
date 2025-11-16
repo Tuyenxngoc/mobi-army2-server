@@ -3,7 +3,6 @@ package com.teamobi.mobiarmy2.fight;
 import com.teamobi.mobiarmy2.entity.Bullet;
 import com.teamobi.mobiarmy2.entity.MapBrick;
 import com.teamobi.mobiarmy2.entity.MapTile;
-import com.teamobi.mobiarmy2.entity.Player;
 import com.teamobi.mobiarmy2.server.MapManager;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
@@ -112,13 +111,6 @@ public class FightMapManager {
         for (MapTile mapTile : mapTiles) {
             mapTile.collision(X, Y, bull);
         }
-        for (int i = 0; i < fightManager.getTotalPlayers(); i++) {
-            Player pl = fightManager.getPlayers()[i];
-            if (pl != null && pl.getCharacterId() != 17) {
-                pl.collision(X, Y, bull);
-            }
-        }
-        //Todo: bom hen gio fix
     }
 
     public void addNewTiles(MapTile mapTile) {

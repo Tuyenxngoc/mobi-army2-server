@@ -18,8 +18,8 @@ public class Bullet {
     protected byte bullId;
     protected int damage;
 
-    protected short X;
-    protected short Y;
+    protected short x;
+    protected short y;
     protected short lastX;
     protected short lastY;
     protected short vx;
@@ -49,8 +49,8 @@ public class Bullet {
         this.bullId = bullId;
         this.damage = (damage * player.getDamage()) / 100;
         this.player = player;
-        this.X = (short) X;
-        this.Y = (short) Y;
+        this.x = (short) X;
+        this.y = (short) Y;
         this.lastX = (short) X;
         this.lastY = (short) Y;
         this.vx = (short) vx;
@@ -105,43 +105,43 @@ public class Bullet {
 
         frame++;
 
-        this.XArray.add(X);
-        this.YArray.add(Y);
+        XArray.add(x);
+        YArray.add(y);
 
         // Kiểm tra đạn bay ra ngoài map
-        if ((X < -200) || (X > mapManager.getWidth() + 200) || (Y > mapManager.getHeight() + 200)) {
+        if ((x < -200) || (x > mapManager.getWidth() + 200) || (y > mapManager.getHeight() + 200)) {
             isCollected = true;
             return;
         }
 
         // Lưu vị trí cũ để kiểm tra va chạm
-        short preX = X;
-        short preY = Y;
+        short preX = x;
+        short preY = y;
 
         // Di chuyển đạn theo vận tốc
-        X += vx;
-        Y += vy;
+        x += vx;
+        y += vy;
 
-        lastX = X;
-        lastY = Y;
+        lastX = x;
+        lastY = y;
 
         // Kiểm tra va chạm với map/player
-        short[] collisionResult = bulletManager.getCollisionPoint(preX, preY, X, Y, canPassThroughPlayers, canPassThroughMap);
+        short[] collisionResult = bulletManager.getCollisionPoint(preX, preY, x, y, canPassThroughPlayers, canPassThroughMap);
         if (collisionResult != null) {
             isCollected = true;
 
-            X = collisionResult[0];
-            Y = collisionResult[1];
-            XArray.add(X);
-            YArray.add(Y);
+            x = collisionResult[0];
+            y = collisionResult[1];
+            XArray.add(x);
+            YArray.add(y);
 
             int type = collisionResult[2]; // Loại va chạm
             if (type == 1) { // Va chạm với player tính super shot type
                 calculateSuperType();
             }
 
-            if (this.canCollide) {
-                mapManager.collision(X, Y, this);
+            if (canCollide) {
+                bulletManager.handleCollision(this);
             }
 
             return;
@@ -153,8 +153,8 @@ public class Bullet {
         // Xác định điểm cao nhất (đỉnh quỹ đạo)
         if (vy > 0 && !isMaxY) {
             isMaxY = true;
-            peakX = X;
-            peakY = Y;
+            peakX = x;
+            peakY = y;
         }
 
         // Áp dụng hiệu ứng Vòi Rồng
@@ -162,14 +162,14 @@ public class Bullet {
     }
 
     private void applyVoiRongEffect() {
-        if (!this.bulletManager.isHasVoiRong()) {
+        if (!bulletManager.isHasVoiRong()) {
             return;
         }
 
-        for (BulletManager.VoiRong vr : this.bulletManager.getVoiRongs()) {
-            if (this.X >= vr.X - 5 && this.X <= vr.X + 10) {
-                this.vx -= 2;
-                this.vy -= 2;
+        for (BulletManager.VoiRong vr : bulletManager.getVoiRongs()) {
+            if (x >= vr.X - 5 && x <= vr.X + 10) {
+                vx -= 2;
+                vy -= 2;
                 break;
             }
         }
@@ -182,7 +182,7 @@ public class Bullet {
         }
 
         if (isMaxY) {// Siêu cao
-            int dropHeight = Y - peakY;
+            int dropHeight = y - peakY;
 
             if (dropHeight > 350 && dropHeight < 450) {// Super type 1: Rơi từ độ cao 350-450
                 bulletManager.setSuperType((byte) 1);
@@ -193,7 +193,7 @@ public class Bullet {
 
         short gunId = player.getGunId();
         if ((gunId == 2 || gunId == 3) && !XArray.isEmpty()) { // Siêu xa
-            int distance = Math.abs(X - XArray.getFirst());
+            int distance = Math.abs(x - XArray.getFirst());
 
             if (distance > 375) {
                 bulletManager.setSuperType((byte) 4);

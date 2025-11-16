@@ -12,12 +12,12 @@ public class SmallBoomBum extends Bullet {
     @Override
     public void nextXY() {
         isCollected = true;
-        XArray.add(X);
-        YArray.add(Y);
-        Y += 2;
-        XArray.add(X);
-        YArray.add(Y);
-        bulletManager.getFightManager().getMapManger().collision(X, Y, this);
+        XArray.add(x);
+        YArray.add(y);
+        y += 2;
+        XArray.add(x);
+        YArray.add(y);
+        bulletManager.getFightManager().getMapManger().collision(x, y, this);
         player.setDead(true);
         player.setWidth((short) 0);
         player.setHeight((short) 0);

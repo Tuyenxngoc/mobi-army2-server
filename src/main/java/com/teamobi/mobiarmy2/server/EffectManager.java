@@ -29,7 +29,6 @@ public class EffectManager {
         }
     }
 
-
     public static byte getHoleIndexByBulletId(byte bullId) {
         return switch (bullId) {
             case 1, 27 -> 1;

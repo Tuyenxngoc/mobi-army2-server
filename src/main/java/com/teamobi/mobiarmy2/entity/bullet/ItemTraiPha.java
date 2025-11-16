@@ -14,12 +14,12 @@ public class ItemTraiPha extends Bullet {
     public void nextXY() {
         super.nextXY();
         if (super.isCollected) {
-            this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 12, this.damage, player, this.X - 8, this.Y - 493, -1, 2, 0, 100));
-            this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 12, this.damage, player, this.X + 12, this.Y - 496, 0, 1, 0, 100));
-            this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 12, this.damage, player, this.X - 19, this.Y - 505, -2, 1, 0, 100));
-            this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 12, this.damage, player, this.X + 18, this.Y - 505, 1, 1, 0, 100));
-            this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 12, this.damage, player, this.X + 20, this.Y - 512, 2, 0, 0, 100));
-            this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 12, this.damage, player, this.X - 20, this.Y - 512, -3, 0, 0, 100));
+            this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 12, this.damage, player, this.x - 8, this.y - 493, -1, 2, 0, 100));
+            this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 12, this.damage, player, this.x + 12, this.y - 496, 0, 1, 0, 100));
+            this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 12, this.damage, player, this.x - 19, this.y - 505, -2, 1, 0, 100));
+            this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 12, this.damage, player, this.x + 18, this.y - 505, 1, 1, 0, 100));
+            this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 12, this.damage, player, this.x + 20, this.y - 512, 2, 0, 0, 100));
+            this.bulletManager.addBullet(new Bullet(bulletManager, (byte) 12, this.damage, player, this.x - 20, this.y - 512, -3, 0, 0, 100));
         }
     }
 }

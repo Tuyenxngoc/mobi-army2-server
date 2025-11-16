@@ -12,13 +12,13 @@ public class ItemTuSat extends Bullet {
     @Override
     public void nextXY() {
         this.isCollected = true;
-        this.XArray.add(X);
-        this.YArray.add(Y);
-        this.Y += 2;
-        this.XArray.add(X);
-        this.YArray.add(Y);
+        this.XArray.add(x);
+        this.YArray.add(y);
+        this.y += 2;
+        this.XArray.add(x);
+        this.YArray.add(y);
         if (this.canCollide) {
-            bulletManager.getFightManager().getMapManger().collision(X, Y, this);
+            bulletManager.getFightManager().getMapManger().collision(x, y, this);
         }
     }
 }

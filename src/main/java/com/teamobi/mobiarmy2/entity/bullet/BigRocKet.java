@@ -28,15 +28,15 @@ public class BigRocKet extends Bullet {
     public void nextXY() {
         if (this.flyshoot) {
             this.vy = -50;
-            if (this.Y < -1200) {
+            if (this.y < -1200) {
                 vy = 0;
                 for (byte i = 0; i < 21; i++) {
-                    X = (short) (X - (player.getX() - toX) / 20);
+                    x = (short) (x - (player.getX() - toX) / 20);
                     super.frame++;
-                    this.XArray.add(X);
-                    this.YArray.add(Y);
+                    this.XArray.add(x);
+                    this.YArray.add(y);
                 }
-                X = toX;
+                x = toX;
                 this.flyshoot = false;
             }
         }
