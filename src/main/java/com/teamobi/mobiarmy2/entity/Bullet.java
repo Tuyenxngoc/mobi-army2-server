@@ -18,8 +18,13 @@ public class Bullet {
     protected byte bullId;
     protected int damage;
 
-    protected List<Short> XArray;
-    protected List<Short> YArray;
+    private List<Point> trajectory = new ArrayList<>();//Quỹ đạo bay của đạn từ súng đến mục tiêu
+
+    private byte dXLaser;//Vector hướng X của tia laser
+    private byte dYLaser;//Vector hướng Y của tia laser
+
+    private List<Point> hitPoints = new ArrayList<>();//Các điểm va chạm/nổ
+
     protected short x;
     protected short y;
     protected short vx;
@@ -40,7 +45,7 @@ public class Bullet {
     protected short frame;
     protected boolean canPassThroughPlayers;
     protected boolean canPassThroughMap;
-    protected boolean canCollide;
+    protected boolean canCollide = true;
 
     public Bullet(BulletManager bulletManager, byte bullId, int damage, Player player, int X, int Y, int vx, int vy, int msg, int g100) {
         this.bulletManager = bulletManager;
@@ -55,19 +60,6 @@ public class Bullet {
         this.ax100 = (short) (fightManager.getWindX() * msg / 100);
         this.ay100 = (short) (fightManager.getWindY() * msg / 100);
         this.g100 = (short) g100;
-        this.vxTemp = 0;
-        this.vyTemp = 0;
-        this.vyTemp2 = 0;
-        this.isCollected = false;
-        this.isMaxY = false;
-        this.peakX = -1;
-        this.peakY = -1;
-        this.frame = 0;
-        this.XArray = new ArrayList<>();
-        this.YArray = new ArrayList<>();
-        this.canPassThroughPlayers = false;
-        this.canPassThroughMap = false;
-        this.canCollide = true;
     }
 
     public static int getImpactRadiusByBullId(int bullId) {
@@ -100,9 +92,7 @@ public class Bullet {
         FightMapManager mapManager = fightManager.getMapManger();
 
         frame++;
-
-        XArray.add(x);
-        YArray.add(y);
+        trajectory.add(new Point(x, y));
 
         // Kiểm tra đạn bay ra ngoài map
         if ((x < -200) || (x > mapManager.getWidth() + 200) || (y > mapManager.getHeight() + 200)) {
@@ -125,8 +115,7 @@ public class Bullet {
 
             x = collisionResult[0];
             y = collisionResult[1];
-            XArray.add(x);
-            YArray.add(y);
+            trajectory.add(new Point(x, y));
 
             int type = collisionResult[2]; // Loại va chạm
             if (type == 1) { // Va chạm với player tính super shot type
@@ -155,17 +144,7 @@ public class Bullet {
     }
 
     private void applyGravityFieldEffect() {
-        if (!bulletManager.isHasVoiRong()) {
-            return;
-        }
 
-        for (VoiRong vr : bulletManager.getVoiRongs()) {
-            if (x >= vr.X - 5 && x <= vr.X + 10) {
-                vx -= 2;
-                vy -= 2;
-                break;
-            }
-        }
     }
 
     private void calculateSuperType() {
@@ -185,8 +164,8 @@ public class Bullet {
         }
 
         short gunId = player.getGunId();
-        if ((gunId == 2 || gunId == 3) && !XArray.isEmpty()) { // Siêu xa
-            int distance = Math.abs(x - XArray.getFirst());
+        if ((gunId == 2 || gunId == 3) && !trajectory.isEmpty()) { // Siêu xa
+            int distance = Math.abs(x - trajectory.getFirst().getX());
 
             if (distance > 375) {
                 bulletManager.setSuperType((byte) 4);

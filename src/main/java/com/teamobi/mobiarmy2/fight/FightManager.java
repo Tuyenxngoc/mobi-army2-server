@@ -447,121 +447,7 @@ public class FightManager {
     }
 
     public short[] getForceArgXY(int idGun, boolean isXuyenMap, short X, short Y, short toX, short toY, short Mx, short My, int arg, int force, int msg, int g100) {
-        byte i = (byte) (Utils.nextInt(2) == 0 ? -1 : 1);
-        short argS = (short) (i == 1 ? arg : 180 - arg);
-        byte forceS = (byte) force;
-        do {
-            short x, y, vx, vy;
-            x = (short) (X + (20 * Utils.cos(argS) >> 10));
-            y = (short) (Y - 12 - (20 * Utils.sin(argS) >> 10));
-            vx = (short) (forceS * Utils.cos(argS) >> 10);
-            vy = (short) -(forceS * Utils.sin(argS) >> 10);
-            short ax100 = (short) (windX * msg / 100);
-            short ay100 = (short) (windY * msg / 100);
-            short vxTemp = 0, vyTemp = 0, vyTemp2 = 0;
-
-            if (idGun == 13) {
-                y -= 25;
-            }
-            while (true) {
-                if ((x < -200) || (x > mapManager.getWidth() + 200) || (y > mapManager.getHeight() + 200)) {
-                    break;
-                }
-                short preX = x, preY = y;
-                x += vx;
-                y += vy;
-                byte collision = getCollisionPoint(preX, preY, x, y, toX, toY, Mx, My, isXuyenMap);
-                if (collision == 1) {
-                    return new short[]{argS, forceS};
-                } else if (collision == 2) {
-                    break;
-                }
-                vxTemp += Math.abs(ax100);
-                vyTemp += Math.abs(ay100);
-                vyTemp2 += g100;
-                if (Math.abs(vxTemp) >= 100) {
-                    if (ax100 > 0) {
-                        vx += vxTemp / 100;
-                    } else {
-                        vx -= vxTemp / 100;
-                    }
-                    vxTemp %= 100;
-                }
-                if (Math.abs(vyTemp) >= 100) {
-                    if (ay100 > 0) {
-                        vy += vyTemp / 100;
-                    } else {
-                        vy -= vyTemp / 100;
-                    }
-                    vyTemp %= 100;
-                }
-                if (Math.abs(vyTemp2) >= 100) {
-                    vy += vyTemp2 / 100;
-                    vyTemp2 %= 100;
-                }
-            }
-            forceS++;
-            if (forceS > 30) {
-                argS += i;
-                forceS = (byte) force;
-                argS = (short) Utils.toArg0_360(argS);
-                if (argS == arg) {
-                    break;
-                }
-            }
-        } while (true);
-
         return null;
-    }
-
-    private byte getCollisionPoint(short X1, short Y1, short X2, short Y2, short toX, short toY, short Mx, short My, boolean isXuyenMap) {
-        int Dx = X2 - X1;
-        int Dy = Y2 - Y1;
-        byte x_unit = 0;
-        byte y_unit = 0;
-        byte x_unit2 = 0;
-        byte y_unit2 = 0;
-        if (Dx < 0) {
-            x_unit = x_unit2 = -1;
-        } else if (Dx > 0) {
-            x_unit = x_unit2 = 1;
-        }
-        if (Dy < 0) {
-            y_unit = y_unit2 = -1;
-        } else if (Dy > 0) {
-            y_unit = y_unit2 = 1;
-        }
-        int k1 = Math.abs(Dx);
-        int k2 = Math.abs(Dy);
-        if (k1 > k2) {
-            y_unit2 = 0;
-        } else {
-            k1 = Math.abs(Dy);
-            k2 = Math.abs(Dx);
-            x_unit2 = 0;
-        }
-        int k = k1 >> 1;
-        short X = X1, Y = Y1;
-        for (int i = 0; i <= k1; i++) {
-            if (Math.abs(X - toX) <= Mx && Math.abs(Y - toY) <= My) {
-                return 1;
-            }
-            if (!isXuyenMap) {
-                if (mapManager.isCollision(X, Y)) {
-                    return 2;
-                }
-            }
-            k += k2;
-            if (k >= k1) {
-                k -= k1;
-                X += x_unit;
-                Y += y_unit;
-            } else {
-                X += x_unit2;
-                Y += y_unit2;
-            }
-        }
-        return 0;
     }
 
     public synchronized void nextTurn() {
@@ -628,14 +514,6 @@ public class FightManager {
             Player player = players[playerTurn];
             player.resetValueInNewTurn();
             player.updateAngry((byte) 10);
-        }
-
-        List<Boss> addBosses = bulletManager.getAddBosses();
-        if (!addBosses.isEmpty()) {
-            for (Boss bos : addBosses) {
-                addBoss(bos);
-            }
-            addBosses.clear();
         }
 
         executorNextTurn.submit(() -> {
@@ -1161,10 +1039,11 @@ public class FightManager {
             return;
         }
 
+        byte typeShoot = bulletManager.getTypeShoot();
         try {
             Message ms = new Message(Cmd.FIRE_ARMY);
             DataOutputStream ds = ms.writer();
-            ds.writeByte(bulletManager.getTypeShoot());
+            ds.writeByte(typeShoot);
             ds.writeByte(player.isUsePow() ? 1 : 0);
             ds.writeByte(index);
             ds.writeByte(bullId);
@@ -1184,41 +1063,48 @@ public class FightManager {
             ds.writeByte(numShoot);
             ds.writeByte(bullets.size());
             for (Bullet bullet : bullets) {
-                List<Short> xArrays = bullet.getXArray();
-                List<Short> yArrays = bullet.getYArray();
-                ds.writeShort(xArrays.size());
-                if (bulletManager.getTypeShoot() == 0) {
-                    for (int j = 0; j < xArrays.size(); j++) {
-                        if (j == 0) {
-                            ds.writeShort(xArrays.getFirst());
-                            ds.writeShort(yArrays.getFirst());
+                List<Point> trajectory = bullet.getTrajectory();
+                int size = trajectory.size();
+                ds.writeShort(size);// Ghi độ dài quỹ đạo
+
+                if (typeShoot == 0) {// Ghi tọa độ theo dạng delta (chênh lệch)
+                    for (int i = 0; i < size; i++) {
+                        Point point = bullet.getTrajectory().get(i);
+
+                        if (i == 0) {
+                            // Điểm đầu tiên: ghi tọa độ tuyệt đối
+                            ds.writeShort(point.getX());
+                            ds.writeShort(point.getY());
                         } else {
-                            if ((j == xArrays.size() - 1) && bullId == 49) {
-                                ds.writeShort(xArrays.get(j));
-                                ds.writeShort(yArrays.get(j));
-                                ds.writeByte(bulletManager.getMgtAddX());
-                                ds.writeByte(bulletManager.getMgtAddY());
-                                break;
+                            if ((i == size - 1) && bullId == 49) {// Điểm cuối của laser Magenta
+                                ds.writeShort(point.getX());
+                                ds.writeShort(point.getY());
+                                ds.writeByte(bullet.getDXLaser());
+                                ds.writeByte(bullet.getDYLaser());
+                            } else {
+                                Point prevPoint = bullet.getTrajectory().get(i - 1);
+                                ds.writeByte((byte) (point.getX() - prevPoint.getX()));
+                                ds.writeByte((byte) (point.getY() - prevPoint.getY()));
                             }
-                            ds.writeByte((byte) (xArrays.get(j) - xArrays.get(j - 1)));
-                            ds.writeByte((byte) (yArrays.get(j) - yArrays.get(j - 1)));
                         }
                     }
-                } else if (bulletManager.getTypeShoot() == 1) {
-                    for (int j = 0; j < xArrays.size(); j++) {
-                        ds.writeShort(xArrays.get(j));
-                        ds.writeShort(yArrays.get(j));
+                } else if (typeShoot == 1) { // Ghi tọa độ tuyệt đối cho mỗi điểm
+                    for (Point point : bullet.getTrajectory()) {
+                        ds.writeShort(point.getX());
+                        ds.writeShort(point.getY());
                     }
                 }
+
                 if (bullId == 48) {
-                    ds.writeByte(1);
-                    for (int j = 0; j < 1; j++) {
-                        ds.writeShort(0);
-                        ds.writeShort(0);
+                    ds.writeByte(bullet.getHitPoints().size());
+                    for (Point hit : bullet.getHitPoints()) {
+                        ds.writeShort(hit.getX());
+                        ds.writeShort(hit.getY());
                     }
                 }
             }
 
+            // Ghi thông tin nếu đạn siêu cao
             byte superType = bulletManager.getSuperType();
             ds.writeByte(superType);
             if (superType == 1 || superType == 2) {
