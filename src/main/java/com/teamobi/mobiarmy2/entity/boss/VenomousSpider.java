@@ -35,7 +35,7 @@ public class VenomousSpider extends Boss {
             fightManager.sendPlayerFlyPosition(index);
 
             //Gửi message capture
-            fightManager.capture(index, player.getIndex());
+            fightManager.sendCapture(index, player.getIndex());
 
             //Thả tơ nhện
             fightManager.newShoot(index, (byte) 8, (short) 270, (byte) 10, (byte) 0, (byte) 1, false);

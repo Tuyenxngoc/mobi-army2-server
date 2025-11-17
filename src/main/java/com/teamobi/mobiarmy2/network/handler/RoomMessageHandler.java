@@ -127,7 +127,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
     }
 
     public void handleLeaveBoard() {
-        if (us().getState() == UserState.WAITING) {
+        if (us().getState() != UserState.WAIT_FIGHT && us().getState() != UserState.FIGHTING) {
             return;
         }
         fw().leaveTeam(us().getUserId());

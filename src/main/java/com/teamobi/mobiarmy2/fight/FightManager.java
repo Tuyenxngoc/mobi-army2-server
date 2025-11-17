@@ -47,7 +47,6 @@ public class FightManager {
     private final BulletManager bulletManager;
     private final CountdownTimer countdownTimer;
     private final ExecutorService executorNextTurn;
-    private final ExecutorService executorEndGame;
     @Getter
     private Player[] players;
     @Getter
@@ -73,7 +72,6 @@ public class FightManager {
         this.bulletManager = new BulletManager(this);
         this.countdownTimer = new CountdownTimer(MAX_PLAY_TIME + 10, this::onTimeUp);
         this.executorNextTurn = Executors.newSingleThreadExecutor();
-        this.executorEndGame = Executors.newSingleThreadExecutor();
         this.playerTurn = -1;
     }
 
@@ -91,13 +89,11 @@ public class FightManager {
 
     private void sendLuckyUpdate(byte index) {
         try {
-            Player player = players[index];
             Message ms = new Message(Cmd.LUCKY);
             DataOutputStream ds = ms.writer();
             ds.writeByte(index);
             ds.flush();
             fightWait.sendToTeam(ms);
-            player.setLucky(false);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -187,6 +183,200 @@ public class FightManager {
         }
     }
 
+    private void sendMssAddBosses(Boss[] bosses) {
+        try {
+            Message ms = new Message(Cmd.GET_BOSS);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(bosses.length);
+            for (Boss boss : bosses) {
+                ds.writeInt(-1);
+                ds.writeUTF(boss.getName());
+                ds.writeInt(boss.getMaxHp());
+                ds.writeByte(boss.getCharacterId());
+                ds.writeShort(boss.getX());
+                ds.writeShort(boss.getY());
+            }
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendCapture(byte index, byte toIndex) {
+        try {
+            Message ms = new Message(Cmd.CAPTURE);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(index);
+            ds.writeByte(toIndex);
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendBulletHit(byte index, byte toIndex) {
+        try {
+            Message ms = new Message(Cmd.BIT);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(index);
+            ds.writeByte(toIndex);
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendRewardMessage(Player player, Reward reward) {
+        try {
+            Message ms = new Message(Cmd.GIFT);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(0);//index gift
+            ds.writeByte(player.getIndex());//player index
+            ds.writeByte(reward.getType());//gift type
+            switch (reward.getType()) {
+                //xu
+                case 0 -> ds.writeShort(reward.getXu());
+
+                //item fight
+                case 1 -> {
+                    ds.writeByte(reward.getItemIndex());
+                    ds.writeByte(reward.getQuantity());
+                }
+
+                //equip
+                case 2 -> {
+                    Equipment equip = reward.getEquip().getEquipment();
+                    ds.writeByte(equip.getCharacterId());
+                    ds.writeByte(equip.getEquipType());
+                    ds.writeShort(equip.getEquipIndex());
+                    ds.writeUTF(equip.getName());
+                }
+
+                //xp
+                case 3 -> ds.writeByte(reward.getXp());
+
+                //notification
+                case 4 -> {
+                    SpecialItemChest specialItem = reward.getSpecialItem();
+                    ds.writeUTF(specialItem.getItem().getName());
+                }
+            }
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendNextTurnMessage(int turn) {
+        try {
+            Message ms = new Message(Cmd.NEXT_TURN_2);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(turn);
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendPlayerFlyPosition(byte index) {
+        Player player = players[index];
+        try {
+            Message ms = new Message(Cmd.FLY);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(index);
+            ds.writeShort(player.getX());
+            ds.writeShort(player.getY());
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendGhostAttackInfo(byte index, byte toIndex) {
+        try {
+            Message ms = new Message(Cmd.GHOST_BIT);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(index);
+            ds.writeByte(toIndex);
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendWindUpdate() {
+        try {
+            Message ms = new Message(Cmd.WIND);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(windX);
+            ds.writeByte(windY);
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendUseItemMessage(byte itemIndex, int index) {
+        try {
+            Message ms = new Message(Cmd.USE_ITEM);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(index);
+            ds.writeByte(itemIndex);
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendMessageUpdateXY(int index) {
+        try {
+            Player player = players[index];
+            Message ms = new Message(Cmd.MOVE_ARMY);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(index);
+            ds.writeShort(player.getX());
+            ds.writeShort(player.getY());
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendFightInfo(Player player) {
+        try {
+            Message ms = new Message(Cmd.START_ARMY);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(fightWait.getMapId());
+            ds.writeByte(MAX_PLAY_TIME);
+            ds.writeShort(player.getTeamPoints());
+            for (int j = 0; j < MAX_USER_FIGHT; j++) {
+                Player pl = players[j];
+                if (pl == null) {
+                    ds.writeShort(-1);
+                    continue;
+                }
+                ds.writeShort(pl.getX());
+                ds.writeShort(pl.getY());
+                ds.writeShort(pl.getMaxHp());
+            }
+
+            ds.flush();
+            player.getUser().sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void handleLuckUpdates() {
         for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             Player player = players[i];
@@ -204,6 +394,7 @@ public class FightManager {
                 continue;
             }
             sendLuckyUpdate(i);
+            player.setLucky(false);
         }
     }
 
@@ -292,16 +483,7 @@ public class FightManager {
             }
         }
 
-        try {
-            Message ms = new Message(Cmd.WIND);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(windX);
-            ds.writeByte(windY);
-            ds.flush();
-            fightWait.sendToTeam(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        sendWindUpdate();
     }
 
     private int getCurrentTurn() {
@@ -451,76 +633,77 @@ public class FightManager {
     }
 
     public synchronized void nextTurn() {
-        turnCount++;
-        byte roomType = fightWait.getRoomType();
-
-        //Cập nhật vị trí y của các player
-        for (Player player : players) {
-            if (player == null) {
-                continue;
-            }
-            player.updateYPosition();
-        }
-
-        //Cập nhật trạng thái người chơi
-        updatePlayerStatuses();
-
-        //Cập nhật số xp nhận được
-        updateXpPlayers();
-
-        //Cập nhật số cup nhận được
-        updateCupPlayers();
-
-        //Lần đầu radom lượt chơi
-        if (playerTurn == -1) {
-            while (true) {
-                int next;
-                if (roomType == 5) {
-                    next = Utils.nextInt(MAX_USER_FIGHT, totalPlayers);
-                } else {
-                    next = Utils.nextInt(MAX_USER_FIGHT);
-                }
-                if (players[next] != null && !INVALID_CHARACTER_IDS.contains(players[next].getCharacterId())) {
-                    if (next < MAX_USER_FIGHT) {
-                        playerTurn = next;
-                        bossTurn = MAX_USER_FIGHT;
-                        isBossTurn = false;
-                    } else {
-                        playerTurn = 0;
-                        bossTurn = next;
-                        isBossTurn = true;
-                    }
-                    break;
-                }
-            }
-        } else {
-            if (roomType == 5) {
-                if (isBossTurn) {
-                    playerTurn = getNextValidTurn(playerTurn, 0, MAX_USER_FIGHT);
-                } else {
-                    bossTurn = getNextValidTurn(bossTurn, MAX_USER_FIGHT, totalPlayers);
-                }
-                isBossTurn = !isBossTurn;
-            } else {
-                playerTurn = getNextValidTurn(playerTurn, 0, MAX_USER_FIGHT);
-            }
-        }
-
-        //Đặt lại giá trị của người chơi trong lượt mới như thể lực, ..., vv
-        if (isBossTurn) {
-            Boss boss = (Boss) players[bossTurn];
-            boss.resetValueInNewTurn();
-        } else {
-            Player player = players[playerTurn];
-            player.resetValueInNewTurn();
-            player.updateAngry((byte) 10);
-        }
-
         executorNextTurn.submit(() -> {
+            turnCount++;
+            byte roomType = fightWait.getRoomType();
+
+            //Cập nhật vị trí y của các player
+            for (Player player : players) {
+                if (player == null) {
+                    continue;
+                }
+                player.updateYPosition();
+            }
+
+            //Cập nhật trạng thái người chơi
+            updatePlayerStatuses();
+
+            //Cập nhật số xp nhận được
+            updateXpPlayers();
+
+            //Cập nhật số cup nhận được
+            updateCupPlayers();
+
+            //Lần đầu radom lượt chơi
+            if (playerTurn == -1) {
+                while (true) {
+                    int next;
+                    if (roomType == 5) {
+                        next = Utils.nextInt(MAX_USER_FIGHT, totalPlayers);
+                    } else {
+                        next = Utils.nextInt(MAX_USER_FIGHT);
+                    }
+                    if (players[next] != null && !INVALID_CHARACTER_IDS.contains(players[next].getCharacterId())) {
+                        if (next < MAX_USER_FIGHT) {
+                            playerTurn = next;
+                            bossTurn = MAX_USER_FIGHT;
+                            isBossTurn = false;
+                        } else {
+                            playerTurn = 0;
+                            bossTurn = next;
+                            isBossTurn = true;
+                        }
+                        break;
+                    }
+                }
+            } else {
+                if (roomType == 5) {
+                    if (isBossTurn) {
+                        playerTurn = getNextValidTurn(playerTurn, 0, MAX_USER_FIGHT);
+                    } else {
+                        bossTurn = getNextValidTurn(bossTurn, MAX_USER_FIGHT, totalPlayers);
+                    }
+                    isBossTurn = !isBossTurn;
+                } else {
+                    playerTurn = getNextValidTurn(playerTurn, 0, MAX_USER_FIGHT);
+                }
+            }
+
+            //Đặt lại giá trị của người chơi trong lượt mới như thể lực, ..., vv
+            if (isBossTurn) {
+                Boss boss = (Boss) players[bossTurn];
+                boss.resetValueInNewTurn();
+            } else {
+                Player player = players[playerTurn];
+                player.resetValueInNewTurn();
+                player.updateAngry((byte) 10);
+            }
+
             if (turnCount > 1) {
                 try {
                     Thread.sleep(2000L);
-                } catch (InterruptedException ignored) {
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
             }
             nextWind();
@@ -543,23 +726,19 @@ public class FightManager {
         sendMssAddBosses(new Boss[]{boss});
     }
 
-    private void sendMssAddBosses(Boss[] bosses) {
-        try {
-            Message ms = new Message(Cmd.GET_BOSS);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(bosses.length);
-            for (Boss boss : bosses) {
-                ds.writeInt(-1);
-                ds.writeUTF(boss.getName());
-                ds.writeInt(boss.getMaxHp());
-                ds.writeByte(boss.getCharacterId());
-                ds.writeShort(boss.getX());
-                ds.writeShort(boss.getY());
+    public void giveXpToTeammates(boolean isTeamBlue, int addXP, Player sharer) {
+        int i = isTeamBlue ? 0 : 1;
+        int step = fightWait.getRoomType() == 5 ? 1 : 2;
+
+        for (; i < MAX_USER_FIGHT; i += step) {
+            Player player = players[i];
+            if (player != sharer
+                    && player != null
+                    && player.getUser() != null
+                    && !player.isDead()
+            ) {
+                player.updateXp(addXP, false);
             }
-            ds.flush();
-            fightWait.sendToTeam(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -576,18 +755,6 @@ public class FightManager {
             turn++;
         }
         return currentTurn;
-    }
-
-    private void sendNextTurnMessage(int turn) {
-        try {
-            Message ms = new Message(Cmd.NEXT_TURN_2);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(turn);
-            ds.flush();
-            fightWait.sendToTeam(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public void leave(int userId) {
@@ -724,7 +891,7 @@ public class FightManager {
                 Message ms = new Message(Cmd.STOP_GAME);
                 DataOutputStream ds = ms.writer();
                 ds.writeByte(winStatus);
-                ds.writeByte(0);
+                ds.writeByte(0);//exBonus
                 if (winStatus == 1 || winStatus == 0) {
                     ds.writeInt(fightWait.getMoney());
                 } else {
@@ -823,10 +990,11 @@ public class FightManager {
             }
         }
 
-        executorEndGame.execute(() -> {
+        new Thread(() -> {
             try {
                 Thread.sleep(8000);
-            } catch (InterruptedException ignored) {
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
             fightWait.fightComplete();
 
@@ -834,26 +1002,16 @@ public class FightManager {
             if (turnCount > 5 && fightWait.getRoomType() != 5) {
                 try {
                     Thread.sleep(2000);
-                } catch (InterruptedException ignored) {
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
 
                 boolean isBlueWin = result == MatchResult.BLUE_WIN;
                 fightWait.startGiftBoxOpening(isBlueWin);
-
-//                for (byte i = 0; i < MAX_USER_FIGHT; i++) {
-//                    Player player = players[i];
-//                    if (player == null || player.getUser() == null) {
-//                        continue;
-//                    }
-//                    if ((player.isTeamBlue() && result == MatchResult.BLUE_WIN) ||
-//                            (!player.isTeamBlue() && result == MatchResult.RED_WIN)) {
-//                        player.getUser().getGiftBoxService().startGiftBoxOpening(2, 30);
-//                    }
-//                }
             }
 
             refreshFightManager();
-        });
+        }).start();
     }
 
     private byte getRewardMaterialId() {
@@ -967,43 +1125,19 @@ public class FightManager {
         if (fightWait.getMoney() > 0) {
             updateMoneyPlayers(-fightWait.getMoney());
         }
-        sendFightInfo();
-        if (fightWait.getRoomType() == 5) {
-            nextBosses();
-        }
-        nextTurn();
-    }
 
-    private void sendFightInfo() {
         for (int i = 0; i < MAX_USER_FIGHT; i++) {
             Player player = players[i];
             if (player == null || player.getUser() == null) {
                 continue;
             }
-
-            try {
-                Message ms = new Message(Cmd.START_ARMY);
-                DataOutputStream ds = ms.writer();
-                ds.writeByte(fightWait.getMapId());
-                ds.writeByte(MAX_PLAY_TIME);
-                ds.writeShort(player.getTeamPoints());
-                for (int j = 0; j < MAX_USER_FIGHT; j++) {
-                    Player pl = players[j];
-                    if (pl == null) {
-                        ds.writeShort(-1);
-                        continue;
-                    }
-                    ds.writeShort(pl.getX());
-                    ds.writeShort(pl.getY());
-                    ds.writeShort(pl.getMaxHp());
-                }
-
-                ds.flush();
-                player.getUser().sendMessage(ms);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            sendFightInfo(player);
         }
+
+        if (fightWait.getRoomType() == 5) {
+            nextBosses();
+        }
+        nextTurn();
     }
 
     public synchronized void addShoot(int userId, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
@@ -1147,21 +1281,6 @@ public class FightManager {
         }
     }
 
-    public void sendMessageUpdateXY(int index) {
-        try {
-            Player player = players[index];
-            Message ms = new Message(Cmd.MOVE_ARMY);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(index);
-            ds.writeShort(player.getX());
-            ds.writeShort(player.getY());
-            ds.flush();
-            fightWait.sendToTeam(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public synchronized void skipTurn(int userId) {
         int index = getPlayerIndexByUserId(userId);
         if (index == -1 || index != playerTurn || isBossTurn) {
@@ -1214,16 +1333,7 @@ public class FightManager {
             player.getUser().updateFightItems(itemIndex, (byte) -1);
         }
 
-        try {
-            Message ms = new Message(Cmd.USE_ITEM);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(index);
-            ds.writeByte(itemIndex);
-            ds.flush();
-            fightWait.sendToTeam(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        sendUseItemMessage(itemIndex, index);
 
         //Xử lý khi dùng item
         handleItem(player, index, itemIndex);
@@ -1356,117 +1466,6 @@ public class FightManager {
     }
 
     public void updateCantSee(Player pl) {
-    }
-
-    public void sendPlayerFlyPosition(byte index) {
-        Player player = players[index];
-        try {
-            Message ms = new Message(Cmd.FLY);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(index);
-            ds.writeShort(player.getX());
-            ds.writeShort(player.getY());
-            ds.flush();
-            fightWait.sendToTeam(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void sendGhostAttackInfo(byte index, byte toIndex) {
-        try {
-            Message ms = new Message(Cmd.GHOST_BIT);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(index);
-            ds.writeByte(toIndex);
-            ds.flush();
-            fightWait.sendToTeam(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void capture(byte index, byte toIndex) {
-        try {
-            Message ms = new Message(Cmd.CAPTURE);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(index);
-            ds.writeByte(toIndex);
-            ds.flush();
-            fightWait.sendToTeam(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void sendBulletHit(byte index, byte toIndex) {
-        try {
-            Message ms = new Message(Cmd.BIT);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(index);
-            ds.writeByte(toIndex);
-            ds.flush();
-            fightWait.sendToTeam(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void giveXpToTeammates(boolean isTeamBlue, int addXP, Player sharer) {
-        int i = isTeamBlue ? 0 : 1;
-        int step = fightWait.getRoomType() == 5 ? 1 : 2;
-
-        for (; i < MAX_USER_FIGHT; i += step) {
-            Player player = players[i];
-            if (player != sharer
-                    && player != null
-                    && player.getUser() != null
-                    && !player.isDead()
-            ) {
-                player.updateXp(addXP, false);
-            }
-        }
-    }
-
-    public void sendRewardMessage(Player player, Reward reward) {
-        try {
-            Message ms = new Message(Cmd.GIFT);
-            DataOutputStream ds = ms.writer();
-            ds.writeByte(0);//null byte
-            ds.writeByte(player.getIndex());//player index
-            ds.writeByte(reward.getType());//gift type
-            switch (reward.getType()) {
-                //xu
-                case 0 -> ds.writeShort(reward.getXu());
-
-                //item fight
-                case 1 -> {
-                    ds.writeByte(reward.getItemIndex());
-                    ds.writeByte(reward.getQuantity());
-                }
-
-                //equip
-                case 2 -> {
-                    Equipment equip = reward.getEquip().getEquipment();
-                    ds.writeByte(equip.getCharacterId());
-                    ds.writeByte(equip.getEquipType());
-                    ds.writeShort(equip.getEquipIndex());
-                }
-
-                //xp
-                case 3 -> ds.writeByte(reward.getXp());
-
-                //notification
-                case 4 -> {
-                    SpecialItemChest specialItem = reward.getSpecialItem();
-                    ds.writeUTF(specialItem.getItem().getName());
-                }
-            }
-            ds.flush();
-            fightWait.sendToTeam(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public void collisionPlayers(short x, short y, Bullet bullet) {
