@@ -46,7 +46,7 @@ public class FightManager {
     private final FightMapManager mapManager;
     private final BulletManager bulletManager;
     private final CountdownTimer countdownTimer;
-    private final ExecutorService executorNextTurn;
+    private final ExecutorService fightLoop = Executors.newSingleThreadExecutor();
     @Getter
     private Player[] players;
     @Getter
@@ -71,7 +71,6 @@ public class FightManager {
         this.mapManager = new FightMapManager(this);
         this.bulletManager = new BulletManager(this);
         this.countdownTimer = new CountdownTimer(MAX_PLAY_TIME + 10, this::onTimeUp);
-        this.executorNextTurn = Executors.newSingleThreadExecutor();
         this.playerTurn = -1;
     }
 
@@ -632,7 +631,11 @@ public class FightManager {
         return null;
     }
 
-    public synchronized void nextTurn() {
+    public void nextTurn() {
+        fightLoop.submit(this::doNextTurn);
+    }
+
+    private void doNextTurn() {
         MatchResult result = getMatchResult();
         if (result != null) {
             fightComplete(result);
