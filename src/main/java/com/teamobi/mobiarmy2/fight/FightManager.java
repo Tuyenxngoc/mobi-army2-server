@@ -493,7 +493,7 @@ public class FightManager {
         return playerTurn;
     }
 
-    private void nextBosses() {
+    private void spawnBosses() {
         byte playerCount = fightWait.getNumPlayers();
 
         switch (fightWait.getMapId()) {
@@ -1135,7 +1135,7 @@ public class FightManager {
         }
 
         if (fightWait.getRoomType() == 5) {
-            nextBosses();
+            spawnBosses();
         }
         nextTurn();
     }
