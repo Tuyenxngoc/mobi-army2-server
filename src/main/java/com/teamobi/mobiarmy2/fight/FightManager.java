@@ -633,8 +633,9 @@ public class FightManager {
     }
 
     public synchronized void nextTurn() {
-        if (checkWin()) {
-            return;
+        MatchResult result = getMatchResult();
+        if (result != null) {
+            fightComplete(result);
         }
 
         turnCount++;
@@ -791,14 +792,16 @@ public class FightManager {
     }
 
     /**
-     * Kiểm tra xem trận đấu đã kết thúc chưa
+     * Kiểm tra kết quả trận đấu
      *
-     * @return true nếu trận đấu đã kết thúc, false nếu còn tiếp tục
+     * @return MatchResult nếu trận đấu đã kết thúc (DRAW/BLUE_WIN/RED_WIN),
+     * null nếu trận đấu đang tiếp tục hoặc chưa bắt đầu
      */
-    public boolean checkWin() {
+    public MatchResult getMatchResult() {
         if (!fightWait.isStarted()) {
-            return true;
+            return null;
         }
+
         if (fightWait.getRoomType() == 5) {
             int playerAliveCount = 0, bossAliveCount = 0, i = 0;
             while (i < MAX_USER_FIGHT) {
@@ -818,17 +821,17 @@ public class FightManager {
             if (playerAliveCount == 0 || bossAliveCount == 0) {
                 if (playerAliveCount == bossAliveCount) {
                     if (isBossTurn) {
-                        fightComplete(MatchResult.RED_WIN);
+                        return MatchResult.RED_WIN;
                     } else {
-                        fightComplete(MatchResult.BLUE_WIN);
+                        return MatchResult.BLUE_WIN;
                     }
                 } else if (playerAliveCount == 0) {
-                    fightComplete(MatchResult.RED_WIN);
+                    return MatchResult.RED_WIN;
                 } else {
-                    fightComplete(MatchResult.BLUE_WIN);
+                    return MatchResult.BLUE_WIN;
                 }
             } else {
-                return false;
+                return null;
             }
         } else {
             int redAliveCount = 0, blueAliveCount = 0;
@@ -847,17 +850,16 @@ public class FightManager {
             }
             if (redAliveCount == 0 || blueAliveCount == 0) {
                 if (redAliveCount == blueAliveCount) {
-                    fightComplete(MatchResult.DRAW);
+                    return MatchResult.DRAW;
                 } else if (redAliveCount == 0) {
-                    fightComplete(MatchResult.BLUE_WIN);
+                    return MatchResult.BLUE_WIN;
                 } else {
-                    fightComplete(MatchResult.RED_WIN);
+                    return MatchResult.RED_WIN;
                 }
             } else {
-                return false;
+                return null;
             }
         }
-        return true;
     }
 
     private void fightComplete(MatchResult result) {
