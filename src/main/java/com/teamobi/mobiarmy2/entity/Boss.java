@@ -18,12 +18,6 @@ public abstract class Boss extends Player {
 
     public abstract void turnAction();
 
-    protected void skipTurn() {
-        if (!fightManager.checkWin()) {
-            fightManager.nextTurn();
-        }
-    }
-
     protected void moveToTarget(Player player) {
         //Lưu lại vị trí ban đầu
         int preX = x;

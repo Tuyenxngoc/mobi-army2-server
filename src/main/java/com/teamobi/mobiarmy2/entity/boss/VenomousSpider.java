@@ -45,7 +45,7 @@ public class VenomousSpider extends Boss {
             fightManager.sendPlayerFlyPosition(index);
 
             //Chuyển lượt tiếp theo
-            skipTurn();
+            fightManager.nextTurn();
         } else {
             if (actionCountdown > 0) {
                 actionCountdown--;
@@ -67,19 +67,15 @@ public class VenomousSpider extends Boss {
                     fightManager.sendPlayerFlyPosition(index);
 
                     //Chuyển lượt tiếp theo
-                    if (!fightManager.checkWin()) {
-                        fightManager.nextTurn();
-                    }
+                    fightManager.nextTurn();
                 } else {
                     x = (short) Utils.nextInt(50, fightManager.getMapManger().getWidth() - 50);
                     fightManager.sendPlayerFlyPosition(index);
-                    fightManager.newShoot(index, (byte) 47, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 10, (byte) 0, (byte) 1, true);
+                    fightManager.newShoot(index, (byte) 47, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 10, (byte) 0, (byte) 1);
                 }
             } else {
                 //Chuyển lượt tiếp theo
-                if (!fightManager.checkWin()) {
-                    fightManager.nextTurn();
-                }
+                fightManager.nextTurn();
             }
         }
     }

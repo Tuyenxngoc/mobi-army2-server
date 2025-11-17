@@ -633,87 +633,97 @@ public class FightManager {
     }
 
     public synchronized void nextTurn() {
-        executorNextTurn.submit(() -> {
-            turnCount++;
-            byte roomType = fightWait.getRoomType();
+        if (checkWin()) {
+            return;
+        }
 
-            //Cập nhật vị trí y của các player
-            for (Player player : players) {
-                if (player == null) {
-                    continue;
-                }
-                player.updateYPosition();
+        turnCount++;
+
+        //Cập nhật vị trí y của các player
+        for (Player player : players) {
+            if (player == null) {
+                continue;
             }
+            player.updateYPosition();
+        }
 
-            //Cập nhật trạng thái người chơi
-            updatePlayerStatuses();
+        //Cập nhật trạng thái người chơi
+        updatePlayerStatuses();
 
-            //Cập nhật số xp nhận được
-            updateXpPlayers();
+        //Cập nhật số xp nhận được
+        updateXpPlayers();
 
-            //Cập nhật số cup nhận được
-            updateCupPlayers();
+        //Cập nhật số cup nhận được
+        updateCupPlayers();
 
-            //Lần đầu radom lượt chơi
-            if (playerTurn == -1) {
-                while (true) {
-                    int next;
-                    if (roomType == 5) {
-                        next = Utils.nextInt(MAX_USER_FIGHT, totalPlayers);
-                    } else {
-                        next = Utils.nextInt(MAX_USER_FIGHT);
-                    }
-                    if (players[next] != null && !INVALID_CHARACTER_IDS.contains(players[next].getCharacterId())) {
-                        if (next < MAX_USER_FIGHT) {
-                            playerTurn = next;
-                            bossTurn = MAX_USER_FIGHT;
-                            isBossTurn = false;
-                        } else {
-                            playerTurn = 0;
-                            bossTurn = next;
-                            isBossTurn = true;
-                        }
-                        break;
-                    }
-                }
+        // Tính lượt chơi tiếp theo
+        if (playerTurn == -1) {
+            initFirstTurn();
+        } else {
+            calculateNextTurn();
+        }
+
+        //Đặt lại giá trị của người chơi trong lượt mới như thể lực, ..., vv
+        if (isBossTurn) {
+            Boss boss = (Boss) players[bossTurn];
+            boss.resetValueInNewTurn();
+        } else {
+            Player player = players[playerTurn];
+            player.resetValueInNewTurn();
+            player.updateAngry((byte) 10);
+        }
+
+        // Random gió
+        nextWind();
+
+        // Gửi thông báo lượt chơi tiếp theo
+        sendNextTurnMessage(isBossTurn ? bossTurn : playerTurn);
+
+        //Khởi động lại đồng hồ đếm ngược
+        countdownTimer.reset();
+
+        // Thực hiện hành động của boss trong lượt
+        if (isBossTurn) {
+            ((Boss) players[bossTurn]).turnAction();
+        }
+    }
+
+    private void initFirstTurn() {
+        byte roomType = fightWait.getRoomType();
+        while (true) {
+            int next;
+            if (roomType == 5) {
+                next = Utils.nextInt(MAX_USER_FIGHT, totalPlayers);
             } else {
-                if (roomType == 5) {
-                    if (isBossTurn) {
-                        playerTurn = getNextValidTurn(playerTurn, 0, MAX_USER_FIGHT);
-                    } else {
-                        bossTurn = getNextValidTurn(bossTurn, MAX_USER_FIGHT, totalPlayers);
-                    }
-                    isBossTurn = !isBossTurn;
+                next = Utils.nextInt(MAX_USER_FIGHT);
+            }
+            if (players[next] != null && !INVALID_CHARACTER_IDS.contains(players[next].getCharacterId())) {
+                if (next < MAX_USER_FIGHT) {
+                    playerTurn = next;
+                    bossTurn = MAX_USER_FIGHT;
+                    isBossTurn = false;
                 } else {
-                    playerTurn = getNextValidTurn(playerTurn, 0, MAX_USER_FIGHT);
+                    playerTurn = 0;
+                    bossTurn = next;
+                    isBossTurn = true;
                 }
+                break;
             }
+        }
+    }
 
-            //Đặt lại giá trị của người chơi trong lượt mới như thể lực, ..., vv
+    private void calculateNextTurn() {
+        byte roomType = fightWait.getRoomType();
+        if (roomType == 5) {
             if (isBossTurn) {
-                Boss boss = (Boss) players[bossTurn];
-                boss.resetValueInNewTurn();
+                playerTurn = getNextValidTurn(playerTurn, 0, MAX_USER_FIGHT);
             } else {
-                Player player = players[playerTurn];
-                player.resetValueInNewTurn();
-                player.updateAngry((byte) 10);
+                bossTurn = getNextValidTurn(bossTurn, MAX_USER_FIGHT, totalPlayers);
             }
-
-            if (turnCount > 1) {
-                try {
-                    Thread.sleep(2000L);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-            nextWind();
-            sendNextTurnMessage(isBossTurn ? bossTurn : playerTurn);
-            countdownTimer.reset();
-
-            if (isBossTurn) {
-                ((Boss) players[bossTurn]).turnAction();
-            }
-        });
+            isBossTurn = !isBossTurn;
+        } else {
+            playerTurn = getNextValidTurn(playerTurn, 0, MAX_USER_FIGHT);
+        }
     }
 
     public void addBoss(Boss boss) {
@@ -772,16 +782,19 @@ public class FightManager {
         //Gửi thông báo đến ván chơi
         fightWait.chatMessage(userId, GameString.ESCAPED_GAME);
 
-        //Kiểm tra chưa kết thúc ván thì chuyển lượt
-        if (!checkWin()) {
-            if (index == getCurrentTurn()) {
-                nextTurn();
-            } else {
-                sendNextTurnMessage(isBossTurn ? bossTurn : playerTurn);
-            }
+        //Chuyển lượt nếu người chơi đang trong lượt
+        if (index == getCurrentTurn()) {
+            nextTurn();
+        } else {
+            sendNextTurnMessage(isBossTurn ? bossTurn : playerTurn);
         }
     }
 
+    /**
+     * Kiểm tra xem trận đấu đã kết thúc chưa
+     *
+     * @return true nếu trận đấu đã kết thúc, false nếu còn tiếp tục
+     */
     public boolean checkWin() {
         if (!fightWait.isStarted()) {
             return true;
@@ -1134,9 +1147,12 @@ public class FightManager {
             sendFightInfo(player);
         }
 
+        // Tạo boss nếu là chế độ đấu trùm
         if (fightWait.getRoomType() == 5) {
             spawnBosses();
         }
+
+        // Bắt đầu lượt chơi đầu tiên
         nextTurn();
     }
 
@@ -1148,6 +1164,10 @@ public class FightManager {
         Player player = players[index];
         player.updateXY(x, y);
 
+        newShoot(index, bullId, angle, force, force2, numShoot);
+    }
+
+    public void newShoot(int index, byte bullId, short angle, byte force, byte force2, byte numShoot) {
         newShoot(index, bullId, angle, force, force2, numShoot, true);
     }
 
@@ -1250,8 +1270,8 @@ public class FightManager {
         //Xóa các đạn đã bắn
         bulletManager.resetBullets();
 
-        //Nếu chưa kết thúc trận đấu thì tìm lượt mới
-        if (isNextTurn && !checkWin()) {
+        //Chuyển lượt mới
+        if (isNextTurn) {
             nextTurn();
         }
     }
@@ -1374,7 +1394,7 @@ public class FightManager {
             }
 
             //Tự sát
-            case 24 -> newShoot(playerIndex, (byte) 50, (short) 0, (byte) 0, (byte) 0, (byte) 1, true);
+            case 24 -> newShoot(playerIndex, (byte) 50, (short) 0, (byte) 0, (byte) 0, (byte) 1);
 
             //Ufo Todo
             case 27 -> {

@@ -14,7 +14,7 @@ public class Robot extends Boss {
     public void turnAction() {
         Player closestPlayer = fightManager.findClosestPlayer(x, y);
         if (closestPlayer == null) {
-            skipTurn();
+            fightManager.nextTurn();
             return;
         }
 
@@ -22,7 +22,7 @@ public class Robot extends Boss {
             fightManager.newShoot(index, (byte) 35, (short) 0, (byte) 0, (byte) 0, (byte) 1, false);
             byte force = (byte) Utils.nextInt(15, 30);
             short arg = (short) Utils.nextInt(80, 100);
-            fightManager.newShoot(index, (byte) 36, arg, force, (byte) 0, (byte) 1, true);
+            fightManager.newShoot(index, (byte) 36, arg, force, (byte) 0, (byte) 1);
             return;
         }
 
@@ -39,12 +39,10 @@ public class Robot extends Boss {
                         (short) (randomPlayer.getWidth() / 2), (short) (randomPlayer.getHeight() / 2), 50, 5, 80, 100
                 );
                 if (forceArgXY == null) {
-                    if (!fightManager.checkWin()) {
-                        fightManager.nextTurn();
-                    }
+                    fightManager.nextTurn();
                     return;
                 }
-                fightManager.newShoot(index, (byte) 0, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1, true);
+                fightManager.newShoot(index, (byte) 0, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1);
             }
             case 1 -> {
                 short[] forceArgXY = fightManager.getForceArgXY(
@@ -52,12 +50,10 @@ public class Robot extends Boss {
                         (short) (randomPlayer.getWidth() / 2), (short) (randomPlayer.getHeight() / 2), 50, 5, 80, 60
                 );
                 if (forceArgXY == null) {
-                    if (!fightManager.checkWin()) {
-                        fightManager.nextTurn();
-                    }
+                    fightManager.nextTurn();
                     return;
                 }
-                fightManager.newShoot(index, (byte) 2, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1, true);
+                fightManager.newShoot(index, (byte) 2, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1);
             }
             case 2 -> {
                 short[] forceArgXY = fightManager.getForceArgXY(
@@ -65,12 +61,10 @@ public class Robot extends Boss {
                         (short) (randomPlayer.getWidth() / 2), (short) (randomPlayer.getHeight() / 2), 50, 5, 50, 80
                 );
                 if (forceArgXY == null) {
-                    if (!fightManager.checkWin()) {
-                        fightManager.nextTurn();
-                    }
+                    fightManager.nextTurn();
                     return;
                 }
-                fightManager.newShoot(index, (byte) 10, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1, true);
+                fightManager.newShoot(index, (byte) 10, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1);
             }
             case 3 -> {
                 usedItemId = 6;
@@ -79,12 +73,10 @@ public class Robot extends Boss {
                         (short) (randomPlayer.getWidth() / 2), (short) (randomPlayer.getHeight() / 2), 50, 5, 70, 90
                 );
                 if (forceArgXY == null) {
-                    if (!fightManager.checkWin()) {
-                        fightManager.nextTurn();
-                    }
+                    fightManager.nextTurn();
                     return;
                 }
-                fightManager.newShoot(index, (byte) 6, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1, true);
+                fightManager.newShoot(index, (byte) 6, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1);
             }
             case 4 -> {
                 usedItemId = 7;
@@ -93,12 +85,10 @@ public class Robot extends Boss {
                         (short) (randomPlayer.getWidth() / 2), (short) (randomPlayer.getHeight() / 2), 50, 5, 70, 80
                 );
                 if (forceArgXY == null) {
-                    if (!fightManager.checkWin()) {
-                        fightManager.nextTurn();
-                    }
+                    fightManager.nextTurn();
                     return;
                 }
-                fightManager.newShoot(index, (byte) 7, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1, true);
+                fightManager.newShoot(index, (byte) 7, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1);
             }
             default -> {
                 short[] forceArgXY = fightManager.getForceArgXY(
@@ -106,12 +96,10 @@ public class Robot extends Boss {
                         randomPlayer.getWidth(), randomPlayer.getHeight(), 50, 5, 0, 80
                 );
                 if (forceArgXY == null) {
-                    if (!fightManager.checkWin()) {
-                        fightManager.nextTurn();
-                    }
+                    fightManager.nextTurn();
                     return;
                 }
-                fightManager.newShoot(index, (byte) 36, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1, true);
+                fightManager.newShoot(index, (byte) 36, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1);
             }
         }
     }

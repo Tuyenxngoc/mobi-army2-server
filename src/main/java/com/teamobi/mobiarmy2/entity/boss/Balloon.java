@@ -23,7 +23,7 @@ public class Balloon extends Boss {
             BalloonEye newBoss = new BalloonEye(fightManager, (byte) fightManager.getTotalPlayers(), (short) (x + 55), (short) (y - 27), (short) 1000);
             bodyParts[4] = newBoss;
             fightManager.addBoss(newBoss);
-            skipTurn();
+            fightManager.nextTurn();
             return;
         }
 
@@ -36,14 +36,14 @@ public class Balloon extends Boss {
                 bodyParts[0].die();
 
                 //Kết thúc trận đấu
-                fightManager.checkWin();
+                fightManager.nextTurn();
                 return;
             }
         }
 
         Player player = fightManager.findClosestPlayer(x, y);
         if (player == null) {
-            skipTurn();
+            fightManager.nextTurn();
             return;
         }
 
@@ -63,9 +63,9 @@ public class Balloon extends Boss {
                 updateBodyPartsCoordinates(toX, toY);
 
                 if (!bodyParts[1].isDead()) {
-                    fightManager.newShoot(index, (byte) 44, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 10, (byte) 0, (byte) 1, true);
+                    fightManager.newShoot(index, (byte) 44, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 10, (byte) 0, (byte) 1);
                 } else if (!bodyParts[2].isDead()) {
-                    fightManager.newShoot(index, (byte) 43, (short) 270, (byte) 20, (byte) 0, (byte) 1, true);
+                    fightManager.newShoot(index, (byte) 43, (short) 270, (byte) 20, (byte) 0, (byte) 1);
                 }
             }
 
@@ -75,11 +75,11 @@ public class Balloon extends Boss {
                 short toY = (short) Utils.nextInt(-100, 50);
                 updateBodyPartsCoordinates(toX, toY);
 
-                fightManager.newShoot(index, (byte) 44, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 10, (byte) 0, (byte) 1, true);
+                fightManager.newShoot(index, (byte) 44, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 10, (byte) 0, (byte) 1);
             }
 
             //Gun Big
-            case 2 -> fightManager.newShoot(index, (byte) 43, (short) 270, (byte) 20, (byte) 0, (byte) 1, true);
+            case 2 -> fightManager.newShoot(index, (byte) 43, (short) 270, (byte) 20, (byte) 0, (byte) 1);
 
             //Eye
             case 4 -> {
@@ -87,7 +87,7 @@ public class Balloon extends Boss {
                 short toY = (short) Utils.nextInt(-50, 50);
                 updateBodyPartsCoordinates(toX, toY);
 
-                fightManager.newShoot(index, (byte) 45, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 20, (byte) 0, (byte) 1, true);
+                fightManager.newShoot(index, (byte) 45, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 20, (byte) 0, (byte) 1);
             }
         }
     }
