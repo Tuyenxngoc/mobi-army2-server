@@ -45,19 +45,27 @@ public class BulletManager {
         }
     }
 
+    public void resetBullets() {
+        bullets.clear();
+        typeShoot = 0;
+        superType = 0;
+        superX = 0;
+        superY = 0;
+    }
+
     public void updateBullets() {
-        boolean hasNext;
+        boolean updated;
         do {
-            hasNext = false;
+            updated = false;
             for (int i = 0; i < bullets.size(); i++) {
                 Bullet bullet = bullets.get(i);
                 if (bullet == null || bullet.isCollected()) {
                     continue;
                 }
-                hasNext = true;
                 bullet.update();
+                updated = true;
             }
-        } while (hasNext);
+        } while (updated);
     }
 
     public short[] getCollisionPoint(short x1, short y1, short x2, short y2, boolean canPassThroughPlayers, boolean canPassThroughMap) {

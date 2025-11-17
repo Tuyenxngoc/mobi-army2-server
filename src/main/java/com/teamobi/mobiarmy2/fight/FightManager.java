@@ -1169,10 +1169,6 @@ public class FightManager {
         updateLuckyPlayers();
 
         List<Bullet> bullets = bulletManager.getBullets();
-        if (bullets.isEmpty()) {
-            return;
-        }
-
         byte typeShoot = bulletManager.getTypeShoot();
         try {
             Message ms = new Message(Cmd.FIRE_ARMY);
@@ -1252,7 +1248,7 @@ public class FightManager {
         }
 
         //Xóa các đạn đã bắn
-        bulletManager.getBullets().clear();
+        bulletManager.resetBullets();
 
         //Nếu chưa kết thúc trận đấu thì tìm lượt mới
         if (isNextTurn && !checkWin()) {
