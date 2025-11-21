@@ -41,6 +41,16 @@ public class BulletManager {
                     }
                     bullets.add(new Bullet(this, (byte) 0, (pl.isUsePow() ? 630 : (numShoot == 2 ? 210 : 280)), pl, x, y, vx, vy, 80, 100));
                 }
+                case 1 -> { //Aka
+                    if (pl.getUsedItemId() > 0 || characterId != 1) {
+                        return;
+                    }
+                    int damage = (numShoot == 2 ? 109 : 145);
+                    int n = pl.isUsePow() ? 6 : 2;
+                    for (int i = 0; i < n; i++) {
+                        bullets.add(new Bullet(this, (byte) 1, damage, pl, x, y, vx, vy, 50, 50));
+                    }
+                }
             }
         }
     }

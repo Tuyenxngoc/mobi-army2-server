@@ -38,7 +38,7 @@ public class VenomousSpider extends Boss {
             fightManager.sendCapture(index, player.getIndex());
 
             //Thả tơ nhện
-            fightManager.newShoot(index, (byte) 8, (short) 270, (byte) 10, (byte) 0, (byte) 1, false);
+            fightManager.createShoot(index, (byte) 8, (short) 270, (byte) 10, (byte) 0, (byte) 1, false);
 
             //Di chuyển về vị trí cũ
             x = preX;
@@ -71,7 +71,7 @@ public class VenomousSpider extends Boss {
                 } else {
                     x = (short) Utils.nextInt(50, fightManager.getMapManger().getWidth() - 50);
                     fightManager.sendPlayerFlyPosition(index);
-                    fightManager.newShoot(index, (byte) 47, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 10, (byte) 0, (byte) 1);
+                    fightManager.createShoot(index, (byte) 47, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 10, (byte) 0, (byte) 1);
                 }
             } else {
                 //Chuyển lượt tiếp theo

@@ -1161,7 +1161,7 @@ public class FightManager {
         nextTurn();
     }
 
-    public synchronized void addShoot(int userId, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
+    public synchronized void handlePlayerShoot(int userId, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
         int index = getPlayerIndexByUserId(userId);
         if (index == -1 || index != playerTurn || isBossTurn || !fightWait.isStarted()) {
             return;
@@ -1169,14 +1169,14 @@ public class FightManager {
         Player player = players[index];
         player.updateXY(x, y);
 
-        newShoot(index, bullId, angle, force, force2, numShoot);
+        createShoot(index, bullId, angle, force, force2, numShoot);
     }
 
-    public void newShoot(int index, byte bullId, short angle, byte force, byte force2, byte numShoot) {
-        newShoot(index, bullId, angle, force, force2, numShoot, true);
+    public void createShoot(int index, byte bullId, short angle, byte force, byte force2, byte numShoot) {
+        createShoot(index, bullId, angle, force, force2, numShoot, true);
     }
 
-    public void newShoot(int index, byte bullId, short angle, byte force, byte force2, byte numShoot, boolean isNextTurn) {
+    public void createShoot(int index, byte bullId, short angle, byte force, byte force2, byte numShoot, boolean isNextTurn) {
         Player player = players[index];
         if (player.isDoubleShoot()) {
             player.setDoubleShoot(false);
@@ -1399,7 +1399,7 @@ public class FightManager {
             }
 
             //Tự sát
-            case 24 -> newShoot(playerIndex, (byte) 50, (short) 0, (byte) 0, (byte) 0, (byte) 1);
+            case 24 -> createShoot(playerIndex, (byte) 50, (short) 0, (byte) 0, (byte) 0, (byte) 1);
 
             //Ufo Todo
             case 27 -> {

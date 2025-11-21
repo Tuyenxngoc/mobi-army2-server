@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class LoginRateLimiterService {
-    private static final int LOGIN_BLOCK_DURATION_SECONDS = 20;
+    private static final int LOGIN_BLOCK_DURATION_SECONDS = 10;
     private final Map<String, Long> blockedUsers = new ConcurrentHashMap<>();
 
     /**

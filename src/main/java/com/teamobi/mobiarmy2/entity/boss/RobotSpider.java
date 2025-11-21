@@ -21,10 +21,10 @@ public class RobotSpider extends Boss {
         int distance = calculateDistance(player.getX(), player.getY());
         if (distance < 30) {
             this.usedItemId = 9;
-            fightManager.newShoot(index, (byte) 8, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 30, (byte) 0, (byte) 1, false);
+            fightManager.createShoot(index, (byte) 8, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 30, (byte) 0, (byte) 1, false);
             byte force = (byte) Utils.nextInt(15, 30);
             short arg = (short) Utils.nextInt(80, 100);
-            fightManager.newShoot(index, (byte) 36, arg, force, (byte) 0, (byte) 1);
+            fightManager.createShoot(index, (byte) 36, arg, force, (byte) 0, (byte) 1);
             return;
         }
 
@@ -41,10 +41,10 @@ public class RobotSpider extends Boss {
                     fightManager.nextTurn();
                     return;
                 }
-                fightManager.newShoot(index, (byte) 8, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1, false);
+                fightManager.createShoot(index, (byte) 8, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1, false);
                 byte force = (byte) Utils.nextInt(15, 30);
                 short arg = (short) Utils.nextInt(80, 100);
-                fightManager.newShoot(index, (byte) 36, arg, force, (byte) 0, (byte) 1);
+                fightManager.createShoot(index, (byte) 36, arg, force, (byte) 0, (byte) 1);
             }
             case 1 -> {// Laser
                 usedItemId = 16;
@@ -58,7 +58,7 @@ public class RobotSpider extends Boss {
                     fightManager.nextTurn();
                     return;
                 }
-                fightManager.newShoot(index, (byte) 14, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1);
+                fightManager.createShoot(index, (byte) 14, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1);
             }
             case 2 -> {// Rocket
                 short[] forceArgXY = fightManager.getForceArgXY(
@@ -71,7 +71,7 @@ public class RobotSpider extends Boss {
                     fightManager.nextTurn();
                     return;
                 }
-                fightManager.newShoot(index, (byte) 33, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1);
+                fightManager.createShoot(index, (byte) 33, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1);
             }
         }
     }

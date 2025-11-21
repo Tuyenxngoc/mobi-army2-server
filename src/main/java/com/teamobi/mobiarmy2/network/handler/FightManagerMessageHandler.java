@@ -47,7 +47,7 @@ public class FightManagerMessageHandler extends BaseMessageHandler {
         }
         byte numShoot = dis.readByte();
 
-        fm().addShoot(us().getUserId(), bullId, x, y, angle, force, force2, numShoot);
+        fm().handlePlayerShoot(us().getUserId(), bullId, x, y, angle, force, force2, numShoot);
     }
 
     public void processShootingResult(Message ms) {
