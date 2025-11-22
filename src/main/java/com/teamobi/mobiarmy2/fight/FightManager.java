@@ -54,8 +54,8 @@ public class FightManager {
     @Getter
     private int turnCount;
     private boolean isBossTurn;
-    private int playerTurn;
-    private int bossTurn;
+    private int playerTurn = -1;
+    private int bossTurn = -1;
     @Getter
     private byte windX;
     @Getter
@@ -71,7 +71,6 @@ public class FightManager {
         this.mapManager = new FightMapManager(this);
         this.bulletManager = new BulletManager(this);
         this.countdownTimer = new CountdownTimer(MAX_PLAY_TIME + 10, this::onTimeUp);
-        this.playerTurn = -1;
     }
 
     private void refreshFightManager() {
@@ -79,8 +78,8 @@ public class FightManager {
         totalPlayers = MAX_USER_FIGHT;
         turnCount = 0;
         isBossTurn = false;
-        playerTurn = 0;
-        bossTurn = MAX_USER_FIGHT;
+        playerTurn = -1;
+        bossTurn = -1;
         windX = 0;
         windY = 0;
         countdownTimer.stop();
@@ -644,7 +643,8 @@ public class FightManager {
         turnCount++;
 
         //Cập nhật vị trí y của các player
-        for (Player player : players) {
+        for (int i = 0; i < totalPlayers; i++) {
+            Player player = players[i];
             if (player == null) {
                 continue;
             }

@@ -51,6 +51,30 @@ public class BulletManager {
                         bullets.add(new Bullet(this, (byte) 1, damage, pl, x, y, vx, vy, 50, 50));
                     }
                 }
+                case 2 -> { //3tia
+                    if (pl.getUsedItemId() > 0 || (characterId != 2 && characterId != 14)) {
+                        return;
+                    }
+                    int n = pl.isUsePow() ? 4 : 2;
+                    int damage = numShoot == 2 ? 75 : 100;
+                    for (int i = 0; i < n; i++) {
+                        int arg = angle + i * 5;
+                        x = pl.getX() + (20 * Utils.cos(arg) >> 10);
+                        y = pl.getY() - 12 - (20 * Utils.sin(arg) >> 10);
+                        vx = (force * Utils.cos(arg) >> 10);
+                        vy = -(force * Utils.sin(arg) >> 10);
+                        bullets.add(new Bullet(this, (byte) 2, damage, pl, x, y, vx, vy, 80, 60));
+                        if (i == 0 || i == 4) {
+                            continue;
+                        }
+                        arg = angle - i * 5;
+                        x = pl.getX() + (20 * Utils.cos(arg) >> 10);
+                        y = pl.getY() - 12 - (20 * Utils.sin(arg) >> 10);
+                        vx = (force * Utils.cos(arg) >> 10);
+                        vy = -(force * Utils.sin(arg) >> 10);
+                        bullets.add(new Bullet(this, (byte) 2, damage, pl, x, y, vx, vy, 80, 60));
+                    }
+                }
             }
         }
     }
