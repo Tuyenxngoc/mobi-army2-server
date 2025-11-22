@@ -47,13 +47,16 @@ public class Bullet {
     protected boolean canPassThroughMap;
     protected boolean canCollide = true;
 
-    public Bullet(BulletManager bulletManager, byte bullId, int damage, Player player, int X, int Y, int vx, int vy, int msg, int g100) {
+    public Bullet() {
+    }
+
+    public Bullet(BulletManager bulletManager, byte bullId, int damage, Player player, int x, int y, int vx, int vy, int msg, int g100) {
         this.bulletManager = bulletManager;
         this.bullId = bullId;
         this.damage = (damage * player.getDamage()) / 100;
         this.player = player;
-        this.x = (short) X;
-        this.y = (short) Y;
+        this.x = (short) x;
+        this.y = (short) y;
         this.vx = (short) vx;
         this.vy = (short) vy;
         FightManager fightManager = bulletManager.getFightManager();

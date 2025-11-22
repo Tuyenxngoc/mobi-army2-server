@@ -6,6 +6,7 @@ import com.teamobi.mobiarmy2.constant.MatchResult;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.entity.*;
 import com.teamobi.mobiarmy2.entity.boss.*;
+import com.teamobi.mobiarmy2.entity.bullet.ChickyTrung;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.server.FightItemManager;
@@ -13,6 +14,7 @@ import com.teamobi.mobiarmy2.server.SpecialItemManager;
 import com.teamobi.mobiarmy2.service.ClanService;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -21,6 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Predicate;
 
+@Slf4j
 public class FightManager {
     private static final int MAX_ELEMENT_FIGHT = 100;
     private static final int MAX_USER_FIGHT = 8;
@@ -1008,28 +1011,26 @@ public class FightManager {
             }
         }
 
-        new Thread(() -> {
+        try {
+            Thread.sleep(8000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        fightWait.fightComplete();
+
+        //Cập nhật mở quà
+        if (turnCount > 5 && fightWait.getRoomType() != 5) {
             try {
-                Thread.sleep(8000);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-            fightWait.fightComplete();
 
-            //Cập nhật mở quà
-            if (turnCount > 5 && fightWait.getRoomType() != 5) {
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
+            boolean isBlueWin = result == MatchResult.BLUE_WIN;
+            fightWait.startGiftBoxOpening(isBlueWin);
+        }
 
-                boolean isBlueWin = result == MatchResult.BLUE_WIN;
-                fightWait.startGiftBoxOpening(isBlueWin);
-            }
-
-            refreshFightManager();
-        }).start();
+        refreshFightManager();
     }
 
     private byte getRewardMaterialId() {
@@ -1221,6 +1222,11 @@ public class FightManager {
                 List<Point> trajectory = bullet.getTrajectory();
                 int size = trajectory.size();
                 ds.writeShort(size);// Ghi độ dài quỹ đạo
+
+                if (bullet instanceof ChickyTrung) {
+                    log.debug("Bullet ChickyTrung size: {}", size);
+                    log.debug("Trajectory: {}", trajectory);
+                }
 
                 if (typeShoot == 0) {// Ghi tọa độ theo dạng delta (chênh lệch)
                     for (int i = 0; i < size; i++) {
