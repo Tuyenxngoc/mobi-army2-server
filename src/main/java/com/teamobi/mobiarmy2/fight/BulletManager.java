@@ -586,9 +586,9 @@ public class BulletManager {
         return null;
     }
 
-    public void handleCollision(Bullet bullet) {
-        fightManager.getMapManger().collision(bullet.getX(), bullet.getY(), bullet);
-        fightManager.collisionPlayers(bullet.getX(), bullet.getY(), bullet);
+    public void handleCollision(short x, short y, Bullet bullet) {
+        fightManager.getMapManger().collision(x, y, bullet);
+        fightManager.collisionPlayers(x, y, bullet);
     }
 
 }

@@ -14,7 +14,6 @@ import java.util.List;
 public class Bullet {
     protected BulletManager bulletManager;
     protected Player player;
-    protected boolean isCollected;// Đạn đã bị thu hồi (va chạm hoặc bay ra ngoài map)
     protected byte bullId;
     protected int damage;
 
@@ -45,7 +44,8 @@ public class Bullet {
     protected short frame;
     protected boolean canPassThroughPlayers;
     protected boolean canPassThroughMap;
-    protected boolean canCollide = true;
+    protected boolean canCollide = true;// Đạn có thể va chạm
+    protected boolean isCollected;// Đạn đã bị thu hồi (va chạm hoặc bay ra ngoài map)
 
     public Bullet() {
     }
@@ -126,7 +126,7 @@ public class Bullet {
             }
 
             if (canCollide) {
-                bulletManager.handleCollision(this);
+                bulletManager.handleCollision(x, y, this);
             }
 
             return;
@@ -135,8 +135,8 @@ public class Bullet {
         // Cập nhật gia tốc
         updateAcceleration();
 
-        // Xác định điểm cao nhất (đỉnh quỹ đạo, tính tại tọa độ đỉnh đầu tiên)
-        if (vy >= 0 && !isMaxY) {
+        // Xác định điểm cao nhất (đỉnh quỹ đạo)
+        if (vy > 0 && !isMaxY) {
             isMaxY = true;
             xAtPeakY = x;
             peakY = y;

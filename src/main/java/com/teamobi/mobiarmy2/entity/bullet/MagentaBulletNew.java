@@ -18,20 +18,19 @@ public class MagentaBulletNew extends Bullet {
     public void update() {
         super.update();
         if (isMaxY) {
-            // Lưu lại tọa độ đỉnh vì tọa độ chỉ lưu vào đầu hàm update
-            trajectory.add(new Point(x, y));
             isCollected = true;
 
-            int deltaX = xAtPeakY - trajectory.getFirst().getX();
-            int deltaY = peakY - trajectory.getFirst().getY();
+            Point first = trajectory.getFirst();
+            int deltaX = x - first.getX();
+            int deltaY = y - first.getY();
 
             int arg = Utils.getArg(deltaX, deltaY);
-
             deltaX = (force * Utils.cos(arg)) >> 10;
             deltaY = (force * Utils.sin(arg)) >> 10;
 
-            short newX = xAtPeakY;
-            short newY = peakY;
+            Point last = trajectory.getLast();
+            short newX = (short) last.getX();
+            short newY = (short) last.getY();
 
             while (true) {
                 if ((newX < -100) || (newX > bulletManager.getFightManager().getMapManger().getWidth() + 100) || (newY > bulletManager.getFightManager().getMapManger().getHeight() + 100)) {
@@ -44,14 +43,14 @@ public class MagentaBulletNew extends Bullet {
                     newY = collisionResult[1];
 
                     if (canCollide) {
-                        bulletManager.handleCollision(this);
+                        bulletManager.handleCollision(newX, newY, this);
                     }
 
                     break;
                 }
 
-                newX += (short) deltaX;
-                newY -= (short) deltaY;
+                newX += deltaX;
+                newY -= deltaY;
             }
 
             trajectory.add(new Point(newX, newY));
