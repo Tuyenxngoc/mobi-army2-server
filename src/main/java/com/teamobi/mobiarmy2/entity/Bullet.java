@@ -14,16 +14,16 @@ import java.util.List;
 public class Bullet {
     protected BulletManager bulletManager;
     protected Player player;
-    protected boolean isCollected;
+    protected boolean isCollected;// Đạn đã bị thu hồi (va chạm hoặc bay ra ngoài map)
     protected byte bullId;
     protected int damage;
 
-    private List<Point> trajectory = new ArrayList<>();//Quỹ đạo bay của đạn từ súng đến mục tiêu
+    protected List<Point> trajectory = new ArrayList<>();//Quỹ đạo bay của đạn từ súng đến mục tiêu
 
-    private byte dXLaser;//Vector hướng X của tia laser
-    private byte dYLaser;//Vector hướng Y của tia laser
+    protected byte dXLaser;//Vector hướng X của tia laser
+    protected byte dYLaser;//Vector hướng Y của tia laser
 
-    private List<Point> hitPoints = new ArrayList<>();//Các điểm va chạm/nổ
+    protected List<Point> hitPoints = new ArrayList<>();//Các điểm va chạm/nổ
 
     protected short x;
     protected short y;
@@ -39,8 +39,8 @@ public class Bullet {
     protected short vyTemp2;
 
     protected boolean isMaxY;
-    protected short peakX;
-    protected short peakY;
+    protected short xAtPeakY;// X tương ứng tại đỉnh Y
+    protected short peakY;// giá trị cực đại của Y
 
     protected short frame;
     protected boolean canPassThroughPlayers;
@@ -135,10 +135,10 @@ public class Bullet {
         // Cập nhật gia tốc
         updateAcceleration();
 
-        // Xác định điểm cao nhất (đỉnh quỹ đạo)
-        if (vy > 0 && !isMaxY) {
+        // Xác định điểm cao nhất (đỉnh quỹ đạo, tính tại tọa độ đỉnh đầu tiên)
+        if (vy >= 0 && !isMaxY) {
             isMaxY = true;
-            peakX = x;
+            xAtPeakY = x;
             peakY = y;
         }
 
@@ -176,7 +176,7 @@ public class Bullet {
         }
 
         if (bulletManager.getSuperType() != 0) {
-            bulletManager.setSuperX(peakX);
+            bulletManager.setSuperX(xAtPeakY);
             bulletManager.setSuperY(peakY);
         }
     }

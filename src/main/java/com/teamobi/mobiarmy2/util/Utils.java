@@ -208,7 +208,7 @@ public class Utils {
         return IntArg;
     }
 
-    public static int toArg0_360(int arg) {
+    public static int normalizeAngle360(int arg) {
         if (arg >= 360) {
             arg -= 360;
         }
@@ -219,7 +219,7 @@ public class Utils {
     }
 
     public static int cos(int arg) {
-        if ((arg = toArg0_360(arg)) >= 0 && arg < 90) {
+        if ((arg = normalizeAngle360(arg)) >= 0 && arg < 90) {
             return COS_DATA[arg];
         }
         if (arg >= 90 && arg < 180) {
@@ -233,7 +233,7 @@ public class Utils {
     }
 
     public static int sin(int arg) {
-        if ((arg = toArg0_360(arg)) >= 0 && arg < 90) {
+        if ((arg = normalizeAngle360(arg)) >= 0 && arg < 90) {
             return SIN_DATA[arg];
         }
         if (arg >= 90 && arg < 180) {

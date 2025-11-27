@@ -13,6 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 public class BulletManager {
+    private static final boolean MAGENTA_NEW_BULLET = true;
     private FightManager fightManager;
     private List<Bullet> bullets = new ArrayList<>();
     private byte typeShoot;
@@ -25,6 +26,10 @@ public class BulletManager {
     }
 
     public void addShoot(Player pl, byte bullId, short angle, byte force, byte force2, byte numShoot) {
+        if (bullId == 49) { // Magenta trong chế độ bắn thường không phải luyện tập phải cộng lực thêm 5
+            force += 5;
+        }
+
         //Tính vị trí bắt đầu của viên đạn
         int x = pl.getX() + (20 * Utils.cos(angle) >> 10);
         int y = pl.getY() - 12 - (20 * Utils.sin(angle) >> 10);
@@ -395,12 +400,12 @@ public class BulletManager {
                     if (isUsingItem || characterId != 9) {
                         return;
                     }
-                    if (true) {
-                        bullets.add(new MGTBulletNew(this, (byte) 49, pl.isUsePow() ? 1000 : (numShoot == 2 ? 308 : 400), pl, x, y, vx, vy, 40, 70, force));
+                    if (MAGENTA_NEW_BULLET) {
+                        bullets.add(new MagentaBulletNew(this, (byte) 49, pl.isUsePow() ? 1000 : (numShoot == 2 ? 308 : 400), pl, x, y, vx, vy, 40, 70, force));
                     } else {
                         vx = (1600 * Utils.cos(angle) >> 10);
                         vy = -(1600 * Utils.sin(angle) >> 10);
-                        bullets.add(new MGTBulletOld(this, (byte) 59, pl.isUsePow() ? 1000 : (numShoot == 2 ? 308 : 400), pl, x, y, vx, vy, force));
+                        bullets.add(new MagentaBulletOld(this, (byte) 59, pl.isUsePow() ? 1000 : (numShoot == 2 ? 308 : 400), pl, x, y, vx, vy, force));
                     }
                 }
 
