@@ -18,7 +18,7 @@ public class ChickyBullet extends Bullet {
     public void update() {
         super.update();
         if (force2 == frame) {
-            bulletManager.addBullet(new ChickyTrung(bulletManager, (byte) 20, baseDamage, player, x, y, 0, 0, 20, 50));
+            bulletManager.addBullet(new ChickyTrung(bulletManager, (byte) 20, baseDamage, player, x, y, 0, 0, 10, 30));
         }
     }
 }
