@@ -17,18 +17,25 @@ public class MagentaBulletNew extends Bullet {
     @Override
     public void update() {
         super.update();
-        if (isMaxY) {
-            isCollected = true;
 
+        // Viên đạn đã đạt đỉnh khi vy >= 0
+        if (vy >= 0) {
+            isCollected = true; // Kết thúc viên đạn khi đạt đỉnh
+
+            // Lưu lại tọa độ tại đỉnh
+            trajectory.add(new Point(x, y));
+
+            // Tính toán sau khi đạt đỉnh
             Point first = trajectory.getFirst();
-            int deltaX = x - first.getX();
-            int deltaY = y - first.getY();
+            Point last = trajectory.getLast();
+
+            int deltaX = last.getX() - first.getX();
+            int deltaY = last.getY() - first.getY();
 
             int arg = Utils.getArg(deltaX, deltaY);
             deltaX = (force * Utils.cos(arg)) >> 10;
             deltaY = (force * Utils.sin(arg)) >> 10;
 
-            Point last = trajectory.getLast();
             short newX = (short) last.getX();
             short newY = (short) last.getY();
 

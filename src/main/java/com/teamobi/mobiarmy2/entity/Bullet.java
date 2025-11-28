@@ -37,8 +37,7 @@ public class Bullet {
     protected short vyTemp;
     protected short vyTemp2;
 
-    protected boolean isMaxY;
-    protected short xAtPeakY;// X tương ứng tại đỉnh Y
+    protected boolean isMaxY;// buttet khi đạt đỉnh Y và bắt đầu rơi xuống vào lượt sau
     protected short peakY;// giá trị cực đại của Y
 
     protected short frame;
@@ -138,7 +137,6 @@ public class Bullet {
         // Xác định điểm cao nhất (đỉnh quỹ đạo)
         if (vy > 0 && !isMaxY) {
             isMaxY = true;
-            xAtPeakY = x;
             peakY = y;
         }
 
@@ -153,6 +151,11 @@ public class Bullet {
     private void calculateSuperType() {
         // Nếu dùng item hoặc dùng power thì không tính
         if (player.getUsedItemId() != -1 || player.isUsePow()) {
+            return;
+        }
+
+        // Nếu đã có super type thì không tính nữa
+        if (bulletManager.getSuperType() != 0) {
             return;
         }
 
@@ -176,8 +179,20 @@ public class Bullet {
         }
 
         if (bulletManager.getSuperType() != 0) {
-            bulletManager.setSuperX(xAtPeakY);
-            bulletManager.setSuperY(peakY);
+            // Tọa độ đầu tiên đạt đỉnh nếu có nhiều đỉnh Y
+            Point peakPoint = null;
+
+            for (Point point : trajectory) {
+                if (point.getY() == peakY) {
+                    peakPoint = point;
+                    break;
+                }
+            }
+
+            if (peakPoint != null) {
+                bulletManager.setSuperX((short) peakPoint.getX());
+                bulletManager.setSuperY((short) peakPoint.getY());
+            }
         }
     }
 
