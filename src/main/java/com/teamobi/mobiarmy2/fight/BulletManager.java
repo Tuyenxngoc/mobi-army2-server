@@ -192,7 +192,7 @@ public class BulletManager {
                     if (isUsingItem || characterId != 8) {
                         return;
                     }
-                    bullets.add(new ApaBullet(this, (byte) 17, pl.isUsePow() ? 216 : (numShoot == 2 ? 81 : 108), pl, x, y, vx, vy, 30, 100, force, force2));
+                    bullets.add(new ApaBullet(this, (byte) 17, pl.isUsePow() ? 216 : (numShoot == 2 ? 81 : 108), pl, x, y, vx, vy, 30, 100, angle, force, force2));
                 }
 
                 // Chicky
