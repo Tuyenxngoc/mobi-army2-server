@@ -6,12 +6,14 @@ import com.teamobi.mobiarmy2.fight.BulletManager;
 import com.teamobi.mobiarmy2.util.Utils;
 
 public class ApaBullet extends Bullet {
+    private int baseDamage;
     private short angle;
     private byte force;
     private byte force2;
 
     public ApaBullet(BulletManager bulletManager, byte bullId, int damage, Player player, int x, int y, int vx, int vy, int msg, int g100, short angle, byte force, byte force2) {
         super(bulletManager, bullId, damage, player, x, y, vx, vy, msg, g100);
+        this.baseDamage = damage;
         this.angle = angle;
         this.force = force;
         this.force2 = force2;
@@ -43,7 +45,7 @@ public class ApaBullet extends Bullet {
                 int vxn = (force * Utils.cos(arg) >> 11);
                 int vyn = -(force * Utils.sin(arg) >> 11);
 
-                bulletManager.addBullet(new Bullet(bulletManager, (byte) 18, damage, player, bulletX, bulletY, vxn, vyn, 30, 100));
+                bulletManager.addBullet(new Bullet(bulletManager, (byte) 18, baseDamage, player, bulletX, bulletY, vxn, vyn, 30, 100));
             }
 
             isCollected = true;// Viên đạn mẹ biến mất

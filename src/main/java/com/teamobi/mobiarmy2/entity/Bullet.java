@@ -37,8 +37,8 @@ public class Bullet {
     protected short vyTemp;
     protected short vyTemp2;
 
-    protected boolean isMaxY;// buttet khi đạt đỉnh Y và bắt đầu rơi xuống vào lượt sau
-    protected short peakY;// giá trị cực đại của Y
+    protected boolean isMaxY;//Bullet khi đạt đỉnh Y và bắt đầu rơi xuống vào lượt sau
+    protected short peakY;//Giá trị cực đại của Y
 
     protected short frame;
     protected boolean canPassThroughPlayers;
