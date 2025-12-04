@@ -13,7 +13,7 @@ public class ItemTeleport extends Bullet {
     public void update() {
         super.update();
         if (isCollected) {
-            player.setXY(x, y);
+            player.setXY(x, y);//Todo cập nhật xy quá sớm dẫn đến x y gửi khi bắn làm nhân vật bay quá xa không đúng
         }
     }
 }

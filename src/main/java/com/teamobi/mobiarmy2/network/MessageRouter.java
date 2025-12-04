@@ -104,7 +104,7 @@ public class MessageRouter {
 
                 case Cmd.FIRE_ARMY -> fightManagerMessageHandler.handleShot(ms);
 
-                case Cmd.SHOOT_RESULT -> fightManagerMessageHandler.processShootingResult(ms);
+                case Cmd.SHOOT_RESULT -> fightManagerMessageHandler.processShootingResult();
 
                 case Cmd.USE_ITEM -> fightManagerMessageHandler.handleUseItem(ms);
 

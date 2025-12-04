@@ -637,6 +637,7 @@ public class FightManager {
         fightLoop.submit(this::doNextTurn);
     }
 
+    //todo nexturn quá sớm
     private void doNextTurn() {
         MatchResult result = getMatchResult();
         if (result != null) {
@@ -1223,11 +1224,6 @@ public class FightManager {
                 int size = trajectory.size();
                 ds.writeShort(size);// Ghi độ dài quỹ đạo
 
-                if (bullet instanceof ChickyTrung) {
-                    log.debug("Bullet ChickyTrung size: {}", size);
-                    log.debug("Trajectory: {}", trajectory);
-                }
-
                 if (typeShoot == 0) {// Ghi tọa độ theo dạng delta (chênh lệch)
                     for (int i = 0; i < size; i++) {
                         Point point = bullet.getTrajectory().get(i);
@@ -1285,6 +1281,10 @@ public class FightManager {
         if (isNextTurn) {
             nextTurn();
         }
+    }
+
+    public void fffdfsffd() {
+
     }
 
     public void changeLocation(int userId, short x, short y) {

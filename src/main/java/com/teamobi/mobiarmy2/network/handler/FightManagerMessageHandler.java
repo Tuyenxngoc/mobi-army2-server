@@ -50,8 +50,8 @@ public class FightManagerMessageHandler extends BaseMessageHandler {
         fm().handlePlayerShoot(us().getUserId(), bullId, x, y, angle, force, force2, numShoot);
     }
 
-    public void processShootingResult(Message ms) {
-        //todo
+    public void processShootingResult() {
+        fm().fffdfsffd();
     }
 
     public void handleUseItem(Message ms) throws IOException {
