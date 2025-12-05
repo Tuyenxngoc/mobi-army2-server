@@ -12,6 +12,7 @@ public class MagentaBulletNew extends Bullet {
     public MagentaBulletNew(BulletManager bulletManager, byte bullId, int damage, Player player, int x, int y, int vx, int vy, int msg, int g100, byte force) {
         super(bulletManager, bullId, damage, player, x, y, vx, vy, msg, g100);
         this.force = force;
+        this.canSuperType = false;
     }
 
     @Override

@@ -7,13 +7,16 @@ import com.teamobi.mobiarmy2.fight.BulletManager;
 public class ItemTeleport extends Bullet {
     public ItemTeleport(BulletManager bulletManager, byte bullId, int damage, Player player, int x, int y, int vx, int vy, int msg, int g100) {
         super(bulletManager, bullId, damage, player, x, y, vx, vy, msg, g100);
+        this.canCollide = false;
+        this.canSuperType = false;
+        this.canPassThroughPlayers = true;
     }
 
     @Override
     public void update() {
         super.update();
         if (isCollected) {
-            player.setXY(x, y);//Todo cập nhật xy quá sớm dẫn đến x y gửi khi bắn làm nhân vật bay quá xa không đúng
+            player.setXY(x, y);
         }
     }
 }

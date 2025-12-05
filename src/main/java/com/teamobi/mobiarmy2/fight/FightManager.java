@@ -6,7 +6,6 @@ import com.teamobi.mobiarmy2.constant.MatchResult;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.entity.*;
 import com.teamobi.mobiarmy2.entity.boss.*;
-import com.teamobi.mobiarmy2.entity.bullet.ChickyTrung;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.server.FightItemManager;
@@ -637,7 +636,6 @@ public class FightManager {
         fightLoop.submit(this::doNextTurn);
     }
 
-    //todo nexturn quá sớm
     private void doNextTurn() {
         MatchResult result = getMatchResult();
         if (result != null) {
@@ -692,6 +690,11 @@ public class FightManager {
 
         // Thực hiện hành động của boss trong lượt
         if (isBossTurn) {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             ((Boss) players[bossTurn]).turnAction();
         }
     }
@@ -1189,12 +1192,33 @@ public class FightManager {
         //Tính toán người chơi nào rơi sao
         handleLuckUpdates();
 
+        int xS = player.getX();
+        int yS = player.getY();
+
         bulletManager.addShoot(player, bullId, angle, force, force2, numShoot);
         bulletManager.updateBullets();
 
         //Gửi ms những người chơi may mắn
         updateLuckyPlayers();
 
+        //Gủi ms bắn đạn
+        sendFireArmyPacket(index, bullId, xS, yS, angle, force2, numShoot, player);
+
+        //Xóa các đạn đã bắn
+        bulletManager.resetBullets();
+
+        //Chuyển lượt mới
+        if (isNextTurn) {
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            nextTurn();
+        }
+    }
+
+    private void sendFireArmyPacket(int index, byte bullId, int xS, int yS, short angle, byte force2, byte numShoot, Player player) {
         List<Bullet> bullets = bulletManager.getBullets();
         byte typeShoot = bulletManager.getTypeShoot();
         try {
@@ -1204,8 +1228,8 @@ public class FightManager {
             ds.writeByte(player.isUsePow() ? 1 : 0);
             ds.writeByte(index);
             ds.writeByte(bullId);
-            ds.writeShort(player.getX());
-            ds.writeShort(player.getY());
+            ds.writeShort(xS);
+            ds.writeShort(yS);
             ds.writeShort(angle);
             if (bullId == 17 || bullId == 19) {
                 ds.writeByte(force2);
@@ -1272,14 +1296,6 @@ public class FightManager {
             fightWait.sendToTeam(ms);
         } catch (IOException e) {
             e.printStackTrace();
-        }
-
-        //Xóa các đạn đã bắn
-        bulletManager.resetBullets();
-
-        //Chuyển lượt mới
-        if (isNextTurn) {
-            nextTurn();
         }
     }
 

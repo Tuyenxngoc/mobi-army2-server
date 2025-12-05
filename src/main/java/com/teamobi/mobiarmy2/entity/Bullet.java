@@ -4,6 +4,7 @@ import com.teamobi.mobiarmy2.fight.BulletManager;
 import com.teamobi.mobiarmy2.fight.FightManager;
 import com.teamobi.mobiarmy2.fight.FightMapManager;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class Bullet {
     protected BulletManager bulletManager;
     protected Player player;
@@ -40,14 +42,12 @@ public class Bullet {
     protected boolean isMaxY;//Bullet khi đạt đỉnh Y và bắt đầu rơi xuống vào lượt sau
     protected short peakY;//Giá trị cực đại của Y
 
-    protected short frame;
-    protected boolean canPassThroughPlayers;
-    protected boolean canPassThroughMap;
+    protected short frame;// Số frame đã đi qua kể từ khi bắn
+    protected boolean canPassThroughPlayers;// Đạn có thể xuyên qua player
+    protected boolean canPassThroughMap;// Đạn có thể xuyên qua map
     protected boolean canCollide = true;// Đạn có thể va chạm
+    protected boolean canSuperType = true;// Đạn có thể tính super type
     protected boolean isCollected;// Đạn đã bị thu hồi (va chạm hoặc bay ra ngoài map)
-
-    public Bullet() {
-    }
 
     public Bullet(BulletManager bulletManager, byte bullId, int damage, Player player, int x, int y, int vx, int vy, int msg, int g100) {
         this.bulletManager = bulletManager;
@@ -119,9 +119,11 @@ public class Bullet {
             y = collisionResult[1];
             trajectory.add(new Point(x, y));
 
-            int type = collisionResult[2]; // Loại va chạm
-            if (type == 1) { // Va chạm với player tính super shot type
-                calculateSuperType();
+            if (canSuperType) {
+                int type = collisionResult[2]; // Loại va chạm
+                if (type == 1) { // Va chạm với player tính super shot type
+                    calculateSuperType();
+                }
             }
 
             if (canCollide) {

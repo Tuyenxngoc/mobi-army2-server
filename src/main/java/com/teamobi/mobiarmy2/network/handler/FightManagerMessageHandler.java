@@ -9,11 +9,13 @@ import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.util.Utils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+@Slf4j
 public class FightManagerMessageHandler extends BaseMessageHandler {
     public FightManagerMessageHandler(Session session) {
         super(session);
@@ -87,7 +89,7 @@ public class FightManagerMessageHandler extends BaseMessageHandler {
             x[i] = dis.readInt();
             y[i] = dis.readInt();
         }
-        //todo
+        log.debug("Size: {}, x: {}, y: {}", size, x, y);
     }
 
     public void enterTrainingMap() throws IOException {
