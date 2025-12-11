@@ -1,0 +1,45 @@
+package com.teamobi.mobiarmy2.fight.boss;
+
+import com.teamobi.mobiarmy2.fight.Boss;
+import com.teamobi.mobiarmy2.fight.FightManager;
+import com.teamobi.mobiarmy2.fight.FightMapManager;
+import com.teamobi.mobiarmy2.fight.Player;
+import com.teamobi.mobiarmy2.util.Utils;
+
+public class UFO extends Boss {
+    private boolean turnShoot;
+
+    public UFO(FightManager fightManager, byte index, short x, short y, short maxHp) {
+        super(fightManager, index, (byte) 16, "UFO", x, y, (short) 51, (short) 46, maxHp, 4);
+        super.isFlying = true;
+        turnShoot = false;
+    }
+
+    @Override
+    public void turnAction() {
+        short ys = y, xs = x;
+        FightMapManager mapManager = fightManager.getMapManager();
+        while (turnShoot && ys < mapManager.getHeight() + 200 && !mapManager.isCollision(xs, ys)) {
+            if (ys > mapManager.getHeight()) {
+                turnShoot = false;
+            }
+            ys++;
+        }
+
+        if (turnShoot) {
+            turnShoot = false;
+            fightManager.createShoot(index, (byte) 42, (short) 270, (byte) 20, (byte) 0, (byte) 1);
+        } else {
+            turnShoot = true;
+
+            Player player = fightManager.getRandomPlayer(null);
+            if (player != null) {
+                x = player.getX();
+                y = (short) (player.getY() - Utils.nextInt(150, 500));
+                fightManager.sendPlayerFlyPosition(index);
+            }
+
+            fightManager.nextTurn();
+        }
+    }
+}

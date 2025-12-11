@@ -1,8 +1,5 @@
 package com.teamobi.mobiarmy2.fight;
 
-import com.teamobi.mobiarmy2.entity.Bullet;
-import com.teamobi.mobiarmy2.entity.MapBrick;
-import com.teamobi.mobiarmy2.entity.MapTile;
 import com.teamobi.mobiarmy2.server.MapManager;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;

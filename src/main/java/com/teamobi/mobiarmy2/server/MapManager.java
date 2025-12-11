@@ -2,8 +2,8 @@ package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.entity.ArmyMap;
-import com.teamobi.mobiarmy2.entity.ImageData;
-import com.teamobi.mobiarmy2.entity.MapBrick;
+import com.teamobi.mobiarmy2.fight.ImageData;
+import com.teamobi.mobiarmy2.fight.MapBrick;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import javax.imageio.ImageIO;

@@ -1,8 +1,8 @@
 package com.teamobi.mobiarmy2.util;
 
-import com.teamobi.mobiarmy2.entity.Boss;
-import com.teamobi.mobiarmy2.entity.MapTile;
-import com.teamobi.mobiarmy2.entity.Player;
+import com.teamobi.mobiarmy2.fight.Boss;
+import com.teamobi.mobiarmy2.fight.MapTile;
+import com.teamobi.mobiarmy2.fight.Player;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

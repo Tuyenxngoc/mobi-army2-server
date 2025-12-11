@@ -1,6 +1,6 @@
 package com.teamobi.mobiarmy2.util;
 
-import com.teamobi.mobiarmy2.entity.ImageData;
+import com.teamobi.mobiarmy2.fight.ImageData;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

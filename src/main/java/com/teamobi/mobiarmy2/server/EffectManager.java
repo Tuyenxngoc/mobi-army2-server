@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.constant.GameConstants;
-import com.teamobi.mobiarmy2.entity.ImageData;
+import com.teamobi.mobiarmy2.fight.ImageData;
 import com.teamobi.mobiarmy2.util.ImageUtils;
 
 import java.io.IOException;
