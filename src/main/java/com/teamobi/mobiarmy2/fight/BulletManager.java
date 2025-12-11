@@ -558,7 +558,7 @@ public class BulletManager {
         for (int i = 0; i <= k1; i++) {
             // Check map collision
             if (!canPassThroughMap) {
-                if (fightManager.getMapManger().isCollision(X, Y)) {
+                if (fightManager.getMapManager().isCollision(X, Y)) {
                     return new short[]{X, Y, 0};
                 }
             }
@@ -587,7 +587,7 @@ public class BulletManager {
     }
 
     public void handleCollision(short x, short y, Bullet bullet) {
-        fightManager.getMapManger().collision(x, y, bullet);
+        fightManager.getMapManager().collision(x, y, bullet);
         fightManager.collisionPlayers(x, y, bullet);
     }
 

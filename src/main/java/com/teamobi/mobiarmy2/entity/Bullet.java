@@ -91,7 +91,7 @@ public class Bullet {
 
     public void update() {
         FightManager fightManager = bulletManager.getFightManager();
-        FightMapManager mapManager = fightManager.getMapManger();
+        FightMapManager mapManager = fightManager.getMapManager();
 
         frame++;
         trajectory.add(new Point(x, y));

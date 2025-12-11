@@ -18,7 +18,7 @@ public class UFO extends Boss {
     @Override
     public void turnAction() {
         short ys = y, xs = x;
-        FightMapManager mapManager = fightManager.getMapManger();
+        FightMapManager mapManager = fightManager.getMapManager();
         while (turnShoot && ys < mapManager.getHeight() + 200 && !mapManager.isCollision(xs, ys)) {
             if (ys > mapManager.getHeight()) {
                 turnShoot = false;

@@ -45,6 +45,8 @@ public class FightManager {
     private static final Set<Byte> UNAUTHORIZED_ITEMS = Set.of((byte) 9, (byte) 23, (byte) 26, (byte) 28, (byte) 30, (byte) 31);
 
     private final FightWait fightWait;
+
+    @Getter
     private final FightMapManager mapManager;
     private final BulletManager bulletManager;
     private final CountdownTimer countdownTimer;
@@ -72,7 +74,7 @@ public class FightManager {
         this.players = new Player[MAX_ELEMENT_FIGHT];
         this.mapManager = new FightMapManager(this);
         this.bulletManager = new BulletManager(this);
-        this.countdownTimer = new CountdownTimer(MAX_PLAY_TIME + 10, this::onTimeUp);
+        this.countdownTimer = new CountdownTimer(MAX_PLAY_TIME + 10, this::nextTurn);
     }
 
     private void refreshFightManager() {
@@ -640,6 +642,7 @@ public class FightManager {
         MatchResult result = getMatchResult();
         if (result != null) {
             fightComplete(result);
+            return;
         }
 
         turnCount++;
@@ -1209,11 +1212,6 @@ public class FightManager {
 
         //Chuyển lượt mới
         if (isNextTurn) {
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             nextTurn();
         }
     }
@@ -1447,14 +1445,6 @@ public class FightManager {
             //Hút máu
             case 35 -> player.setVampireCount((byte) 2);
         }
-    }
-
-    public FightMapManager getMapManger() {
-        return mapManager;
-    }
-
-    public void onTimeUp() {
-        nextTurn();
     }
 
     public Player getPlayerTurn() {
