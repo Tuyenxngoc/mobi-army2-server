@@ -13,7 +13,9 @@ import java.util.List;
 public class BulletManager {
     private static final boolean MAGENTA_NEW_BULLET = true;
     private FightManager fightManager;
+    private FightMapManager fightMapManager;
     private List<Bullet> bullets = new ArrayList<>();
+    private List<Player> pendingBosses = new ArrayList<>();
     private byte typeShoot;
     private byte superType;
     private short superX;
@@ -21,6 +23,11 @@ public class BulletManager {
 
     public BulletManager(FightManager fightManager) {
         this.fightManager = fightManager;
+        this.fightMapManager = fightManager.getFightMapManager();
+    }
+
+    public void addPendingBoss(Player player) {
+        pendingBosses.add(player);
     }
 
     public void addShoot(Player pl, byte bullId, short angle, byte force, byte force2, byte numShoot) {
@@ -556,7 +563,7 @@ public class BulletManager {
         for (int i = 0; i <= k1; i++) {
             // Check map collision
             if (!canPassThroughMap) {
-                if (fightManager.getMapManager().isCollision(X, Y)) {
+                if (fightMapManager.isCollision(X, Y)) {
                     return new short[]{X, Y, 0};
                 }
             }
@@ -585,7 +592,7 @@ public class BulletManager {
     }
 
     public void handleCollision(short x, short y, Bullet bullet) {
-        fightManager.getMapManager().collision(x, y, bullet);
+        fightMapManager.collision(x, y, bullet);
         fightManager.collisionPlayers(x, y, bullet);
     }
 

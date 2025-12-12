@@ -69,7 +69,7 @@ public class VenomousSpider extends Boss {
                     //Chuyển lượt tiếp theo
                     fightManager.doNextTurn();
                 } else {
-                    x = (short) Utils.nextInt(50, fightManager.getMapManager().getWidth() - 50);
+                    x = (short) Utils.nextInt(50, fightManager.getFightMapManager().getWidth() - 50);
                     fightManager.sendPlayerFlyPosition(index);
                     fightManager.createShoot(index, (byte) 47, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 10, (byte) 0, (byte) 1);
                 }

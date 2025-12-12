@@ -49,7 +49,7 @@ public class FightManager {
     private final FightWait fightWait;
 
     @Getter
-    private final FightMapManager mapManager;
+    private final FightMapManager fightMapManager;
     private final BulletManager bulletManager;
     private final CountdownTimer countdownTimer;
     private final ExecutorService fightLoop = Executors.newSingleThreadExecutor();
@@ -74,7 +74,7 @@ public class FightManager {
         this.fightWait = fightWait;
         this.clanService = clanService;
         this.players = new Player[MAX_ELEMENT_FIGHT];
-        this.mapManager = new FightMapManager(this);
+        this.fightMapManager = new FightMapManager(this);
         this.bulletManager = new BulletManager(this);
         this.countdownTimer = new CountdownTimer(MAX_PLAY_TIME + 10, this::nextTurn);
     }
@@ -598,7 +598,7 @@ public class FightManager {
             case 37 -> {//Nhện độc
                 byte bossCount = BOSS_COUNTS[7][playerCount - 1];
                 for (byte i = 0; i < bossCount; i++) {
-                    short X = (short) Utils.nextInt(20, mapManager.getWidth() - 20);
+                    short X = (short) Utils.nextInt(20, fightMapManager.getWidth() - 20);
                     short Y = (short) 250;
                     players[totalPlayers] = new VenomousSpider(this, (byte) totalPlayers, X, Y, (short) 3800);
                     totalPlayers++;
@@ -1099,10 +1099,10 @@ public class FightManager {
     public void startGame(short teamPointsBlue, short teamPointsRed) {
         fightLoop.submit(() -> {
             //Tải dữ liệu bản đồ
-            mapManager.loadMapId(fightWait.getMapId());
+            fightMapManager.loadMapId(fightWait.getMapId());
 
             //Tải dữ liệu vị trí
-            List<short[]> randomPositions = mapManager.getRandomPlayerPositions(MAX_USER_FIGHT);
+            List<short[]> randomPositions = fightMapManager.getRandomPlayerPositions(MAX_USER_FIGHT);
 
             //Sử dụng cache để lưu trữ kết quả clan items
             Map<Short, boolean[]> clanItemsCache = new HashMap<>();

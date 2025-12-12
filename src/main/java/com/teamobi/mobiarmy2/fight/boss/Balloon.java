@@ -58,7 +58,7 @@ public class Balloon extends Boss {
 
         switch (currentTurn) {
             case 0 -> {//Balloon
-                short toX = (short) Utils.nextInt(100, fightManager.getMapManager().getWidth() - 100);
+                short toX = (short) Utils.nextInt(100, fightManager.getFightMapManager().getWidth() - 100);
                 short toY = (short) Utils.nextInt(-150, 50);
                 updateBodyPartsCoordinates(toX, toY);
 
@@ -71,7 +71,7 @@ public class Balloon extends Boss {
 
             //Gun
             case 1 -> {
-                short toX = (short) Utils.nextInt(100, fightManager.getMapManager().getWidth() - 100);
+                short toX = (short) Utils.nextInt(100, fightManager.getFightMapManager().getWidth() - 100);
                 short toY = (short) Utils.nextInt(-100, 50);
                 updateBodyPartsCoordinates(toX, toY);
 
@@ -83,7 +83,7 @@ public class Balloon extends Boss {
 
             //Eye
             case 4 -> {
-                short toX = (short) Utils.nextInt(100, fightManager.getMapManager().getWidth() - 100);
+                short toX = (short) Utils.nextInt(100, fightManager.getFightMapManager().getWidth() - 100);
                 short toY = (short) Utils.nextInt(-50, 50);
                 updateBodyPartsCoordinates(toX, toY);
 

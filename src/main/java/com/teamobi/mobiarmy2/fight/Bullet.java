@@ -86,15 +86,17 @@ public class Bullet {
         };
     }
 
+    /**
+     * Logic cập nhật đạn: add tọa độ, cập nhật gia tốc, tăng x, y
+     */
     public void update() {
-        FightManager fightManager = bulletManager.getFightManager();
-        FightMapManager mapManager = fightManager.getMapManager();
 
         frame++;
         trajectory.add(new Point(x, y));
 
         // Kiểm tra đạn bay ra ngoài map
-        if ((x < -200) || (x > mapManager.getWidth() + 200) || (y > mapManager.getHeight() + 200)) {
+        FightMapManager fightMapManager = bulletManager.getFightMapManager();
+        if ((x < -200) || (x > fightMapManager.getWidth() + 200) || (y > fightMapManager.getHeight() + 200)) {
             isCollected = true;
             return;
         }

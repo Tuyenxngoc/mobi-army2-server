@@ -34,7 +34,7 @@ public class Ghost2 extends Boss {
         fightManager.sendGhostAttackInfo(index, player.getIndex());
 
         // Cập nhật vị trí ngẫu nhiên
-        short[] position = fightManager.getMapManager().getRandomPosition((short) 100, (short) 100, (short) 50, (short) 200);
+        short[] position = fightManager.getFightMapManager().getRandomPosition((short) 100, (short) 100, (short) 50, (short) 200);
         x = position[0];
         y = position[1];
 
