@@ -1,10 +1,10 @@
 package com.teamobi.mobiarmy2.dao;
 
 import com.google.gson.Gson;
+import com.teamobi.mobiarmy2.dto.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.entity.Formula;
 import com.teamobi.mobiarmy2.entity.SpecialItem;
 import com.teamobi.mobiarmy2.entity.SpecialItemChest;
-import com.teamobi.mobiarmy2.json.SpecialItemChestJson;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.FormulaManager;
 import com.teamobi.mobiarmy2.server.HikariCPManager;

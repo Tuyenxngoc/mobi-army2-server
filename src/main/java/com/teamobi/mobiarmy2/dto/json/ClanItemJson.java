@@ -1,4 +1,4 @@
-package com.teamobi.mobiarmy2.json;
+package com.teamobi.mobiarmy2.dto.json;
 
 import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
