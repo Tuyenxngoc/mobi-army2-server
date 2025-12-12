@@ -45,7 +45,7 @@ public class VenomousSpider extends Boss {
             fightManager.sendPlayerFlyPosition(index);
 
             //Chuyển lượt tiếp theo
-            fightManager.nextTurn();
+            fightManager.doNextTurn();
         } else {
             if (actionCountdown > 0) {
                 actionCountdown--;
@@ -67,7 +67,7 @@ public class VenomousSpider extends Boss {
                     fightManager.sendPlayerFlyPosition(index);
 
                     //Chuyển lượt tiếp theo
-                    fightManager.nextTurn();
+                    fightManager.doNextTurn();
                 } else {
                     x = (short) Utils.nextInt(50, fightManager.getMapManager().getWidth() - 50);
                     fightManager.sendPlayerFlyPosition(index);
@@ -75,7 +75,7 @@ public class VenomousSpider extends Boss {
                 }
             } else {
                 //Chuyển lượt tiếp theo
-                fightManager.nextTurn();
+                fightManager.doNextTurn();
             }
         }
     }

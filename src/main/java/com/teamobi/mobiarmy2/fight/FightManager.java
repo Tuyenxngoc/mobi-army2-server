@@ -88,7 +88,9 @@ public class FightManager {
         bossTurn = -1;
         windX = 0;
         windY = 0;
+        startTime = 0;
         countdownTimer.stop();
+        bulletManager.resetBullets();
     }
 
     private void sendLuckyUpdate(byte index) {
@@ -473,9 +475,9 @@ public class FightManager {
         return -1;
     }
 
-    private synchronized void nextWind() {
+    private void nextWind() {
         Player player = players[getCurrentTurn()];
-        if (player != null && player.getWindStopCount() > 0) {
+        if (player.getWindStopCount() > 0) {
             player.decreaseWindStopCount();
 
             windX = 0;
@@ -640,7 +642,7 @@ public class FightManager {
         fightLoop.submit(this::doNextTurn);
     }
 
-    private void doNextTurn() {
+    public void doNextTurn() {
         MatchResult result = getMatchResult();
         if (result != null) {
             fightComplete(result);
@@ -695,12 +697,13 @@ public class FightManager {
 
         // Thực hiện hành động của boss trong lượt
         if (isBossTurn) {
+            Boss boss = (Boss) players[bossTurn];
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
-            ((Boss) players[bossTurn]).turnAction();
+            boss.turnAction();
         }
     }
 
@@ -784,26 +787,28 @@ public class FightManager {
     }
 
     public void leave(int userId) {
-        int index = getPlayerIndexByUserId(userId);
-        if (index == -1) {
-            return;
-        }
+        fightLoop.submit(() -> {
+            int index = getPlayerIndexByUserId(userId);
+            if (index == -1) {
+                return;
+            }
 
-        //Cập nhật thông tin người chơi
-        Player player = players[index];
-        player.die();
-        player.getUser().updateCup(-5);
-        player.setUser(null);
+            //Cập nhật thông tin người chơi
+            Player player = players[index];
+            player.die();
+            player.getUser().updateCup(-5);
+            player.setUser(null);
 
-        //Gửi thông báo đến ván chơi
-        fightWait.chatMessage(userId, GameString.ESCAPED_GAME);
+            //Gửi thông báo đến ván chơi
+            fightWait.chatMessage(userId, GameString.ESCAPED_GAME);
 
-        //Chuyển lượt nếu người chơi đang trong lượt
-        if (index == getCurrentTurn()) {
-            nextTurn();
-        } else {
-            sendNextTurnMessage(isBossTurn ? bossTurn : playerTurn);
-        }
+            //Chuyển lượt nếu người chơi đang trong lượt
+            if (index == getCurrentTurn()) {
+                doNextTurn();
+            } else {
+                sendNextTurnMessage(isBossTurn ? bossTurn : playerTurn);
+            }
+        });
     }
 
     /**
@@ -827,7 +832,7 @@ public class FightManager {
                 i++;
             }
             while (i < totalPlayers) {
-                Boss boss = (Boss) this.players[i];
+                Boss boss = (Boss) players[i];
                 if (boss != null && !boss.isDead()) {
                     bossAliveCount++;
                 }
@@ -1029,14 +1034,21 @@ public class FightManager {
 
         //Cập nhật mở quà
         if (turnCount > 5 && fightWait.getRoomType() != 5) {
+            boolean isBlueWin = result == MatchResult.BLUE_WIN;
+            fightWait.startGiftBoxOpening(isBlueWin);
+
             try {
-                Thread.sleep(2000);
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-
-            boolean isBlueWin = result == MatchResult.BLUE_WIN;
-            fightWait.startGiftBoxOpening(isBlueWin);
+        } else {
+            // Chờ một chút để đảm bảo messages được gửi đi
+            try {
+                Thread.sleep(8000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
 
         refreshFightManager();
@@ -1087,99 +1099,103 @@ public class FightManager {
     }
 
     public void startGame(short teamPointsBlue, short teamPointsRed) {
-        //Tải dữ liệu bản đồ
-        mapManager.loadMapId(fightWait.getMapId());
+        fightLoop.submit(() -> {
+            //Tải dữ liệu bản đồ
+            mapManager.loadMapId(fightWait.getMapId());
 
-        //Tải dữ liệu vị trí
-        List<short[]> randomPositions = mapManager.getRandomPlayerPositions(MAX_USER_FIGHT);
+            //Tải dữ liệu vị trí
+            List<short[]> randomPositions = mapManager.getRandomPlayerPositions(MAX_USER_FIGHT);
 
-        //Sử dụng cache để lưu trữ kết quả clan items
-        Map<Short, boolean[]> clanItemsCache = new HashMap<>();
-        for (byte i = 0; i < MAX_USER_FIGHT; i++) {
-            User user = fightWait.getUsers()[i];
-            if (user == null) {
-                continue;
-            }
+            //Sử dụng cache để lưu trữ kết quả clan items
+            Map<Short, boolean[]> clanItemsCache = new HashMap<>();
+            for (byte i = 0; i < MAX_USER_FIGHT; i++) {
+                User user = fightWait.getUsers()[i];
+                if (user == null) {
+                    continue;
+                }
 
-            //Lấy ra vị trí
-            short x = randomPositions.get(i)[0];
-            short y = randomPositions.get(i)[1];
+                //Lấy ra vị trí
+                short x = randomPositions.get(i)[0];
+                short y = randomPositions.get(i)[1];
 
-            //Lấy điểm đồng đội
-            short teamPoints;
-            boolean isTeamBlue = false;
-            if (fightWait.getRoomType() == 5 || i % 2 == 0) {
-                teamPoints = teamPointsBlue;
-                isTeamBlue = true;
-            } else {
-                teamPoints = teamPointsRed;
-            }
-
-            //Lấy ra chỉ số
-            short[] abilities = user.calculateCharacterAbilities(teamPoints);
-
-            //Lấy danh sách items của clan
-            boolean[] clanItems = new boolean[ClanItemManager.CLAN_ITEM_MAP.size()];
-            if (user.getClanId() != null) {
-                if (clanItemsCache.containsKey(user.getClanId())) {
-                    clanItems = clanItemsCache.get(user.getClanId());
+                //Lấy điểm đồng đội
+                short teamPoints;
+                boolean isTeamBlue = false;
+                if (fightWait.getRoomType() == 5 || i % 2 == 0) {
+                    teamPoints = teamPointsBlue;
+                    isTeamBlue = true;
                 } else {
-                    clanItems = clanService.getClanItems(user.getClanId());
-                    clanItemsCache.put(user.getClanId(), clanItems);
+                    teamPoints = teamPointsRed;
                 }
-            }
 
-            //Xóa túi đựng item nếu sử dụng
-            byte[] items = fightWait.getItems(i);
-            for (int j = 4; j < items.length; j++) {
-                if (items[i] > 0) {
-                    user.updateFightItems((byte) (12 + j - 4), (byte) -1);
+                //Lấy ra chỉ số
+                short[] abilities = user.calculateCharacterAbilities(teamPoints);
+
+                //Lấy danh sách items của clan
+                boolean[] clanItems = new boolean[ClanItemManager.CLAN_ITEM_MAP.size()];
+                if (user.getClanId() != null) {
+                    if (clanItemsCache.containsKey(user.getClanId())) {
+                        clanItems = clanItemsCache.get(user.getClanId());
+                    } else {
+                        clanItems = clanService.getClanItems(user.getClanId());
+                        clanItemsCache.put(user.getClanId(), clanItems);
+                    }
                 }
+
+                //Xóa túi đựng item nếu sử dụng
+                byte[] items = fightWait.getItems(i);
+                for (int j = 4; j < items.length; j++) {
+                    if (items[i] > 0) {
+                        user.updateFightItems((byte) (12 + j - 4), (byte) -1);
+                    }
+                }
+
+                //Trừ xu cược
+                user.updateXu(-fightWait.getMoney());
+
+                //Cập nhật trạng thái người chơi
+                user.setState(UserState.FIGHTING);
+
+                players[i] = new Player(this, user, i, isTeamBlue, x, y, items, abilities, teamPoints, clanItems);
             }
 
-            //Trừ xu cược
-            user.updateXu(-fightWait.getMoney());
+            //Cập nhật trang thái game
+            startTime = System.currentTimeMillis();
+            totalPlayers = MAX_USER_FIGHT;
 
-            //Cập nhật trạng thái người chơi
-            user.setState(UserState.FIGHTING);
-
-            players[i] = new Player(this, user, i, isTeamBlue, x, y, items, abilities, teamPoints, clanItems);
-        }
-
-        //Cập nhật trang thái game
-        startTime = System.currentTimeMillis();
-        totalPlayers = MAX_USER_FIGHT;
-
-        if (fightWait.getMoney() > 0) {
-            updateMoneyPlayers(-fightWait.getMoney());
-        }
-
-        for (int i = 0; i < MAX_USER_FIGHT; i++) {
-            Player player = players[i];
-            if (player == null || player.getUser() == null) {
-                continue;
+            if (fightWait.getMoney() > 0) {
+                updateMoneyPlayers(-fightWait.getMoney());
             }
-            sendFightInfo(player);
-        }
 
-        // Tạo boss nếu là chế độ đấu trùm
-        if (fightWait.getRoomType() == 5) {
-            spawnBosses();
-        }
+            for (int i = 0; i < MAX_USER_FIGHT; i++) {
+                Player player = players[i];
+                if (player == null || player.getUser() == null) {
+                    continue;
+                }
+                sendFightInfo(player);
+            }
 
-        // Bắt đầu lượt chơi đầu tiên
-        nextTurn();
+            // Tạo boss nếu là chế độ đấu trùm
+            if (fightWait.getRoomType() == 5) {
+                spawnBosses();
+            }
+
+            // Bắt đầu lượt chơi đầu tiên
+            nextTurn();
+        });
     }
 
-    public synchronized void handlePlayerShoot(int userId, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
-        int index = getPlayerIndexByUserId(userId);
-        if (index == -1 || index != playerTurn || isBossTurn || !fightWait.isStarted()) {
-            return;
-        }
-        Player player = players[index];
-        player.updateXY(x, y);
+    public void handlePlayerShoot(int userId, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
+        fightLoop.submit(() -> {
+            int index = getPlayerIndexByUserId(userId);
+            if (index == -1 || index != playerTurn || isBossTurn || !fightWait.isStarted()) {
+                return;
+            }
+            Player player = players[index];
+            player.updateXY(x, y);
 
-        createShoot(index, bullId, angle, force, force2, numShoot);
+            createShoot(index, bullId, angle, force, force2, numShoot);
+        });
     }
 
     public void createShoot(int index, byte bullId, short angle, byte force, byte force2, byte numShoot) {
@@ -1214,7 +1230,7 @@ public class FightManager {
 
         //Chuyển lượt mới
         if (isNextTurn) {
-            nextTurn();
+            doNextTurn();
         }
     }
 
@@ -1304,82 +1320,88 @@ public class FightManager {
     }
 
     public void changeLocation(int userId, short x, short y) {
-        int index = getPlayerIndexByUserId(userId);
-        if (index == -1) {
-            return;
-        }
-
-        Player player = players[index];
-
-        //Lưu lại vị trí ban đầu
-        int preX = player.getX();
-        int preY = player.getY();
-
-        //Cập nhật vị trí mới
-        player.updateXY(x, y);
-
-        //Gửi thông báo nếu vị trí thay đổi
-        if (preX != player.getX() || preY != player.getY()) {
-            sendMessageUpdateXY(index);
-        }
-    }
-
-    public synchronized void skipTurn(int userId) {
-        int index = getPlayerIndexByUserId(userId);
-        if (index == -1 || index != playerTurn || isBossTurn) {
-            return;
-        }
-        Player player = players[playerTurn];
-        if (player.getSkippedTurns() < 5) {
-            nextTurn();
-            player.incrementSkippedTurns();
-        }
-    }
-
-    public synchronized void useItem(int userId, byte itemIndex) {
-        int index = getPlayerIndexByUserId(userId);
-        if (index == -1 || index != playerTurn) {
-            return;
-        }
-
-        Player player = players[index];
-        if (player.isItemUsed() || player.isUsePow()) {
-            return;
-        }
-
-        //Khi đấu boss thì cấm dùng 1 số item
-        if (fightWait.getRoomType() == 5 && UNAUTHORIZED_ITEMS.contains(itemIndex)) {
-            player.getUser().sendMoneyErrorMessage(GameString.ITEM_UNAUTHORIZED);
-            return;
-        }
-
-        if (itemIndex == 100) {//Nếu là pow thì kiểm tra angry
-            if (player.getAngry() < 100) {
+        fightLoop.submit(() -> {
+            int index = getPlayerIndexByUserId(userId);
+            if (index == -1) {
                 return;
-            } else {
-                player.setAngry((byte) 0);
-                player.setUsePow(true);
             }
-        } else { //Kiểm tra người chơi có mang theo item hay không
-            int slot = -1;
-            byte[] items = player.getItems();
-            for (byte i = 0; i < items.length; i++) {
-                if (items[i] == itemIndex) {
-                    slot = i;
+
+            Player player = players[index];
+
+            //Lưu lại vị trí ban đầu
+            int preX = player.getX();
+            int preY = player.getY();
+
+            //Cập nhật vị trí mới
+            player.updateXY(x, y);
+
+            //Gửi thông báo nếu vị trí thay đổi
+            if (preX != player.getX() || preY != player.getY()) {
+                sendMessageUpdateXY(index);
+            }
+        });
+    }
+
+    public void skipTurn(int userId) {
+        fightLoop.submit(() -> {
+            int index = getPlayerIndexByUserId(userId);
+            if (index == -1 || index != playerTurn || isBossTurn) {
+                return;
+            }
+            Player player = players[playerTurn];
+            if (player.getSkippedTurns() < 5) {
+                player.incrementSkippedTurns();
+                doNextTurn();
+            }
+        });
+    }
+
+    public void useItem(int userId, byte itemIndex) {
+        fightLoop.submit(() -> {
+            int index = getPlayerIndexByUserId(userId);
+            if (index == -1 || index != playerTurn) {
+                return;
+            }
+
+            Player player = players[index];
+            if (player.isItemUsed() || player.isUsePow()) {
+                return;
+            }
+
+            //Khi đấu boss thì cấm dùng 1 số item
+            if (fightWait.getRoomType() == 5 && UNAUTHORIZED_ITEMS.contains(itemIndex)) {
+                player.getUser().sendMoneyErrorMessage(GameString.ITEM_UNAUTHORIZED);
+                return;
+            }
+
+            if (itemIndex == 100) {//Nếu là pow thì kiểm tra angry
+                if (player.getAngry() < 100) {
+                    return;
+                } else {
+                    player.setAngry((byte) 0);
+                    player.setUsePow(true);
                 }
+            } else { //Kiểm tra người chơi có mang theo item hay không
+                int slot = -1;
+                byte[] items = player.getItems();
+                for (byte i = 0; i < items.length; i++) {
+                    if (items[i] == itemIndex) {
+                        slot = i;
+                    }
+                }
+                if (slot == -1) {
+                    return;
+                }
+
+                player.usedItem(slot);
+                player.getUser().updateFightItems(itemIndex, (byte) -1);
             }
-            if (slot == -1) {
-                return;
-            }
 
-            player.usedItem(slot);
-            player.getUser().updateFightItems(itemIndex, (byte) -1);
-        }
+            sendUseItemMessage(itemIndex, index);
 
-        sendUseItemMessage(itemIndex, index);
-
-        //Xử lý khi dùng item
-        handleItem(player, index, itemIndex);
+            //Xử lý khi dùng item
+            handleItem(player, index, itemIndex);
+        });
     }
 
     private void handleItem(Player player, int playerIndex, byte itemIndex) {

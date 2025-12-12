@@ -15,7 +15,7 @@ public class Ghost2 extends Boss {
     public void turnAction() {
         Player player = fightManager.getRandomPlayer(null);
         if (player == null) {
-            fightManager.nextTurn();
+            fightManager.doNextTurn();
             return;
         }
 
@@ -45,6 +45,6 @@ public class Ghost2 extends Boss {
         player.updateHP((short) -Utils.nextInt(400, 800));
 
         // Tiếp tục chơi
-        fightManager.nextTurn();
+        fightManager.doNextTurn();
     }
 }

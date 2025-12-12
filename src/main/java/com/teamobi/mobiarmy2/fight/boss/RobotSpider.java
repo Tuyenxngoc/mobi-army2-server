@@ -14,7 +14,7 @@ public class RobotSpider extends Boss {
     public void turnAction() {
         Player player = fightManager.findClosestPlayer(x, y);
         if (player == null) {
-            fightManager.nextTurn();
+            fightManager.doNextTurn();
             return;
         }
 
@@ -38,7 +38,7 @@ public class RobotSpider extends Boss {
                         50, 5, 70, 70
                 );
                 if (forceArgXY == null) {
-                    fightManager.nextTurn();
+                    fightManager.doNextTurn();
                     return;
                 }
                 fightManager.createShoot(index, (byte) 8, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1, false);
@@ -55,7 +55,7 @@ public class RobotSpider extends Boss {
                         50, 5, 10, 50
                 );
                 if (forceArgXY == null) {
-                    fightManager.nextTurn();
+                    fightManager.doNextTurn();
                     return;
                 }
                 fightManager.createShoot(index, (byte) 14, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1);
@@ -68,7 +68,7 @@ public class RobotSpider extends Boss {
                         50, 5, 50, 80
                 );
                 if (forceArgXY == null) {
-                    fightManager.nextTurn();
+                    fightManager.doNextTurn();
                     return;
                 }
                 fightManager.createShoot(index, (byte) 33, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1);
