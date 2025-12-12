@@ -374,7 +374,12 @@ public class Player {
         }
 
         //Tăng sát thương khi đạn siêu cao
-        //todo...
+        byte superType = bull.getBulletManager().getSuperType();
+        switch (superType) {
+            case 1 -> damage = (int) (damage * 1.10f);// +10%
+            case 2 -> damage = (int) (damage * 1.20f);// +20%
+            case 4 -> damage = (int) (damage * 1.30f);// +30%
+        }
 
         //Tính toán điểm phòng thủ
         int d = defense;

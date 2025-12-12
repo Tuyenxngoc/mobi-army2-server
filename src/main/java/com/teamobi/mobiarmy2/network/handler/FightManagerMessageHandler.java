@@ -53,7 +53,9 @@ public class FightManagerMessageHandler extends BaseMessageHandler {
     }
 
     public void processShootingResult() {
-        fm().fffdfsffd();
+        // Client vẽ xong đạn bay và xử lý va chạm, gửi kết quả về server
+        // Theo logic thì sau khi client gủi thì mói đổi lượt, hoặc quá thời gian chờ
+        fm().processShootingResult(us().getUserId());
     }
 
     public void handleUseItem(Message ms) throws IOException {

@@ -698,6 +698,8 @@ public class FightManager {
         // Thực hiện hành động của boss trong lượt
         if (isBossTurn) {
             Boss boss = (Boss) players[bossTurn];
+
+            // Đợi 2 giây trước khi boss hành động
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
@@ -1025,6 +1027,7 @@ public class FightManager {
             }
         }
 
+        //Kết thúc ván đấu sau 8 giây
         try {
             Thread.sleep(8000);
         } catch (InterruptedException e) {
@@ -1034,21 +1037,16 @@ public class FightManager {
 
         //Cập nhật mở quà
         if (turnCount > 5 && fightWait.getRoomType() != 5) {
+
+            //Đợi thêm 2 giây trước khi mở quà
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
             boolean isBlueWin = result == MatchResult.BLUE_WIN;
             fightWait.startGiftBoxOpening(isBlueWin);
-
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        } else {
-            // Chờ một chút để đảm bảo messages được gửi đi
-            try {
-                Thread.sleep(8000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
         }
 
         refreshFightManager();
@@ -1181,8 +1179,12 @@ public class FightManager {
             }
 
             // Bắt đầu lượt chơi đầu tiên
-            nextTurn();
+            doNextTurn();
         });
+    }
+
+    public void processShootingResult(int userId) {
+        // Hiện tại không sử dụng
     }
 
     public void handlePlayerShoot(int userId, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
@@ -1230,6 +1232,13 @@ public class FightManager {
 
         //Chuyển lượt mới
         if (isNextTurn) {
+
+            //Đợi 3 giây trước khi chuyển lượt
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
             doNextTurn();
         }
     }
@@ -1313,10 +1322,6 @@ public class FightManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public void fffdfsffd() {
-
     }
 
     public void changeLocation(int userId, short x, short y) {
