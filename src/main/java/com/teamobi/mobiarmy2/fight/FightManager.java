@@ -1246,9 +1246,9 @@ public class FightManager {
         //Chuyển lượt mới
         if (isNextTurn) {
 
-            //Đợi 3 giây trước khi chuyển lượt
+            //Đợi 2 giây trước khi chuyển lượt
             try {
-                Thread.sleep(3000);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }

@@ -42,4 +42,10 @@ public abstract class Boss extends Player {
         super.resetValueInNewTurn();
         stamina = 100;
     }
+
+    public void bomAction() {
+        isDead = true;
+        height = 0;
+        width = 0;
+    }
 }

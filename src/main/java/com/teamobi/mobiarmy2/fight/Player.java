@@ -54,8 +54,8 @@ public class Player {
     private boolean isDoubleSpeed;
     private boolean isUsePow;
     private boolean isTeamBlue;
-    private short width;
-    private short height;
+    protected short width;
+    protected short height;
     private int xpUp;
     private int allXpUp;
     private int cupUp;

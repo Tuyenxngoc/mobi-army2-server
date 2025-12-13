@@ -90,7 +90,7 @@ public class BulletManager {
                         return;
                     }
                     pl.getUser().updateMission(5, 1);
-                    bullets.add(new ItemBomB52(this, (byte) 4, 600, pl, x, y, vx, vy, 0, 80));
+                    bullets.add(new ItemBomB52(this, 600, pl, x, y, vx, vy, 0, 80));
                 }
 
                 // Item bay
@@ -99,7 +99,7 @@ public class BulletManager {
                         return;
                     }
                     pl.setLucky(false);
-                    bullets.add(new ItemTeleport(this, (byte) 5, 0, pl, x, y, vx, vy, 0, 80));
+                    bullets.add(new ItemTeleport(this, 0, pl, x, y, vx, vy, 0, 80));
                 }
 
                 // Item bom pha dat
@@ -168,7 +168,7 @@ public class BulletManager {
                         return;
                     }
                     pl.setLucky(false);
-                    bullets.add(new ItemVoiRong(this, (byte) 13, 0, pl, x, y, vx, vy, 50, 120));
+                    bullets.add(new ItemVoiRong(this, 0, pl, x, y, vx, vy, 50, 120));
                 }
 
                 // Item dan laser
@@ -176,7 +176,7 @@ public class BulletManager {
                     if (pl.getUsedItemId() != 16) {
                         return;
                     }
-                    bullets.add(new ItemLaser(this, (byte) 14, 500, pl, x, y, vx, vy, 10, 50));
+                    bullets.add(new ItemLaser(this, 500, pl, x, y, vx, vy, 10, 50));
                 }
 
                 // Item dan trai pha
@@ -184,7 +184,7 @@ public class BulletManager {
                     if (pl.getUsedItemId() != 11) {
                         return;
                     }
-                    bullets.add(new ItemTraiPha(this, (byte) 16, 200, pl, x, y, vx, vy, 0, 100));
+                    bullets.add(new ItemTraiPha(this, 200, pl, x, y, vx, vy, 0, 100));
                 }
 
                 // Apache
@@ -192,7 +192,7 @@ public class BulletManager {
                     if (isUsingItem || characterId != 8) {
                         return;
                     }
-                    bullets.add(new ApaBullet(this, (byte) 17, pl.isUsePow() ? 216 : (numShoot == 2 ? 81 : 108), pl, x, y, vx, vy, 30, 100, angle, force, force2));
+                    bullets.add(new ApaBullet(this, pl.isUsePow() ? 216 : (numShoot == 2 ? 81 : 108), pl, x, y, vx, vy, 30, 100, angle, force, force2));
                 }
 
                 // Chicky
@@ -200,7 +200,7 @@ public class BulletManager {
                     if (isUsingItem || characterId != 6) {
                         return;
                     }
-                    bullets.add(new ChickyBullet(this, (byte) 19, pl.isUsePow() ? 500 : (numShoot == 2 ? 169 : 225), pl, x, y, vx, vy, 20, 50, force2));
+                    bullets.add(new ChickyBullet(this, pl.isUsePow() ? 500 : (numShoot == 2 ? 169 : 225), pl, x, y, vx, vy, 20, 50, force2));
                 }
 
                 // Tazan
@@ -208,7 +208,7 @@ public class BulletManager {
                     if (isUsingItem || characterId != 7) {
                         return;
                     }
-                    bullets.add(new TazranBullet(this, (byte) 21, pl.isUsePow() ? 800 : (numShoot == 2 ? 225 : 340), pl, x, y, vx, vy, 10, 50));
+                    bullets.add(new TazranBullet(this, pl.isUsePow() ? 800 : (numShoot == 2 ? 225 : 340), pl, x, y, vx, vy, 10, 50));
                 }
 
                 // Item chuot gan bom
@@ -224,7 +224,7 @@ public class BulletManager {
                     if (pl.getUsedItemId() != 21) {
                         return;
                     }
-                    bullets.add(new ItemSaoBang(this, (byte) 23, 200, pl, x, y, vx, vy, 20, 100));
+                    bullets.add(new ItemSaoBang(this, 200, pl, x, y, vx, vy, 20, 100));
                 }
 
                 // Item Dan xuyen dat
@@ -268,7 +268,7 @@ public class BulletManager {
                     if (characterId != 12) {
                         return;
                     }
-                    bullets.add(new BigBoomBum(this, (byte) 31, 1000, pl));
+                    bullets.add(new BigBoomBum(this, 1000, pl));
                 }
 
                 // Small boom bum
@@ -276,7 +276,7 @@ public class BulletManager {
                     if (characterId != 11) {
                         return;
                     }
-                    bullets.add(new SmallBoomBum(this, (byte) 32, 100, pl));
+                    bullets.add(new SmallBoomBum(this, 100, pl));
                 }
 
                 //dan nhen
@@ -295,7 +295,7 @@ public class BulletManager {
                         return;
                     }
                     pl.setLucky(false);
-                    bullets.add(new SmallBoomAdd(this, (byte) 34, 0, pl, x, y, vx, vy, 0, 80));
+                    bullets.add(new SmallBoomAdd(this, 0, pl, x, y, vx, vy, 0, 80));
                 }
 
                 //T-rex or Robot jump
