@@ -4,8 +4,8 @@ import com.teamobi.mobiarmy2.fight.Boss;
 import com.teamobi.mobiarmy2.fight.FightManager;
 
 public class BalloonGunBig extends Boss {
-    public BalloonGunBig(FightManager fightManager, byte index, short x, short y, short maxHp) {
-        super(fightManager, index, (byte) 19, "Balloon Gun Big", x, y, (short) 35, (short) 39, maxHp, 4);
+    public BalloonGunBig(FightManager fightManager, short x, short y, short maxHp) {
+        super(fightManager, (byte) 19, "Balloon Gun Big", x, y, (short) 35, (short) 39, maxHp, 4);
         super.isFlying = true;
     }
 

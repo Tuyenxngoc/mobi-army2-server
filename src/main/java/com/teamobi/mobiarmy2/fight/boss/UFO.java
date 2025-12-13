@@ -9,8 +9,8 @@ import com.teamobi.mobiarmy2.util.Utils;
 public class UFO extends Boss {
     private boolean turnShoot;
 
-    public UFO(FightManager fightManager, byte index, short x, short y, short maxHp) {
-        super(fightManager, index, (byte) 16, "UFO", x, y, (short) 51, (short) 46, maxHp, 4);
+    public UFO(FightManager fightManager, short x, short y, short maxHp) {
+        super(fightManager, (byte) 16, "UFO", x, y, (short) 51, (short) 46, maxHp, 4);
         super.isFlying = true;
         turnShoot = false;
     }

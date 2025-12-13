@@ -6,8 +6,8 @@ import com.teamobi.mobiarmy2.fight.Player;
 import com.teamobi.mobiarmy2.util.Utils;
 
 public class BigBoom extends Boss {
-    public BigBoom(FightManager fightManager, byte index, short x, short y, short maxHp) {
-        super(fightManager, index, (byte) 12, "Big boom", x, y, (short) 28, (short) 28, maxHp, 4);
+    public BigBoom(FightManager fightManager, short x, short y, short maxHp) {
+        super(fightManager, (byte) 12, "Big boom", x, y, (short) 28, (short) 28, maxHp, 4);
     }
 
     @Override

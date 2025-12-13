@@ -15,7 +15,6 @@ public class BulletManager {
     private FightManager fightManager;
     private FightMapManager fightMapManager;
     private List<Bullet> bullets = new ArrayList<>();
-    private List<Player> pendingBosses = new ArrayList<>();
     private byte typeShoot;
     private byte superType;
     private short superX;
@@ -24,10 +23,6 @@ public class BulletManager {
     public BulletManager(FightManager fightManager) {
         this.fightManager = fightManager;
         this.fightMapManager = fightManager.getFightMapManager();
-    }
-
-    public void addPendingBoss(Player player) {
-        pendingBosses.add(player);
     }
 
     public void addShoot(Player pl, byte bullId, short angle, byte force, byte force2, byte numShoot) {

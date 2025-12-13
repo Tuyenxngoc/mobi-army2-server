@@ -6,8 +6,8 @@ import com.teamobi.mobiarmy2.fight.Player;
 import com.teamobi.mobiarmy2.util.Utils;
 
 public class Robot extends Boss {
-    public Robot(FightManager fightManager, byte index, short x, short y, short maxHp) {
-        super(fightManager, index, (byte) 14, "Robot", x, y, (short) 24, (short) 25, maxHp, 4);
+    public Robot(FightManager fightManager, short x, short y, short maxHp) {
+        super(fightManager, (byte) 14, "Robot", x, y, (short) 24, (short) 25, maxHp, 4);
     }
 
     @Override

@@ -11,8 +11,8 @@ public class Balloon extends Boss {
     private final Player[] bodyParts = new Player[5];
     private int currentTurn = -1;
 
-    public Balloon(FightManager fightManager, byte index, short x, short y) {
-        super(fightManager, index, (byte) 17, "Balloon", x, y, (short) 0, (short) 0, (short) 1, 4);
+    public Balloon(FightManager fightManager, short x, short y) {
+        super(fightManager, (byte) 17, "Balloon", x, y, (short) 0, (short) 0, (short) 1, 4);
         super.isFlying = true;
     }
 
@@ -20,9 +20,9 @@ public class Balloon extends Boss {
     public void turnAction() {
         // Thêm Balloon Eye nếu bodyParts[4] là null, Gun và Gun Big bị tiêu diệt
         if (bodyParts[4] == null && bodyParts[1].isDead() && bodyParts[2].isDead()) {
-            BalloonEye newBoss = new BalloonEye(fightManager, (byte) fightManager.getTotalPlayers(), (short) (x + 55), (short) (y - 27), (short) 1000);
-            bodyParts[4] = newBoss;
-            fightManager.addBoss(newBoss);
+            BalloonEye balloonEye = new BalloonEye(fightManager, (short) (x + 55), (short) (y - 27), (short) 1000);
+            bodyParts[4] = balloonEye;
+            fightManager.addPendingBoss(balloonEye);
             fightManager.doNextTurn();
             return;
         }

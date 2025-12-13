@@ -16,11 +16,11 @@ public class SmallBoomAdd extends Bullet {
         super.update();
 
         // Kiểm tra vị trí hợp lệ để thêm SmallBoom
-        FightMapManager fightMapManager = bulletManager.getFightMapManager();
-        if (isCollected && x > 0 && x < fightMapManager.getWidth() && y < fightMapManager.getHeight()) {
+        FightMapManager map = bulletManager.getFightMapManager();
+        if (isCollected && x > 0 && x < map.getWidth() && y < map.getHeight()) {
             FightManager fightManager = bulletManager.getFightManager();
-            Player player = new SmallBoom(fightManager, (byte) fightManager.getTotalPlayers(), x, y, (short) 1000);
-            bulletManager.addPendingBoss(player);
+            Boss boss = new SmallBoom(fightManager, x, y, (short) 1000);
+            fightManager.addPendingBoss(boss);
         }
     }
 }

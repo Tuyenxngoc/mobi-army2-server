@@ -6,8 +6,8 @@ import com.teamobi.mobiarmy2.fight.Player;
 import com.teamobi.mobiarmy2.util.Utils;
 
 public class Ghost extends Boss {
-    public Ghost(FightManager fightManager, byte index, short x, short y, short maxHp) {
-        super(fightManager, index, (byte) 25, "Ghost", x, y, (short) 35, (short) 31, maxHp, 5);
+    public Ghost(FightManager fightManager, short x, short y, short maxHp) {
+        super(fightManager, (byte) 25, "Ghost", x, y, (short) 35, (short) 31, maxHp, 5);
         super.isFlying = true;
     }
 

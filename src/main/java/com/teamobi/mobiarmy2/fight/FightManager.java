@@ -67,6 +67,7 @@ public class FightManager {
     @Getter
     private byte windY;
     private long startTime;
+    private final List<Boss> pendingBosses = new ArrayList<>();
 
     private final ClanService clanService;
 
@@ -77,6 +78,10 @@ public class FightManager {
         this.fightMapManager = new FightMapManager(this);
         this.bulletManager = new BulletManager(this);
         this.countdownTimer = new CountdownTimer(MAX_PLAY_TIME + 10, this::nextTurn);
+    }
+
+    public void addPendingBoss(Boss player) {
+        pendingBosses.add(player);
     }
 
     private void refreshFightManager() {
@@ -189,11 +194,11 @@ public class FightManager {
         }
     }
 
-    private void sendMssAddBosses(Boss[] bosses) {
+    private void sendMssAddBosses(List<Boss> bosses) {
         try {
             Message ms = new Message(Cmd.GET_BOSS);
             DataOutputStream ds = ms.writer();
-            ds.writeByte(bosses.length);
+            ds.writeByte(bosses.size());
             for (Boss boss : bosses) {
                 ds.writeInt(-1);
                 ds.writeUTF(boss.getName());
@@ -499,8 +504,9 @@ public class FightManager {
         return playerTurn;
     }
 
-    private void spawnBosses() {
+    private void initMapBosses() {
         byte playerCount = fightWait.getNumPlayers();
+        List<Boss> spawnBosses = new ArrayList<>();
 
         switch (fightWait.getMapId()) {
             case 30 -> {//Bom 1
@@ -509,8 +515,8 @@ public class FightManager {
                     short bossX = (short) ((i % 2 == 0) ? Utils.nextInt(95, 315) : Utils.nextInt(890, 1070));
                     short bossY = (short) (50 + 40 * Utils.nextInt(3));
                     short bossHealth = 1000;
-                    players[totalPlayers] = new BigBoom(this, (byte) totalPlayers, bossX, bossY, bossHealth);
-                    totalPlayers++;
+                    Boss boss = new BigBoom(this, bossX, bossY, bossHealth);
+                    spawnBosses.add(boss);
                 }
             }
 
@@ -520,8 +526,8 @@ public class FightManager {
                     short bossX = (short) (Utils.nextInt(445, 800) + i * 50);
                     short bossY = 180;
                     short bossHealth = 1500;
-                    players[totalPlayers] = new BigBoom(this, (byte) totalPlayers, bossX, bossY, bossHealth);
-                    totalPlayers++;
+                    Boss boss = new BigBoom(this, bossX, bossY, bossHealth);
+                    spawnBosses.add(boss);
                 }
             }
 
@@ -530,8 +536,8 @@ public class FightManager {
                 short[] tempY = new short[]{221, 221, 198, 369, 369, 369};
                 byte bossCount = BOSS_COUNTS[2][playerCount - 1];
                 for (byte i = 0; i < bossCount; i++) {
-                    players[totalPlayers] = new RobotSpider(this, (byte) totalPlayers, tempX[i], tempY[i], (short) 1500);
-                    totalPlayers++;
+                    Boss boss = new RobotSpider(this, tempX[i], tempY[i], (short) 1500);
+                    spawnBosses.add(boss);
                 }
             }
 
@@ -541,22 +547,22 @@ public class FightManager {
                 for (int i = 0; i < bossCount; i++) {
                     short X = tempX[i];
                     short Y = 200;
-                    players[totalPlayers] = new Robot(this, (byte) totalPlayers, X, Y, (short) 3700);
-                    totalPlayers++;
+                    Boss boss = new Robot(this, X, Y, (short) 3700);
+                    spawnBosses.add(boss);
                 }
             }
 
             case 34 -> {// T. rex máy
                 short X = 880;
                 short Y = 400;
-                players[totalPlayers] = new TRex(this, (byte) totalPlayers, X, Y, (short) 15000);
-                totalPlayers++;
+                Boss tRex = new TRex(this, X, Y, (short) 15000);
+                spawnBosses.add(tRex);
 
                 byte bossCount = BOSS_COUNTS[4][playerCount - 1];
                 for (byte i = 0; i < bossCount; i++) {
                     X = (short) (Utils.nextInt(470, 755));
-                    players[totalPlayers] = new BigBoom(this, (byte) totalPlayers, X, Y, (short) 1500);
-                    totalPlayers++;
+                    Boss bigBoom = new BigBoom(this, X, Y, (short) 1500);
+                    spawnBosses.add(bigBoom);
                 }
             }
 
@@ -565,8 +571,8 @@ public class FightManager {
                 for (byte i = 0; i < bossCount; i++) {
                     short X = (short) (Utils.nextInt(300, 800));
                     short Y = (short) Utils.nextInt(-350, 100);
-                    players[totalPlayers] = new UFO(this, (byte) totalPlayers, X, Y, (short) 4500);
-                    totalPlayers++;
+                    Boss boss = new UFO(this, X, Y, (short) 4500);
+                    spawnBosses.add(boss);
                 }
             }
 
@@ -574,25 +580,21 @@ public class FightManager {
                 short X = (short) (Utils.nextInt(300, 800));
                 short Y = (short) Utils.nextInt(-350, 100);
 
-                Balloon balloon = new Balloon(this, (byte) totalPlayers, X, Y);
+                Balloon balloon = new Balloon(this, X, Y);
                 balloon.getBodyParts()[0] = balloon;
-                players[totalPlayers] = balloon;
-                totalPlayers++;
+                spawnBosses.add(balloon);
 
-                BalloonGun balloonGun = new BalloonGun(this, (byte) totalPlayers, (short) (X + 51), (short) (Y + 19), (short) 2000);
+                BalloonGun balloonGun = new BalloonGun(this, (short) (X + 51), (short) (Y + 19), (short) 2000);
                 balloon.getBodyParts()[1] = balloonGun;
-                players[totalPlayers] = balloonGun;
-                totalPlayers++;
+                spawnBosses.add(balloonGun);
 
-                BalloonGunBig balloonGunBig = new BalloonGunBig(this, (byte) totalPlayers, (short) (X - 5), (short) (Y + 30), (short) 2500);
+                BalloonGunBig balloonGunBig = new BalloonGunBig(this, (short) (X - 5), (short) (Y + 30), (short) 2500);
                 balloon.getBodyParts()[2] = balloonGunBig;
-                players[totalPlayers] = balloonGunBig;
-                totalPlayers++;
+                spawnBosses.add(balloonGunBig);
 
-                BalloonFanBack balloonFanBack = new BalloonFanBack(this, (byte) totalPlayers, (short) (X - 67), (short) (Y - 6), (short) 1000);
+                BalloonFanBack balloonFanBack = new BalloonFanBack(this, (short) (X - 67), (short) (Y - 6), (short) 1000);
                 balloon.getBodyParts()[3] = balloonFanBack;
-                players[totalPlayers] = balloonFanBack;
-                totalPlayers++;
+                spawnBosses.add(balloonFanBack);
             }
 
             case 37 -> {//Nhện độc
@@ -600,8 +602,8 @@ public class FightManager {
                 for (byte i = 0; i < bossCount; i++) {
                     short X = (short) Utils.nextInt(20, fightMapManager.getWidth() - 20);
                     short Y = (short) 250;
-                    players[totalPlayers] = new VenomousSpider(this, (byte) totalPlayers, X, Y, (short) 3800);
-                    totalPlayers++;
+                    Boss boss = new VenomousSpider(this, X, Y, (short) 3800);
+                    spawnBosses.add(boss);
                 }
             }
 
@@ -610,8 +612,8 @@ public class FightManager {
                 for (byte i = 0; i < bossCount; i++) {
                     short X = (short) ((short) 700 - i * 80);
                     short Y = (short) (Utils.nextInt(30));
-                    players[totalPlayers] = new Ghost(this, (byte) totalPlayers, X, Y, (short) 1800);
-                    totalPlayers++;
+                    Boss boss = new Ghost(this, X, Y, (short) 1800);
+                    spawnBosses.add(boss);
                 }
             }
 
@@ -620,18 +622,14 @@ public class FightManager {
                 for (byte i = 0; i < bossCount; i++) {
                     short X = (short) (700 - i * 80);
                     short Y = (short) Utils.nextInt(30);
-                    players[totalPlayers] = new Ghost2(this, (byte) totalPlayers, X, Y, (short) 1800);
-                    totalPlayers++;
+                    Boss boss = new Ghost2(this, X, Y, (short) 1800);
+                    spawnBosses.add(boss);
                 }
             }
         }
 
-        //Gửi thông tin thêm các boss đã tạo đến các team
-        Boss[] bosses = new Boss[totalPlayers - MAX_USER_FIGHT];
-        for (int i = 0; i < bosses.length; i++) {
-            bosses[i] = (Boss) players[i + MAX_USER_FIGHT];
-        }
-        sendMssAddBosses(bosses);
+        //Thêm boss vào danh sách
+        spawnBosses(spawnBosses);
     }
 
     public short[] getForceArgXY(int idGun, boolean isXuyenMap, short X, short Y, short toX, short toY, short Mx, short My, int arg, int force, int msg, int g100) {
@@ -685,6 +683,10 @@ public class FightManager {
             player.resetValueInNewTurn();
             player.updateAngry((byte) 10);
         }
+
+        //Spawn boss nếu có
+        spawnBosses(pendingBosses);
+        pendingBosses.clear();
 
         // Random gió
         nextWind();
@@ -747,14 +749,25 @@ public class FightManager {
         }
     }
 
-    public void addBoss(Boss boss) {
-        if (totalPlayers >= FightManager.MAX_ELEMENT_FIGHT) {
+    private void spawnBosses(List<Boss> bosses) {
+        List<Boss> addedBosses = new ArrayList<>();
+        for (Boss boss : bosses) {
+            if (totalPlayers >= FightManager.MAX_ELEMENT_FIGHT) {
+                break;
+            }
+
+            players[totalPlayers] = boss;
+            boss.index = (byte) totalPlayers;
+            totalPlayers++;
+
+            addedBosses.add(boss);
+        }
+
+        if (addedBosses.isEmpty()) {
             return;
         }
-        players[totalPlayers] = boss;
-        totalPlayers++;
 
-        sendMssAddBosses(new Boss[]{boss});
+        sendMssAddBosses(addedBosses);
     }
 
     public void giveXpToTeammates(boolean isTeamBlue, int addXP, Player sharer) {
@@ -1175,7 +1188,7 @@ public class FightManager {
 
             // Tạo boss nếu là chế độ đấu trùm
             if (fightWait.getRoomType() == 5) {
-                spawnBosses();
+                initMapBosses();
             }
 
             // Bắt đầu lượt chơi đầu tiên
