@@ -440,7 +440,7 @@ public class FightWait {
 
     public synchronized void leaveTeam(int userId) {
         if (started) {
-            fightManager.leave(userId);
+            fightManager.leaveGame(userId);
         }
 
         int index = getUserIndexByUserId(userId);
