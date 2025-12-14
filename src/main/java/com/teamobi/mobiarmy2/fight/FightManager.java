@@ -242,6 +242,14 @@ public class FightManager {
         });
     }
 
+    public void updatePlayerCoordinates(int userId, short x, short y) {
+        Player player = getPlayerTurn();
+        if (player == null || player.getUser() == null || player.getUser().getUserId() != userId) {
+            return;
+        }
+        //Todo update player coordinates if needed
+    }
+
     public void useItem(int userId, byte itemIndex) {
         fightLoop.submit(() -> {
             int index = getPlayerIndexByUserId(userId);
@@ -908,8 +916,12 @@ public class FightManager {
         // Gửi thông báo lượt chơi tiếp theo
         sendNextTurnMessage(isBossTurn ? bossTurn : playerTurn);
 
-        //Khởi động lại đồng hồ đếm ngược
-        countdownTimer.reset();
+        //Cài đồng hồ đếm ngược
+        if (isBossTurn) {
+            countdownTimer.stop();// Boss không có giới hạn thời gian
+        } else {
+            countdownTimer.reset();// Người chơi có giới hạn thời gian
+        }
 
         // Thực hiện hành động của boss trong lượt
         if (isBossTurn) {
@@ -921,7 +933,12 @@ public class FightManager {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-            boss.turnAction();
+
+            if (turnCount == 1) {
+                doNextTurn();
+            } else {
+                boss.turnAction();
+            }
         }
     }
 
