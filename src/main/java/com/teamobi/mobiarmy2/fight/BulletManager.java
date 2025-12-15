@@ -414,7 +414,7 @@ public class BulletManager {
                     if (pl.getUsedItemId() != 24) {
                         return;
                     }
-                    bullets.add(new ItemTuSat(this, (byte) 50, 1500, pl));
+                    bullets.add(new SuicideItem(this, 1500, pl));
                 }
 
                 // Item bom mu
