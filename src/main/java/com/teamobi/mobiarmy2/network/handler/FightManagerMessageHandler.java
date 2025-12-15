@@ -55,7 +55,6 @@ public class FightManagerMessageHandler extends BaseMessageHandler {
     public void processShootingResult() {
         // Client vẽ xong đạn bay và xử lý va chạm, gửi kết quả về server
         // Theo logic thì sau khi client gủi thì mói đổi lượt, hoặc quá thời gian chờ
-        fm().processShootingResult(us().getUserId());
     }
 
     public void handleUseItem(Message ms) throws IOException {
@@ -83,7 +82,7 @@ public class FightManagerMessageHandler extends BaseMessageHandler {
         fm().updatePlayerCoordinates(us().getUserId(), x, y);
     }
 
-    public void clearBullet(Message ms) throws IOException {
+    public void handleCheckCross(Message ms) throws IOException {
         DataInputStream dis = ms.reader();
         int size = dis.readByte();
         int[] x = new int[size];
@@ -92,7 +91,7 @@ public class FightManagerMessageHandler extends BaseMessageHandler {
             x[i] = dis.readInt();
             y[i] = dis.readInt();
         }
-        log.debug("Size: {}, x: {}, y: {}", size, x, y);
+        // Danh sách tọa độ (x, y) của các điểm nổ / điểm giao cắt đạn lên server.
     }
 
     public void enterTrainingMap() throws IOException {

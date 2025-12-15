@@ -63,9 +63,9 @@ public class Balloon extends Boss {
                 updateBodyPartsCoordinates(toX, toY);
 
                 if (!bodyParts[1].isDead()) {
-                    fightManager.createShoot(index, (byte) 44, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 10, (byte) 0, (byte) 1);
+                    fightManager.createShoot(this, (byte) 44, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 10, (byte) 0, (byte) 1);
                 } else if (!bodyParts[2].isDead()) {
-                    fightManager.createShoot(index, (byte) 43, (short) 270, (byte) 20, (byte) 0, (byte) 1);
+                    fightManager.createShoot(this, (byte) 43, (short) 270, (byte) 20, (byte) 0, (byte) 1);
                 }
             }
 
@@ -75,11 +75,11 @@ public class Balloon extends Boss {
                 short toY = (short) Utils.nextInt(-100, 50);
                 updateBodyPartsCoordinates(toX, toY);
 
-                fightManager.createShoot(index, (byte) 44, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 10, (byte) 0, (byte) 1);
+                fightManager.createShoot(this, (byte) 44, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 10, (byte) 0, (byte) 1);
             }
 
             //Gun Big
-            case 2 -> fightManager.createShoot(index, (byte) 43, (short) 270, (byte) 20, (byte) 0, (byte) 1);
+            case 2 -> fightManager.createShoot(this, (byte) 43, (short) 270, (byte) 20, (byte) 0, (byte) 1);
 
             //Eye
             case 4 -> {
@@ -87,7 +87,7 @@ public class Balloon extends Boss {
                 short toY = (short) Utils.nextInt(-50, 50);
                 updateBodyPartsCoordinates(toX, toY);
 
-                fightManager.createShoot(index, (byte) 45, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 20, (byte) 0, (byte) 1);
+                fightManager.createShoot(this, (byte) 45, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 20, (byte) 0, (byte) 1);
             }
         }
     }

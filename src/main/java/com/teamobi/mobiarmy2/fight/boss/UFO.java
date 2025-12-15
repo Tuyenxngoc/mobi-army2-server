@@ -28,7 +28,7 @@ public class UFO extends Boss {
 
         if (turnShoot) {
             turnShoot = false;
-            fightManager.createShoot(index, (byte) 42, (short) 270, (byte) 20, (byte) 0, (byte) 1);
+            fightManager.createShoot(this, (byte) 42, (short) 270, (byte) 20, (byte) 0, (byte) 1);
         } else {
             turnShoot = true;
 

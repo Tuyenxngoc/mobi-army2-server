@@ -148,7 +148,7 @@ public class MessageRouter {
 
                 case Cmd.FIND_PLAYER -> fightWaitMessageHandler.handleFindPlayerWait(ms);
 
-                case Cmd.CHECK_CROSS -> fightManagerMessageHandler.clearBullet(ms);
+                case Cmd.CHECK_CROSS -> fightManagerMessageHandler.handleCheckCross(ms);
 
                 case Cmd.CHANGE_PASS -> authMessageHandler.handleChangePassword(ms);
 

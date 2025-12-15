@@ -194,25 +194,25 @@ public class FightManager {
 
     public void handlePlayerShoot(int userId, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
         fightLoop.submit(() -> {
-            int index = getPlayerIndexByUserId(userId);
-            if (index == -1 || index != playerTurn || isBossTurn || !fightWait.isStarted()) {
+            Player player = getPlayerTurn();
+            if (player.getUser() == null || player.getUser().getUserId() != userId) {
                 return;
             }
-            Player player = players[index];
+
+            // Cập nhật vị trí người chơi
             player.updateXY(x, y);
 
-            createShoot(index, bullId, angle, force, force2, numShoot);
+            // Tạo đạn bắn
+            createShoot(player, bullId, angle, force, force2, numShoot);
         });
     }
 
     public void changeLocation(int userId, short x, short y) {
         fightLoop.submit(() -> {
-            int index = getPlayerIndexByUserId(userId);
-            if (index == -1) {
+            Player player = getPlayerTurn();
+            if (player.getUser() == null || player.getUser().getUserId() != userId) {
                 return;
             }
-
-            Player player = players[index];
 
             //Lưu lại vị trí ban đầu
             int preX = player.getX();
@@ -223,18 +223,18 @@ public class FightManager {
 
             //Gửi thông báo nếu vị trí thay đổi
             if (preX != player.getX() || preY != player.getY()) {
-                sendMessageUpdateXY(index);
+                sendMessageUpdateXY(player.getIndex());
             }
         });
     }
 
     public void skipTurn(int userId) {
         fightLoop.submit(() -> {
-            int index = getPlayerIndexByUserId(userId);
-            if (index == -1 || index != playerTurn || isBossTurn) {
+            Player player = getPlayerTurn();
+            if (player.getUser() == null || player.getUser().getUserId() != userId) {
                 return;
             }
-            Player player = players[playerTurn];
+
             if (player.getSkippedTurns() < 5) {
                 player.incrementSkippedTurns();
                 doNextTurn();
@@ -252,12 +252,11 @@ public class FightManager {
 
     public void useItem(int userId, byte itemIndex) {
         fightLoop.submit(() -> {
-            int index = getPlayerIndexByUserId(userId);
-            if (index == -1 || index != playerTurn) {
+            Player player = getPlayerTurn();
+            if (player.getUser() == null || player.getUser().getUserId() != userId) {
                 return;
             }
 
-            Player player = players[index];
             if (player.isItemUsed() || player.isUsePow()) {
                 return;
             }
@@ -291,15 +290,11 @@ public class FightManager {
                 player.getUser().updateFightItems(itemIndex, (byte) -1);
             }
 
-            sendUseItemMessage(itemIndex, index);
+            sendUseItemMessage(itemIndex, player.getIndex());
 
             //Xử lý khi dùng item
-            handleItem(player, index, itemIndex);
+            handleItem(player, itemIndex);
         });
-    }
-
-    public void processShootingResult(int userId) {
-        // Hiện tại không sử dụng
     }
 
     public void addPendingBoss(Boss player) {
@@ -703,7 +698,7 @@ public class FightManager {
     }
 
     private void updateWind() {
-        Player player = players[getCurrentTurn()];
+        Player player = getPlayerTurn();
         if (player.getWindStopCount() > 0) {
             player.decreaseWindStopCount();
 
@@ -1315,12 +1310,11 @@ public class FightManager {
         }
     }
 
-    public void createShoot(int index, byte bullId, short angle, byte force, byte force2, byte numShoot) {
-        createShoot(index, bullId, angle, force, force2, numShoot, true);
+    public void createShoot(Player player, byte bullId, short angle, byte force, byte force2, byte numShoot) {
+        createShoot(player, bullId, angle, force, force2, numShoot, true);
     }
 
-    public void createShoot(int index, byte bullId, short angle, byte force, byte force2, byte numShoot, boolean isNextTurn) {
-        Player player = players[index];
+    public void createShoot(Player player, byte bullId, short angle, byte force, byte force2, byte numShoot, boolean isNextTurn) {
         if (player.isDoubleShoot()) {
             player.setDoubleShoot(false);
         } else {
@@ -1340,7 +1334,7 @@ public class FightManager {
         updateLuckyPlayers();
 
         //Gủi ms bắn đạn
-        sendFireArmyPacket(index, bullId, xS, yS, angle, force2, numShoot, player);
+        sendFireArmyPacket(bullId, xS, yS, angle, force2, numShoot, player);
 
         //Xóa các đạn đã bắn
         bulletManager.resetBullets();
@@ -1358,7 +1352,7 @@ public class FightManager {
         }
     }
 
-    private void sendFireArmyPacket(int index, byte bullId, int xS, int yS, short angle, byte force2, byte numShoot, Player player) {
+    private void sendFireArmyPacket(byte bullId, int xS, int yS, short angle, byte force2, byte numShoot, Player player) {
         List<Bullet> bullets = bulletManager.getBullets();
         byte typeShoot = bulletManager.getTypeShoot();
         try {
@@ -1366,7 +1360,7 @@ public class FightManager {
             DataOutputStream ds = ms.writer();
             ds.writeByte(typeShoot);
             ds.writeByte(player.isUsePow() ? 1 : 0);
-            ds.writeByte(index);
+            ds.writeByte(player.getIndex());
             ds.writeByte(bullId);
             ds.writeShort(xS);
             ds.writeShort(yS);
@@ -1439,12 +1433,12 @@ public class FightManager {
         }
     }
 
-    private void handleItem(Player player, int playerIndex, byte itemIndex) {
+    private void handleItem(Player player, byte itemIndex) {
         switch (itemIndex) {
             //Hồi máu
             case 0 -> {
                 player.updateHP((short) 350);
-                sendHpUpdate((byte) playerIndex);
+                sendHpUpdate(player.getIndex());
             }
 
             //Bắn x2
@@ -1478,7 +1472,7 @@ public class FightManager {
             }
 
             //Tự sát
-            case 24 -> createShoot(playerIndex, (byte) 50, (short) 0, (byte) 0, (byte) 0, (byte) 1);
+            case 24 -> createShoot(player, (byte) 50, (short) 0, (byte) 0, (byte) 0, (byte) 1);
 
             //Ufo Todo
             case 27 -> {
@@ -1489,13 +1483,13 @@ public class FightManager {
             case 32 -> {
                 short hpUp = (short) (player.getMaxHp() / 2);
                 player.updateHP(hpUp);
-                sendHpUpdate((byte) playerIndex);
+                sendHpUpdate(player.getIndex());
             }
 
             //Hồi máu 100%
             case 33 -> {
                 player.updateHP(player.getMaxHp());
-                sendHpUpdate((byte) playerIndex);
+                sendHpUpdate(player.getIndex());
             }
 
             //Vô hình
