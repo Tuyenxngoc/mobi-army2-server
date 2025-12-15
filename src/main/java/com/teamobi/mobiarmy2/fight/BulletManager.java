@@ -216,7 +216,7 @@ public class BulletManager {
                     if (pl.getUsedItemId() != 18) {
                         return;
                     }
-                    bullets.add(new ItemChuotGanBom(this, (byte) 22, 500, pl, x, y, force, angle < 89));
+                    bullets.add(new BombMouseBullet(this, 500, pl, x, y, force, angle < 89));
                 }
 
                 // Item Sao Bang
@@ -249,9 +249,8 @@ public class BulletManager {
                     if (pl.getUsedItemId() != 22) {
                         return;
                     }
-                    vx = 0;
-                    vy = -force / 2;
-                    bullets.add(new ItemMuaDan(this, (byte) 28, 200, pl, x, y, vx, vy, 0, 20));
+                    int newVy = -force / 2;
+                    bullets.add(new ItemMuaDan(this, 200, pl, x, y, 0, newVy, 0, 20));
                 }
 
                 // Item khoang dat
@@ -319,7 +318,7 @@ public class BulletManager {
                     if (characterId != 15) {
                         return;
                     }
-                    bullets.add(new BigRocKet(this, (byte) 37, 570, pl));
+                    bullets.add(new BigRocKet(this, 570, pl));
                 }
 
                 // T-rex lazer
@@ -481,7 +480,7 @@ public class BulletManager {
                     if (characterId != 15) {
                         return;
                     }
-                    bullets.add(new BigRocKet(this, (byte) 37, 600, pl));
+                    bullets.add(new BigRocKet(this, 600, pl));
                 }
 
                 //T-rex TG jump
