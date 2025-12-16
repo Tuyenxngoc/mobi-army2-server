@@ -302,7 +302,7 @@ public class BulletManager {
                     if (characterId != 15 && characterId != 14) {
                         return;
                     }
-                    bullets.add(new Jump(this, (byte) 35, 1200, pl));
+                    bullets.add(new Jump(this, 1200, pl));
                 }
 
                 //Jump Fly 
@@ -474,23 +474,6 @@ public class BulletManager {
                     pl.setLucky(false);
                     bullets.add(new ItemBomHenGio(this, (byte) 57, 600, pl, x, y, vx, vy, 0, 120));
                 }
-
-                //T-rex TG Rocket
-                case 58 -> {
-                    if (characterId != 15) {
-                        return;
-                    }
-                    bullets.add(new BigRocKet(this, 600, pl));
-                }
-
-                //T-rex TG jump
-                case 59 -> {
-                    if (characterId != 15 && characterId != 14) {
-                        return;
-                    }
-                    bullets.add(new Jump(this, (byte) 35, 100000, pl));
-                }
-
             }
         }
     }
