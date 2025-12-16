@@ -1547,6 +1547,25 @@ public class FightManager {
         return closestPlayer;
     }
 
+    public Player getRandomPlayer() {
+        List<Player> validPlayers = new ArrayList<>();
+
+        for (byte i = 0; i < MAX_USER_FIGHT; i++) {
+            Player player = players[i];
+            if (player == null || player.getUser() == null || player.isDead()) {
+                continue;
+            }
+            validPlayers.add(player);
+        }
+
+        if (validPlayers.isEmpty()) {
+            return null;
+        }
+
+        int randomIndex = Utils.nextInt(0, validPlayers.size() - 1);
+        return validPlayers.get(randomIndex);
+    }
+
     public void updateCantMove(Player pl) {
         pl.setFreezeCount((byte) 5);
     }
