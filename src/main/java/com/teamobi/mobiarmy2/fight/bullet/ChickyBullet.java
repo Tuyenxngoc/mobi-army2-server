@@ -8,8 +8,8 @@ public class ChickyBullet extends Bullet {
     private byte force2;
     private int baseDamage;
 
-    public ChickyBullet(BulletManager bulletManager, int damage, Player player, int x, int y, int vx, int vy, int msg, int g100, byte force2) {
-        super(bulletManager, (byte) 19, damage, player, x, y, vx, vy, msg, g100);
+    public ChickyBullet(BulletManager bulletManager, int damage, Player player, int x, int y, int vx, int vy, byte force2) {
+        super(bulletManager, (byte) 19, damage, player, x, y, vx, vy, 20, 50);
         this.force2 = force2;
         this.baseDamage = damage;
     }

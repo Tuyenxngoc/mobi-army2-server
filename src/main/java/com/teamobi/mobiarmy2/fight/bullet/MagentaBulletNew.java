@@ -9,8 +9,8 @@ import com.teamobi.mobiarmy2.util.Utils;
 public class MagentaBulletNew extends Bullet {
     private final int force;
 
-    public MagentaBulletNew(BulletManager bulletManager, byte bullId, int damage, Player player, int x, int y, int vx, int vy, int msg, int g100, byte force) {
-        super(bulletManager, bullId, damage, player, x, y, vx, vy, msg, g100);
+    public MagentaBulletNew(BulletManager bulletManager, byte bullId, int damage, Player player, int x, int y, int vx, int vy, byte force) {
+        super(bulletManager, bullId, damage, player, x, y, vx, vy, 40, 70);
         this.force = force;
         this.canSuperType = false;
     }

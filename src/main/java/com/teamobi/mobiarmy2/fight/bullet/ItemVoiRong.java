@@ -5,7 +5,7 @@ import com.teamobi.mobiarmy2.fight.BulletManager;
 import com.teamobi.mobiarmy2.fight.Player;
 
 public class ItemVoiRong extends Bullet {
-    public ItemVoiRong(BulletManager bulletManager, int damage, Player player, int x, int y, int vx, int vy, int msg, int g100) {
-        super(bulletManager, (byte) 13, damage, player, x, y, vx, vy, msg, g100);
+    public ItemVoiRong(BulletManager bulletManager, int damage, Player player, int x, int y, int vx, int vy) {
+        super(bulletManager, (byte) 13, damage, player, x, y, vx, vy, 50, 120);
     }
 }

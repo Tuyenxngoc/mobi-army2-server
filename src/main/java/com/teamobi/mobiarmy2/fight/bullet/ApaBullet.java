@@ -11,8 +11,8 @@ public class ApaBullet extends Bullet {
     private byte force;
     private byte force2;
 
-    public ApaBullet(BulletManager bulletManager, int damage, Player player, int x, int y, int vx, int vy, int msg, int g100, short angle, byte force, byte force2) {
-        super(bulletManager, (byte) 17, damage, player, x, y, vx, vy, msg, g100);
+    public ApaBullet(BulletManager bulletManager, int damage, Player player, int x, int y, int vx, int vy, short angle, byte force, byte force2) {
+        super(bulletManager, (byte) 17, damage, player, x, y, vx, vy, 30, 100);
         this.baseDamage = damage;
         this.angle = angle;
         this.force = force;
