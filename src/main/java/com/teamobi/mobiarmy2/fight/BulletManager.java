@@ -90,7 +90,7 @@ public class BulletManager {
                         return;
                     }
                     pl.getUser().updateMission(5, 1);
-                    bullets.add(new ItemBomB52(this, 600, pl, x, y, vx, vy, 0, 80));
+                    bullets.add(new ItemBomB52(this, 600, pl, x, y, vx, vy));
                 }
 
                 // Item bay

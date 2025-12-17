@@ -10,8 +10,9 @@ public class BigRocKet extends Bullet {
 
     public BigRocKet(BulletManager bulletManager, int damage, Player player) {
         super(bulletManager, (byte) 37, damage, player, player.getX() - 20, player.getY() - 120, 0, 0, 0, 0);
-        bulletManager.setTypeShoot((byte) 1);//Ghi tọa độ tuyệt đối
+        this.canSuperType = false;
         this.targetX = bulletManager.getFightManager().getRandomPlayer().getX();
+        bulletManager.setTypeShoot((byte) 1);//Ghi tọa độ tuyệt đối
     }
 
     @Override
