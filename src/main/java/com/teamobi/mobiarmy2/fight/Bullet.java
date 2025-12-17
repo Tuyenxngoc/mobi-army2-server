@@ -114,9 +114,15 @@ public class Bullet {
         if (collisionResult != null) {
             isCollected = true;
 
-            x = collisionResult[0];
-            y = collisionResult[1];
-            trajectory.add(new Point(x, y));
+            // Cập nhật tọa độ đạn tại điểm va chạm
+            short cx = collisionResult[0];
+            short cy = collisionResult[1];
+
+            if (x != cx || y != cy) {// Chỉ thêm điểm va chạm nếu khác với điểm hiện tại (tránh trường hợp preX == x && preY == y)
+                x = cx;
+                y = cy;
+                trajectory.add(new Point(x, y));
+            }
 
             if (canSuperType) {
                 int type = collisionResult[2]; // Loại va chạm
