@@ -5,7 +5,7 @@ import com.teamobi.mobiarmy2.fight.BulletManager;
 import com.teamobi.mobiarmy2.fight.Player;
 
 public class BigRocKet extends Bullet {
-    public static final int MIN_Y = -614;
+    private static final int MIN_Y = -614;
     private final short targetX;
 
     public BigRocKet(BulletManager bulletManager, int damage, Player player) {

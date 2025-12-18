@@ -6,7 +6,7 @@ import com.teamobi.mobiarmy2.fight.Player;
 import com.teamobi.mobiarmy2.fight.Point;
 
 public class B52Bullet extends Bullet {
-    private Point target;
+    private final Point target;
 
     public B52Bullet(BulletManager bulletManager, int damage, Player player, int x, int y, Point target) {
         super(bulletManager, (byte) 3, damage, player, x, y, 5, 0, 0, 70);

@@ -20,7 +20,6 @@ public class RobotSpider extends Boss {
 
         int distance = calculateDistance(player.getX(), player.getY());
         if (distance < 30) {
-            this.usedItemId = 9;
             fightManager.createShoot(this, (byte) 8, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 30, (byte) 0, (byte) 1, false);
             byte force = (byte) Utils.nextInt(15, 30);
             short arg = (short) Utils.nextInt(80, 100);
@@ -30,7 +29,6 @@ public class RobotSpider extends Boss {
 
         switch (Utils.nextInt(3)) {
             case 0 -> {// Tơ nhện
-                usedItemId = 9;
                 short[] forceArgXY = fightManager.getForceArgXY(
                         characterId, false, x, y, player.getX(),
                         (short) (player.getY() - (player.getHeight() / 2)),
@@ -47,7 +45,6 @@ public class RobotSpider extends Boss {
                 fightManager.createShoot(this, (byte) 36, arg, force, (byte) 0, (byte) 1);
             }
             case 1 -> {// Laser
-                usedItemId = 16;
                 short[] forceArgXY = fightManager.getForceArgXY(
                         characterId, false, x, y, player.getX(),
                         (short) (player.getY() - (player.getHeight() / 2)),

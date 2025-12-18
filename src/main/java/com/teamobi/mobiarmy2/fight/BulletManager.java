@@ -122,11 +122,11 @@ public class BulletManager {
 
                 // Item to nhen
                 case 8 -> {
-                    if (pl.getUsedItemId() == 9) {
-                        bullets.add(new ItemToNhen(this, (byte) 8, 300, pl, x, y, vx, vy));
+                    if (characterId == 13 || pl.getUsedItemId() == 9) {
+                        bullets.add(new ItemToNhen(this, 300, pl, x, y, vx, vy));
                     }
                     if (characterId == 22) {
-                        bullets.add(new SpiderDropSilk(this, (byte) 8, 300, pl));
+                        bullets.add(new SpiderDropSilk(this, 300, pl));
                     }
                 }
 
@@ -173,7 +173,7 @@ public class BulletManager {
 
                 // Item dan laser
                 case 14 -> {
-                    if (pl.getUsedItemId() != 16) {
+                    if (characterId == 13 || pl.getUsedItemId() != 16) {
                         return;
                     }
                     bullets.add(new ItemLaser(this, 500, pl, x, y, vx, vy));
@@ -310,7 +310,7 @@ public class BulletManager {
                     if (characterId != 14 && characterId != 13) {
                         return;
                     }
-                    bullets.add(new JumpOrFly(this, (byte) 36, 0, pl, x, y, vx, vy));
+                    bullets.add(new JumpOrFly(this, 0, pl, x, y, vx, vy));
                 }
 
                 //T-rex Rocket
@@ -422,7 +422,7 @@ public class BulletManager {
                         return;
                     }
                     pl.setLucky(false);
-                    bullets.add(new ItemBomMu(this, (byte) 51, 0, pl, x, y, vx, vy));
+                    bullets.add(new ItemBomMu(this, 0, pl, x, y, vx, vy));
                 }
 
                 // Item Khoang dat 2
@@ -430,7 +430,7 @@ public class BulletManager {
                     if (pl.getUsedItemId() != 26) {
                         return;
                     }
-                    bullets.add(new ItemKhoangDat2(this, (byte) 52, 500, pl, x, y, vx, vy));
+                    bullets.add(new ItemKhoangDat2(this, 500, pl, x, y, vx, vy));
                 }
 
                 // Item Dong Bang
@@ -439,7 +439,7 @@ public class BulletManager {
                         return;
                     }
                     pl.setLucky(false);
-                    bullets.add(new ItemDongBang(this, (byte) 54, 0, pl, x, y, vx, vy));
+                    bullets.add(new ItemDongBang(this, 0, pl, x, y, vx, vy));
                 }
 
                 // Item Khoi Doc
@@ -448,7 +448,7 @@ public class BulletManager {
                         return;
                     }
                     pl.setLucky(false);
-                    bullets.add(new ItemKhoiDoc(this, (byte) 55, 150, pl, x, y, vx, vy));
+                    bullets.add(new ItemKhoiDoc(this, 150, pl, x, y, vx, vy));
                 }
 
                 // Item To nhen 2
@@ -462,7 +462,7 @@ public class BulletManager {
                         y = pl.getY() - 12 - (20 * Utils.sin(arg3) >> 10);
                         vx = (force * Utils.cos(arg3) >> 10);
                         vy = -(force * Utils.sin(arg3) >> 10);
-                        bullets.add(new ItemToNhen(this, (byte) 56, 300, pl, x, y, vx, vy));
+                        bullets.add(new ItemToNhen(this, 300, pl, x, y, vx, vy));
                     }
                 }
 

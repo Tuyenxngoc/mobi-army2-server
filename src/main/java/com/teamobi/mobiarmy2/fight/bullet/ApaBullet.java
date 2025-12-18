@@ -6,10 +6,10 @@ import com.teamobi.mobiarmy2.fight.Player;
 import com.teamobi.mobiarmy2.util.Utils;
 
 public class ApaBullet extends Bullet {
-    private int baseDamage;
-    private short angle;
-    private byte force;
-    private byte force2;
+    private final int baseDamage;
+    private final short angle;
+    private final byte force;
+    private final byte force2;
 
     public ApaBullet(BulletManager bulletManager, int damage, Player player, int x, int y, int vx, int vy, short angle, byte force, byte force2) {
         super(bulletManager, (byte) 17, damage, player, x, y, vx, vy, 30, 100);

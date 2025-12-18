@@ -5,7 +5,7 @@ import com.teamobi.mobiarmy2.fight.BulletManager;
 import com.teamobi.mobiarmy2.fight.Player;
 
 public class ItemKhoangDat2 extends Bullet {
-    public ItemKhoangDat2(BulletManager bulletManager, byte bullId, int damage, Player player, int x, int y, int vx, int vy) {
-        super(bulletManager, bullId, damage, player, x, y, vx, vy, 10, 100);
+    public ItemKhoangDat2(BulletManager bulletManager, int damage, Player player, int x, int y, int vx, int vy) {
+        super(bulletManager, (byte) 52, damage, player, x, y, vx, vy, 10, 100);
     }
 }

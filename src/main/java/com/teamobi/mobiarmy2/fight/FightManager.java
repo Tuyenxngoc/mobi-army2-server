@@ -381,6 +381,21 @@ public class FightManager {
         }
     }
 
+    public void sendUpdateCoordinates(byte index) {
+        try {
+            Player player = players[index];
+            Message ms = new Message(Cmd.UPDATE_XY);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(index);
+            ds.writeShort(player.getX());
+            ds.writeShort(player.getY());
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void sendAngryUpdate(byte index) {
         try {
             Player player = players[index];
@@ -1381,6 +1396,13 @@ public class FightManager {
                 List<Point> trajectory = bullet.getTrajectory();
                 int size = trajectory.size();
                 ds.writeShort(size);// Ghi độ dài quỹ đạo
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Bullet ID: {}, Trajectory Size: {}", bullId, size);
+                    for (Point p : trajectory) {
+                        log.debug("Bullet Trajectory Point: x={}, y={}", p.getX(), p.getY());
+                    }
+                }
 
                 if (typeShoot == 0) {// Ghi tọa độ theo dạng delta (chênh lệch)
                     for (int i = 0; i < size; i++) {

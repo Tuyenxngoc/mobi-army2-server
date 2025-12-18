@@ -11,7 +11,6 @@ public class ItemMuaDan extends Bullet {
         this.canCollide = false;
     }
 
-
     @Override
     public void update() {
         super.update();
