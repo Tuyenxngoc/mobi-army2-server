@@ -259,7 +259,7 @@ public class BulletManager {
                         return;
                     }
                     pl.setLucky(false);
-                    bullets.add(new ItemKhoangDat(this, (byte) 30, pl, pl.getX(), pl.getY(), force));
+                    bullets.add(new ItemKhoangDat(this, pl, force));
                 }
 
                 // Big boom bum

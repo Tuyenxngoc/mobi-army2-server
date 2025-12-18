@@ -44,7 +44,7 @@ public class FightManager {
 
     //Danh sách id boss không có lượt chơi
     private static final Set<Byte> INVALID_CHARACTER_IDS = new HashSet<>(Set.of((byte) 18, (byte) 19, (byte) 20, (byte) 21, (byte) 23, (byte) 24));
-    private static final Set<Byte> UNAUTHORIZED_ITEMS = Set.of((byte) 9, (byte) 23, (byte) 26, (byte) 28, (byte) 30, (byte) 31);
+    private static final Set<Byte> UNAUTHORIZED_ITEMS = Set.of((byte) 9, (byte) 26, (byte) 28, (byte) 30, (byte) 31);
 
     private final FightWait fightWait;
 
