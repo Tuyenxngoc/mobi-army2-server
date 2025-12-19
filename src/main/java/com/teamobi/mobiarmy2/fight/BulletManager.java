@@ -168,7 +168,7 @@ public class BulletManager {
                         return;
                     }
                     pl.setLucky(false);
-                    bullets.add(new ItemVoiRong(this, 0, pl, x, y, vx, vy));
+                    bullets.add(new ItemVoiRong(this, pl, x, y, vx, vy));
                 }
 
                 // Item dan laser
@@ -233,7 +233,7 @@ public class BulletManager {
                         return;
                     }
                     vy = (force * Utils.sin(-angle) >> 10);
-                    bullets.add(new ItemXuyenDat(this, (byte) 25, 500, pl, x, y, vx, vy, force));
+                    bullets.add(new ItemXuyenDat(this, 500, pl, x, y, vx, vy, force));
                 }
 
                 // Item ten lua
@@ -241,7 +241,7 @@ public class BulletManager {
                     if (pl.getUsedItemId() != 19) {
                         return;
                     }
-                    bullets.add(new ItemTenLua(this, (byte) 26, 200, pl, x, y, vx, vy, force));
+                    bullets.add(new ItemTenLua(this, 200, pl, x, y, vx, vy, force));
                 }
 
                 // Item mua dan
@@ -378,7 +378,7 @@ public class BulletManager {
                     if (characterId != 17) {
                         return;
                     }
-                    bullets.add(new BalloonLazer(this, (byte) 45, 500, pl, x + 65, y - 27));
+                    bullets.add(new BalloonLazer(this, 500, pl, x + 65, y - 27));
                 }
 
                 case 47 -> {
@@ -404,7 +404,7 @@ public class BulletManager {
                     } else {
                         vx = (1600 * Utils.cos(angle) >> 10);
                         vy = -(1600 * Utils.sin(angle) >> 10);
-                        bullets.add(new MagentaBulletOld(this, (byte) 59, pl.isUsePow() ? 1000 : (numShoot == 2 ? 308 : 400), pl, x, y, vx, vy, force));
+                        bullets.add(new MagentaBulletOld(this, pl.isUsePow() ? 1000 : (numShoot == 2 ? 308 : 400), pl, x, y, vx, vy, force));
                     }
                 }
 
@@ -422,7 +422,7 @@ public class BulletManager {
                         return;
                     }
                     pl.setLucky(false);
-                    bullets.add(new ItemBomMu(this, 0, pl, x, y, vx, vy));
+                    bullets.add(new ItemBomMu(this, pl, x, y, vx, vy));
                 }
 
                 // Item Khoang dat 2
@@ -439,7 +439,7 @@ public class BulletManager {
                         return;
                     }
                     pl.setLucky(false);
-                    bullets.add(new ItemDongBang(this, 0, pl, x, y, vx, vy));
+                    bullets.add(new ItemDongBang(this, pl, x, y, vx, vy));
                 }
 
                 // Item Khoi Doc
@@ -472,7 +472,7 @@ public class BulletManager {
                         return;
                     }
                     pl.setLucky(false);
-                    bullets.add(new ItemBomHenGio(this, (byte) 57, 600, pl, x, y, vx, vy));
+                    bullets.add(new ItemBomHenGio(this, 600, pl, x, y, vx, vy));
                 }
             }
         }

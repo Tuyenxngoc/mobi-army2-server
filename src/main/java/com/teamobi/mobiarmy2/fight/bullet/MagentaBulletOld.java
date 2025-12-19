@@ -5,11 +5,12 @@ import com.teamobi.mobiarmy2.fight.BulletManager;
 import com.teamobi.mobiarmy2.fight.Player;
 
 public class MagentaBulletOld extends Bullet {
-    public MagentaBulletOld(BulletManager bulletManager, byte bullId, int damage, Player player, int x, int y, int vx, int vy, int msg, int g100) {
-        super(bulletManager, bullId, damage, player, x, y, vx, vy, msg, g100);
+    public MagentaBulletOld(BulletManager bulletManager, int damage, Player player, int x, int y, int vx, int vy, byte force) {
+        super(bulletManager, (byte) 59, damage, player, x, y, vx, vy, 0, 0);
     }
 
-    public MagentaBulletOld(BulletManager bulletManager, byte bullId, int damage, Player pl, int x, int y, int vx, int vy, byte force) {
-        super();
+    @Override
+    public void update() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

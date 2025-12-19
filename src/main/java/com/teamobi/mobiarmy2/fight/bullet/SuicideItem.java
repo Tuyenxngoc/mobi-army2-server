@@ -10,7 +10,6 @@ public class SuicideItem extends Bullet {
 
     public SuicideItem(BulletManager bulletManager, int damage, Player player) {
         super(bulletManager, (byte) 50, damage, player, player.getX(), player.getY() - 12, 0, 0, 0, 0);
-
     }
 
     @Override

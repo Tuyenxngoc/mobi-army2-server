@@ -5,8 +5,8 @@ import com.teamobi.mobiarmy2.fight.BulletManager;
 import com.teamobi.mobiarmy2.fight.Player;
 
 public class ChickyBullet extends Bullet {
-    private byte force2;
-    private int baseDamage;
+    private final byte force2;
+    private final int baseDamage;
 
     public ChickyBullet(BulletManager bulletManager, int damage, Player player, int x, int y, int vx, int vy, byte force2) {
         super(bulletManager, (byte) 19, damage, player, x, y, vx, vy, 20, 50);

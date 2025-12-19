@@ -339,11 +339,11 @@ public class FightManager {
         }
     }
 
-    private void sendEyeSmokeUpdate(byte index) {
+    private void sendEyeSmokeUpdate(byte type, byte index) {
         try {
             Message ms = new Message(Cmd.EYE_SMOKE);
             DataOutputStream ds = ms.writer();
-            ds.writeByte(0);
+            ds.writeByte(type);// 0: add, 1: remove
             ds.writeByte(index);
             ds.flush();
             fightWait.sendToTeam(ms);
@@ -352,11 +352,11 @@ public class FightManager {
         }
     }
 
-    private void sendFreezeUpdate(byte index) {
+    private void sendFreezeUpdate(byte type, byte index) {
         try {
             Message ms = new Message(Cmd.FREEZE);
             DataOutputStream ds = ms.writer();
-            ds.writeByte(0);
+            ds.writeByte(type);// 0: add, 1: remove
             ds.writeByte(index);
             ds.flush();
             fightWait.sendToTeam(ms);
@@ -653,15 +653,6 @@ public class FightManager {
             if (player.isUpdateAngry()) {
                 sendAngryUpdate(i);
             }
-            if (player.getFreezeCount() > 0) {
-                sendFreezeUpdate(i);
-            }
-            if (player.getEyeSmokeCount() > 0) {
-                sendEyeSmokeUpdate(i);
-            }
-            if (player.isPoisoned()) {
-                sendPoisonUpdate(i);
-            }
         }
     }
 
@@ -873,14 +864,6 @@ public class FightManager {
     }
 
     public void doNextTurn() {
-        MatchResult result = getMatchResult();
-        if (result != null) {
-            fightComplete(result);
-            return;
-        }
-
-        turnCount++;
-
         //Cập nhật vị trí y của các player
         for (int i = 0; i < totalPlayers; i++) {
             Player player = players[i];
@@ -898,6 +881,15 @@ public class FightManager {
 
         //Cập nhật số cup nhận được
         updateCupPlayers();
+
+        //Kiểm tra kết quả trận đấu
+        MatchResult result = getMatchResult();
+        if (result != null) {
+            fightComplete(result);
+            return;
+        }
+
+        turnCount++;
 
         // Tính lượt chơi tiếp theo
         if (playerTurn == -1) {
@@ -1114,15 +1106,6 @@ public class FightManager {
     }
 
     private void fightComplete(MatchResult result) {
-        //Cập nhật trạng thái người chơi
-        updatePlayerStatuses();
-
-        //Cập nhật số xp nhận được
-        updateXpPlayers();
-
-        //Cập nhật số cup nhận được
-        updateCupPlayers();
-
         long duration = System.currentTimeMillis() - startTime;
         boolean fightInValid = false;
         if (duration < 5000) {
@@ -1588,13 +1571,6 @@ public class FightManager {
         return validPlayers.get(randomIndex);
     }
 
-    public void updateCantMove(Player pl) {
-        pl.setFreezeCount((byte) 5);
-    }
-
-    public void updateCantSee(Player pl) {
-    }
-
     public void collisionPlayers(short x, short y, Bullet bullet) {
         for (int i = 0; i < totalPlayers; i++) {
             Player pl = players[i];
@@ -1603,4 +1579,54 @@ public class FightManager {
             }
         }
     }
+
+    public void onBulletExplode(short bx, short by, Bullet bullet) {
+        int impactRadius = Bullet.getImpactRadiusByBullId(bullet.bullId);
+
+        for (Player player : players) {
+            if (player == null || player.isDead() || player.getInvisibleCount() > 0) {
+                continue;
+            }
+
+            if (isInRange(player, bx, by, impactRadius)) {
+                applyBulletEffect(bullet, player);
+            }
+        }
+    }
+
+    private void applyBulletEffect(Bullet bullet, Player player) {
+        switch (bullet.getBullId()) {
+            case 51 -> {//Bom mù
+                if (player.getEyeSmokeCount() <= 0) {
+                    sendEyeSmokeUpdate((byte) 0, player.getIndex());
+                }
+                player.setEyeSmokeCount((byte) 5);
+            }
+
+            case 54 -> {//Đóng băng
+                if (player.getFreezeCount() <= 0) {
+                    sendFreezeUpdate((byte) 0, player.getIndex());
+                }
+                player.setFreezeCount((byte) 5);
+            }
+
+            case 55 -> {//Khói độc
+                if (!player.isPoisoned()) {
+                    player.setPoisoned(true);
+                    sendPoisonUpdate(player.getIndex());
+                }
+            }
+        }
+    }
+
+    private boolean isInRange(Player pl, int bx, int by, int radius) {
+        int dx = pl.getX() - bx;
+        int dy = (pl.getY() - pl.height / 2) - by;
+
+        int distanceSq = dx * dx + dy * dy;
+        int hitRadius = radius + pl.width / 2;
+
+        return distanceSq <= hitRadius * hitRadius;
+    }
+
 }

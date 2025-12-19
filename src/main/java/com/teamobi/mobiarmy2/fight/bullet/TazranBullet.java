@@ -10,7 +10,7 @@ public class TazranBullet extends Bullet {
     private byte turnState;
 
     // true nếu hướng ban đầu là sang trái (vx <= 0)
-    private boolean isLeft;
+    private final boolean isLeft;
 
     public TazranBullet(BulletManager bulletManager, int damage, Player player, int x, int y, int vx, int vy) {
         super(bulletManager, (byte) 21, damage, player, x, y, vx, vy, 10, 50);
