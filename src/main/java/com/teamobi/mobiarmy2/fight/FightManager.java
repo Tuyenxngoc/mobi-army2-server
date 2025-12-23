@@ -1479,10 +1479,8 @@ public class FightManager {
             //Tự sát
             case 24 -> createShoot(player, (byte) 50, (short) 0, (byte) 0, (byte) 0, (byte) 1);
 
-            //Ufo Todo
-            case 27 -> {
-                System.out.println("tobe continue...");
-            }
+            //Ufo
+            case 27 -> addPendingBoss(new UFOPet(this, (short) 140, (short) 0, (short) 550));
 
             //Hồi máu 50%
             case 32 -> {
