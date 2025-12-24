@@ -70,6 +70,7 @@ public class FightManager {
     @Getter
     private byte windY;
     private long startTime;
+    private int nextBossId = -10;
 
     public FightManager(FightWait fightWait, ClanService clanService) {
         this.fightWait = fightWait;
@@ -311,6 +312,7 @@ public class FightManager {
         windX = 0;
         windY = 0;
         startTime = 0;
+        nextBossId = -10;
         countdownTimer.stop();
         bulletManager.resetBullets();
     }
@@ -432,7 +434,7 @@ public class FightManager {
             DataOutputStream ds = ms.writer();
             ds.writeByte(bosses.size());
             for (Boss boss : bosses) {
-                ds.writeInt(-1);
+                ds.writeInt(nextBossId--);
                 ds.writeUTF(boss.getName());
                 ds.writeInt(boss.getMaxHp());
                 ds.writeByte(boss.getCharacterId());
@@ -776,8 +778,8 @@ public class FightManager {
             }
 
             case 34 -> {// T. rex máy
-                short X = 880;
-                short Y = 400;
+                short X = 886;
+                short Y = 428;
                 Boss tRex = new TRex(this, X, Y, (short) 15000);
                 spawnBosses.add(tRex);
 
