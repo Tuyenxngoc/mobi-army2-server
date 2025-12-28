@@ -367,6 +367,18 @@ public class FightManager {
         }
     }
 
+    private void sendEndInvisible(byte whoEnd) {
+        try {
+            Message ms = new Message(Cmd.END_INVISIBLE);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(whoEnd);
+            ds.flush();
+            fightWait.sendToTeam(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void sendHpUpdate(byte index) {
         try {
             Player player = players[index];
@@ -908,6 +920,43 @@ public class FightManager {
             Player player = players[playerTurn];
             player.resetValueInNewTurn();
             player.updateAngry((byte) 10);
+
+            //Giảm số lần hút máu
+            if (player.getVampireCount() > 0) {
+                player.setVampireCount((byte) (player.getVampireCount() - 1));
+            }
+
+            //Giảm số lần vô hình
+            if (player.getInvisibleCount() > 0) {
+                player.setInvisibleCount((byte) (player.getInvisibleCount() - 1));
+                if (player.getInvisibleCount() == 0) {
+                    sendEndInvisible(player.getIndex());
+                }
+            }
+
+            //Giảm số lần tàn hình
+            if (player.getVanishCount() > 0) {
+                player.setVanishCount((byte) (player.getVanishCount() - 1));
+                if (player.getVanishCount() == 0) {
+                    sendEndInvisible(player.getIndex());
+                }
+            }
+
+            //Giảm số lần bom mù
+            if (player.getEyeSmokeCount() > 0) {
+                player.setEyeSmokeCount((byte) (player.getEyeSmokeCount() - 1));
+                if (player.getEyeSmokeCount() == 0) {
+                    sendEyeSmokeUpdate((byte) 1, player.getIndex());
+                }
+            }
+
+            //Giảm số lần đóng băng
+            if (player.getFreezeCount() > 0) {
+                player.setFreezeCount((byte) (player.getFreezeCount() - 1));
+                if (player.getFreezeCount() == 0) {
+                    sendFreezeUpdate((byte) 1, player.getIndex());
+                }
+            }
         }
 
         //Spawn boss nếu có
