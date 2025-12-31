@@ -17,7 +17,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class RoomMessageHandler extends BaseMessageHandler {
-    private static final int minimumWaitTime = 5000;
+    private static final int REJOIN_COOLDOWN_MS = 3000;
     private long timeSinceLeftRoom;
 
     public RoomMessageHandler(Session session) {
@@ -99,7 +99,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
             return;
         }
 
-        long timeRemaining = minimumWaitTime - (System.currentTimeMillis() - timeSinceLeftRoom);
+        long timeRemaining = REJOIN_COOLDOWN_MS - (System.currentTimeMillis() - timeSinceLeftRoom);
         if (timeRemaining > 0) {
             us().sendServerMessage(GameString.createJoinAreaErrorMessage((int) (timeRemaining / 1000) + 1));
             return;

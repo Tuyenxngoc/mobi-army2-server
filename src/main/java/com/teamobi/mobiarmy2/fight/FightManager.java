@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.Predicate;
 
 @Slf4j
@@ -168,8 +169,8 @@ public class FightManager {
         });
     }
 
-    public void leaveGame(int userId) {
-        fightLoop.submit(() -> {
+    public Future<?> leaveGame(int userId) {
+        return fightLoop.submit(() -> {
             int index = getPlayerIndexByUserId(userId);
             if (index == -1) {
                 return;

@@ -13,6 +13,7 @@ import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.ClanService;
 import com.teamobi.mobiarmy2.service.GiftBoxService;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -21,10 +22,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+@Slf4j
 public class FightWait {
     public static final byte MAX_ITEMS_SLOT = 8;
     public static final int KICK_BOSS_TIME = 90;
     public static final byte[] CONTINUOUS_MAPS = {30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
+    public static final int GAME_END_WAIT_TIME_MS = 3000;
+    public static final int PLAYER_JOIN_WAIT_TIME_MS = 3000;
 
     @Getter
     private final FightManager fightManager;
@@ -294,14 +298,14 @@ public class FightWait {
         }
 
         //Kiểm tra thời gian kết thúc ván gần nhất
-        long remainingTime = 5000 - (System.currentTimeMillis() - endTime);
+        long remainingTime = GAME_END_WAIT_TIME_MS - (System.currentTimeMillis() - endTime);
         if (remainingTime > 0) {
             roomOwner.sendServerMessage(GameString.createWaitClickMessage(remainingTime / 1000 + 1));
             return;
         }
 
         //Kiểm tra thời gian người chơi vào phòng gần nhất
-        remainingTime = 5000 - (System.currentTimeMillis() - lastPlayerJoinTime);
+        remainingTime = PLAYER_JOIN_WAIT_TIME_MS - (System.currentTimeMillis() - lastPlayerJoinTime);
         if (remainingTime > 0) {
             roomOwner.sendMoneyErrorMessage(GameString.createWaitClickMessage(remainingTime / 1000 + 1));
             return;
@@ -440,7 +444,11 @@ public class FightWait {
 
     public synchronized void leaveTeam(int userId) {
         if (started) {
-            fightManager.leaveGame(userId);
+            try {
+                fightManager.leaveGame(userId).get();
+            } catch (Exception e) {
+                log.error("Leave game failed", e);
+            }
         }
 
         int index = getUserIndexByUserId(userId);
