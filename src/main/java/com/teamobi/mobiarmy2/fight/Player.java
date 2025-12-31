@@ -466,4 +466,12 @@ public class Player {
         itemUsed = true;
         items[slot] = -1;
     }
+
+    public boolean shouldCollide() {
+        return true;
+    }
+
+    public boolean shouldCollideWith(Player shooter) {
+        return true;
+    }
 }

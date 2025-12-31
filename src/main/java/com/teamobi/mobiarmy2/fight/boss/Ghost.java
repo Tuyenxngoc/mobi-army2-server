@@ -12,6 +12,11 @@ public class Ghost extends Boss {
     }
 
     @Override
+    public boolean shouldCollide() {
+        return !isDead;
+    }
+
+    @Override
     public void turnAction() {
         Player player = fightManager.getRandomPlayer(null);
         if (player == null) {

@@ -342,7 +342,9 @@ public class BulletManager {
                     if (characterId != 16) {
                         return;
                     }
-                    bullets.add(new Bullet(this, (byte) 42, 1000, pl, pl.getX(), pl.getY(), vx, vy + 10, 10, 0));
+                    Bullet bullet = new Bullet(this, (byte) 42, 1000, pl, pl.getX(), pl.getY(), vx, vy, 10, 0);
+                    bullet.setCanSuperType(false);
+                    bullets.add(bullet);
                 }
 
                 //Balloon Gun Big
@@ -505,7 +507,7 @@ public class BulletManager {
         } while (updated);
     }
 
-    public short[] getCollisionPoint(short x1, short y1, short x2, short y2, boolean canPassThroughPlayers, boolean canPassThroughMap) {
+    public short[] getCollisionPoint(Player shooter, short x1, short y1, short x2, short y2, boolean canPassThroughPlayers, boolean canPassThroughMap) {
         int deltaX = x2 - x1;
         int deltaY = y2 - y1;
 
@@ -548,8 +550,13 @@ public class BulletManager {
             // Check player collision
             if (!canPassThroughPlayers) {
                 for (int j = 0; j < fightManager.getTotalPlayers(); j++) {
-                    Player pl = fightManager.getPlayers()[j];
-                    if (pl != null && pl.isCollision(X, Y)) {
+                    Player target = fightManager.getPlayers()[j];
+
+                    if (target == null) continue;
+
+                    if (!target.shouldCollide() || !target.shouldCollideWith(shooter)) continue;
+
+                    if (target.isCollision(X, Y)) {
                         return new short[]{X, Y, 1};
                     }
                 }

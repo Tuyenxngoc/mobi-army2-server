@@ -16,6 +16,17 @@ public class UFO extends Boss {
     }
 
     @Override
+    public boolean shouldCollide() {
+        return !isDead;
+    }
+
+    @Override
+    public boolean shouldCollideWith(Player shooter) {
+        // UFO không va chạm với UFO khác (bao gồm cả UFO và UFOPet)
+        return !(shooter instanceof UFO || shooter instanceof UFOPet);
+    }
+
+    @Override
     public void turnAction() {
         short ys = y, xs = x;
         FightMapManager mapManager = fightManager.getFightMapManager();

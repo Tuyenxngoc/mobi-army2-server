@@ -10,6 +10,11 @@ public class BalloonFanBack extends Boss {
     }
 
     @Override
+    public boolean shouldCollide() {
+        return !isDead;
+    }
+
+    @Override
     public void turnAction() {
         throw new UnsupportedOperationException("Cannot call nextTurn from BalloonFanBack!");
     }
