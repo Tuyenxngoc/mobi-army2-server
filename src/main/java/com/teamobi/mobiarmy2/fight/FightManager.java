@@ -117,7 +117,7 @@ public class FightManager {
 
                 //Lấy danh sách items của clan
                 boolean[] clanItems = new boolean[ClanItemManager.CLAN_ITEM_MAP.size()];
-                if (user.getClanId() != null) {
+                if (user.hasClan()) {
                     if (clanItemsCache.containsKey(user.getClanId())) {
                         clanItems = clanItemsCache.get(user.getClanId());
                     } else {
@@ -1237,7 +1237,7 @@ public class FightManager {
                     }
 
                     //Cộng xp và cup cho clan
-                    if (user.getClanId() != null) {
+                    if (user.hasClan()) {
                         clanService.updateXp(user.getClanId(), user.getUserId(), player.getAllXpUp() / 100);
                         clanService.updateCup(user.getClanId(), user.getUserId(), player.getAllCupUp());
                     }

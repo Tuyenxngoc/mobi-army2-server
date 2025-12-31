@@ -875,7 +875,7 @@ public class FightWait {
     }
 
     public synchronized void addUser(User us) throws IOException {
-        if (room.getType() == 6 && us.getClanId() == null) {
+        if (room.getType() == 6 && !us.hasClan()) {
             us.sendServerMessage(GameString.NO_CLAN_MEMBERSHIP);
             return;
         }
@@ -907,7 +907,7 @@ public class FightWait {
             ds = ms.writer();
             ds.writeByte(bestLocation);
             ds.writeInt(us.getUserId());
-            ds.writeShort(us.getClanId() != null ? us.getClanId() : 0);
+            ds.writeShort(us.getClanId());
             ds.writeUTF(us.getUsername());
             ds.writeByte(us.getCurrentLevel());
             ds.writeByte(us.getActiveCharacterId());
@@ -941,7 +941,7 @@ public class FightWait {
             User user = users[i];
             if (user != null) {
                 ds.writeInt(user.getUserId());
-                ds.writeShort(user.getClanId() != null ? user.getClanId() : 0);
+                ds.writeShort(user.getClanId());
                 ds.writeUTF(user.getUsername());
                 ds.writeInt(user.getXu());
                 ds.writeByte(user.getCurrentLevel());

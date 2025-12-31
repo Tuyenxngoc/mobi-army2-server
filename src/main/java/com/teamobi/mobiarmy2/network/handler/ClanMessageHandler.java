@@ -29,7 +29,7 @@ public class ClanMessageHandler extends BaseMessageHandler {
         if (us().isNotWaiting()) {
             return;
         }
-        if (us().getClanId() == null) {
+        if (!us().hasClan()) {
             return;
         }
 
@@ -72,7 +72,7 @@ public class ClanMessageHandler extends BaseMessageHandler {
     }
 
     public void handlePurchaseClanItem(Message ms) throws IOException {
-        if (us().getClanId() == null) {
+        if (!us().hasClan()) {
             us().sendServerMessage(GameString.NO_CLAN_MEMBERSHIP);
             return;
         }

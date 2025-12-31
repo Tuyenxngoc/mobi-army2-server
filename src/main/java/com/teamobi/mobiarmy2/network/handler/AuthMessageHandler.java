@@ -319,7 +319,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
         ds.writeInt(us().getXu());
         ds.writeInt(us().getLuong());
         ds.writeByte(us().getActiveCharacterId());
-        ds.writeShort(us().getClanId() != null ? us().getClanId() : 0);
+        ds.writeShort(us().getClanId());
         ds.writeByte(0);//clan rights
 
         for (int i = 0; i < 10; i++) {

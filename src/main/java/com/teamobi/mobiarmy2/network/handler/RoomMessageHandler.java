@@ -70,7 +70,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
             return;
         }
         Room room = rooms[roomNumber];
-        if (room.getType() == 6 && us().getClanId() == null) {
+        if (room.getType() == 6 && !us().hasClan()) {
             us().sendServerMessage(GameString.NO_CLAN_MEMBERSHIP);
             return;
         }

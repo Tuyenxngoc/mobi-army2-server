@@ -181,13 +181,7 @@ public class UserDAO {
                         userDTO.setEquipmentPurchased(resultSet.getShort("equipment_purchased"));
                         userDTO.setChestLocked(resultSet.getBoolean("is_chest_locked"));
                         userDTO.setInvitationLocked(resultSet.getBoolean("is_invitation_locked"));
-
-                        Object clanIdObj = resultSet.getObject("clan_id");
-                        if (clanIdObj != null) {
-                            userDTO.setClanId(((Number) clanIdObj).shortValue());
-                        } else {
-                            userDTO.setClanId(null);
-                        }
+                        userDTO.setClanId(resultSet.getShort("clan_id"));
 
                         //Đọc dữ liệu trang bị
                         EquipmentChestJson[] equipmentChestJsons = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);

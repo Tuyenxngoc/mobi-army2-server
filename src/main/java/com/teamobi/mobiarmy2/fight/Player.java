@@ -106,7 +106,7 @@ public class Player {
         this.defense = abilities[2];
         this.luck = abilities[3];
 
-        if (user.getClanId() != null) {
+        if (user.hasClan()) {
             applyClanBonuses();
         }
 

@@ -14,7 +14,7 @@ import java.util.Set;
 @Setter
 public class UserDTO {
     private int userId;
-    private Short clanId;
+    private short clanId;
     private int xu;
     private int luong;
     private int cup;

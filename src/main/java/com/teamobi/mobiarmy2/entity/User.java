@@ -30,7 +30,7 @@ public class User {
     private String accountId;
     private int userId;
     private String username;
-    private Short clanId;
+    private short clanId;
     private int xu;
     private int luong;
     private int cup;
@@ -67,6 +67,10 @@ public class User {
 
     public boolean isNotWaiting() {
         return !state.equals(UserState.WAITING);
+    }
+
+    public boolean hasClan() {
+        return clanId > 0;
     }
 
     public void sendMessage(Message ms) {
