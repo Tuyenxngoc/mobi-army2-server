@@ -471,7 +471,7 @@ public class Player {
         return true;
     }
 
-    public boolean shouldCollideWith(Player shooter) {
+    public boolean shouldCollideWith(Bullet bullet) {
         return true;
     }
 }

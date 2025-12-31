@@ -507,7 +507,7 @@ public class BulletManager {
         } while (updated);
     }
 
-    public short[] getCollisionPoint(Player shooter, short x1, short y1, short x2, short y2, boolean canPassThroughPlayers, boolean canPassThroughMap) {
+    public short[] getCollisionPoint(Bullet bullet, short x1, short y1, short x2, short y2, boolean canPassThroughPlayers, boolean canPassThroughMap) {
         int deltaX = x2 - x1;
         int deltaY = y2 - y1;
 
@@ -554,7 +554,7 @@ public class BulletManager {
 
                     if (target == null) continue;
 
-                    if (!target.shouldCollide() || !target.shouldCollideWith(shooter)) continue;
+                    if (!target.shouldCollide() || !target.shouldCollideWith(bullet)) continue;
 
                     if (target.isCollision(X, Y)) {
                         return new short[]{X, Y, 1};

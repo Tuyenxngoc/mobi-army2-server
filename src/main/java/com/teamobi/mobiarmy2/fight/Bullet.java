@@ -110,7 +110,7 @@ public class Bullet {
         y += vy;
 
         // Kiểm tra va chạm với map/player
-        short[] collisionResult = bulletManager.getCollisionPoint(player, preX, preY, x, y, canPassThroughPlayers, canPassThroughMap);
+        short[] collisionResult = bulletManager.getCollisionPoint(this, preX, preY, x, y, canPassThroughPlayers, canPassThroughMap);
         if (collisionResult != null) {
             isCollected = true;
 

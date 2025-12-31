@@ -44,7 +44,7 @@ public class MagentaBulletNew extends Bullet {
                 if ((newX < -100) || (newX > bulletManager.getFightMapManager().getWidth() + 100) || (newY > bulletManager.getFightMapManager().getHeight() + 100)) {
                     break;
                 }
-                short[] collisionResult = bulletManager.getCollisionPoint(player, newX, newY, (short) (newX + deltaX), (short) (newY - deltaY), false, false);
+                short[] collisionResult = bulletManager.getCollisionPoint(this, newX, newY, (short) (newX + deltaX), (short) (newY - deltaY), false, false);
                 if (collisionResult != null) {
 
                     newX = collisionResult[0];

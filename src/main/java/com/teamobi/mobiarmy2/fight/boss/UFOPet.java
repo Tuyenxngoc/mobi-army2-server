@@ -1,8 +1,8 @@
 package com.teamobi.mobiarmy2.fight.boss;
 
 import com.teamobi.mobiarmy2.fight.Boss;
+import com.teamobi.mobiarmy2.fight.Bullet;
 import com.teamobi.mobiarmy2.fight.FightManager;
-import com.teamobi.mobiarmy2.fight.Player;
 
 public class UFOPet extends Boss {
 
@@ -17,9 +17,8 @@ public class UFOPet extends Boss {
     }
 
     @Override
-    public boolean shouldCollideWith(Player shooter) {
-        // UFOPet không va chạm với UFO khác (bao gồm cả UFO và UFOPet)
-        return !(shooter instanceof UFO || shooter instanceof UFOPet);
+    public boolean shouldCollideWith(Bullet bullet) {
+        return bullet.getBullId() != 42;
     }
 
     @Override
