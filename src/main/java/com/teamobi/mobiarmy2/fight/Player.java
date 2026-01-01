@@ -314,7 +314,7 @@ public class Player {
 
     public synchronized void collision(short bx, short by, Bullet bull) {
         //Bỏ qua nếu đã bại hoặc đang vô hình
-        if (isDead || invisibleCount > 0) {
+        if (isDead || invisibleCount > 0 || characterId == 17) {
             return;
         }
 
