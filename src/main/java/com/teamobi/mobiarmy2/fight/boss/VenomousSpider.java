@@ -17,6 +17,11 @@ public class VenomousSpider extends Boss {
     }
 
     @Override
+    public boolean shouldCollide() {
+        return !isDead;
+    }
+
+    @Override
     public void turnAction() {
         short preX = x;
 
