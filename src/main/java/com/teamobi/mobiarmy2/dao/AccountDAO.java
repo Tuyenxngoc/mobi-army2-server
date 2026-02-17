@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.dao;
 
+import com.teamobi.mobiarmy2.constant.AccountStatus;
 import com.teamobi.mobiarmy2.dto.AccountDTO;
 import com.teamobi.mobiarmy2.server.HikariCPManager;
 import org.mindrot.jbcrypt.BCrypt;
@@ -18,7 +19,7 @@ public class AccountDAO {
 
     public AccountDTO findByUsernameAndPassword(String username, String password) {
         try (Connection connection = hikariCPManager.getConnection()) {
-            String userQuery = "SELECT `account_id`, `password`, `is_enabled`, `is_locked` FROM accounts WHERE username = ?";
+            String userQuery = "SELECT `account_id`, `password`, `status` FROM accounts WHERE username = ?";
             try (PreparedStatement userStatement = connection.prepareStatement(userQuery)) {
                 userStatement.setString(1, username);
                 try (ResultSet userResultSet = userStatement.executeQuery()) {
@@ -29,8 +30,7 @@ public class AccountDAO {
                         }
                         AccountDTO accountDTO = new AccountDTO();
                         accountDTO.setAccountId(userResultSet.getString("account_id"));
-                        accountDTO.setLock(userResultSet.getBoolean("is_locked"));
-                        accountDTO.setActive(userResultSet.getBoolean("is_enabled"));
+                        accountDTO.setStatus(AccountStatus.valueOf(userResultSet.getString("status")));
                         return accountDTO;
                     }
                 }

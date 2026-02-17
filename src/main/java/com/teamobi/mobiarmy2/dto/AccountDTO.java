@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.dto;
 
+import com.teamobi.mobiarmy2.constant.AccountStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,6 +8,5 @@ import lombok.Setter;
 @Setter
 public class AccountDTO {
     private String accountId;
-    private boolean isLock;
-    private boolean isActive;
+    private AccountStatus status;
 }

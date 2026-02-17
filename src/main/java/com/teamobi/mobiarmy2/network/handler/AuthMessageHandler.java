@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.network.handler;
 
 import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.config.ServerConfig;
+import com.teamobi.mobiarmy2.constant.AccountStatus;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.constant.UserState;
@@ -131,11 +132,11 @@ public class AuthMessageHandler extends BaseMessageHandler {
             sendMessageLoginFail(GameString.LOGIN_FAILED);
             return;
         }
-        if (accountDTO.isLock()) {
+        if (accountDTO.getStatus().equals(AccountStatus.LOCKED)) {
             sendMessageLoginFail(GameString.ACCOUNT_LOCKED);
             return;
         }
-        if (!accountDTO.isActive()) {
+        if (!accountDTO.getStatus().equals(AccountStatus.ACTIVE)) {
             sendMessageLoginFail(GameString.ACCOUNT_INACTIVE);
             return;
         }

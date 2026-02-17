@@ -161,7 +161,7 @@ public class ClanDAO {
         try (Connection connection = hikariCPManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT " +
-                             "c.clan_id, c.name, c.mem_max, c.xu, c.luong, c.cup, c.xp, c.level, c.description, c.created_date, c.item, " +
+                             "c.clan_id, c.name, c.member_max, c.xu, c.luong, c.cup, c.xp, c.level, c.description, c.created_date, c.item, " +
                              "a.username, " +
                              "(SELECT COUNT(*) FROM clan_members cm WHERE cm.clan_id = c.clan_id) AS member_count " +
                              "FROM clans c " +
@@ -176,7 +176,7 @@ public class ClanDAO {
                     clanInfoDTO.setClanId(resultSet.getShort("clan_id"));
                     clanInfoDTO.setName(resultSet.getString("name"));
                     clanInfoDTO.setMemberCount(resultSet.getByte("member_count"));
-                    clanInfoDTO.setMaxMemberCount(resultSet.getByte("mem_max"));
+                    clanInfoDTO.setMaxMemberCount(resultSet.getByte("member_max"));
                     clanInfoDTO.setMasterName(resultSet.getString("username"));
                     clanInfoDTO.setXu(resultSet.getInt("xu"));
                     clanInfoDTO.setLuong(resultSet.getInt("luong"));
@@ -353,7 +353,7 @@ public class ClanDAO {
         try (Connection connection = hikariCPManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT " +
-                             "c.clan_id, c.name, c.mem_max, c.xu, c.luong, c.cup, c.xp, c.level, c.description, " +
+                             "c.clan_id, c.name, c.member_max, c.xu, c.luong, c.cup, c.xp, c.level, c.description, " +
                              "a.username, " +
                              "(SELECT COUNT(*) FROM clan_members cm WHERE cm.clan_id = c.clan_id) AS member_count " +
                              "FROM clans c " +
@@ -370,7 +370,7 @@ public class ClanDAO {
                     clanInfo.setClanId(resultSet.getShort("clan_id"));
                     clanInfo.setName(resultSet.getString("name"));
                     clanInfo.setMemberCount(resultSet.getByte("member_count"));
-                    clanInfo.setMaxMemberCount(resultSet.getByte("mem_max"));
+                    clanInfo.setMaxMemberCount(resultSet.getByte("member_max"));
                     clanInfo.setMasterName(resultSet.getString("username"));
                     clanInfo.setXu(resultSet.getInt("xu"));
                     clanInfo.setLuong(resultSet.getInt("luong"));
