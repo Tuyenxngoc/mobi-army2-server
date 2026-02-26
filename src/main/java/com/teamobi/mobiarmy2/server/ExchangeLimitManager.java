@@ -2,14 +2,11 @@ package com.teamobi.mobiarmy2.server;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -17,17 +14,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 public class ExchangeLimitManager {
-    private static final int NUM_DAILY_RESETS = 3;
     private static final int[] MAX_GOLD_PER_VIP = {10, 5, 2};
     private static final int[] MAX_SILVER_PER_VIP = {15, 10, 5};
+    private static final int CYCLE_HOURS = 3;
+    private static final int RESET_MINUTE = 15;
 
     private final AtomicInteger[] goldCounters = initCounters(MAX_GOLD_PER_VIP.length);
     private final AtomicInteger[] silverCounters = initCounters(MAX_SILVER_PER_VIP.length);
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     public void init() {
-        scheduleInitialResets();
-        scheduleMidnightTask();
+        scheduleNextReset();
     }
 
     private AtomicInteger[] initCounters(int size) {
@@ -66,59 +63,45 @@ public class ExchangeLimitManager {
         }
     }
 
-    private void scheduleInitialResets() {
-        long remainingSeconds = calculateDelayUntilMidnight();
-        generateAndScheduleResets(0, remainingSeconds);
-    }
+    private void scheduleNextReset() {
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.systemDefault());
+        ZonedDateTime nextReset = calculateNextResetTime(now);
+        long delay = ChronoUnit.MILLIS.between(now, nextReset);
 
-    private void scheduleMidnightTask() {
-        long delayUntilMidnight = calculateDelayUntilMidnight();
-        scheduler.scheduleAtFixedRate(
-                this::scheduleDailyResets,
-                delayUntilMidnight,
-                86400,
-                TimeUnit.SECONDS
-        );
-        log.info("Scheduling daily reset task with delay of {} seconds until midnight.", delayUntilMidnight);
-    }
-
-    private long calculateDelayUntilMidnight() {
-        ZoneId zone = ZoneId.systemDefault();
-        ZonedDateTime now = ZonedDateTime.now(zone);
-        ZonedDateTime nextMidnight = now.toLocalDate().plusDays(1).atStartOfDay(zone);
-        return ChronoUnit.SECONDS.between(now, nextMidnight);
-    }
-
-    private void scheduleDailyResets() {
-        generateAndScheduleResets(0, 86400);
-    }
-
-    private void generateAndScheduleResets(long minDelay, long maxDelay) {
-        Set<Long> delays = new HashSet<>();
-        Random random = new Random();
-        ZoneId zone = ZoneId.systemDefault();
-
-        while (delays.size() < NUM_DAILY_RESETS) {
-            long delay = minDelay + (long) (random.nextDouble() * (maxDelay - minDelay));
-            delays.add(delay);
+        if (delay < 0) {
+            delay = 0;
         }
 
-        Set<String> resetTimes = new TreeSet<>();
-        ZonedDateTime now = ZonedDateTime.now(zone);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        scheduler.schedule(() -> {
+            try {
+                resetCounters();
+            } catch (Exception e) {
+                log.error("Error in reset task", e);
+            } finally {
+                scheduleNextReset();
+            }
+        }, delay, TimeUnit.MILLISECONDS);
 
-        for (Long delay : delays) {
-            ZonedDateTime resetTime = now.plusSeconds(delay);
-            String formattedTime = resetTime.format(formatter);
-            resetTimes.add(formattedTime);
+        Duration duration = Duration.ofMillis(delay);
+        log.info("Next reset scheduled at: {} (delay: {} minutes)",
+                nextReset.format(DateTimeFormatter.ofPattern("HH:mm:ss")), duration.toMinutes());
+    }
 
-            scheduler.schedule(
-                    this::resetCounters,
-                    delay,
-                    TimeUnit.SECONDS
-            );
+    private ZonedDateTime calculateNextResetTime(ZonedDateTime now) {
+        // Find the nearest previous cycle start hour (0, 3, 6, ...)
+        int currentHour = now.getHour();
+        int baseHour = (currentHour / CYCLE_HOURS) * CYCLE_HOURS;
+
+        ZonedDateTime candidate = now.withHour(baseHour)
+                .withMinute(RESET_MINUTE)
+                .withSecond(0)
+                .withNano(0);
+
+        // If 'now' has already passed the candidate time, move to the next cycle
+        if (!candidate.isAfter(now)) {
+            candidate = candidate.plusHours(CYCLE_HOURS);
         }
 
-        log.info("Transaction counters will reset at the following times: {}", resetTimes);
+        return candidate;
     }
 }

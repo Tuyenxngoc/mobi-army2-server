@@ -566,11 +566,33 @@ public class InventoryMessageHandler extends BaseMessageHandler {
             }
 
             case 86 -> {
+                ApplicationContext ctx = ApplicationContext.getInstance();
+                ServerConfig serverConfig = ctx.getBean(ServerConfig.class);
+
+                if (!serverConfig.isTet()) {
+                    sendMessageConfirm("Bạn có muốn dùng bánh trưng không?");
+                    return;
+                }
+
+                ExchangeLimitManager exchangeLimitManager = ctx.getBean(ExchangeLimitManager.class);
+
                 if (specialItemChest.getQuantity() == 50) {
+                    if (exchangeLimitManager.isGoldLimitReached(0)) {
+                        us().sendServerMessage("Đã hết số lượng trang bị vàng cấp 1");
+                        return;
+                    }
                     sendMessageConfirm("Bạn có muốn đổi 50 bánh trưng hoàn thiện để lấy một bộ trang bị vàng cấp 1 không?");
                 } else if (specialItemChest.getQuantity() == 100) {
+                    if (exchangeLimitManager.isGoldLimitReached(1)) {
+                        us().sendServerMessage("Đã hết số lượng trang bị vàng cấp 2");
+                        return;
+                    }
                     sendMessageConfirm("Bạn có muốn đổi 100 bánh trưng hoàn thiện để lấy một bộ trang bị vàng cấp 2 không?");
                 } else if (specialItemChest.getQuantity() == 150) {
+                    if (exchangeLimitManager.isGoldLimitReached(2)) {
+                        us().sendServerMessage("Đã hết số lượng trang bị vàng cấp 3");
+                        return;
+                    }
                     sendMessageConfirm("Bạn có muốn đổi 150 bánh trưng hoàn thiện để lấy một bộ trang bị vàng cấp 3 không?");
                 } else {
                     sendMessageConfirm("Bạn có muốn dùng bánh trưng không?");
@@ -578,11 +600,33 @@ public class InventoryMessageHandler extends BaseMessageHandler {
             }
 
             case 87 -> {
+                ApplicationContext ctx = ApplicationContext.getInstance();
+                ServerConfig serverConfig = ctx.getBean(ServerConfig.class);
+
+                if (!serverConfig.isTet()) {
+                    sendMessageConfirm("Bạn có muốn dùng bánh tét không?");
+                    return;
+                }
+
+                ExchangeLimitManager exchangeLimitManager = ctx.getBean(ExchangeLimitManager.class);
+
                 if (specialItemChest.getQuantity() == 50) {
+                    if (exchangeLimitManager.isSilverLimitReached(0)) {
+                        us().sendServerMessage("Đã hết số lượng trang bị bạc cấp 1");
+                        return;
+                    }
                     sendMessageConfirm("Bạn có muốn đổi 50 bánh tét hoàn thiện để lấy một bộ trang bị bạc cấp 1 không?");
                 } else if (specialItemChest.getQuantity() == 100) {
+                    if (exchangeLimitManager.isSilverLimitReached(1)) {
+                        us().sendServerMessage("Đã hết số lượng trang bị bạc cấp 2");
+                        return;
+                    }
                     sendMessageConfirm("Bạn có muốn đổi 100 bánh tét hoàn thiện để lấy một bộ trang bị bạc cấp 2 không?");
                 } else if (specialItemChest.getQuantity() == 150) {
+                    if (exchangeLimitManager.isSilverLimitReached(2)) {
+                        us().sendServerMessage("Đã hết số lượng trang bị bạc cấp 3");
+                        return;
+                    }
                     sendMessageConfirm("Bạn có muốn đổi 150 bánh tét hoàn thiện để lấy một bộ trang bị bạc cấp 3 không?");
                 } else {
                     sendMessageConfirm("Bạn có muốn dùng bánh tét không?");
