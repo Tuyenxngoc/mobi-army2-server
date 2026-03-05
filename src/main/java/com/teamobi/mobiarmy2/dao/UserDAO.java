@@ -125,7 +125,7 @@ public class UserDAO {
                 "`equipment_purchased` = ?, " +
                 "`x2_xp_time` = ?, " +
                 "`last_online` = ?, " +
-                "`point_event` = ? " +
+                "`event_points` = ? " +
                 " WHERE user_id = ?";
         hikariCPManager.update(sql,
                 gson.toJson(user.getFriends()),
@@ -144,7 +144,7 @@ public class UserDAO {
                 user.getEquipmentPurchased(),
                 user.getXpX2Time(),
                 LocalDateTime.now(),
-                user.getPointEvent(),
+                user.getEventPoint(),
                 user.getUserId()
         );
     }
@@ -152,7 +152,7 @@ public class UserDAO {
     public UserDTO findByAccountId(String accountId) {
         try (Connection connection = hikariCPManager.getConnection()) {
             String playerQuery = "SELECT " +
-                    "u.user_id, u.xu, u.luong, u.cup, u.point_event, " +
+                    "u.user_id, u.xu, u.luong, u.cup, u.event_points, " +
                     "u.materials_purchased, u.equipment_purchased, " +
                     "u.fight_items, u.equipment_chest, u.special_item_chest, " +
                     "u.friends, u.missions, u.mission_levels, " +
@@ -176,7 +176,7 @@ public class UserDAO {
                         userDTO.setLuong(resultSet.getInt("luong"));
                         userDTO.setCup(resultSet.getInt("cup"));
                         userDTO.setActiveCharacterId(resultSet.getByte("character_id"));
-                        userDTO.setPointEvent(resultSet.getInt("point_event"));
+                        userDTO.setEventPoint(resultSet.getInt("event_points"));
                         userDTO.setMaterialsPurchased(resultSet.getByte("materials_purchased"));
                         userDTO.setEquipmentPurchased(resultSet.getShort("equipment_purchased"));
                         userDTO.setChestLocked(resultSet.getBoolean("is_chest_locked"));

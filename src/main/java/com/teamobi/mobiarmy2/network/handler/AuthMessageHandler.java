@@ -258,7 +258,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
         us().setXu(userDTO.getXu());
         us().setLuong(userDTO.getLuong());
         us().setCup(userDTO.getCup());
-        us().setPointEvent(userDTO.getPointEvent());
+        us().setEventPoint(userDTO.getEventPoint());
         us().setClanId(userDTO.getClanId());
         us().setActiveCharacterId(userDTO.getActiveCharacterId());
         us().setFriends(userDTO.getFriends());

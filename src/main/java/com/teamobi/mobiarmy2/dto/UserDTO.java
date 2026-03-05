@@ -21,7 +21,7 @@ public class UserDTO {
     private boolean isChestLocked;
     private boolean isInvitationLocked;
     private byte activeCharacterId;
-    private int pointEvent;
+    private int eventPoint;
     private byte materialsPurchased;
     private short equipmentPurchased;
     private LocalDateTime xpX2Time;
