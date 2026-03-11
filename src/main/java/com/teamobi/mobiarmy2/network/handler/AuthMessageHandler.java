@@ -2,10 +2,7 @@ package com.teamobi.mobiarmy2.network.handler;
 
 import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.config.ServerConfig;
-import com.teamobi.mobiarmy2.constant.AccountStatus;
-import com.teamobi.mobiarmy2.constant.Cmd;
-import com.teamobi.mobiarmy2.constant.GameString;
-import com.teamobi.mobiarmy2.constant.UserState;
+import com.teamobi.mobiarmy2.constant.*;
 import com.teamobi.mobiarmy2.dao.AccountDAO;
 import com.teamobi.mobiarmy2.dao.UserCharacterDAO;
 import com.teamobi.mobiarmy2.dao.UserDAO;
@@ -247,8 +244,8 @@ public class AuthMessageHandler extends BaseMessageHandler {
         userDAO.setOnline(userDTO.getUserId(), Boolean.TRUE);
 
         sendLoginSuccess();
-        sendCharacterData(serverConfig);
-        sendRoomCaption(serverConfig);
+        sendCharacterData();
+        sendRoomCaption();
         sendMapCollisionInfo();
         us().sendServerInfo(serverConfig.getMessageLogin(), false);
     }
@@ -361,15 +358,14 @@ public class AuthMessageHandler extends BaseMessageHandler {
             }
         }
 
-        ServerConfig serverConfig = ApplicationContext.getInstance().getBean(ServerConfig.class);
-        ds.writeUTF(serverConfig.getAddInfo());
-        ds.writeUTF(serverConfig.getAddInfoUrl());
-        ds.writeUTF(serverConfig.getRegTeamUrl());
+        ds.writeUTF(GameConstants.ADD_INFO);
+        ds.writeUTF(GameConstants.ADD_INFO_URL);
+        ds.writeUTF(GameConstants.REG_TEAM_URL);
         ds.flush();
         sendMessage(ms);
     }
 
-    public void sendCharacterData(ServerConfig config) throws IOException {
+    public void sendCharacterData() throws IOException {
         List<Character> characterEntries = CharacterManager.CHARACTERS;
         int characterCount = characterEntries.size();
         Message ms = new Message(Cmd.SKIP_2);
@@ -390,27 +386,27 @@ public class AuthMessageHandler extends BaseMessageHandler {
         for (Character character : characterEntries) {
             ds.writeByte(character.getBulletCount());
         }
-        ds.writeByte(config.getMaxElementFight());
-        ds.writeByte(config.getBossRoomMapId().length);
-        for (byte mapId : config.getBossRoomMapId()) {
+        ds.writeByte(GameConstants.MAX_ELEMENT_FIGHT);
+        ds.writeByte(GameConstants.BOSS_ROOM_MAP_ID.length);
+        for (byte mapId : GameConstants.BOSS_ROOM_MAP_ID) {
             ds.writeByte(mapId);
         }
-        for (byte bossId : config.getBossRoomBossId()) {
+        for (byte bossId : GameConstants.BOSS_ROOM_BOSS_ID) {
             ds.writeByte(bossId);
         }
-        ds.writeByte(config.getNumPlayer());
+        ds.writeByte(GameConstants.NUM_PLAYER_PER_ROOM);
         ds.flush();
         sendMessage(ms);
     }
 
-    private void sendRoomCaption(ServerConfig config) throws IOException {
-        String[] names = config.getRoomNameVi();
+    private void sendRoomCaption() throws IOException {
+        String[] names = GameConstants.ROOM_NAME_VI;
         Message ms = new Message(Cmd.ROOM_CAPTION);
         DataOutputStream ds = ms.writer();
         ds.writeByte(names.length);
         for (int i = 0; i < names.length; i++) {
             ds.writeUTF(names[i]);
-            ds.writeUTF(config.getRoomNameEn()[i]);
+            ds.writeUTF(GameConstants.ROOM_NAME_EN[i]);
         }
         ds.flush();
         sendMessage(ms);

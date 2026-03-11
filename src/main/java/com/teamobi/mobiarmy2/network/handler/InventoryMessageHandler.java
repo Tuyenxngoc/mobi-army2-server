@@ -3,6 +3,7 @@ package com.teamobi.mobiarmy2.network.handler;
 import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
+import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.constant.UserAction;
 import com.teamobi.mobiarmy2.entity.*;
@@ -812,8 +813,7 @@ public class InventoryMessageHandler extends BaseMessageHandler {
     }
 
     private void purchaseEquipment(short saleIndex, byte unit) {
-        ServerConfig serverConfig = ApplicationContext.getInstance().getBean(ServerConfig.class);
-        if (us().getEquipmentChest().size() >= serverConfig.getMaxEquipmentSlots()) {
+        if (us().getEquipmentChest().size() >= GameConstants.MAX_EQUIPMENT_SLOTS) {
             us().sendServerMessage(GameString.CHEST_NO_SPACE);
             return;
         }
