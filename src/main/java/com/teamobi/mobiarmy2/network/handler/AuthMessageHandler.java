@@ -386,27 +386,28 @@ public class AuthMessageHandler extends BaseMessageHandler {
         for (Character character : characterEntries) {
             ds.writeByte(character.getBulletCount());
         }
-        ds.writeByte(GameConstants.MAX_ELEMENT_FIGHT);
-        ds.writeByte(GameConstants.BOSS_ROOM_MAP_ID.length);
-        for (byte mapId : GameConstants.BOSS_ROOM_MAP_ID) {
+        ds.writeByte(RoomManager.MAX_ELEMENT_FIGHT);
+        ds.writeByte(RoomManager.BOSS_ROOM_MAP_ID.length);
+        for (byte mapId : RoomManager.BOSS_ROOM_MAP_ID) {
             ds.writeByte(mapId);
         }
-        for (byte bossId : GameConstants.BOSS_ROOM_BOSS_ID) {
+        for (byte bossId : RoomManager.BOSS_ROOM_BOSS_ID) {
             ds.writeByte(bossId);
         }
-        ds.writeByte(GameConstants.NUM_PLAYER_PER_ROOM);
+        ds.writeByte(RoomManager.NUM_PLAYER_PER_ROOM);
         ds.flush();
         sendMessage(ms);
     }
 
     private void sendRoomCaption() throws IOException {
-        String[] names = GameConstants.ROOM_NAME_VI;
+        String[] roomNameVi = RoomManager.ROOM_NAME_VI;
+        String[] roomNameEn = RoomManager.ROOM_NAME_EN;
         Message ms = new Message(Cmd.ROOM_CAPTION);
         DataOutputStream ds = ms.writer();
-        ds.writeByte(names.length);
-        for (int i = 0; i < names.length; i++) {
-            ds.writeUTF(names[i]);
-            ds.writeUTF(GameConstants.ROOM_NAME_EN[i]);
+        ds.writeByte(roomNameVi.length);
+        for (int i = 0; i < roomNameVi.length; i++) {
+            ds.writeUTF(roomNameVi[i]);
+            ds.writeUTF(roomNameEn[i]);
         }
         ds.flush();
         sendMessage(ms);

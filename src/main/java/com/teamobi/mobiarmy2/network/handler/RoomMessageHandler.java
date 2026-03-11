@@ -2,7 +2,6 @@ package com.teamobi.mobiarmy2.network.handler;
 
 import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.constant.Cmd;
-import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.entity.Room;
@@ -27,7 +26,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
     public void sendRoomName() throws IOException {
         RoomManager roomManager = ApplicationContext.getInstance()
                 .getBean(RoomManager.class);
-        String[] names = GameConstants.BOSS_ROOM_NAME;
+        String[] names = RoomManager.BOSS_ROOM_NAME;
         int startMapBoss = roomManager.getStartMapBoss();
         Message ms = new Message(Cmd.CHANGE_ROOM_NAME);
         DataOutputStream ds = ms.writer();
@@ -146,7 +145,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
             // Đấu trùm
             case 5 -> {
                 int start = roomManager.getStartMapBoss();
-                int end = start + GameConstants.ROOM_QUANTITY[5];
+                int end = start + RoomManager.ROOM_QUANTITY[5];
 
                 outerLoop:
                 for (int i = start; i < end; i++) {
