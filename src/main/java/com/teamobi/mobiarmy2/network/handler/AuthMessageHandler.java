@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.network.handler;
 
 import com.teamobi.mobiarmy2.app.ApplicationContext;
+import com.teamobi.mobiarmy2.config.RoomConfig;
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.AccountStatus;
 import com.teamobi.mobiarmy2.constant.Cmd;
@@ -75,6 +76,8 @@ public class AuthMessageHandler extends BaseMessageHandler {
             us().setLogged(false);
             // Lưu thời gian đăng xuất gần nhất
             loginRateLimiterService.saveLogoutTime(us().getUsername());
+
+            log.info("User data saved successfully on logout for user: {}", us().getUserId());
         } else {
             log.error("Failed to save user data on logout for user: {}", us().getUserId());
         }
@@ -415,14 +418,14 @@ public class AuthMessageHandler extends BaseMessageHandler {
     }
 
     private void sendRoomCaption() throws IOException {
-        String[] roomNameVi = RoomManager.ROOM_NAME_VI;
-        String[] roomNameEn = RoomManager.ROOM_NAME_EN;
+        RoomConfig[] configs = RoomManager.ROOM_CONFIGS;
+
         Message ms = new Message(Cmd.ROOM_CAPTION);
         DataOutputStream ds = ms.writer();
-        ds.writeByte(roomNameVi.length);
-        for (int i = 0; i < roomNameVi.length; i++) {
-            ds.writeUTF(roomNameVi[i]);
-            ds.writeUTF(roomNameEn[i]);
+        ds.writeByte(configs.length);
+        for (RoomConfig config : configs) {
+            ds.writeUTF(config.getNameVi());
+            ds.writeUTF(config.getNameEn());
         }
         ds.flush();
         sendMessage(ms);

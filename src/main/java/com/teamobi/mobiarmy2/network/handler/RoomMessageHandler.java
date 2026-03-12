@@ -9,7 +9,6 @@ import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.RoomManager;
-import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -137,85 +136,10 @@ public class RoomMessageHandler extends BaseMessageHandler {
     public void handleJoinAnyBoard(Message ms) throws IOException {
         RoomManager roomManager = ApplicationContext.getInstance()
                 .getBean(RoomManager.class);
-        Room[] rooms = roomManager.getRooms();
 
-        FightWait fightWait = null;
         int type = ms.reader().readByte();
-        switch (type) {
-            // Đấu trùm
-            case 5 -> {
-                int start = roomManager.getStartMapBoss();
-                int end = start + RoomManager.ROOM_QUANTITY[5];
 
-                outerLoop:
-                for (int i = start; i < end; i++) {
-                    Room room = rooms[i];
-                    for (FightWait fight : room.getFightWaits()) {
-                        if (!fight.isStarted() &&
-                                !fight.isPassSet() &&
-                                !fight.isContinuous() &&
-                                fight.getNumPlayers() < fight.getMaxSetPlayers() &&
-                                fight.getMoney() <= us().getXu()
-                        ) {
-                            fightWait = fight;
-                            break outerLoop;
-                        }
-                    }
-                }
-            }
-
-            //4vs4->1vs1
-            case 4, 3, 2, 1 -> {
-                int end = roomManager.getStartMapBoss();
-                int index = Utils.nextInt(0, end - 1);
-                Room room = rooms[index];
-                for (FightWait fight : room.getFightWaits()) {
-                    if (!fight.isStarted() &&
-                            !fight.isPassSet() &&
-                            fight.getNumPlayers() < fight.getMaxSetPlayers() &&
-                            fight.getMoney() <= us().getXu() &&
-                            fight.getMaxSetPlayers() == type * 2
-                    ) {
-                        fightWait = fight;
-                        break;
-                    }
-                }
-            }
-
-            //Khu vực trống
-            case 0 -> {
-                int end = roomManager.getStartMapBoss();
-                int index = Utils.nextInt(0, end - 1);
-                Room room = rooms[index];
-                for (FightWait fight : room.getFightWaits()) {
-                    if (!fight.isStarted() &&
-                            !fight.isPassSet() &&
-                            fight.getMoney() <= us().getXu() &&
-                            fight.getNumPlayers() == 0
-                    ) {
-                        fightWait = fight;
-                        break;
-                    }
-                }
-            }
-
-            //Ngẫu nhiên
-            case -1 -> {
-                int end = roomManager.getStartMapBoss();
-                int index = Utils.nextInt(0, end - 1);
-                Room room = rooms[index];
-                for (FightWait fight : room.getFightWaits()) {
-                    if (!fight.isStarted() &&
-                            !fight.isPassSet() &&
-                            fight.getNumPlayers() < fight.getMaxSetPlayers() &&
-                            fight.getMoney() <= us().getXu()
-                    ) {
-                        fightWait = fight;
-                        break;
-                    }
-                }
-            }
-        }
+        FightWait fightWait = roomManager.findRandomFightWait(type, us().getXu());
 
         if (fightWait == null) {
             us().sendMoneyErrorMessage(GameString.AREA_NOT_FOUND);
