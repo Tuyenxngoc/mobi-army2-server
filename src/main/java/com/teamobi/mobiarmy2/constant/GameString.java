@@ -4,8 +4,10 @@ import com.teamobi.mobiarmy2.util.Utils;
 
 public class GameString {
     public static final String MAINTENANCE_MODE = "Server đang bảo trì. Vui lòng quay lại sau khi hoàn tất";
+    public static final String SERVER_FULL = "Máy chủ đang đầy. Vui lòng quay lại sau";
     public static final String RANKING_NOT_LOADED = "Chưa tải xong bảng xếp hạng";
     public static final String NO_RANKING = "Chưa có hạng";
+    public static final String SERVER_ERROR = "Có lỗi xảy ra. Vui lòng thử lại sau";
 
     public static final String INVITE_OFFLINE = "Bạn đó đã offline rồi!";
     public static final String INVITE_ALREADY_IN_GAME = "Bạn đó đã vào bàn khác chơi rồi!";

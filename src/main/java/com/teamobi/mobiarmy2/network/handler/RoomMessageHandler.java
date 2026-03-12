@@ -1,7 +1,6 @@
 package com.teamobi.mobiarmy2.network.handler;
 
 import com.teamobi.mobiarmy2.app.ApplicationContext;
-import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.constant.UserState;
@@ -25,10 +24,10 @@ public class RoomMessageHandler extends BaseMessageHandler {
     }
 
     public void sendRoomName() throws IOException {
-        ServerConfig serverConfig = ApplicationContext.getInstance()
-                .getBean(ServerConfig.class);
-        String[] names = serverConfig.getBossRoomName();
-        int startMapBoss = serverConfig.getStartMapBoss();
+        RoomManager roomManager = ApplicationContext.getInstance()
+                .getBean(RoomManager.class);
+        String[] names = RoomManager.BOSS_ROOM_NAME;
+        int startMapBoss = roomManager.getStartMapBoss();
         Message ms = new Message(Cmd.CHANGE_ROOM_NAME);
         DataOutputStream ds = ms.writer();
         ds.writeByte(names.length);
@@ -136,17 +135,17 @@ public class RoomMessageHandler extends BaseMessageHandler {
     }
 
     public void handleJoinAnyBoard(Message ms) throws IOException {
-        Room[] rooms = ApplicationContext.getInstance()
-                .getBean(RoomManager.class).getRooms();
-        ServerConfig serverConfig = ApplicationContext.getInstance()
-                .getBean(ServerConfig.class);
+        RoomManager roomManager = ApplicationContext.getInstance()
+                .getBean(RoomManager.class);
+        Room[] rooms = roomManager.getRooms();
+
         FightWait fightWait = null;
         int type = ms.reader().readByte();
         switch (type) {
             // Đấu trùm
             case 5 -> {
-                int start = serverConfig.getStartMapBoss();
-                int end = start + serverConfig.getRoomQuantity()[5];
+                int start = roomManager.getStartMapBoss();
+                int end = start + RoomManager.ROOM_QUANTITY[5];
 
                 outerLoop:
                 for (int i = start; i < end; i++) {
@@ -167,7 +166,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
 
             //4vs4->1vs1
             case 4, 3, 2, 1 -> {
-                int end = serverConfig.getStartMapBoss();
+                int end = roomManager.getStartMapBoss();
                 int index = Utils.nextInt(0, end - 1);
                 Room room = rooms[index];
                 for (FightWait fight : room.getFightWaits()) {
@@ -185,7 +184,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
 
             //Khu vực trống
             case 0 -> {
-                int end = serverConfig.getStartMapBoss();
+                int end = roomManager.getStartMapBoss();
                 int index = Utils.nextInt(0, end - 1);
                 Room room = rooms[index];
                 for (FightWait fight : room.getFightWaits()) {
@@ -202,7 +201,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
 
             //Ngẫu nhiên
             case -1 -> {
-                int end = serverConfig.getStartMapBoss();
+                int end = roomManager.getStartMapBoss();
                 int index = Utils.nextInt(0, end - 1);
                 Room room = rooms[index];
                 for (FightWait fight : room.getFightWaits()) {

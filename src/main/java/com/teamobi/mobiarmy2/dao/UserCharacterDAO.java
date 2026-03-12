@@ -54,8 +54,16 @@ public class UserCharacterDAO {
     }
 
     public UserCharacterDTO findByUserIdAndCharacterId(int userId, byte characterId) {
-        try (Connection connection = hikariCPManager.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM `user_characters` WHERE user_id = ? AND character_id = ?")) {
+        try (Connection connection = hikariCPManager.getConnection()) {
+            return findByUserIdAndCharacterId(connection, userId, characterId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public UserCharacterDTO findByUserIdAndCharacterId(Connection connection, int userId, byte characterId) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM `user_characters` WHERE user_id = ? AND character_id = ?")) {
             statement.setInt(1, userId);
             statement.setByte(2, characterId);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -63,16 +71,28 @@ public class UserCharacterDAO {
                     return mapToUserCharacterDTO(resultSet);
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return null;
     }
 
     public Optional<Integer> create(int userId, byte characterId) {
+        try (Connection connection = hikariCPManager.getConnection()) {
+            return create(connection, userId, characterId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Integer> create(Connection connection, int userId, byte characterId) throws SQLException {
         // language=SQL
         String sql = "INSERT INTO `user_characters`(`user_id`, `character_id`) VALUES (?,?)";
-        return hikariCPManager.update(sql, userId, characterId);
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, userId);
+            statement.setByte(2, characterId);
+            int rowsUpdated = statement.executeUpdate();
+            return Optional.of(rowsUpdated);
+        }
     }
 
     public void update(UserCharacterDTO userCharacterDTO) {
@@ -92,27 +112,24 @@ public class UserCharacterDAO {
         );
     }
 
-    public void updateAll(List<UserCharacterDTO> userCharacterDTOs) {
+    public void updateAll(Connection connection, List<UserCharacterDTO> userCharacterDTOs) throws SQLException {
         Gson gson = GsonUtil.getInstance();
 
         // language=SQL
         String sql = "UPDATE user_characters SET level = ?, points = ?, xp = ?, data = ?, additional_points = ? WHERE user_id = ? AND character_id = ?";
 
-        hikariCPManager.executeBatch(sql, statement -> {
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
             for (UserCharacterDTO userCharacterDTO : userCharacterDTOs) {
-                try {
-                    statement.setInt(1, userCharacterDTO.getLevel());
-                    statement.setInt(2, userCharacterDTO.getPoints());
-                    statement.setInt(3, userCharacterDTO.getXp());
-                    statement.setString(4, gson.toJson(userCharacterDTO.getData()));
-                    statement.setString(5, gson.toJson(userCharacterDTO.getAdditionalPoints()));
-                    statement.setInt(6, userCharacterDTO.getUserId());
-                    statement.setByte(7, userCharacterDTO.getCharacterId());
-                    statement.addBatch();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+                statement.setInt(1, userCharacterDTO.getLevel());
+                statement.setInt(2, userCharacterDTO.getPoints());
+                statement.setInt(3, userCharacterDTO.getXp());
+                statement.setString(4, gson.toJson(userCharacterDTO.getData()));
+                statement.setString(5, gson.toJson(userCharacterDTO.getAdditionalPoints()));
+                statement.setInt(6, userCharacterDTO.getUserId());
+                statement.setByte(7, userCharacterDTO.getCharacterId());
+                statement.addBatch();
             }
-        });
+            statement.executeBatch();
+        }
     }
 }

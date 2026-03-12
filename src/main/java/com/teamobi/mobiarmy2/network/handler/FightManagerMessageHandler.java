@@ -1,13 +1,12 @@
 package com.teamobi.mobiarmy2.network.handler;
 
-import com.teamobi.mobiarmy2.app.ApplicationContext;
-import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.fight.TrainingManager;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.FightItemManager;
+import com.teamobi.mobiarmy2.server.RoomManager;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -153,8 +152,7 @@ public class FightManagerMessageHandler extends BaseMessageHandler {
 
     private void initializeTrainingManager() {
         if (us().getTrainingManager() == null) {
-            ServerConfig serverConfig = ApplicationContext.getInstance().getBean(ServerConfig.class);
-            us().setTrainingManager(new TrainingManager(us(), serverConfig.getTrainingMapId()));
+            us().setTrainingManager(new TrainingManager(us(), RoomManager.TRAINING_MAP_ID));
         }
     }
 }

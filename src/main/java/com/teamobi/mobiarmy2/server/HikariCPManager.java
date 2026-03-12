@@ -13,6 +13,12 @@ import java.util.function.Consumer;
 
 @Slf4j
 public class HikariCPManager {
+
+    @FunctionalInterface
+    public interface TransactionConsumer {
+        void accept(Connection connection) throws SQLException;
+    }
+
     private final HikariCPConfig config;
     private HikariDataSource dataSource;
 
@@ -66,6 +72,36 @@ public class HikariCPManager {
         } catch (SQLException e) {
             log.error("SQL Update failed: {}", e.getMessage(), e);
             return Optional.empty();
+        }
+    }
+
+    public boolean transaction(TransactionConsumer transactionConsumer) {
+        Connection connection = null;
+        try {
+            connection = getConnection();
+            connection.setAutoCommit(false);
+            transactionConsumer.accept(connection);
+            connection.commit();
+            return true;
+        } catch (Exception e) {
+            log.error("Transaction failed: {}", e.getMessage(), e);
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    log.error("Rollback failed: {}", ex.getMessage(), ex);
+                }
+            }
+            return false;
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(true);
+                    connection.close();
+                } catch (SQLException e) {
+                    log.error("Failed to close connection after transaction: {}", e.getMessage(), e);
+                }
+            }
         }
     }
 

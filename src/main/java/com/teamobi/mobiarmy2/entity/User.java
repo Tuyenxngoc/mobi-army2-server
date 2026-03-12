@@ -1,7 +1,6 @@
 package com.teamobi.mobiarmy2.entity;
 
 import com.teamobi.mobiarmy2.app.ApplicationContext;
-import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.constant.UserState;
@@ -222,7 +221,7 @@ public class User {
         if (fightItems[itemIndex] < 0) {
             fightItems[itemIndex] = 0;
         }
-        byte maxItem = ApplicationContext.getInstance().getBean(ServerConfig.class).getMaxItem();
+        byte maxItem = GameConstants.MAX_FIGHT_ITEM_QUANTITY;
         if (fightItems[itemIndex] > maxItem) {
             fightItems[itemIndex] = maxItem;
         }

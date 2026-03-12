@@ -1,7 +1,5 @@
 package com.teamobi.mobiarmy2.network.handler;
 
-import com.teamobi.mobiarmy2.app.ApplicationContext;
-import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.constant.GameString;
@@ -24,6 +22,8 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 public class ShopMessageHandler extends BaseMessageHandler {
+    public static final int MAX_MATERIAL_PURCHASE_LIMIT = 20;
+
     private final UserCharacterDAO userCharacterDAO;
 
     public ShopMessageHandler(Session session, UserCharacterDAO userCharacterDAO) {
@@ -39,7 +39,7 @@ public class ShopMessageHandler extends BaseMessageHandler {
         if (itemIndex < 0 || itemIndex >= FightItemManager.FIGHT_ITEMS.size()) {
             return;
         }
-        if (us().getFightItems()[itemIndex] + quantity > ApplicationContext.getInstance().getBean(ServerConfig.class).getMaxItem()) {
+        if (us().getFightItems()[itemIndex] + quantity > GameConstants.MAX_FIGHT_ITEM_QUANTITY) {
             return;
         }
         if (unit == 0) {
@@ -167,14 +167,13 @@ public class ShopMessageHandler extends BaseMessageHandler {
     }
 
     private void purchaseSpecialItem(byte unit, byte itemId, byte quantity) {
-        ServerConfig serverConfig = ApplicationContext.getInstance().getBean(ServerConfig.class);
-        //Kiểm tra số lượng mua hợp lệ
+        // Kiểm tra số lượng mua hợp lệ
         if (quantity < 1) {
             return;
         }
 
-        //Kiểm tra số lượng đang có trong rương
-        if (us().getInventorySpecialItemCount(itemId) + quantity > serverConfig.getMaxSpecialItemSlots()) {
+        // Kiểm tra số lượng đang có trong rương
+        if (us().getInventorySpecialItemCount(itemId) + quantity > GameConstants.MAX_SPECIAL_ITEM_SLOTS) {
             us().sendServerMessage(GameString.CHEST_MAXIMUM_REACHED);
             return;
         }
@@ -184,13 +183,14 @@ public class ShopMessageHandler extends BaseMessageHandler {
             return;
         }
 
-        //Giới hạn số lần mua vật liệu
+        // Giới hạn số lần mua vật liệu
         if (item.isMaterial()) {
-            if (us().getMaterialsPurchased() >= GameConstants.MAX_MATERIAL_PURCHASE_LIMIT) {
+            if (us().getMaterialsPurchased() >= MAX_MATERIAL_PURCHASE_LIMIT) {
                 us().sendServerMessage(GameString.MATERIAL_PURCHASE_LIMIT);
                 return;
-            } else if (us().getMaterialsPurchased() + quantity > GameConstants.MAX_MATERIAL_PURCHASE_LIMIT) {
-                us().sendServerMessage(GameString.createMaterialPurchaseLimitMessage(GameConstants.MAX_MATERIAL_PURCHASE_LIMIT - us().getMaterialsPurchased()));
+            } else if (us().getMaterialsPurchased() + quantity > MAX_MATERIAL_PURCHASE_LIMIT) {
+                us().sendServerMessage(GameString.createMaterialPurchaseLimitMessage(
+                        MAX_MATERIAL_PURCHASE_LIMIT - us().getMaterialsPurchased()));
                 return;
             }
         }

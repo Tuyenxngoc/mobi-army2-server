@@ -1,7 +1,6 @@
 package com.teamobi.mobiarmy2.service;
 
-import com.teamobi.mobiarmy2.app.ApplicationContext;
-import com.teamobi.mobiarmy2.config.ServerConfig;
+import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.dao.RankingDAO;
 import com.teamobi.mobiarmy2.dto.UserLeaderboardDTO;
 import lombok.Getter;
@@ -50,15 +49,12 @@ public class LeaderboardService {
     }
 
     private void addBonusGiftsForPlayers() {
-        int[] topBonus = ApplicationContext.getInstance()
-                .getBean(ServerConfig.class).getTopBonus();
-
         int i = 0;
         for (UserLeaderboardDTO userLeaderboardDTO : leaderboardEntries.getFirst()) {
             if (i >= 3) {
                 break;
             }
-            rankingDAO.addBonusGift(userLeaderboardDTO.getUserId(), topBonus[i]);
+            rankingDAO.addBonusGift(userLeaderboardDTO.getUserId(), GameConstants.TOP_BONUS[i]);
             i++;
         }
     }

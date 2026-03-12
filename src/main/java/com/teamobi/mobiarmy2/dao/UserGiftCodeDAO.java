@@ -30,9 +30,14 @@ public class UserGiftCodeDAO {
         return false;
     }
 
-    public void create(long giftCodeId, int userId) {
+    public void create(Connection connection, long giftCodeId, int userId) throws SQLException {
         // language=SQL
         String sql = "INSERT INTO user_gift_codes (created_date, gift_code_id, user_id) VALUES (?, ?, ?)";
-        hikariCPManager.update(sql, LocalDateTime.now(), giftCodeId, userId);
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setObject(1, LocalDateTime.now());
+            statement.setLong(2, giftCodeId);
+            statement.setInt(3, userId);
+            statement.executeUpdate();
+        }
     }
 }

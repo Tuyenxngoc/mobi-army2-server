@@ -19,7 +19,6 @@ public class ResourceMessageHandler extends BaseMessageHandler {
 
     public void getMoreGame() throws IOException {
         ServerConfig serverConfig = ApplicationContext.getInstance().getBean(ServerConfig.class);
-
         Message ms = new Message(Cmd.MORE_GAME);
         DataOutputStream ds = ms.writer();
         ds.writeUTF(serverConfig.getDownloadTitle());

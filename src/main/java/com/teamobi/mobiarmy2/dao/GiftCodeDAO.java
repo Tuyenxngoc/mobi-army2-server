@@ -45,9 +45,12 @@ public class GiftCodeDAO {
         return null;
     }
 
-    public void decrementUsageLimit(long giftCodeId) {
+    public void decrementUsageLimit(Connection connection, long giftCodeId) throws SQLException {
         // language=SQL
         String sql = "UPDATE gift_codes SET usage_limit = usage_limit - 1 WHERE gift_code_id = ?";
-        hikariCPManager.update(sql, giftCodeId);
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, giftCodeId);
+            statement.executeUpdate();
+        }
     }
 }

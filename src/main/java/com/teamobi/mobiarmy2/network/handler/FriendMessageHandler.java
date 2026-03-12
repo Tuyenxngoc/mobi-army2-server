@@ -1,8 +1,8 @@
 package com.teamobi.mobiarmy2.network.handler;
 
 import com.teamobi.mobiarmy2.app.ApplicationContext;
-import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
+import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dao.UserDAO;
 import com.teamobi.mobiarmy2.dto.FriendDTO;
@@ -86,13 +86,12 @@ public class FriendMessageHandler extends BaseMessageHandler {
     }
 
     public void handleAddFriend(Message ms) throws IOException {
-        int maxFriends = ApplicationContext.getInstance().getBean(ServerConfig.class).getMaxFriends();
         Set<Integer> friends = us().getFriends();
         try {
             int id = ms.reader().readInt();
 
             // Kiểm tra số lượng bạn bè đã đạt giới hạn
-            if (friends.size() >= maxFriends) {
+            if (friends.size() >= GameConstants.MAX_FRIENDS) {
                 sendAddFriendMessage(2);
                 return;
             }
