@@ -86,13 +86,12 @@ public class FriendMessageHandler extends BaseMessageHandler {
     }
 
     public void handleAddFriend(Message ms) throws IOException {
-        int maxFriends = GameConstants.MAX_FRIENDS;
         Set<Integer> friends = us().getFriends();
         try {
             int id = ms.reader().readInt();
 
             // Kiểm tra số lượng bạn bè đã đạt giới hạn
-            if (friends.size() >= maxFriends) {
+            if (friends.size() >= GameConstants.MAX_FRIENDS) {
                 sendAddFriendMessage(2);
                 return;
             }
