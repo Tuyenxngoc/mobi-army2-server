@@ -2,7 +2,10 @@ package com.teamobi.mobiarmy2.network.handler;
 
 import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.config.ServerConfig;
-import com.teamobi.mobiarmy2.constant.*;
+import com.teamobi.mobiarmy2.constant.AccountStatus;
+import com.teamobi.mobiarmy2.constant.Cmd;
+import com.teamobi.mobiarmy2.constant.GameString;
+import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.dao.AccountDAO;
 import com.teamobi.mobiarmy2.dao.UserCharacterDAO;
 import com.teamobi.mobiarmy2.dao.UserDAO;
@@ -18,6 +21,7 @@ import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.*;
 import com.teamobi.mobiarmy2.service.LoginRateLimiterService;
 import com.teamobi.mobiarmy2.util.Utils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -25,8 +29,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
+@Slf4j
 public class AuthMessageHandler extends BaseMessageHandler {
     private final LoginRateLimiterService loginRateLimiterService;
 
@@ -51,23 +55,29 @@ public class AuthMessageHandler extends BaseMessageHandler {
             us().getFightWait().leaveTeam(us().getUserId());
         }
 
-        //Cập nhật thông tin tài khoản
-        userDAO.update(us());
+        HikariCPManager hikariCPManager = ApplicationContext.getInstance().getBean(HikariCPManager.class);
+        boolean success = hikariCPManager.transaction(connection -> {
+            // Cập nhật thông tin tài khoản
+            userDAO.update(connection, us());
 
-        //Cập nhật thông tin nhân vật
-        List<UserCharacterDTO> userCharacterDTOS = new ArrayList<>();
-        for (byte i = 0; i < us().getOwnedCharacters().length; i++) {
-            if (us().getOwnedCharacters()[i]) {
-                UserCharacterDTO userCharacterDTO = getUserCharacterDTO(i);
-                userCharacterDTOS.add(userCharacterDTO);
+            // Cập nhật thông tin nhân vật
+            List<UserCharacterDTO> userCharacterDTOS = new ArrayList<>();
+            for (byte i = 0; i < us().getOwnedCharacters().length; i++) {
+                if (us().getOwnedCharacters()[i]) {
+                    UserCharacterDTO userCharacterDTO = getUserCharacterDTO(i);
+                    userCharacterDTOS.add(userCharacterDTO);
+                }
             }
+            userCharacterDAO.updateAll(connection, userCharacterDTOS);
+        });
+
+        if (success) {
+            us().setLogged(false);
+            // Lưu thời gian đăng xuất gần nhất
+            loginRateLimiterService.saveLogoutTime(us().getUsername());
+        } else {
+            log.error("Failed to save user data on logout for user: {}", us().getUserId());
         }
-        userCharacterDAO.updateAll(userCharacterDTOS);
-
-        us().setLogged(false);
-
-        //Lưu thời gian đăng xuất gần nhất
-        loginRateLimiterService.saveLogoutTime(us().getUsername());
     }
 
     private UserCharacterDTO getUserCharacterDTO(byte i) {
@@ -104,6 +114,12 @@ public class AuthMessageHandler extends BaseMessageHandler {
         if (ApplicationContext.getInstance()
                 .getBean(ServerManager.class).isMaintenanceMode()) {
             sendMessageLoginFail(GameString.MAINTENANCE_MODE);
+            return;
+        }
+
+        ServerManager serverManager = ApplicationContext.getInstance().getBean(ServerManager.class);
+        if (serverManager.getUserCount() >= serverConfig.getMaxClients()) {
+            sendMessageLoginFail(GameString.SERVER_FULL);
             return;
         }
 
@@ -149,13 +165,21 @@ public class AuthMessageHandler extends BaseMessageHandler {
 
         UserDTO userDTO = userDAO.findByAccountId(us().getAccountId());
         if (userDTO == null) {
-            // Tạo mới người dùng
-            Optional<Integer> result = userDAO.create(accountDTO.getAccountId(), 1000, 0);
+            // Tạo mới người dùng và nhân vật mặc định
+            HikariCPManager hikariCPManager = ApplicationContext.getInstance().getBean(HikariCPManager.class);
+            boolean success = hikariCPManager.transaction(connection -> {
+                int userId = userDAO.create(connection, us().getAccountId(), 1000, 0);
+                userCharacterDAO.create(connection, userId, CharacterManager.CHARACTERS.get(0).getId());
+                userCharacterDAO.create(connection, userId, CharacterManager.CHARACTERS.get(1).getId());
+                userCharacterDAO.create(connection, userId, CharacterManager.CHARACTERS.get(2).getId());
+            });
 
-            if (result.isPresent()) {
-                userDTO = userDAO.findByAccountId(accountDTO.getAccountId());
+            if (!success) {
+                sendMessageLoginFail(GameString.LOGIN_FAILED);
+                return;
             }
 
+            userDTO = userDAO.findByAccountId(us().getAccountId());
             if (userDTO == null) {
                 sendMessageLoginFail(GameString.LOGIN_FAILED);
                 return;
@@ -179,18 +203,8 @@ public class AuthMessageHandler extends BaseMessageHandler {
         //Dữ liệu nhân vật
         List<UserCharacterDTO> userCharacterDTOS = userCharacterDAO.findAllByUserId(us().getUserId());
         if (userCharacterDTOS.isEmpty()) {
-            //Tạo mới nhân vật
-            Optional<Integer> result1 = userCharacterDAO.create(us().getUserId(), CharacterManager.CHARACTERS.get(0).getId());
-            Optional<Integer> result2 = userCharacterDAO.create(us().getUserId(), CharacterManager.CHARACTERS.get(1).getId());
-            Optional<Integer> result3 = userCharacterDAO.create(us().getUserId(), CharacterManager.CHARACTERS.get(2).getId());
-            if (result1.isPresent() && result2.isPresent() && result3.isPresent()) {
-                userCharacterDTOS = userCharacterDAO.findAllByUserId(us().getUserId());
-            }
-
-            if (userCharacterDTOS.isEmpty()) {
-                sendMessageLoginFail(GameString.LOGIN_FAILED);
-                return;
-            }
+            sendMessageLoginFail(GameString.LOGIN_FAILED);
+            return;
         }
         updateUserCharacters(userCharacterDTOS);
 
@@ -311,6 +325,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
     }
 
     public void sendLoginSuccess() throws IOException {
+        ServerConfig serverConfig = ApplicationContext.getInstance().getBean(ServerConfig.class);
         Message ms = new Message(Cmd.LOGIN_SUCESS);
         DataOutputStream ds = ms.writer();
         ds.writeInt(us().getUserId());
@@ -358,9 +373,9 @@ public class AuthMessageHandler extends BaseMessageHandler {
             }
         }
 
-        ds.writeUTF(GameConstants.ADD_INFO);
-        ds.writeUTF(GameConstants.ADD_INFO_URL);
-        ds.writeUTF(GameConstants.REG_TEAM_URL);
+        ds.writeUTF(serverConfig.getAddInfo());
+        ds.writeUTF(serverConfig.getAddInfoUrl());
+        ds.writeUTF(serverConfig.getRegTeamUrl());
         ds.flush();
         sendMessage(ms);
     }

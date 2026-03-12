@@ -1,8 +1,7 @@
 package com.teamobi.mobiarmy2.dao;
 
 import com.google.gson.Gson;
-import com.teamobi.mobiarmy2.app.ApplicationContext;
-import com.teamobi.mobiarmy2.config.ServerConfig;
+import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dto.UserLeaderboardDTO;
 import com.teamobi.mobiarmy2.dto.json.EquipmentChestJson;
@@ -32,7 +31,6 @@ public class RankingDAO {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             byte index = 1;
-            int[] topBonus = ApplicationContext.getInstance().getBean(ServerConfig.class).getTopBonus();
             Gson gson = GsonUtil.getInstance();
             while (resultSet.next()) {
                 UserLeaderboardDTO userLeaderboardDTO = new UserLeaderboardDTO();
@@ -54,7 +52,7 @@ public class RankingDAO {
                 userLeaderboardDTO.setDetail(Utils.getStringNumber(resultSet.getInt("points")));
 
                 if (applyBonus && index <= 3) {
-                    userLeaderboardDTO.setUsername(GameString.createTopBonusMessage(resultSet.getString("username"), Utils.getStringNumber(topBonus[index - 1])));
+                    userLeaderboardDTO.setUsername(GameString.createTopBonusMessage(resultSet.getString("username"), Utils.getStringNumber(GameConstants.TOP_BONUS[index - 1])));
                 } else {
                     userLeaderboardDTO.setUsername(resultSet.getString("username"));
                 }

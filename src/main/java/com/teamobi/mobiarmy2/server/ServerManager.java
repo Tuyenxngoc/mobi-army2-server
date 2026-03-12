@@ -126,6 +126,11 @@ public class ServerManager {
     }
 
     public void addSession(Session session) {
+        if (sessions.size() >= serverConfig.getMaxClients()) {
+            log.warn("Max clients reached. Rejecting session: {}", session.getSessionId());
+            session.closeChannel();
+            return;
+        }
         sessions.put(session.getSessionId(), session);
     }
 
@@ -133,6 +138,10 @@ public class ServerManager {
         if (user != null && user.getSession() != null) {
             userToSession.put(user.getUserId(), user.getSession().getSessionId());
         }
+    }
+
+    public int getUserCount() {
+        return userToSession.size();
     }
 
     public void removeSession(Long sessionId) {

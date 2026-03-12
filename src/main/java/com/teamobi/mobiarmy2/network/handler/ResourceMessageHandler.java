@@ -18,11 +18,12 @@ public class ResourceMessageHandler extends BaseMessageHandler {
     }
 
     public void getMoreGame() throws IOException {
+        ServerConfig serverConfig = ApplicationContext.getInstance().getBean(ServerConfig.class);
         Message ms = new Message(Cmd.MORE_GAME);
         DataOutputStream ds = ms.writer();
-        ds.writeUTF(GameConstants.DOWNLOAD_TITLE);
-        ds.writeUTF(GameConstants.DOWNLOAD_INFO);
-        ds.writeUTF(GameConstants.DOWNLOAD_URL);
+        ds.writeUTF(serverConfig.getDownloadTitle());
+        ds.writeUTF(serverConfig.getDownloadInfo());
+        ds.writeUTF(serverConfig.getDownloadUrl());
         ds.flush();
         sendMessage(ms);
     }

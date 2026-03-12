@@ -27,7 +27,12 @@ public class ServerConfig {
     private int maxClients;
     private String messageLogin;
     private String[] message;
-    private int[] topBonus;
+    private String addInfo;
+    private String addInfoUrl;
+    private String regTeamUrl;
+    private String downloadTitle;
+    private String downloadInfo;
+    private String downloadUrl;
     private LocalDateTime tetStartTime;
     private LocalDateTime tetEndTime;
     private boolean isTet;
@@ -39,7 +44,6 @@ public class ServerConfig {
         ) {
             configMap.load(isr);
             initConfig();
-            validateConfig();
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
@@ -58,12 +62,17 @@ public class ServerConfig {
             valuesVersion2 = Byte.parseByte(configMap.getProperty("values_version_2", "1"));
             playerVersion2 = Byte.parseByte(configMap.getProperty("player_version_2", "1"));
 
-            maxClients = Integer.parseInt(configMap.getProperty("max_clients", String.valueOf(GameConstants.MAX_CLIENTS_DEFAULT)));
+            maxClients = Integer.parseInt(configMap.getProperty("max_clients", "1000"));
 
             messageLogin = configMap.getProperty("message_login", "");
             message = gson.fromJson(configMap.getProperty("message", "[]"), String[].class);
 
-            topBonus = gson.fromJson(configMap.getProperty("top_bonus", "[]"), int[].class);
+            addInfo = configMap.getProperty("add_info", "");
+            addInfoUrl = configMap.getProperty("add_info_url", "");
+            regTeamUrl = configMap.getProperty("reg_team_url", "");
+            downloadTitle = configMap.getProperty("download_title", "");
+            downloadInfo = configMap.getProperty("download_info", "");
+            downloadUrl = configMap.getProperty("download_url", "");
 
             tetStartTime = LocalDateTime.parse(configMap.getProperty("tet.start"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             tetEndTime = LocalDateTime.parse(configMap.getProperty("tet.end"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
@@ -75,16 +84,4 @@ public class ServerConfig {
         }
     }
 
-    private void validateConfig() {
-        if (topBonus.length == 0) {
-            System.out.println("Invalid value for top_bonus");
-            System.exit(1);
-        }
-        for (int i = 0; i < topBonus.length; i++) {
-            if (topBonus[i] < 0 || topBonus[i] > GameConstants.MAX_XU) {
-                System.out.println("Invalid value for top_bonus at index " + i);
-                System.exit(1);
-            }
-        }
-    }
 }

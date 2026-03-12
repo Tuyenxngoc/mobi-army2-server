@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.network.handler;
 
+import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dao.GiftCodeDAO;
@@ -13,6 +14,7 @@ import com.teamobi.mobiarmy2.entity.SpecialItemChest;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
+import com.teamobi.mobiarmy2.server.HikariCPManager;
 import com.teamobi.mobiarmy2.server.PaymentManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -69,8 +71,18 @@ public class PaymentMessageHandler extends BaseMessageHandler {
             return;
         }
 
-        giftCodeDAO.decrementUsageLimit(giftCode.getGiftCodeId());
-        userGiftCodeDAO.create(giftCode.getGiftCodeId(), us().getUserId());
+        HikariCPManager hikariCPManager = ApplicationContext
+                .getInstance()
+                .getBean(HikariCPManager.class);
+        boolean success = hikariCPManager.transaction(connection -> {
+            giftCodeDAO.decrementUsageLimit(connection, giftCode.getGiftCodeId());
+            userGiftCodeDAO.create(connection, giftCode.getGiftCodeId(), us().getUserId());
+        });
+
+        if (!success) {
+            us().sendServerMessage(GameString.SERVER_ERROR);
+            return;
+        }
 
         if (giftCode.getXu() > 0) {
             us().updateXu(giftCode.getXu());

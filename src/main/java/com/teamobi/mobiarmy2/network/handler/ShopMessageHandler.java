@@ -22,6 +22,8 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 public class ShopMessageHandler extends BaseMessageHandler {
+    public static final int MAX_MATERIAL_PURCHASE_LIMIT = 20;
+
     private final UserCharacterDAO userCharacterDAO;
 
     public ShopMessageHandler(Session session, UserCharacterDAO userCharacterDAO) {
@@ -165,12 +167,12 @@ public class ShopMessageHandler extends BaseMessageHandler {
     }
 
     private void purchaseSpecialItem(byte unit, byte itemId, byte quantity) {
-        //Kiểm tra số lượng mua hợp lệ
+        // Kiểm tra số lượng mua hợp lệ
         if (quantity < 1) {
             return;
         }
 
-        //Kiểm tra số lượng đang có trong rương
+        // Kiểm tra số lượng đang có trong rương
         if (us().getInventorySpecialItemCount(itemId) + quantity > GameConstants.MAX_SPECIAL_ITEM_SLOTS) {
             us().sendServerMessage(GameString.CHEST_MAXIMUM_REACHED);
             return;
@@ -181,13 +183,14 @@ public class ShopMessageHandler extends BaseMessageHandler {
             return;
         }
 
-        //Giới hạn số lần mua vật liệu
+        // Giới hạn số lần mua vật liệu
         if (item.isMaterial()) {
-            if (us().getMaterialsPurchased() >= GameConstants.MAX_MATERIAL_PURCHASE_LIMIT) {
+            if (us().getMaterialsPurchased() >= MAX_MATERIAL_PURCHASE_LIMIT) {
                 us().sendServerMessage(GameString.MATERIAL_PURCHASE_LIMIT);
                 return;
-            } else if (us().getMaterialsPurchased() + quantity > GameConstants.MAX_MATERIAL_PURCHASE_LIMIT) {
-                us().sendServerMessage(GameString.createMaterialPurchaseLimitMessage(GameConstants.MAX_MATERIAL_PURCHASE_LIMIT - us().getMaterialsPurchased()));
+            } else if (us().getMaterialsPurchased() + quantity > MAX_MATERIAL_PURCHASE_LIMIT) {
+                us().sendServerMessage(GameString.createMaterialPurchaseLimitMessage(
+                        MAX_MATERIAL_PURCHASE_LIMIT - us().getMaterialsPurchased()));
                 return;
             }
         }

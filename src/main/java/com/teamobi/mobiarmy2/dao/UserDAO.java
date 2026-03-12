@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.dao;
 
 import com.google.gson.Gson;
+import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.dto.FriendDTO;
 import com.teamobi.mobiarmy2.dto.UserDTO;
 import com.teamobi.mobiarmy2.dto.json.EquipmentChestJson;
@@ -11,15 +12,14 @@ import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.server.*;
 import com.teamobi.mobiarmy2.util.GsonUtil;
 import com.teamobi.mobiarmy2.util.Utils;
+import lombok.extern.slf4j.Slf4j;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class UserDAO {
     private final HikariCPManager hikariCPManager;
 
@@ -67,18 +67,18 @@ public class UserDAO {
         return GsonUtil.getInstance().toJson(equipmentChestJsons);
     }
 
-    public Optional<Integer> create(String accountId, int xu, int luong) {
+    public int create(Connection connection, String accountId, int xu, int luong) throws SQLException {
         Gson gson = GsonUtil.getInstance();
 
         byte[] fightItems = new byte[FightItemManager.FIGHT_ITEMS.size()];
-        fightItems[0] = 99;
-        fightItems[1] = 99;
+        fightItems[0] = GameConstants.MAX_FIGHT_ITEM_QUANTITY;
+        fightItems[1] = GameConstants.MAX_FIGHT_ITEM_QUANTITY;
 
         int[] missions = new int[MissionManager.MISSIONS.size()];
         byte[] missionLevels = new byte[missions.length];
         Arrays.fill(missionLevels, (byte) 1);
 
-        int[] friends = {2};
+        int[] friends = {2};// Người đưa tin
 
         // language=SQL
         String sql = "INSERT INTO `users` " +
@@ -86,22 +86,41 @@ public class UserDAO {
                 "fight_items, missions, mission_levels, friends, equipment_chest, special_item_chest) " +
                 "VALUES (?,?,?,?,?,?,?,?,?,?)";
 
-        return hikariCPManager.update(
-                sql,
-                accountId,
-                xu,
-                luong,
-                LocalDateTime.now(),
-                gson.toJson(fightItems),
-                gson.toJson(missions),
-                gson.toJson(missionLevels),
-                gson.toJson(friends),
-                "[]",
-                "[]"
-        );
+        try (PreparedStatement statement =
+                     connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            statement.setString(1, accountId);
+            statement.setInt(2, xu);
+            statement.setInt(3, luong);
+            statement.setObject(4, LocalDateTime.now());
+            statement.setString(5, gson.toJson(fightItems));
+            statement.setString(6, gson.toJson(missions));
+            statement.setString(7, gson.toJson(missionLevels));
+            statement.setString(8, gson.toJson(friends));
+            statement.setString(9, "[]");
+            statement.setString(10, "[]");
+
+            statement.executeUpdate();
+
+            try (ResultSet rs = statement.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1); // user_id
+                }
+            }
+        }
+
+        throw new SQLException("Insert succeeded but no generated key returned");
     }
 
     public void update(User user) {
+        try (Connection connection = hikariCPManager.getConnection()) {
+            update(connection, user);
+        } catch (SQLException e) {
+            log.error("Failed to get connection for user update: {}", e.getMessage(), e);
+        }
+    }
+
+    public void update(Connection connection, User user) throws SQLException {
         Gson gson = GsonUtil.getInstance();
 
         String specialItemChestJson = convertSpecialItemChestEntriesToJson(user.getSpecialItemChest());
@@ -127,137 +146,145 @@ public class UserDAO {
                 "`last_online` = ?, " +
                 "`event_points` = ? " +
                 " WHERE user_id = ?";
-        hikariCPManager.update(sql,
-                gson.toJson(user.getFriends()),
-                user.getXu(),
-                user.getLuong(),
-                user.getCup(),
-                gson.toJson(user.getFightItems()),
-                equipmentChestJson,
-                specialItemChestJson,
-                false,
-                gson.toJson(user.getMission()),
-                gson.toJson(user.getMissionLevel()),
-                user.getTopEarningsXu(),
-                user.getUserCharacterIds()[user.getActiveCharacterId()],
-                user.getMaterialsPurchased(),
-                user.getEquipmentPurchased(),
-                user.getXpX2Time(),
-                LocalDateTime.now(),
-                user.getEventPoint(),
-                user.getUserId()
-        );
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, gson.toJson(user.getFriends()));
+            statement.setInt(2, user.getXu());
+            statement.setInt(3, user.getLuong());
+            statement.setInt(4, user.getCup());
+            statement.setString(5, gson.toJson(user.getFightItems()));
+            statement.setString(6, equipmentChestJson);
+            statement.setString(7, specialItemChestJson);
+            statement.setBoolean(8, false);
+            statement.setString(9, gson.toJson(user.getMission()));
+            statement.setString(10, gson.toJson(user.getMissionLevel()));
+            statement.setInt(11, user.getTopEarningsXu());
+            statement.setLong(12, user.getUserCharacterIds()[user.getActiveCharacterId()]);
+            statement.setByte(13, user.getMaterialsPurchased());
+            statement.setShort(14, user.getEquipmentPurchased());
+            statement.setObject(15, user.getXpX2Time());
+            statement.setObject(16, LocalDateTime.now());
+            statement.setInt(17, user.getEventPoint());
+            statement.setInt(18, user.getUserId());
+            statement.executeUpdate();
+        }
     }
 
     public UserDTO findByAccountId(String accountId) {
         try (Connection connection = hikariCPManager.getConnection()) {
-            String playerQuery = "SELECT " +
-                    "u.user_id, u.xu, u.luong, u.cup, u.event_points, " +
-                    "u.materials_purchased, u.equipment_purchased, " +
-                    "u.fight_items, u.equipment_chest, u.special_item_chest, " +
-                    "u.friends, u.missions, u.mission_levels, " +
-                    "u.x2_xp_time, u.daily_reward_time, u.top_earnings_xu, " +
-                    "u.is_chest_locked, u.is_invitation_locked, " +
-                    "uc.character_id, uc.user_character_id, uc.level, " +
-                    "uc.xp, uc.points, uc.additional_points, uc.data, " +
-                    "cm.clan_id " +
-                    "FROM users u " +
-                    "LEFT JOIN user_characters uc ON u.active_user_character_id = uc.user_character_id " +
-                    "LEFT JOIN clan_members cm ON u.user_id = cm.user_id " +
-                    "WHERE account_id = ?";
-            try (PreparedStatement statement = connection.prepareStatement(playerQuery)) {
-                statement.setString(1, accountId);
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    if (resultSet.next()) {
-                        Gson gson = GsonUtil.getInstance();
-                        UserDTO userDTO = new UserDTO();
-                        userDTO.setUserId(resultSet.getInt("user_id"));
-                        userDTO.setXu(resultSet.getInt("xu"));
-                        userDTO.setLuong(resultSet.getInt("luong"));
-                        userDTO.setCup(resultSet.getInt("cup"));
-                        userDTO.setActiveCharacterId(resultSet.getByte("character_id"));
-                        userDTO.setEventPoint(resultSet.getInt("event_points"));
-                        userDTO.setMaterialsPurchased(resultSet.getByte("materials_purchased"));
-                        userDTO.setEquipmentPurchased(resultSet.getShort("equipment_purchased"));
-                        userDTO.setChestLocked(resultSet.getBoolean("is_chest_locked"));
-                        userDTO.setInvitationLocked(resultSet.getBoolean("is_invitation_locked"));
-                        userDTO.setClanId(resultSet.getShort("clan_id"));
+            return findByAccountId(connection, accountId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
-                        //Đọc dữ liệu trang bị
-                        EquipmentChestJson[] equipmentChestJsons = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
-                        for (EquipmentChestJson json : equipmentChestJsons) {
-                            EquipmentChest equip = new EquipmentChest();
-                            equip.setEquipment(EquipmentManager.getEquipment(json.getEquipmentId()));
-                            if (equip.getEquipment() == null) {
-                                continue;
-                            }
-                            equip.setKey(json.getKey());
-                            equip.setPurchaseDate(json.getPurchaseDate());
-                            equip.setVipLevel(json.getVipLevel());
-                            equip.setInUse(json.getInUse() == 1);
-                            equip.setAddPoints(json.getAddPoints());
-                            equip.setAddPercents(json.getAddPercents());
-                            equip.setSlots(json.getSlots());
-                            byte emptySlot = 0;
-                            for (int i = 0; i < equip.getSlots().length; i++) {
-                                if (equip.getSlots()[i] < 0) {
-                                    emptySlot++;
-                                }
-                            }
-                            equip.setEmptySlot(emptySlot);
-                            userDTO.getEquipmentChest().put(equip.getKey(), equip);
+    public UserDTO findByAccountId(Connection connection, String accountId) {
+        String playerQuery = "SELECT " +
+                "u.user_id, u.xu, u.luong, u.cup, u.event_points, " +
+                "u.materials_purchased, u.equipment_purchased, " +
+                "u.fight_items, u.equipment_chest, u.special_item_chest, " +
+                "u.friends, u.missions, u.mission_levels, " +
+                "u.x2_xp_time, u.daily_reward_time, u.top_earnings_xu, " +
+                "u.is_chest_locked, u.is_invitation_locked, " +
+                "uc.character_id, uc.user_character_id, uc.level, " +
+                "uc.xp, uc.points, uc.additional_points, uc.data, " +
+                "cm.clan_id " +
+                "FROM users u " +
+                "LEFT JOIN user_characters uc ON u.active_user_character_id = uc.user_character_id " +
+                "LEFT JOIN clan_members cm ON u.user_id = cm.user_id " +
+                "WHERE account_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(playerQuery)) {
+            statement.setString(1, accountId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    Gson gson = GsonUtil.getInstance();
+                    UserDTO userDTO = new UserDTO();
+                    userDTO.setUserId(resultSet.getInt("user_id"));
+                    userDTO.setXu(resultSet.getInt("xu"));
+                    userDTO.setLuong(resultSet.getInt("luong"));
+                    userDTO.setCup(resultSet.getInt("cup"));
+                    userDTO.setActiveCharacterId(resultSet.getByte("character_id"));
+                    userDTO.setEventPoint(resultSet.getInt("event_points"));
+                    userDTO.setMaterialsPurchased(resultSet.getByte("materials_purchased"));
+                    userDTO.setEquipmentPurchased(resultSet.getShort("equipment_purchased"));
+                    userDTO.setChestLocked(resultSet.getBoolean("is_chest_locked"));
+                    userDTO.setInvitationLocked(resultSet.getBoolean("is_invitation_locked"));
+                    userDTO.setClanId(resultSet.getShort("clan_id"));
+
+                    //Đọc dữ liệu trang bị
+                    EquipmentChestJson[] equipmentChestJsons = gson.fromJson(resultSet.getString("equipment_chest"), EquipmentChestJson[].class);
+                    for (EquipmentChestJson json : equipmentChestJsons) {
+                        EquipmentChest equip = new EquipmentChest();
+                        equip.setEquipment(EquipmentManager.getEquipment(json.getEquipmentId()));
+                        if (equip.getEquipment() == null) {
+                            continue;
                         }
-
-                        //Đọc dữ liệu item
-                        SpecialItemChestJson[] specialItemChestJsons = gson.fromJson(resultSet.getString("special_item_chest"), SpecialItemChestJson[].class);
-                        for (SpecialItemChestJson item : specialItemChestJsons) {
-                            SpecialItemChest specialItemChest = new SpecialItemChest();
-                            specialItemChest.setItem(SpecialItemManager.getSpecialItemById(item.getId()));
-                            if (specialItemChest.getItem() == null) {
-                                continue;
+                        equip.setKey(json.getKey());
+                        equip.setPurchaseDate(json.getPurchaseDate());
+                        equip.setVipLevel(json.getVipLevel());
+                        equip.setInUse(json.getInUse() == 1);
+                        equip.setAddPoints(json.getAddPoints());
+                        equip.setAddPercents(json.getAddPercents());
+                        equip.setSlots(json.getSlots());
+                        byte emptySlot = 0;
+                        for (int i = 0; i < equip.getSlots().length; i++) {
+                            if (equip.getSlots()[i] < 0) {
+                                emptySlot++;
                             }
-                            specialItemChest.setQuantity(item.getQuantity());
-                            userDTO.getSpecialItemChest().put(specialItemChest.getItem().getId(), specialItemChest);
                         }
-
-                        //Dữ liệu bạn bè
-                        int[] friendsArray = gson.fromJson(resultSet.getString("friends"), int[].class);
-                        Set<Integer> friendsList = Arrays.stream(friendsArray)
-                                .boxed().collect(Collectors.toSet());
-                        userDTO.setFriends(friendsList);
-
-                        //Đọc dữ liệu item chiến đấu
-                        byte[] items = gson.fromJson(resultSet.getString("fight_items"), byte[].class);
-                        int desiredSizeItem = FightItemManager.FIGHT_ITEMS.size();
-                        userDTO.setItems(
-                                items.length != desiredSizeItem
-                                        ? Utils.adjustArray(items, desiredSizeItem, (byte) 0)
-                                        : items
-                        );
-
-                        //Dữ liệu nhiệm vụ
-                        int[] missions = gson.fromJson(resultSet.getString("missions"), int[].class);
-                        int desiredSizeMission = MissionManager.MISSIONS.size();
-                        userDTO.setMission(
-                                missions.length != desiredSizeMission
-                                        ? Utils.adjustArray(missions, desiredSizeMission, 0)
-                                        : missions
-                        );
-
-                        //Dữ liệu cấp nhiệm vụ
-                        byte[] missionLevels = gson.fromJson(resultSet.getString("mission_levels"), byte[].class);
-                        userDTO.setMissionLevel(
-                                missionLevels.length != desiredSizeMission
-                                        ? Utils.adjustArray(missionLevels, desiredSizeMission, (byte) 1)
-                                        : missionLevels
-                        );
-
-                        userDTO.setXpX2Time(Utils.getLocalDateTimeFromTimestamp(resultSet, "x2_xp_time"));
-                        userDTO.setDailyRewardTime(Utils.getLocalDateTimeFromTimestamp(resultSet, "daily_reward_time"));
-                        userDTO.setTopEarningsXu(resultSet.getInt("top_earnings_xu"));
-
-                        return userDTO;
+                        equip.setEmptySlot(emptySlot);
+                        userDTO.getEquipmentChest().put(equip.getKey(), equip);
                     }
+
+                    //Đọc dữ liệu item
+                    SpecialItemChestJson[] specialItemChestJsons = gson.fromJson(resultSet.getString("special_item_chest"), SpecialItemChestJson[].class);
+                    for (SpecialItemChestJson item : specialItemChestJsons) {
+                        SpecialItemChest specialItemChest = new SpecialItemChest();
+                        specialItemChest.setItem(SpecialItemManager.getSpecialItemById(item.getId()));
+                        if (specialItemChest.getItem() == null) {
+                            continue;
+                        }
+                        specialItemChest.setQuantity(item.getQuantity());
+                        userDTO.getSpecialItemChest().put(specialItemChest.getItem().getId(), specialItemChest);
+                    }
+
+                    //Dữ liệu bạn bè
+                    int[] friendsArray = gson.fromJson(resultSet.getString("friends"), int[].class);
+                    Set<Integer> friendsList = Arrays.stream(friendsArray)
+                            .boxed().collect(Collectors.toSet());
+                    userDTO.setFriends(friendsList);
+
+                    //Đọc dữ liệu item chiến đấu
+                    byte[] items = gson.fromJson(resultSet.getString("fight_items"), byte[].class);
+                    int desiredSizeItem = FightItemManager.FIGHT_ITEMS.size();
+                    userDTO.setItems(
+                            items.length != desiredSizeItem
+                                    ? Utils.adjustArray(items, desiredSizeItem, (byte) 0)
+                                    : items
+                    );
+
+                    //Dữ liệu nhiệm vụ
+                    int[] missions = gson.fromJson(resultSet.getString("missions"), int[].class);
+                    int desiredSizeMission = MissionManager.MISSIONS.size();
+                    userDTO.setMission(
+                            missions.length != desiredSizeMission
+                                    ? Utils.adjustArray(missions, desiredSizeMission, 0)
+                                    : missions
+                    );
+
+                    //Dữ liệu cấp nhiệm vụ
+                    byte[] missionLevels = gson.fromJson(resultSet.getString("mission_levels"), byte[].class);
+                    userDTO.setMissionLevel(
+                            missionLevels.length != desiredSizeMission
+                                    ? Utils.adjustArray(missionLevels, desiredSizeMission, (byte) 1)
+                                    : missionLevels
+                    );
+
+                    userDTO.setXpX2Time(Utils.getLocalDateTimeFromTimestamp(resultSet, "x2_xp_time"));
+                    userDTO.setDailyRewardTime(Utils.getLocalDateTimeFromTimestamp(resultSet, "daily_reward_time"));
+                    userDTO.setTopEarningsXu(resultSet.getInt("top_earnings_xu"));
+
+                    return userDTO;
                 }
             }
         } catch (Exception e) {
