@@ -1,6 +1,5 @@
 package com.teamobi.mobiarmy2.network.handler;
 
-import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameConstants;
@@ -13,12 +12,14 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class ResourceMessageHandler extends BaseMessageHandler {
-    public ResourceMessageHandler(Session session) {
+    private final ServerConfig serverConfig;
+
+    public ResourceMessageHandler(Session session, ServerConfig serverConfig) {
         super(session);
+        this.serverConfig = serverConfig;
     }
 
     public void getMoreGame() throws IOException {
-        ServerConfig serverConfig = ApplicationContext.getInstance().getBean(ServerConfig.class);
         Message ms = new Message(Cmd.MORE_GAME);
         DataOutputStream ds = ms.writer();
         ds.writeUTF(serverConfig.getDownloadTitle());
@@ -77,7 +78,6 @@ public class ResourceMessageHandler extends BaseMessageHandler {
     }
 
     public void getFilePack(Message ms) throws IOException {
-        ServerConfig serverConfig = ApplicationContext.getInstance().getBean(ServerConfig.class);
         DataInputStream dis = ms.reader();
         byte type = dis.readByte();
         byte version = dis.readByte();

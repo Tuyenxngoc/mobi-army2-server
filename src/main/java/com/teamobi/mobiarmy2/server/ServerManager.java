@@ -1,6 +1,5 @@
 package com.teamobi.mobiarmy2.server;
 
-import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.entity.User;
@@ -36,27 +35,32 @@ public class ServerManager {
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
 
+    private final GameDataService gameDataService;
+    private final LeaderboardService leaderboardService;
+    private final RoomManager roomManager;
+    private final ExchangeLimitManager exchangeLimitManager;
     private final ServerConfig serverConfig;
 
-    public ServerManager(ServerConfig serverConfig) {
+    public ServerManager(ServerConfig serverConfig,
+                         GameDataService gameDataService,
+                         LeaderboardService leaderboardService,
+                         RoomManager roomManager,
+                         ExchangeLimitManager exchangeLimitManager) {
         this.serverConfig = serverConfig;
+        this.gameDataService = gameDataService;
+        this.leaderboardService = leaderboardService;
+        this.roomManager = roomManager;
+        this.exchangeLimitManager = exchangeLimitManager;
     }
 
     public void init() {
-        ApplicationContext ctx = ApplicationContext.getInstance();
-
-        GameDataService gameDataService = ctx.getBean(GameDataService.class);
-        LeaderboardService leaderboardService = ctx.getBean(LeaderboardService.class);
-
         gameDataService.loadServerData();
         gameDataService.setCache();
         leaderboardService.init();
 
-        RoomManager roomManager = ctx.getBean(RoomManager.class);
         roomManager.init();
 
         if (serverConfig.isTet()) {
-            ExchangeLimitManager exchangeLimitManager = ctx.getBean(ExchangeLimitManager.class);
             exchangeLimitManager.init();
         }
     }

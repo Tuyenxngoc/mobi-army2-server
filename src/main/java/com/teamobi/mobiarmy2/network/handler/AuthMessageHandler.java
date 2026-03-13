@@ -1,6 +1,5 @@
 package com.teamobi.mobiarmy2.network.handler;
 
-import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.config.RoomConfig;
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.AccountStatus;
@@ -39,12 +38,26 @@ public class AuthMessageHandler extends BaseMessageHandler {
     private final AccountDAO accountDAO;
     private final UserCharacterDAO userCharacterDAO;
 
-    public AuthMessageHandler(Session session, LoginRateLimiterService loginRateLimiterService, UserDAO userDAO, AccountDAO accountDAO, UserCharacterDAO userCharacterDAO) {
+    private final ServerConfig serverConfig;
+    private final ServerManager serverManager;
+    private final HikariCPManager hikariCPManager;
+
+    public AuthMessageHandler(Session session,
+                              LoginRateLimiterService loginRateLimiterService,
+                              UserDAO userDAO,
+                              AccountDAO accountDAO,
+                              UserCharacterDAO userCharacterDAO,
+                              ServerConfig serverConfig,
+                              ServerManager serverManager,
+                              HikariCPManager hikariCPManager) {
         super(session);
         this.loginRateLimiterService = loginRateLimiterService;
         this.userDAO = userDAO;
         this.accountDAO = accountDAO;
         this.userCharacterDAO = userCharacterDAO;
+        this.serverConfig = serverConfig;
+        this.serverManager = serverManager;
+        this.hikariCPManager = hikariCPManager;
     }
 
     public void handleLogout() {
@@ -56,7 +69,6 @@ public class AuthMessageHandler extends BaseMessageHandler {
             us().getFightWait().leaveTeam(us().getUserId());
         }
 
-        HikariCPManager hikariCPManager = ApplicationContext.getInstance().getBean(HikariCPManager.class);
         boolean success = hikariCPManager.transaction(connection -> {
             // Cập nhật thông tin tài khoản
             userDAO.update(connection, us());
@@ -108,19 +120,15 @@ public class AuthMessageHandler extends BaseMessageHandler {
     }
 
     public void handleLogin(Message ms) throws IOException {
-        ServerConfig serverConfig = ApplicationContext.getInstance().getBean(ServerConfig.class);
-
         if (us() != null && us().isLogged()) {
             return;
         }
 
-        if (ApplicationContext.getInstance()
-                .getBean(ServerManager.class).isMaintenanceMode()) {
+        if (serverManager.isMaintenanceMode()) {
             sendMessageLoginFail(GameString.MAINTENANCE_MODE);
             return;
         }
 
-        ServerManager serverManager = ApplicationContext.getInstance().getBean(ServerManager.class);
         if (serverManager.getUserCount() >= serverConfig.getMaxClients()) {
             sendMessageLoginFail(GameString.SERVER_FULL);
             return;
@@ -169,7 +177,6 @@ public class AuthMessageHandler extends BaseMessageHandler {
         UserDTO userDTO = userDAO.findByAccountId(us().getAccountId());
         if (userDTO == null) {
             // Tạo mới người dùng và nhân vật mặc định
-            HikariCPManager hikariCPManager = ApplicationContext.getInstance().getBean(HikariCPManager.class);
             boolean success = hikariCPManager.transaction(connection -> {
                 int userId = userDAO.create(connection, us().getAccountId(), 1000, 0);
                 userCharacterDAO.create(connection, userId, CharacterManager.CHARACTERS.get(0).getId());
@@ -190,8 +197,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
         }
 
         //Kiểm tra có đang đăng nhập hay không
-        User userLogin = ApplicationContext.getInstance()
-                .getBean(ServerManager.class).getUserByUserId(userDTO.getUserId());
+        User userLogin = serverManager.getUserByUserId(userDTO.getUserId());
         if (userLogin != null) {
             userLogin.sendMoneyErrorMessage(GameString.ACCOUNT_OTHER_LOGIN);
             userLogin.getSession().closeChannel();
@@ -215,9 +221,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
         us().setLogged(true);
 
         // Register into online index for fast lookup
-        ApplicationContext.getInstance()
-                .getBean(ServerManager.class)
-                .registerUser(us());
+        serverManager.registerUser(us());
 
         //Tặng quà hằng ngày
         if (Utils.canReceiveDailyReward(userDTO.getDailyRewardTime())) {
@@ -328,7 +332,6 @@ public class AuthMessageHandler extends BaseMessageHandler {
     }
 
     public void sendLoginSuccess() throws IOException {
-        ServerConfig serverConfig = ApplicationContext.getInstance().getBean(ServerConfig.class);
         Message ms = new Message(Cmd.LOGIN_SUCESS);
         DataOutputStream ds = ms.writer();
         ds.writeInt(us().getUserId());

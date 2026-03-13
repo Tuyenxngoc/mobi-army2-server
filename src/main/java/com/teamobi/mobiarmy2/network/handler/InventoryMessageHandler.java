@@ -1,6 +1,5 @@
 package com.teamobi.mobiarmy2.network.handler;
 
-import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameConstants;
@@ -31,8 +30,13 @@ public class InventoryMessageHandler extends BaseMessageHandler {
     private List<EquipmentChest> selectedEquips;
     private List<SpecialItemChest> selectedSpecialItems;
 
-    public InventoryMessageHandler(Session session) {
+    private final ServerConfig serverConfig;
+    private final ExchangeLimitManager exchangeLimitManager;
+
+    public InventoryMessageHandler(Session session, ServerConfig serverConfig, ExchangeLimitManager exchangeLimitManager) {
         super(session);
+        this.serverConfig = serverConfig;
+        this.exchangeLimitManager = exchangeLimitManager;
     }
 
     private List<SpecialItemChest> getSelectedSpecialItems() {
@@ -307,16 +311,12 @@ public class InventoryMessageHandler extends BaseMessageHandler {
             }
 
             case 86 -> {
-                ApplicationContext ctx = ApplicationContext.getInstance();
-                ServerConfig serverConfig = ctx.getBean(ServerConfig.class);
                 if (!serverConfig.isTet()) {
                     us().updateXp(1000 * specialItemChest.getQuantity());
                     us().updateInventory(null, null, null, List.of(specialItemChest));
                     us().sendServerMessage("Dùng bánh trưng thành công");
                     return;
                 }
-
-                ExchangeLimitManager exchangeLimitManager = ctx.getBean(ExchangeLimitManager.class);
                 if (specialItemChest.getQuantity() == 50) {
                     if (exchangeLimitManager.isGoldLimitReached(0)) {
                         us().sendServerMessage("Đã hết số lượng trang bị vàng cấp 1");
@@ -399,16 +399,12 @@ public class InventoryMessageHandler extends BaseMessageHandler {
             }
 
             case 87 -> {
-                ApplicationContext ctx = ApplicationContext.getInstance();
-                ServerConfig serverConfig = ctx.getBean(ServerConfig.class);
                 if (!serverConfig.isTet()) {
                     us().updateXp(500 * specialItemChest.getQuantity());
                     us().updateInventory(null, null, null, List.of(specialItemChest));
                     us().sendServerMessage("Dùng bánh tét thành công");
                     return;
                 }
-
-                ExchangeLimitManager exchangeLimitManager = ctx.getBean(ExchangeLimitManager.class);
                 if (specialItemChest.getQuantity() == 50) {
                     if (exchangeLimitManager.isSilverLimitReached(0)) {
                         us().sendServerMessage("Đã hết số lượng trang bị bạc cấp 1");
@@ -567,15 +563,10 @@ public class InventoryMessageHandler extends BaseMessageHandler {
             }
 
             case 86 -> {
-                ApplicationContext ctx = ApplicationContext.getInstance();
-                ServerConfig serverConfig = ctx.getBean(ServerConfig.class);
-
                 if (!serverConfig.isTet()) {
                     sendMessageConfirm("Bạn có muốn dùng bánh trưng không?");
                     return;
                 }
-
-                ExchangeLimitManager exchangeLimitManager = ctx.getBean(ExchangeLimitManager.class);
 
                 if (specialItemChest.getQuantity() == 50) {
                     if (exchangeLimitManager.isGoldLimitReached(0)) {
@@ -601,15 +592,10 @@ public class InventoryMessageHandler extends BaseMessageHandler {
             }
 
             case 87 -> {
-                ApplicationContext ctx = ApplicationContext.getInstance();
-                ServerConfig serverConfig = ctx.getBean(ServerConfig.class);
-
                 if (!serverConfig.isTet()) {
                     sendMessageConfirm("Bạn có muốn dùng bánh tét không?");
                     return;
                 }
-
-                ExchangeLimitManager exchangeLimitManager = ctx.getBean(ExchangeLimitManager.class);
 
                 if (specialItemChest.getQuantity() == 50) {
                     if (exchangeLimitManager.isSilverLimitReached(0)) {

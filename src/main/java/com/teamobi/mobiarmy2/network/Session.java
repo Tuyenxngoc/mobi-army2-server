@@ -1,10 +1,15 @@
 package com.teamobi.mobiarmy2.network;
 
 import com.teamobi.mobiarmy2.app.ApplicationContext;
+import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.handler.*;
+import com.teamobi.mobiarmy2.server.ExchangeLimitManager;
+import com.teamobi.mobiarmy2.server.HikariCPManager;
+import com.teamobi.mobiarmy2.server.RoomManager;
+import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.service.ClanService;
 import com.teamobi.mobiarmy2.service.LeaderboardService;
 import com.teamobi.mobiarmy2.service.LoginRateLimiterService;
@@ -26,8 +31,7 @@ public class Session {
             Cmd.REGISTER_2,
             Cmd.SET_PROVIDER,
             Cmd.VERSION_CODE,
-            Cmd.GETSTRING
-    );
+            Cmd.GETSTRING);
 
     @Getter
     private final long sessionId;
@@ -71,8 +75,10 @@ public class Session {
                 ctx.getBean(LoginRateLimiterService.class),
                 ctx.getBean(UserDAO.class),
                 ctx.getBean(AccountDAO.class),
-                ctx.getBean(UserCharacterDAO.class)
-        );
+                ctx.getBean(UserCharacterDAO.class),
+                ctx.getBean(ServerConfig.class),
+                ctx.getBean(ServerManager.class),
+                ctx.getBean(HikariCPManager.class));
         this.messageRouter = new MessageRouter(authMessageHandler);
 
         VIRTUAL_EXECUTOR.submit(this::processLoop);
@@ -164,15 +170,18 @@ public class Session {
         ClanService clanService = context.getBean(ClanService.class);
 
         ClanMessageHandler clanMessageHandler = new ClanMessageHandler(this, clanService);
-        FriendMessageHandler friendMessageHandler = new FriendMessageHandler(this, userDAO);
+        FriendMessageHandler friendMessageHandler = new FriendMessageHandler(this, userDAO,
+                context.getBean(ServerManager.class));
         ShopMessageHandler shopMessageHandler = new ShopMessageHandler(this, userCharacterDAO);
-        ResourceMessageHandler resourceMessageHandler = new ResourceMessageHandler(this);
+        ResourceMessageHandler resourceMessageHandler = new ResourceMessageHandler(this,
+                context.getBean(ServerConfig.class));
         MissionMessageHandler missionMessageHandler = new MissionMessageHandler(this);
         FormulaMessageHandler formulaMessageHandler = new FormulaMessageHandler(this);
-        RoomMessageHandler roomMessageHandler = new RoomMessageHandler(this);
+        RoomMessageHandler roomMessageHandler = new RoomMessageHandler(this, context.getBean(RoomManager.class));
         FightWaitMessageHandler fightWaitMessageHandler = new FightWaitMessageHandler(this, userDAO);
         FightManagerMessageHandler fightManagerMessageHandler = new FightManagerMessageHandler(this);
-        InventoryMessageHandler inventoryMessageHandler = new InventoryMessageHandler(this);
+        InventoryMessageHandler inventoryMessageHandler = new InventoryMessageHandler(this,
+                context.getBean(ServerConfig.class), context.getBean(ExchangeLimitManager.class));
         LeaderboardMessageHandler leaderboardMessageHandler = new LeaderboardMessageHandler(this, leaderboardService);
         SpinMessageHandler spinMessageHandler = new SpinMessageHandler(this);
         PaymentMessageHandler paymentMessageHandler = new PaymentMessageHandler(this, giftCodeDAO, userGiftCodeDAO);

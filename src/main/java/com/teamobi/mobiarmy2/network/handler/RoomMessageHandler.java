@@ -1,6 +1,5 @@
 package com.teamobi.mobiarmy2.network.handler;
 
-import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.constant.UserState;
@@ -18,13 +17,14 @@ public class RoomMessageHandler extends BaseMessageHandler {
     private static final int REJOIN_COOLDOWN_MS = 3000;
     private long timeSinceLeftRoom;
 
-    public RoomMessageHandler(Session session) {
+    private final RoomManager roomManager;
+
+    public RoomMessageHandler(Session session, RoomManager roomManager) {
         super(session);
+        this.roomManager = roomManager;
     }
 
     public void sendRoomName() throws IOException {
-        RoomManager roomManager = ApplicationContext.getInstance()
-                .getBean(RoomManager.class);
         String[] names = RoomManager.BOSS_ROOM_NAME;
         int startMapBoss = roomManager.getStartMapBoss();
         Message ms = new Message(Cmd.CHANGE_ROOM_NAME);
@@ -43,8 +43,6 @@ public class RoomMessageHandler extends BaseMessageHandler {
         if (us().isNotWaiting()) {
             return;
         }
-        RoomManager roomManager = ApplicationContext.getInstance()
-                .getBean(RoomManager.class);
         Message ms = new Message(Cmd.ROOM_LIST);
         DataOutputStream ds = ms.writer();
         for (Room room : roomManager.getRooms()) {
@@ -61,8 +59,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
         if (us().isNotWaiting()) {
             return;
         }
-        Room[] rooms = ApplicationContext.getInstance()
-                .getBean(RoomManager.class).getRooms();
+        Room[] rooms = roomManager.getRooms();
         byte roomNumber = ms.reader().readByte();
         if (roomNumber < 0 || roomNumber >= rooms.length) {
             return;
@@ -103,8 +100,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
             return;
         }
 
-        Room[] rooms = ApplicationContext.getInstance()
-                .getBean(RoomManager.class).getRooms();
+        Room[] rooms = roomManager.getRooms();
         DataInputStream dis = ms.reader();
         byte roomNumber = dis.readByte();
         byte areaNumber = dis.readByte();
@@ -134,8 +130,6 @@ public class RoomMessageHandler extends BaseMessageHandler {
     }
 
     public void handleJoinAnyBoard(Message ms) throws IOException {
-        RoomManager roomManager = ApplicationContext.getInstance()
-                .getBean(RoomManager.class);
 
         int type = ms.reader().readByte();
 
