@@ -3,7 +3,7 @@ package com.teamobi.mobiarmy2.fight.boss;
 import com.teamobi.mobiarmy2.fight.Boss;
 import com.teamobi.mobiarmy2.fight.FightManager;
 import com.teamobi.mobiarmy2.fight.Player;
-import com.teamobi.mobiarmy2.util.Utils;
+import com.teamobi.mobiarmy2.util.RandomUtil;
 
 public class TRex extends Boss {
     public TRex(FightManager fightManager, short x, short y, short maxHp) {
@@ -30,7 +30,7 @@ public class TRex extends Boss {
             randomPlayer = closestPlayer;
         }
 
-        switch (Utils.nextInt(3)) {
+        switch (RandomUtil.nextInt(3)) {
             case 0 -> // T. rex rocket
                     fightManager.createShoot(this, (byte) 37, (short) 110, (byte) 30, (byte) 0, (byte) 1);
 

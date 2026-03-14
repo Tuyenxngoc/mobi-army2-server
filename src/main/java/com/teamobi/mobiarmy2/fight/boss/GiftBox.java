@@ -3,7 +3,7 @@ package com.teamobi.mobiarmy2.fight.boss;
 import com.teamobi.mobiarmy2.fight.Boss;
 import com.teamobi.mobiarmy2.fight.FightManager;
 import com.teamobi.mobiarmy2.fight.Reward;
-import com.teamobi.mobiarmy2.util.Utils;
+import com.teamobi.mobiarmy2.util.RandomUtil;
 
 public class GiftBox extends Boss {
     private static final short[] COINS_BONUS = {1000, 5000, 10000, 15000, 20000, 25000, 30000};
@@ -23,28 +23,28 @@ public class GiftBox extends Boss {
 
     public Reward getRandomReward() {
         Reward reward = new Reward();
-        switch (Utils.nextInt(5)) {
+        switch (RandomUtil.nextInt(5)) {
             case 0 -> {
-                short randomCoins = COINS_BONUS[Utils.nextInt(COINS_BONUS.length)];
+                short randomCoins = COINS_BONUS[RandomUtil.nextInt(COINS_BONUS.length)];
                 reward.coins(randomCoins);
             }
 
             case 1 -> {
-                byte randomItemId = ITEM_IDS[Utils.nextInt(ITEM_IDS.length)];
-                byte itemCount = (byte) (Utils.nextInt(3) + 1);
+                byte randomItemId = ITEM_IDS[RandomUtil.nextInt(ITEM_IDS.length)];
+                byte itemCount = (byte) (RandomUtil.nextInt(3) + 1);
                 reward.items(randomItemId, itemCount);
             }
 
             case 2 -> reward.equip();
 
             case 3 -> {
-                short randomXP = XP_BONUS[Utils.nextInt(XP_BONUS.length)];
+                short randomXP = XP_BONUS[RandomUtil.nextInt(XP_BONUS.length)];
                 reward.xp(randomXP);
             }
 
             case 4 -> {
-                byte randomSpecialItemId = SPECIAL_ITEM_IDS[Utils.nextInt(SPECIAL_ITEM_IDS.length)];
-                byte specialItemCount = (byte) (Utils.nextInt(2) + 1);
+                byte randomSpecialItemId = SPECIAL_ITEM_IDS[RandomUtil.nextInt(SPECIAL_ITEM_IDS.length)];
+                byte specialItemCount = (byte) (RandomUtil.nextInt(2) + 1);
                 reward.specialItems(randomSpecialItemId, specialItemCount);
             }
         }

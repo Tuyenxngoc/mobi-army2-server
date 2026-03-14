@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.fight;
 
 import com.teamobi.mobiarmy2.server.MapManager;
+import com.teamobi.mobiarmy2.util.RandomUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 
@@ -115,8 +116,8 @@ public class FightMapManager {
     }
 
     public short[] getRandomPosition(int leftMargin, int rightMargin, int topMargin, int bottomMargin) {
-        short x = (short) Utils.nextInt(leftMargin, (width - rightMargin));
-        short y = (short) Utils.nextInt(topMargin, (height - bottomMargin));
+        short x = (short) RandomUtil.nextInt(leftMargin, (width - rightMargin));
+        short y = (short) RandomUtil.nextInt(topMargin, (height - bottomMargin));
         return new short[]{x, y};
     }
 }

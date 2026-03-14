@@ -3,7 +3,7 @@ package com.teamobi.mobiarmy2.fight.boss;
 import com.teamobi.mobiarmy2.fight.Boss;
 import com.teamobi.mobiarmy2.fight.FightManager;
 import com.teamobi.mobiarmy2.fight.Player;
-import com.teamobi.mobiarmy2.util.Utils;
+import com.teamobi.mobiarmy2.util.RandomUtil;
 
 public class Robot extends Boss {
     public Robot(FightManager fightManager, short x, short y, short maxHp) {
@@ -20,8 +20,8 @@ public class Robot extends Boss {
 
         if (Math.abs(x - closestPlayer.getX()) <= 40 && Math.abs(y - closestPlayer.getY()) <= 40) {
             fightManager.createShoot(this, (byte) 35, (short) 0, (byte) 0, (byte) 0, (byte) 1, false);
-            byte force = (byte) Utils.nextInt(15, 30);
-            short arg = (short) Utils.nextInt(80, 100);
+            byte force = (byte) RandomUtil.nextInt(15, 30);
+            short arg = (short) RandomUtil.nextInt(80, 100);
             fightManager.createShoot(this, (byte) 36, arg, force, (byte) 0, (byte) 1);
             return;
         }
@@ -32,7 +32,7 @@ public class Robot extends Boss {
             randomPlayer = closestPlayer;
         }
 
-        switch (Utils.nextInt(9)) {
+        switch (RandomUtil.nextInt(9)) {
             case 0 -> {
                 short[] forceArgXY = fightManager.getForceArgXY(
                         characterId, true, x, y, randomPlayer.getX(), randomPlayer.getY(),

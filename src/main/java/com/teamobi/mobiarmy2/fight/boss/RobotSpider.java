@@ -3,6 +3,7 @@ package com.teamobi.mobiarmy2.fight.boss;
 import com.teamobi.mobiarmy2.fight.Boss;
 import com.teamobi.mobiarmy2.fight.FightManager;
 import com.teamobi.mobiarmy2.fight.Player;
+import com.teamobi.mobiarmy2.util.RandomUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 
 public class RobotSpider extends Boss {
@@ -21,13 +22,13 @@ public class RobotSpider extends Boss {
         int distance = calculateDistance(player.getX(), player.getY());
         if (distance < 30) {
             fightManager.createShoot(this, (byte) 8, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 30, (byte) 0, (byte) 1, false);
-            byte force = (byte) Utils.nextInt(15, 30);
-            short arg = (short) Utils.nextInt(80, 100);
+            byte force = (byte) RandomUtil.nextInt(15, 30);
+            short arg = (short) RandomUtil.nextInt(80, 100);
             fightManager.createShoot(this, (byte) 36, arg, force, (byte) 0, (byte) 1);
             return;
         }
 
-        switch (Utils.nextInt(3)) {
+        switch (RandomUtil.nextInt(3)) {
             case 0 -> {// Tơ nhện
                 short[] forceArgXY = fightManager.getForceArgXY(
                         characterId, false, x, y, player.getX(),
@@ -40,8 +41,8 @@ public class RobotSpider extends Boss {
                     return;
                 }
                 fightManager.createShoot(this, (byte) 8, forceArgXY[0], (byte) forceArgXY[1], (byte) 0, (byte) 1, false);
-                byte force = (byte) Utils.nextInt(15, 30);
-                short arg = (short) Utils.nextInt(80, 100);
+                byte force = (byte) RandomUtil.nextInt(15, 30);
+                short arg = (short) RandomUtil.nextInt(80, 100);
                 fightManager.createShoot(this, (byte) 36, arg, force, (byte) 0, (byte) 1);
             }
             case 1 -> {// Laser

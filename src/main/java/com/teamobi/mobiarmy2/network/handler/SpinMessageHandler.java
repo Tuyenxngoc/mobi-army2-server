@@ -5,7 +5,7 @@ import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.FightItemManager;
-import com.teamobi.mobiarmy2.util.Utils;
+import com.teamobi.mobiarmy2.util.RandomUtil;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -63,28 +63,28 @@ public class SpinMessageHandler extends BaseMessageHandler {
         }
         ms = new Message(Cmd.RULET);
         DataOutputStream ds = ms.writer();
-        int luckyIndex = Utils.nextInt(10);
+        int luckyIndex = RandomUtil.nextInt(10);
         for (byte i = 0; i < 10; i++) {
-            byte type = (byte) Utils.nextInt(SPIN_TYPE_PROBABILITIES);
+            byte type = (byte) RandomUtil.nextInt(SPIN_TYPE_PROBABILITIES);
             byte itemId = 0;
             int quantity = 0;
 
             switch (type) {
                 case 0 -> {
                     itemId = FightItemManager.getRandomItem();
-                    quantity = SPIN_ITEM_COUNTS[0][Utils.nextInt(SPIN_ITEM_COUNTS[1])];
+                    quantity = SPIN_ITEM_COUNTS[0][RandomUtil.nextInt(SPIN_ITEM_COUNTS[1])];
                     if (i == luckyIndex) {
                         us().updateFightItems(itemId, (byte) quantity);
                     }
                 }
                 case 1 -> {
-                    quantity = SPIN_XU_COUNTS[0][Utils.nextInt(SPIN_XU_COUNTS[1])];
+                    quantity = SPIN_XU_COUNTS[0][RandomUtil.nextInt(SPIN_XU_COUNTS[1])];
                     if (i == luckyIndex) {
                         us().updateXu(quantity);
                     }
                 }
                 case 2 -> {
-                    quantity = SPIN_XP_COUNTS[0][Utils.nextInt(SPIN_XP_COUNTS[1])];
+                    quantity = SPIN_XP_COUNTS[0][RandomUtil.nextInt(SPIN_XP_COUNTS[1])];
                     if (i == luckyIndex) {
                         us().updateXp(quantity);
                     }

@@ -8,7 +8,7 @@ import com.teamobi.mobiarmy2.entity.SpecialItemChest;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.FormulaManager;
-import com.teamobi.mobiarmy2.util.Utils;
+import com.teamobi.mobiarmy2.util.RandomUtil;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -145,8 +145,8 @@ public class FormulaMessageHandler extends BaseMessageHandler {
         byte[] addPoints = new byte[5];
         byte[] addPercents = new byte[5];
         for (int i = 0; i < 5; i++) {
-            addPoints[i] = (byte) Utils.nextInt(formula.getAddPointsMin()[i], formula.getAddPointsMax()[i]);
-            addPercents[i] = (byte) Utils.nextInt(formula.getAddPercentsMin()[i], formula.getAddPercentsMax()[i]);
+            addPoints[i] = (byte) RandomUtil.nextInt(formula.getAddPointsMin()[i], formula.getAddPointsMax()[i]);
+            addPercents[i] = (byte) RandomUtil.nextInt(formula.getAddPercentsMin()[i], formula.getAddPercentsMax()[i]);
         }
 
         //Tạo trang bị mới

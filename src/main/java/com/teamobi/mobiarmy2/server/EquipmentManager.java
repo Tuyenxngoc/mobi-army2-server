@@ -2,7 +2,7 @@ package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.dto.json.EquipmentChestJson;
 import com.teamobi.mobiarmy2.entity.Equipment;
-import com.teamobi.mobiarmy2.util.Utils;
+import com.teamobi.mobiarmy2.util.RandomUtil;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -73,7 +73,7 @@ public class EquipmentManager {
             return null;
         }
 
-        return filteredEquipments.get(Utils.nextInt(filteredEquipments.size()));
+        return filteredEquipments.get(RandomUtil.nextInt(filteredEquipments.size()));
     }
 
     public static short[] getEquipmentIndexes(EquipmentChestJson[] equipmentChestJsons, int[] data, byte characterId) {

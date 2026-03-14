@@ -4,7 +4,7 @@ import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.entity.ArmyMap;
 import com.teamobi.mobiarmy2.fight.ImageData;
 import com.teamobi.mobiarmy2.fight.MapBrick;
-import com.teamobi.mobiarmy2.util.Utils;
+import com.teamobi.mobiarmy2.util.RandomUtil;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -30,7 +30,7 @@ public class MapManager {
             if (!notSelectableSet.contains(entry.getKey())) {
                 count++;
                 // Xác suất chọn phần tử hiện tại
-                if (Utils.nextInt(count) == 0) {
+                if (RandomUtil.nextInt(count) == 0) {
                     result = entry.getKey();
                 }
             }

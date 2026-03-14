@@ -3,7 +3,7 @@ package com.teamobi.mobiarmy2.fight.boss;
 import com.teamobi.mobiarmy2.fight.Boss;
 import com.teamobi.mobiarmy2.fight.FightManager;
 import com.teamobi.mobiarmy2.fight.Player;
-import com.teamobi.mobiarmy2.util.Utils;
+import com.teamobi.mobiarmy2.util.RandomUtil;
 
 public class BigBoom extends Boss {
     public BigBoom(FightManager fightManager, short x, short y, short maxHp) {
@@ -18,12 +18,12 @@ public class BigBoom extends Boss {
             return;
         }
 
-        if (Utils.nextInt(100) < 45) {
+        if (RandomUtil.nextInt(100) < 45) {
             short angle;
             if (player.getX() > x) {
-                angle = (short) Utils.nextInt(70, 75);
+                angle = (short) RandomUtil.nextInt(70, 75);
             } else {
-                angle = (short) Utils.nextInt(110, 115);
+                angle = (short) RandomUtil.nextInt(110, 115);
             }
             byte force = (byte) (Math.abs(x - player.getX()) / 20);
             if (force < 8) {

@@ -3,7 +3,7 @@ package com.teamobi.mobiarmy2.server;
 import com.teamobi.mobiarmy2.config.RoomConfig;
 import com.teamobi.mobiarmy2.entity.Room;
 import com.teamobi.mobiarmy2.fight.FightWait;
-import com.teamobi.mobiarmy2.util.Utils;
+import com.teamobi.mobiarmy2.util.RandomUtil;
 import lombok.Getter;
 
 public class RoomManager {
@@ -123,7 +123,7 @@ public class RoomManager {
 
             case 4, 3, 2, 1 -> {
                 int end = startMapBoss;
-                int index = Utils.nextInt(0, end - 1);
+                int index = RandomUtil.nextInt(0, end - 1);
 
                 Room room = rooms[index];
 
@@ -142,7 +142,7 @@ public class RoomManager {
 
             case 0 -> {
                 int end = startMapBoss;
-                int index = Utils.nextInt(0, end - 1);
+                int index = RandomUtil.nextInt(0, end - 1);
 
                 Room room = rooms[index];
 
@@ -160,7 +160,7 @@ public class RoomManager {
 
             case -1 -> {
                 int end = startMapBoss;
-                int index = Utils.nextInt(0, end - 1);
+                int index = RandomUtil.nextInt(0, end - 1);
 
                 Room room = rooms[index];
 

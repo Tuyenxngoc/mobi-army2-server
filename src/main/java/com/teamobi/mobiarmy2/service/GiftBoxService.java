@@ -5,6 +5,7 @@ import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.util.MessageUtils;
+import com.teamobi.mobiarmy2.util.RandomUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.util.List;
@@ -78,10 +79,10 @@ public class GiftBoxService {
         byte type = 2;
         String str;
         int[] rate = new int[]{140, 200, 150, 300, 200, 10};
-        int randomIndex = Utils.nextInt(rate);
+        int randomIndex = RandomUtil.nextInt(rate);
         switch (randomIndex) {
             case 0 -> {
-                int randomXu = Utils.getNonLinearRandom(50, 1049);
+                int randomXu = RandomUtil.getNonLinearRandom(50, 1049);
                 int xuUp = (randomXu / 50) * 50;
                 if (user != null) {
                     user.updateXu(xuUp);
@@ -92,7 +93,7 @@ public class GiftBoxService {
                 str = "+" + Utils.getStringNumber(xuUp) + " xu";
             }
             case 1 -> {
-                int randomXp = Utils.getNonLinearRandom(50, 1049);
+                int randomXp = RandomUtil.getNonLinearRandom(50, 1049);
                 int xpUp = (randomXp / 50) * 50;
                 if (user != null) {
                     user.updateXp(xpUp, false);
@@ -105,12 +106,12 @@ public class GiftBoxService {
             case 2 -> {
                 byte[] nextItem = new byte[]{0, 10, 20, 30, 40};
                 if (user != null) {
-                    byte idItem = (byte) Utils.nextInt(6);
-                    id = (byte) (idItem + nextItem[Utils.nextInt(nextItem.length)]);
+                    byte idItem = (byte) RandomUtil.nextInt(6);
+                    id = (byte) (idItem + nextItem[RandomUtil.nextInt(nextItem.length)]);
                     user.addSpecialItem(id, (short) 1);
                 } else {
-                    byte idItem = (byte) (Utils.nextInt(6) + 4);
-                    id = (byte) (idItem + nextItem[Utils.nextInt(nextItem.length)]);
+                    byte idItem = (byte) (RandomUtil.nextInt(6) + 4);
+                    id = (byte) (idItem + nextItem[RandomUtil.nextInt(nextItem.length)]);
                 }
                 str = "+1";
             }
@@ -119,27 +120,27 @@ public class GiftBoxService {
                 id = FightItemManager.getRandomItem();
                 byte numb;
                 if (user != null) {
-                    numb = (byte) Utils.nextInt(1, 5);
+                    numb = (byte) RandomUtil.nextInt(1, 5);
                     user.updateFightItems(id, numb);
                 } else {
-                    numb = (byte) Utils.nextInt(1, 10);
+                    numb = (byte) RandomUtil.nextInt(1, 10);
                 }
                 str = "+" + numb;
             }
             case 4 -> {
-                id = (byte) Utils.nextInt(62, 68);
+                id = (byte) RandomUtil.nextInt(62, 68);
                 short numb;
                 if (user != null) {
-                    numb = (short) Utils.nextInt(1, 5);
+                    numb = (short) RandomUtil.nextInt(1, 5);
                     user.addSpecialItem(id, numb);
                 } else {
-                    numb = (short) Utils.nextInt(1, 10);
+                    numb = (short) RandomUtil.nextInt(1, 10);
                 }
                 str = "+" + numb;
             }
             default -> {
                 byte[] arrItems = new byte[]{54};
-                id = arrItems[Utils.nextInt(arrItems.length)];
+                id = arrItems[RandomUtil.nextInt(arrItems.length)];
                 if (user != null) {
                     user.addSpecialItem(id, (short) 1);
                 }

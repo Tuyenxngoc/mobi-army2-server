@@ -1,6 +1,7 @@
 package com.teamobi.mobiarmy2.fight;
 
 import com.teamobi.mobiarmy2.fight.bullet.*;
+import com.teamobi.mobiarmy2.util.RandomUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
@@ -370,7 +371,7 @@ public class BulletManager {
                     }
                     short vxrd = 0;
                     for (int i = 0; i < 15; i++) {
-                        vxrd = (short) Utils.nextInt(-10, 10);
+                        vxrd = (short) RandomUtil.nextInt(-10, 10);
                         bullets.add(new Bullet(this, (byte) 44, 100, pl, x + 51, y + 40, vx + vxrd, vy, 40, 40));
                     }
                 }

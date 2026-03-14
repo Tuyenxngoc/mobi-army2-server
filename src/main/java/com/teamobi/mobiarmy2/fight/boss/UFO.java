@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.fight.boss;
 
 import com.teamobi.mobiarmy2.fight.*;
-import com.teamobi.mobiarmy2.util.Utils;
+import com.teamobi.mobiarmy2.util.RandomUtil;
 
 public class UFO extends Boss {
     private boolean turnShoot;
@@ -42,7 +42,7 @@ public class UFO extends Boss {
             Player player = fightManager.getRandomPlayer(null);
             if (player != null) {
                 x = player.getX();
-                y = (short) (player.getY() - Utils.nextInt(150, 500));
+                y = (short) (player.getY() - RandomUtil.nextInt(150, 500));
                 fightManager.sendPlayerFlyPosition(index);
             }
 

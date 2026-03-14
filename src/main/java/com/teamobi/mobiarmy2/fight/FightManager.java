@@ -13,7 +13,7 @@ import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
 import com.teamobi.mobiarmy2.service.ClanService;
-import com.teamobi.mobiarmy2.util.Utils;
+import com.teamobi.mobiarmy2.util.RandomUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -732,13 +732,28 @@ public class FightManager {
             windX = 0;
             windY = 0;
         } else {
-            if (Utils.nextInt(0, 100) > 25) {
-                windX = (byte) Utils.nextInt(-70, 70);
-                windY = (byte) Utils.nextInt(-70, 70);
+            int[] range = getWindRange(player);
+
+            if (RandomUtil.nextInt(0, 100) > 25) {
+                windX = (byte) RandomUtil.nextInt(-range[0], range[0]);
+                windY = (byte) RandomUtil.nextInt(-range[1], range[1]);
             }
         }
 
         sendWindUpdate();
+    }
+
+    /**
+     * Lấy phạm vi gió dựa trên ID nhân vật của người chơi.
+     *
+     * @param player
+     * @return mảng chứa phạm vi gió theo trục X và Y.
+     */
+    private int[] getWindRange(Player player) {
+        if (player.getCharacterId() == 9) {
+            return new int[]{60, 25};
+        }
+        return new int[]{70, 70};
     }
 
     private int getCurrentTurn() {
@@ -760,8 +775,8 @@ public class FightManager {
             case 30 -> {//Bom 1
                 byte bossCount = BOSS_COUNTS[0][playerCount - 1];
                 for (byte i = 0; i < bossCount; i++) {
-                    short bossX = (short) ((i % 2 == 0) ? Utils.nextInt(95, 315) : Utils.nextInt(890, 1070));
-                    short bossY = (short) (50 + 40 * Utils.nextInt(3));
+                    short bossX = (short) ((i % 2 == 0) ? RandomUtil.nextInt(95, 315) : RandomUtil.nextInt(890, 1070));
+                    short bossY = (short) (50 + 40 * RandomUtil.nextInt(3));
                     short bossHealth = 1000;
                     Boss boss = new BigBoom(this, bossX, bossY, bossHealth);
                     spawnBosses.add(boss);
@@ -771,7 +786,7 @@ public class FightManager {
             case 31 -> {//Bom 2
                 byte bossCount = BOSS_COUNTS[1][playerCount - 1];
                 for (byte i = 0; i < bossCount; i++) {
-                    short bossX = (short) (Utils.nextInt(445, 800) + i * 50);
+                    short bossX = (short) (RandomUtil.nextInt(445, 800) + i * 50);
                     short bossY = 180;
                     short bossHealth = 1500;
                     Boss boss = new BigBoom(this, bossX, bossY, bossHealth);
@@ -808,7 +823,7 @@ public class FightManager {
 
                 byte bossCount = BOSS_COUNTS[4][playerCount - 1];
                 for (byte i = 0; i < bossCount; i++) {
-                    X = (short) (Utils.nextInt(470, 755));
+                    X = (short) (RandomUtil.nextInt(470, 755));
                     Boss bigBoom = new BigBoom(this, X, Y, (short) 1500);
                     spawnBosses.add(bigBoom);
                 }
@@ -817,16 +832,16 @@ public class FightManager {
             case 35 -> {//Khu vực cấm
                 byte bossCount = BOSS_COUNTS[5][playerCount - 1];
                 for (byte i = 0; i < bossCount; i++) {
-                    short X = (short) (Utils.nextInt(300, 800));
-                    short Y = (short) Utils.nextInt(-350, 100);
+                    short X = (short) (RandomUtil.nextInt(300, 800));
+                    short Y = (short) RandomUtil.nextInt(-350, 100);
                     Boss boss = new UFO(this, X, Y, (short) 4500);
                     spawnBosses.add(boss);
                 }
             }
 
             case 36 -> {//Đỉnh hi mã lạp sơn
-                short X = (short) (Utils.nextInt(300, 800));
-                short Y = (short) Utils.nextInt(-350, 100);
+                short X = (short) (RandomUtil.nextInt(300, 800));
+                short Y = (short) RandomUtil.nextInt(-350, 100);
 
                 Balloon balloon = new Balloon(this, X, Y);
                 balloon.getBodyParts()[0] = balloon;
@@ -848,7 +863,7 @@ public class FightManager {
             case 37 -> {//Nhện độc
                 byte bossCount = BOSS_COUNTS[7][playerCount - 1];
                 for (byte i = 0; i < bossCount; i++) {
-                    short X = (short) Utils.nextInt(20, fightMapManager.getWidth() - 20);
+                    short X = (short) RandomUtil.nextInt(20, fightMapManager.getWidth() - 20);
                     short Y = (short) 250;
                     Boss boss = new VenomousSpider(this, X, Y, (short) 3800);
                     spawnBosses.add(boss);
@@ -859,7 +874,7 @@ public class FightManager {
                 byte bossCount = BOSS_COUNTS[8][playerCount - 1];
                 for (byte i = 0; i < bossCount; i++) {
                     short X = (short) ((short) 700 - i * 80);
-                    short Y = (short) (Utils.nextInt(30));
+                    short Y = (short) (RandomUtil.nextInt(30));
                     Boss boss = new Ghost(this, X, Y, (short) 1800);
                     spawnBosses.add(boss);
                 }
@@ -869,7 +884,7 @@ public class FightManager {
                 byte bossCount = BOSS_COUNTS[9][playerCount - 1];
                 for (byte i = 0; i < bossCount; i++) {
                     short X = (short) (700 - i * 80);
-                    short Y = (short) Utils.nextInt(30);
+                    short Y = (short) RandomUtil.nextInt(30);
                     Boss boss = new Ghost2(this, X, Y, (short) 1800);
                     spawnBosses.add(boss);
                 }
@@ -1016,9 +1031,9 @@ public class FightManager {
         while (true) {
             int next;
             if (roomType == 5) {
-                next = Utils.nextInt(MAX_USER_FIGHT, totalPlayers);
+                next = RandomUtil.nextInt(MAX_USER_FIGHT, totalPlayers);
             } else {
-                next = Utils.nextInt(MAX_USER_FIGHT);
+                next = RandomUtil.nextInt(MAX_USER_FIGHT);
             }
             if (players[next] != null && !INVALID_CHARACTER_IDS.contains(players[next].getCharacterId())) {
                 if (next < MAX_USER_FIGHT) {
@@ -1223,9 +1238,9 @@ public class FightManager {
                     if (winStatus == 1 && fightWait.getRoomType() == 5) {
                         user.updateXp(10, true);
 
-                        int chance = Utils.nextInt(100);
+                        int chance = RandomUtil.nextInt(100);
                         if (chance < 30) {//30% nhận nguyên liệu
-                            short quantity = (short) Utils.nextInt(1, 5);
+                            short quantity = (short) RandomUtil.nextInt(1, 5);
                             byte id = getRewardMaterialId();
 
                             SpecialItemChest newItem = new SpecialItemChest(quantity, SpecialItemManager.getSpecialItemById(id));
@@ -1235,7 +1250,7 @@ public class FightManager {
                             user.sendServerMessage(reward);
                         } else {
                             StringBuilder reward = new StringBuilder("Phần thưởng diệt trùm của bạn là ");
-                            int count = Utils.nextInt(2, 3);
+                            int count = RandomUtil.nextInt(2, 3);
                             for (int k = 0; k < count; k++) {
                                 byte indexItem = FightItemManager.getRandomItem();
                                 byte quantity = 1;
@@ -1612,7 +1627,7 @@ public class FightManager {
             return null;
         }
 
-        return validPlayers.get(Utils.nextInt(validPlayers.size()));
+        return validPlayers.get(RandomUtil.nextInt(validPlayers.size()));
     }
 
     public Player findClosestPlayer(short targetX, short targetY) {
@@ -1653,7 +1668,7 @@ public class FightManager {
             return null;
         }
 
-        int randomIndex = Utils.nextInt(0, validPlayers.size() - 1);
+        int randomIndex = RandomUtil.nextInt(0, validPlayers.size() - 1);
         return validPlayers.get(randomIndex);
     }
 

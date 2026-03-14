@@ -12,7 +12,7 @@ import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.ExchangeLimitManager;
 import com.teamobi.mobiarmy2.server.FabricateItemManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
-import com.teamobi.mobiarmy2.util.Utils;
+import com.teamobi.mobiarmy2.util.RandomUtil;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -243,7 +243,7 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                 case UPGRADE_GEM -> {
                     SpecialItemChest specialItemChest = specialItemList.getFirst();
                     int successRate = (90 - (specialItemChest.getItem().getId() % 10) * 10);
-                    int randomNumber = Utils.nextInt(100);
+                    int randomNumber = RandomUtil.nextInt(100);
                     if (randomNumber < successRate) {
                         SpecialItemChest newItem = new SpecialItemChest();
                         newItem.setQuantity((short) 1);
@@ -327,8 +327,8 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                         byte[] addPoints = new byte[5];
                         byte[] addPercents = new byte[5];
                         for (byte n = 0; n < 5; n++) {
-                            addPoints[n] = (byte) Utils.nextInt(15, 20);
-                            addPercents[n] = (byte) Utils.nextInt(8, 10);
+                            addPoints[n] = (byte) RandomUtil.nextInt(15, 20);
+                            addPercents[n] = (byte) RandomUtil.nextInt(8, 10);
                         }
                         EquipmentChest newEquip = new EquipmentChest();
                         newEquip.setEquipment(EquipmentManager.getEquipment(us().getActiveCharacterId(), i, (short) (30 + i)));
@@ -353,8 +353,8 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                         byte[] addPoints = new byte[5];
                         byte[] addPercents = new byte[5];
                         for (byte n = 0; n < 5; n++) {
-                            addPoints[n] = (byte) Utils.nextInt(20, 25);
-                            addPercents[n] = (byte) Utils.nextInt(10, 12);
+                            addPoints[n] = (byte) RandomUtil.nextInt(20, 25);
+                            addPercents[n] = (byte) RandomUtil.nextInt(10, 12);
                         }
                         EquipmentChest newEquip = new EquipmentChest();
                         newEquip.setEquipment(EquipmentManager.getEquipment(us().getActiveCharacterId(), i, (short) (30 + i)));
@@ -379,8 +379,8 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                         byte[] addPoints = new byte[5];
                         byte[] addPercents = new byte[5];
                         for (byte n = 0; n < 5; n++) {
-                            addPoints[n] = (byte) Utils.nextInt(25, 30);
-                            addPercents[n] = (byte) Utils.nextInt(12, 14);
+                            addPoints[n] = (byte) RandomUtil.nextInt(25, 30);
+                            addPercents[n] = (byte) RandomUtil.nextInt(12, 14);
                         }
                         EquipmentChest newEquip = new EquipmentChest();
                         newEquip.setEquipment(EquipmentManager.getEquipment(us().getActiveCharacterId(), i, (short) (30 + i)));
@@ -425,8 +425,8 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                         byte[] currentMinPercents = minPercents[i];
 
                         for (byte n = 0; n < 5; n++) {
-                            generatedPoints[n] = (byte) Utils.nextInt(currentMinPoints[n], currentMaxPoints[n]);
-                            generatedPercents[n] = (byte) Utils.nextInt(currentMinPercents[n], currentMaxPercents[n]);
+                            generatedPoints[n] = (byte) RandomUtil.nextInt(currentMinPoints[n], currentMaxPoints[n]);
+                            generatedPercents[n] = (byte) RandomUtil.nextInt(currentMinPercents[n], currentMaxPercents[n]);
                         }
 
                         EquipmentChest newEquipment = new EquipmentChest();
@@ -462,8 +462,8 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                         byte[] currentMinPercents = minPercents[i];
 
                         for (byte n = 0; n < 5; n++) {
-                            generatedPoints[n] = (byte) Utils.nextInt(currentMinPoints[n], currentMaxPoints[n]);
-                            generatedPercents[n] = (byte) Utils.nextInt(currentMinPercents[n], currentMaxPercents[n]);
+                            generatedPoints[n] = (byte) RandomUtil.nextInt(currentMinPoints[n], currentMaxPoints[n]);
+                            generatedPercents[n] = (byte) RandomUtil.nextInt(currentMinPercents[n], currentMaxPercents[n]);
                         }
 
                         EquipmentChest newEquipment = new EquipmentChest();
@@ -499,8 +499,8 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                         byte[] currentMinPercents = minPercents[i];
 
                         for (byte n = 0; n < 5; n++) {
-                            generatedPoints[n] = (byte) Utils.nextInt(currentMinPoints[n], currentMaxPoints[n]);
-                            generatedPercents[n] = (byte) Utils.nextInt(currentMinPercents[n], currentMaxPercents[n]);
+                            generatedPoints[n] = (byte) RandomUtil.nextInt(currentMinPoints[n], currentMaxPoints[n]);
+                            generatedPercents[n] = (byte) RandomUtil.nextInt(currentMinPercents[n], currentMaxPercents[n]);
                         }
 
                         EquipmentChest newEquipment = new EquipmentChest();
@@ -525,8 +525,8 @@ public class InventoryMessageHandler extends BaseMessageHandler {
 
                 Map<Byte, Short> itemQuantityMap = new HashMap<>();
                 for (int i = 0; i < specialItemChest.getQuantity(); i++) {
-                    short randomQuantity = (short) Utils.nextInt(1, 5);
-                    byte randomItemId = (byte) Utils.nextInt(62, 68);
+                    short randomQuantity = (short) RandomUtil.nextInt(1, 5);
+                    byte randomItemId = (byte) RandomUtil.nextInt(62, 68);
 
                     if (itemQuantityMap.containsKey(randomItemId)) {
                         itemQuantityMap.put(randomItemId, (short) (itemQuantityMap.get(randomItemId) + randomQuantity));

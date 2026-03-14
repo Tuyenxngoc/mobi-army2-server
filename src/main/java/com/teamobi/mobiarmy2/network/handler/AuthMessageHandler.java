@@ -20,6 +20,7 @@ import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.*;
 import com.teamobi.mobiarmy2.service.LoginRateLimiterService;
+import com.teamobi.mobiarmy2.util.RandomUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -240,7 +241,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
 
             //Tặng quà tết
             if (serverConfig.isTet()) {
-                int luckyXu = Utils.getNonLinearRandom(1000, 50999);
+                int luckyXu = RandomUtil.getNonLinearRandom(1000, 50999);
                 int xuUp = (luckyXu / 1000) * 1000;
                 us().updateXu(xuUp);
                 us().sendMessageToUser(GameString.createDailyRewardMessage(xuUp));

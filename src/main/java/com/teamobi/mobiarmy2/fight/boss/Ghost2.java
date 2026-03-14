@@ -3,7 +3,7 @@ package com.teamobi.mobiarmy2.fight.boss;
 import com.teamobi.mobiarmy2.fight.Boss;
 import com.teamobi.mobiarmy2.fight.FightManager;
 import com.teamobi.mobiarmy2.fight.Player;
-import com.teamobi.mobiarmy2.util.Utils;
+import com.teamobi.mobiarmy2.util.RandomUtil;
 
 public class Ghost2 extends Boss {
     public Ghost2(FightManager fightManager, short x, short y, short maxHp) {
@@ -47,7 +47,7 @@ public class Ghost2 extends Boss {
         fightManager.sendPlayerFlyPosition(index);
 
         // Trừ máu người chơi
-        player.updateHP((short) -Utils.nextInt(400, 800));
+        player.updateHP((short) -RandomUtil.nextInt(400, 800));
 
         // Tiếp tục chơi
         fightManager.doNextTurn();

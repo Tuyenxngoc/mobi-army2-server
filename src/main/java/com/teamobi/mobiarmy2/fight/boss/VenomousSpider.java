@@ -3,6 +3,7 @@ package com.teamobi.mobiarmy2.fight.boss;
 import com.teamobi.mobiarmy2.fight.Boss;
 import com.teamobi.mobiarmy2.fight.FightManager;
 import com.teamobi.mobiarmy2.fight.Player;
+import com.teamobi.mobiarmy2.util.RandomUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 
@@ -74,7 +75,7 @@ public class VenomousSpider extends Boss {
                     //Chuyển lượt tiếp theo
                     fightManager.doNextTurn();
                 } else {
-                    x = (short) Utils.nextInt(50, fightManager.getFightMapManager().getWidth() - 50);
+                    x = (short) RandomUtil.nextInt(50, fightManager.getFightMapManager().getWidth() - 50);
                     fightManager.sendPlayerFlyPosition(index);
                     fightManager.createShoot(this, (byte) 47, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 10, (byte) 0, (byte) 1);
                 }

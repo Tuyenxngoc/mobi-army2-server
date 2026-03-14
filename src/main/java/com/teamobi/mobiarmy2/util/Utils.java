@@ -16,10 +16,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Locale;
-import java.util.Random;
 
 public class Utils {
-    private static final Random RANDOM;
     private static final DateTimeFormatter DATE_TIME_FORMATTER;
     private static final NumberFormat NUMBER_FORMAT;
     private static final short[] SIN_DATA;
@@ -27,7 +25,6 @@ public class Utils {
     private static final int[] TAN_DATA;
 
     static {
-        RANDOM = new Random();
         DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(CommonConstant.PATTERN_DATE_TIME);
         Locale locale = new Locale.Builder()
                 .setLanguage("vi")
@@ -51,54 +48,6 @@ public class Utils {
                 TAN_DATA[i] = (SIN_DATA[i] << 10) / COS_DATA[i];
             }
         }
-    }
-
-    /**
-     * Generates a random integer within the specified range using a non-linear distribution.
-     * The generated number is more likely to be closer to the minimum value than to the maximum value.
-     *
-     * @param min the lower bound of the range (inclusive)
-     * @param max the upper bound of the range (inclusive)
-     * @return a random integer between {@code min} and {@code max} (inclusive)
-     * @throws IllegalArgumentException if {@code min} is greater than {@code max}
-     */
-    public static int getNonLinearRandom(int min, int max) {
-        double rand = RANDOM.nextDouble();
-        return (int) (min + (1 - Math.sqrt(1 - rand)) * (max - min));
-    }
-
-    /**
-     * Generates a random integer within the specified range (inclusive).
-     *
-     * @param x1 the lower bound of the range (inclusive)
-     * @param x2 the upper bound of the range (inclusive)
-     * @return a random integer between {@code x1} and {@code x2} (inclusive)
-     * @throws IllegalArgumentException if {@code x1} is greater than {@code x2}
-     */
-    public static int nextInt(int x1, int x2) {
-        return x1 + RANDOM.nextInt(x2 - x1 + 1);
-    }
-
-    public static int nextInt(int max) {
-        return RANDOM.nextInt(max);
-    }
-
-    public static int nextInt(int[] probabilities) {
-        int sum = 0;
-        for (int prob : probabilities) {
-            sum += prob;
-        }
-
-        int randomNumber = RANDOM.nextInt(sum);
-
-        int cumulativeSum = 0;
-        for (int i = 0; i < probabilities.length; i++) {
-            cumulativeSum += probabilities[i];
-            if (randomNumber < cumulativeSum) {
-                return i;
-            }
-        }
-        return -1;
     }
 
     public static String formatThousands(int number) {

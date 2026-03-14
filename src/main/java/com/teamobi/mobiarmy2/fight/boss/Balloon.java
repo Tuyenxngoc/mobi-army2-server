@@ -3,6 +3,7 @@ package com.teamobi.mobiarmy2.fight.boss;
 import com.teamobi.mobiarmy2.fight.Boss;
 import com.teamobi.mobiarmy2.fight.FightManager;
 import com.teamobi.mobiarmy2.fight.Player;
+import com.teamobi.mobiarmy2.util.RandomUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 
@@ -58,8 +59,8 @@ public class Balloon extends Boss {
 
         switch (currentTurn) {
             case 0 -> {//Balloon
-                short toX = (short) Utils.nextInt(100, fightManager.getFightMapManager().getWidth() - 100);
-                short toY = (short) Utils.nextInt(-150, 50);
+                short toX = (short) RandomUtil.nextInt(100, fightManager.getFightMapManager().getWidth() - 100);
+                short toY = (short) RandomUtil.nextInt(-150, 50);
                 updateBodyPartsCoordinates(toX, toY);
 
                 if (!bodyParts[1].isDead()) {
@@ -71,8 +72,8 @@ public class Balloon extends Boss {
 
             //Gun
             case 1 -> {
-                short toX = (short) Utils.nextInt(100, fightManager.getFightMapManager().getWidth() - 100);
-                short toY = (short) Utils.nextInt(-100, 50);
+                short toX = (short) RandomUtil.nextInt(100, fightManager.getFightMapManager().getWidth() - 100);
+                short toY = (short) RandomUtil.nextInt(-100, 50);
                 updateBodyPartsCoordinates(toX, toY);
 
                 fightManager.createShoot(this, (byte) 44, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 10, (byte) 0, (byte) 1);
@@ -83,8 +84,8 @@ public class Balloon extends Boss {
 
             //Eye
             case 4 -> {
-                short toX = (short) Utils.nextInt(100, fightManager.getFightMapManager().getWidth() - 100);
-                short toY = (short) Utils.nextInt(-50, 50);
+                short toX = (short) RandomUtil.nextInt(100, fightManager.getFightMapManager().getWidth() - 100);
+                short toY = (short) RandomUtil.nextInt(-50, 50);
                 updateBodyPartsCoordinates(toX, toY);
 
                 fightManager.createShoot(this, (byte) 45, (short) Utils.getArgXY(x, y, player.getX(), player.getY()), (byte) 20, (byte) 0, (byte) 1);
