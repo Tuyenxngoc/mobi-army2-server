@@ -1,9 +1,9 @@
 package com.teamobi.mobiarmy2.fight;
 
-import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.fight.boss.GiftBox;
 import com.teamobi.mobiarmy2.fight.boss.GiftBoxFalling;
+import com.teamobi.mobiarmy2.util.RandomUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
@@ -158,9 +158,7 @@ public class Player {
     }
 
     public void nextLuck() {
-        double luckNormalized = (double) luck / GameConstants.MAX_ABILITY_VALUE;
-        luckNormalized = Math.min(0.75, luckNormalized);
-        isLucky = Math.random() < luckNormalized;
+        isLucky = RandomUtil.nextBoolean();
     }
 
     public void decreaseWindStopCount() {
