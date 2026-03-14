@@ -20,9 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.function.Predicate;
 
 @Slf4j
@@ -53,7 +51,7 @@ public class FightManager {
     private final FightMapManager fightMapManager;
     private final BulletManager bulletManager;
     private final CountdownTimer countdownTimer;
-    private final ExecutorService fightLoop = Executors.newSingleThreadExecutor();
+    private final ScheduledExecutorService fightLoop = Executors.newSingleThreadScheduledExecutor();
     private final List<Boss> pendingBosses = new ArrayList<>();
     private final ClanService clanService;
 
@@ -73,6 +71,9 @@ public class FightManager {
     private long startTime;
     private int nextBossId = -10;
 
+    private ScheduledFuture<?> autoNextTurnTask;
+    private long lastShootTime;
+
     public FightManager(FightWait fightWait, ClanService clanService) {
         this.fightWait = fightWait;
         this.clanService = clanService;
@@ -82,6 +83,9 @@ public class FightManager {
         this.countdownTimer = new CountdownTimer(MAX_PLAY_TIME + 10, this::nextTurn);
     }
 
+    /**
+     * Khởi tạo và bắt đầu một ván chơi mới.
+     */
     public void startGame(short teamPointsBlue, short teamPointsRed) {
         fightLoop.submit(() -> {
             //Tải dữ liệu bản đồ
@@ -128,9 +132,11 @@ public class FightManager {
 
                 //Xóa túi đựng item nếu sử dụng
                 byte[] items = fightWait.getItems(i);
-                for (int j = 4; j < items.length; j++) {
-                    if (items[i] > 0) {
-                        user.updateFightItems((byte) (12 + j - 4), (byte) -1);
+                if (items != null) {
+                    for (int j = 4; j < items.length; j++) {
+                        if (items[j] > 0) {
+                            user.updateFightItems((byte) (12 + j - 4), (byte) -1);
+                        }
                     }
                 }
 
@@ -463,7 +469,7 @@ public class FightManager {
 
     private void sendNextTurnMessage(int turn) {
         try {
-            Message ms = new Message(Cmd.NEXT_TURN_2);
+            Message ms = new Message(Cmd.NEXT_TURN);
             DataOutputStream ds = ms.writer();
             ds.writeByte(turn);
             ds.flush();
@@ -638,7 +644,7 @@ public class FightManager {
     private void handleLuckUpdates() {
         for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             Player player = players[i];
-            if (player == null || player.getUser() == null) {
+            if (player == null || player.getUser() == null || player.isDead()) {
                 continue;
             }
             player.nextLuck();
@@ -648,7 +654,7 @@ public class FightManager {
     private void updateLuckyPlayers() {
         for (byte i = 0; i < MAX_USER_FIGHT; i++) {
             Player player = players[i];
-            if (player == null || player.getUser() == null || !player.isLucky()) {
+            if (player == null || player.getUser() == null || player.isDead() || !player.isLucky()) {
                 continue;
             }
             sendLuckyUpdate(i);
@@ -742,6 +748,10 @@ public class FightManager {
         return playerTurn;
     }
 
+    /**
+     * Khởi tạo ngẫu nhiên vị trí, số lượng và các loại chi tiết của Boss dựa theo ID của bản đồ.
+     * Số lượng Boss sẽ tự động co can (scale) theo số người chơi tham gia trong phòng (sử dụng mảng BOSS_COUNTS).
+     */
     private void initMapBosses() {
         byte playerCount = fightWait.getNumPlayers();
         List<Boss> spawnBosses = new ArrayList<>();
@@ -878,7 +888,12 @@ public class FightManager {
         fightLoop.submit(this::doNextTurn);
     }
 
+    /**
+     * Xử lý logic chuyển đổi sang lượt tiếp theo của trận đấu.
+     */
     public void doNextTurn() {
+        log.info("Turn {} complete. Processing next turn...", turnCount);
+
         //Cập nhật vị trí y của các player
         for (int i = 0; i < totalPlayers; i++) {
             Player player = players[i];
@@ -982,20 +997,20 @@ public class FightManager {
             Boss boss = (Boss) players[bossTurn];
 
             // Đợi 2 giây trước khi boss hành động
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-
-            if (turnCount == 1) {
-                doNextTurn();
-            } else {
-                boss.turnAction();
-            }
+            fightLoop.schedule(() -> {
+                if (turnCount == 1) {
+                    doNextTurn();
+                } else {
+                    boss.turnAction();
+                }
+            }, 2, TimeUnit.SECONDS);
         }
     }
 
+    /**
+     * Chọn ngẫu nhiên một người chơi (hoặc Boss nếu là chế độ Boss) đáp ứng đủ yêu cầu để trở thành
+     * người khai hỏa đi lượt đầu tiên của màn chơi.
+     */
     private void initFirstTurn() {
         byte roomType = fightWait.getRoomType();
         while (true) {
@@ -1114,13 +1129,7 @@ public class FightManager {
                 i++;
             }
             if (playerAliveCount == 0 || bossAliveCount == 0) {
-                if (playerAliveCount == bossAliveCount) {
-                    if (isBossTurn) {
-                        return MatchResult.RED_WIN;
-                    } else {
-                        return MatchResult.BLUE_WIN;
-                    }
-                } else if (playerAliveCount == 0) {
+                if (playerAliveCount == 0) {
                     return MatchResult.RED_WIN;
                 } else {
                     return MatchResult.BLUE_WIN;
@@ -1157,6 +1166,9 @@ public class FightManager {
         }
     }
 
+    /**
+     * Xử lý tất toán các thủ tục khi trận đấu kết thúc (có phe thắng/thua hoặc hòa).
+     */
     private void fightComplete(MatchResult result) {
         long duration = System.currentTimeMillis() - startTime;
         boolean fightInValid = false;
@@ -1292,28 +1304,20 @@ public class FightManager {
         }
 
         //Kết thúc ván đấu sau 8 giây
-        try {
-            Thread.sleep(8000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        fightWait.fightComplete();
+        fightLoop.schedule(() -> {
+            fightWait.fightComplete();
 
-        //Cập nhật mở quà
-        if (turnCount > 5 && fightWait.getRoomType() != 5) {
-
-            //Đợi thêm 2 giây trước khi mở quà
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+            //Cập nhật mở quà
+            if (turnCount > 5 && fightWait.getRoomType() != 5) {
+                //Đợi thêm 2 giây trước khi mở quà (tổng 10s sau khi đấu xong)
+                fightLoop.schedule(() -> {
+                    boolean isBlueWin = result == MatchResult.BLUE_WIN;
+                    fightWait.startGiftBoxOpening(isBlueWin);
+                }, 2, TimeUnit.SECONDS);
             }
 
-            boolean isBlueWin = result == MatchResult.BLUE_WIN;
-            fightWait.startGiftBoxOpening(isBlueWin);
-        }
-
-        refreshFightManager();
+            refreshFightManager();
+        }, 8, TimeUnit.SECONDS);
     }
 
     private byte getRewardMaterialId() {
@@ -1391,15 +1395,47 @@ public class FightManager {
 
         //Chuyển lượt mới
         if (isNextTurn) {
+            lastShootTime = System.currentTimeMillis();
 
-            //Đợi 2 giây trước khi chuyển lượt
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+            // Hủy bộ đếm thời gian tự động chuyển lượt nếu đang tồn tại
+            if (autoNextTurnTask != null && !autoNextTurnTask.isDone()) {
+                autoNextTurnTask.cancel(false);
             }
-            doNextTurn();
+
+            // Nếu là Boss bắn (isBossTurn), mặc định 2s tự đổi lượt
+            // Nếu là Player bắn, 5s timeout nếu không nhận được SHOOT_RESULT
+            int timeout = isBossTurn ? 2 : 5;
+            autoNextTurnTask = fightLoop.schedule(this::doNextTurn, timeout, TimeUnit.SECONDS);
         }
+    }
+
+    public void handlePlayerShootResult(int userId) {
+        fightLoop.submit(() -> {
+            Player player = getPlayerTurn();
+            // Nếu không phải trong trạng thái chờ thì bỏ qua
+            if (autoNextTurnTask == null || autoNextTurnTask.isDone() || player == null) {
+                return;
+            }
+
+            // Chỉ chấp nhận báo cáo từ chính người chơi vừa bắn
+            if (player.getUser() == null || player.getUser().getUserId() != userId) {
+                return;
+            }
+
+            // Hủy bộ đếm thời gian Timeout
+            autoNextTurnTask.cancel(false);
+
+            // Kiểm tra xem đã đủ 2s từ lúc bắn chưa
+            long elapsedDelay = System.currentTimeMillis() - lastShootTime;
+
+            if (elapsedDelay < 2000) {
+                // Nếu chưa tới 2s thì chờ cho đủ 2s
+                fightLoop.schedule(this::doNextTurn, 2000 - elapsedDelay, TimeUnit.MILLISECONDS);
+            } else {
+                // Nếu thời gian chờ đã hơn 2s thì gọi chuyển lượt luôn
+                doNextTurn();
+            }
+        });
     }
 
     private void sendFireArmyPacket(byte bullId, int xS, int yS, short angle, byte force2, byte numShoot, Player player) {
@@ -1432,12 +1468,12 @@ public class FightManager {
                 int size = trajectory.size();
                 ds.writeShort(size);// Ghi độ dài quỹ đạo
 
-                if (log.isDebugEnabled()) {
-                    log.debug("Bullet ID: {}, Trajectory Size: {}", bullId, size);
-                    for (Point p : trajectory) {
-                        log.debug("Bullet Trajectory Point: x={}, y={}", p.getX(), p.getY());
-                    }
-                }
+//                if (log.isDebugEnabled()) {
+//                    log.debug("Bullet ID: {}, Trajectory Size: {}", bullId, size);
+//                    for (Point p : trajectory) {
+//                        log.debug("Bullet Trajectory Point: x={}, y={}", p.getX(), p.getY());
+//                    }
+//                }
 
                 if (typeShoot == 0) {// Ghi tọa độ theo dạng delta (chênh lệch)
                     for (int i = 0; i < size; i++) {

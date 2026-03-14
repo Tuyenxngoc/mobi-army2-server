@@ -188,7 +188,7 @@ public class MessageRouter {
 
                 case Cmd.MATERIAL_ICON -> resourceMessageHandler.getMaterialIconMessage(ms);
 
-                case Cmd.GETSTRING -> authMessageHandler.getAgent(ms);
+                case Cmd.GET_STRING -> authMessageHandler.getAgent(ms);
 
                 default -> log.warn("Command {} is not supported", ms.getCommand());
             }

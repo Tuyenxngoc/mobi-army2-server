@@ -154,6 +154,7 @@ public class Player {
         hp = 0;
         isUpdateHP = true;
         isDead = true;
+        isLucky = false;
     }
 
     public void nextLuck() {
@@ -417,19 +418,22 @@ public class Player {
                 }
             }
 
-            //Cộng xp
-            shooter.updateXp(xpExist, true);
+            // Chỉ cộng XP và Cup nếu hạ gục kẻ địch
+            if (shooter.isTeamBlue() != this.isTeamBlue()) {
+                //Cộng xp
+                shooter.updateXp(xpExist, true);
 
-            //Logic cộng cup
-            if (shooter.getUser() != null && user != null) {
-                int cupDifference = shooter.getUser().getCup() - user.getCup();
-                int cupUp = (3000 - cupDifference) / 100;
-                if (cupUp > 0) {
-                    if (cupUp > 60) {
-                        cupUp = 60;
+                //Logic cộng cup
+                if (shooter.getUser() != null && user != null) {
+                    int cupDifference = shooter.getUser().getCup() - user.getCup();
+                    int cupUp = (3000 - cupDifference) / 100;
+                    if (cupUp > 0) {
+                        if (cupUp > 60) {
+                            cupUp = 60;
+                        }
+                        updateCup(-cupUp);
+                        shooter.updateCup(cupUp);
                     }
-                    updateCup(-cupUp);
-                    shooter.updateCup(cupUp);
                 }
             }
         }

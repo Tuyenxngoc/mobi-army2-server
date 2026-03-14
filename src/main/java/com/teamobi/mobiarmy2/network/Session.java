@@ -31,7 +31,7 @@ public class Session {
             Cmd.REGISTER_2,
             Cmd.SET_PROVIDER,
             Cmd.VERSION_CODE,
-            Cmd.GETSTRING);
+            Cmd.GET_STRING);
 
     @Getter
     private final long sessionId;
