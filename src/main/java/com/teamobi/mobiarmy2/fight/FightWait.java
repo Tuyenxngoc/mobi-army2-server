@@ -94,7 +94,7 @@ public class FightWait {
         this.giftBoxService = new GiftBoxService();
     }
 
-    private void refreshFightWait() {
+    private synchronized void refreshFightWait() {
         byte maxPlayers = room.getMaxPlayerFight();
 
         money = room.getMinXu();
@@ -141,7 +141,7 @@ public class FightWait {
         return -1;
     }
 
-    private void onTimeUp() {
+    private synchronized void onTimeUp() {
         if (bossIndex < 0 || bossIndex >= users.length) {
             return;
         }
@@ -157,7 +157,7 @@ public class FightWait {
         }
     }
 
-    private void changeBoss(int index) {
+    private synchronized void changeBoss(int index) {
         bossIndex = index;
         countdownTimer.reset();
     }
@@ -191,6 +191,9 @@ public class FightWait {
     private void sendMessageKick(int index, String s) {
         try {
             User user = users[index];
+            if (user == null) {
+                return;
+            }
             Message ms = new Message(Cmd.KICK);
             DataOutputStream ds = ms.writer();
             ds.writeShort(index);
@@ -208,7 +211,7 @@ public class FightWait {
         numReady = 0;
     }
 
-    private void findNewBoss() {
+    private synchronized void findNewBoss() {
         for (byte i = 0; i < users.length; i++) {
             if (users[i] != null) {
                 changeBoss(i);
@@ -217,14 +220,15 @@ public class FightWait {
         }
     }
 
-    private void handleUserRemoval(int index) {
+    private synchronized void handleUserRemoval(int index) {
         //Xóa người chơi và cập nhật trạng thái người chơi
         users[index].setState(UserState.WAITING);
         users[index].setFightWait(null);
         users[index] = null;
         numPlayers--;
 
-        //Xóa trạng thái sẵn sàng
+        //Xóa trang bị và trạng thái sẵn sàng
+        items[index] = new byte[MAX_ITEMS_SLOT];
         if (readies[index]) {
             readies[index] = false;
             numReady--;
@@ -233,10 +237,11 @@ public class FightWait {
 
     private void notifyPlayerLeave(int userId) {
         try {
+            User owner = getRoomOwner();
             Message ms = new Message(Cmd.SOMEONE_LEAVEBOARD);
             DataOutputStream ds = ms.writer();
             ds.writeInt(userId);
-            ds.writeInt(getRoomOwner().getUserId());
+            ds.writeInt(owner.getUserId());
             ds.flush();
             sendToTeam(ms);
         } catch (IOException e) {
@@ -268,7 +273,7 @@ public class FightWait {
         return items[i];
     }
 
-    public void fightComplete() {
+    public synchronized void fightComplete() {
         resetReadies();
         countdownTimer.reset();
 
@@ -423,6 +428,7 @@ public class FightWait {
         // Kiểm tra cân bằng số lượng người chơi giữa 2 phe (trừ chế độ Đấu Trùm)
         if (room.getType() != 5 && numTeamBlue != numTeamRed) {
             roomOwner.sendServerMessage(GameString.TEAM_SIZE_MISMATCH);
+            return;
         }
 
         started = true;
@@ -514,7 +520,7 @@ public class FightWait {
         notifyPlayerLeave(targetUserId);
     }
 
-    public void handleKickPlayer(int targetUserId, int index, String message) {
+    public synchronized void handleKickPlayer(int targetUserId, int index, String message) {
         sendMessageKick(index, message);
         handleUserRemoval(index);
         if (numPlayers <= 0) {
@@ -527,7 +533,7 @@ public class FightWait {
         }
     }
 
-    public void decreaseContinuousLevel() {
+    public synchronized void nextContinuousLevel() {
         continuousLevel = (byte) ((continuousLevel + 1) % CONTINUOUS_MAPS.length);
         mapId = CONTINUOUS_MAPS[continuousLevel];
     }
@@ -666,13 +672,26 @@ public class FightWait {
             return;
         }
 
+        // Ngoài chủ phòng ra, người chơi đang sẵn sàng không được đổi phe
+        if (bossIndex != index && readies[index]) {
+            return;
+        }
+
         byte newIndex = (byte) ((index % 2 == 0) ? 1 : 0);
         boolean teamChanged = false;
 
         for (; newIndex < users.length; newIndex += 2) {
             if (users[newIndex] == null) {
+                // Cập nhật các giá trị của người chơi ở vị trí mới
                 users[newIndex] = user;
+                items[newIndex] = items[index];
+                readies[newIndex] = false;
+
+                // Xóa thông tin người chơi ở vị trí cũ
                 users[index] = null;
+                items[index] = new byte[MAX_ITEMS_SLOT];
+                readies[index] = false;
+
                 if (bossIndex == index) {
                     bossIndex = newIndex;
                 }
@@ -785,7 +804,7 @@ public class FightWait {
         }
     }
 
-    public void findPlayer(int userId) {
+    public synchronized void findPlayer(int userId) {
         if (started) {
             return;
         }
@@ -822,7 +841,7 @@ public class FightWait {
         }
     }
 
-    public void inviteToRoom(int userId) {
+    public synchronized void inviteToRoom(int userId) {
         User roomOwner = getRoomOwner();
 
         User user = ApplicationContext.getInstance()

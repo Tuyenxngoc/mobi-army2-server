@@ -195,6 +195,7 @@ public class FightManager {
                 user.setState(UserState.FIGHTING);
 
                 players[i] = new Player(this, user, i, isTeamBlue, x, y, items, abilities, clanItems);
+                log.info("Player [{}]: Hp={}/{}, Dame={}, Def={}, Luck={}", user.getUsername(), players[i].getHp(), players[i].getMaxHp(), players[i].getDamage(), players[i].getDefense(), players[i].getLuck());
             }
 
             //Cập nhật trang thái game
@@ -304,6 +305,7 @@ public class FightManager {
             return;
         }
         //Todo update player coordinates if needed
+        System.out.println("Player " + player.getUser().getUsername() + " updated coordinates to (" + x + ", " + y + ")");
     }
 
     public void useItem(int userId, byte itemIndex) {
@@ -1343,7 +1345,7 @@ public class FightManager {
 
         if (fightWait.isContinuous()) {
             if (result == MatchResult.BLUE_WIN) {//Nếu là đấu liên hoàn và thắng thì đổi map
-                fightWait.decreaseContinuousLevel();
+                fightWait.nextContinuousLevel();
 
                 //Xóa người chơi bị hạ khỏi phòng
                 for (byte i = 0; i < MAX_USER_FIGHT; i++) {
