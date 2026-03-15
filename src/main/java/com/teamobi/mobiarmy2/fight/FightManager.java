@@ -19,7 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.*;
 import java.util.function.Predicate;
 
@@ -86,16 +89,64 @@ public class FightManager {
     /**
      * Khởi tạo và bắt đầu một ván chơi mới.
      */
-    public void startGame(short teamPointsBlue, short teamPointsRed) {
+    public void startGame() {
         fightLoop.submit(() -> {
+            // Tính toán điểm đồng đội
+            int totalTeamPointsBlue = 0;
+            int totalTeamPointsRed = 0;
+            byte roomType = fightWait.getRoomType();
+            byte numPlayers = fightWait.getNumPlayers();
+
+            for (byte i = 0; i < MAX_USER_FIGHT; i++) {
+                User user = fightWait.getUsers()[i];
+                if (user == null) {
+                    continue;
+                }
+
+                //Lấy danh sách items của clan
+                boolean[] clanItems;
+                if (user.hasClan()) {
+                    clanItems = clanService.getClanItems(user.getClanId());
+                } else {
+                    clanItems = new boolean[ClanItemManager.CLAN_ITEM_MAP.size()];
+                }
+
+                byte teamPointsPercentBonus = 0; // Phần trăm bonus điểm đồng đội từ clan items, nếu có
+                if (clanItems[2]) {
+                    teamPointsPercentBonus += 5;
+                }
+                if (clanItems[9]) {
+                    teamPointsPercentBonus += 10;
+                }
+
+                if (roomType == 5) {
+                    if (numPlayers > 1) {
+                        totalTeamPointsBlue += user.calculateTeamPoints(teamPointsPercentBonus);
+                    }
+                } else {
+                    if (i % 2 == 0) {
+                        if (numPlayers > 3) {
+                            totalTeamPointsBlue += user.calculateTeamPoints(teamPointsPercentBonus);
+                        }
+                    } else {
+                        if (numPlayers > 3) {
+                            totalTeamPointsRed += user.calculateTeamPoints(teamPointsPercentBonus);
+                        }
+                    }
+                }
+            }
+
+            short teamPointsBlue = (short) (totalTeamPointsBlue / 200);
+            short teamPointsRed = (short) (totalTeamPointsRed / 200);
+
+            log.info("Team points - Blue: {}, Red: {}", teamPointsBlue, teamPointsRed);
+
             //Tải dữ liệu bản đồ
             fightMapManager.loadMapId(fightWait.getMapId());
 
             //Tải dữ liệu vị trí
             List<short[]> randomPositions = fightMapManager.getRandomPlayerPositions(MAX_USER_FIGHT);
 
-            //Sử dụng cache để lưu trữ kết quả clan items
-            Map<Short, boolean[]> clanItemsCache = new HashMap<>();
             for (byte i = 0; i < MAX_USER_FIGHT; i++) {
                 User user = fightWait.getUsers()[i];
                 if (user == null) {
@@ -117,17 +168,14 @@ public class FightManager {
                 }
 
                 //Lấy ra chỉ số
-                short[] abilities = user.calculateCharacterAbilities(teamPoints);
+                int[] abilities = user.calculateCharacterAbilities(teamPoints);
 
                 //Lấy danh sách items của clan
-                boolean[] clanItems = new boolean[ClanItemManager.CLAN_ITEM_MAP.size()];
+                boolean[] clanItems;
                 if (user.hasClan()) {
-                    if (clanItemsCache.containsKey(user.getClanId())) {
-                        clanItems = clanItemsCache.get(user.getClanId());
+                    clanItems = clanService.getClanItems(user.getClanId());
                     } else {
-                        clanItems = clanService.getClanItems(user.getClanId());
-                        clanItemsCache.put(user.getClanId(), clanItems);
-                    }
+                    clanItems = new boolean[ClanItemManager.CLAN_ITEM_MAP.size()];
                 }
 
                 //Xóa túi đựng item nếu sử dụng
@@ -146,7 +194,7 @@ public class FightManager {
                 //Cập nhật trạng thái người chơi
                 user.setState(UserState.FIGHTING);
 
-                players[i] = new Player(this, user, i, isTeamBlue, x, y, items, abilities, teamPoints, clanItems);
+                players[i] = new Player(this, user, i, isTeamBlue, x, y, items, abilities, clanItems);
             }
 
             //Cập nhật trang thái game
@@ -162,7 +210,7 @@ public class FightManager {
                 if (player == null || player.getUser() == null) {
                     continue;
                 }
-                sendFightInfo(player);
+                sendFightInfo(player, (player.isTeamBlue() ? teamPointsBlue : teamPointsRed));
             }
 
             // Tạo boss nếu là chế độ đấu trùm
@@ -616,13 +664,13 @@ public class FightManager {
         }
     }
 
-    private void sendFightInfo(Player player) {
+    private void sendFightInfo(Player player, int teamPoints) {
         try {
             Message ms = new Message(Cmd.START_ARMY);
             DataOutputStream ds = ms.writer();
             ds.writeByte(fightWait.getMapId());
             ds.writeByte(MAX_PLAY_TIME);
-            ds.writeShort(player.getTeamPoints());
+            ds.writeShort(teamPoints);
             for (int j = 0; j < MAX_USER_FIGHT; j++) {
                 Player pl = players[j];
                 if (pl == null) {

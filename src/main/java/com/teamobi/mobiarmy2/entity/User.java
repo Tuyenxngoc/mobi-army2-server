@@ -465,15 +465,9 @@ public class User {
         return EquipmentManager.equipDefault[activeCharacterId][0].getEquipIndex();
     }
 
-    /**
-     * Calculates the team points for the current character based on the bonus percent.
-     *
-     * @param bonusPercent The bonus percent to be applied to the team points.
-     * @return The calculated team points, capped at a maximum of MAX_ABILITY_VALUE.
-     */
-    public short calculateTeamPoints(byte bonusPercent) {
+    public int calculateTeamPoints(byte bonusPercent) {
         short percents = bonusPercent;
-        short points = addedPoints[activeCharacterId][4];
+        short points = addedPoints[activeCharacterId][4];// Điểm cộng thêm cho chỉ số đồng đội
 
         EquipmentChest[] equippedItems = characterEquips[activeCharacterId];
         for (EquipmentChest equip : equippedItems) {
@@ -481,24 +475,37 @@ public class User {
                 continue;//Bỏ qua nếu trang bị không tồn tại hoặc đã hết hạn
             }
 
+            // Cộng thêm điểm và % cộng thêm từ trang bị đang mặc cho chỉ số đồng đội
             points += equip.getAddPoints()[4];
             percents += equip.getAddPercents()[4];
         }
 
+        // Tính điểm đồng đội: 10 đơn vị mỗi điểm + % cộng thêm từ trang bị và bonusPercent
         int teamPoints = points * 10;
-        teamPoints += (teamPoints * percents / 100);
+        teamPoints = Utils.calculatePercentBonus(teamPoints, percents);
 
-        return (short) Math.min(teamPoints, GameConstants.MAX_ABILITY_VALUE);
+        return teamPoints;
     }
 
-    public short[] calculateCharacterAbilities(short teamPoints) {
-        int[] abilities = new int[5];
-        short[] percents = new short[5];
+    public int[] calculateCharacterAbilities(short teamPoints) {
+        int[] result = new int[4];
 
-        short[] points = addedPoints[activeCharacterId].clone();
-        for (int i = 0; i < points.length; i++) {
-            points[i] += teamPoints;
+        // base ability của nhân vật
+        short[] source = addedPoints[activeCharacterId];
+        int[] baseAbility = new int[source.length];
+
+        for (int i = 0; i < source.length; i++) {
+            baseAbility[i] = source[i];
         }
+
+        // cộng điểm team
+        for (int i = 0; i < baseAbility.length; i++) {
+            baseAbility[i] += teamPoints;
+        }
+
+        // tổng điểm và % từ trang bị
+        short[] totalPointEquip = new short[5];
+        short[] totalPercentEquip = new short[5];
 
         EquipmentChest[] equippedItems = characterEquips[activeCharacterId];
         for (EquipmentChest equip : equippedItems) {
@@ -506,27 +513,32 @@ public class User {
                 continue;//Bỏ qua nếu trang bị không tồn tại hoặc đã hết hạn
             }
 
-            for (byte i = 0; i < points.length; i++) {
-                points[i] += equip.getAddPoints()[i];
-                percents[i] += equip.getAddPercents()[i];
+            byte[] addPoints = equip.getAddPoints();
+            byte[] addPercents = equip.getAddPercents();
+
+            for (byte i = 0; i < 5; i++) {
+                totalPointEquip[i] += addPoints[i];
+                totalPercentEquip[i] += addPercents[i];
             }
         }
 
-        abilities[0] = 1000 + (points[0] * 10);
-        abilities[0] += (abilities[0] * percents[0] / 100);
+        // HP
+        int hp = 1000 + baseAbility[0] * 10 + totalPointEquip[0] * 10;
+        hp += (1000 + baseAbility[0]) * totalPercentEquip[0] / 100;
+        result[0] = hp;
 
-        short baseDamage = CharacterManager.CHARACTERS.get(activeCharacterId).getDamage();
-        abilities[1] = (baseDamage * (100 + (points[1] / 3) + percents[1]) / 100) * 100 / baseDamage;
+        // DAMAGE
+        int maxDamage = CharacterManager.CHARACTERS.get(activeCharacterId).getDamage();
+        int damPoint = baseAbility[1] + totalPointEquip[1];
+        result[1] = maxDamage * (damPoint / 3 + 100 + totalPercentEquip[1]) / 100;
 
-        for (byte i = 2; i < abilities.length; i++) {
-            abilities[i] = points[i] * 10;
-            abilities[i] += (abilities[i] * percents[i] / 100);
-        }
+        // DEFENSE
+        int defPoint = baseAbility[2] + totalPointEquip[2];
+        result[2] = Utils.calculatePercentBonus(defPoint * 10, totalPercentEquip[2]);
 
-        short[] result = new short[abilities.length];
-        for (byte i = 0; i < result.length; i++) {
-            result[i] = (short) Math.min(abilities[i], GameConstants.MAX_ABILITY_VALUE);
-        }
+        // LUCK
+        int luckPoint = baseAbility[3] + totalPointEquip[3];
+        result[3] = Utils.calculatePercentBonus(luckPoint * 10, totalPercentEquip[3]);
 
         return result;
     }

@@ -7,71 +7,79 @@ import com.teamobi.mobiarmy2.util.RandomUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Getter
 @Setter
 public class Player {
     protected FightManager fightManager;
+    protected User user;
     protected byte characterId;
     protected byte index;
-    protected byte stamina;
+    protected short gunId;
+    protected boolean isTeamBlue;
+
     protected short x;
     protected short y;
-    protected short damage;
-    protected boolean isFlying;
-    protected boolean isDead;
-    protected byte usedItemId;
-    private User user;
-    private short gunId;
-    private byte pixel;
-    private byte angry;
-    private short steps;
-    private short maxHp;
-    private short hp;
-    private short defense;
-    private short luck;
-    private short teamPoints;
-    private byte[] items;
-    private boolean isUpdateHP;
-    private boolean isUpdateAngry;
-    private boolean isUpdateXP;
-    private boolean isUpdateCup;
-    private boolean isLucky;
-    private boolean isPoisoned;
-    private byte eyeSmokeCount;
-    private byte invisibleCount; // Số lần vô hình
-    private byte vanishCount; // Số lần tàn hình
-    private byte vampireCount;  // Số lần hút máu
-    private byte freezeCount;
-    private byte windStopCount;
-    private boolean[] clanItems;
-    private byte skippedTurns;
-    private boolean itemUsed;
-    private boolean isDoubleShoot;
-    private boolean isDoubleSpeed;
-    private boolean isUsePow;
-    private boolean isTeamBlue;
     protected short width;
     protected short height;
-    private int xpUp;
-    private int allXpUp;
-    private int cupUp;
-    private int allCupUp;
-    private int xpExist;
-    private List<Reward> rewards;
+    protected short steps;
+    protected boolean isFlying;
+
+    protected int hp;
+    protected int maxHp;
+    protected int damage;
+    protected int defense;
+    protected int luck;
+    protected byte stamina;
+    protected byte angry;
+    protected byte pixel;
+
+    protected boolean isDead;
+    protected boolean isLucky;
+    protected boolean isPoisoned;
+    protected boolean isDoubleShoot;
+    protected boolean isDoubleSpeed;
+    protected boolean isUsePow;
+    protected boolean itemUsed;
+    protected byte usedItemId;
+
+    protected byte invisibleCount; // Số lần vô hình
+    protected byte vanishCount;    // Số lần tàn hình
+    protected byte vampireCount;   // Số lần hút máu
+    protected byte freezeCount;
+    protected byte windStopCount;
+    protected byte eyeSmokeCount;
+    protected byte skippedTurns;
+
+    protected byte[] items;
+    protected boolean[] clanItems;
+
+    protected boolean isUpdateHP;
+    protected boolean isUpdateAngry;
+    protected boolean isUpdateXP;
+    protected boolean isUpdateCup;
+
+    protected int xpUp;
+    protected int allXpUp;
+    protected int cupUp;
+    protected int allCupUp;
+    protected int xpExist;
+    protected List<Reward> rewards;
 
     public Player(int index, int x, int y, int hp, int maxHp) {
         this.index = (byte) index;
         this.x = (short) x;
         this.y = (short) y;
-        this.hp = (short) hp;
-        this.maxHp = (short) maxHp;
+        this.hp = hp;
+        this.maxHp = maxHp;
     }
 
-    public Player(FightManager fightManager, byte characterId, short x, short y, short width, short height, short maxHp, int xpExist) {
+    public Player(FightManager fightManager, byte characterId, short x, short y, short width, short height, int maxHp, int xpExist) {
         this.fightManager = fightManager;
         this.characterId = characterId;
         this.x = x;
@@ -83,7 +91,7 @@ public class Player {
         this.xpExist = xpExist;
     }
 
-    public Player(FightManager fightManager, User user, byte index, boolean isTeamBlue, short x, short y, byte[] items, short[] abilities, short teamPoints, boolean[] clanItems) {
+    public Player(FightManager fightManager, User user, byte index, boolean isTeamBlue, short x, short y, byte[] items, int[] abilities, boolean[] clanItems) {
         this.fightManager = fightManager;
         this.user = user;
         this.gunId = user.getGunId();
@@ -96,7 +104,6 @@ public class Player {
         this.width = 24;
         this.height = 24;
         this.items = items;
-        this.teamPoints = teamPoints;
         this.clanItems = clanItems;
         this.usedItemId = -1;
         this.xpExist = user.getCurrentLevel() / 2 + 2;
@@ -115,37 +122,37 @@ public class Player {
 
     private void applyClanBonuses() {
         if (clanItems[1]) { //5% may mắn
-            luck += (short) (luck * 5 / 100);
+            luck = Utils.calculatePercentBonus(luck, 5);
         }
         if (clanItems[3]) { //5% phòng thủ
-            defense += (short) (defense * 5 / 100);
+            defense = Utils.calculatePercentBonus(defense, 5);
         }
         if (clanItems[5]) { //5% HP
-            maxHp += (short) (maxHp * 5 / 100);
+            maxHp = Utils.calculatePercentBonus(maxHp, 5);
         }
         if (clanItems[6]) { //5% sức mạnh
-            damage += (short) (damage * 5 / 100);
+            damage = Utils.calculatePercentBonus(damage, 5);
         }
         if (clanItems[8]) { //10% may mắn
-            luck += (short) (luck * 10 / 100);
+            luck = Utils.calculatePercentBonus(luck, 10);
         }
         if (clanItems[10]) { //10% phòng thủ
-            defense += (short) (defense * 10 / 100);
+            defense = Utils.calculatePercentBonus(defense, 10);
         }
         if (clanItems[12]) { //10% HP
-            maxHp += (short) (maxHp * 10 / 100);
+            maxHp = Utils.calculatePercentBonus(maxHp, 10);
         }
         if (clanItems[13]) { //10% sức mạnh
-            damage += (short) (damage * 10 / 100);
+            damage = Utils.calculatePercentBonus(damage, 10);
         }
         if (clanItems[14]) { //30% phòng thủ cho Canon và AK
             if (characterId == 1 || characterId == 5) {
-                defense += (short) (defense * 30 / 100);
+                defense = Utils.calculatePercentBonus(defense, 30);
             }
         }
         if (clanItems[15]) { //15% sức mạnh cho King Kong và Proton
             if (characterId == 2 || characterId == 3) {
-                damage += (short) (damage * 15 / 100);
+                damage = Utils.calculatePercentBonus(damage, 15);
             }
         }
     }
@@ -171,7 +178,7 @@ public class Player {
         skippedTurns++;
     }
 
-    public synchronized void updateHP(short addHp) {
+    public synchronized void updateHP(int addHp) {
         isUpdateHP = true;
         hp += addHp;
 
@@ -361,38 +368,39 @@ public class Player {
             damage *= 2;
         }
 
-        //Tăng sát thương từ item clan
+        // Tăng sát thương từ item clan khi sử dụng tuyệt chiêu Pow
         if (shooter.isUsePow()) {
-            if (shooter.clanItems[5]) {
-                damage += (damage * 5) / 100;  //+5% damage
+            if (shooter.clanItems[4]) {
+                damage = Utils.calculatePercentBonus(damage, 5);  //+5% damage
             }
-            if (shooter.clanItems[6]) {
-                damage += (damage * 11) / 100;  //+10% damage
+            if (shooter.clanItems[11]) {
+                damage = Utils.calculatePercentBonus(damage, 10); //+10% damage
             }
         }
 
         //Tăng sát thương khi đạn siêu cao
         byte superType = bull.getBulletManager().getSuperType();
         switch (superType) {
-            case 1 -> damage = (int) (damage * 1.10f);// +10%
-            case 2 -> damage = (int) (damage * 1.20f);// +20%
-            case 4 -> damage = (int) (damage * 1.30f);// +30%
+            case 1 -> damage = Utils.calculatePercentBonus(damage, 10);// +10%
+            case 2 -> damage = Utils.calculatePercentBonus(damage, 20);// +20%
+            case 4 -> damage = Utils.calculatePercentBonus(damage, 30);// +30%
         }
 
         //Tính toán điểm phòng thủ
-        int d = defense;
+        int effectiveDefense = defense;
         if (isLucky) {
             //Giảm sát thương
             damage = Math.round((float) damage / 2);
 
-            //Cộng thêm chỉ số phòng thủ
-            d = defense + defense / 10;
-        }
-        if (d > 0) {
-            damage = damage - d / 100;
+            //Cộng thêm 10% chỉ số phòng thủ khi may mắn
+            effectiveDefense = Utils.calculatePercentBonus(defense, 10);
         }
 
-        updateHP((short) -damage);
+        if (effectiveDefense > 0) {
+            log.info("Effective Defense: {}", effectiveDefense);
+        }
+
+        updateHP(-damage);
 
         if (shooter instanceof Boss || shooter == this) {
             return;

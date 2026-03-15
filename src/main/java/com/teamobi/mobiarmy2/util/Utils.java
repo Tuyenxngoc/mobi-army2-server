@@ -310,4 +310,15 @@ public class Utils {
     public static boolean isAlphanumeric(String s) {
         return !s.matches(CommonConstant.ALPHANUMERIC_PATTERN);
     }
+
+    /**
+     * Tính giá trị sau khi áp dụng phần trăm tăng thêm.
+     *
+     * @param value   Giá trị gốc.
+     * @param percent Phần trăm bonus cần cộng thêm.
+     * @return Giá trị sau khi đã cộng phần trăm bonus.
+     */
+    public static int calculatePercentBonus(int value, int percent) {
+        return value + (value * percent / 100);
+    }
 }

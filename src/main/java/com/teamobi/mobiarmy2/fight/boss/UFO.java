@@ -6,7 +6,7 @@ import com.teamobi.mobiarmy2.util.RandomUtil;
 public class UFO extends Boss {
     private boolean turnShoot;
 
-    public UFO(FightManager fightManager, short x, short y, short maxHp) {
+    public UFO(FightManager fightManager, short x, short y, int maxHp) {
         super(fightManager, (byte) 16, "UFO", x, y, (short) 51, (short) 46, maxHp, 4);
         super.isFlying = true;
         turnShoot = false;

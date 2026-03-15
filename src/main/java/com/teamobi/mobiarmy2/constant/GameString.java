@@ -59,7 +59,8 @@ public class GameString {
     public static final String AREA_INSUFFICIENT_FUNDS = "Không đủ tiền cược!";
     public static final String AREA_FULL = "Khu vực đã đầy!";
     public static final String KICKED_BY_HOST = "Bạn bị đuổi bởi chủ phòng!";
-    public static final String TEAM_MUST_BE_SAME_FACTION = "Đội phải cùng phe!";
+    public static final String CLAN_MUST_BE_SAME = "Các thành viên cùng phe phải cùng biệt đội!";
+    public static final String CLAN_MUST_BE_DIFFERENT = "Hai phe phải thuộc 2 biệt đội khác nhau!";
     public static final String TEAM_NOT_READY = "Mọi người chưa sẵn sàng!";
     public static final String MAP_SELECTION_ERROR = "Không thể chọn map";
     public static final String MATCH_NOT_COUNTED = "Ván chơi không tính vì thời gian quá ngắn hoặc bạn có hành vi tiêu cực!";

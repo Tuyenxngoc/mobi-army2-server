@@ -7,7 +7,7 @@ import com.teamobi.mobiarmy2.util.RandomUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 
 public class RobotSpider extends Boss {
-    public RobotSpider(FightManager fightManager, short x, short y, short maxHp) {
+    public RobotSpider(FightManager fightManager, short x, short y, int maxHp) {
         super(fightManager, (byte) 13, "Robot Spider", x, y, (short) 42, (short) 42, maxHp, 4);
     }
 

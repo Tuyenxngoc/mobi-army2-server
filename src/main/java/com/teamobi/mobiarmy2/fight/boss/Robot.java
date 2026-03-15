@@ -6,7 +6,7 @@ import com.teamobi.mobiarmy2.fight.Player;
 import com.teamobi.mobiarmy2.util.RandomUtil;
 
 public class Robot extends Boss {
-    public Robot(FightManager fightManager, short x, short y, short maxHp) {
+    public Robot(FightManager fightManager, short x, short y, int maxHp) {
         super(fightManager, (byte) 14, "Robot", x, y, (short) 24, (short) 25, maxHp, 4);
     }
 

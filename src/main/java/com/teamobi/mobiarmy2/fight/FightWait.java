@@ -19,7 +19,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 @Slf4j
@@ -316,45 +315,58 @@ public class FightWait {
             return;
         }
 
-        //Kiểm tra phe còn lại có cùng clan hay không
+        // Kiểm tra điều kiện trong chế độ Đấu đội
         if (room.getType() == 6) {
             for (byte i = 0; i < users.length; i++) {
                 if (users[i] == null) {
                     continue;
                 }
-                for (byte j = 0; j < users.length; j++) {
-                    if (j == i || users[j] == null || (j % 2 == 0 && i % 2 == 0) || (j % 2 != 0 && i % 2 != 0)) {
+                for (byte j = (byte) (i + 1); j < users.length; j++) {
+                    if (users[j] == null) {
                         continue;
                     }
-                    if (Objects.equals(users[j].getClanId(), users[i].getClanId())) {
-                        roomOwner.sendServerMessage(GameString.TEAM_MUST_BE_SAME_FACTION);
-                        return;
+                    // Nếu i và j cùng phe (cùng chẵn hoặc cùng lẻ)
+                    if (i % 2 == j % 2) {
+                        // Các thành viên cùng phe phải thuộc cùng một clan
+                        if (users[i].getClanId() != users[j].getClanId()) {
+                            roomOwner.sendServerMessage(GameString.CLAN_MUST_BE_SAME);
+                            return;
+                        }
+                    } else {
+                        // Nếu i và j khác phe, hai phe phải thuộc hai clan khác nhau
+                        if (users[i].getClanId() == users[j].getClanId()) {
+                            roomOwner.sendServerMessage(GameString.CLAN_MUST_BE_DIFFERENT);
+                            return;
+                        }
                     }
                 }
             }
         }
 
+        // Khởi tạo biến đếm số lượng người chơi và tổng điểm đồng đội mỗi phe
         byte numTeamRed = 0;
         byte numTeamBlue = 0;
-        short teamPointsBlue = 0;
-        short teamPointsRed = 0;
 
+        // Vòng lặp kiểm tra từng người chơi trong phòng
         for (byte i = 0; i < users.length; i++) {
             User user = users[i];
             if (user == null) {
                 continue;
             }
 
+            // Kiểm tra nếu người chơi đang trong quá trình mở hộp quà
             if (giftBoxService.isOpeningGift(user.getUserId())) {
                 roomOwner.sendServerMessage(GameString.createOpeningGiftMessage(user.getUsername()));
                 return;
             }
 
+            // Kiểm tra trạng thái sẵn sàng (Chủ phòng không cần check ready)
             if (bossIndex != i && !readies[i]) {
                 roomOwner.sendServerMessage(GameString.createGameStartErrorMessageUserNotReady(user.getUsername()));
                 return;
             }
 
+            // Kiểm tra số dư tài khoản có đủ để tham gia ván cược không
             if (user.getXu() < money) {
                 roomOwner.sendServerMessage(GameString.createGameStartErrorMessageInsufficientFunds(user.getUsername()));
                 return;
@@ -363,7 +375,8 @@ public class FightWait {
             byte[] userItems = items[i];
             byte[] itemUsageMap = new byte[FightItemManager.FIGHT_ITEMS.size()];
 
-            //Đếm số lượng item mà người dùng đang có
+            // Kiểm tra hợp lệ cho các Item mang theo
+            // Bước A: Thống kê số lượng từng loại item người chơi đã chọn vào các slot
             for (byte itemIndex : userItems) {
                 if (itemIndex < 0 || itemIndex >= itemUsageMap.length) {
                     continue;
@@ -371,16 +384,16 @@ public class FightWait {
                 itemUsageMap[itemIndex]++;
             }
 
+            // Bước B: Đối chiếu số lượng đã chọn với giới hạn cho phép và số lượng thực tế trong kho
             for (int j = 0; j < userItems.length; j++) {
                 byte itemIndex = userItems[j];
                 if (itemIndex < 0 || itemIndex >= itemUsageMap.length) {
                     continue;
                 }
 
-                //Kiểm tra điều kiện số lượng item
-                if (itemUsageMap[itemIndex] > FightItemManager.FIGHT_ITEMS.get(itemIndex).getCarriedItemCount() || //Số lượng vượt quá số lượng cho phép
-                        itemUsageMap[itemIndex] > user.getItemFightQuantity(itemIndex) || //Số lượng vượt quá số lượng đang có
-                        (j >= 4 && user.getItemFightQuantity(12 + j - 4) == 0) //Item chứa đã hết
+                if (itemUsageMap[itemIndex] > FightItemManager.FIGHT_ITEMS.get(itemIndex).getCarriedItemCount() || // Vượt quá giới hạn mang theo của item
+                        itemUsageMap[itemIndex] > user.getItemFightQuantity(itemIndex) || // Vượt quá số lượng item đang sở hữu
+                        (j >= 4 && user.getItemFightQuantity(12 + j - 4) == 0) // Các slot từ 4-7 yêu cầu phải có Item túi đựng (từ id 12-15) còn số lượng
                 ) {
                     try {
                         Message ms = new Message(Cmd.SERVER_MESSAGE);
@@ -395,40 +408,25 @@ public class FightWait {
                 }
             }
 
-            //Lấy ra bonus item clan
-            byte bonusPercent = 0;
-
-            //Đếm số người chơi và tính điểm đồng đội (chỉ áp dụng điểm đồng đội nếu có người chơi cùng)
+            // Phân loại phe để đếm số lượng người chơi hỗ trợ kiểm tra cân bằng đội hình
             if (room.getType() == 5) {
                 numTeamBlue++;
-                if (numPlayers > 1) {
-                    teamPointsBlue += user.calculateTeamPoints(bonusPercent);
-                }
             } else {
                 if (i % 2 == 0) {
                     numTeamBlue++;
-                    if (numPlayers > 3) {
-                        teamPointsBlue += user.calculateTeamPoints(bonusPercent);
-                    }
                 } else {
                     numTeamRed++;
-                    if (numPlayers > 3) {
-                        teamPointsRed += user.calculateTeamPoints(bonusPercent);
-                    }
                 }
             }
         }
 
+        // Kiểm tra cân bằng số lượng người chơi giữa 2 phe (trừ chế độ Đấu Trùm)
         if (room.getType() != 5 && numTeamBlue != numTeamRed) {
             roomOwner.sendServerMessage(GameString.TEAM_SIZE_MISMATCH);
         }
 
-        //Cập nhật lại điểm đồng đội
-        teamPointsBlue = (short) (teamPointsBlue / 20);
-        teamPointsRed = (short) (teamPointsRed / 20);
-
         started = true;
-        fightManager.startGame(teamPointsBlue, teamPointsRed);
+        fightManager.startGame();
 
         resetReadies();
         countdownTimer.stop();

@@ -4,7 +4,7 @@ import com.teamobi.mobiarmy2.fight.Boss;
 import com.teamobi.mobiarmy2.fight.FightManager;
 
 public class BalloonEye extends Boss {
-    public BalloonEye(FightManager fightManager, short x, short y, short maxHp) {
+    public BalloonEye(FightManager fightManager, short x, short y, int maxHp) {
         super(fightManager, (byte) 21, "Balloon Eye", x, y, (short) 13, (short) 14, maxHp, 4);
         super.isFlying = true;
     }

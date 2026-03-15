@@ -6,7 +6,7 @@ import com.teamobi.mobiarmy2.fight.Player;
 import com.teamobi.mobiarmy2.util.RandomUtil;
 
 public class TRex extends Boss {
-    public TRex(FightManager fightManager, short x, short y, short maxHp) {
+    public TRex(FightManager fightManager, short x, short y, int maxHp) {
         super(fightManager, (byte) 15, "T. rex", x, y, (short) 45, (short) 50, maxHp, 4);
     }
 
