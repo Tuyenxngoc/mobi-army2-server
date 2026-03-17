@@ -49,7 +49,7 @@ public class Bullet {
     public Bullet(BulletManager bulletManager, byte bullId, int damage, Player player, int x, int y, int vx, int vy, int msg, int g100) {
         this.bulletManager = bulletManager;
         this.bullId = bullId;
-        this.damage = (damage * player.getDamagePercent()) / 100;
+        this.damage = (int) Math.round((double) damage * player.getDamagePercent() / 100);
         this.player = player;
         this.x = (short) x;
         this.y = (short) y;

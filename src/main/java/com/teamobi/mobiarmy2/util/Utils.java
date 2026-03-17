@@ -319,6 +319,6 @@ public class Utils {
      * @return Giá trị sau khi đã cộng phần trăm bonus.
      */
     public static int calculatePercentBonus(int value, int percent) {
-        return value + (value * percent / 100);
+        return (int) Math.round((double) value * (100 + percent) / 100);
     }
 }

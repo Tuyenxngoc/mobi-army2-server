@@ -16,6 +16,14 @@ import java.util.List;
 @Getter
 @Setter
 public class Player {
+    // Hằng số K trong công thức: P = stat / (stat + K)
+    // Ý nghĩa:
+    // - Khi stat = 3825 → hiệu quả = 50%
+    // - Điều khiển tốc độ tăng (diminishing return)
+    // - Stat càng cao → tăng hiệu quả càng chậm, không bao giờ đạt 100%
+    // Dùng cho các hệ: luck (tỉ lệ), phòng thủ (giảm damage), v.v.
+    public static final int STAT_HALF_EFFECT_POINT = 3825;
+
     protected FightManager fightManager;
     protected User user;
     protected byte characterId;
@@ -165,7 +173,8 @@ public class Player {
     }
 
     public void nextLuck() {
-        isLucky = RandomUtil.nextBoolean();
+        // Tỉ lệ = luck / (luck + BASE_STAT_LIMIT)
+        isLucky = RandomUtil.nextInt(luck + STAT_HALF_EFFECT_POINT) < luck;
     }
 
     public void decreaseWindStopCount() {
@@ -357,7 +366,7 @@ public class Player {
         //Tính sát thương
         int damage = bull.getDamage();
         if (distance > width / 2) {
-            damage -= (damage * (distance - width / 2)) / impactRadius;
+            damage -= (int) Math.round((double) damage * (distance - width / 2) / impactRadius);
         }
         if (damage <= 0) {
             return;
@@ -398,6 +407,9 @@ public class Player {
 
         if (effectiveDefense > 0) {
             log.info("Effective Defense: {}", effectiveDefense);
+
+            // Áp dụng công thức phòng thủ: D = A * STAT_HALF_EFFECT_POINT / (STAT_HALF_EFFECT_POINT + DEF)
+            damage = (int) Math.round((double) damage * STAT_HALF_EFFECT_POINT / (STAT_HALF_EFFECT_POINT + effectiveDefense));
         }
 
         log.info("Damage: {}", damage);
