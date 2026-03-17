@@ -32,7 +32,7 @@ public class Player {
 
     protected int hp;
     protected int maxHp;
-    protected int damage;
+    protected int damagePercent;
     protected int defense;
     protected int luck;
     protected byte stamina;
@@ -109,7 +109,7 @@ public class Player {
         this.xpExist = user.getCurrentLevel() / 2 + 2;
 
         this.maxHp = abilities[0];
-        this.damage = abilities[1];
+        this.damagePercent = abilities[1];
         this.defense = abilities[2];
         this.luck = abilities[3];
 
@@ -131,7 +131,7 @@ public class Player {
             maxHp = Utils.calculatePercentBonus(maxHp, 5);
         }
         if (clanItems[6]) { //5% sức mạnh
-            damage = Utils.calculatePercentBonus(damage, 5);
+            damagePercent = Utils.calculatePercentBonus(damagePercent, 5);
         }
         if (clanItems[8]) { //10% may mắn
             luck = Utils.calculatePercentBonus(luck, 10);
@@ -143,7 +143,7 @@ public class Player {
             maxHp = Utils.calculatePercentBonus(maxHp, 10);
         }
         if (clanItems[13]) { //10% sức mạnh
-            damage = Utils.calculatePercentBonus(damage, 10);
+            damagePercent = Utils.calculatePercentBonus(damagePercent, 10);
         }
         if (clanItems[14]) { //30% phòng thủ cho Canon và AK
             if (characterId == 1 || characterId == 5) {
@@ -152,7 +152,7 @@ public class Player {
         }
         if (clanItems[15]) { //15% sức mạnh cho King Kong và Proton
             if (characterId == 2 || characterId == 3) {
-                damage = Utils.calculatePercentBonus(damage, 15);
+                damagePercent = Utils.calculatePercentBonus(damagePercent, 15);
             }
         }
     }
@@ -399,6 +399,8 @@ public class Player {
         if (effectiveDefense > 0) {
             log.info("Effective Defense: {}", effectiveDefense);
         }
+
+        log.info("Damage: {}", damage);
 
         updateHP(-damage);
 

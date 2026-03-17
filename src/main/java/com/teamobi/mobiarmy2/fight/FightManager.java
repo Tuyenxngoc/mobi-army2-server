@@ -195,7 +195,7 @@ public class FightManager {
                 user.setState(UserState.FIGHTING);
 
                 players[i] = new Player(this, user, i, isTeamBlue, x, y, items, abilities, clanItems);
-                log.info("Player [{}]: Hp={}/{}, Dame={}, Def={}, Luck={}", user.getUsername(), players[i].getHp(), players[i].getMaxHp(), players[i].getDamage(), players[i].getDefense(), players[i].getLuck());
+                log.info("Player [{}]: Hp={}/{}, DamePt={}, Def={}, Luck={}", user.getUsername(), players[i].getHp(), players[i].getMaxHp(), players[i].getDamagePercent(), players[i].getDefense(), players[i].getLuck());
             }
 
             //Cập nhật trang thái game

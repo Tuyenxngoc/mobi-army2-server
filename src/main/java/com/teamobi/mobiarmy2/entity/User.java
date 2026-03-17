@@ -8,7 +8,10 @@ import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.fight.TrainingManager;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
-import com.teamobi.mobiarmy2.server.*;
+import com.teamobi.mobiarmy2.server.EquipmentManager;
+import com.teamobi.mobiarmy2.server.ServerManager;
+import com.teamobi.mobiarmy2.server.SpecialItemManager;
+import com.teamobi.mobiarmy2.server.UserXpManager;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
@@ -488,7 +491,7 @@ public class User {
     }
 
     public int[] calculateCharacterAbilities(short teamPoints) {
-        int[] result = new int[4];
+        int[] ability = new int[4];
 
         // base ability của nhân vật
         short[] source = addedPoints[activeCharacterId];
@@ -525,22 +528,21 @@ public class User {
         // HP
         int hp = 1000 + baseAbility[0] * 10 + totalPointEquip[0] * 10;
         hp += (1000 + baseAbility[0]) * totalPercentEquip[0] / 100;
-        result[0] = hp;
+        ability[0] = hp;
 
         // DAMAGE
-        int maxDamage = CharacterManager.CHARACTERS.get(activeCharacterId).getDamage();
         int damPoint = baseAbility[1] + totalPointEquip[1];
-        result[1] = maxDamage * (damPoint / 3 + 100 + totalPercentEquip[1]) / 100;
+        ability[1] = damPoint / 3 + 100 + totalPercentEquip[1]; // % damage
 
         // DEFENSE
         int defPoint = baseAbility[2] + totalPointEquip[2];
-        result[2] = Utils.calculatePercentBonus(defPoint * 10, totalPercentEquip[2]);
+        ability[2] = Utils.calculatePercentBonus(defPoint * 10, totalPercentEquip[2]);
 
         // LUCK
         int luckPoint = baseAbility[3] + totalPointEquip[3];
-        result[3] = Utils.calculatePercentBonus(luckPoint * 10, totalPercentEquip[3]);
+        ability[3] = Utils.calculatePercentBonus(luckPoint * 10, totalPercentEquip[3]);
 
-        return result;
+        return ability;
     }
 
     public void addSpecialItem(byte id, short quantity) {
