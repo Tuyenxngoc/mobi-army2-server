@@ -95,7 +95,7 @@ public class FightManager {
      * Khởi tạo và bắt đầu một ván chơi mới.
      */
     public void startGame() {
-        fightLoop.submit(() -> {
+        fightLoop.submit(wrap(() -> {
             // Tính toán điểm đồng đội
             int totalTeamPointsBlue = 0;
             int totalTeamPointsRed = 0;
@@ -226,11 +226,11 @@ public class FightManager {
 
             // Bắt đầu lượt chơi đầu tiên
             doNextTurn();
-        });
+        }));
     }
 
     public Future<?> leaveGame(int userId) {
-        return fightLoop.submit(() -> {
+        return fightLoop.submit(wrap(() -> {
             int index = getPlayerIndexByUserId(userId);
             if (index == -1) {
                 return;
@@ -251,11 +251,11 @@ public class FightManager {
             } else {
                 sendNextTurnMessage(isBossTurn ? bossTurn : playerTurn);
             }
-        });
+        }));
     }
 
     public void handlePlayerShoot(int userId, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
-        fightLoop.submit(() -> {
+        fightLoop.submit(wrap(() -> {
             Player player = getPlayerTurn();
             if (player.getUser() == null || player.getUser().getUserId() != userId) {
                 return;
@@ -266,11 +266,11 @@ public class FightManager {
 
             // Tạo đạn bắn
             createShoot(player, bullId, angle, force, force2, numShoot);
-        });
+        }));
     }
 
     public void changeLocation(int userId, short x, short y) {
-        fightLoop.submit(() -> {
+        fightLoop.submit(wrap(() -> {
             Player player = getPlayerTurn();
             if (player.getUser() == null || player.getUser().getUserId() != userId) {
                 return;
@@ -287,11 +287,11 @@ public class FightManager {
             if (preX != player.getX() || preY != player.getY()) {
                 sendMessageUpdateXY(player.getIndex());
             }
-        });
+        }));
     }
 
     public void skipTurn(int userId) {
-        fightLoop.submit(() -> {
+        fightLoop.submit(wrap(() -> {
             Player player = getPlayerTurn();
             if (player.getUser() == null || player.getUser().getUserId() != userId) {
                 return;
@@ -302,7 +302,7 @@ public class FightManager {
                 hasActionInTurn = true;
                 doNextTurn();
             }
-        });
+        }));
     }
 
     public void updatePlayerCoordinates(int userId, short x, short y) {
@@ -315,7 +315,7 @@ public class FightManager {
     }
 
     public void useItem(int userId, byte itemIndex) {
-        fightLoop.submit(() -> {
+        fightLoop.submit(wrap(() -> {
             Player player = getPlayerTurn();
             if (player.getUser() == null || player.getUser().getUserId() != userId) {
                 return;
@@ -359,7 +359,7 @@ public class FightManager {
             //Xử lý khi dùng item
             handleItem(player, itemIndex);
             hasActionInTurn = true;
-        });
+        }));
     }
 
     public void addPendingBoss(Boss player) {
@@ -960,7 +960,7 @@ public class FightManager {
     }
 
     public void nextTurn() {
-        fightLoop.submit(this::doNextTurn);
+        fightLoop.submit(wrap(this::doNextTurn));
     }
 
     /**
@@ -1107,13 +1107,13 @@ public class FightManager {
             Boss boss = (Boss) players[bossTurn];
 
             // Đợi 2 giây trước khi boss hành động
-            fightLoop.schedule(() -> {
+            fightLoop.schedule(wrap(() -> {
                 if (turnCount == 1) {
                     doNextTurn();
                 } else {
                     boss.turnAction();
                 }
-            }, 2, TimeUnit.SECONDS);
+            }), 2, TimeUnit.SECONDS);
         }
     }
 
@@ -1417,20 +1417,20 @@ public class FightManager {
         }
 
         //Kết thúc ván đấu sau 8 giây
-        fightLoop.schedule(() -> {
+        fightLoop.schedule(wrap(() -> {
             fightWait.fightComplete();
 
             //Cập nhật mở quà
             if (turnCount > 5 && fightWait.getRoomType() != 5) {
                 //Đợi thêm 2 giây trước khi mở quà (tổng 10s sau khi đấu xong)
-                fightLoop.schedule(() -> {
+                fightLoop.schedule(wrap(() -> {
                     boolean isBlueWin = result == MatchResult.BLUE_WIN;
                     fightWait.startGiftBoxOpening(isBlueWin);
-                }, 2, TimeUnit.SECONDS);
+                }), 2, TimeUnit.SECONDS);
             }
 
             refreshFightManager();
-        }, 8, TimeUnit.SECONDS);
+        }), 8, TimeUnit.SECONDS);
     }
 
     private byte getRewardMaterialId() {
@@ -1519,12 +1519,12 @@ public class FightManager {
             // Nếu là Boss bắn (isBossTurn), mặc định 2s tự đổi lượt
             // Nếu là Player bắn, 5s timeout nếu không nhận được SHOOT_RESULT
             int timeout = isBossTurn ? 2 : 5;
-            autoNextTurnTask = fightLoop.schedule(this::doNextTurn, timeout, TimeUnit.SECONDS);
+            autoNextTurnTask = fightLoop.schedule(wrap(this::doNextTurn), timeout, TimeUnit.SECONDS);
         }
     }
 
     public void handlePlayerShootResult(int userId) {
-        fightLoop.submit(() -> {
+        fightLoop.submit(wrap(() -> {
             Player player = getPlayerTurn();
             // Nếu không phải trong trạng thái chờ thì bỏ qua
             if (autoNextTurnTask == null || autoNextTurnTask.isDone() || player == null) {
@@ -1544,12 +1544,12 @@ public class FightManager {
 
             if (elapsedDelay < 2000) {
                 // Nếu chưa tới 2s thì chờ cho đủ 2s
-                fightLoop.schedule(this::doNextTurn, 2000 - elapsedDelay, TimeUnit.MILLISECONDS);
+                fightLoop.schedule(wrap(this::doNextTurn), 2000 - elapsedDelay, TimeUnit.MILLISECONDS);
             } else {
                 // Nếu thời gian chờ đã hơn 2s thì gọi chuyển lượt luôn
                 doNextTurn();
             }
-        });
+        }));
     }
 
     private void sendFireArmyPacket(byte bullId, int xS, int yS, short angle, byte force2, byte numShoot, Player player) {
@@ -1831,4 +1831,13 @@ public class FightManager {
         return distanceSq <= hitRadius * hitRadius;
     }
 
+    private Runnable wrap(Runnable task) {
+        return () -> {
+            try {
+                task.run();
+            } catch (Exception e) {
+                log.error("Exception in fightLoop: ", e);
+            }
+        };
+    }
 }
