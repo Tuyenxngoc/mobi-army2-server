@@ -13,6 +13,7 @@ import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
 import com.teamobi.mobiarmy2.service.ClanService;
+import com.teamobi.mobiarmy2.util.MapTileExporter;
 import com.teamobi.mobiarmy2.util.RandomUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -975,9 +976,9 @@ public class FightManager {
                 if (!hasActionInTurn) {
                     if (fightWait.getRoomType() == 5) {
                         p.setInactiveTurns((byte) (p.getInactiveTurns() + 1));
-                        log.info("Player {} inactive for {} turns", p.getUser().getUsername(), p.getInactiveTurns());
+                        log.info("Player {} inactive for {} turns", p.getIndex(), p.getInactiveTurns());
                         if (p.getInactiveTurns() >= 2) {
-                            log.info("Player {} died due to inactivity", p.getUser().getUsername());
+                            log.info("Player {} died due to inactivity", p.getIndex());
                             p.die();
                         }
                     } else {
@@ -1028,6 +1029,8 @@ public class FightManager {
             fightComplete(result);
             return;
         }
+
+//        exportMap();
 
         turnCount++;
 
@@ -1114,6 +1117,20 @@ public class FightManager {
                     boss.turnAction();
                 }
             }), 2, TimeUnit.SECONDS);
+        }
+    }
+
+    private void exportMap() {
+        try {
+            MapTileExporter.export(
+                    fightMapManager,
+                    players,
+                    fightWait.getMapId(),
+                    turnCount
+            );
+            log.info("Exported map state successfully.");
+        } catch (Exception e) {
+            log.error("Failed to export map", e);
         }
     }
 
