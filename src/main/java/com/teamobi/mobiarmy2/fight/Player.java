@@ -63,6 +63,7 @@ public class Player {
     protected byte windStopCount;
     protected byte eyeSmokeCount;
     protected byte skippedTurns;
+    protected byte inactiveTurns;
 
     protected byte[] items;
     protected boolean[] clanItems;

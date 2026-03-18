@@ -47,6 +47,7 @@ public class FightManager {
     //Danh sách id boss không có lượt chơi
     private static final Set<Byte> INVALID_CHARACTER_IDS = new HashSet<>(Set.of((byte) 18, (byte) 19, (byte) 20, (byte) 21, (byte) 23, (byte) 24));
     private static final Set<Byte> UNAUTHORIZED_ITEMS = Set.of((byte) 9, (byte) 28, (byte) 30, (byte) 31);
+    public static final int MAX_SKIP_TURNS = 3;
 
     private final FightWait fightWait;
 
@@ -76,6 +77,10 @@ public class FightManager {
 
     private ScheduledFuture<?> autoNextTurnTask;
     private long lastShootTime;
+
+    private int teamBlueSkippedTurns = 0;
+    private int teamRedSkippedTurns = 0;
+    private boolean hasActionInTurn = false;
 
     public FightManager(FightWait fightWait, ClanService clanService) {
         this.fightWait = fightWait;
@@ -292,8 +297,9 @@ public class FightManager {
                 return;
             }
 
-            if (player.getSkippedTurns() < 5) {
+            if (player.getSkippedTurns() < MAX_SKIP_TURNS) {
                 player.incrementSkippedTurns();
+                hasActionInTurn = true;
                 doNextTurn();
             }
         });
@@ -352,6 +358,7 @@ public class FightManager {
 
             //Xử lý khi dùng item
             handleItem(player, itemIndex);
+            hasActionInTurn = true;
         });
     }
 
@@ -370,6 +377,9 @@ public class FightManager {
         windY = 0;
         startTime = 0;
         nextBossId = -10;
+        teamBlueSkippedTurns = 0;
+        teamRedSkippedTurns = 0;
+        hasActionInTurn = false;
         countdownTimer.stop();
         bulletManager.resetBullets();
     }
@@ -959,6 +969,41 @@ public class FightManager {
     public void doNextTurn() {
         log.info("Turn {} complete. Processing next turn...", turnCount);
 
+        if (turnCount > 0) {
+            if (!isBossTurn && playerTurn != -1 && players[playerTurn] != null) {
+                Player p = players[playerTurn];
+                if (!hasActionInTurn) {
+                    if (fightWait.getRoomType() == 5) {
+                        p.setInactiveTurns((byte) (p.getInactiveTurns() + 1));
+                        log.info("Player {} inactive for {} turns", p.getUser().getUsername(), p.getInactiveTurns());
+                        if (p.getInactiveTurns() >= 2) {
+                            log.info("Player {} died due to inactivity", p.getUser().getUsername());
+                            p.die();
+                        }
+                    } else {
+                        if (p.isTeamBlue()) {
+                            teamBlueSkippedTurns++;
+                            log.info("Team Blue skipped {} consecutive turns", teamBlueSkippedTurns);
+                        } else {
+                            teamRedSkippedTurns++;
+                            log.info("Team Red skipped {} consecutive turns", teamRedSkippedTurns);
+                        }
+                    }
+                } else {
+                    if (fightWait.getRoomType() == 5) {
+                        p.setInactiveTurns((byte) 0);
+                    } else {
+                        if (p.isTeamBlue()) {
+                            teamBlueSkippedTurns = 0;
+                        } else {
+                            teamRedSkippedTurns = 0;
+                        }
+                    }
+                }
+            }
+            hasActionInTurn = false;
+        }
+
         //Cập nhật vị trí y của các player
         for (int i = 0; i < totalPlayers; i++) {
             Player player = players[i];
@@ -1203,6 +1248,9 @@ public class FightManager {
                 return null;
             }
         } else {
+            if (teamBlueSkippedTurns >= 2 || teamRedSkippedTurns >= 2) {
+                return MatchResult.DRAW;
+            }
             int redAliveCount = 0, blueAliveCount = 0;
             for (byte i = 0; i < MAX_USER_FIGHT; i++) {
                 Player player = players[i];
@@ -1434,6 +1482,7 @@ public class FightManager {
     }
 
     public void createShoot(Player player, byte bullId, short angle, byte force, byte force2, byte numShoot, boolean isNextTurn) {
+        hasActionInTurn = true;
         if (player.isDoubleShoot()) {
             player.setDoubleShoot(false);
         } else {
