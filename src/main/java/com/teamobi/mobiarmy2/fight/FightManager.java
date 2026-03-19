@@ -288,6 +288,11 @@ public class FightManager {
             if (preX != player.getX() || preY != player.getY()) {
                 sendMessageUpdateXY(player.getIndex());
             }
+
+            // Nếu người chơi chết trong lượt của mình (rơi vực), chuyển lượt ngay lập tức
+            if (player.isDead() && player.getIndex() == getCurrentTurn()) {
+                doNextTurn();
+            }
         }));
     }
 
@@ -307,12 +312,27 @@ public class FightManager {
     }
 
     public void updatePlayerCoordinates(int userId, short x, short y) {
-        Player player = getPlayerTurn();
-        if (player == null || player.getUser() == null || player.getUser().getUserId() != userId) {
-            return;
-        }
-        //Todo update player coordinates if needed
-        System.out.println("Player " + player.getUser().getUsername() + " updated coordinates to (" + x + ", " + y + ")");
+        fightLoop.submit(wrap(() -> {
+            int index = getPlayerIndexByUserId(userId);
+            if (index == -1) {
+                return;
+            }
+            Player player = players[index];
+            if (player == null || player.getUser() == null || player.isDead()) {
+                return;
+            }
+
+            // Đồng bộ tọa độ
+            player.updateXY(x, y);
+
+            // Gửi message cập nhật tọa độ
+            sendUpdateCoordinates(player.getIndex());
+
+            // Nếu người chơi chết trong lượt của mình (rơi vực), chuyển lượt ngay lập tức
+            if (player.isDead() && player.getIndex() == getCurrentTurn()) {
+                doNextTurn();
+            }
+        }));
     }
 
     public void useItem(int userId, byte itemIndex) {

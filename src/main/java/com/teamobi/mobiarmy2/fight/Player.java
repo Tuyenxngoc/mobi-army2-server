@@ -256,17 +256,25 @@ public class Player {
     }
 
     public synchronized void updateXY(short x, short y) {
-        while (x != this.x || y != this.y) {
-            int preX = this.x;
-            int preY = this.y;
-            if (x < this.x) {
-                move(false);
-            } else if (x > this.x) {
+        if (this.isFlying) {
+            this.x = x;
+            this.y = y;
+            return;
+        }
+        while (this.x != x || this.y != y) {
+            short preX = this.x;
+            short preY = this.y;
+            if (this.x < x) {
                 move(true);
+            } else if (this.x > x) {
+                move(false);
+            } else if (this.y != y) {
+                // Nếu X đã khớp nhưng Y chưa khớp (rơi thẳng đứng)
+                updateYPosition();
             }
 
-            //Nếu không di chuyển được thì thoát vòng lặp
-            if (preX == this.x && preY <= this.y) {
+            // Nếu không di chuyển được nữa (vướng tường hoặc đã chạm đất) thì thoát
+            if (preX == this.x && preY == this.y) {
                 return;
             }
         }
@@ -290,8 +298,10 @@ public class Player {
         } else {
             x -= step;
         }
+
+        // Logic vướng tường (Wall check)
         if (mapManager.isCollision(x, (short) (y - 5))) {
-            steps--; //Giảm số bước nếu không thể di chuyển
+            steps--; // Trả lại step
             if (addX) {
                 x -= step;
             } else {
@@ -299,25 +309,33 @@ public class Player {
             }
             return;
         }
+
+        // Logic leo dốc (Slope check)
         for (short i = 4; i >= 0; i--) {
             if (mapManager.isCollision(x, (short) (y - i))) {
                 y -= i;
                 return;
             }
         }
+
+        // Nếu không có đất dưới chân -> rơi (Fall)
         updateYPosition();
     }
 
     public synchronized void updateYPosition() {
+        if (isFlying || isDead) {
+            return;
+        }
         FightMapManager mapManager = fightManager.getFightMapManager();
+        // Rơi theo từng pixel cho đến khi chạm đất hoặc ra ngoài bản đồ
         while (y < mapManager.getHeight() + 200) {
-            if (mapManager.isCollision(x, y) || isFlying) {
+            if (mapManager.isCollision(x, y)) {
                 return;
             }
             y++;
         }
 
-        //Nếu rơi quá bản đồ thì tự sát
+        // Nếu rơi quá bản đồ thì tự sát
         die();
     }
 
