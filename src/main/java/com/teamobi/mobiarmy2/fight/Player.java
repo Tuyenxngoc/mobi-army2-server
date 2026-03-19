@@ -57,8 +57,8 @@ public class Player {
     protected byte usedItemId;
 
     protected byte invisibleCount; // Số lần vô hình
-    protected byte vanishCount;    // Số lần tàn hình
-    protected byte vampireCount;   // Số lần hút máu
+    protected byte vanishCount; // Số lần tàn hình
+    protected byte vampireCount; // Số lần hút máu
     protected byte freezeCount;
     protected byte windStopCount;
     protected byte eyeSmokeCount;
@@ -88,7 +88,8 @@ public class Player {
         this.maxHp = maxHp;
     }
 
-    public Player(FightManager fightManager, byte characterId, short x, short y, short width, short height, int maxHp, int xpExist) {
+    public Player(FightManager fightManager, byte characterId, short x, short y, short width, short height, int maxHp,
+                  int xpExist) {
         this.fightManager = fightManager;
         this.characterId = characterId;
         this.x = x;
@@ -100,7 +101,8 @@ public class Player {
         this.xpExist = xpExist;
     }
 
-    public Player(FightManager fightManager, User user, byte index, boolean isTeamBlue, short x, short y, byte[] items, int[] abilities, boolean[] clanItems) {
+    public Player(FightManager fightManager, User user, byte index, boolean isTeamBlue, short x, short y, byte[] items,
+                  int[] abilities, boolean[] clanItems) {
         this.fightManager = fightManager;
         this.user = user;
         this.gunId = user.getGunId();
@@ -130,36 +132,36 @@ public class Player {
     }
 
     private void applyClanBonuses() {
-        if (clanItems[1]) { //5% may mắn
+        if (clanItems[1]) { // 5% may mắn
             luck = Utils.calculatePercentBonus(luck, 5);
         }
-        if (clanItems[3]) { //5% phòng thủ
+        if (clanItems[3]) { // 5% phòng thủ
             defense = Utils.calculatePercentBonus(defense, 5);
         }
-        if (clanItems[5]) { //5% HP
+        if (clanItems[5]) { // 5% HP
             maxHp = Utils.calculatePercentBonus(maxHp, 5);
         }
-        if (clanItems[6]) { //5% sức mạnh
+        if (clanItems[6]) { // 5% sức mạnh
             damagePercent = Utils.calculatePercentBonus(damagePercent, 5);
         }
-        if (clanItems[8]) { //10% may mắn
+        if (clanItems[8]) { // 10% may mắn
             luck = Utils.calculatePercentBonus(luck, 10);
         }
-        if (clanItems[10]) { //10% phòng thủ
+        if (clanItems[10]) { // 10% phòng thủ
             defense = Utils.calculatePercentBonus(defense, 10);
         }
-        if (clanItems[12]) { //10% HP
+        if (clanItems[12]) { // 10% HP
             maxHp = Utils.calculatePercentBonus(maxHp, 10);
         }
-        if (clanItems[13]) { //10% sức mạnh
+        if (clanItems[13]) { // 10% sức mạnh
             damagePercent = Utils.calculatePercentBonus(damagePercent, 10);
         }
-        if (clanItems[14]) { //30% phòng thủ cho Canon và AK
+        if (clanItems[14]) { // 30% phòng thủ cho Canon và AK
             if (characterId == 1 || characterId == 5) {
                 defense = Utils.calculatePercentBonus(defense, 30);
             }
         }
-        if (clanItems[15]) { //15% sức mạnh cho King Kong và Proton
+        if (clanItems[15]) { // 15% sức mạnh cho King Kong và Proton
             if (characterId == 2 || characterId == 3) {
                 damagePercent = Utils.calculatePercentBonus(damagePercent, 15);
             }
@@ -192,7 +194,7 @@ public class Player {
         isUpdateHP = true;
         hp += addHp;
 
-        //Nếu may mắn và máu thấp hơn 10 thì máu bằng 10
+        // Nếu may mắn và máu thấp hơn 10 thì máu bằng 10
         if (isLucky && hp < 10) {
             hp = 10;
         }
@@ -347,12 +349,12 @@ public class Player {
     }
 
     public synchronized void collision(short bx, short by, Bullet bull) {
-        //Bỏ qua nếu đã bại hoặc đang vô hình
+        // Bỏ qua nếu đã bại hoặc đang vô hình
         if (isDead || invisibleCount > 0 || characterId == 17) {
             return;
         }
 
-        //Bỏ qua va chạm cho boom bum
+        // Bỏ qua va chạm cho boom bum
         if ((bull.bullId == 31 || bull.bullId == 32 || bull.bullId == 35) && this.index >= 8) {
             return;
         }
@@ -361,28 +363,29 @@ public class Player {
         int bullId = bull.getBullId();
         int shooterCharacterId = shooter.getCharacterId();
 
-        //Logic tính toán tầm ảnh hưởng
+        // Logic tính toán tầm ảnh hưởng
         int impactRadius = Bullet.getImpactRadiusByBullId(bull.getBullId());
-        if (bullId == 35 && shooterCharacterId == 15) {//T. rex jump
+        if (bullId == 35 && shooterCharacterId == 15) {// T. rex jump
             impactRadius = 250;
         }
 
-        //Nhân đôi tầm ảnh hưởng nếu sử dụng kỹ năng pow với các nhân vật cụ thể
-        if (shooter.isUsePow() && (shooterCharacterId == 3 || shooterCharacterId == 4 || shooterCharacterId == 6 || shooterCharacterId == 7 || shooterCharacterId == 8)) {
+        // Nhân đôi tầm ảnh hưởng nếu sử dụng kỹ năng pow với các nhân vật cụ thể
+        if (shooter.isUsePow() && (shooterCharacterId == 3 || shooterCharacterId == 4 || shooterCharacterId == 6
+                || shooterCharacterId == 7 || shooterCharacterId == 8)) {
             impactRadius *= 2;
         }
 
-        //Kiểm tra điều kiện để bỏ qua xử lý va chạm
+        // Kiểm tra điều kiện để bỏ qua xử lý va chạm
         if (!Utils.intersectRegions(x, y, width, height, bx, by, impactRadius * 2, impactRadius * 2)) {
             return;
         }
 
-        //Tính toán khoảng cách từ điểm va chạm
+        // Tính toán khoảng cách từ điểm va chạm
         int deltaX = Math.abs(x - bx);
         int deltaY = Math.abs(y - height / 2 - by);
         int distance = (int) Math.hypot(deltaX, deltaY);
 
-        //Tính sát thương
+        // Tính sát thương
         int damage = bull.getDamage();
         if (distance > width / 2) {
             damage -= (int) Math.round((double) damage * (distance - width / 2) / impactRadius);
@@ -391,7 +394,7 @@ public class Player {
             return;
         }
 
-        //Nhân đôi sát thương nếu may mắn
+        // Nhân đôi sát thương nếu may mắn
         if (shooter.isLucky) {
             damage *= 2;
         }
@@ -399,14 +402,14 @@ public class Player {
         // Tăng sát thương từ item clan khi sử dụng tuyệt chiêu Pow
         if (shooter.isUsePow()) {
             if (shooter.clanItems[4]) {
-                damage = Utils.calculatePercentBonus(damage, 5);  //+5% damage
+                damage = Utils.calculatePercentBonus(damage, 5); // +5% damage
             }
             if (shooter.clanItems[11]) {
-                damage = Utils.calculatePercentBonus(damage, 10); //+10% damage
+                damage = Utils.calculatePercentBonus(damage, 10); // +10% damage
             }
         }
 
-        //Tăng sát thương khi đạn siêu cao
+        // Tăng sát thương khi đạn siêu cao
         byte superType = bull.getBulletManager().getSuperType();
         switch (superType) {
             case 1 -> damage = Utils.calculatePercentBonus(damage, 10);// +10%
@@ -414,21 +417,23 @@ public class Player {
             case 4 -> damage = Utils.calculatePercentBonus(damage, 30);// +30%
         }
 
-        //Tính toán điểm phòng thủ
+        // Tính toán điểm phòng thủ
         int effectiveDefense = defense;
         if (isLucky) {
-            //Giảm sát thương
+            // Giảm sát thương
             damage = Math.round((float) damage / 2);
 
-            //Cộng thêm 10% chỉ số phòng thủ khi may mắn
+            // Cộng thêm 10% chỉ số phòng thủ khi may mắn
             effectiveDefense = Utils.calculatePercentBonus(defense, 10);
         }
 
         if (effectiveDefense > 0) {
             log.info("Effective Defense: {}", effectiveDefense);
 
-            // Áp dụng công thức phòng thủ: D = A * STAT_HALF_EFFECT_POINT / (STAT_HALF_EFFECT_POINT + DEF)
-            damage = (int) Math.round((double) damage * STAT_HALF_EFFECT_POINT / (STAT_HALF_EFFECT_POINT + effectiveDefense));
+            // Áp dụng công thức phòng thủ: D = A * STAT_HALF_EFFECT_POINT /
+            // (STAT_HALF_EFFECT_POINT + DEF)
+            damage = (int) Math
+                    .round((double) damage * STAT_HALF_EFFECT_POINT / (STAT_HALF_EFFECT_POINT + effectiveDefense));
         }
 
         log.info("Damage: {}", damage);
@@ -453,16 +458,19 @@ public class Player {
                     shooter.addReward(giftBox.getRandomReward());
                 }
                 case 26 -> {
-//                    Player players = new Ghost2(fightManager, (byte) (fightMNG.allCount + fightMNG.bullMNG.addboss.size()), 1800 + (fightMNG.getLevelTeam() * 10), (short) (Until.nextInt(100, fightMNG.mapMNG.Width - 100)), (short) Until.nextInt(150));
+                    // Player players = new Ghost2(fightManager, (byte) (fightMNG.allCount +
+                    // fightMNG.bullMNG.addboss.size()), 1800 + (fightMNG.getLevelTeam() * 10),
+                    // (short) (Until.nextInt(100, fightMNG.mapMNG.Width - 100)), (short)
+                    // Until.nextInt(150));
                 }
             }
 
             // Chỉ cộng XP và Cup nếu hạ gục kẻ địch
             if (shooter.isTeamBlue() != this.isTeamBlue()) {
-                //Cộng xp
+                // Cộng xp
                 shooter.updateXp(xpExist, true);
 
-                //Logic cộng cup
+                // Logic cộng cup
                 if (shooter.getUser() != null && user != null) {
                     int cupDifference = shooter.getUser().getCup() - user.getCup();
                     int cupUp = (3000 - cupDifference) / 100;
@@ -495,7 +503,8 @@ public class Player {
     }
 
     public synchronized void setXY(short x, short y) {
-        if (x >= 0 && x < fightManager.getFightMapManager().getWidth() && y < fightManager.getFightMapManager().getHeight()) {
+        if (x >= 0 && x < fightManager.getFightMapManager().getWidth()
+                && y < fightManager.getFightMapManager().getHeight()) {
             this.x = x;
             this.y = y;
         }
@@ -503,7 +512,9 @@ public class Player {
 
     public synchronized void usedItem(int slot) {
         usedItemId = items[slot];
-        if (usedItemId == 0 || usedItemId == 2 || usedItemId == 3 || usedItemId == 4 || usedItemId == 5 || usedItemId == 10 || usedItemId == 32 || usedItemId == 33 || usedItemId == 34 || usedItemId == 35 || usedItemId == 100) {
+        if (usedItemId == 0 || usedItemId == 2 || usedItemId == 3 || usedItemId == 4 || usedItemId == 5
+                || usedItemId == 10 || usedItemId == 32 || usedItemId == 33 || usedItemId == 34 || usedItemId == 35
+                || usedItemId == 100) {
             usedItemId = -1;
         }
         itemUsed = true;
