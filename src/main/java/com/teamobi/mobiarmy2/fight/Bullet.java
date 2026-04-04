@@ -55,7 +55,7 @@ public class Bullet {
         this.y = (short) y;
         this.vx = (short) vx;
         this.vy = (short) vy;
-        FightManager fightManager = bulletManager.getFightManager();
+        IFightManager fightManager = bulletManager.getFightManager();
         this.ax100 = (short) (fightManager.getWindX() * msg / 100);
         this.ay100 = (short) (fightManager.getWindY() * msg / 100);
         this.g100 = (short) g100;

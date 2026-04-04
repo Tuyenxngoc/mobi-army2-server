@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 public class BulletManager {
-    private FightManager fightManager;
+    private IFightManager fightManager;
     private FightMapManager fightMapManager;
     private List<Bullet> bullets = new ArrayList<>();
     private byte typeShoot;
@@ -17,7 +17,7 @@ public class BulletManager {
     private short superX;
     private short superY;
 
-    public BulletManager(FightManager fightManager) {
+    public BulletManager(IFightManager fightManager) {
         this.fightManager = fightManager;
         this.fightMapManager = fightManager.getFightMapManager();
     }

@@ -24,7 +24,7 @@ public class Player {
     // Dùng cho các hệ: luck (tỉ lệ), phòng thủ (giảm damage), v.v.
     public static final int STAT_HALF_EFFECT_POINT = 3825;
 
-    protected FightManager fightManager;
+    protected IFightManager fightManager;
     protected User user;
     protected byte characterId;
     protected byte index;
@@ -88,7 +88,7 @@ public class Player {
         this.maxHp = maxHp;
     }
 
-    public Player(FightManager fightManager, byte characterId, short x, short y, short width, short height, int maxHp,
+    public Player(IFightManager fightManager, byte characterId, short x, short y, short width, short height, int maxHp,
                   int xpExist) {
         this.fightManager = fightManager;
         this.characterId = characterId;
@@ -101,7 +101,7 @@ public class Player {
         this.xpExist = xpExist;
     }
 
-    public Player(FightManager fightManager, User user, byte index, boolean isTeamBlue, short x, short y, byte[] items,
+    public Player(IFightManager fightManager, User user, byte index, boolean isTeamBlue, short x, short y, byte[] items,
                   int[] abilities, boolean[] clanItems) {
         this.fightManager = fightManager;
         this.user = user;

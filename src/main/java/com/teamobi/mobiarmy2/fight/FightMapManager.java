@@ -12,7 +12,7 @@ import java.util.List;
 public class FightMapManager {
     @Getter
     private final List<MapTile> mapTiles = new ArrayList<>();
-    private final FightManager fightManager;
+    private final IFightManager fightManager;
     @Getter
     private short width;
     @Getter
@@ -20,7 +20,7 @@ public class FightMapManager {
     private short[] playerInitXPositions;
     private short[] playerInitYPositions;
 
-    public FightMapManager(FightManager fightManager) {
+    public FightMapManager(IFightManager fightManager) {
         this.fightManager = fightManager;
     }
 

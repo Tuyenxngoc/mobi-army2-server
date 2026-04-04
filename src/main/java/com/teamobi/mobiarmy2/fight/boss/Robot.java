@@ -1,12 +1,12 @@
 package com.teamobi.mobiarmy2.fight.boss;
 
 import com.teamobi.mobiarmy2.fight.Boss;
-import com.teamobi.mobiarmy2.fight.FightManager;
+import com.teamobi.mobiarmy2.fight.IFightManager;
 import com.teamobi.mobiarmy2.fight.Player;
 import com.teamobi.mobiarmy2.util.RandomUtil;
 
 public class Robot extends Boss {
-    public Robot(FightManager fightManager, short x, short y, int maxHp) {
+    public Robot(IFightManager fightManager, short x, short y, int maxHp) {
         super(fightManager, (byte) 14, "Robot", x, y, (short) 24, (short) 25, maxHp, 4);
     }
 

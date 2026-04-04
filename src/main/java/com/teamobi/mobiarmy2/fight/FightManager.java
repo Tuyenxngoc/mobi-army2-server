@@ -28,7 +28,7 @@ import java.util.concurrent.*;
 import java.util.function.Predicate;
 
 @Slf4j
-public class FightManager {
+public class FightManager implements IFightManager {
     private static final int MAX_ELEMENT_FIGHT = 100;
     private static final int MAX_USER_FIGHT = 8;
     private static final int MAX_PLAY_TIME = 30;
@@ -1207,7 +1207,7 @@ public class FightManager {
     private void spawnBosses(List<Boss> bosses) {
         List<Boss> addedBosses = new ArrayList<>();
         for (Boss boss : bosses) {
-            if (totalPlayers >= FightManager.MAX_ELEMENT_FIGHT) {
+            if (totalPlayers >= MAX_ELEMENT_FIGHT) {
                 break;
             }
 

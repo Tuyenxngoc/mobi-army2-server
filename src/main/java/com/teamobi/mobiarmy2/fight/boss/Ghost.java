@@ -1,12 +1,12 @@
 package com.teamobi.mobiarmy2.fight.boss;
 
 import com.teamobi.mobiarmy2.fight.Boss;
-import com.teamobi.mobiarmy2.fight.FightManager;
+import com.teamobi.mobiarmy2.fight.IFightManager;
 import com.teamobi.mobiarmy2.fight.Player;
 import com.teamobi.mobiarmy2.util.RandomUtil;
 
 public class Ghost extends Boss {
-    public Ghost(FightManager fightManager, short x, short y, int maxHp) {
+    public Ghost(IFightManager fightManager, short x, short y, int maxHp) {
         super(fightManager, (byte) 25, "Ghost", x, y, (short) 35, (short) 31, maxHp, 5);
         super.isFlying = true;
     }

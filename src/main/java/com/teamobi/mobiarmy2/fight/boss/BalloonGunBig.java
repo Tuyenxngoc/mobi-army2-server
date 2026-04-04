@@ -1,10 +1,10 @@
 package com.teamobi.mobiarmy2.fight.boss;
 
 import com.teamobi.mobiarmy2.fight.Boss;
-import com.teamobi.mobiarmy2.fight.FightManager;
+import com.teamobi.mobiarmy2.fight.IFightManager;
 
 public class BalloonGunBig extends Boss {
-    public BalloonGunBig(FightManager fightManager, short x, short y, int maxHp) {
+    public BalloonGunBig(IFightManager fightManager, short x, short y, int maxHp) {
         super(fightManager, (byte) 19, "Balloon Gun Big", x, y, (short) 35, (short) 39, maxHp, 4);
         super.isFlying = true;
     }
