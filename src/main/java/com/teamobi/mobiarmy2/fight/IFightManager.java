@@ -27,8 +27,6 @@ public interface IFightManager {
 
     void sendBulletHit(byte index, byte toIndex);
 
-    void sendRewardMessage(Player player, Reward reward);
-
     void sendPlayerFlyPosition(byte index);
 
     void sendGhostAttackInfo(byte index, byte toIndex);
@@ -40,8 +38,6 @@ public interface IFightManager {
     Player[] getPlayers();
 
     int getTotalPlayers();
-
-    int getTurnCount();
 
     byte getWindX();
 

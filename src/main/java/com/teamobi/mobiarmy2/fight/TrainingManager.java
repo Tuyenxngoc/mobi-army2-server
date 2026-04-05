@@ -35,77 +35,43 @@ public class TrainingManager implements IFightManager {
 
     @Override
     public void startGame() {
+        // Tải dữ liệu bản đồ
+        fightMapManager.loadMapId(mapId);
 
-    }
+        // Tải dữ liệu vị trí
+        List<short[]> randomPositions = fightMapManager.getRandomPlayerPositions(8);
 
-    @Override
-    public Future<?> leaveGame(int userId) {
-        return null;
-    }
+        short[] playerPosition = randomPositions.get(0);
+        short[] enemyPosition = randomPositions.get(1);
 
-    @Override
-    public void handlePlayerShoot(int userId, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
+        short gunId = trainingUser.getGunId();
+        byte characterId = trainingUser.getActiveCharacterId();
+        players[0] = new Player(this, 0, playerPosition[0], playerPosition[1], 70, 1000, gunId, characterId, true); // người chơi luyện tập
+        players[1] = new Player(this, 1, enemyPosition[0], enemyPosition[1], 1000, 1000, gunId, characterId, false);
 
-    }
-
-    @Override
-    public void changeLocation(int userId, short x, short y) {
-
-    }
-
-    @Override
-    public void skipTurn(int userId) {
-
-    }
-
-    @Override
-    public void updatePlayerCoordinates(int userId, short x, short y) {
-
-    }
-
-    @Override
-    public void useItem(int userId, byte itemIndex) {
-
-    }
-
-    @Override
-    public void addPendingBoss(Boss player) {
-
-    }
-
-    @Override
-    public void sendUpdateCoordinates(byte index) {
-
-    }
-
-    @Override
-    public void sendCapture(byte index, byte toIndex) {
-
-    }
-
-    @Override
-    public void sendBulletHit(byte index, byte toIndex) {
-
-    }
-
-    @Override
-    public void sendRewardMessage(Player player, Reward reward) {
-
-    }
-
-    @Override
-    public void sendPlayerFlyPosition(byte index) {
-
-    }
-
-    @Override
-    public void sendGhostAttackInfo(byte index, byte toIndex) {
-
-    }
-
-    @Override
-    public void sendMessageUpdateXY(int index) {
-
+        try {
+            Message ms = new Message(Cmd.START_ARMY);
+            DataOutputStream ds = ms.writer();
+            short[] equips = trainingUser.getEquips();
+            for (short i : equips) {
+                ds.writeShort(i);
+            }
+            ds.writeByte(mapId);
+            ds.writeByte(30);
+            ds.writeShort(0);
+            for (Player player : players) {
+                ds.writeShort(player.getX());
+                ds.writeShort(player.getY());
+                ds.writeShort(player.getMaxHp());
+            }
+            for (byte i = 0; i < 6; i++) {
+                ds.writeShort(-1);
+            }
+            ds.flush();
+            trainingUser.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -116,21 +82,6 @@ public class TrainingManager implements IFightManager {
     @Override
     public int getTotalPlayers() {
         return 2;
-    }
-
-    @Override
-    public int getTurnCount() {
-        return 0;
-    }
-
-    @Override
-    public short[] getForceArgXY(int idGun, boolean isXuyenMap, short X, short Y, short toX, short toY, short Mx, short My, int arg, int force, int msg, int g100) {
-        return new short[0];
-    }
-
-    @Override
-    public void nextTurn() {
-
     }
 
     private void updateWind() {
@@ -172,9 +123,18 @@ public class TrainingManager implements IFightManager {
 
     @Override
     public void doNextTurn() {
-        // Cập nhật vị trí y của các player
-        players[0].updateYPosition();
-        players[1].updateYPosition();
+        for (Player player : players) {
+            // Lưu lại vị trí ban đầu
+            int preY = player.getY();
+
+            // Cập nhật vị trí y
+            player.updateYPosition();
+
+            // Gửi thông báo nếu vị trí thay đổi
+            if (preY != player.getY()) {
+                sendMessageUpdateXY(player.getIndex());
+            }
+        }
 
         // Đặt lại giá trị của người chơi trong lượt mới như thể lực, ..., vv
         Player player = players[0];
@@ -200,108 +160,25 @@ public class TrainingManager implements IFightManager {
     }
 
     @Override
-    public void giveXpToTeammates(boolean isTeamBlue, int addXP, Player sharer) {
-
-    }
-
-    @Override
-    public void createShoot(Player player, byte bullId, short angle, byte force, byte force2, byte numShoot) {
-
-    }
-
-    @Override
-    public void createShoot(Player player, byte bullId, short angle, byte force, byte force2, byte numShoot, boolean isNextTurn) {
-
-    }
-
-    @Override
-    public void handlePlayerShootResult(int userId) {
-
-    }
-
-    @Override
     public Player getPlayerTurn() {
         return players[0]; // Luôn trả về người chơi luyện tập
-    }
-
-    @Override
-    public Player getRandomPlayer(Predicate<Player> condition) {
-        return null;
-    }
-
-    @Override
-    public Player findClosestPlayer(short targetX, short targetY) {
-        return null;
-    }
-
-    @Override
-    public Player getRandomPlayer() {
-        return null;
-    }
-
-    @Override
-    public void collisionPlayers(short x, short y, Bullet bullet) {
-
-    }
-
-    @Override
-    public void onBulletExplode(short bx, short by, Bullet bullet) {
-
-    }
-
-    public void startTraining() {
-        // Tải dữ liệu bản đồ
-        fightMapManager.loadMapId(mapId);
-
-        // Tải dữ liệu vị trí
-        List<short[]> randomPositions = fightMapManager.getRandomPlayerPositions(8);
-
-        short[] playerPosition = randomPositions.get(0);
-        short[] enemyPosition = randomPositions.get(1);
-
-        short gunId = trainingUser.getGunId();
-        byte characterId = trainingUser.getActiveCharacterId();
-        players[0] = new Player(this, 0, playerPosition[0], playerPosition[1], 70, 1000, gunId, characterId, true); // người chơi luyện tập
-        players[1] = new Player(this, 1, enemyPosition[0], enemyPosition[1], 1000, 1000, gunId, characterId, false);
-
-        try {
-            Message ms = new Message(Cmd.START_ARMY);
-            DataOutputStream ds = ms.writer();
-            short[] equips = trainingUser.getEquips();
-            for (short i : equips) {
-                ds.writeShort(i);
-            }
-            ds.writeByte(mapId);
-            ds.writeByte(30);
-            ds.writeShort(0);
-            for (Player player : players) {
-                ds.writeShort(player.getX());
-                ds.writeShort(player.getY());
-                ds.writeShort(player.getMaxHp());
-            }
-            for (byte i = 0; i < 6; i++) {
-                ds.writeShort(-1);
-            }
-            ds.flush();
-            trainingUser.sendMessage(ms);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public void stopTraining() {
         bulletManager.resetBullets();
     }
 
-    public void addShoot(byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
+    public void handlePlayerShoot(int userId, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
         Player player = getPlayerTurn();
 
         // Cập nhật vị trí người chơi
         player.updateXY(x, y);
 
+        // Lưu tọa độ ban đầu của người chơi trước khi bắn
         int xS = player.getX();
         int yS = player.getY();
 
+        // Tạo đạn và cập nhật quỹ đạo
         bulletManager.addShoot(player, bullId, angle, force, force2, numShoot);
         bulletManager.updateBullets();
 
@@ -397,24 +274,128 @@ public class TrainingManager implements IFightManager {
         }
     }
 
-    public void changeLocation(short x, short y) {
-        Player player = getPlayerTurn();
+    @Override
+    public void changeLocation(int userId, short x, short y) {
 
-        // Lưu lại vị trí ban đầu
-        int preX = player.getX();
-        int preY = player.getY();
+    }
 
-        // Cập nhật vị trí mới
-        player.updateXY(x, y);
+    @Override
+    public Future<?> leaveGame(int userId) {
+        return null;
+    }
 
-        // Gửi thông báo nếu vị trí thay đổi
-        if (preX != player.getX() || preY != player.getY()) {
-            sendMessageUpdateXY(player.getIndex());
+    @Override
+    public void skipTurn(int userId) {
+
+    }
+
+    @Override
+    public void updatePlayerCoordinates(int userId, short x, short y) {
+
+    }
+
+    @Override
+    public void useItem(int userId, byte itemIndex) {
+
+    }
+
+    @Override
+    public void addPendingBoss(Boss player) {
+
+    }
+
+    @Override
+    public void sendUpdateCoordinates(byte index) {
+
+    }
+
+    @Override
+    public void sendCapture(byte index, byte toIndex) {
+
+    }
+
+    @Override
+    public void sendBulletHit(byte index, byte toIndex) {
+
+    }
+
+    @Override
+    public void sendPlayerFlyPosition(byte index) {
+
+    }
+
+    @Override
+    public void sendGhostAttackInfo(byte index, byte toIndex) {
+
+    }
+
+    public void sendMessageUpdateXY(int index) {
+        try {
+            Player player = players[index];
+            Message ms = new Message(Cmd.MOVE_ARMY);
+            DataOutputStream ds = ms.writer();
+            ds.writeByte(index);
+            ds.writeShort(player.getX());
+            ds.writeShort(player.getY());
+            ds.flush();
+            trainingUser.sendMessage(ms);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
 
-        // Nếu người chơi chết trong lượt của mình (rơi vực), chuyển lượt ngay lập tức
-        if (player.isDead()) {
-            System.out.println("Player " + player.getIndex() + " has died. Ending training session.");
-        }
+    @Override
+    public short[] getForceArgXY(int idGun, boolean isXuyenMap, short X, short Y, short toX, short toY, short Mx, short My, int arg, int force, int msg, int g100) {
+        return new short[0];
+    }
+
+    @Override
+    public void nextTurn() {
+
+    }
+
+    @Override
+    public void giveXpToTeammates(boolean isTeamBlue, int addXP, Player sharer) {
+
+    }
+
+    @Override
+    public void createShoot(Player player, byte bullId, short angle, byte force, byte force2, byte numShoot) {
+
+    }
+
+    @Override
+    public void createShoot(Player player, byte bullId, short angle, byte force, byte force2, byte numShoot, boolean isNextTurn) {
+
+    }
+
+    @Override
+    public void handlePlayerShootResult(int userId) {
+
+    }
+
+    @Override
+    public Player getRandomPlayer(Predicate<Player> condition) {
+        return null;
+    }
+
+    @Override
+    public Player findClosestPlayer(short targetX, short targetY) {
+        return null;
+    }
+
+    @Override
+    public Player getRandomPlayer() {
+        return null;
+    }
+
+    @Override
+    public void collisionPlayers(short x, short y, Bullet bullet) {
+
+    }
+
+    @Override
+    public void onBulletExplode(short bx, short by, Bullet bullet) {
+
     }
 }

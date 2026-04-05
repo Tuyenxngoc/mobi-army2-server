@@ -21,15 +21,14 @@ public class FightManagerMessageHandler extends BaseMessageHandler {
     }
 
     public void movePlayer(Message ms) throws IOException {
+        if (us().getState() != UserState.FIGHTING) {
+            return;
+        }
+
         DataInputStream dis = ms.reader();
         short x = dis.readShort();
         short y = dis.readShort();
-
-        if (us().getState() == UserState.FIGHTING) {
-            fm().changeLocation(us().getUserId(), x, y);
-        } else if (us().getState() == UserState.TRAINING) {
-            us().getTrainingManager().changeLocation(x, y);
-        }
+        fm().changeLocation(us().getUserId(), x, y);
     }
 
     public void handleShot(Message ms) throws IOException {
@@ -114,7 +113,7 @@ public class FightManagerMessageHandler extends BaseMessageHandler {
             }
 
             us().setState(UserState.TRAINING);
-            us().getTrainingManager().startTraining();
+            us().getTrainingManager().startGame();
         } else {//Out game
             if (us().getState() != UserState.TRAINING) {
                 return;
@@ -148,7 +147,7 @@ public class FightManagerMessageHandler extends BaseMessageHandler {
         }
         byte numShoot = dis.readByte();
 
-        us().getTrainingManager().addShoot(bullId, x, y, angle, force, force2, numShoot);
+        us().getTrainingManager().handlePlayerShoot(us().getUserId(), bullId, x, y, angle, force, force2, numShoot);
     }
 
     private void initializeTrainingManager() {

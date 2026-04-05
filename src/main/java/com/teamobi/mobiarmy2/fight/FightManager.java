@@ -293,6 +293,7 @@ public class FightManager implements IFightManager {
                 sendMessageUpdateXY(player.getIndex());
             }
 
+            // todo check bug
             // Nếu người chơi chết trong lượt của mình (rơi vực), chuyển lượt ngay lập tức
             if (player.isDead() && player.getIndex() == getCurrentTurn()) {
                 doNextTurn();
