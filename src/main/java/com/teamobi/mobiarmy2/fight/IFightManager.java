@@ -11,7 +11,7 @@ public interface IFightManager {
 
     void handlePlayerShoot(int userId, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot);
 
-    void changeLocation(int userId, short x, short y);
+    void handlePlayerMove(int userId, short x, short y);
 
     void skipTurn(int userId);
 

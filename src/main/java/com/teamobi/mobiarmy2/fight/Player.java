@@ -285,11 +285,13 @@ public class Player {
         while (this.x != x || this.y != y) {
             short preX = this.x;
             short preY = this.y;
+
+            // Di chuyển ngang tới X mục tiêu
             if (this.x < x) {
                 move(true);
             } else if (this.x > x) {
                 move(false);
-            } else if (this.y != y) {
+            } else {
                 // Nếu X đã khớp nhưng Y chưa khớp (rơi thẳng đứng)
                 updateYPosition();
             }

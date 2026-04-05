@@ -274,7 +274,7 @@ public class FightManager implements IFightManager {
         }));
     }
 
-    public void changeLocation(int userId, short x, short y) {
+    public void handlePlayerMove(int userId, short x, short y) {
         fightLoop.submit(wrap(() -> {
             Player player = getPlayerTurn();
             if (player.getUser() == null || player.getUser().getUserId() != userId) {
@@ -293,9 +293,8 @@ public class FightManager implements IFightManager {
                 sendMessageUpdateXY(player.getIndex());
             }
 
-            // todo check bug
             // Nếu người chơi chết trong lượt của mình (rơi vực), chuyển lượt ngay lập tức
-            if (player.isDead() && player.getIndex() == getCurrentTurn()) {
+            if (player.isDead()) {
                 doNextTurn();
             }
         }));
@@ -316,6 +315,7 @@ public class FightManager implements IFightManager {
         }));
     }
 
+    // todo check bug
     public void updatePlayerCoordinates(int userId, short x, short y) {
         fightLoop.submit(wrap(() -> {
             int index = getPlayerIndexByUserId(userId);

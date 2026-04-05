@@ -28,7 +28,7 @@ public class FightManagerMessageHandler extends BaseMessageHandler {
         DataInputStream dis = ms.reader();
         short x = dis.readShort();
         short y = dis.readShort();
-        fm().changeLocation(us().getUserId(), x, y);
+        fm().handlePlayerMove(us().getUserId(), x, y);
     }
 
     public void handleShot(Message ms) throws IOException {

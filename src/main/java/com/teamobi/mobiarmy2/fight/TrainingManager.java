@@ -275,7 +275,7 @@ public class TrainingManager implements IFightManager {
     }
 
     @Override
-    public void changeLocation(int userId, short x, short y) {
+    public void handlePlayerMove(int userId, short x, short y) {
 
     }
 
