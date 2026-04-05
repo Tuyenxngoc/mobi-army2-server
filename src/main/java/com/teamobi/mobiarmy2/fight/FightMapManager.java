@@ -12,17 +12,12 @@ import java.util.List;
 public class FightMapManager {
     @Getter
     private final List<MapTile> mapTiles = new ArrayList<>();
-    private final IFightManager fightManager;
     @Getter
     private short width;
     @Getter
     private short height;
     private short[] playerInitXPositions;
     private short[] playerInitYPositions;
-
-    public FightMapManager(IFightManager fightManager) {
-        this.fightManager = fightManager;
-    }
 
     public List<short[]> getRandomPlayerPositions(int numPlayers) {
         //Kiểm tra nếu số người chơi lớn hơn số vị trí khả dụng

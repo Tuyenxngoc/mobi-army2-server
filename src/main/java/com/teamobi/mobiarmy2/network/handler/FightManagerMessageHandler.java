@@ -148,7 +148,7 @@ public class FightManagerMessageHandler extends BaseMessageHandler {
         }
         byte numShoot = dis.readByte();
 
-        us().getTrainingManager().addShoot(us(), bullId, x, y, angle, force, force2, numShoot);
+        us().getTrainingManager().addShoot(bullId, x, y, angle, force, force2, numShoot);
     }
 
     private void initializeTrainingManager() {

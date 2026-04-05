@@ -88,8 +88,8 @@ public class FightManager implements IFightManager {
         this.fightWait = fightWait;
         this.clanService = clanService;
         this.players = new Player[MAX_ELEMENT_FIGHT];
-        this.fightMapManager = new FightMapManager(this);
-        this.bulletManager = new BulletManager(this);
+        this.fightMapManager = new FightMapManager();
+        this.bulletManager = new BulletManager(this, fightMapManager);
         this.countdownTimer = new CountdownTimer(MAX_PLAY_TIME + 10, this::nextTurn);
     }
 
@@ -816,13 +816,11 @@ public class FightManager implements IFightManager {
 
             windX = 0;
             windY = 0;
-        } else {
-            int[] range = getWindRange(player);
+        } else if (RandomUtil.nextInt(0, 100) > 25) {
+            int[] range = getWindRange(player.getCharacterId());
 
-            if (RandomUtil.nextInt(0, 100) > 25) {
-                windX = (byte) RandomUtil.nextInt(-range[0], range[0]);
-                windY = (byte) RandomUtil.nextInt(-range[1], range[1]);
-            }
+            windX = (byte) RandomUtil.nextInt(-range[0], range[0]);
+            windY = (byte) RandomUtil.nextInt(-range[1], range[1]);
         }
 
         sendWindUpdate();
@@ -831,11 +829,11 @@ public class FightManager implements IFightManager {
     /**
      * Lấy phạm vi gió dựa trên ID nhân vật của người chơi.
      *
-     * @param player
+     * @param characterId ID nhân vật của người chơi.
      * @return mảng chứa phạm vi gió theo trục X và Y.
      */
-    private int[] getWindRange(Player player) {
-        if (player.getCharacterId() == 9) {
+    private int[] getWindRange(byte characterId) {
+        if (characterId == 9) {
             return new int[]{60, 25};
         }
         return new int[]{70, 70};

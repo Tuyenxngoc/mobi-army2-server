@@ -17,9 +17,9 @@ public class BulletManager {
     private short superX;
     private short superY;
 
-    public BulletManager(IFightManager fightManager) {
+    public BulletManager(IFightManager fightManager, FightMapManager fightMapManager) {
         this.fightManager = fightManager;
-        this.fightMapManager = fightManager.getFightMapManager();
+        this.fightMapManager = fightMapManager;
     }
 
     public void addShoot(Player pl, byte bullId, short angle, byte force, byte force2, byte numShoot) {

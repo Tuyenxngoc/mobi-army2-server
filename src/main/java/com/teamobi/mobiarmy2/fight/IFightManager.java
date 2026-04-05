@@ -5,7 +5,6 @@ import java.util.function.Predicate;
 
 public interface IFightManager {
 
-
     void startGame();
 
     Future<?> leaveGame(int userId);
