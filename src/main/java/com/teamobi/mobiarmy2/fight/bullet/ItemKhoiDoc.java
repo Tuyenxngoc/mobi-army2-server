@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.fight.bullet;
 
 import com.teamobi.mobiarmy2.fight.Bullet;
 import com.teamobi.mobiarmy2.fight.BulletManager;
+import com.teamobi.mobiarmy2.fight.IFightManager;
 import com.teamobi.mobiarmy2.fight.Player;
 
 public class ItemKhoiDoc extends Bullet {
@@ -15,7 +16,7 @@ public class ItemKhoiDoc extends Bullet {
     public void update() {
         super.update();
         if (isCollected) {
-            bulletManager.getFightManager().onBulletExplode(x, y, this);
+            ((IFightManager) bulletManager.getFightManager()).onBulletExplode(x, y, this);
         }
     }
 }

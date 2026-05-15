@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 public class BulletManager {
-    private IFightManager fightManager;
+    private IFightBase fightManager;
     private FightMapManager fightMapManager;
     private List<Bullet> bullets = new ArrayList<>();
     private byte typeShoot;
@@ -17,7 +17,7 @@ public class BulletManager {
     private short superX;
     private short superY;
 
-    public BulletManager(IFightManager fightManager, FightMapManager fightMapManager) {
+    public BulletManager(IFightBase fightManager, FightMapManager fightMapManager) {
         this.fightManager = fightManager;
         this.fightMapManager = fightMapManager;
     }
@@ -124,7 +124,9 @@ public class BulletManager {
 
     public void handleCollision(short x, short y, Bullet bullet) {
         fightMapManager.collision(x, y, bullet);
-        fightManager.collisionPlayers(x, y, bullet);
+        if (fightManager instanceof IFightManager fm) {
+            fm.collisionPlayers(x, y, bullet);
+        }
     }
 
 }

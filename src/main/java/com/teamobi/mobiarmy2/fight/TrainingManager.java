@@ -9,10 +9,8 @@ import lombok.Getter;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.Future;
-import java.util.function.Predicate;
 
-public class TrainingManager implements IFightManager {
+public class TrainingManager implements IFightBase {
     private final User trainingUser;
     private final Player[] players;
     @Getter
@@ -168,6 +166,7 @@ public class TrainingManager implements IFightManager {
         bulletManager.resetBullets();
     }
 
+    @Override
     public void handlePlayerShoot(int userId, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot) {
         Player player = getPlayerTurn();
 
@@ -275,60 +274,6 @@ public class TrainingManager implements IFightManager {
     }
 
     @Override
-    public void handlePlayerMove(int userId, short x, short y) {
-
-    }
-
-    @Override
-    public Future<?> leaveGame(int userId) {
-        return null;
-    }
-
-    @Override
-    public void skipTurn(int userId) {
-
-    }
-
-    @Override
-    public void updatePlayerCoordinates(int userId, short x, short y) {
-
-    }
-
-    @Override
-    public void useItem(int userId, byte itemIndex) {
-
-    }
-
-    @Override
-    public void addPendingBoss(Boss player) {
-
-    }
-
-    @Override
-    public void sendUpdateCoordinates(byte index) {
-
-    }
-
-    @Override
-    public void sendCapture(byte index, byte toIndex) {
-
-    }
-
-    @Override
-    public void sendBulletHit(byte index, byte toIndex) {
-
-    }
-
-    @Override
-    public void sendPlayerFlyPosition(byte index) {
-
-    }
-
-    @Override
-    public void sendGhostAttackInfo(byte index, byte toIndex) {
-
-    }
-
     public void sendMessageUpdateXY(int index) {
         try {
             Player player = players[index];
@@ -342,60 +287,5 @@ public class TrainingManager implements IFightManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public short[] getForceArgXY(int idGun, boolean isXuyenMap, short X, short Y, short toX, short toY, short Mx, short My, int arg, int force, int msg, int g100) {
-        return new short[0];
-    }
-
-    @Override
-    public void nextTurn() {
-
-    }
-
-    @Override
-    public void giveXpToTeammates(boolean isTeamBlue, int addXP, Player sharer) {
-
-    }
-
-    @Override
-    public void createShoot(Player player, byte bullId, short angle, byte force, byte force2, byte numShoot) {
-
-    }
-
-    @Override
-    public void createShoot(Player player, byte bullId, short angle, byte force, byte force2, byte numShoot, boolean isNextTurn) {
-
-    }
-
-    @Override
-    public void handlePlayerShootResult(int userId) {
-
-    }
-
-    @Override
-    public Player getRandomPlayer(Predicate<Player> condition) {
-        return null;
-    }
-
-    @Override
-    public Player findClosestPlayer(short targetX, short targetY) {
-        return null;
-    }
-
-    @Override
-    public Player getRandomPlayer() {
-        return null;
-    }
-
-    @Override
-    public void collisionPlayers(short x, short y, Bullet bullet) {
-
-    }
-
-    @Override
-    public void onBulletExplode(short bx, short by, Bullet bullet) {
-
     }
 }

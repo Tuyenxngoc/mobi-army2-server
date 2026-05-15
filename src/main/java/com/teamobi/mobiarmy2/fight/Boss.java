@@ -7,9 +7,11 @@ import lombok.Setter;
 @Setter
 public abstract class Boss extends Player {
     private String name;
+    protected final IFightManager fightManager;
 
     public Boss(IFightManager fightManager, byte characterId, String name, short x, short y, short width, short height, int maxHp, int xpExist) {
         super(fightManager, characterId, x, y, width, height, maxHp, xpExist);
+        this.fightManager = fightManager;
         this.name = name;
         this.stamina = 100;
         this.damagePercent = 100;

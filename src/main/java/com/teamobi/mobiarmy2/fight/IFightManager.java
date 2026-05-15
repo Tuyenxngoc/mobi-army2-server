@@ -3,13 +3,9 @@ package com.teamobi.mobiarmy2.fight;
 import java.util.concurrent.Future;
 import java.util.function.Predicate;
 
-public interface IFightManager {
-
-    void startGame();
+public interface IFightManager extends IFightBase {
 
     Future<?> leaveGame(int userId);
-
-    void handlePlayerShoot(int userId, byte bullId, short x, short y, short angle, byte force, byte force2, byte numShoot);
 
     void handlePlayerMove(int userId, short x, short y);
 
@@ -31,23 +27,9 @@ public interface IFightManager {
 
     void sendGhostAttackInfo(byte index, byte toIndex);
 
-    void sendMessageUpdateXY(int index);
-
-    FightMapManager getFightMapManager();
-
-    Player[] getPlayers();
-
-    int getTotalPlayers();
-
-    byte getWindX();
-
-    byte getWindY();
-
     short[] getForceArgXY(int idGun, boolean isXuyenMap, short X, short Y, short toX, short toY, short Mx, short My, int arg, int force, int msg, int g100);
 
     void nextTurn();
-
-    void doNextTurn();
 
     void giveXpToTeammates(boolean isTeamBlue, int addXP, Player sharer);
 
@@ -56,8 +38,6 @@ public interface IFightManager {
     void createShoot(Player player, byte bullId, short angle, byte force, byte force2, byte numShoot, boolean isNextTurn);
 
     void handlePlayerShootResult(int userId);
-
-    Player getPlayerTurn();
 
     Player getRandomPlayer(Predicate<Player> condition);
 

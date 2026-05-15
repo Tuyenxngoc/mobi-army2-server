@@ -25,7 +25,7 @@ public class Player {
     // Dùng cho các hệ: luck (tỉ lệ), phòng thủ (giảm damage), v.v.
     public static final int STAT_HALF_EFFECT_POINT = 3825;
 
-    protected IFightManager fightManager;
+    protected IFightBase fightManager;
     protected User user;
     protected byte characterId;
     protected byte index;
@@ -81,7 +81,7 @@ public class Player {
     protected int xpExist;
     protected List<Reward> rewards;
 
-    public Player(IFightManager fightManager, byte characterId, short x, short y, short width, short height, int maxHp,
+    public Player(IFightBase fightManager, byte characterId, short x, short y, short width, short height, int maxHp,
                   int xpExist) {
         this.fightManager = fightManager;
         this.characterId = characterId;
@@ -94,7 +94,7 @@ public class Player {
         this.xpExist = xpExist;
     }
 
-    public Player(IFightManager fightManager, int index, int x, int y, int hp, int maxHp, short gunId, byte characterId, boolean isTeamBlue) {
+    public Player(IFightBase fightManager, int index, int x, int y, int hp, int maxHp, short gunId, byte characterId, boolean isTeamBlue) {
         this.fightManager = fightManager;
         this.gunId = gunId;
         this.characterId = characterId;
@@ -120,7 +120,7 @@ public class Player {
         this.luck = 0;
     }
 
-    public Player(IFightManager fightManager, User user, byte index, boolean isTeamBlue, short x, short y, byte[] items,
+    public Player(IFightBase fightManager, User user, byte index, boolean isTeamBlue, short x, short y, byte[] items,
                   int[] abilities, boolean[] clanItems) {
         this.fightManager = fightManager;
         this.user = user;
@@ -252,8 +252,8 @@ public class Player {
 
         // Cộng XP cho đồng đội
         int teamXp = addXP / 4;
-        if (shareXp && teamXp > 1) {
-            fightManager.giveXpToTeammates(isTeamBlue, teamXp, this);
+        if (shareXp && teamXp > 1 && fightManager instanceof IFightManager fm) {
+            fm.giveXpToTeammates(isTeamBlue, teamXp, this);
         }
 
         if (clanItems[0]) {
