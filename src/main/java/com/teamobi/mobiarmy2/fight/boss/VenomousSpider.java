@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.fight.boss;
 
 import com.teamobi.mobiarmy2.fight.Boss;
-import com.teamobi.mobiarmy2.fight.FightManager;
+import com.teamobi.mobiarmy2.fight.IFightManager;
 import com.teamobi.mobiarmy2.fight.Player;
 import com.teamobi.mobiarmy2.util.RandomUtil;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -12,7 +12,7 @@ public class VenomousSpider extends Boss {
     private Player targetPlayer;
     private byte actionCountdown;
 
-    public VenomousSpider(FightManager fightManager, short x, short y, int maxHp) {
+    public VenomousSpider(IFightManager fightManager, short x, short y, int maxHp) {
         super(fightManager, (byte) 22, "Venomous Spider", x, y, (short) 45, (short) 48, maxHp, 4);
         super.isFlying = true;
     }

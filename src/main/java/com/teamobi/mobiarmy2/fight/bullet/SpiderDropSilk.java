@@ -19,7 +19,7 @@ public class SpiderDropSilk extends Bullet {
         // Cập nhật lại tọa độ của người chơi mục tiêu
         VenomousSpider boss = (VenomousSpider) player;
         boss.getTargetPlayer().setXY(x, y);
-        bulletManager.getFightManager().sendUpdateCoordinates(boss.getTargetPlayer().getIndex());
+        ((IFightManager) bulletManager.getFightManager()).sendUpdateCoordinates(boss.getTargetPlayer().getIndex());
 
         // Thêm mạng nhện vào bản đồ
         bulletManager.getFightMapManager().addNewTiles(new MapTile(-1, (short) (x - 21), (short) (y - 20), EffectManager.spiderWebData, true));

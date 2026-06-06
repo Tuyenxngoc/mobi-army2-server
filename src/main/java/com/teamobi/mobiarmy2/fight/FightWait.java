@@ -30,7 +30,7 @@ public class FightWait {
     public static final int PLAYER_JOIN_WAIT_TIME_MS = 3000;
 
     @Getter
-    private final FightManager fightManager;
+    private final IFightManager fightManager;
     @Getter
     private final Room room;
     @Getter

@@ -29,7 +29,7 @@ public class BulletFactory {
                                              byte force, byte force2, byte numShoot) {
         List<Bullet> bullets = new ArrayList<>();
 
-        if (bullId == 49) { // Magenta trong chế độ bắn thường không phải luyện tập phải cộng lực thêm 5
+        if (bullId == 49 && bulletManager.getFightManager() instanceof FightManager) { // Magenta trong chế độ bắn thường không phải luyện tập phải cộng lực thêm 5
             force += 5;
         }
 

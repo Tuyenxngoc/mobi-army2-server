@@ -28,7 +28,7 @@ import java.util.concurrent.*;
 import java.util.function.Predicate;
 
 @Slf4j
-public class FightManager {
+public class FightManager implements IFightManager {
     private static final int MAX_ELEMENT_FIGHT = 100;
     private static final int MAX_USER_FIGHT = 8;
     private static final int MAX_PLAY_TIME = 30;
@@ -88,8 +88,8 @@ public class FightManager {
         this.fightWait = fightWait;
         this.clanService = clanService;
         this.players = new Player[MAX_ELEMENT_FIGHT];
-        this.fightMapManager = new FightMapManager(this);
-        this.bulletManager = new BulletManager(this);
+        this.fightMapManager = new FightMapManager();
+        this.bulletManager = new BulletManager(this, fightMapManager);
         this.countdownTimer = new CountdownTimer(MAX_PLAY_TIME + 10, this::nextTurn);
     }
 
@@ -274,7 +274,7 @@ public class FightManager {
         }));
     }
 
-    public void changeLocation(int userId, short x, short y) {
+    public void handlePlayerMove(int userId, short x, short y) {
         fightLoop.submit(wrap(() -> {
             Player player = getPlayerTurn();
             if (player.getUser() == null || player.getUser().getUserId() != userId) {
@@ -294,7 +294,7 @@ public class FightManager {
             }
 
             // Nếu người chơi chết trong lượt của mình (rơi vực), chuyển lượt ngay lập tức
-            if (player.isDead() && player.getIndex() == getCurrentTurn()) {
+            if (player.isDead()) {
                 doNextTurn();
             }
         }));
@@ -315,6 +315,7 @@ public class FightManager {
         }));
     }
 
+    // todo check bug
     public void updatePlayerCoordinates(int userId, short x, short y) {
         fightLoop.submit(wrap(() -> {
             int index = getPlayerIndexByUserId(userId);
@@ -816,13 +817,11 @@ public class FightManager {
 
             windX = 0;
             windY = 0;
-        } else {
-            int[] range = getWindRange(player);
+        } else if (RandomUtil.nextInt(0, 100) > 25) {
+            int[] range = getWindRange(player.getCharacterId());
 
-            if (RandomUtil.nextInt(0, 100) > 25) {
-                windX = (byte) RandomUtil.nextInt(-range[0], range[0]);
-                windY = (byte) RandomUtil.nextInt(-range[1], range[1]);
-            }
+            windX = (byte) RandomUtil.nextInt(-range[0], range[0]);
+            windY = (byte) RandomUtil.nextInt(-range[1], range[1]);
         }
 
         sendWindUpdate();
@@ -831,11 +830,11 @@ public class FightManager {
     /**
      * Lấy phạm vi gió dựa trên ID nhân vật của người chơi.
      *
-     * @param player
+     * @param characterId ID nhân vật của người chơi.
      * @return mảng chứa phạm vi gió theo trục X và Y.
      */
-    private int[] getWindRange(Player player) {
-        if (player.getCharacterId() == 9) {
+    private int[] getWindRange(byte characterId) {
+        if (characterId == 9) {
             return new int[]{60, 25};
         }
         return new int[]{70, 70};
@@ -1207,7 +1206,7 @@ public class FightManager {
     private void spawnBosses(List<Boss> bosses) {
         List<Boss> addedBosses = new ArrayList<>();
         for (Boss boss : bosses) {
-            if (totalPlayers >= FightManager.MAX_ELEMENT_FIGHT) {
+            if (totalPlayers >= MAX_ELEMENT_FIGHT) {
                 break;
             }
 

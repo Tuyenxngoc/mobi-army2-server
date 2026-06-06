@@ -3,6 +3,7 @@ package com.teamobi.mobiarmy2.fight;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.fight.boss.GiftBox;
 import com.teamobi.mobiarmy2.fight.boss.GiftBoxFalling;
+import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.util.RandomUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 import lombok.Getter;
@@ -24,7 +25,7 @@ public class Player {
     // Dùng cho các hệ: luck (tỉ lệ), phòng thủ (giảm damage), v.v.
     public static final int STAT_HALF_EFFECT_POINT = 3825;
 
-    protected FightManager fightManager;
+    protected IFightBase fightManager;
     protected User user;
     protected byte characterId;
     protected byte index;
@@ -80,15 +81,7 @@ public class Player {
     protected int xpExist;
     protected List<Reward> rewards;
 
-    public Player(int index, int x, int y, int hp, int maxHp) {
-        this.index = (byte) index;
-        this.x = (short) x;
-        this.y = (short) y;
-        this.hp = hp;
-        this.maxHp = maxHp;
-    }
-
-    public Player(FightManager fightManager, byte characterId, short x, short y, short width, short height, int maxHp,
+    public Player(IFightBase fightManager, byte characterId, short x, short y, short width, short height, int maxHp,
                   int xpExist) {
         this.fightManager = fightManager;
         this.characterId = characterId;
@@ -101,7 +94,33 @@ public class Player {
         this.xpExist = xpExist;
     }
 
-    public Player(FightManager fightManager, User user, byte index, boolean isTeamBlue, short x, short y, byte[] items,
+    public Player(IFightBase fightManager, int index, int x, int y, int hp, int maxHp, short gunId, byte characterId, boolean isTeamBlue) {
+        this.fightManager = fightManager;
+        this.gunId = gunId;
+        this.characterId = characterId;
+        this.index = (byte) index;
+
+        this.isTeamBlue = isTeamBlue;
+        this.x = (short) x;
+        this.y = (short) y;
+
+        this.stamina = 60;
+        this.width = 24;
+        this.height = 24;
+
+        this.items = new byte[8];
+        this.clanItems = new boolean[ClanItemManager.CLAN_ITEM_MAP.size()];
+        this.usedItemId = -1;
+        this.xpExist = 0;
+
+        this.hp = hp;
+        this.maxHp = maxHp;
+        this.damagePercent = 100;
+        this.defense = 0;
+        this.luck = 0;
+    }
+
+    public Player(IFightBase fightManager, User user, byte index, boolean isTeamBlue, short x, short y, byte[] items,
                   int[] abilities, boolean[] clanItems) {
         this.fightManager = fightManager;
         this.user = user;
@@ -233,8 +252,8 @@ public class Player {
 
         // Cộng XP cho đồng đội
         int teamXp = addXP / 4;
-        if (shareXp && teamXp > 1) {
-            fightManager.giveXpToTeammates(isTeamBlue, teamXp, this);
+        if (shareXp && teamXp > 1 && fightManager instanceof IFightManager fm) {
+            fm.giveXpToTeammates(isTeamBlue, teamXp, this);
         }
 
         if (clanItems[0]) {
@@ -266,11 +285,13 @@ public class Player {
         while (this.x != x || this.y != y) {
             short preX = this.x;
             short preY = this.y;
+
+            // Di chuyển ngang tới X mục tiêu
             if (this.x < x) {
                 move(true);
             } else if (this.x > x) {
                 move(false);
-            } else if (this.y != y) {
+            } else {
                 // Nếu X đã khớp nhưng Y chưa khớp (rơi thẳng đứng)
                 updateYPosition();
             }

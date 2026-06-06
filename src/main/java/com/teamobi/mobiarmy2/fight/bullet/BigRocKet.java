@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.fight.bullet;
 
 import com.teamobi.mobiarmy2.fight.Bullet;
 import com.teamobi.mobiarmy2.fight.BulletManager;
+import com.teamobi.mobiarmy2.fight.IFightManager;
 import com.teamobi.mobiarmy2.fight.Player;
 
 public class BigRocKet extends Bullet {
@@ -11,7 +12,7 @@ public class BigRocKet extends Bullet {
     public BigRocKet(BulletManager bulletManager, int damage, Player player) {
         super(bulletManager, (byte) 37, damage, player, player.getX() - 20, player.getY() - 120, 0, 0, 0, 0);
         this.canSuperType = false;
-        this.targetX = bulletManager.getFightManager().getRandomPlayer().getX();
+        this.targetX = ((IFightManager) bulletManager.getFightManager()).getRandomPlayer().getX();
         bulletManager.setTypeShoot((byte) 1);//Ghi tọa độ tuyệt đối
     }
 
