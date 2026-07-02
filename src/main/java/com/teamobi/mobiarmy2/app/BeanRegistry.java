@@ -3,6 +3,7 @@ package com.teamobi.mobiarmy2.app;
 import com.teamobi.mobiarmy2.config.HikariCPConfig;
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.dao.*;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.server.ExchangeLimitManager;
 import com.teamobi.mobiarmy2.server.HikariCPManager;
 import com.teamobi.mobiarmy2.server.RoomManager;
@@ -65,5 +66,6 @@ public class BeanRegistry {
                 context.getBean(LeaderboardService.class),
                 context.getBean(RoomManager.class),
                 context.getBean(ExchangeLimitManager.class)));
+        context.registerBean(MessageSender.class, new MessageSender(context.getBean(ServerManager.class)));
     }
 }
