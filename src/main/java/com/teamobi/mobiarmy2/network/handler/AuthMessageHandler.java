@@ -167,7 +167,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
         }
 
         // Tạo người dùng mới
-        User user = new User(session);
+        User user = new User(session, messageSender);
         user.setAccountId(accountDTO.getAccountId());
 
         // Đặt người dùng vào session

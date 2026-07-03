@@ -9,6 +9,7 @@ import com.teamobi.mobiarmy2.entity.SpecialItemChest;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.fight.boss.*;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
@@ -60,6 +61,7 @@ public class FightManager implements IFightManager {
     private final ScheduledExecutorService fightLoop = Executors.newSingleThreadScheduledExecutor();
     private final List<Boss> pendingBosses = new ArrayList<>();
     private final ClanService clanService;
+    private final MessageSender messageSender;
 
     @Getter
     private Player[] players;
@@ -84,9 +86,10 @@ public class FightManager implements IFightManager {
     private int teamRedSkippedTurns = 0;
     private boolean hasActionInTurn = false;
 
-    public FightManager(FightWait fightWait, ClanService clanService) {
+    public FightManager(FightWait fightWait, ClanService clanService, MessageSender messageSender) {
         this.fightWait = fightWait;
         this.clanService = clanService;
+        this.messageSender = messageSender;
         this.players = new Player[MAX_ELEMENT_FIGHT];
         this.fightMapManager = new FightMapManager();
         this.bulletManager = new BulletManager(this, fightMapManager);
@@ -721,7 +724,7 @@ public class FightManager implements IFightManager {
             }
 
             ds.flush();
-            player.getUser().sendMessage(ms);
+            messageSender.sendTo(player.getUser(), ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1368,7 +1371,7 @@ public class FightManager implements IFightManager {
                     ds.writeInt(-fightWait.getMoney());
                 }
                 ds.flush();
-                user.sendMessage(ms);
+                messageSender.sendTo(user, ms);
 
                 // Gửi thông báo số xp và cup nhận được
                 user.sendUpdateXp(player.getAllXpUp(), false);

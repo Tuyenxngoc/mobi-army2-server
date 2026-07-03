@@ -7,6 +7,7 @@ import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.entity.Room;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.MapManager;
 import com.teamobi.mobiarmy2.server.ServerManager;
@@ -63,6 +64,7 @@ public class FightWait {
     private long lastPlayerJoinTime;
 
     private final GiftBoxService giftBoxService;
+    private final MessageSender messageSender;
 
     public FightWait(Room room, byte id) {
         this.room = room;
@@ -70,7 +72,8 @@ public class FightWait {
 
         byte maxPlayers = room.getMaxPlayerFight();
 
-        this.fightManager = new FightManager(this, ApplicationContext.getInstance().getBean(ClanService.class));
+        this.messageSender = ApplicationContext.getInstance().getBean(MessageSender.class);
+        this.fightManager = new FightManager(this, ApplicationContext.getInstance().getBean(ClanService.class), messageSender);
         this.users = new User[maxPlayers];
         this.items = new byte[maxPlayers][MAX_ITEMS_SLOT];
         this.readies = new boolean[maxPlayers];
@@ -170,7 +173,7 @@ public class FightWait {
                 ds.writeByte(us.getItemFightQuantity(12 + i));
             }
             ds.flush();
-            us.sendMessage(ms);
+            messageSender.sendTo(us, ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -182,7 +185,7 @@ public class FightWait {
             DataOutputStream ds = ms.writer();
             ds.writeByte(mapId);
             ds.flush();
-            us.sendMessage(ms);
+            messageSender.sendTo(us, ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -200,7 +203,7 @@ public class FightWait {
             ds.writeInt(user.getUserId());
             ds.writeUTF(s);
             ds.flush();
-            user.sendMessage(ms);
+            messageSender.sendTo(user, ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -441,7 +444,7 @@ public class FightWait {
     public void sendToTeam(Message ms) {
         for (User user : users) {
             if (user != null) {
-                user.sendMessage(ms);
+                messageSender.sendTo(user, ms);
             }
         }
     }
@@ -835,7 +838,7 @@ public class FightWait {
                 }
             }
             ds.flush();
-            roomOwner.sendMessage(ms);
+            messageSender.sendTo(roomOwner, ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -870,7 +873,7 @@ public class FightWait {
             ds.writeByte(id);
             ds.writeUTF(password);
             ds.flush();
-            user.sendMessage(ms);
+            messageSender.sendTo(user, ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -885,7 +888,7 @@ public class FightWait {
             ds.writeUTF(name);
             ds.writeByte(room.getType());
             ds.flush();
-            user.sendMessage(ms);
+            messageSender.sendTo(user, ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -973,7 +976,7 @@ public class FightWait {
             }
         }
         ds.flush();
-        us.sendMessage(ms);
+        messageSender.sendTo(us, ms);
 
         sendUpdateMap(us);
         sendUpdateItemSlot(us);

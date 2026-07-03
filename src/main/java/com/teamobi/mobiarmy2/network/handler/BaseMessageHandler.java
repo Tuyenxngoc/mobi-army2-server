@@ -1,20 +1,24 @@
 package com.teamobi.mobiarmy2.network.handler;
 
+import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.fight.IFightManager;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.network.Session;
 
 public abstract class BaseMessageHandler {
     protected final Session session;
+    protected final MessageSender messageSender;
 
     protected BaseMessageHandler(Session session) {
         this.session = session;
+        this.messageSender = ApplicationContext.getInstance().getBean(MessageSender.class);
     }
 
     protected void sendMessage(Message ms) {
-        session.sendMessage(ms);
+        messageSender.sendTo(session, ms);
     }
 
     protected User us() {

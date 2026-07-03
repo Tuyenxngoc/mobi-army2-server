@@ -1,15 +1,14 @@
 package com.teamobi.mobiarmy2.entity;
 
-import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.fight.TrainingManager;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
-import com.teamobi.mobiarmy2.server.ServerManager;
 import com.teamobi.mobiarmy2.server.SpecialItemManager;
 import com.teamobi.mobiarmy2.server.UserXpManager;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -28,6 +27,7 @@ import java.util.Set;
 @Setter
 public class User {
     private final Session session;
+    private final MessageSender messageSender;
     private UserState state = UserState.WAITING;
     private String accountId;
     private int userId;
@@ -63,8 +63,9 @@ public class User {
     private FightWait fightWait;
     private TrainingManager trainingManager;
 
-    public User(Session session) {
+    public User(Session session, MessageSender messageSender) {
         this.session = session;
+        this.messageSender = messageSender;
     }
 
     public boolean isNotWaiting() {
@@ -73,10 +74,6 @@ public class User {
 
     public boolean hasClan() {
         return clanId > 0;
-    }
-
-    public void sendMessage(Message ms) {
-        session.sendMessage(ms);
     }
 
     public int getCurrentLevelPercent() {
@@ -270,7 +267,7 @@ public class User {
             ds.writeByte(addEquipment.getEquipment().isDisguise() ? 1 : 0);
             ds.writeByte(addEquipment.getVipLevel());
             ds.flush();
-            sendMessage(ms);
+            messageSender.sendTo(this, ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -365,7 +362,7 @@ public class User {
             ds.writeByte(updateQuantity);
             ds.write(bas.toByteArray());
             ds.flush();
-            sendMessage(ms);
+            messageSender.sendTo(this, ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -561,7 +558,7 @@ public class User {
             ds.writeInt(xu);
             ds.writeInt(luong);
             ds.flush();
-            sendMessage(ms);
+            messageSender.sendTo(this, ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -574,7 +571,7 @@ public class User {
             ds.writeByte(cupUp);
             ds.writeInt(cup);
             ds.flush();
-            sendMessage(ms);
+            messageSender.sendTo(this, ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -597,7 +594,7 @@ public class User {
                 ds.writeByte(getCurrentLevelPercent());
             }
             ds.flush();
-            sendMessage(ms);
+            messageSender.sendTo(this, ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -609,7 +606,7 @@ public class User {
             DataOutputStream ds = ms.writer();
             ds.writeUTF(message);
             ds.flush();
-            sendMessage(ms);
+            messageSender.sendTo(this, ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -621,7 +618,7 @@ public class User {
             DataOutputStream ds = ms.writer();
             ds.writeUTF(message);
             ds.flush();
-            sendMessage(ms);
+            messageSender.sendTo(this, ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -644,7 +641,7 @@ public class User {
             }
             ds.writeUTF(message);
             ds.flush();
-            recipient.sendMessage(ms);
+            messageSender.sendTo(recipient, ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -661,10 +658,9 @@ public class User {
             ds.flush();
 
             if (toServer) {
-                ApplicationContext.getInstance()
-                        .getBean(ServerManager.class).sendToServer(ms);
+                messageSender.broadcast(ms);
             } else {
-                sendMessage(ms);
+                messageSender.sendTo(this, ms);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -685,7 +681,7 @@ public class User {
             ds.writeInt(getCurrentRequiredXp());
             ds.writeInt(cup);
             ds.flush();
-            sendMessage(ms);
+            messageSender.sendTo(this, ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -699,7 +695,7 @@ public class User {
                 ds.writeInt(equipData[activeCharacterId][i]);
             }
             ds.flush();
-            sendMessage(ms);
+            messageSender.sendTo(this, ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -730,7 +726,7 @@ public class User {
                 ds.writeInt(getEquipData()[getActiveCharacterId()][i]);
             }
             ds.flush();
-            sendMessage(ms);
+            messageSender.sendTo(this, ms);
 
             ms = new Message(Cmd.MATERIAL);
             ds = ms.writer();
@@ -743,7 +739,7 @@ public class User {
                 ds.writeUTF(item.getItem().getDetail());
             }
             ds.flush();
-            sendMessage(ms);
+            messageSender.sendTo(this, ms);
         } catch (IOException e) {
             e.printStackTrace();
         }

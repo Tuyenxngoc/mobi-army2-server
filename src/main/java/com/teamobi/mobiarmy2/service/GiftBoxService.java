@@ -1,13 +1,17 @@
 package com.teamobi.mobiarmy2.service;
 
+import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.entity.User;
+import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.server.FightItemManager;
-import com.teamobi.mobiarmy2.util.MessageUtils;
 import com.teamobi.mobiarmy2.util.RandomUtil;
 import com.teamobi.mobiarmy2.util.Utils;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -18,12 +22,17 @@ public class GiftBoxService {
     private static final int XU_COST_PER_GIFT = 1000; // Chi phí mở mỗi quà khi hết lượt
     private static final int DEFAULT_GIFT_TIME = 30; // Thời gian mặc định để mở quà (giây)
 
+    private final MessageSender messageSender;
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     private ScheduledFuture<?> giftTask;
 
     private final Map<Integer, GiftBoxState> userGiftStates = new ConcurrentHashMap<>();
     private int giftOpenTime;
     private boolean running = false;
+
+    public GiftBoxService() {
+        this.messageSender = ApplicationContext.getInstance().getBean(MessageSender.class);
+    }
 
     static class GiftBoxState {
         User user;
@@ -51,15 +60,23 @@ public class GiftBoxService {
     }
 
     private void sendStartMessage(User user, int freeGiftBoxCount, int giftOpenTime) {
-        MessageUtils.send(user.getSession(), Cmd.GET_LUCKYGIFT, ds -> {
+        try {
+            Message ms = new Message(Cmd.GET_LUCKYGIFT);
+            DataOutputStream ds = ms.writer();
             ds.writeByte(-1);
             ds.writeByte(giftOpenTime);
             ds.writeUTF(GameString.createGiftOpeningSummaryMessage(freeGiftBoxCount, MAX_OPENED_GIFTS, XU_COST_PER_GIFT));
-        });
+            ds.flush();
+            messageSender.sendTo(user, ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void sendGiftResults(GiftBoxState state) {
-        MessageUtils.send(state.user.getSession(), Cmd.GET_LUCKYGIFT, ds -> {
+        try {
+            Message ms = new Message(Cmd.GET_LUCKYGIFT);
+            DataOutputStream ds = ms.writer();
             ds.writeByte(-2);
             for (boolean opened : state.giftOpened) {
                 if (opened) {
@@ -71,7 +88,11 @@ public class GiftBoxService {
                     ds.writeUTF(reward.str);
                 }
             }
-        });
+            ds.flush();
+            messageSender.sendTo(state.user, ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private Reward generateAndProcessReward(User user) {
@@ -246,12 +267,18 @@ public class GiftBoxService {
         state.openedGiftCount++;
 
         Reward reward = generateAndProcessReward(user);
-        MessageUtils.send(user.getSession(), Cmd.GET_LUCKYGIFT, ds -> {
+        try {
+            Message ms = new Message(Cmd.GET_LUCKYGIFT);
+            DataOutputStream ds = ms.writer();
             ds.writeByte(0);
             ds.writeByte(boxIndex);
             ds.writeByte(reward.type);
             ds.writeByte(reward.id);
             ds.writeUTF(reward.str);
-        });
+            ds.flush();
+            messageSender.sendTo(user, ms);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

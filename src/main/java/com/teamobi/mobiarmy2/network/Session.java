@@ -84,7 +84,7 @@ public class Session {
         VIRTUAL_EXECUTOR.submit(this::processLoop);
     }
 
-    public void sendMessage(Message msg) {
+    void sendMessage(Message msg) {
         if (msg == null || channel == null || !channel.isActive()) {
             return;
         }

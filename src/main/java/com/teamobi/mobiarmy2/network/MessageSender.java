@@ -39,6 +39,8 @@ public class MessageSender {
     }
 
     public void broadcast(Message ms) {
-        serverManager.sendToServer(ms);
+        for (Session session : serverManager.getSessions()) {
+            sendTo(session, ms);
+        }
     }
 }

@@ -4,6 +4,7 @@ import com.sun.management.OperatingSystemMXBean;
 import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.server.ServerManager;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -107,8 +108,8 @@ public class ServerViewController {
                     ds.flush();
 
                     ApplicationContext.getInstance()
-                            .getBean(ServerManager.class)
-                            .sendToServer(ms);
+                            .getBean(MessageSender.class)
+                            .broadcast(ms);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

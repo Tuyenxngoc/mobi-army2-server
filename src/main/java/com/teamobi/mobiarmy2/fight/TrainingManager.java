@@ -1,8 +1,10 @@
 package com.teamobi.mobiarmy2.fight;
 
+import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.util.RandomUtil;
 import lombok.Getter;
 
@@ -22,6 +24,7 @@ public class TrainingManager implements IFightBase {
     private final BulletManager bulletManager;
     @Getter
     private final FightMapManager fightMapManager;
+    private final MessageSender messageSender;
 
     public TrainingManager(User trainingUser, byte mapId) {
         this.trainingUser = trainingUser;
@@ -29,6 +32,7 @@ public class TrainingManager implements IFightBase {
         this.players = new Player[2];
         this.fightMapManager = new FightMapManager();
         this.bulletManager = new BulletManager(this, fightMapManager);
+        this.messageSender = ApplicationContext.getInstance().getBean(MessageSender.class);
     }
 
     @Override
@@ -66,7 +70,7 @@ public class TrainingManager implements IFightBase {
                 ds.writeShort(-1);
             }
             ds.flush();
-            trainingUser.sendMessage(ms);
+            messageSender.sendTo(trainingUser, ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -113,7 +117,7 @@ public class TrainingManager implements IFightBase {
             ds.writeByte(windX);
             ds.writeByte(windY);
             ds.flush();
-            trainingUser.sendMessage(ms);
+            messageSender.sendTo(trainingUser, ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -151,7 +155,7 @@ public class TrainingManager implements IFightBase {
             DataOutputStream ds = ms.writer();
             ds.writeByte(0);
             ds.flush();
-            trainingUser.sendMessage(ms);
+            messageSender.sendTo(trainingUser, ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -267,7 +271,7 @@ public class TrainingManager implements IFightBase {
                 ds.writeShort(bulletManager.getSuperY());
             }
             ds.flush();
-            trainingUser.sendMessage(ms);
+            messageSender.sendTo(trainingUser, ms);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -283,7 +287,7 @@ public class TrainingManager implements IFightBase {
             ds.writeShort(player.getX());
             ds.writeShort(player.getY());
             ds.flush();
-            trainingUser.sendMessage(ms);
+            messageSender.sendTo(trainingUser, ms);
         } catch (IOException e) {
             e.printStackTrace();
         }

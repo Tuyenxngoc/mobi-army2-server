@@ -3,7 +3,6 @@ package com.teamobi.mobiarmy2.server;
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.entity.User;
-import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.NettyServerInitializer;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.service.GameDataService;
@@ -19,6 +18,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -155,10 +155,8 @@ public class ServerManager {
         }
     }
 
-    public void sendToServer(Message ms) {
-        for (Session session : sessions.values()) {
-            session.sendMessage(ms);
-        }
+    public Collection<Session> getSessions() {
+        return sessions.values();
     }
 
     public User getUserByUserId(int userId) {
