@@ -86,15 +86,15 @@ public class PaymentMessageHandler extends BaseMessageHandler {
 
         if (giftCode.getXu() > 0) {
             us().updateXu(giftCode.getXu());
-            messageSender.sendMessageToUser(us(), GameString.createGiftCodeRewardMessage(code, Utils.getStringNumber(giftCode.getXu()) + " xu"));
+            messageSender.sendAdminMessage(us(), GameString.createGiftCodeRewardMessage(code, Utils.getStringNumber(giftCode.getXu()) + " xu"));
         }
         if (giftCode.getLuong() > 0) {
             us().updateLuong(giftCode.getLuong());
-            messageSender.sendMessageToUser(us(), GameString.createGiftCodeRewardMessage(code, Utils.getStringNumber(giftCode.getLuong()) + " lượng"));
+            messageSender.sendAdminMessage(us(), GameString.createGiftCodeRewardMessage(code, Utils.getStringNumber(giftCode.getLuong()) + " lượng"));
         }
         if (giftCode.getExp() > 0) {
             us().updateXp(giftCode.getExp());
-            messageSender.sendMessageToUser(us(), GameString.createGiftCodeRewardMessage(code, Utils.getStringNumber(giftCode.getExp()) + " exp"));
+            messageSender.sendAdminMessage(us(), GameString.createGiftCodeRewardMessage(code, Utils.getStringNumber(giftCode.getExp()) + " exp"));
         }
         if (giftCode.getItems() != null) {
             List<SpecialItemChest> additionalItems = new ArrayList<>();
@@ -106,7 +106,7 @@ public class PaymentMessageHandler extends BaseMessageHandler {
                 }
                 newItem.setQuantity(item.getQuantity());
                 additionalItems.add(newItem);
-                messageSender.sendMessageToUser(us(), GameString.createGiftCodeRewardMessageWithQuantity(code, newItem.getQuantity(), newItem.getItem().getName()));
+                messageSender.sendAdminMessage(us(), GameString.createGiftCodeRewardMessageWithQuantity(code, newItem.getQuantity(), newItem.getItem().getName()));
             }
             us().updateInventory(null, null, additionalItems, null);
         }
@@ -120,7 +120,7 @@ public class PaymentMessageHandler extends BaseMessageHandler {
                 addEquip.setAddPoints(json.getAddPoints());
                 addEquip.setAddPercents(json.getAddPercents());
                 us().addEquipment(addEquip);
-                messageSender.sendMessageToUser(us(), GameString.createGiftCodeRewardMessage(code, addEquip.getEquipment().getName()));
+                messageSender.sendAdminMessage(us(), GameString.createGiftCodeRewardMessage(code, addEquip.getEquipment().getName()));
             }
         }
 

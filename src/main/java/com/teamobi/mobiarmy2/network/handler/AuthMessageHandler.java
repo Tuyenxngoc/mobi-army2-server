@@ -230,12 +230,12 @@ public class AuthMessageHandler extends BaseMessageHandler {
             byte indexItem = FightItemManager.getRandomItem();
             byte quantity = 1;
             us().updateFightItems(indexItem, quantity);
-            messageSender.sendMessageToUser(us(), GameString.createDailyRewardMessage(quantity, FightItemManager.FIGHT_ITEMS.get(indexItem).getName()));
+            messageSender.sendAdminMessage(us(), GameString.createDailyRewardMessage(quantity, FightItemManager.FIGHT_ITEMS.get(indexItem).getName()));
 
             //Cập nhật quà top
             if (us().getTopEarningsXu() > 0) {
                 us().updateXu(us().getTopEarningsXu());
-                messageSender.sendMessageToUser(us(), GameString.createDailyTopRewardMessage(us().getTopEarningsXu()));
+                messageSender.sendAdminMessage(us(), GameString.createDailyTopRewardMessage(us().getTopEarningsXu()));
                 us().setTopEarningsXu(0);
             }
 
@@ -244,7 +244,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
                 int luckyXu = RandomUtil.getNonLinearRandom(1000, 50999);
                 int xuUp = (luckyXu / 1000) * 1000;
                 us().updateXu(xuUp);
-                messageSender.sendMessageToUser(us(), GameString.createDailyRewardMessage(xuUp));
+                messageSender.sendAdminMessage(us(), GameString.createDailyRewardMessage(xuUp));
             }
 
             //Đặt lại số lần mua nguyên liệu
@@ -252,7 +252,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
 
             //Gửi message khi login
             for (String msg : serverConfig.getMessage()) {
-                messageSender.sendMessageToUser(us(), msg);
+                messageSender.sendAdminMessage(us(), msg);
             }
 
             //Cập nhật nhiệm vụ đăng nhập

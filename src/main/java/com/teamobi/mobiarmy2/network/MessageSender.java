@@ -9,11 +9,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 
-/**
- * Điểm gửi Message duy nhất cho mọi đích: một session, một user, nhiều user, hoặc toàn server.
- * Thay thế các đường gửi rải rác trước đây (User.sendMessage/sendMessageToUser/sendServerInfo,
- * ServerManager.sendToServer gọi trực tiếp từ entity).
- */
 @Slf4j
 public class MessageSender {
     private final ServerManager serverManager;
@@ -73,7 +68,7 @@ public class MessageSender {
         }
     }
 
-    public void sendMessageToUser(User user, String message) {
+    public void sendAdminMessage(User user, String message) {
         sendMessageToUser(true, user, message, user);
     }
 

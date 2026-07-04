@@ -1261,7 +1261,7 @@ public class FightManager implements IFightManager {
      * Kiểm tra kết quả trận đấu
      *
      * @return MatchResult nếu trận đấu đã kết thúc (DRAW/BLUE_WIN/RED_WIN),
-     *         null nếu trận đấu đang tiếp tục hoặc chưa bắt đầu
+     * null nếu trận đấu đang tiếp tục hoặc chưa bắt đầu
      */
     private MatchResult getMatchResult() {
         if (!fightWait.isStarted()) {
