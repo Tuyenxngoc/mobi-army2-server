@@ -356,7 +356,7 @@ public class FightManager implements IFightManager {
 
             // Khi đấu boss thì cấm dùng 1 số item
             if (fightWait.getRoomType() == 5 && UNAUTHORIZED_ITEMS.contains(itemIndex)) {
-                player.getUser().sendMoneyErrorMessage(GameString.ITEM_UNAUTHORIZED);
+                messageSender.sendMoneyErrorMessage(player.getUser(), GameString.ITEM_UNAUTHORIZED);
                 return;
             }
 
@@ -1339,7 +1339,7 @@ public class FightManager implements IFightManager {
                 if (player == null || player.getUser() == null) {
                     continue;
                 }
-                player.getUser().sendMoneyErrorMessage(GameString.MATCH_NOT_COUNTED);
+                messageSender.sendMoneyErrorMessage(player.getUser(), GameString.MATCH_NOT_COUNTED);
             }
         }
 
@@ -1394,7 +1394,7 @@ public class FightManager implements IFightManager {
 
                             String reward = String.format("Phần thưởng diệt trùm của bạn là %dx %s",
                                     newItem.getQuantity(), newItem.getItem().getName());
-                            user.sendServerMessage(reward);
+                            messageSender.sendServerMessage(user, reward);
                         } else {
                             StringBuilder reward = new StringBuilder("Phần thưởng diệt trùm của bạn là ");
                             int count = RandomUtil.nextInt(2, 3);
@@ -1406,7 +1406,7 @@ public class FightManager implements IFightManager {
                                 reward.append(FightItemManager.FIGHT_ITEMS.get(indexItem).getName()).append(", ");
                             }
                             reward.deleteCharAt(reward.length() - 2);
-                            user.sendServerMessage(reward.toString());
+                            messageSender.sendServerMessage(user, reward.toString());
                         }
                     }
 

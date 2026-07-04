@@ -63,7 +63,7 @@ public class MissionMessageHandler extends BaseMessageHandler {
                 message = GameString.MISSION_COMPLETED;
             }
         }
-        us().sendMoneyErrorMessage(message);
+        messageSender.sendMoneyErrorMessage(us(), message);
     }
 
     private void sendMissionInfo() throws IOException {

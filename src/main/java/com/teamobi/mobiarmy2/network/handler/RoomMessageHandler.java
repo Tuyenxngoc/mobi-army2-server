@@ -66,7 +66,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
         }
         Room room = rooms[roomNumber];
         if (room.getType() == 6 && !us().hasClan()) {
-            us().sendServerMessage(GameString.NO_CLAN_MEMBERSHIP);
+            messageSender.sendServerMessage(us(), GameString.NO_CLAN_MEMBERSHIP);
             return;
         }
         ms = new Message(Cmd.BOARD_LIST);
@@ -96,7 +96,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
 
         long timeRemaining = REJOIN_COOLDOWN_MS - (System.currentTimeMillis() - timeSinceLeftRoom);
         if (timeRemaining > 0) {
-            us().sendServerMessage(GameString.createJoinAreaErrorMessage((int) (timeRemaining / 1000) + 1));
+            messageSender.sendServerMessage(us(), GameString.createJoinAreaErrorMessage((int) (timeRemaining / 1000) + 1));
             return;
         }
 
@@ -114,7 +114,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
         }
         FightWait fightWait = fightWaits[areaNumber];
         if (fightWait.isPassSet() && !fightWait.getPassword().equals(password)) {
-            us().sendServerMessage(GameString.AREA_INCORRECT_PASSWORD);
+            messageSender.sendServerMessage(us(), GameString.AREA_INCORRECT_PASSWORD);
             return;
         }
         fightWait.addUser(us());
@@ -136,7 +136,7 @@ public class RoomMessageHandler extends BaseMessageHandler {
         FightWait fightWait = roomManager.findRandomFightWait(type, us().getXu());
 
         if (fightWait == null) {
-            us().sendMoneyErrorMessage(GameString.AREA_NOT_FOUND);
+            messageSender.sendMoneyErrorMessage(us(), GameString.AREA_NOT_FOUND);
         } else {
             fightWait.sendInfo(us());
             fightWait.addUser(us());

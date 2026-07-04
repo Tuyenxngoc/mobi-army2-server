@@ -86,13 +86,13 @@ public class InventoryMessageHandler extends BaseMessageHandler {
             sendMessage(ms);
         } else {
             if (us().getXu() < gia) {
-                us().sendServerMessage(GameString.INSUFFICIENT_FUNDS);
+                messageSender.sendServerMessage(us(), GameString.INSUFFICIENT_FUNDS);
                 return;
             }
             us().updateXu(-gia);
             equip.setPurchaseDate(LocalDateTime.now());
             us().updateInventory(equip, null, null, null);
-            us().sendServerMessage(GameString.EXTEND_SUCCESS);
+            messageSender.sendServerMessage(us(), GameString.EXTEND_SUCCESS);
         }
     }
 
@@ -187,7 +187,7 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                     userAction = UserAction.INSERT_GEM_INTO_EQUIPMENT;
                     sendMessageConfirm(GameString.GEM_COMBINE_REQUEST);
                 } else {
-                    us().sendServerMessage(GameString.COMBINE_ERROR);
+                    messageSender.sendServerMessage(us(), GameString.COMBINE_ERROR);
                 }
                 return;
             }
@@ -221,7 +221,7 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                     }
                 }
             }
-            us().sendServerMessage(GameString.COMBINE_ERROR);
+            messageSender.sendServerMessage(us(), GameString.COMBINE_ERROR);
         } else {
             switch (userAction) {
                 case INSERT_GEM_INTO_EQUIPMENT -> {
@@ -234,9 +234,9 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                             equip.addPoints(specialItem.getItem().getAbility());
                         }
                         us().updateInventory(equip, null, null, specialItemList);
-                        us().sendServerMessage(GameString.GEM_COMBINE_SUCCESS);
+                        messageSender.sendServerMessage(us(), GameString.GEM_COMBINE_SUCCESS);
                     } else {
-                        us().sendServerMessage(GameString.GEM_COMBINE_NO_SLOT);
+                        messageSender.sendServerMessage(us(), GameString.GEM_COMBINE_NO_SLOT);
                     }
                 }
 
@@ -250,22 +250,22 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                         newItem.setItem(SpecialItemManager.getSpecialItemById((byte) (specialItemChest.getItem().getId() + 1)));
 
                         us().updateInventory(null, null, List.of(newItem), List.of(specialItemChest));
-                        us().sendServerMessage(GameString.createGemUpgradeSuccessMessage(newItem.getQuantity(), newItem.getItem().getName()));
+                        messageSender.sendServerMessage(us(), GameString.createGemUpgradeSuccessMessage(newItem.getQuantity(), newItem.getItem().getName()));
                     } else {
                         specialItemChest.setQuantity((short) 1);
                         us().updateInventory(null, null, null, List.of(specialItemChest));
-                        us().sendServerMessage(GameString.COMBINE_FAILURE);
+                        messageSender.sendServerMessage(us(), GameString.COMBINE_FAILURE);
                     }
                 }
 
                 case SELL_GEM -> {
                     if (us().isChestLocked()) {
-                        us().sendServerMessage(GameString.CHEST_LOCKED_NO_SELL);
+                        messageSender.sendServerMessage(us(), GameString.CHEST_LOCKED_NO_SELL);
                         return;
                     }
                     us().updateInventory(null, null, null, specialItemList);
                     us().updateXu(totalTransactionAmount);
-                    us().sendServerMessage(GameString.PURCHASE_SUCCESS);
+                    messageSender.sendServerMessage(us(), GameString.PURCHASE_SUCCESS);
                 }
 
                 case USE_SPECIAL_ITEM -> handleUseSpecialItem(specialItemList.getFirst());
@@ -292,7 +292,7 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                     us().updateInventory(null, null, addItems, specialItemList);
 
                     if (!fabricateItem.getCompletionMessage().isEmpty()) {
-                        us().sendServerMessage(fabricateItem.getCompletionMessage());
+                        messageSender.sendServerMessage(us(), fabricateItem.getCompletionMessage());
                     }
                 }
             }
@@ -307,19 +307,19 @@ public class InventoryMessageHandler extends BaseMessageHandler {
             case 54 -> {
                 us().addDaysToXpX2Time(1);
                 us().updateInventory(null, null, null, List.of(specialItemChest));
-                us().sendServerMessage(GameString.ITEM_X2_XP_USAGE_SUCCESS);
+                messageSender.sendServerMessage(us(), GameString.ITEM_X2_XP_USAGE_SUCCESS);
             }
 
             case 86 -> {
                 if (!serverConfig.isTet()) {
                     us().updateXp(1000 * specialItemChest.getQuantity());
                     us().updateInventory(null, null, null, List.of(specialItemChest));
-                    us().sendServerMessage("Dùng bánh trưng thành công");
+                    messageSender.sendServerMessage(us(), "Dùng bánh trưng thành công");
                     return;
                 }
                 if (specialItemChest.getQuantity() == 50) {
                     if (exchangeLimitManager.isGoldLimitReached(0)) {
-                        us().sendServerMessage("Đã hết số lượng trang bị vàng cấp 1");
+                        messageSender.sendServerMessage(us(), "Đã hết số lượng trang bị vàng cấp 1");
                         return;
                     }
 
@@ -342,10 +342,10 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                     exchangeLimitManager.incrementGoldCount(0);
 
                     us().updateInventory(null, null, null, List.of(specialItemChest));
-                    us().sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
+                    messageSender.sendServerMessage(us(), GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 } else if (specialItemChest.getQuantity() == 100) {
                     if (exchangeLimitManager.isGoldLimitReached(1)) {
-                        us().sendServerMessage("Đã hết số lượng trang bị vàng cấp 2");
+                        messageSender.sendServerMessage(us(), "Đã hết số lượng trang bị vàng cấp 2");
                         return;
                     }
 
@@ -368,10 +368,10 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                     exchangeLimitManager.incrementGoldCount(1);
 
                     us().updateInventory(null, null, null, List.of(specialItemChest));
-                    us().sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
+                    messageSender.sendServerMessage(us(), GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 } else if (specialItemChest.getQuantity() == 150) {
                     if (exchangeLimitManager.isGoldLimitReached(2)) {
-                        us().sendServerMessage("Đã hết số lượng trang bị vàng cấp 3");
+                        messageSender.sendServerMessage(us(), "Đã hết số lượng trang bị vàng cấp 3");
                         return;
                     }
 
@@ -394,7 +394,7 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                     exchangeLimitManager.incrementGoldCount(2);
 
                     us().updateInventory(null, null, null, List.of(specialItemChest));
-                    us().sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
+                    messageSender.sendServerMessage(us(), GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 }
             }
 
@@ -402,12 +402,12 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                 if (!serverConfig.isTet()) {
                     us().updateXp(500 * specialItemChest.getQuantity());
                     us().updateInventory(null, null, null, List.of(specialItemChest));
-                    us().sendServerMessage("Dùng bánh tét thành công");
+                    messageSender.sendServerMessage(us(), "Dùng bánh tét thành công");
                     return;
                 }
                 if (specialItemChest.getQuantity() == 50) {
                     if (exchangeLimitManager.isSilverLimitReached(0)) {
-                        us().sendServerMessage("Đã hết số lượng trang bị bạc cấp 1");
+                        messageSender.sendServerMessage(us(), "Đã hết số lượng trang bị bạc cấp 1");
                         return;
                     }
 
@@ -441,10 +441,10 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                     exchangeLimitManager.incrementSilverCount(0);
 
                     us().updateInventory(null, null, null, List.of(specialItemChest));
-                    us().sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
+                    messageSender.sendServerMessage(us(), GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 } else if (specialItemChest.getQuantity() == 100) {
                     if (exchangeLimitManager.isSilverLimitReached(1)) {
-                        us().sendServerMessage("Đã hết số lượng trang bị bạc cấp 2");
+                        messageSender.sendServerMessage(us(), "Đã hết số lượng trang bị bạc cấp 2");
                         return;
                     }
 
@@ -478,10 +478,10 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                     exchangeLimitManager.incrementSilverCount(1);
 
                     us().updateInventory(null, null, null, List.of(specialItemChest));
-                    us().sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
+                    messageSender.sendServerMessage(us(), GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 } else if (specialItemChest.getQuantity() == 150) {
                     if (exchangeLimitManager.isSilverLimitReached(2)) {
-                        us().sendServerMessage("Đã hết số lượng trang bị bạc cấp 3");
+                        messageSender.sendServerMessage(us(), "Đã hết số lượng trang bị bạc cấp 3");
                         return;
                     }
 
@@ -515,7 +515,7 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                     exchangeLimitManager.incrementSilverCount(2);
 
                     us().updateInventory(null, null, null, List.of(specialItemChest));
-                    us().sendServerMessage(GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
+                    messageSender.sendServerMessage(us(), GameString.NEW_YEAR_EVENT_GIFT_MESSAGE);
                 }
             }
 
@@ -549,7 +549,7 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                 }
 
                 us().updateInventory(null, null, generatedItems, List.of(specialItemChest));
-                us().sendServerMessage(rewardMessage.toString());
+                messageSender.sendServerMessage(us(), rewardMessage.toString());
             }
         }
     }
@@ -570,19 +570,19 @@ public class InventoryMessageHandler extends BaseMessageHandler {
 
                 if (specialItemChest.getQuantity() == 50) {
                     if (exchangeLimitManager.isGoldLimitReached(0)) {
-                        us().sendServerMessage("Đã hết số lượng trang bị vàng cấp 1");
+                        messageSender.sendServerMessage(us(), "Đã hết số lượng trang bị vàng cấp 1");
                         return;
                     }
                     sendMessageConfirm("Bạn có muốn đổi 50 bánh trưng hoàn thiện để lấy một bộ trang bị vàng cấp 1 không?");
                 } else if (specialItemChest.getQuantity() == 100) {
                     if (exchangeLimitManager.isGoldLimitReached(1)) {
-                        us().sendServerMessage("Đã hết số lượng trang bị vàng cấp 2");
+                        messageSender.sendServerMessage(us(), "Đã hết số lượng trang bị vàng cấp 2");
                         return;
                     }
                     sendMessageConfirm("Bạn có muốn đổi 100 bánh trưng hoàn thiện để lấy một bộ trang bị vàng cấp 2 không?");
                 } else if (specialItemChest.getQuantity() == 150) {
                     if (exchangeLimitManager.isGoldLimitReached(2)) {
-                        us().sendServerMessage("Đã hết số lượng trang bị vàng cấp 3");
+                        messageSender.sendServerMessage(us(), "Đã hết số lượng trang bị vàng cấp 3");
                         return;
                     }
                     sendMessageConfirm("Bạn có muốn đổi 150 bánh trưng hoàn thiện để lấy một bộ trang bị vàng cấp 3 không?");
@@ -599,19 +599,19 @@ public class InventoryMessageHandler extends BaseMessageHandler {
 
                 if (specialItemChest.getQuantity() == 50) {
                     if (exchangeLimitManager.isSilverLimitReached(0)) {
-                        us().sendServerMessage("Đã hết số lượng trang bị bạc cấp 1");
+                        messageSender.sendServerMessage(us(), "Đã hết số lượng trang bị bạc cấp 1");
                         return;
                     }
                     sendMessageConfirm("Bạn có muốn đổi 50 bánh tét hoàn thiện để lấy một bộ trang bị bạc cấp 1 không?");
                 } else if (specialItemChest.getQuantity() == 100) {
                     if (exchangeLimitManager.isSilverLimitReached(1)) {
-                        us().sendServerMessage("Đã hết số lượng trang bị bạc cấp 2");
+                        messageSender.sendServerMessage(us(), "Đã hết số lượng trang bị bạc cấp 2");
                         return;
                     }
                     sendMessageConfirm("Bạn có muốn đổi 100 bánh tét hoàn thiện để lấy một bộ trang bị bạc cấp 2 không?");
                 } else if (specialItemChest.getQuantity() == 150) {
                     if (exchangeLimitManager.isSilverLimitReached(2)) {
-                        us().sendServerMessage("Đã hết số lượng trang bị bạc cấp 3");
+                        messageSender.sendServerMessage(us(), "Đã hết số lượng trang bị bạc cấp 3");
                         return;
                     }
                     sendMessageConfirm("Bạn có muốn đổi 150 bánh tét hoàn thiện để lấy một bộ trang bị bạc cấp 3 không?");
@@ -623,7 +623,7 @@ public class InventoryMessageHandler extends BaseMessageHandler {
             case 93 ->
                     sendMessageConfirm(GameString.createBlackFridayGiftBoxConfirmation(specialItemChest.getQuantity()));
 
-            default -> us().sendServerMessage(GameString.COMBINE_ERROR);
+            default -> messageSender.sendServerMessage(us(), GameString.COMBINE_ERROR);
         }
     }
 
@@ -735,7 +735,7 @@ public class InventoryMessageHandler extends BaseMessageHandler {
             case 2 -> {//Xác nhận bán trang bị
                 if (userAction == UserAction.REMOVE_GEM_FROM_EQUIPMENT) {//Xác nhận tháo ngọc
                     if (us().getXu() < totalTransactionAmount) {
-                        us().sendServerMessage(GameString.INSUFFICIENT_FUNDS);
+                        messageSender.sendServerMessage(us(), GameString.INSUFFICIENT_FUNDS);
                         return;
                     }
 
@@ -769,21 +769,21 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                     us().updateInventory(selectedEquipment, null, recoveredGems, null);
 
                     //Gửi thông báo thành công
-                    us().sendServerMessage(GameString.GEM_REMOVAL_SUCCESS);
+                    messageSender.sendServerMessage(us(), GameString.GEM_REMOVAL_SUCCESS);
                 } else if (userAction == UserAction.SELL_EQUIPMENT) {//Xác nhận bán trang bị
                     //Kiểm tra có khóa rương không
                     if (us().isChestLocked()) {
-                        us().sendServerMessage(GameString.CHEST_LOCKED_NO_SELL);
+                        messageSender.sendServerMessage(us(), GameString.CHEST_LOCKED_NO_SELL);
                         return;
                     }
 
                     for (EquipmentChest equipment : equipList) {
                         if (equipment.isInUse()) {
-                            us().sendServerMessage(GameString.EQUIP_SELL_ERROR_IN_USE);
+                            messageSender.sendServerMessage(us(), GameString.EQUIP_SELL_ERROR_IN_USE);
                             return;
                         }
                         if (equipment.getEmptySlot() < 3) {
-                            us().sendServerMessage(GameString.EQUIP_SELL_ERROR_REMOVE_GEMS);
+                            messageSender.sendServerMessage(us(), GameString.EQUIP_SELL_ERROR_REMOVE_GEMS);
                             return;
                         }
                     }
@@ -791,7 +791,7 @@ public class InventoryMessageHandler extends BaseMessageHandler {
                         us().updateInventory(null, validEquipment, null, null);
                     }
                     us().updateXu(totalTransactionAmount);
-                    us().sendServerMessage(GameString.PURCHASE_SUCCESS);
+                    messageSender.sendServerMessage(us(), GameString.PURCHASE_SUCCESS);
                 }
                 userAction = null;
             }
@@ -800,7 +800,7 @@ public class InventoryMessageHandler extends BaseMessageHandler {
 
     private void purchaseEquipment(short saleIndex, byte unit) {
         if (us().getEquipmentChest().size() >= GameConstants.MAX_EQUIPMENT_SLOTS) {
-            us().sendServerMessage(GameString.CHEST_NO_SPACE);
+            messageSender.sendServerMessage(us(), GameString.CHEST_NO_SPACE);
             return;
         }
         Equipment equipment = EquipmentManager.getEquipmentBySaleIndex(saleIndex);
@@ -809,13 +809,13 @@ public class InventoryMessageHandler extends BaseMessageHandler {
         }
         if (unit == 0) {
             if (us().getXu() < equipment.getPriceXu()) {
-                us().sendServerMessage(GameString.INSUFFICIENT_FUNDS);
+                messageSender.sendServerMessage(us(), GameString.INSUFFICIENT_FUNDS);
                 return;
             }
             us().updateXu(-equipment.getPriceXu());
         } else {
             if (us().getLuong() < equipment.getPriceLuong()) {
-                us().sendServerMessage(GameString.INSUFFICIENT_FUNDS);
+                messageSender.sendServerMessage(us(), GameString.INSUFFICIENT_FUNDS);
                 return;
             }
             us().updateLuong(-equipment.getPriceLuong());
@@ -823,6 +823,6 @@ public class InventoryMessageHandler extends BaseMessageHandler {
         EquipmentChest newEquip = new EquipmentChest();
         newEquip.setEquipment(equipment);
         us().addEquipment(newEquip);
-        us().sendServerMessage(GameString.PURCHASE_SUCCESS);
+        messageSender.sendServerMessage(us(), GameString.PURCHASE_SUCCESS);
     }
 }

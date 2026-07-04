@@ -46,20 +46,20 @@ public class FriendMessageHandler extends BaseMessageHandler {
         //Neu la nguoi dua tin -> chat The gioi
         if (userId == 2) {
             if (us().getXu() < PRICE_CHAT_SERVER) {
-                us().sendServerMessage(GameString.INSUFFICIENT_FUNDS);
+                messageSender.sendServerMessage(us(), GameString.INSUFFICIENT_FUNDS);
                 return;
             }
             us().updateXu(-PRICE_CHAT_SERVER);
-            us().sendServerInfo(GameString.createMessageFromSender(us().getUsername(), content), true);
+            messageSender.sendServerInfo(us(), GameString.createMessageFromSender(us().getUsername(), content), true);
             return;
         }
 
         User receiver = serverManager.getUserByUserId(userId);
         if (receiver == null) {
-            us().sendServerMessage(GameString.INVITE_OFFLINE);
+            messageSender.sendServerMessage(us(), GameString.INVITE_OFFLINE);
             return;
         }
-        us().sendMessageToUser(false, content, receiver);
+        messageSender.sendMessageToUser(false, us(), content, receiver);
     }
 
     public void handleViewFriendList() throws IOException {
@@ -137,11 +137,11 @@ public class FriendMessageHandler extends BaseMessageHandler {
     public void handleFindPlayer(Message ms) throws IOException {
         String username = ms.reader().readUTF().trim();
         if (username.isEmpty()) {
-            us().sendServerMessage(GameString.FRIEND_ADD_MISSING_NAME);
+            messageSender.sendServerMessage(us(), GameString.FRIEND_ADD_MISSING_NAME);
             return;
         }
         if (Utils.isAlphanumeric(username)) {
-            us().sendServerMessage(GameString.FRIEND_ADD_INVALID_NAME);
+            messageSender.sendServerMessage(us(), GameString.FRIEND_ADD_INVALID_NAME);
             return;
         }
         Optional<Integer> foundUserId = userDAO.findUserIdByUsername(username);

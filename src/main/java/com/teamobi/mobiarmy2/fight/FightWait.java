@@ -307,19 +307,19 @@ public class FightWait {
         //Kiểm tra thời gian kết thúc ván gần nhất
         long remainingTime = GAME_END_WAIT_TIME_MS - (System.currentTimeMillis() - endTime);
         if (remainingTime > 0) {
-            roomOwner.sendServerMessage(GameString.createWaitClickMessage(remainingTime / 1000 + 1));
+            messageSender.sendServerMessage(roomOwner, GameString.createWaitClickMessage(remainingTime / 1000 + 1));
             return;
         }
 
         //Kiểm tra thời gian người chơi vào phòng gần nhất
         remainingTime = PLAYER_JOIN_WAIT_TIME_MS - (System.currentTimeMillis() - lastPlayerJoinTime);
         if (remainingTime > 0) {
-            roomOwner.sendMoneyErrorMessage(GameString.createWaitClickMessage(remainingTime / 1000 + 1));
+            messageSender.sendMoneyErrorMessage(roomOwner, GameString.createWaitClickMessage(remainingTime / 1000 + 1));
             return;
         }
 
         if (numReady == 0 && room.getType() != 5) {
-            roomOwner.sendServerMessage(GameString.TEAM_NOT_READY);
+            messageSender.sendServerMessage(roomOwner, GameString.TEAM_NOT_READY);
             return;
         }
 
@@ -337,13 +337,13 @@ public class FightWait {
                     if (i % 2 == j % 2) {
                         // Các thành viên cùng phe phải thuộc cùng một clan
                         if (users[i].getClanId() != users[j].getClanId()) {
-                            roomOwner.sendServerMessage(GameString.CLAN_MUST_BE_SAME);
+                            messageSender.sendServerMessage(roomOwner, GameString.CLAN_MUST_BE_SAME);
                             return;
                         }
                     } else {
                         // Nếu i và j khác phe, hai phe phải thuộc hai clan khác nhau
                         if (users[i].getClanId() == users[j].getClanId()) {
-                            roomOwner.sendServerMessage(GameString.CLAN_MUST_BE_DIFFERENT);
+                            messageSender.sendServerMessage(roomOwner, GameString.CLAN_MUST_BE_DIFFERENT);
                             return;
                         }
                     }
@@ -364,19 +364,19 @@ public class FightWait {
 
             // Kiểm tra nếu người chơi đang trong quá trình mở hộp quà
             if (giftBoxService.isOpeningGift(user.getUserId())) {
-                roomOwner.sendServerMessage(GameString.createOpeningGiftMessage(user.getUsername()));
+                messageSender.sendServerMessage(roomOwner, GameString.createOpeningGiftMessage(user.getUsername()));
                 return;
             }
 
             // Kiểm tra trạng thái sẵn sàng (Chủ phòng không cần check ready)
             if (bossIndex != i && !readies[i]) {
-                roomOwner.sendServerMessage(GameString.createGameStartErrorMessageUserNotReady(user.getUsername()));
+                messageSender.sendServerMessage(roomOwner, GameString.createGameStartErrorMessageUserNotReady(user.getUsername()));
                 return;
             }
 
             // Kiểm tra số dư tài khoản có đủ để tham gia ván cược không
             if (user.getXu() < money) {
-                roomOwner.sendServerMessage(GameString.createGameStartErrorMessageInsufficientFunds(user.getUsername()));
+                messageSender.sendServerMessage(roomOwner, GameString.createGameStartErrorMessageInsufficientFunds(user.getUsername()));
                 return;
             }
 
@@ -430,7 +430,7 @@ public class FightWait {
 
         // Kiểm tra cân bằng số lượng người chơi giữa 2 phe (trừ chế độ Đấu Trùm)
         if (room.getType() != 5 && numTeamBlue != numTeamRed) {
-            roomOwner.sendServerMessage(GameString.TEAM_SIZE_MISMATCH);
+            messageSender.sendServerMessage(roomOwner, GameString.TEAM_SIZE_MISMATCH);
             return;
         }
 
@@ -514,7 +514,7 @@ public class FightWait {
 
         User user = users[index];
         if (giftBoxService.isOpeningGift(user.getUserId())) {
-            roomOwner.sendServerMessage(GameString.createOpeningGiftMessage(user.getUsername()));
+            messageSender.sendServerMessage(roomOwner, GameString.createOpeningGiftMessage(user.getUsername()));
             return;
         }
 
@@ -599,12 +599,12 @@ public class FightWait {
         }
 
         if (newMoney < room.getMinXu() || newMoney > room.getMaxXu()) {
-            roomOwner.sendServerMessage(GameString.createBettingRangeErrorMessage(room.getMinXu(), room.getMaxXu()));
+            messageSender.sendServerMessage(roomOwner, GameString.createBettingRangeErrorMessage(room.getMinXu(), room.getMaxXu()));
             return;
         }
 
         if (roomOwner.getXu() < newMoney) {
-            roomOwner.sendServerMessage(GameString.INSUFFICIENT_FUNDS);
+            messageSender.sendServerMessage(roomOwner, GameString.INSUFFICIENT_FUNDS);
             return;
         }
 
@@ -730,7 +730,7 @@ public class FightWait {
         }
 
         if (isContinuous()) {
-            roomOwner.sendServerMessage(GameString.MAP_SELECTION_ERROR);
+            messageSender.sendServerMessage(roomOwner, GameString.MAP_SELECTION_ERROR);
             return;
         }
 
@@ -739,7 +739,7 @@ public class FightWait {
                 continue;
             }
             if (giftBoxService.isOpeningGift(user.getUserId())) {
-                user.sendServerMessage(GameString.createOpeningGiftMessage(user.getUsername()));
+                messageSender.sendServerMessage(user, GameString.createOpeningGiftMessage(user.getUsername()));
                 return;
             }
         }
@@ -754,7 +754,7 @@ public class FightWait {
             }
 
             if (!mapIdFound) {
-                roomOwner.sendServerMessage(GameString.createMapSelectionErrorMessage(MapManager.getMapNames(room.getMapCanSelected())));
+                messageSender.sendServerMessage(roomOwner, GameString.createMapSelectionErrorMessage(MapManager.getMapNames(room.getMapCanSelected())));
                 return;
             }
         } else {
@@ -769,7 +769,7 @@ public class FightWait {
                 } else {
                     msg = GameString.MAP_SELECTION_ERROR;
                 }
-                roomOwner.sendServerMessage(msg);
+                messageSender.sendServerMessage(roomOwner, msg);
                 return;
             }
         }
@@ -850,17 +850,17 @@ public class FightWait {
         User user = ApplicationContext.getInstance()
                 .getBean(ServerManager.class).getUserByUserId(userId);
         if (user == null) {
-            roomOwner.sendServerMessage(GameString.INVITE_OFFLINE);
+            messageSender.sendServerMessage(roomOwner, GameString.INVITE_OFFLINE);
             return;
         }
 
         if (user.isNotWaiting()) {
-            roomOwner.sendServerMessage(GameString.INVITE_ALREADY_IN_GAME);
+            messageSender.sendServerMessage(roomOwner, GameString.INVITE_ALREADY_IN_GAME);
             return;
         }
 
         if (user.isInvitationLocked()) {
-            roomOwner.sendServerMessage(GameString.INVITE_DISABLED);
+            messageSender.sendServerMessage(roomOwner, GameString.INVITE_DISABLED);
             return;
         }
 
@@ -896,22 +896,22 @@ public class FightWait {
 
     public synchronized void addUser(User us) throws IOException {
         if (room.getType() == 6 && !us.hasClan()) {
-            us.sendServerMessage(GameString.NO_CLAN_MEMBERSHIP);
+            messageSender.sendServerMessage(us, GameString.NO_CLAN_MEMBERSHIP);
             return;
         }
 
         if (started || (isContinuous() && continuousLevel > 0)) {
-            us.sendServerMessage(GameString.AREA_JOIN_IN_PROGRESS);
+            messageSender.sendServerMessage(us, GameString.AREA_JOIN_IN_PROGRESS);
             return;
         }
 
         if (money > us.getXu()) {
-            us.sendServerMessage(GameString.AREA_INSUFFICIENT_FUNDS);
+            messageSender.sendServerMessage(us, GameString.AREA_INSUFFICIENT_FUNDS);
             return;
         }
 
         if (numPlayers >= maxSetPlayers) {
-            us.sendServerMessage(GameString.AREA_FULL);
+            messageSender.sendServerMessage(us, GameString.AREA_FULL);
             return;
         }
 
