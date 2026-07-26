@@ -1,6 +1,5 @@
 package com.teamobi.mobiarmy2.service;
 
-import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.entity.User;
@@ -30,8 +29,8 @@ public class GiftBoxService {
     private int giftOpenTime;
     private boolean running = false;
 
-    public GiftBoxService() {
-        this.messageSender = ApplicationContext.getInstance().getBean(MessageSender.class);
+    public GiftBoxService(MessageSender messageSender) {
+        this.messageSender = messageSender;
     }
 
     static class GiftBoxState {

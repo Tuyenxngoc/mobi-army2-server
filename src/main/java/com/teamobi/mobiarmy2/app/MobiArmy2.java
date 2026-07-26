@@ -5,8 +5,8 @@ import com.teamobi.mobiarmy2.ui.ServerUI;
 
 public class MobiArmy2 {
     public static void main(String[] args) {
-        BeanRegistry.registerBeans();
-        ServerManager serverManager = ApplicationContext.getInstance().getBean(ServerManager.class);
+        AppContext app = new AppContext();
+        ServerManager serverManager = app.getServerManager();
         Runtime.getRuntime().addShutdownHook(new Thread(serverManager::stop, "ServerShutdownHook"));
 
         new Thread(() -> {

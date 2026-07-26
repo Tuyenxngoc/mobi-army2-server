@@ -1,6 +1,5 @@
 package com.teamobi.mobiarmy2.fight;
 
-import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.Message;
@@ -26,13 +25,13 @@ public class TrainingManager implements IFightBase {
     private final FightMapManager fightMapManager;
     private final MessageSender messageSender;
 
-    public TrainingManager(User trainingUser, byte mapId) {
+    public TrainingManager(User trainingUser, byte mapId, MessageSender messageSender) {
         this.trainingUser = trainingUser;
         this.mapId = mapId;
         this.players = new Player[2];
         this.fightMapManager = new FightMapManager();
         this.bulletManager = new BulletManager(this, fightMapManager);
-        this.messageSender = ApplicationContext.getInstance().getBean(MessageSender.class);
+        this.messageSender = messageSender;
     }
 
     @Override

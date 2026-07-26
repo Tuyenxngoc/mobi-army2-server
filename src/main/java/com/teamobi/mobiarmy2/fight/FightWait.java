@@ -1,6 +1,5 @@
 package com.teamobi.mobiarmy2.fight;
 
-import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.constant.UserState;
@@ -65,15 +64,22 @@ public class FightWait {
 
     private final GiftBoxService giftBoxService;
     private final MessageSender messageSender;
+    private final ServerManager serverManager;
 
-    public FightWait(Room room, byte id) {
+    public FightWait(
+            Room room,
+            byte id,
+            MessageSender messageSender,
+            ClanService clanService,
+            ServerManager serverManager) {
         this.room = room;
         this.id = id;
 
         byte maxPlayers = room.getMaxPlayerFight();
 
-        this.messageSender = ApplicationContext.getInstance().getBean(MessageSender.class);
-        this.fightManager = new FightManager(this, ApplicationContext.getInstance().getBean(ClanService.class), messageSender);
+        this.messageSender = messageSender;
+        this.serverManager = serverManager;
+        this.fightManager = new FightManager(this, clanService, messageSender);
         this.users = new User[maxPlayers];
         this.items = new byte[maxPlayers][MAX_ITEMS_SLOT];
         this.readies = new boolean[maxPlayers];
@@ -94,7 +100,7 @@ public class FightWait {
         this.maxSetPlayers = room.getNumPlayerInitRoom();
         this.countdownTimer = new CountdownTimer(KICK_BOSS_TIME, this::onTimeUp);
 
-        this.giftBoxService = new GiftBoxService();
+        this.giftBoxService = new GiftBoxService(null);
     }
 
     private synchronized void refreshFightWait() {
@@ -817,8 +823,7 @@ public class FightWait {
             return;
         }
 
-        List<User> userList = ApplicationContext.getInstance()
-                .getBean(ServerManager.class).findWaitPlayers(userId);
+        List<User> userList = serverManager.findWaitPlayers(userId);
 
         try {
             Message ms = new Message(Cmd.FIND_PLAYER);
@@ -847,8 +852,7 @@ public class FightWait {
     public synchronized void inviteToRoom(int userId) {
         User roomOwner = getRoomOwner();
 
-        User user = ApplicationContext.getInstance()
-                .getBean(ServerManager.class).getUserByUserId(userId);
+        User user = serverManager.getUserByUserId(userId);
         if (user == null) {
             messageSender.sendServerMessage(roomOwner, GameString.INVITE_OFFLINE);
             return;

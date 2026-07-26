@@ -1,11 +1,8 @@
 package com.teamobi.mobiarmy2.ui.controllers;
 
 import com.sun.management.OperatingSystemMXBean;
-import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.network.Message;
-import com.teamobi.mobiarmy2.network.MessageSender;
-import com.teamobi.mobiarmy2.server.ServerManager;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -86,9 +83,9 @@ public class ServerViewController {
         maintainButton.setDisable(true);
 
         // Bật chế độ bảo trì trên server
-        ApplicationContext.getInstance()
-                .getBean(ServerManager.class)
-                .setMaintenanceMode(true);
+//        ApplicationContext.getInstance()
+//                .getBean(ServerManager.class)
+//                .setMaintenanceMode(true);
 
         final int[] timeRemaining = {countdownTime};
 
@@ -107,9 +104,9 @@ public class ServerViewController {
                     ds.writeUTF("Server sẽ bảo trì sau " + timeRemaining[0] + " giây, vui lòng thoát game để tránh mất dữ liệu.");
                     ds.flush();
 
-                    ApplicationContext.getInstance()
-                            .getBean(MessageSender.class)
-                            .broadcast(ms);
+//                    ApplicationContext.getInstance()
+//                            .getBean(MessageSender.class)
+//                            .broadcast(ms);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

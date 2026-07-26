@@ -1,6 +1,5 @@
 package com.teamobi.mobiarmy2.network;
 
-import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.network.codec.MessageDecoder;
 import com.teamobi.mobiarmy2.network.codec.MessageEncoder;
 import com.teamobi.mobiarmy2.network.codec.PlainMessageDecoder;
@@ -17,11 +16,9 @@ public class NettyServerInitializer extends ChannelInitializer<SocketChannel> {
     private final ConnectionBlockerService connectionBlockerService;
     private final ServerManager serverManager;
 
-    public NettyServerInitializer() {
-        ApplicationContext context = ApplicationContext.getInstance();
-
-        connectionBlockerService = context.getBean(ConnectionBlockerService.class);
-        serverManager = context.getBean(ServerManager.class);
+    public NettyServerInitializer(ConnectionBlockerService connectionBlockerService, ServerManager serverManager) {
+        this.connectionBlockerService = connectionBlockerService;
+        this.serverManager = serverManager;
     }
 
     @Override

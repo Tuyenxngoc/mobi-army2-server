@@ -32,7 +32,7 @@ public class Room {
         this.iconType = iconType;
         this.fightWaits = new FightWait[numArea];
         for (byte i = 0; i < numArea; i++) {
-            fightWaits[i] = new FightWait(this, i);
+            fightWaits[i] = new FightWait(this, i, null, null, null);//todo app
         }
     }
 

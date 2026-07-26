@@ -1,6 +1,5 @@
 package com.teamobi.mobiarmy2.network.handler;
 
-import com.teamobi.mobiarmy2.app.ApplicationContext;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dao.GiftCodeDAO;
@@ -29,11 +28,13 @@ import java.util.List;
 public class PaymentMessageHandler extends BaseMessageHandler {
     private final GiftCodeDAO giftCodeDAO;
     private final UserGiftCodeDAO userGiftCodeDAO;
+    private final HikariCPManager hikariCPManager;
 
-    public PaymentMessageHandler(Session session, GiftCodeDAO giftCodeDAO, UserGiftCodeDAO userGiftCodeDAO) {
+    public PaymentMessageHandler(Session session, GiftCodeDAO giftCodeDAO, UserGiftCodeDAO userGiftCodeDAO, HikariCPManager hikariCPManager) {
         super(session);
         this.giftCodeDAO = giftCodeDAO;
         this.userGiftCodeDAO = userGiftCodeDAO;
+        this.hikariCPManager = hikariCPManager;
     }
 
     public void handleCardRecharge(Message ms) throws IOException {
@@ -71,9 +72,6 @@ public class PaymentMessageHandler extends BaseMessageHandler {
             return;
         }
 
-        HikariCPManager hikariCPManager = ApplicationContext
-                .getInstance()
-                .getBean(HikariCPManager.class);
         boolean success = hikariCPManager.transaction(connection -> {
             giftCodeDAO.decrementUsageLimit(connection, giftCode.getGiftCodeId());
             userGiftCodeDAO.create(connection, giftCode.getGiftCodeId(), us().getUserId());
