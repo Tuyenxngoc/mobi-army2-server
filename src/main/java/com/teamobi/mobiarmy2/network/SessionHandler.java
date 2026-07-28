@@ -1,7 +1,7 @@
 package com.teamobi.mobiarmy2.network;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
-import com.teamobi.mobiarmy2.server.ServerManager;
+import com.teamobi.mobiarmy2.server.SessionRegistry;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
@@ -39,11 +39,11 @@ public class SessionHandler extends SimpleChannelInboundHandler<Message> {
     private Runnable onKeyExchangeComplete;
 
     private Session session;
-    private final ServerManager serverManager;
+    private final SessionRegistry sessionRegistry;
     private long lastKeepAliveTime = System.currentTimeMillis();
 
-    public SessionHandler(ServerManager serverManager) {
-        this.serverManager = serverManager;
+    public SessionHandler(SessionRegistry sessionRegistry) {
+        this.sessionRegistry = sessionRegistry;
         this.encryptionKey = generateSessionKey();
     }
 
@@ -64,7 +64,7 @@ public class SessionHandler extends SimpleChannelInboundHandler<Message> {
         long sessionId = System.nanoTime();
         this.session = new Session(sessionId, ctx.channel());
 
-        serverManager.addSession(session);
+        sessionRegistry.addSession(session);
 
         log.info("New client connected: {}", sessionId);
     }
@@ -143,6 +143,6 @@ public class SessionHandler extends SimpleChannelInboundHandler<Message> {
         log.info("Client {} disconnected", session.getSessionId());
 
         session.cleanup();
-        serverManager.removeSession(session.getSessionId());
+        sessionRegistry.removeSession(session.getSessionId());
     }
 }

@@ -9,7 +9,7 @@ import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.MapManager;
-import com.teamobi.mobiarmy2.server.ServerManager;
+import com.teamobi.mobiarmy2.server.SessionRegistry;
 import com.teamobi.mobiarmy2.service.ClanService;
 import com.teamobi.mobiarmy2.service.GiftBoxService;
 import lombok.Getter;
@@ -64,21 +64,21 @@ public class FightWait {
 
     private final GiftBoxService giftBoxService;
     private final MessageSender messageSender;
-    private final ServerManager serverManager;
+    private final SessionRegistry sessionRegistry;
 
     public FightWait(
             Room room,
             byte id,
             MessageSender messageSender,
             ClanService clanService,
-            ServerManager serverManager) {
+            SessionRegistry sessionRegistry) {
         this.room = room;
         this.id = id;
 
         byte maxPlayers = room.getMaxPlayerFight();
 
         this.messageSender = messageSender;
-        this.serverManager = serverManager;
+        this.sessionRegistry = sessionRegistry;
         this.fightManager = new FightManager(this, clanService, messageSender);
         this.users = new User[maxPlayers];
         this.items = new byte[maxPlayers][MAX_ITEMS_SLOT];
@@ -823,7 +823,7 @@ public class FightWait {
             return;
         }
 
-        List<User> userList = serverManager.findWaitPlayers(userId);
+        List<User> userList = sessionRegistry.findWaitPlayers(userId);
 
         try {
             Message ms = new Message(Cmd.FIND_PLAYER);
@@ -852,7 +852,7 @@ public class FightWait {
     public synchronized void inviteToRoom(int userId) {
         User roomOwner = getRoomOwner();
 
-        User user = serverManager.getUserByUserId(userId);
+        User user = sessionRegistry.getUserByUserId(userId);
         if (user == null) {
             messageSender.sendServerMessage(roomOwner, GameString.INVITE_OFFLINE);
             return;

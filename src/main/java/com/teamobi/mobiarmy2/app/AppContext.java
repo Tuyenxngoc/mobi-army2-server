@@ -8,6 +8,7 @@ import com.teamobi.mobiarmy2.server.ExchangeLimitManager;
 import com.teamobi.mobiarmy2.server.HikariCPManager;
 import com.teamobi.mobiarmy2.server.RoomManager;
 import com.teamobi.mobiarmy2.server.ServerManager;
+import com.teamobi.mobiarmy2.server.SessionRegistry;
 import com.teamobi.mobiarmy2.service.*;
 import lombok.Getter;
 
@@ -50,10 +51,11 @@ public final class AppContext {
     private final ConnectionBlockerService connectionBlockerService;
 
     // Manager
+    private final SessionRegistry sessionRegistry;
+    private final MessageSender messageSender;
     private final ExchangeLimitManager exchangeLimitManager;
     private final RoomManager roomManager;
     private final ServerManager serverManager;
-    private final MessageSender messageSender;
 
     public AppContext() {
         serverConfig = new ServerConfig();
@@ -100,6 +102,9 @@ public final class AppContext {
         loginRateLimiterService = new LoginRateLimiterService();
         connectionBlockerService = new ConnectionBlockerService();
 
+        sessionRegistry = new SessionRegistry(serverConfig);
+        messageSender = new MessageSender(sessionRegistry);
+
         exchangeLimitManager = new ExchangeLimitManager();
         roomManager = new RoomManager();
         serverManager = new ServerManager(
@@ -107,7 +112,7 @@ public final class AppContext {
                 gameDataService,
                 leaderboardService,
                 roomManager,
-                exchangeLimitManager);
-        messageSender = new MessageSender(serverManager);
+                exchangeLimitManager,
+                sessionRegistry);
     }
 }

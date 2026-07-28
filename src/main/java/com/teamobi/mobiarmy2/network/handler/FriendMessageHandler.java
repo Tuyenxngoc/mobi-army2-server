@@ -8,7 +8,7 @@ import com.teamobi.mobiarmy2.dto.FriendDTO;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.Message;
 import com.teamobi.mobiarmy2.network.Session;
-import com.teamobi.mobiarmy2.server.ServerManager;
+import com.teamobi.mobiarmy2.server.SessionRegistry;
 import com.teamobi.mobiarmy2.util.Utils;
 
 import java.io.DataInputStream;
@@ -22,12 +22,12 @@ public class FriendMessageHandler extends BaseMessageHandler {
     private static final int PRICE_CHAT_SERVER = 10_000;
 
     private final UserDAO userDAO;
-    private final ServerManager serverManager;
+    private final SessionRegistry sessionRegistry;
 
-    public FriendMessageHandler(Session session, UserDAO userDAO, ServerManager serverManager) {
+    public FriendMessageHandler(Session session, UserDAO userDAO, SessionRegistry sessionRegistry) {
         super(session);
         this.userDAO = userDAO;
-        this.serverManager = serverManager;
+        this.sessionRegistry = sessionRegistry;
     }
 
     public void handleSendMessage(Message ms) throws IOException {
@@ -54,7 +54,7 @@ public class FriendMessageHandler extends BaseMessageHandler {
             return;
         }
 
-        User receiver = serverManager.getUserByUserId(userId);
+        User receiver = sessionRegistry.getUserByUserId(userId);
         if (receiver == null) {
             messageSender.sendServerMessage(us(), GameString.INVITE_OFFLINE);
             return;

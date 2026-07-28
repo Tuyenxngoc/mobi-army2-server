@@ -2,7 +2,7 @@ package com.teamobi.mobiarmy2.network;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.entity.User;
-import com.teamobi.mobiarmy2.server.ServerManager;
+import com.teamobi.mobiarmy2.server.SessionRegistry;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.DataOutputStream;
@@ -11,10 +11,10 @@ import java.util.Collection;
 
 @Slf4j
 public class MessageSender {
-    private final ServerManager serverManager;
+    private final SessionRegistry sessionRegistry;
 
-    public MessageSender(ServerManager serverManager) {
-        this.serverManager = serverManager;
+    public MessageSender(SessionRegistry sessionRegistry) {
+        this.sessionRegistry = sessionRegistry;
     }
 
     public void sendTo(Session session, Message ms) {
@@ -39,7 +39,7 @@ public class MessageSender {
     }
 
     public void broadcast(Message ms) {
-        for (Session session : serverManager.getSessions()) {
+        for (Session session : sessionRegistry.getSessions()) {
             sendTo(session, ms);
         }
     }

@@ -4,7 +4,7 @@ import com.teamobi.mobiarmy2.network.codec.MessageDecoder;
 import com.teamobi.mobiarmy2.network.codec.MessageEncoder;
 import com.teamobi.mobiarmy2.network.codec.PlainMessageDecoder;
 import com.teamobi.mobiarmy2.network.codec.PlainMessageEncoder;
-import com.teamobi.mobiarmy2.server.ServerManager;
+import com.teamobi.mobiarmy2.server.SessionRegistry;
 import com.teamobi.mobiarmy2.service.ConnectionBlockerService;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
@@ -14,16 +14,16 @@ import java.util.concurrent.TimeUnit;
 
 public class NettyServerInitializer extends ChannelInitializer<SocketChannel> {
     private final ConnectionBlockerService connectionBlockerService;
-    private final ServerManager serverManager;
+    private final SessionRegistry sessionRegistry;
 
-    public NettyServerInitializer(ConnectionBlockerService connectionBlockerService, ServerManager serverManager) {
+    public NettyServerInitializer(ConnectionBlockerService connectionBlockerService, SessionRegistry sessionRegistry) {
         this.connectionBlockerService = connectionBlockerService;
-        this.serverManager = serverManager;
+        this.sessionRegistry = sessionRegistry;
     }
 
     @Override
     protected void initChannel(SocketChannel ch) {
-        SessionHandler sessionHandler = new SessionHandler(serverManager);
+        SessionHandler sessionHandler = new SessionHandler(sessionRegistry);
 
         // Initial pipeline with plain encoder/decoder
         ch.pipeline()

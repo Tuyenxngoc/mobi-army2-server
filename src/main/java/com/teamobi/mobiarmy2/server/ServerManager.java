@@ -1,8 +1,6 @@
 package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.config.ServerConfig;
-import com.teamobi.mobiarmy2.constant.UserState;
-import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.NettyServerInitializer;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.service.GameDataService;
@@ -17,15 +15,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-
 @Slf4j
 public class ServerManager {
-    private final ConcurrentHashMap<Long, Session> sessions = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Integer, Long> userToSession = new ConcurrentHashMap<>();
     @Setter
     @Getter
     private boolean isMaintenanceMode = false;
@@ -40,17 +31,20 @@ public class ServerManager {
     private final RoomManager roomManager;
     private final ExchangeLimitManager exchangeLimitManager;
     private final ServerConfig serverConfig;
+    private final SessionRegistry sessionRegistry;
 
     public ServerManager(ServerConfig serverConfig,
                          GameDataService gameDataService,
                          LeaderboardService leaderboardService,
                          RoomManager roomManager,
-                         ExchangeLimitManager exchangeLimitManager) {
+                         ExchangeLimitManager exchangeLimitManager,
+                         SessionRegistry sessionRegistry) {
         this.serverConfig = serverConfig;
         this.gameDataService = gameDataService;
         this.leaderboardService = leaderboardService;
         this.roomManager = roomManager;
         this.exchangeLimitManager = exchangeLimitManager;
+        this.sessionRegistry = sessionRegistry;
     }
 
     public void init() {
@@ -80,7 +74,8 @@ public class ServerManager {
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new NettyServerInitializer(null, null))//todo app
+                    //todo app: còn thiếu connectionBlockerService + factory tạo Session/handler
+                    .childHandler(new NettyServerInitializer(null, sessionRegistry))
                     .option(ChannelOption.SO_BACKLOG, 1024)
                     .childOption(ChannelOption.TCP_NODELAY, true)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
@@ -106,9 +101,7 @@ public class ServerManager {
         log.info("Stopping server...");
 
         // Đóng tất cả session
-        for (Session session : sessions.values()) {
-            session.closeChannel();
-        }
+        sessionRegistry.closeAllSessions();
 
         //Tắt executor dùng Virtual Thread
         Session.shutdownExecutor();
@@ -127,67 +120,5 @@ public class ServerManager {
         }
 
         log.info("Server stopped successfully.");
-    }
-
-    public void addSession(Session session) {
-        if (sessions.size() >= serverConfig.getMaxClients()) {
-            log.warn("Max clients reached. Rejecting session: {}", session.getSessionId());
-            session.closeChannel();
-            return;
-        }
-        sessions.put(session.getSessionId(), session);
-    }
-
-    public void registerUser(User user) {
-        if (user != null && user.getSession() != null) {
-            userToSession.put(user.getUserId(), user.getSession().getSessionId());
-        }
-    }
-
-    public int getUserCount() {
-        return userToSession.size();
-    }
-
-    public void removeSession(Long sessionId) {
-        Session removed = sessions.remove(sessionId);
-        if (removed != null && removed.getUser() != null) {
-            userToSession.remove(removed.getUser().getUserId());
-        }
-    }
-
-    public Collection<Session> getSessions() {
-        return sessions.values();
-    }
-
-    public User getUserByUserId(int userId) {
-        Long sessionId = userToSession.get(userId);
-        if (sessionId == null) {
-            return null;
-        }
-        Session session = sessions.get(sessionId);
-        return session != null ? session.getUser() : null;
-    }
-
-    public List<User> findWaitPlayers(int excludedUserId) {
-        List<User> result = new ArrayList<>(10);
-        for (var entry : userToSession.entrySet()) {
-            if (result.size() >= 10) break;
-            int userId = entry.getKey();
-            if (userId == excludedUserId) continue;
-
-            Long sessionId = entry.getValue();
-            if (sessionId == null) continue;
-
-            Session session = sessions.get(sessionId);
-            if (session == null) continue;
-
-            User user = session.getUser();
-            if (user == null || !user.isLogged()) continue;
-
-            if (user.getState() == UserState.WAITING) {
-                result.add(user);
-            }
-        }
-        return result;
     }
 }

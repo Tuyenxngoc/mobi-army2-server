@@ -41,6 +41,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
 
     private final ServerConfig serverConfig;
     private final ServerManager serverManager;
+    private final SessionRegistry sessionRegistry;
     private final HikariCPManager hikariCPManager;
 
     public AuthMessageHandler(Session session,
@@ -50,6 +51,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
                               UserCharacterDAO userCharacterDAO,
                               ServerConfig serverConfig,
                               ServerManager serverManager,
+                              SessionRegistry sessionRegistry,
                               HikariCPManager hikariCPManager) {
         super(session);
         this.loginRateLimiterService = loginRateLimiterService;
@@ -58,6 +60,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
         this.userCharacterDAO = userCharacterDAO;
         this.serverConfig = serverConfig;
         this.serverManager = serverManager;
+        this.sessionRegistry = sessionRegistry;
         this.hikariCPManager = hikariCPManager;
     }
 
@@ -130,7 +133,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
             return;
         }
 
-        if (serverManager.getUserCount() >= serverConfig.getMaxClients()) {
+        if (sessionRegistry.getUserCount() >= serverConfig.getMaxClients()) {
             sendMessageLoginFail(GameString.SERVER_FULL);
             return;
         }
@@ -198,7 +201,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
         }
 
         //Kiểm tra có đang đăng nhập hay không
-        User userLogin = serverManager.getUserByUserId(userDTO.getUserId());
+        User userLogin = sessionRegistry.getUserByUserId(userDTO.getUserId());
         if (userLogin != null) {
             messageSender.sendMoneyErrorMessage(userLogin, GameString.ACCOUNT_OTHER_LOGIN);
             userLogin.getSession().closeChannel();
@@ -222,7 +225,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
         us().setLogged(true);
 
         // Register into online index for fast lookup
-        serverManager.registerUser(us());
+        sessionRegistry.registerUser(us());
 
         //Tặng quà hằng ngày
         if (Utils.canReceiveDailyReward(userDTO.getDailyRewardTime())) {
