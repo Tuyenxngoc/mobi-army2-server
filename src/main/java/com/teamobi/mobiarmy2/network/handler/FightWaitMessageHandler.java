@@ -6,6 +6,7 @@ import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.dao.UserDAO;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -17,8 +18,8 @@ import java.util.Optional;
 public class FightWaitMessageHandler extends BaseMessageHandler {
     private final UserDAO userDAO;
 
-    public FightWaitMessageHandler(Session session, UserDAO userDAO) {
-        super(session);
+    public FightWaitMessageHandler(Session session, MessageSender messageSender, UserDAO userDAO) {
+        super(session, messageSender);
         this.userDAO = userDAO;
     }
 

@@ -6,6 +6,7 @@ import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.entity.Room;
 import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.RoomManager;
 
@@ -19,8 +20,8 @@ public class RoomMessageHandler extends BaseMessageHandler {
 
     private final RoomManager roomManager;
 
-    public RoomMessageHandler(Session session, RoomManager roomManager) {
-        super(session);
+    public RoomMessageHandler(Session session, MessageSender messageSender, RoomManager roomManager) {
+        super(session, messageSender);
         this.roomManager = roomManager;
     }
 

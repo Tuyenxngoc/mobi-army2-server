@@ -3,6 +3,7 @@ package com.teamobi.mobiarmy2.network.handler;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.util.RandomUtil;
@@ -36,8 +37,8 @@ public class SpinMessageHandler extends BaseMessageHandler {
 
     private long lastSpinTime;
 
-    public SpinMessageHandler(Session session) {
-        super(session);
+    public SpinMessageHandler(Session session, MessageSender messageSender) {
+        super(session, messageSender);
     }
 
     public void handleSpinWheel(Message ms) throws IOException {

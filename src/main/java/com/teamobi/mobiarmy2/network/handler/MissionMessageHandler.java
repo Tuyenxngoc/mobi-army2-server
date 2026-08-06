@@ -4,6 +4,7 @@ import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.entity.Mission;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.MissionManager;
 
@@ -12,8 +13,8 @@ import java.io.IOException;
 import java.util.List;
 
 public class MissionMessageHandler extends BaseMessageHandler {
-    public MissionMessageHandler(Session session) {
-        super(session);
+    public MissionMessageHandler(Session session, MessageSender messageSender) {
+        super(session, messageSender);
     }
 
     public void handleGetMissions(Message ms) throws IOException {

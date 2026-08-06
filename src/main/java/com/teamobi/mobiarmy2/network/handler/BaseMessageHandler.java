@@ -16,11 +16,6 @@ public abstract class BaseMessageHandler {
         this.messageSender = messageSender;
     }
 
-    protected BaseMessageHandler(Session s) {
-        this.session = s;
-        messageSender = null;//todo app
-    }
-
     protected void sendMessage(Message ms) {
         messageSender.sendTo(session, ms);
     }

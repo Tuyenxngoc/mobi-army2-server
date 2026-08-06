@@ -15,15 +15,19 @@ import java.util.concurrent.TimeUnit;
 public class NettyServerInitializer extends ChannelInitializer<SocketChannel> {
     private final ConnectionBlockerService connectionBlockerService;
     private final SessionRegistry sessionRegistry;
+    private final SessionFactory sessionFactory;
 
-    public NettyServerInitializer(ConnectionBlockerService connectionBlockerService, SessionRegistry sessionRegistry) {
+    public NettyServerInitializer(ConnectionBlockerService connectionBlockerService,
+                                  SessionRegistry sessionRegistry,
+                                  SessionFactory sessionFactory) {
         this.connectionBlockerService = connectionBlockerService;
         this.sessionRegistry = sessionRegistry;
+        this.sessionFactory = sessionFactory;
     }
 
     @Override
     protected void initChannel(SocketChannel ch) {
-        SessionHandler sessionHandler = new SessionHandler(sessionRegistry);
+        SessionHandler sessionHandler = new SessionHandler(sessionRegistry, sessionFactory);
 
         // Initial pipeline with plain encoder/decoder
         ch.pipeline()

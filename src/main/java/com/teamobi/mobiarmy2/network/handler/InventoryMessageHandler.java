@@ -7,6 +7,7 @@ import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.constant.UserAction;
 import com.teamobi.mobiarmy2.entity.*;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.ExchangeLimitManager;
@@ -33,8 +34,8 @@ public class InventoryMessageHandler extends BaseMessageHandler {
     private final ServerConfig serverConfig;
     private final ExchangeLimitManager exchangeLimitManager;
 
-    public InventoryMessageHandler(Session session, ServerConfig serverConfig, ExchangeLimitManager exchangeLimitManager) {
-        super(session);
+    public InventoryMessageHandler(Session session, MessageSender messageSender, ServerConfig serverConfig, ExchangeLimitManager exchangeLimitManager) {
+        super(session, messageSender);
         this.serverConfig = serverConfig;
         this.exchangeLimitManager = exchangeLimitManager;
     }

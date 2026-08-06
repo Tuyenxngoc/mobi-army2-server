@@ -4,6 +4,7 @@ import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.GameConstants;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.util.Utils;
 
@@ -14,8 +15,8 @@ import java.io.IOException;
 public class ResourceMessageHandler extends BaseMessageHandler {
     private final ServerConfig serverConfig;
 
-    public ResourceMessageHandler(Session session, ServerConfig serverConfig) {
-        super(session);
+    public ResourceMessageHandler(Session session, MessageSender messageSender, ServerConfig serverConfig) {
+        super(session, messageSender);
         this.serverConfig = serverConfig;
     }
 

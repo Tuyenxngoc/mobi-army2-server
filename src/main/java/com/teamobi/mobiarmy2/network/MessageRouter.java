@@ -3,44 +3,57 @@ package com.teamobi.mobiarmy2.network;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.network.handler.*;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class MessageRouter {
     @Getter
     private final AuthMessageHandler authMessageHandler;
-    @Setter
-    private ClanMessageHandler clanMessageHandler;
-    @Setter
-    private FriendMessageHandler friendMessageHandler;
-    @Setter
-    private ShopMessageHandler shopMessageHandler;
-    @Setter
-    private ResourceMessageHandler resourceMessageHandler;
-    @Setter
-    private MissionMessageHandler missionMessageHandler;
-    @Setter
-    private FormulaMessageHandler formulaMessageHandler;
-    @Setter
-    private RoomMessageHandler roomMessageHandler;
-    @Setter
-    private FightWaitMessageHandler fightWaitMessageHandler;
-    @Setter
-    private FightManagerMessageHandler fightManagerMessageHandler;
-    @Setter
-    private InventoryMessageHandler inventoryMessageHandler;
-    @Setter
-    private LeaderboardMessageHandler leaderboardMessageHandler;
-    @Setter
-    private SpinMessageHandler spinMessageHandler;
-    @Setter
-    private PaymentMessageHandler paymentMessageHandler;
-    @Setter
-    private CharacterMessageHandler characterMessageHandler;
+    private final ClanMessageHandler clanMessageHandler;
+    private final FriendMessageHandler friendMessageHandler;
+    private final ShopMessageHandler shopMessageHandler;
+    private final ResourceMessageHandler resourceMessageHandler;
+    private final MissionMessageHandler missionMessageHandler;
+    private final FormulaMessageHandler formulaMessageHandler;
+    private final RoomMessageHandler roomMessageHandler;
+    private final FightWaitMessageHandler fightWaitMessageHandler;
+    private final FightManagerMessageHandler fightManagerMessageHandler;
+    private final InventoryMessageHandler inventoryMessageHandler;
+    private final LeaderboardMessageHandler leaderboardMessageHandler;
+    private final SpinMessageHandler spinMessageHandler;
+    private final PaymentMessageHandler paymentMessageHandler;
+    private final CharacterMessageHandler characterMessageHandler;
 
-    public MessageRouter(AuthMessageHandler authMessageHandler) {
+    public MessageRouter(AuthMessageHandler authMessageHandler,
+                         ClanMessageHandler clanMessageHandler,
+                         FriendMessageHandler friendMessageHandler,
+                         ShopMessageHandler shopMessageHandler,
+                         ResourceMessageHandler resourceMessageHandler,
+                         MissionMessageHandler missionMessageHandler,
+                         FormulaMessageHandler formulaMessageHandler,
+                         RoomMessageHandler roomMessageHandler,
+                         FightWaitMessageHandler fightWaitMessageHandler,
+                         FightManagerMessageHandler fightManagerMessageHandler,
+                         InventoryMessageHandler inventoryMessageHandler,
+                         LeaderboardMessageHandler leaderboardMessageHandler,
+                         SpinMessageHandler spinMessageHandler,
+                         PaymentMessageHandler paymentMessageHandler,
+                         CharacterMessageHandler characterMessageHandler) {
         this.authMessageHandler = authMessageHandler;
+        this.clanMessageHandler = clanMessageHandler;
+        this.friendMessageHandler = friendMessageHandler;
+        this.shopMessageHandler = shopMessageHandler;
+        this.resourceMessageHandler = resourceMessageHandler;
+        this.missionMessageHandler = missionMessageHandler;
+        this.formulaMessageHandler = formulaMessageHandler;
+        this.roomMessageHandler = roomMessageHandler;
+        this.fightWaitMessageHandler = fightWaitMessageHandler;
+        this.fightManagerMessageHandler = fightManagerMessageHandler;
+        this.inventoryMessageHandler = inventoryMessageHandler;
+        this.leaderboardMessageHandler = leaderboardMessageHandler;
+        this.spinMessageHandler = spinMessageHandler;
+        this.paymentMessageHandler = paymentMessageHandler;
+        this.characterMessageHandler = characterMessageHandler;
     }
 
     public void onMessage(Message ms) {

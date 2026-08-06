@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.network.handler;
 
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.CharacterManager;
 
@@ -9,8 +10,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class CharacterMessageHandler extends BaseMessageHandler {
-    public CharacterMessageHandler(Session session) {
-        super(session);
+    public CharacterMessageHandler(Session session, MessageSender messageSender) {
+        super(session, messageSender);
     }
 
     public void handleChoseCharacter(Message ms) throws IOException {

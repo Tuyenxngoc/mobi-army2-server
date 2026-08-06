@@ -10,6 +10,7 @@ import com.teamobi.mobiarmy2.entity.Equipment;
 import com.teamobi.mobiarmy2.entity.SpecialItem;
 import com.teamobi.mobiarmy2.entity.SpecialItemChest;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.*;
 
@@ -26,8 +27,8 @@ public class ShopMessageHandler extends BaseMessageHandler {
 
     private final UserCharacterDAO userCharacterDAO;
 
-    public ShopMessageHandler(Session session, UserCharacterDAO userCharacterDAO) {
-        super(session);
+    public ShopMessageHandler(Session session, MessageSender messageSender, UserCharacterDAO userCharacterDAO) {
+        super(session, messageSender);
         this.userCharacterDAO = userCharacterDAO;
     }
 

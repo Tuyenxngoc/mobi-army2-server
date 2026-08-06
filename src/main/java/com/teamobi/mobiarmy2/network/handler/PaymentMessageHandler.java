@@ -11,6 +11,7 @@ import com.teamobi.mobiarmy2.entity.EquipmentChest;
 import com.teamobi.mobiarmy2.entity.Payment;
 import com.teamobi.mobiarmy2.entity.SpecialItemChest;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.EquipmentManager;
 import com.teamobi.mobiarmy2.server.HikariCPManager;
@@ -30,8 +31,8 @@ public class PaymentMessageHandler extends BaseMessageHandler {
     private final UserGiftCodeDAO userGiftCodeDAO;
     private final HikariCPManager hikariCPManager;
 
-    public PaymentMessageHandler(Session session, GiftCodeDAO giftCodeDAO, UserGiftCodeDAO userGiftCodeDAO, HikariCPManager hikariCPManager) {
-        super(session);
+    public PaymentMessageHandler(Session session, MessageSender messageSender, GiftCodeDAO giftCodeDAO, UserGiftCodeDAO userGiftCodeDAO, HikariCPManager hikariCPManager) {
+        super(session, messageSender);
         this.giftCodeDAO = giftCodeDAO;
         this.userGiftCodeDAO = userGiftCodeDAO;
         this.hikariCPManager = hikariCPManager;

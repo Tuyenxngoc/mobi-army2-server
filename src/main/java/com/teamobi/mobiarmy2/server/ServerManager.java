@@ -3,6 +3,8 @@ package com.teamobi.mobiarmy2.server;
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.network.NettyServerInitializer;
 import com.teamobi.mobiarmy2.network.Session;
+import com.teamobi.mobiarmy2.network.SessionFactory;
+import com.teamobi.mobiarmy2.service.ConnectionBlockerService;
 import com.teamobi.mobiarmy2.service.GameDataService;
 import com.teamobi.mobiarmy2.service.LeaderboardService;
 import io.netty.bootstrap.ServerBootstrap;
@@ -11,15 +13,10 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ServerManager {
-    @Setter
-    @Getter
-    private boolean isMaintenanceMode = false;
     private boolean isRunning = false;
 
     private Channel serverChannel;
@@ -32,19 +29,25 @@ public class ServerManager {
     private final ExchangeLimitManager exchangeLimitManager;
     private final ServerConfig serverConfig;
     private final SessionRegistry sessionRegistry;
+    private final SessionFactory sessionFactory;
+    private final ConnectionBlockerService connectionBlockerService;
 
     public ServerManager(ServerConfig serverConfig,
                          GameDataService gameDataService,
                          LeaderboardService leaderboardService,
                          RoomManager roomManager,
                          ExchangeLimitManager exchangeLimitManager,
-                         SessionRegistry sessionRegistry) {
+                         SessionRegistry sessionRegistry,
+                         SessionFactory sessionFactory,
+                         ConnectionBlockerService connectionBlockerService) {
         this.serverConfig = serverConfig;
         this.gameDataService = gameDataService;
         this.leaderboardService = leaderboardService;
         this.roomManager = roomManager;
         this.exchangeLimitManager = exchangeLimitManager;
         this.sessionRegistry = sessionRegistry;
+        this.sessionFactory = sessionFactory;
+        this.connectionBlockerService = connectionBlockerService;
     }
 
     public void init() {
@@ -74,8 +77,7 @@ public class ServerManager {
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    //todo app: còn thiếu connectionBlockerService + factory tạo Session/handler
-                    .childHandler(new NettyServerInitializer(null, sessionRegistry))
+                    .childHandler(new NettyServerInitializer(connectionBlockerService, sessionRegistry, sessionFactory))
                     .option(ChannelOption.SO_BACKLOG, 1024)
                     .childOption(ChannelOption.TCP_NODELAY, true)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);

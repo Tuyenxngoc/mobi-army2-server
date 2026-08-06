@@ -5,6 +5,7 @@ import com.teamobi.mobiarmy2.constant.GameString;
 import com.teamobi.mobiarmy2.dto.*;
 import com.teamobi.mobiarmy2.entity.ClanItemShop;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.CacheManager;
 import com.teamobi.mobiarmy2.server.ClanItemManager;
@@ -20,8 +21,8 @@ public class ClanMessageHandler extends BaseMessageHandler {
 
     private final ClanService clanService;
 
-    public ClanMessageHandler(Session session, ClanService clanService) {
-        super(session);
+    public ClanMessageHandler(Session session, MessageSender messageSender, ClanService clanService) {
+        super(session, messageSender);
         this.clanService = clanService;
     }
 

@@ -17,6 +17,7 @@ import com.teamobi.mobiarmy2.entity.EquipmentChest;
 import com.teamobi.mobiarmy2.entity.FightItem;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.*;
 import com.teamobi.mobiarmy2.service.LoginRateLimiterService;
@@ -40,26 +41,27 @@ public class AuthMessageHandler extends BaseMessageHandler {
     private final UserCharacterDAO userCharacterDAO;
 
     private final ServerConfig serverConfig;
-    private final ServerManager serverManager;
+    private final ServerState serverState;
     private final SessionRegistry sessionRegistry;
     private final HikariCPManager hikariCPManager;
 
     public AuthMessageHandler(Session session,
+                              MessageSender messageSender,
                               LoginRateLimiterService loginRateLimiterService,
                               UserDAO userDAO,
                               AccountDAO accountDAO,
                               UserCharacterDAO userCharacterDAO,
                               ServerConfig serverConfig,
-                              ServerManager serverManager,
+                              ServerState serverState,
                               SessionRegistry sessionRegistry,
                               HikariCPManager hikariCPManager) {
-        super(session);
+        super(session, messageSender);
         this.loginRateLimiterService = loginRateLimiterService;
         this.userDAO = userDAO;
         this.accountDAO = accountDAO;
         this.userCharacterDAO = userCharacterDAO;
         this.serverConfig = serverConfig;
-        this.serverManager = serverManager;
+        this.serverState = serverState;
         this.sessionRegistry = sessionRegistry;
         this.hikariCPManager = hikariCPManager;
     }
@@ -128,7 +130,7 @@ public class AuthMessageHandler extends BaseMessageHandler {
             return;
         }
 
-        if (serverManager.isMaintenanceMode()) {
+        if (serverState.isMaintenanceMode()) {
             sendMessageLoginFail(GameString.MAINTENANCE_MODE);
             return;
         }
@@ -176,7 +178,6 @@ public class AuthMessageHandler extends BaseMessageHandler {
         // Đặt người dùng vào session
         session.setUser(user);
         session.setVersion(version);
-        session.registerHandlers();
 
         UserDTO userDTO = userDAO.findByAccountId(us().getAccountId());
         if (userDTO == null) {

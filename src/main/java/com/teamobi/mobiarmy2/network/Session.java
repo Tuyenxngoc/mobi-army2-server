@@ -49,17 +49,26 @@ public class Session {
     @Setter
     private User user;
 
-    private final MessageRouter messageRouter;
+    private MessageRouter messageRouter;
     private final BlockingQueue<Message> messageQueue = new LinkedBlockingQueue<>();
     private volatile boolean running = true;
 
-    public Session(long sessionId, Channel channel) {
+    Session(long sessionId, Channel channel) {
         this.sessionId = sessionId;
         this.channel = channel;
         this.ipAddress = channel.remoteAddress().toString();
+    }
 
-        this.messageRouter = null;//todo app new MessageRouter(authMessageHandler);
-
+    /**
+     * Gắn router rồi bắt đầu vòng xử lý message.
+     * <p>
+     * Tách khỏi constructor vì các handler trong router cần chính Session này,
+     * nên router chỉ dựng được sau khi Session tồn tại. Chỉ
+     * {@link SessionFactory} gọi, đúng một lần, ngay sau khi tạo Session và
+     * trước khi có message nào được enqueue.
+     */
+    void attachRouter(MessageRouter messageRouter) {
+        this.messageRouter = messageRouter;
         VIRTUAL_EXECUTOR.submit(this::processLoop);
     }
 
@@ -136,50 +145,6 @@ public class Session {
 
         messageQueue.clear();
         messageQueue.offer(POISON_PILL);
-    }
-
-    public void registerHandlers() {
-//        ApplicationContext context = ApplicationContext.getInstance();
-//
-//        UserDAO userDAO = context.getBean(UserDAO.class);
-//        UserCharacterDAO userCharacterDAO = context.getBean(UserCharacterDAO.class);
-//        LeaderboardService leaderboardService = context.getBean(LeaderboardService.class);
-//        GiftCodeDAO giftCodeDAO = context.getBean(GiftCodeDAO.class);
-//        UserGiftCodeDAO userGiftCodeDAO = context.getBean(UserGiftCodeDAO.class);
-//        ClanService clanService = context.getBean(ClanService.class);
-//
-//        ClanMessageHandler clanMessageHandler = new ClanMessageHandler(this, clanService);
-//        FriendMessageHandler friendMessageHandler = new FriendMessageHandler(this, userDAO,
-//                context.getBean(ServerManager.class));
-//        ShopMessageHandler shopMessageHandler = new ShopMessageHandler(this, userCharacterDAO);
-//        ResourceMessageHandler resourceMessageHandler = new ResourceMessageHandler(this,
-//                context.getBean(ServerConfig.class));
-//        MissionMessageHandler missionMessageHandler = new MissionMessageHandler(this);
-//        FormulaMessageHandler formulaMessageHandler = new FormulaMessageHandler(this);
-//        RoomMessageHandler roomMessageHandler = new RoomMessageHandler(this, context.getBean(RoomManager.class));
-//        FightWaitMessageHandler fightWaitMessageHandler = new FightWaitMessageHandler(this, userDAO);
-//        FightManagerMessageHandler fightManagerMessageHandler = new FightManagerMessageHandler(this);
-//        InventoryMessageHandler inventoryMessageHandler = new InventoryMessageHandler(this,
-//                context.getBean(ServerConfig.class), context.getBean(ExchangeLimitManager.class));
-//        LeaderboardMessageHandler leaderboardMessageHandler = new LeaderboardMessageHandler(this, leaderboardService);
-//        SpinMessageHandler spinMessageHandler = new SpinMessageHandler(this);
-//        PaymentMessageHandler paymentMessageHandler = new PaymentMessageHandler(this, giftCodeDAO, userGiftCodeDAO);
-//        CharacterMessageHandler characterMessageHandler = new CharacterMessageHandler(this);
-//
-//        messageRouter.setClanMessageHandler(clanMessageHandler);
-//        messageRouter.setFriendMessageHandler(friendMessageHandler);
-//        messageRouter.setShopMessageHandler(shopMessageHandler);
-//        messageRouter.setResourceMessageHandler(resourceMessageHandler);
-//        messageRouter.setMissionMessageHandler(missionMessageHandler);
-//        messageRouter.setFormulaMessageHandler(formulaMessageHandler);
-//        messageRouter.setRoomMessageHandler(roomMessageHandler);
-//        messageRouter.setFightWaitMessageHandler(fightWaitMessageHandler);
-//        messageRouter.setFightManagerMessageHandler(fightManagerMessageHandler);
-//        messageRouter.setInventoryMessageHandler(inventoryMessageHandler);
-//        messageRouter.setLeaderboardMessageHandler(leaderboardMessageHandler);
-//        messageRouter.setSpinMessageHandler(spinMessageHandler);
-//        messageRouter.setPaymentMessageHandler(paymentMessageHandler);
-//        messageRouter.setCharacterMessageHandler(characterMessageHandler);
     }
 
     public static void shutdownExecutor() {

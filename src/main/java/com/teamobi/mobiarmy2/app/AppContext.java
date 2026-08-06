@@ -4,10 +4,12 @@ import com.teamobi.mobiarmy2.config.HikariCPConfig;
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.dao.*;
 import com.teamobi.mobiarmy2.network.MessageSender;
+import com.teamobi.mobiarmy2.network.SessionFactory;
 import com.teamobi.mobiarmy2.server.ExchangeLimitManager;
 import com.teamobi.mobiarmy2.server.HikariCPManager;
 import com.teamobi.mobiarmy2.server.RoomManager;
 import com.teamobi.mobiarmy2.server.ServerManager;
+import com.teamobi.mobiarmy2.server.ServerState;
 import com.teamobi.mobiarmy2.server.SessionRegistry;
 import com.teamobi.mobiarmy2.service.*;
 import lombok.Getter;
@@ -51,10 +53,12 @@ public final class AppContext {
     private final ConnectionBlockerService connectionBlockerService;
 
     // Manager
+    private final ServerState serverState;
     private final SessionRegistry sessionRegistry;
     private final MessageSender messageSender;
     private final ExchangeLimitManager exchangeLimitManager;
     private final RoomManager roomManager;
+    private final SessionFactory sessionFactory;
     private final ServerManager serverManager;
 
     public AppContext() {
@@ -102,17 +106,38 @@ public final class AppContext {
         loginRateLimiterService = new LoginRateLimiterService();
         connectionBlockerService = new ConnectionBlockerService();
 
+        serverState = new ServerState();
         sessionRegistry = new SessionRegistry(serverConfig);
         messageSender = new MessageSender(sessionRegistry);
 
         exchangeLimitManager = new ExchangeLimitManager();
         roomManager = new RoomManager();
+
+        sessionFactory = new SessionFactory(
+                messageSender,
+                loginRateLimiterService,
+                userDAO,
+                accountDAO,
+                userCharacterDAO,
+                giftCodeDAO,
+                userGiftCodeDAO,
+                serverConfig,
+                serverState,
+                sessionRegistry,
+                hikariCPManager,
+                clanService,
+                leaderboardService,
+                roomManager,
+                exchangeLimitManager);
+
         serverManager = new ServerManager(
                 serverConfig,
                 gameDataService,
                 leaderboardService,
                 roomManager,
                 exchangeLimitManager,
-                sessionRegistry);
+                sessionRegistry,
+                sessionFactory,
+                connectionBlockerService);
     }
 }

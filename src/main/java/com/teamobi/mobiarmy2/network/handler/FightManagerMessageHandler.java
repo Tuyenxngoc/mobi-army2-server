@@ -4,6 +4,7 @@ import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.constant.UserState;
 import com.teamobi.mobiarmy2.fight.TrainingManager;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.RoomManager;
@@ -16,8 +17,8 @@ import java.io.IOException;
 
 @Slf4j
 public class FightManagerMessageHandler extends BaseMessageHandler {
-    public FightManagerMessageHandler(Session session) {
-        super(session);
+    public FightManagerMessageHandler(Session session, MessageSender messageSender) {
+        super(session, messageSender);
     }
 
     public void movePlayer(Message ms) throws IOException {

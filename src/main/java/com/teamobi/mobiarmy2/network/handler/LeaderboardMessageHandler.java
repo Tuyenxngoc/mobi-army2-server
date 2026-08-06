@@ -3,6 +3,7 @@ package com.teamobi.mobiarmy2.network.handler;
 import com.teamobi.mobiarmy2.constant.Cmd;
 import com.teamobi.mobiarmy2.dto.UserLeaderboardDTO;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.service.LeaderboardService;
 
@@ -14,8 +15,8 @@ import java.util.List;
 public class LeaderboardMessageHandler extends BaseMessageHandler {
     private final LeaderboardService leaderboardService;
 
-    public LeaderboardMessageHandler(Session session, LeaderboardService leaderboardService) {
-        super(session);
+    public LeaderboardMessageHandler(Session session, MessageSender messageSender, LeaderboardService leaderboardService) {
+        super(session, messageSender);
         this.leaderboardService = leaderboardService;
     }
 

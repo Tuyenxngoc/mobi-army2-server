@@ -7,6 +7,7 @@ import com.teamobi.mobiarmy2.dao.UserDAO;
 import com.teamobi.mobiarmy2.dto.FriendDTO;
 import com.teamobi.mobiarmy2.entity.User;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.SessionRegistry;
 import com.teamobi.mobiarmy2.util.Utils;
@@ -24,8 +25,8 @@ public class FriendMessageHandler extends BaseMessageHandler {
     private final UserDAO userDAO;
     private final SessionRegistry sessionRegistry;
 
-    public FriendMessageHandler(Session session, UserDAO userDAO, SessionRegistry sessionRegistry) {
-        super(session);
+    public FriendMessageHandler(Session session, MessageSender messageSender, UserDAO userDAO, SessionRegistry sessionRegistry) {
+        super(session, messageSender);
         this.userDAO = userDAO;
         this.sessionRegistry = sessionRegistry;
     }

@@ -6,6 +6,7 @@ import com.teamobi.mobiarmy2.entity.EquipmentChest;
 import com.teamobi.mobiarmy2.entity.Formula;
 import com.teamobi.mobiarmy2.entity.SpecialItemChest;
 import com.teamobi.mobiarmy2.network.Message;
+import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.network.Session;
 import com.teamobi.mobiarmy2.server.FormulaManager;
 import com.teamobi.mobiarmy2.util.RandomUtil;
@@ -18,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 public class FormulaMessageHandler extends BaseMessageHandler {
-    public FormulaMessageHandler(Session session) {
-        super(session);
+    public FormulaMessageHandler(Session session, MessageSender messageSender) {
+        super(session, messageSender);
     }
 
     public void handleMergeEquipments(Message ms) throws IOException {

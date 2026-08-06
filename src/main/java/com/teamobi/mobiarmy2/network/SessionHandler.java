@@ -40,10 +40,12 @@ public class SessionHandler extends SimpleChannelInboundHandler<Message> {
 
     private Session session;
     private final SessionRegistry sessionRegistry;
+    private final SessionFactory sessionFactory;
     private long lastKeepAliveTime = System.currentTimeMillis();
 
-    public SessionHandler(SessionRegistry sessionRegistry) {
+    public SessionHandler(SessionRegistry sessionRegistry, SessionFactory sessionFactory) {
         this.sessionRegistry = sessionRegistry;
+        this.sessionFactory = sessionFactory;
         this.encryptionKey = generateSessionKey();
     }
 
@@ -62,7 +64,7 @@ public class SessionHandler extends SimpleChannelInboundHandler<Message> {
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         long sessionId = System.nanoTime();
-        this.session = new Session(sessionId, ctx.channel());
+        this.session = sessionFactory.create(sessionId, ctx.channel());
 
         sessionRegistry.addSession(session);
 
