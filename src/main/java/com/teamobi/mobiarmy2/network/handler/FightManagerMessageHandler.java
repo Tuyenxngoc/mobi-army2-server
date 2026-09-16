@@ -153,7 +153,7 @@ public class FightManagerMessageHandler extends BaseMessageHandler {
 
     private void initializeTrainingManager() {
         if (us().getTrainingManager() == null) {
-            us().setTrainingManager(new TrainingManager(us(), RoomManager.TRAINING_MAP_ID, null));//todo app
+            us().setTrainingManager(new TrainingManager(us(), RoomManager.TRAINING_MAP_ID, messageSender));
         }
     }
 }

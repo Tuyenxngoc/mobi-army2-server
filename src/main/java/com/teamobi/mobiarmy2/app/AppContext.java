@@ -3,6 +3,7 @@ package com.teamobi.mobiarmy2.app;
 import com.teamobi.mobiarmy2.config.HikariCPConfig;
 import com.teamobi.mobiarmy2.config.ServerConfig;
 import com.teamobi.mobiarmy2.dao.*;
+import com.teamobi.mobiarmy2.fight.FightContext;
 import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.network.SessionFactory;
 import com.teamobi.mobiarmy2.server.ExchangeLimitManager;
@@ -111,7 +112,7 @@ public final class AppContext {
         messageSender = new MessageSender(sessionRegistry);
 
         exchangeLimitManager = new ExchangeLimitManager();
-        roomManager = new RoomManager();
+        roomManager = new RoomManager(new FightContext(messageSender, clanService, sessionRegistry));
 
         sessionFactory = new SessionFactory(
                 messageSender,

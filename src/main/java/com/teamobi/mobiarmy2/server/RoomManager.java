@@ -2,6 +2,7 @@ package com.teamobi.mobiarmy2.server;
 
 import com.teamobi.mobiarmy2.config.RoomConfig;
 import com.teamobi.mobiarmy2.entity.Room;
+import com.teamobi.mobiarmy2.fight.FightContext;
 import com.teamobi.mobiarmy2.fight.FightWait;
 import com.teamobi.mobiarmy2.util.RandomUtil;
 import lombok.Getter;
@@ -37,6 +38,12 @@ public class RoomManager {
 
     @Getter
     private int startMapBoss;
+
+    private final FightContext fightContext;
+
+    public RoomManager(FightContext fightContext) {
+        this.fightContext = fightContext;
+    }
 
     public void init() {
 
@@ -85,7 +92,8 @@ public class RoomManager {
                         NUM_AREA,
                         MAX_PLAYER_FIGHT,
                         NUM_PLAYER_INIT_ROOM,
-                        ROOM_ICON_TYPE
+                        ROOM_ICON_TYPE,
+                        fightContext
                 );
 
                 index++;

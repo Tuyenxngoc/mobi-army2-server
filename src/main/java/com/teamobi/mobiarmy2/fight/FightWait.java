@@ -10,7 +10,6 @@ import com.teamobi.mobiarmy2.network.MessageSender;
 import com.teamobi.mobiarmy2.server.FightItemManager;
 import com.teamobi.mobiarmy2.server.MapManager;
 import com.teamobi.mobiarmy2.server.SessionRegistry;
-import com.teamobi.mobiarmy2.service.ClanService;
 import com.teamobi.mobiarmy2.service.GiftBoxService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -66,20 +65,15 @@ public class FightWait {
     private final MessageSender messageSender;
     private final SessionRegistry sessionRegistry;
 
-    public FightWait(
-            Room room,
-            byte id,
-            MessageSender messageSender,
-            ClanService clanService,
-            SessionRegistry sessionRegistry) {
+    public FightWait(Room room, byte id, FightContext fightContext) {
         this.room = room;
         this.id = id;
 
         byte maxPlayers = room.getMaxPlayerFight();
 
-        this.messageSender = messageSender;
-        this.sessionRegistry = sessionRegistry;
-        this.fightManager = new FightManager(this, clanService, messageSender);
+        this.messageSender = fightContext.messageSender();
+        this.sessionRegistry = fightContext.sessionRegistry();
+        this.fightManager = new FightManager(this, fightContext.clanService(), fightContext.messageSender());
         this.users = new User[maxPlayers];
         this.items = new byte[maxPlayers][MAX_ITEMS_SLOT];
         this.readies = new boolean[maxPlayers];
@@ -100,7 +94,7 @@ public class FightWait {
         this.maxSetPlayers = room.getNumPlayerInitRoom();
         this.countdownTimer = new CountdownTimer(KICK_BOSS_TIME, this::onTimeUp);
 
-        this.giftBoxService = new GiftBoxService(null);
+        this.giftBoxService = new GiftBoxService(fightContext.messageSender());
     }
 
     private synchronized void refreshFightWait() {

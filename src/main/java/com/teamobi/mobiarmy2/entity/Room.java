@@ -1,5 +1,6 @@
 package com.teamobi.mobiarmy2.entity;
 
+import com.teamobi.mobiarmy2.fight.FightContext;
 import com.teamobi.mobiarmy2.fight.FightWait;
 import lombok.Getter;
 
@@ -18,7 +19,7 @@ public class Room {
     private final byte iconType;
     private final FightWait[] fightWaits;
 
-    public Room(byte index, byte type, int minXu, int maxXu, byte minMap, byte maxMap, byte[] mapCanSelected, boolean isContinuous, byte numArea, byte maxPlayerFight, byte numPlayerInitRoom, byte iconType) {
+    public Room(byte index, byte type, int minXu, int maxXu, byte minMap, byte maxMap, byte[] mapCanSelected, boolean isContinuous, byte numArea, byte maxPlayerFight, byte numPlayerInitRoom, byte iconType, FightContext fightContext) {
         this.index = index;
         this.type = type;
         this.minXu = minXu;
@@ -32,7 +33,7 @@ public class Room {
         this.iconType = iconType;
         this.fightWaits = new FightWait[numArea];
         for (byte i = 0; i < numArea; i++) {
-            fightWaits[i] = new FightWait(this, i, null, null, null);//todo app
+            fightWaits[i] = new FightWait(this, i, fightContext);
         }
     }
 
