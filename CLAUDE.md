@@ -28,29 +28,33 @@ All code lives under `com.teamobi.mobiarmy2`:
 
 | Package | Contents |
 |---|---|
-| `app` | Bootstrap: `MobiArmy2`, `BeanRegistry`, `ApplicationContext` |
+| `app` | Bootstrap: `MobiArmy2`, `AppContext` (the single composition root) |
 | `constant` | `Cmd` (~80 command IDs), `UserState`, `AccountStatus`, `GameString` |
 | `dao` | 19 DAO classes (MySQL via HikariCP, no ORM) |
 | `dto` | Data transfer objects between layers |
 | `entity` | Domain models: `User`, `Character`, `Equipment`, `Room`, `ArmyMap`, … |
 | `fight` | Combat engine: `FightManager`, `TrainingManager`, `Player`, `Boss` subclasses, `Bullet` subclasses |
-| `network` | Netty layer: `Session`, `Message`, `MessageRouter`, codecs, 16 handler classes |
-| `server` | Stateful singletons: `ServerManager`, `RoomManager`, `CharacterManager`, `EquipmentManager`, … |
-| `service` | `GameDataService`, `LeaderboardService`, `ClanService`, `LoginRateLimiterService` |
+| `network` | Netty layer: `Session`, `SessionFactory`, `Message`, `MessageRouter`, `MessageSender`, codecs, `BaseMessageHandler` + 15 handlers |
+| `server` | Mixed: instance-wired (`ServerManager`, `RoomManager`, `SessionRegistry`, `ServerState`, `HikariCPManager`, `ExchangeLimitManager`) and 15 all-static reference-data holders (`CharacterManager`, `EquipmentManager`, `MapManager`, …) |
+| `service` | `GameDataService`, `LeaderboardService`, `ClanService`, `LoginRateLimiterService`, `ConnectionBlockerService`, `GiftBoxService` |
 | `ui` | JavaFX admin panel (not part of game runtime) |
 | `util` | Utilities: `RandomUtil`, `Utils`, `MapTileExporter` |
 
 ### Startup & Dependency Wiring
 
-`MobiArmy2` → `BeanRegistry.registerBeans()` manually instantiates every singleton in order (configs → DB → DAOs → services → managers → `ServerManager`) → `ApplicationContext` acts as a service locator via `getBean(Class)`. There is no DI framework; all wiring is explicit in `BeanRegistry.java`.
+`MobiArmy2.main` does one thing: `new AppContext()`. `AppContext` is the **single composition root** — its constructor instantiates every singleton in dependency order (configs → `HikariCPManager` → 19 DAOs → services → managers → `SessionFactory` → `ServerManager`) and exposes them through Lombok `@Getter`. There is no DI framework and **no service locator**: nothing calls back into `AppContext` at runtime, so every collaborator must arrive via constructor. When adding a dependency, thread it from `AppContext` down — do not reach for a static accessor.
 
-`ServerManager` bootstraps the Netty `ServerBootstrap`, holds two `ConcurrentHashMap`s (session ID → Session, user ID → Session) used everywhere for broadcast and lookups.
+Where a class only forwards dependencies it does not itself use, bundle them into a record rather than widening its constructor. `FightContext` (`messageSender`, `clanService`, `sessionRegistry`) is the existing example: `RoomManager` → `Room` → `FightWait` pass it through untouched.
+
+`ServerManager` bootstraps the Netty `ServerBootstrap` and owns the server lifecycle. Session lookup lives in `SessionRegistry`, which holds the two `ConcurrentHashMap`s (session ID → Session, user ID → session ID); `MessageSender` wraps it for all sends and broadcasts. `SessionFactory` builds a `Session`, its 15 handlers and the `MessageRouter` per connection.
+
+> **Known gap:** the 15 reference-data managers in `server` (`EquipmentManager`, `MapManager`, `CharacterManager`, `SpecialItemManager`, `FightItemManager`, …) are still all-static global state outside `AppContext` — roughly 162 call sites across 42 files, some with mutable public fields (`EquipmentManager.equipDefault`, `EffectManager.spiderWebData`). This is the main blocker for testability. `RoomManager` has already been converted: its remaining statics are `static final` constants only, which is the intended end state.
 
 ### Network Layer
 
 Each TCP connection becomes a `Session`. After a Diffie-Hellman key exchange the pipeline swaps from `PlainMessageDecoder/Encoder` to the encrypted codec. `Session` uses a virtual-thread-per-task executor to process its inbound message queue sequentially per connection.
 
-`MessageRouter` dispatches on `Message.command` (byte) to one of 16 `BaseMessageHandler` subclasses (Auth, Fight, Shop, Clan, Leaderboard, …). Only a fixed whitelist of commands (`GET_KEY`, `LOGIN`, `REGISTER_2`, `SET_PROVIDER`, `VERSION_CODE`, `GET_STRING`) are accepted before authentication; all others are dropped. Helper methods `us()`, `fw()`, `fm()` on the base handler resolve the current User, FightWait, and FightManager from the session.
+`MessageRouter` dispatches on `Message.command` (byte) to one of 15 `BaseMessageHandler` subclasses (Auth, Fight, Shop, Clan, Leaderboard, …). Only a fixed whitelist of commands (`GET_KEY`, `LOGIN`, `REGISTER_2`, `SET_PROVIDER`, `VERSION_CODE`, `GET_STRING`) are accepted before authentication; all others are dropped. Helper methods `us()`, `fw()`, `fm()` on the base handler resolve the current User, FightWait, and FightManager from the session.
 
 `Message` wraps a command byte + `DataInputStream`/`DataOutputStream` — all game communication is compact binary, not JSON. Handler methods follow the convention: `handleXxx(Message ms)` reads from `ms.reader()` (inbound), `sendXxx(Message ms)` writes to `ms.writer()` (outbound). Handlers validate `us().getState()` against the expected `UserState` before processing.
 
@@ -68,9 +72,9 @@ Command IDs are in `Cmd.java` (~80 constants).
 
 ### Data Layer
 
-19 DAO classes talk to MySQL through HikariCP. All DAOs receive `HikariCPManager` via constructor injection (wired in `BeanRegistry`). Transactions with rollback are done manually via `HikariCPManager.transaction(connection -> { … })`. Passwords are hashed with BCrypt (jBCrypt 0.4). `GameDataService` preloads all reference data (characters, equipment, maps, captions, XP curves) at startup and serialises them into binary cache files sent to clients on first connect (`valuesdata2`, `equipdata2`, `playerdata2`, `icondata2`, `levelCData2`).
+19 DAO classes talk to MySQL through HikariCP. All DAOs receive `HikariCPManager` via constructor injection (wired in `AppContext`). Transactions with rollback are done manually via `HikariCPManager.transaction(connection -> { … })`. Passwords are hashed with BCrypt (jBCrypt 0.4). `GameDataService` preloads all reference data (characters, equipment, maps, captions, XP curves) at startup and serialises them into binary cache files sent to clients on first connect (`valuesdata2`, `equipdata2`, `playerdata2`, `icondata2`, `levelCData2`).
 
-### Key Manager Singletons
+### Key Managers & Services
 
 | Class | Responsibility |
 |---|---|
@@ -78,13 +82,14 @@ Command IDs are in `Cmd.java` (~80 constants).
 | `EquipmentManager` | 100+ weapon/armour stats |
 | `MapManager` | 40+ maps (terrain, background, collision data) |
 | `BulletManager` / `BulletFactory` | 50+ projectile types with physics |
-| `RoomManager` | Room lifecycle, 10 boss-challenge variants |
+| `RoomManager` | Room lifecycle, 10 boss-challenge variants (instance, built with a `FightContext`) |
 | `LeaderboardService` | Top-player rankings with bonus rewards |
 | `ClanService` | Guild management and clan shop |
 | `LoginRateLimiterService` | Brute-force login protection |
+| `SessionRegistry` / `MessageSender` | Session lookup, and all unicast/broadcast sends |
 
 ### Concurrency Model
 
 - One virtual-thread-per-task executor **per Session** — messages within a session are processed sequentially, avoiding per-session locking.
 - `FightManager` uses a scheduled `fightLoop` submitted to a shared `ScheduledExecutorService`; all mutations inside the loop are single-threaded per fight.
-- Cross-session broadcasts iterate `ServerManager`'s `ConcurrentHashMap` and write directly to each session's channel.
+- Cross-session broadcasts go through `MessageSender`, which iterates `SessionRegistry`'s `ConcurrentHashMap` and writes directly to each session's channel.
